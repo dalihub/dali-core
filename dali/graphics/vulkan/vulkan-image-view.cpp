@@ -86,13 +86,19 @@ ImageView::operator vk::ImageView*()
 
 bool ImageView::OnDestroy()
 {
-  mGraphics->RemoveImageView( *this );
+  if( !mGraphics->IsShuttingDown() )
+  {
+    mGraphics->RemoveImageView( *this );
+  }
 
   auto device = mGraphics->GetDevice();
   auto imageView = mImageView;
   auto allocator = &mGraphics->GetAllocator();
 
   mGraphics->DiscardResource( [device, imageView, allocator]() {
+#ifndef NDEBUG
+    printf("Invoking IMAGE VIEW deleter function\n");
+#endif
     device.destroyImageView(imageView, allocator);
   } );
 

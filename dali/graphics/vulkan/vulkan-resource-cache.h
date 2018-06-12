@@ -215,6 +215,12 @@ public:
 
   void EnqueueDiscardOperation( std::function<void()> deleter );
 
+  void Clear();
+
+#ifndef NDEBUG
+  void PrintReferenceCountReport( size_t* outObjectCount = nullptr );
+#endif
+
   ResourceCache() = default;
 
   // The cache should not be copyable

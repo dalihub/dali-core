@@ -28,202 +28,164 @@ namespace Graphics
 {
 namespace Vulkan
 {
-struct DescriptorPool::Impl
-{
-  Impl( DescriptorPool& owner, Graphics& graphics, vk::DescriptorPoolCreateInfo createInfo )
-  : mGraphics( graphics ),
-    mOwner( owner ),
-    mCreateInfo( createInfo )
-  {
 
-  }
-
-  ~Impl()
-  {
-
-  }
-
-  /**
-   * Allocates an array of descriptor sets
-   * @param allocateInfo
-   * @return
-   */
-  std::vector<Handle<DescriptorSet>> AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
-  {
-    // all other fields must be set correct
-    allocateInfo.setDescriptorPool( mVkDescriptorPool );
-    auto result = VkAssert( mGraphics.GetDevice().allocateDescriptorSets( allocateInfo ) );
-
-    std::vector<Handle<DescriptorSet>> retval;
-    retval.reserve( result.size() );
-    for( auto&& item : result )
-    {
-      Handle<DescriptorSet> handle( new DescriptorSet(mGraphics, mOwner, item, allocateInfo) );
-      retval.emplace_back( handle );
-      mDescriptorSetCache.emplace_back( handle );
-    }
-
-    return retval;
-  }
-
-  void Reset()
-  {
-    mGraphics.GetDevice().resetDescriptorPool( mVkDescriptorPool );
-    mDescriptorSetCache.clear();
-  }
-
-  bool Initialise()
-  {
-    mVkDescriptorPool = VkAssert( mGraphics.GetDevice().createDescriptorPool( mCreateInfo, mGraphics.GetAllocator() ) );
-    return true;
-  }
-
-  Graphics& mGraphics;
-  DescriptorPool& mOwner;
-  vk::DescriptorPoolCreateInfo mCreateInfo;
-
-  vk::DescriptorPool mVkDescriptorPool;
-
-  // cache
-  std::vector<Handle<DescriptorSet>> mDescriptorSetCache;
-};
+/**
+ * Class DescriptorPool
+ */
 
 Handle<DescriptorPool> DescriptorPool::New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
 {
   auto pool = Handle<DescriptorPool>( new DescriptorPool( graphics, createInfo ) );
-  if(pool->mImpl->Initialise())
+  if(pool->Initialise())
   {
     graphics.AddDescriptorPool(pool);
   }
   return pool;
 }
 
-DescriptorPool::DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
+DescriptorPool::~DescriptorPool() = default;
+
+bool DescriptorPool::Initialise()
 {
-  mImpl = MakeUnique<Impl>( *this, graphics, createInfo );
+  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator() ) );
+  return true;
 }
 
-DescriptorPool::~DescriptorPool() = default;
+DescriptorPool::DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
+        : mGraphics(&graphics),
+          mCreateInfo(createInfo)
+{
+}
 
 vk::DescriptorPool DescriptorPool::GetVkHandle() const
 {
-  return mImpl->mVkDescriptorPool;
+  return mDescriptorPool;
 }
 
-std::vector<DescriptorSetHandle> DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
+std::vector< RefCountedDescriptorSet > DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
 {
-  return mImpl->AllocateDescriptorSets( allocateInfo );
+  // all other fields must be set correct
+  allocateInfo.setDescriptorPool( mDescriptorPool );
+  auto result = VkAssert( mGraphics->GetDevice().allocateDescriptorSets( allocateInfo ) );
+
+  std::vector< RefCountedDescriptorSet > retval;
+  retval.reserve( result.size() );
+  for( auto&& item : result )
+  {
+    Handle<DescriptorSet> handle( new DescriptorSet(*mGraphics, *this, item, allocateInfo) );
+    retval.emplace_back( handle );
+    mDescriptorSetCache.emplace_back( handle );
+  }
+
+  return retval;
 }
 
 void DescriptorPool::Reset()
 {
-  mImpl->Reset();
+  mGraphics->GetDevice().resetDescriptorPool( mDescriptorPool );
+  mDescriptorSetCache.clear();
 }
 
-/****************************************************************************************
- * Class DescriptorSet::Impl
- */
-
-struct DescriptorSet::Impl
+bool DescriptorPool::OnDestroy()
 {
-  Impl( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet set, vk::DescriptorSetAllocateInfo allocateInfo )
-  : mGraphics( graphics ),
-    mPool( pool ),
-    mAllocateInfo( allocateInfo ),
-    mVkDescriptorSet( set )
+  if( !mGraphics->IsShuttingDown() )
   {
-
+    mGraphics->RemoveDescriptorPool( *this );
   }
 
-  ~Impl()
-  {
-    if(mVkDescriptorSet)
-    {
-      // TODO: @todo non freeable!!!
-      //mGraphics.GetDevice().freeDescriptorSets( mPool.GetVkHandle(), 1, &mVkDescriptorSet );
-    }
-  }
+  auto device = mGraphics->GetDevice();
+  auto descriptorPool = mDescriptorPool;
+  auto allocator = &mGraphics->GetAllocator();
 
-  void WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer, uint32_t offset, uint32_t size )
-  {
-    // add resource to the list
-    mResources.emplace_back( buffer.StaticCast<VkManaged>() );
+  mGraphics->DiscardResource( [device, descriptorPool, allocator] () {
+#ifndef NDEBUG
+    printf("Invoking DESCRIPTOR POOL deleter function\n");
+#endif
+    device.destroyDescriptorPool( descriptorPool, allocator );
+  } );
 
-    auto bufferInfo = vk::DescriptorBufferInfo{}
-         .setOffset( U32(offset) )
-         .setRange( U32(size) )
-         .setBuffer(buffer->GetVkHandle() );
-
-    auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
-         .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-         .setDescriptorCount( 1 )
-         .setDstSet( mVkDescriptorSet )
-         .setDstBinding( binding )
-         .setDstArrayElement( 0 );
-
-    // write descriptor set
-    mGraphics.GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
-  }
-
-  void WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
-  {
-    // add resource to the list
-    mResources.emplace_back( sampler.StaticCast<VkManaged>() );
-    mResources.emplace_back( imageView.StaticCast<VkManaged>() );
-
-    auto imageViewInfo = vk::DescriptorImageInfo{}
-         .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
-         .setImageView( imageView->GetVkHandle() )
-         .setSampler(sampler->GetVkHandle() );
-
-    auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
-                                         .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
-                                         .setDescriptorCount( 1 )
-                                         .setDstSet( mVkDescriptorSet )
-                                         .setDstBinding( binding )
-                                         .setDstArrayElement( 0 );
-
-    // write descriptor set
-    mGraphics.GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
-  }
-
-  void WriteStorageBuffer( Handle<Buffer> buffer, uint32_t offset, uint32_t size )
-  {
-    mResources.emplace_back( buffer.StaticCast<VkManaged>() );
-  }
-
-  Graphics& mGraphics;
-  DescriptorPool& mPool;
-  vk::DescriptorSetAllocateInfo mAllocateInfo;
-  vk::DescriptorSet             mVkDescriptorSet;
-
-  // attached resources
-  std::vector<Handle<VkManaged>> mResources;
-};
+  return false;
+}
 
 /**
- * Called by DescriptorPool only!
+ * Class DescriptorSet
  */
-DescriptorSet::DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet, vk::DescriptorSetAllocateInfo allocateInfo )
+
+//Called by DescriptorPool only!
+DescriptorSet::DescriptorSet( Graphics& graphics,
+                              DescriptorPool& pool,
+                              vk::DescriptorSet descriptorSet,
+                              vk::DescriptorSetAllocateInfo allocateInfo )
+        : mGraphics( &graphics ),
+          mPool( &pool ),
+          mAllocateInfo( allocateInfo ),
+          mDescriptorSet( descriptorSet )
 {
-  mImpl = MakeUnique<Impl>( graphics, pool, descriptorSet, allocateInfo );
 }
 
 DescriptorSet::~DescriptorSet() = default;
 
 void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer, uint32_t offset, uint32_t size )
 {
-  mImpl->WriteUniformBuffer( binding, buffer, offset, size );
+  // add resource to the list
+  mResources.emplace_back( buffer.StaticCast<VkManaged>() );
+
+  auto bufferInfo = vk::DescriptorBufferInfo{}
+          .setOffset( U32(offset) )
+          .setRange( U32(size) )
+          .setBuffer(buffer->GetVkHandle() );
+
+  auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
+                                       .setDescriptorType( vk::DescriptorType::eUniformBuffer )
+                                       .setDescriptorCount( 1 )
+                                       .setDstSet( mDescriptorSet )
+                                       .setDstBinding( binding )
+                                       .setDstArrayElement( 0 );
+
+  // write descriptor set
+  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
 }
 
 vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
 {
-  return mImpl->mVkDescriptorSet;
+  return mDescriptorSet;
 }
 
 void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
 {
-  mImpl->WriteCombinedImageSampler( binding, sampler, imageView );
+  // add resource to the list
+  mResources.emplace_back( sampler.StaticCast<VkManaged>() );
+  mResources.emplace_back( imageView.StaticCast<VkManaged>() );
+
+  auto imageViewInfo = vk::DescriptorImageInfo{}
+          .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
+          .setImageView( imageView->GetVkHandle() )
+          .setSampler(sampler->GetVkHandle() );
+
+  auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
+                                       .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
+                                       .setDescriptorCount( 1 )
+                                       .setDstSet( mDescriptorSet )
+                                       .setDstBinding( binding )
+                                       .setDstArrayElement( 0 );
+
+  // write descriptor set
+  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
+}
+
+void DescriptorSet::WriteStorageBuffer( RefCountedBuffer buffer, uint32_t offset, uint32_t size )
+{
+  NotImplemented()
+}
+
+void DescriptorSet::WriteImage( Handle< Image > )
+{
+  NotImplemented()
+}
+
+void DescriptorSet::Write( vk::WriteDescriptorSet writeDescriptorSet )
+{
+  NotImplemented()
 }
 
 #if 0

@@ -121,13 +121,19 @@ bool Image::OnDestroy()
 {
   if( !mIsExternal )
   {
-    mGraphics->RemoveImage(*this);
+    if( !mGraphics->IsShuttingDown() )
+    {
+      mGraphics->RemoveImage(*this);
+    }
 
     auto device = mGraphics->GetDevice();
     auto image = mImage;
     auto allocator = &mGraphics->GetAllocator();
 
     mGraphics->DiscardResource([device, image, allocator]() {
+#ifndef NDEBUG
+      printf("Invoking IMAGE deleter function\n");
+#endif
       device.destroyImage(image, allocator);
     });
   }

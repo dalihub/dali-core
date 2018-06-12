@@ -82,13 +82,19 @@ void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
 
 bool Buffer::OnDestroy()
 {
-  mGraphics->RemoveBuffer( *this );
+  if( !mGraphics->IsShuttingDown() )
+  {
+    mGraphics->RemoveBuffer( *this );
+  }
 
   auto device = mGraphics->GetDevice();
   auto buffer = mBuffer;
   auto allocator = &mGraphics->GetAllocator();
 
   mGraphics->DiscardResource( [device, buffer, allocator]() {
+#ifndef NDEBUG
+    printf("Invoking BUFFER deleter function\n");
+#endif
     device.destroyBuffer(buffer, allocator);
   } );
 
