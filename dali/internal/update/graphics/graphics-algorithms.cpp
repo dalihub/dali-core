@@ -32,6 +32,7 @@
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-shader.h>
+#include "../../../graphics-api/graphics-api-types.h"
 
 namespace Dali
 {
@@ -43,7 +44,10 @@ namespace
 {
 
 static constexpr float CLIP_MATRIX_DATA[] = {
-  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f
+  1.0f, 0.0f, 0.0f, 0.0f,
+  0.0f, -1.0f, 0.0f, 0.0f,
+  0.0f, 0.0f, -0.5f, 0.0f,
+  0.0f, 0.0f, 0.5f, 1.0f
 };
 static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
 
@@ -371,9 +375,9 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
 
                 // rasterization
               .SetRasterizationState(RasterizationState()
-                                       .SetCullMode(CullMode::NONE)
+                                       .SetCullMode(CullMode::BACK)
                                        .SetPolygonMode(PolygonMode::FILL)
-                                       .SetFrontFace(FrontFace::CLOCKWISE)));
+                                       .SetFrontFace(FrontFace::COUNTER_CLOCKWISE)));
 
     // bind pipeline to the renderer
     renderer->BindPipeline(std::move(pipeline));
