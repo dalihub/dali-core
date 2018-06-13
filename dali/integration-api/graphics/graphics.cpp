@@ -103,8 +103,8 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
 
 void IncludeThisLibrary()
 {
-// dummy function to create linker dependency
-  GraphicsGetBuiltinShader("");
+  // dummy function to create linker dependency
+  //GraphicsGetBuiltinShader("");
 }
 
 } // Namespace Graphics
