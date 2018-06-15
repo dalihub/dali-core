@@ -40,6 +40,11 @@ ChildChangedSignalType& ChildRemovedSignal( Actor actor )
   return GetImplementation( actor ).ChildRemovedSignal();
 }
 
+ChildOrderChangedSignalType& ChildOrderChangedSignal( Actor actor )
+{
+  return GetImplementation( actor ).ChildOrderChangedSignal();
+}
+
 
 
 } // namespace DevelActor
