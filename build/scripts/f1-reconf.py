@@ -42,7 +42,7 @@ os.environ['CXXFLAGS']='-O' + str(options.optimization) + ' -Wall -Wno-unused-pa
 if options.cmake:
     configure_command="cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX . -DCMAKE_BUILD_TYPE=Debug"
 else:
-    configure_command="autoreconf --install && ./configure --prefix=$DESKTOP_PREFIX --enable-debug=yes --enable-profile=UBUNTU --enable-vulkan=1.0"
+    configure_command="autoreconf --install && ./configure --prefix=$DESKTOP_PREFIX --enable-debug=yes --enable-profile=UBUNTU --enable-vulkan=yes"
 
 if options.logging:
     configure_command += " --enable-networklogging"

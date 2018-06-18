@@ -131,7 +131,7 @@ DALI_LDFLAGS="-L${libdir}"
 
 # forward VULKAN_SDK path to the graphics library if set correctly
 if test x"$enable_vulkan" != x"no"; then
-  PKG_CHECK_MODULES(VULKAN, vulkan-${enable_vulkan}, AC_DEFINE(ENABLE_VULKAN, 1, [Vulkan available as package]),
+  PKG_CHECK_MODULES(VULKAN, vulkan, AC_DEFINE(ENABLE_VULKAN, 1, [Vulkan available as package]),
                     [ AC_MSG_ERROR([Vulkan not available as a package!]) ]
                     )
   DALI_LDFLAGS+=" ${VULKAN_LIBS}"
