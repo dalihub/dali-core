@@ -29,6 +29,7 @@ namespace Vulkan
 {
 
 class Graphics;
+
 class CommandBuffer;
 
 
@@ -131,12 +132,13 @@ private: //Internal structs
   struct InternalPool
   {
     static constexpr uint32_t INVALID_NODE_INDEX{ 0xffffffffu };
+
     struct Node
     {
       Node( uint32_t _nextFreeIndex, CommandBuffer* _commandBuffer );
 
-      uint32_t          nextFreeIndex;
-      CommandBuffer*    commandBuffer;
+      uint32_t nextFreeIndex;
+      CommandBuffer* commandBuffer;
     };
 
     InternalPool( CommandPool& owner, Graphics* graphics, uint32_t initialCapacity, bool isPrimary );
@@ -148,7 +150,7 @@ private: //Internal structs
      * @param allocateInfo
      * @return
      */
-    std::vector<vk::CommandBuffer> AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo );
+    std::vector< vk::CommandBuffer > AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo );
 
     /**
      * Resizes command pool to the new capacity. Pool may only grow
@@ -173,13 +175,13 @@ private: //Internal structs
 
     uint32_t GetAllocationCount() const;
 
-    CommandPool&                  mOwner;
-    Graphics*                     mGraphics;
-    std::vector<Node>             mPoolData;
-    uint32_t                      mFirstFree;
-    uint32_t                      mCapacity;
-    uint32_t                      mAllocationCount;
-    bool                          mIsPrimary;
+    CommandPool& mOwner;
+    Graphics* mGraphics;
+    std::vector< Node > mPoolData;
+    uint32_t mFirstFree;
+    uint32_t mCapacity;
+    uint32_t mAllocationCount;
+    bool mIsPrimary;
   };
 
 private: // Data members
@@ -188,8 +190,8 @@ private: // Data members
   vk::CommandPool mCommandPool;
 
   // Pools are lazily allocated, depends on the requested command buffers
-  std::unique_ptr<InternalPool> mInternalPoolPrimary;
-  std::unique_ptr<InternalPool> mInternalPoolSecondary;
+  std::unique_ptr< InternalPool > mInternalPoolPrimary;
+  std::unique_ptr< InternalPool > mInternalPoolSecondary;
 
 };
 

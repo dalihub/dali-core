@@ -34,7 +34,9 @@ class PipelineCache;
 namespace VulkanAPI
 {
 class Controller;
+
 class Ubo;
+
 class Pipeline;
 
 /**
@@ -92,7 +94,7 @@ public:
    * Returns an array of updated descriptor sets
    * @return
    */
-  const std::vector<Vulkan::RefCountedDescriptorSet>& GetDescriptorSets() const;
+  const std::vector< Vulkan::RefCountedDescriptorSet >& GetDescriptorSets() const;
 
   /**
    * Returns associated Vulkan command buffer
@@ -116,17 +118,17 @@ private:
 
 private:
 
-  VulkanAPI::Controller&                       mController;
-  Vulkan::Graphics&                            mGraphics;
-  Vulkan::RefCountedCommandBuffer              mCommandBuffer;
-  Vulkan::RefCountedPipeline                   mVulkanPipeline;
-  Vulkan::RefCountedDescriptorPool             mDescriptorPool;
+  VulkanAPI::Controller& mController;
+  Vulkan::Graphics& mGraphics;
+  Vulkan::RefCountedCommandBuffer mCommandBuffer;
+  Vulkan::RefCountedPipeline mVulkanPipeline;
+  Vulkan::RefCountedDescriptorPool mDescriptorPool;
 
-  std::vector<vk::DescriptorSetLayout>         mVkDescriptorSetLayouts;
+  std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 
-  std::vector<Vulkan::RefCountedDescriptorSet> mDescriptorSets;
+  std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
 
-  std::vector<std::unique_ptr<Ubo>>            mUboBuffers;
+  std::vector< std::unique_ptr< Ubo>> mUboBuffers;
 
   uint32_t mUpdateFlags;
 };

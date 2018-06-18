@@ -54,7 +54,7 @@ namespace VulkanAPI
 RenderCommand::~RenderCommand() = default;
 
 RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
-: mController( controller ), mGraphics( graphics ), mCommandBuffer(), mUpdateFlags( UPDATE_ALL )
+        : mController( controller ), mGraphics( graphics ), mCommandBuffer(), mUpdateFlags( UPDATE_ALL )
 {
 }
 
@@ -66,7 +66,7 @@ void RenderCommand::PrepareResources()
     if( !mVulkanPipeline )
     {
       auto pipeline = dynamic_cast<const VulkanAPI::Pipeline*>( mPipeline );
-      if(!pipeline)
+      if( !pipeline )
       {
         return;
       }
@@ -76,32 +76,32 @@ void RenderCommand::PrepareResources()
     }
 
     // based on pipeline recreate descriptor pool
-    auto poolSizes = std::vector<vk::DescriptorPoolSize>{
-      vk::DescriptorPoolSize{}
-        .setDescriptorCount(10)
-        .setType(vk::DescriptorType::eUniformBuffer),
-      vk::DescriptorPoolSize{}
-        .setDescriptorCount(10)
-        .setType(vk::DescriptorType::eCombinedImageSampler),
-      vk::DescriptorPoolSize{}
-        .setDescriptorCount(10)
-        .setType(vk::DescriptorType::eSampledImage)
+    auto poolSizes = std::vector< vk::DescriptorPoolSize >{
+            vk::DescriptorPoolSize{}
+                    .setDescriptorCount( 10 )
+                    .setType( vk::DescriptorType::eUniformBuffer ),
+            vk::DescriptorPoolSize{}
+                    .setDescriptorCount( 10 )
+                    .setType( vk::DescriptorType::eCombinedImageSampler ),
+            vk::DescriptorPoolSize{}
+                    .setDescriptorCount( 10 )
+                    .setType( vk::DescriptorType::eSampledImage )
     };
 
     // create descriptor pool
-    mDescriptorPool = Vulkan::DescriptorPool::New(mGraphics, vk::DescriptorPoolCreateInfo{}
-      .setMaxSets(Vulkan::U32(mVkDescriptorSetLayouts.size() + 1))
-      .setPPoolSizes(poolSizes.data())
-      .setPoolSizeCount(Vulkan::U32(poolSizes.size())));
+    mDescriptorPool = Vulkan::DescriptorPool::New( mGraphics, vk::DescriptorPoolCreateInfo{}
+            .setMaxSets( Vulkan::U32( mVkDescriptorSetLayouts.size() + 1 ) )
+            .setPPoolSizes( poolSizes.data() )
+            .setPoolSizeCount( Vulkan::U32( poolSizes.size() ) ) );
 
     // allocate descriptor sets. we need a descriptors for each descriptorset
     // in the shader
     // allocate descriptor sets for given pipeline layout
     mDescriptorSets = mDescriptorPool->AllocateDescriptorSets(
-      vk::DescriptorSetAllocateInfo{}
-        .setPSetLayouts(mVkDescriptorSetLayouts.data())
-        .setDescriptorPool(nullptr)
-        .setDescriptorSetCount(uint32_t(mVkDescriptorSetLayouts.size()))
+            vk::DescriptorSetAllocateInfo{}
+                    .setPSetLayouts( mVkDescriptorSetLayouts.data() )
+                    .setDescriptorPool( nullptr )
+                    .setDescriptorSetCount( uint32_t( mVkDescriptorSetLayouts.size() ) )
     );
 
     AllocateUniformBufferMemory();
@@ -117,11 +117,11 @@ void RenderCommand::PrepareResources()
 void RenderCommand::UpdateUniformBuffers()
 {
   uint32_t uboIndex = 0u;
-  if(!mUboBuffers.empty() && mUboBuffers.size() == mPushConstantsBindings.size())
+  if( !mUboBuffers.empty() && mUboBuffers.size() == mPushConstantsBindings.size() )
   {
-    for (auto &&pc : mPushConstantsBindings)
+    for( auto&& pc : mPushConstantsBindings )
     {
-      mUboBuffers[uboIndex++]->WriteKeepMapped(pc.data, 0, pc.size);
+      mUboBuffers[uboIndex++]->WriteKeepMapped( pc.data, 0, pc.size );
     }
   }
 }
@@ -158,10 +158,11 @@ void RenderCommand::BindUniformBuffers()
     auto offset = ubo->GetBindingOffset();
     auto size = ubo->GetBindingSize();
 
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size);
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
 #endif
-    mDescriptorSets[0]->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
+    mDescriptorSets[0]
+            ->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
   }
 }
 
@@ -170,13 +171,15 @@ void RenderCommand::BindTexturesAndSamplers()
   // only if textures/samplers changed, rewrite
   for( auto&& texture : mTextureBindings )
   {
-    auto& image = static_cast<VulkanAPI::Texture&>( texture.texture.Get() );
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingTextureSampler: binding = " << texture.binding);
-    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetTextureRef()->GetSampler(), image.GetTextureRef()->GetImageView() );
+    auto& image = static_cast<VulkanAPI::Texture&>( texture.texture.Get());
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                     "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
+    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetTextureRef()->GetSampler(),
+                                                   image.GetTextureRef()->GetImageView() );
   }
 }
 
-const std::vector<Vulkan::RefCountedDescriptorSet>& RenderCommand::GetDescriptorSets() const
+const std::vector< Vulkan::RefCountedDescriptorSet >& RenderCommand::GetDescriptorSets() const
 {
   return mDescriptorSets;
 }

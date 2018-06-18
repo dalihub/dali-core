@@ -59,7 +59,8 @@ static const unsigned int SpvRevision = 3;
 static const unsigned int SpvOpCodeMask = 0xffff;
 static const unsigned int SpvWordCountShift = 16;
 
-typedef enum SpvSourceLanguage_ {
+typedef enum SpvSourceLanguage_
+{
   SpvSourceLanguageUnknown = 0,
   SpvSourceLanguageESSL = 1,
   SpvSourceLanguageGLSL = 2,
@@ -69,7 +70,8 @@ typedef enum SpvSourceLanguage_ {
   SpvSourceLanguageMax = 0x7fffffff,
 } SpvSourceLanguage;
 
-typedef enum SpvExecutionModel_ {
+typedef enum SpvExecutionModel_
+{
   SpvExecutionModelVertex = 0,
   SpvExecutionModelTessellationControl = 1,
   SpvExecutionModelTessellationEvaluation = 2,
@@ -80,21 +82,24 @@ typedef enum SpvExecutionModel_ {
   SpvExecutionModelMax = 0x7fffffff,
 } SpvExecutionModel;
 
-typedef enum SpvAddressingModel_ {
+typedef enum SpvAddressingModel_
+{
   SpvAddressingModelLogical = 0,
   SpvAddressingModelPhysical32 = 1,
   SpvAddressingModelPhysical64 = 2,
   SpvAddressingModelMax = 0x7fffffff,
 } SpvAddressingModel;
 
-typedef enum SpvMemoryModel_ {
+typedef enum SpvMemoryModel_
+{
   SpvMemoryModelSimple = 0,
   SpvMemoryModelGLSL450 = 1,
   SpvMemoryModelOpenCL = 2,
   SpvMemoryModelMax = 0x7fffffff,
 } SpvMemoryModel;
 
-typedef enum SpvExecutionMode_ {
+typedef enum SpvExecutionMode_
+{
   SpvExecutionModeInvocations = 0,
   SpvExecutionModeSpacingEqual = 1,
   SpvExecutionModeSpacingFractionalEven = 2,
@@ -138,7 +143,8 @@ typedef enum SpvExecutionMode_ {
   SpvExecutionModeMax = 0x7fffffff,
 } SpvExecutionMode;
 
-typedef enum SpvStorageClass_ {
+typedef enum SpvStorageClass_
+{
   SpvStorageClassUniformConstant = 0,
   SpvStorageClassInput = 1,
   SpvStorageClassUniform = 2,
@@ -155,7 +161,8 @@ typedef enum SpvStorageClass_ {
   SpvStorageClassMax = 0x7fffffff,
 } SpvStorageClass;
 
-typedef enum SpvDim_ {
+typedef enum SpvDim_
+{
   SpvDim1D = 0,
   SpvDim2D = 1,
   SpvDim3D = 2,
@@ -166,7 +173,8 @@ typedef enum SpvDim_ {
   SpvDimMax = 0x7fffffff,
 } SpvDim;
 
-typedef enum SpvSamplerAddressingMode_ {
+typedef enum SpvSamplerAddressingMode_
+{
   SpvSamplerAddressingModeNone = 0,
   SpvSamplerAddressingModeClampToEdge = 1,
   SpvSamplerAddressingModeClamp = 2,
@@ -175,13 +183,15 @@ typedef enum SpvSamplerAddressingMode_ {
   SpvSamplerAddressingModeMax = 0x7fffffff,
 } SpvSamplerAddressingMode;
 
-typedef enum SpvSamplerFilterMode_ {
+typedef enum SpvSamplerFilterMode_
+{
   SpvSamplerFilterModeNearest = 0,
   SpvSamplerFilterModeLinear = 1,
   SpvSamplerFilterModeMax = 0x7fffffff,
 } SpvSamplerFilterMode;
 
-typedef enum SpvImageFormat_ {
+typedef enum SpvImageFormat_
+{
   SpvImageFormatUnknown = 0,
   SpvImageFormatRgba32f = 1,
   SpvImageFormatRgba16f = 2,
@@ -225,7 +235,8 @@ typedef enum SpvImageFormat_ {
   SpvImageFormatMax = 0x7fffffff,
 } SpvImageFormat;
 
-typedef enum SpvImageChannelOrder_ {
+typedef enum SpvImageChannelOrder_
+{
   SpvImageChannelOrderR = 0,
   SpvImageChannelOrderA = 1,
   SpvImageChannelOrderRG = 2,
@@ -249,7 +260,8 @@ typedef enum SpvImageChannelOrder_ {
   SpvImageChannelOrderMax = 0x7fffffff,
 } SpvImageChannelOrder;
 
-typedef enum SpvImageChannelDataType_ {
+typedef enum SpvImageChannelDataType_
+{
   SpvImageChannelDataTypeSnormInt8 = 0,
   SpvImageChannelDataTypeSnormInt16 = 1,
   SpvImageChannelDataTypeUnormInt8 = 2,
@@ -270,7 +282,8 @@ typedef enum SpvImageChannelDataType_ {
   SpvImageChannelDataTypeMax = 0x7fffffff,
 } SpvImageChannelDataType;
 
-typedef enum SpvImageOperandsShift_ {
+typedef enum SpvImageOperandsShift_
+{
   SpvImageOperandsBiasShift = 0,
   SpvImageOperandsLodShift = 1,
   SpvImageOperandsGradShift = 2,
@@ -282,7 +295,8 @@ typedef enum SpvImageOperandsShift_ {
   SpvImageOperandsMax = 0x7fffffff,
 } SpvImageOperandsShift;
 
-typedef enum SpvImageOperandsMask_ {
+typedef enum SpvImageOperandsMask_
+{
   SpvImageOperandsMaskNone = 0,
   SpvImageOperandsBiasMask = 0x00000001,
   SpvImageOperandsLodMask = 0x00000002,
@@ -294,7 +308,8 @@ typedef enum SpvImageOperandsMask_ {
   SpvImageOperandsMinLodMask = 0x00000080,
 } SpvImageOperandsMask;
 
-typedef enum SpvFPFastMathModeShift_ {
+typedef enum SpvFPFastMathModeShift_
+{
   SpvFPFastMathModeNotNaNShift = 0,
   SpvFPFastMathModeNotInfShift = 1,
   SpvFPFastMathModeNSZShift = 2,
@@ -303,7 +318,8 @@ typedef enum SpvFPFastMathModeShift_ {
   SpvFPFastMathModeMax = 0x7fffffff,
 } SpvFPFastMathModeShift;
 
-typedef enum SpvFPFastMathModeMask_ {
+typedef enum SpvFPFastMathModeMask_
+{
   SpvFPFastMathModeMaskNone = 0,
   SpvFPFastMathModeNotNaNMask = 0x00000001,
   SpvFPFastMathModeNotInfMask = 0x00000002,
@@ -312,7 +328,8 @@ typedef enum SpvFPFastMathModeMask_ {
   SpvFPFastMathModeFastMask = 0x00000010,
 } SpvFPFastMathModeMask;
 
-typedef enum SpvFPRoundingMode_ {
+typedef enum SpvFPRoundingMode_
+{
   SpvFPRoundingModeRTE = 0,
   SpvFPRoundingModeRTZ = 1,
   SpvFPRoundingModeRTP = 2,
@@ -320,20 +337,23 @@ typedef enum SpvFPRoundingMode_ {
   SpvFPRoundingModeMax = 0x7fffffff,
 } SpvFPRoundingMode;
 
-typedef enum SpvLinkageType_ {
+typedef enum SpvLinkageType_
+{
   SpvLinkageTypeExport = 0,
   SpvLinkageTypeImport = 1,
   SpvLinkageTypeMax = 0x7fffffff,
 } SpvLinkageType;
 
-typedef enum SpvAccessQualifier_ {
+typedef enum SpvAccessQualifier_
+{
   SpvAccessQualifierReadOnly = 0,
   SpvAccessQualifierWriteOnly = 1,
   SpvAccessQualifierReadWrite = 2,
   SpvAccessQualifierMax = 0x7fffffff,
 } SpvAccessQualifier;
 
-typedef enum SpvFunctionParameterAttribute_ {
+typedef enum SpvFunctionParameterAttribute_
+{
   SpvFunctionParameterAttributeZext = 0,
   SpvFunctionParameterAttributeSext = 1,
   SpvFunctionParameterAttributeByVal = 2,
@@ -345,7 +365,8 @@ typedef enum SpvFunctionParameterAttribute_ {
   SpvFunctionParameterAttributeMax = 0x7fffffff,
 } SpvFunctionParameterAttribute;
 
-typedef enum SpvDecoration_ {
+typedef enum SpvDecoration_
+{
   SpvDecorationRelaxedPrecision = 0,
   SpvDecorationSpecId = 1,
   SpvDecorationBlock = 2,
@@ -400,7 +421,8 @@ typedef enum SpvDecoration_ {
   SpvDecorationMax = 0x7fffffff,
 } SpvDecoration;
 
-typedef enum SpvBuiltIn_ {
+typedef enum SpvBuiltIn_
+{
   SpvBuiltInPosition = 0,
   SpvBuiltInPointSize = 1,
   SpvBuiltInClipDistance = 3,
@@ -469,19 +491,22 @@ typedef enum SpvBuiltIn_ {
   SpvBuiltInMax = 0x7fffffff,
 } SpvBuiltIn;
 
-typedef enum SpvSelectionControlShift_ {
+typedef enum SpvSelectionControlShift_
+{
   SpvSelectionControlFlattenShift = 0,
   SpvSelectionControlDontFlattenShift = 1,
   SpvSelectionControlMax = 0x7fffffff,
 } SpvSelectionControlShift;
 
-typedef enum SpvSelectionControlMask_ {
+typedef enum SpvSelectionControlMask_
+{
   SpvSelectionControlMaskNone = 0,
   SpvSelectionControlFlattenMask = 0x00000001,
   SpvSelectionControlDontFlattenMask = 0x00000002,
 } SpvSelectionControlMask;
 
-typedef enum SpvLoopControlShift_ {
+typedef enum SpvLoopControlShift_
+{
   SpvLoopControlUnrollShift = 0,
   SpvLoopControlDontUnrollShift = 1,
   SpvLoopControlDependencyInfiniteShift = 2,
@@ -489,7 +514,8 @@ typedef enum SpvLoopControlShift_ {
   SpvLoopControlMax = 0x7fffffff,
 } SpvLoopControlShift;
 
-typedef enum SpvLoopControlMask_ {
+typedef enum SpvLoopControlMask_
+{
   SpvLoopControlMaskNone = 0,
   SpvLoopControlUnrollMask = 0x00000001,
   SpvLoopControlDontUnrollMask = 0x00000002,
@@ -497,7 +523,8 @@ typedef enum SpvLoopControlMask_ {
   SpvLoopControlDependencyLengthMask = 0x00000008,
 } SpvLoopControlMask;
 
-typedef enum SpvFunctionControlShift_ {
+typedef enum SpvFunctionControlShift_
+{
   SpvFunctionControlInlineShift = 0,
   SpvFunctionControlDontInlineShift = 1,
   SpvFunctionControlPureShift = 2,
@@ -505,7 +532,8 @@ typedef enum SpvFunctionControlShift_ {
   SpvFunctionControlMax = 0x7fffffff,
 } SpvFunctionControlShift;
 
-typedef enum SpvFunctionControlMask_ {
+typedef enum SpvFunctionControlMask_
+{
   SpvFunctionControlMaskNone = 0,
   SpvFunctionControlInlineMask = 0x00000001,
   SpvFunctionControlDontInlineMask = 0x00000002,
@@ -513,7 +541,8 @@ typedef enum SpvFunctionControlMask_ {
   SpvFunctionControlConstMask = 0x00000008,
 } SpvFunctionControlMask;
 
-typedef enum SpvMemorySemanticsShift_ {
+typedef enum SpvMemorySemanticsShift_
+{
   SpvMemorySemanticsAcquireShift = 1,
   SpvMemorySemanticsReleaseShift = 2,
   SpvMemorySemanticsAcquireReleaseShift = 3,
@@ -527,7 +556,8 @@ typedef enum SpvMemorySemanticsShift_ {
   SpvMemorySemanticsMax = 0x7fffffff,
 } SpvMemorySemanticsShift;
 
-typedef enum SpvMemorySemanticsMask_ {
+typedef enum SpvMemorySemanticsMask_
+{
   SpvMemorySemanticsMaskNone = 0,
   SpvMemorySemanticsAcquireMask = 0x00000002,
   SpvMemorySemanticsReleaseMask = 0x00000004,
@@ -541,21 +571,24 @@ typedef enum SpvMemorySemanticsMask_ {
   SpvMemorySemanticsImageMemoryMask = 0x00000800,
 } SpvMemorySemanticsMask;
 
-typedef enum SpvMemoryAccessShift_ {
+typedef enum SpvMemoryAccessShift_
+{
   SpvMemoryAccessVolatileShift = 0,
   SpvMemoryAccessAlignedShift = 1,
   SpvMemoryAccessNontemporalShift = 2,
   SpvMemoryAccessMax = 0x7fffffff,
 } SpvMemoryAccessShift;
 
-typedef enum SpvMemoryAccessMask_ {
+typedef enum SpvMemoryAccessMask_
+{
   SpvMemoryAccessMaskNone = 0,
   SpvMemoryAccessVolatileMask = 0x00000001,
   SpvMemoryAccessAlignedMask = 0x00000002,
   SpvMemoryAccessNontemporalMask = 0x00000004,
 } SpvMemoryAccessMask;
 
-typedef enum SpvScope_ {
+typedef enum SpvScope_
+{
   SpvScopeCrossDevice = 0,
   SpvScopeDevice = 1,
   SpvScopeWorkgroup = 2,
@@ -564,31 +597,36 @@ typedef enum SpvScope_ {
   SpvScopeMax = 0x7fffffff,
 } SpvScope;
 
-typedef enum SpvGroupOperation_ {
+typedef enum SpvGroupOperation_
+{
   SpvGroupOperationReduce = 0,
   SpvGroupOperationInclusiveScan = 1,
   SpvGroupOperationExclusiveScan = 2,
   SpvGroupOperationMax = 0x7fffffff,
 } SpvGroupOperation;
 
-typedef enum SpvKernelEnqueueFlags_ {
+typedef enum SpvKernelEnqueueFlags_
+{
   SpvKernelEnqueueFlagsNoWait = 0,
   SpvKernelEnqueueFlagsWaitKernel = 1,
   SpvKernelEnqueueFlagsWaitWorkGroup = 2,
   SpvKernelEnqueueFlagsMax = 0x7fffffff,
 } SpvKernelEnqueueFlags;
 
-typedef enum SpvKernelProfilingInfoShift_ {
+typedef enum SpvKernelProfilingInfoShift_
+{
   SpvKernelProfilingInfoCmdExecTimeShift = 0,
   SpvKernelProfilingInfoMax = 0x7fffffff,
 } SpvKernelProfilingInfoShift;
 
-typedef enum SpvKernelProfilingInfoMask_ {
+typedef enum SpvKernelProfilingInfoMask_
+{
   SpvKernelProfilingInfoMaskNone = 0,
   SpvKernelProfilingInfoCmdExecTimeMask = 0x00000001,
 } SpvKernelProfilingInfoMask;
 
-typedef enum SpvCapability_ {
+typedef enum SpvCapability_
+{
   SpvCapabilityMatrix = 0,
   SpvCapabilityShader = 1,
   SpvCapabilityGeometry = 2,
@@ -681,7 +719,8 @@ typedef enum SpvCapability_ {
   SpvCapabilityMax = 0x7fffffff,
 } SpvCapability;
 
-typedef enum SpvOp_ {
+typedef enum SpvOp_
+{
   SpvOpNop = 0,
   SpvOpUndef = 1,
   SpvOpSourceContinued = 2,

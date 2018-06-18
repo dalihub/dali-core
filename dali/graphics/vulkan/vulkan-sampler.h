@@ -94,9 +94,9 @@ private:
   ~Sampler() override;
 
 private:
-  Graphics*             mGraphics;
+  Graphics* mGraphics;
   vk::SamplerCreateInfo mCreateInfo;
-  vk::Sampler           mSampler;
+  vk::Sampler mSampler;
 
 };
 

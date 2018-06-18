@@ -107,11 +107,13 @@ public:
    */
   vk::ImageTiling GetImageTiling() const;
 
+  vk::ImageAspectFlags GetAspectFlags() const;
+
   /**
    *
    * @return
    */
-  vk::ImageUsageFlags  GetUsageFlags() const;
+  vk::ImageUsageFlags GetUsageFlags() const;
 
   /**
    * Assigns the specified image memory to the image
@@ -119,6 +121,8 @@ public:
    * @param memory The device memory to be assigned to the image
    */
   void AssignMemory( RefCountedGpuMemoryBlock memory );
+
+  void SetImageLayout( vk::ImageLayout imageLayout );
 
   const Image& ConstRef();
 
@@ -139,12 +143,13 @@ private:
   Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage = nullptr );
 
 private:
-  Graphics*           mGraphics;
+  Graphics* mGraphics;
   vk::ImageCreateInfo mCreateInfo;
-  vk::Image           mImage;
-  vk::ImageLayout     mImageLayout;
+  vk::Image mImage;
+  vk::ImageLayout mImageLayout;
+  vk::ImageAspectFlags mAspectFlags;
 
-  RefCountedGpuMemoryBlock   mDeviceMemory;
+  RefCountedGpuMemoryBlock mDeviceMemory;
   bool mIsExternal;
 };
 

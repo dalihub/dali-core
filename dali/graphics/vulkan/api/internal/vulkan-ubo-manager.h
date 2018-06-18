@@ -27,6 +27,7 @@ namespace Graphics
 namespace VulkanAPI
 {
 class Controller;
+
 class Ubo;
 
 class UboManager
@@ -38,6 +39,7 @@ public:
    * @param controller
    */
   explicit UboManager( Controller& controller );
+
   ~UboManager();
 
   /** Allocates UBO of specified size
@@ -45,7 +47,7 @@ public:
    * @param size
    * @return
    */
-  std::unique_ptr<Ubo> Allocate( uint32_t size );
+  std::unique_ptr< Ubo > Allocate( uint32_t size );
 
   /**
    * Maps all buffers within all pools
@@ -60,7 +62,7 @@ public:
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 

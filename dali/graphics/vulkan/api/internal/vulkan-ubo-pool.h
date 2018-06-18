@@ -29,13 +29,14 @@ namespace Graphics
 namespace VulkanAPI
 {
 class Controller;
+
 class Ubo;
 
 class UboPool
 {
 public:
 
-  explicit UboPool(Controller &controller, uint32_t blockSize, uint32_t initialCapacity );
+  explicit UboPool( Controller& controller, uint32_t blockSize, uint32_t initialCapacity );
 
   ~UboPool();
 
@@ -43,7 +44,7 @@ public:
    * Allocates memory within pool space for new UBO
    * @return unique pointer to the UBO object
    */
-  std::unique_ptr<Ubo> Allocate( uint32_t requestedSize );
+  std::unique_ptr< Ubo > Allocate( uint32_t requestedSize );
 
   /**
    * Releases allocated memory back to the pool
@@ -109,7 +110,7 @@ public:
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 /**
@@ -118,6 +119,7 @@ private:
 struct Ubo
 {
   explicit Ubo( UboPool& pool, struct UboAllocationInfo& allocationInfo );
+
   ~Ubo();
 
   /**
@@ -157,9 +159,9 @@ struct Ubo
   uint32_t GetBindingSize() const;
 
 
-
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
+
   Impl& GetImplementation();
 };
 

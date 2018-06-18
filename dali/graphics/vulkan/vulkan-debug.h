@@ -20,14 +20,27 @@
 #if defined(DEBUG_ENABLED)
 
 #include <iostream>
+#include <cstdarg>
+#include <string>
 
 
 extern const char* LOG_VULKAN;
+
+
+std::string ArgListToString( const char* format, va_list args );
+
+std::string FormatToString( const char* format, ... );
 
 #define DALI_LOG_STREAM( filter, level, stream )  \
   if( nullptr != LOG_VULKAN)                      \
   {                                               \
     std::cout << stream << std::endl;             \
+  }
+
+#define DALI_LOG_INFO( filter, level, format, ... ) \
+  if( nullptr != LOG_VULKAN )                       \
+  {                                                 \
+    std::cout << FormatToString( (format), ##__VA_ARGS__ ); \
   }
 
 #else

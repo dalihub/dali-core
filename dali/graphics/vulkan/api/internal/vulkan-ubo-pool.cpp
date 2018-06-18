@@ -48,27 +48,27 @@ struct Ubo::Impl
         UboPool& pool,
         UboAllocationInfo& allocationInfo
   )
-    : mUbo( ubo ),
-      mPool( pool ),
-      mAllocationInfo( allocationInfo )
+          : mUbo( ubo ),
+            mPool( pool ),
+            mAllocationInfo( allocationInfo )
   {
   }
 
   ~Impl()
   {
-    mPool.Release(mUbo);
+    mPool.Release( mUbo );
   }
 
   uint32_t Write( const void* data, uint32_t offset, uint32_t size )
   {
     bool alreadyMapped = mPool.IsMapped( mUbo );
     void* ptr = mPool.Map( mUbo );
-    memcpy( ptr, reinterpret_cast<const char*>(data)+offset, size );
+    memcpy( ptr, reinterpret_cast<const char*>(data) + offset, size );
 
     // cleanup
     if( !alreadyMapped )
     {
-      mPool.Unmap(mUbo);
+      mPool.Unmap( mUbo );
     }
 
     return size;
@@ -77,8 +77,8 @@ struct Ubo::Impl
   uint32_t WriteKeepMapped( const void* data, uint32_t offset, uint32_t size )
   {
     void* ptr = mPool.Map( mUbo );
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General,  "[UBO] Writing " << size << " bytes into: " << ptr );
-    memcpy( ptr, reinterpret_cast<const char*>(data)+offset, size );
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[UBO] Writing " << size << " bytes into: " << ptr );
+    memcpy( ptr, reinterpret_cast<const char*>(data) + offset, size );
     return size;
   }
 
@@ -97,7 +97,7 @@ struct Ubo::Impl
     return mAllocationInfo.allocationSize;
   }
 
-  Ubo&     mUbo;
+  Ubo& mUbo;
   UboPool& mPool;
   UboAllocationInfo mAllocationInfo;
 
@@ -108,7 +108,10 @@ struct UboPool::Impl
   struct PoolBuffer
   {
     explicit PoolBuffer( Vulkan::RefCountedBuffer buf ) :
-    mappedPtr( nullptr ), buffer( buf ) {}
+            mappedPtr( nullptr ), buffer( buf )
+    {
+    }
+
     ~PoolBuffer() = default;
 
     void* mappedPtr;
@@ -116,17 +119,17 @@ struct UboPool::Impl
   };
 
   explicit Impl( UboPool& uboPool, Controller& controller, uint32_t blockSize, uint32_t initialCapacity )
-  : mUboPool( uboPool ),
-    mController( controller ),
-    mBlockSize( blockSize ),
-    mInitialCapacity( initialCapacity )
+          : mUboPool( uboPool ),
+            mController( controller ),
+            mBlockSize( blockSize ),
+            mInitialCapacity( initialCapacity )
   {
 
   }
 
   ~Impl() = default;
 
-  std::unique_ptr<Ubo> Allocate( uint32_t requestedSize )
+  std::unique_ptr< Ubo > Allocate( uint32_t requestedSize )
   {
     if( mAllocationQueue.empty() )
     {
@@ -137,17 +140,18 @@ struct UboPool::Impl
     mAllocationQueue.pop_back();
     uint32_t heapIndex = allocationIndex / mInitialCapacity;
 
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Allocated block size " << mBlockSize << ", index: " << allocationIndex);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                     "[POOL] Allocated block size " << mBlockSize << ", index: " << allocationIndex );
 
-    auto allocationIndexInPage = uint32_t(allocationIndex % mInitialCapacity);
+    auto allocationIndexInPage = uint32_t( allocationIndex % mInitialCapacity );
 
     auto allocationInfo = UboAllocationInfo{};
     allocationInfo.allocationIndex = allocationIndex;
-    allocationInfo.allocationOffset = allocationIndexInPage*mBlockSize;
+    allocationInfo.allocationOffset = allocationIndexInPage * mBlockSize;
     allocationInfo.allocationSize = requestedSize;
     allocationInfo.pageSize = mBlockSize;
     allocationInfo.heapIndex = heapIndex;
-    return std::make_unique<Ubo>( mUboPool, allocationInfo );
+    return std::make_unique< Ubo >( mUboPool, allocationInfo );
   }
 
   void Release( Ubo& ubo )
@@ -164,45 +168,47 @@ struct UboPool::Impl
 
   void NewUboBuffer()
   {
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Allocating new page of block size " << mBlockSize << ", capacity: " << mInitialCapacity);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                     "[POOL] Allocating new page of block size " << mBlockSize << ", capacity: " << mInitialCapacity );
     // add new Vulkan Buffer object
     auto& graphics = mController.GetGraphics();
 
-    mBuffers.emplace_back( graphics.CreateBuffer(vk::BufferCreateInfo{}
-                                                         .setUsage( vk::BufferUsageFlagBits::eUniformBuffer)
-                                                         .setSharingMode( vk::SharingMode::eExclusive )
-                                                         .setSize( mBlockSize * mInitialCapacity ) ) );
+    mBuffers.emplace_back( graphics.CreateBuffer( vk::BufferCreateInfo{}
+                                                          .setUsage( vk::BufferUsageFlagBits::eUniformBuffer )
+                                                          .setSharingMode( vk::SharingMode::eExclusive )
+                                                          .setSize( mBlockSize * mInitialCapacity ) ) );
     mBuffers.back().buffer->BindMemory(
-              graphics
-                      .GetDeviceMemoryManager()
-                      .GetDefaultAllocator()
-                      .Allocate( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
+            graphics
+                    .GetDeviceMemoryManager()
+                    .GetDefaultAllocator()
+                    .Allocate( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
 
-    auto startIndex = ((mBuffers.size()-1)*mInitialCapacity);
+    auto startIndex = ( ( mBuffers.size() - 1 ) * mInitialCapacity );
     for( uint32_t i = 0u; i < mInitialCapacity; ++i )
     {
-      mAllocationQueue.push_back( uint32_t(startIndex + i));
+      mAllocationQueue.push_back( uint32_t( startIndex + i ) );
     }
   }
 
   void* Map( Ubo& ubo )
   {
     auto& impl = ubo.GetImplementation();
-    auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
-    auto allocationIndex = uint32_t(impl.mAllocationInfo.allocationIndex % mInitialCapacity);
+    auto bufferIndex = uint32_t( impl.mAllocationInfo.allocationIndex / mInitialCapacity );
+    auto allocationIndex = uint32_t( impl.mAllocationInfo.allocationIndex % mInitialCapacity );
 
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping UBO = alloc_index = " << impl.mAllocationInfo.allocationIndex);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                     "[POOL] Mapping UBO = alloc_index = " << impl.mAllocationInfo.allocationIndex );
 
-    return MapBuffer<char>( bufferIndex ) + (allocationIndex*mBlockSize);
+    return MapBuffer< char >( bufferIndex ) + ( allocationIndex * mBlockSize );
   }
 
-  template<class T>
+  template< class T >
   T* MapBuffer( uint32_t bufferIndex )
   {
     if( !mBuffers[bufferIndex].mappedPtr )
     {
-      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping PAGE = " << bufferIndex);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping PAGE = " << bufferIndex );
       mBuffers[bufferIndex].mappedPtr = mBuffers[bufferIndex].buffer->GetMemoryHandle()->Map();
     }
 
@@ -213,7 +219,7 @@ struct UboPool::Impl
   {
     if( mBuffers[bufferIndex].mappedPtr )
     {
-      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Unmapping PAGE = " << bufferIndex);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Unmapping PAGE = " << bufferIndex );
       mBuffers[bufferIndex].buffer->GetMemoryHandle()->Unmap();
       mBuffers[bufferIndex].mappedPtr = nullptr;
     }
@@ -222,22 +228,23 @@ struct UboPool::Impl
   void Unmap( Ubo& ubo )
   {
     auto& impl = ubo.GetImplementation();
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping UBO = alloc[" << impl.mAllocationInfo.allocationIndex);
-    auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                     "[POOL] Mapping UBO = alloc[" << impl.mAllocationInfo.allocationIndex );
+    auto bufferIndex = uint32_t( impl.mAllocationInfo.allocationIndex / mInitialCapacity );
     UnmapBuffer( bufferIndex );
   }
 
   bool IsMapped( Ubo& ubo )
   {
     auto& impl = ubo.GetImplementation();
-    auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
-    return (nullptr != mBuffers[bufferIndex].mappedPtr);
+    auto bufferIndex = uint32_t( impl.mAllocationInfo.allocationIndex / mInitialCapacity );
+    return ( nullptr != mBuffers[bufferIndex].mappedPtr );
   }
 
   Vulkan::RefCountedBuffer GetBuffer( Ubo& ubo ) const
   {
     auto& impl = ubo.GetImplementation();
-    auto bufferIndex = uint32_t(impl.mAllocationInfo.allocationIndex / mInitialCapacity);
+    auto bufferIndex = uint32_t( impl.mAllocationInfo.allocationIndex / mInitialCapacity );
     return mBuffers[bufferIndex].buffer;
   }
 
@@ -246,19 +253,19 @@ struct UboPool::Impl
   uint32_t mBlockSize;
   uint32_t mInitialCapacity;
 
-  std::vector<PoolBuffer>         mBuffers;
-  std::deque<uint32_t>            mAllocationQueue;
+  std::vector< PoolBuffer > mBuffers;
+  std::deque< uint32_t > mAllocationQueue;
 
 };
 
-UboPool::UboPool(Controller &controller, uint32_t blockSize, uint32_t initialCapacity )
+UboPool::UboPool( Controller& controller, uint32_t blockSize, uint32_t initialCapacity )
 {
-  mImpl = std::make_unique<Impl>( *this, controller, blockSize, initialCapacity );
+  mImpl = std::make_unique< Impl >( *this, controller, blockSize, initialCapacity );
 }
 
 UboPool::~UboPool() = default;
 
-std::unique_ptr<Ubo> UboPool::Allocate( uint32_t requestedSize )
+std::unique_ptr< Ubo > UboPool::Allocate( uint32_t requestedSize )
 {
   return mImpl->Allocate( requestedSize );
 }
@@ -290,7 +297,7 @@ void UboPool::Unmap( Ubo& ubo )
 
 void* UboPool::MapPage( uint32_t bufferIndex )
 {
-  return mImpl->MapBuffer<char>( bufferIndex );
+  return mImpl->MapBuffer< char >( bufferIndex );
 }
 
 void UboPool::UnmapPage( uint32_t bufferIndex )
@@ -302,7 +309,7 @@ void UboPool::Map()
 {
   for( auto i = 0u; i < mImpl->mBuffers.size(); ++i )
   {
-    mImpl->MapBuffer<char>( i );
+    mImpl->MapBuffer< char >( i );
   }
 }
 
@@ -316,7 +323,7 @@ void UboPool::Unmap()
 
 Ubo::Ubo( UboPool& pool, UboAllocationInfo& allocationInfo )
 {
-  mImpl = std::make_unique<Impl>( *this, pool, allocationInfo );
+  mImpl = std::make_unique< Impl >( *this, pool, allocationInfo );
 }
 
 Ubo::~Ubo() = default;

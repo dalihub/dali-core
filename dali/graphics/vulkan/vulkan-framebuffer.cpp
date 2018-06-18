@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <dali/graphics/vulkan/vulkan-image-view.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -29,114 +30,159 @@ namespace Vulkan
 struct Framebuffer::Impl
 {
   Impl( Framebuffer& owner, Graphics& graphics, uint32_t width, uint32_t height )
-  : mInterface( owner ), mGraphics( graphics ), mColorImageViewAttachments{}, mDepthStencilImageViewAttachment()
+          : mInterface( owner ),
+            mGraphics( graphics ),
+            mWidth( width ),
+            mHeight( height ),
+            mColorImageViewAttachments{},
+            mDepthStencilImageViewAttachment()
   {
-    mWidth = width;
-    mHeight = height;
   }
 
   // creating render pass may happen either as deferred or
   // when framebuffer is initialised into immutable state
   bool Initialise()
   {
-    mAttachmentReference.clear();
-    mAttachmentDescription.clear();
-    mDefaultClearValues.clear();
-    /*
-     * COLOR ATTACHMENTS
-     */
-    auto attachments         = std::vector<vk::ImageView>{};
-    auto colorAttachmentSize = 0u;
-    for( auto&& colorAttachment : mColorImageViewAttachments )
+    auto attachments = std::vector< vk::ImageView >{};
+
+    if( !mExternalRenderPass )
     {
-      auto attRef = vk::AttachmentReference{};
-      attRef.setLayout( vk::ImageLayout::eColorAttachmentOptimal );
-      attRef.setAttachment( colorAttachmentSize++ );
-      mAttachmentReference.emplace_back( attRef );
-      attachments.emplace_back( colorAttachment->GetVkHandle() );
+      mAttachmentReference.clear();
+      mAttachmentDescription.clear();
+      mDefaultClearValues.clear();
+      /*
+       * COLOR ATTACHMENTS
+       */
 
-      vk::AttachmentDescription attDesc{};
-      attDesc.setSamples( vk::SampleCountFlagBits::e1 )
-        .setInitialLayout( vk::ImageLayout::eUndefined )
-        .setFormat( colorAttachment->GetImage()->GetFormat() )
-        .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
-        .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
-        .setLoadOp( vk::AttachmentLoadOp::eClear )
-        .setStoreOp( vk::AttachmentStoreOp::eStore )
-        .setFinalLayout( vk::ImageLayout::ePresentSrcKHR );
+      auto colorAttachmentSize = 0u;
+      for( auto&& colorAttachment : mColorImageViewAttachments )
+      {
+        auto attRef = vk::AttachmentReference{};
+        attRef.setLayout( vk::ImageLayout::eColorAttachmentOptimal );
+        attRef.setAttachment( colorAttachmentSize++ );
+        mAttachmentReference.push_back( attRef );
+        attachments.push_back( colorAttachment->GetVkHandle() );
 
-      mAttachmentDescription.emplace_back( attDesc );
+        vk::AttachmentDescription attDesc{};
+        attDesc.setSamples( vk::SampleCountFlagBits::e1 )
+               .setInitialLayout( vk::ImageLayout::eUndefined )
+               .setFormat( colorAttachment->GetImage()->GetFormat() )
+               .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
+               .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
+               .setLoadOp( vk::AttachmentLoadOp::eClear )
+               .setStoreOp( vk::AttachmentStoreOp::eStore )
+               .setFinalLayout( vk::ImageLayout::ePresentSrcKHR );
 
-      // update clear color values
-      vk::ClearColorValue clear;
-      clear.setFloat32( {0.0f, 0.0f, 0.0f, 1.0f} );
-      mDefaultClearValues.emplace_back( clear );
+        mAttachmentDescription.push_back( attDesc );
+
+        // update clear color values
+        vk::ClearColorValue clear;
+        clear.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+        mDefaultClearValues.emplace_back( clear );
+      }
+
+      /*
+       * DEPTH-STENCIL ATTACHMENT
+       */
+      if( mDepthStencilImageViewAttachment )
+      {
+        auto attRef = vk::AttachmentReference{};
+        attRef.setLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
+        attRef.setAttachment( colorAttachmentSize );
+        mAttachmentReference.push_back( attRef );
+        attachments.push_back( mDepthStencilImageViewAttachment->GetVkHandle() );
+
+        vk::AttachmentDescription attDesc{};
+        attDesc.setSamples( vk::SampleCountFlagBits::e1 )
+               .setInitialLayout( vk::ImageLayout::eUndefined )
+               .setFormat( mDepthStencilImageViewAttachment->GetImage()->GetFormat() )
+               .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
+               .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
+               .setLoadOp( vk::AttachmentLoadOp::eClear )
+               .setStoreOp( vk::AttachmentStoreOp::eDontCare )
+               .setFinalLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
+        mAttachmentDescription.push_back( attDesc );
+
+        // update clear depth/stencil values
+        vk::ClearDepthStencilValue clear;
+        clear.setDepth( 0.0f ).setStencil( 1 );
+        mDefaultClearValues.emplace_back( clear );
+      }
+
+      /*
+       * SUBPASS
+       */
+      // creating single subpass per framebuffer
+      auto subpassDesc = vk::SubpassDescription{};
+      subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
+      subpassDesc.setColorAttachmentCount( colorAttachmentSize );
+      if( mDepthStencilImageViewAttachment )
+      {
+        subpassDesc.setPDepthStencilAttachment( &mAttachmentReference[colorAttachmentSize] );
+      }
+      subpassDesc.setPColorAttachments( &mAttachmentReference[0] );
+
+      std::array< vk::SubpassDependency, 2 > subpassDependencies{
+
+              vk::SubpassDependency{}.setSrcSubpass( VK_SUBPASS_EXTERNAL )
+                                     .setDstSubpass( 0 )
+                                     .setSrcStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
+                                     .setDstStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
+                                     .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
+                                     .setDstAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
+                                                        vk::AccessFlagBits::eColorAttachmentWrite )
+                                     .setDependencyFlags( vk::DependencyFlagBits::eByRegion ),
+              vk::SubpassDependency{}.setSrcSubpass( 0 )
+                                     .setDstSubpass( VK_SUBPASS_EXTERNAL )
+                                     .setSrcStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
+                                     .setDstStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
+                                     .setSrcAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
+                                                        vk::AccessFlagBits::eColorAttachmentWrite )
+                                     .setDstAccessMask( vk::AccessFlagBits::eMemoryRead )
+                                     .setDependencyFlags( vk::DependencyFlagBits::eByRegion )
+
+      };
+
+      /*
+       * RENDERPASS
+       */
+      // create compatible render pass
+      auto renderPassCreateInfo = vk::RenderPassCreateInfo{}.setAttachmentCount( U32( mAttachmentDescription.size() ) )
+                                                            .setPAttachments( mAttachmentDescription.data() )
+                                                            .setPSubpasses( &subpassDesc )
+                                                            .setSubpassCount( 1 )
+                                                            .setPDependencies( subpassDependencies.data() );
+
+
+      mVkRenderPass = VkAssert( mGraphics.GetDevice().createRenderPass( renderPassCreateInfo,
+                                                                        mGraphics.GetAllocator() ) );
     }
-
-    /*
-     * DEPTH-STENCIL ATTACHMENT
-     */
-    if( mDepthStencilImageViewAttachment )
+    else //Render Pass is externally provided. Just fetch the attachment image views and create the framebuffer
     {
-      auto attRef = vk::AttachmentReference{};
-      attRef.setLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
-      attRef.setAttachment( colorAttachmentSize );
-      mAttachmentReference.emplace_back( attRef );
-      attachments.emplace_back( mDepthStencilImageViewAttachment->GetVkHandle() );
+      for( const auto& colorAttachment : mColorImageViewAttachments )
+      {
+        attachments.push_back( colorAttachment->GetVkHandle() );
+      }
 
-      vk::AttachmentDescription attDesc{};
-      attDesc.setSamples( vk::SampleCountFlagBits::e1 )
-             .setInitialLayout( vk::ImageLayout::eUndefined )
-             .setFormat( mDepthStencilImageViewAttachment->GetImage()->GetFormat() )
-             .setStencilStoreOp( vk::AttachmentStoreOp::eDontCare )
-             .setStencilLoadOp( vk::AttachmentLoadOp::eDontCare )
-             .setLoadOp( vk::AttachmentLoadOp::eClear )
-             .setStoreOp( vk::AttachmentStoreOp::eDontCare )
-             .setFinalLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
-      mAttachmentDescription.emplace_back( attDesc );
-
-      // update clear depth/stencil values
-      vk::ClearDepthStencilValue clear;
-      clear.setDepth( 0.0f ).setStencil( 1.0f );
-      mDefaultClearValues.emplace_back( clear );
+      if( mDepthStencilImageViewAttachment )
+      {
+        attachments.push_back( mDepthStencilImageViewAttachment->GetVkHandle() );
+      }
     }
-
-    /*
-     * SUBPASS
-     */
-    // creating single subpass per framebuffer
-    auto subpassDesc = vk::SubpassDescription{};
-    subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
-    subpassDesc.setColorAttachmentCount( colorAttachmentSize );
-    if( mDepthStencilImageViewAttachment )
-    {
-      subpassDesc.setPDepthStencilAttachment( &mAttachmentReference[colorAttachmentSize] );
-    }
-    subpassDesc.setPColorAttachments( &mAttachmentReference[0] );
-
-    /*
-     * RENDERPASS
-     */
-    // create compatible render pass
-    auto rpInfo = vk::RenderPassCreateInfo{};
-    rpInfo.setAttachmentCount( U32(mAttachmentDescription.size()) );
-    rpInfo.setPAttachments( mAttachmentDescription.data() );
-    rpInfo.setPSubpasses( &subpassDesc );
-    rpInfo.setSubpassCount( 1 );
-    mVkRenderPass = VkAssert( mGraphics.GetDevice().createRenderPass( rpInfo, mGraphics.GetAllocator() ));
 
     /*
      * FRAMEBUFFER
      */
-    vk::FramebufferCreateInfo info;
-    info.setRenderPass( mVkRenderPass )
-        .setPAttachments( attachments.data() )
-        .setLayers( 1 )
-        .setWidth( mWidth )
-        .setHeight( mHeight )
-        .setAttachmentCount( U32(attachments.size()) );
+    auto framebufferCreateInfo = vk::FramebufferCreateInfo{}.setRenderPass( mVkRenderPass )
+                                                            .setPAttachments( attachments.data() )
+                                                            .setLayers( 1 )
+                                                            .setWidth( mWidth )
+                                                            .setHeight( mHeight )
+                                                            .setAttachmentCount( U32( attachments.size() ) );
 
-    mVkFramebuffer = VkAssert( mGraphics.GetDevice().createFramebuffer( info, mGraphics.GetAllocator() ) );
+    mVkFramebuffer = VkAssert( mGraphics.GetDevice()
+                                        .createFramebuffer( framebufferCreateInfo,
+                                                            mGraphics.GetAllocator() ) );
 
     return true;
   }
@@ -146,7 +192,7 @@ struct Framebuffer::Impl
    */
   bool Commit()
   {
-    if(!mInitialised)
+    if( !mInitialised )
     {
       mInitialised = Initialise();
       return mInitialised;
@@ -172,6 +218,12 @@ struct Framebuffer::Impl
     }
   }
 
+  void SetExternalRenderPass( vk::RenderPass externalRenderPass )
+  {
+    mExternalRenderPass = true;
+    mVkRenderPass = externalRenderPass;
+  }
+
   RefCountedImageView GetAttachment( AttachmentType type, uint32_t index ) const
   {
     switch( type )
@@ -195,9 +247,9 @@ struct Framebuffer::Impl
     return RefCountedImageView();
   }
 
-  std::vector<RefCountedImageView> GetAttachments( AttachmentType type ) const
+  std::vector< RefCountedImageView > GetAttachments( AttachmentType type ) const
   {
-    std::vector<RefCountedImageView> retval{};
+    std::vector< RefCountedImageView > retval{};
     switch( type )
     {
       case AttachmentType::COLOR:
@@ -227,7 +279,7 @@ struct Framebuffer::Impl
     {
       case AttachmentType::COLOR:
       {
-        return U32(mColorImageViewAttachments.size());
+        return U32( mColorImageViewAttachments.size() );
       }
       case AttachmentType::DEPTH_STENCIL:
       {
@@ -244,7 +296,7 @@ struct Framebuffer::Impl
     return 0u;
   }
 
-  const std::vector<vk::ClearValue>& GetDefaultClearValues() const
+  const std::vector< vk::ClearValue >& GetDefaultClearValues() const
   {
     return mDefaultClearValues;
   }
@@ -262,22 +314,23 @@ struct Framebuffer::Impl
   }
 
   Framebuffer& mInterface;
-  Graphics&    mGraphics;
+  Graphics& mGraphics;
 
   uint32_t mWidth;
   uint32_t mHeight;
 
-  std::vector<RefCountedImageView> mColorImageViewAttachments;
-  RefCountedImageView              mDepthStencilImageViewAttachment;
-  vk::Framebuffer           mVkFramebuffer;
-  vk::RenderPass            mVkRenderPass;
+  std::vector< RefCountedImageView > mColorImageViewAttachments;
+  RefCountedImageView mDepthStencilImageViewAttachment;
+  vk::Framebuffer mVkFramebuffer;
+  vk::RenderPass mVkRenderPass;
 
   // attachment references for the main subpass
-  std::vector<vk::AttachmentReference>   mAttachmentReference;
-  std::vector<vk::AttachmentDescription> mAttachmentDescription;
+  std::vector< vk::AttachmentReference > mAttachmentReference;
+  std::vector< vk::AttachmentDescription > mAttachmentDescription;
 
-  std::vector<vk::ClearValue> mDefaultClearValues;
-  bool mInitialised{false};
+  std::vector< vk::ClearValue > mDefaultClearValues;
+  bool mInitialised{ false };
+  bool mExternalRenderPass{ false };
 };
 
 RefCountedFramebuffer Framebuffer::New( Graphics& graphics, uint32_t width, uint32_t height )
@@ -288,12 +341,17 @@ RefCountedFramebuffer Framebuffer::New( Graphics& graphics, uint32_t width, uint
 
 Framebuffer::Framebuffer( Graphics& graphics, uint32_t width, uint32_t height )
 {
-  mImpl = std::make_unique<Impl>( *this, graphics, width, height );
+  mImpl = std::make_unique< Impl >( *this, graphics, width, height );
 }
 
 void Framebuffer::SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index )
 {
-  mImpl->SetAttachment( imageViewRef, type, index );
+  mImpl->SetAttachment( std::move( imageViewRef ), type, index );
+}
+
+void Framebuffer::SetExternalRenderPass( vk::RenderPass externalRenderPass )
+{
+  mImpl->SetExternalRenderPass( externalRenderPass );
 }
 
 uint32_t Framebuffer::GetWidth() const
@@ -311,7 +369,7 @@ RefCountedImageView Framebuffer::GetAttachment( AttachmentType type, uint32_t in
   return mImpl->GetAttachment( type, index );
 }
 
-std::vector<RefCountedImageView> Framebuffer::GetAttachments( AttachmentType type ) const
+std::vector< RefCountedImageView > Framebuffer::GetAttachments( AttachmentType type ) const
 {
   return mImpl->GetAttachments( type );
 }
@@ -336,9 +394,49 @@ vk::Framebuffer Framebuffer::GetVkHandle() const
   return mImpl->mVkFramebuffer;
 }
 
-const std::vector<vk::ClearValue>& Framebuffer::GetDefaultClearValues() const
+const std::vector< vk::ClearValue >& Framebuffer::GetDefaultClearValues() const
 {
   return mImpl->GetDefaultClearValues();
+}
+
+bool Framebuffer::OnDestroy()
+{
+  if( !mImpl->mGraphics.IsShuttingDown() )
+  {
+    mImpl->mGraphics.RemoveFramebuffer( *this );
+  }
+
+  auto device = mImpl->mGraphics.GetDevice();
+  auto frameBuffer = mImpl->mVkFramebuffer;
+
+  vk::RenderPass renderPass;
+  if( mImpl->mExternalRenderPass )
+  {
+    renderPass = nullptr;
+  }
+  else
+  {
+    renderPass = mImpl->mVkRenderPass;
+  }
+
+  auto allocator = &mImpl->mGraphics.GetAllocator();
+
+  mImpl->mGraphics.DiscardResource( [ device, frameBuffer, renderPass, allocator ]() {
+
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: framebuffer->%p\n",
+                   static_cast< void* >(frameBuffer) )
+    device.destroyFramebuffer( frameBuffer, allocator );
+
+    if( renderPass )
+    {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: render pass->%p\n",
+                     static_cast< void* >(renderPass) )
+      device.destroyRenderPass( renderPass, allocator );
+    }
+
+  } );
+
+  return false;
 }
 
 } // Namespace Vulkan

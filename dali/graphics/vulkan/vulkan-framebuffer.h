@@ -19,6 +19,7 @@
  */
 
 #include <dali/graphics/vulkan/vulkan-types.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -56,11 +57,13 @@ public:
 
   RefCountedImageView GetAttachment( AttachmentType type, uint32_t index ) const;
 
-  std::vector<RefCountedImageView> GetAttachments( AttachmentType type ) const;
+  std::vector< RefCountedImageView > GetAttachments( AttachmentType type ) const;
 
   uint32_t GetAttachmentCount( AttachmentType type ) const;
 
   void SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
+
+  void SetExternalRenderPass( vk::RenderPass externalRenderPass );
 
   void Commit();
 
@@ -68,14 +71,16 @@ public:
 
   vk::Framebuffer GetVkHandle() const;
 
-  const std::vector<vk::ClearValue>& GetDefaultClearValues() const;
+  const std::vector< vk::ClearValue >& GetDefaultClearValues() const;
+
+  bool OnDestroy() override;
 
 private:
 
   Framebuffer( Graphics& graphics, uint32_t width, uint32_t height );
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 
 };
 

@@ -33,6 +33,7 @@ class SPIRVShader;
 }
 
 class Graphics;
+
 class Shader : public VkManaged // can be overriden as ShaderGLSL for example
 {
 public:
@@ -51,7 +52,7 @@ public:
    * @param info
    * @return
    */
-  static Handle<Shader> New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
+  static Handle< Shader > New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info );
 
   /**
    * Creates new shader module from SPIR-V code
@@ -60,7 +61,7 @@ public:
    * @param size
    * @return
    */
-  static Handle<Shader> New( Graphics& graphics, const void* bytes, std::size_t size );
+  static Handle< Shader > New( Graphics& graphics, const void* bytes, std::size_t size );
 
   /**
    *
@@ -93,7 +94,7 @@ private:
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 } // Namespace Vulkan

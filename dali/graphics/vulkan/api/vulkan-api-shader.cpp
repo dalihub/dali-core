@@ -19,6 +19,7 @@
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -33,7 +34,7 @@ using ShaderPipelineStage = Dali::Graphics::API::ShaderDetails::PipelineStage;
 using ShaderSource = Dali::Graphics::API::ShaderDetails::ShaderSource;
 
 Shader::Shader( Vulkan::Graphics& graphics ) :
-mGraphics( graphics )
+        mGraphics( graphics )
 {
 
 }
@@ -69,24 +70,23 @@ Shader& Shader::DownCast( Dali::Graphics::API::Shader& shader )
 
 Vulkan::RefCountedShader Shader::GetShaderRef( vk::ShaderStageFlagBits shaderStage ) const
 {
-  if(shaderStage == vk::ShaderStageFlagBits::eVertex)
+  if( shaderStage == vk::ShaderStageFlagBits::eVertex )
   {
     return mVertexShader;
   }
-  else if(shaderStage == vk::ShaderStageFlagBits::eFragment)
+  else if( shaderStage == vk::ShaderStageFlagBits::eFragment )
   {
     return mFragmentShader;
   }
   else
   {
-    return Vulkan::RefCountedShader( );
+    return Vulkan::RefCountedShader();
   }
 }
 
 bool Shader::AddShaderModule( Dali::Graphics::API::ShaderDetails::PipelineStage pipelineStage,
                               Dali::Graphics::API::ShaderDetails::Language language,
                               Dali::Graphics::API::ShaderDetails::ShaderSource shaderSource )
-
 {
   // TODO: AB: only supported language is SPIRV for now
   if( language != ShaderLanguage::SPIRV_1_0 && language != ShaderLanguage::SPIRV_1_1 )
@@ -103,19 +103,19 @@ bool Shader::AddShaderModule( Dali::Graphics::API::ShaderDetails::PipelineStage 
 
   auto shaderRef = Vulkan::Shader::New( mGraphics, &shaderSource.code[0], shaderSource.code.size() );
 
-  if(!shaderRef)
+  if( !shaderRef )
   {
     return false;
   }
 
-  if(pipelineStage == ShaderPipelineStage::VERTEX )
+  if( pipelineStage == ShaderPipelineStage::VERTEX )
   {
     mVertexShader = shaderRef;
     mVertexShader->SetExplicitShaderStage( vk::ShaderStageFlagBits::eVertex );
     // update input attributes
     mVertexShader->GetSPIRVReflection().GetVertexInputAttributes( mVertexInputAttributes );
   }
-  else if(pipelineStage == ShaderPipelineStage::FRAGMENT )
+  else if( pipelineStage == ShaderPipelineStage::FRAGMENT )
   {
     mFragmentShader = shaderRef;
     mVertexShader->SetExplicitShaderStage( vk::ShaderStageFlagBits::eFragment );
@@ -128,18 +128,18 @@ bool Shader::AddShaderModule( Dali::Graphics::API::ShaderDetails::PipelineStage 
   if( mVertexShader )
   {
     auto& ubo = mVertexShader->GetSPIRVReflection().GetUniformBlocks();
-    mUniformBlocks.insert(mUniformBlocks.end(), ubo.begin(), ubo.end() );
+    mUniformBlocks.insert( mUniformBlocks.end(), ubo.begin(), ubo.end() );
 
     auto& uniforms = mVertexShader->GetSPIRVReflection().GetOpaqueUniforms();
-    mUniformOpaques.insert(mUniformOpaques.end(), uniforms.begin(), uniforms.end() );
+    mUniformOpaques.insert( mUniformOpaques.end(), uniforms.begin(), uniforms.end() );
   }
   if( mFragmentShader )
   {
     auto& ubo = mFragmentShader->GetSPIRVReflection().GetUniformBlocks();
-    mUniformBlocks.insert(mUniformBlocks.end(), ubo.begin(), ubo.end() );
+    mUniformBlocks.insert( mUniformBlocks.end(), ubo.begin(), ubo.end() );
 
     auto& uniforms = mFragmentShader->GetSPIRVReflection().GetOpaqueUniforms();
-    mUniformOpaques.insert(mUniformOpaques.end(), uniforms.begin(), uniforms.end() );
+    mUniformOpaques.insert( mUniformOpaques.end(), uniforms.begin(), uniforms.end() );
   }
 
   // verify bindings and descriptor sets ( must be no overlaps, or if there are, only one binding will be used )
@@ -151,7 +151,7 @@ bool Shader::IsReflectionSupported() const
   return true;
 }
 
-uint32_t Shader::GetVertexAttributeLocation(const std::string& name) const
+uint32_t Shader::GetVertexAttributeLocation( const std::string& name ) const
 {
   if( !mVertexShader )
   {
@@ -200,7 +200,7 @@ API::ShaderDetails::VertexInputAttributeFormat Shader::GetVertexAttributeFormat(
   return API::ShaderDetails::VertexInputAttributeFormat::UNDEFINED;
 }
 
-std::string Shader::GetVertexAttributeName(uint32_t location) const
+std::string Shader::GetVertexAttributeName( uint32_t location ) const
 {
   if( !mVertexShader || mVertexInputAttributes.size() <= location )
   {
@@ -210,9 +210,9 @@ std::string Shader::GetVertexAttributeName(uint32_t location) const
   return mVertexInputAttributes[location].name;
 }
 
-std::vector<uint32_t> Shader::GetVertexAttributeLocations() const
+std::vector< uint32_t > Shader::GetVertexAttributeLocations() const
 {
-  std::vector<uint32_t> locations;
+  std::vector< uint32_t > locations;
   for( auto&& attr : mVertexInputAttributes )
   {
     if( attr.format != vk::Format::eUndefined )
@@ -224,9 +224,9 @@ std::vector<uint32_t> Shader::GetVertexAttributeLocations() const
   return locations;
 }
 
-std::vector<uint32_t> Shader::GetUniformBlockLocations() const
+std::vector< uint32_t > Shader::GetUniformBlockLocations() const
 {
-  std::vector<uint32_t> retval{};
+  std::vector< uint32_t > retval{};
   for( auto&& ubo : mUniformBlocks )
   {
     retval.emplace_back( ubo.binding );
@@ -241,7 +241,7 @@ std::string Shader::GetUniformBlockName( uint32_t blockIndex ) const
 
 uint32_t Shader::GetUniformBlockMemberCount( uint32_t blockIndex ) const
 {
-  return U32(mUniformBlocks[blockIndex].members.size());
+  return U32( mUniformBlocks[blockIndex].members.size() );
 }
 
 std::string Shader::GetUniformBlockMemberName( uint32_t blockIndex, uint32_t memberLocation ) const
@@ -262,7 +262,7 @@ bool Shader::GetNamedUniform( const std::string& name, API::ShaderDetails::Unifo
   {
     for( auto&& member : ubo.members )
     {
-      if( name == member.name || name == (ubo.name + "." + member.name) )
+      if( name == member.name || name == ( ubo.name + "." + member.name ) )
       {
         out.name = name;
         out.location = member.location;
@@ -292,12 +292,12 @@ bool Shader::GetNamedUniform( const std::string& name, API::ShaderDetails::Unifo
   return false;
 }
 
-std::vector<API::ShaderDetails::UniformInfo> Shader::GetSamplers() const
+std::vector< API::ShaderDetails::UniformInfo > Shader::GetSamplers() const
 {
-  std::vector<API::ShaderDetails::UniformInfo> retval;
+  std::vector< API::ShaderDetails::UniformInfo > retval;
   for( auto&& uniform : mUniformOpaques )
   {
-    if(uniform.type == vk::DescriptorType::eCombinedImageSampler )
+    if( uniform.type == vk::DescriptorType::eCombinedImageSampler )
     {
       API::ShaderDetails::UniformInfo info;
       info.location = 0u;
@@ -308,18 +308,17 @@ std::vector<API::ShaderDetails::UniformInfo> Shader::GetSamplers() const
       retval.emplace_back( info );
     }
   }
-  std::sort(retval.begin(), retval.end(),
-            []( const API::ShaderDetails::UniformInfo& a, const API::ShaderDetails::UniformInfo& b )
-            {
-              return a.binding < b.binding;
-            } );
+  std::sort( retval.begin(), retval.end(),
+             []( const API::ShaderDetails::UniformInfo& a, const API::ShaderDetails::UniformInfo& b ) {
+               return a.binding < b.binding;
+             } );
 
   return retval;
 }
 
 uint32_t Shader::GetUniformBlockCount() const
 {
-  return U32(mUniformBlocks.size());
+  return U32( mUniformBlocks.size() );
 }
 
 bool Shader::GetUniformBlock( uint32_t index, API::ShaderDetails::UniformBlockInfo& out ) const

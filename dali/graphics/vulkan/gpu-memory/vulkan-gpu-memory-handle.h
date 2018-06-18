@@ -27,16 +27,22 @@ namespace Graphics
 namespace Vulkan
 {
 class GpuMemoryAllocator;
-const uint32_t INVALID_ALLOCATION { UINT32_MAX };
 
-struct Any {};
+const uint32_t INVALID_ALLOCATION{ UINT32_MAX };
+
+struct Any
+{
+};
+
 class GpuMemoryBlock : public VkManaged
 {
 public:
 
-  template <class T>
-  GpuMemoryBlock( GpuMemoryAllocator& allocator, std::unique_ptr<T> data ) :
-  mAllocator(allocator), mAllocationData(reinterpret_cast<Any*>(data.release())){}
+  template< class T >
+  GpuMemoryBlock( GpuMemoryAllocator& allocator, std::unique_ptr< T > data ) :
+          mAllocator( allocator ), mAllocationData( reinterpret_cast<Any*>(data.release()) )
+  {
+  }
 
   /**
    *
@@ -49,7 +55,7 @@ public:
    * @tparam T
    * @return
    */
-  template<class T>
+  template< class T >
   T* MapTyped()
   {
     return reinterpret_cast<T*>(Map());
@@ -84,7 +90,7 @@ public:
    * @tparam T
    * @return
    */
-  template <class T>
+  template< class T >
   T* GetData() const
   {
     return reinterpret_cast<T*>(mAllocationData.get());
@@ -120,8 +126,8 @@ public:
 
 private:
 
-  GpuMemoryAllocator&         mAllocator;
-  std::unique_ptr<Any>        mAllocationData; // may be any POD object pointer, depends on allocator
+  GpuMemoryAllocator& mAllocator;
+  std::unique_ptr< Any > mAllocationData; // may be any POD object pointer, depends on allocator
 };
 
 }

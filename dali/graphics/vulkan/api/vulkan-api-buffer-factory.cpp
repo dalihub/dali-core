@@ -20,6 +20,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -27,7 +28,7 @@ namespace Graphics
 namespace VulkanAPI
 {
 BufferFactory::BufferFactory( Controller& controller )
-: mController( controller ), mGraphics(controller.GetGraphics() )
+        : mController( controller ), mGraphics( controller.GetGraphics() )
 {
 
 }
@@ -72,16 +73,15 @@ BufferFactory& BufferFactory::SetSize( uint32_t size )
   return *this;
 }
 
-std::unique_ptr<API::Buffer> BufferFactory::Create() const
+std::unique_ptr< API::Buffer > BufferFactory::Create() const
 {
-  auto retval = std::make_unique<VulkanAPI::Buffer>( mController, mUsage, mUsageHints, mSize );
+  auto retval = std::make_unique< VulkanAPI::Buffer >( mController, mUsage, mUsageHints, mSize );
   if( retval->Initialise() )
   {
-    return std::unique_ptr<API::Buffer>{ retval.release() };
+    return std::unique_ptr< API::Buffer >{ retval.release() };
   }
   return nullptr;
 }
-
 
 
 } // namespace VulkanAPI

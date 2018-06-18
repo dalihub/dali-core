@@ -39,25 +39,25 @@ using namespace Dali::Graphics::Vulkan;
 
 struct Pixmap
 {
-  explicit Pixmap( uint32_t _width, uint32_t _height, vk::Format format  )
-    : width( _width ), height( _height ), bytesPerPixel(1), pixelFormat( format )
+  explicit Pixmap( uint32_t _width, uint32_t _height, vk::Format format )
+          : width( _width ), height( _height ), bytesPerPixel( 1 ), pixelFormat( format )
   {
     totalSizeInBytes = width * height * bytesPerPixel;
-    data.resize(totalSizeInBytes);
+    data.resize( totalSizeInBytes );
   }
 
   explicit Pixmap( uint32_t _width, uint32_t _height )
-  : width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
+          : width( _width ), height( _height ), bytesPerPixel( 4 ), pixelFormat( vk::Format::eR8G8B8A8Unorm )
   {
     data.resize( _width * _height );
   }
 
-  std::vector<uint8_t>  data;
-  uint32_t              width;
-  uint32_t              height;
-  uint32_t              bytesPerPixel;
-  uint32_t              totalSizeInBytes;
-  vk::Format            pixelFormat;
+  std::vector< uint8_t > data;
+  uint32_t width;
+  uint32_t height;
+  uint32_t bytesPerPixel;
+  uint32_t totalSizeInBytes;
+  vk::Format pixelFormat;
 };
 
 /**
@@ -73,7 +73,7 @@ struct Texture::Impl
         uint32_t width,
         uint32_t height,
         vk::Format format ) : mGraphics( graphics ),
-        mPixmap( width, height, format )
+                              mPixmap( width, height, format )
   {
     mWidth = width;
     mHeight = height;
@@ -84,16 +84,17 @@ struct Texture::Impl
   {
     // create buffer
     auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
-    auto size   = sizeInBytes;
-    auto buffer = mGraphics.CreateBuffer(vk::BufferCreateInfo{}
-                                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                                 .setSharingMode( vk::SharingMode::eExclusive )
-                                                 .setSize( size ));
+    auto size = sizeInBytes;
+    auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
+                                                  .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
+                                                  .setSharingMode( vk::SharingMode::eExclusive )
+                                                  .setSize( size ) );
 
-    buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent ) );
+    buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
+                                                    vk::MemoryPropertyFlagBits::eHostCoherent ) );
 
     // copy pixels to the buffer
-    auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
+    auto ptr = buffer->GetMemoryHandle()->MapTyped< char >();
     std::copy( reinterpret_cast<const char*>(data),
                reinterpret_cast<const char*>(data) + sizeInBytes,
                ptr );
@@ -102,48 +103,56 @@ struct Texture::Impl
 
     // record copy and layout change
     auto copy = vk::BufferImageCopy{}
-      .setImageExtent( { mWidth, mHeight, 1} )
-      .setBufferImageHeight( mHeight )
-      .setBufferOffset( 0 )
-      .setBufferRowLength( mWidth )
-      .setImageOffset( {0, 0, 0} )
-      .setImageSubresource( vk::ImageSubresourceLayers{}
-                              .setMipLevel( 0 )
-                              .setAspectMask( vk::ImageAspectFlagBits::eColor )
-                              .setLayerCount( 1 )
-                              .setBaseArrayLayer( 0 ) );
+            .setImageExtent( { mWidth, mHeight, 1 } )
+            .setBufferImageHeight( mHeight )
+            .setBufferOffset( 0 )
+            .setBufferRowLength( mWidth )
+            .setImageOffset( { 0, 0, 0 } )
+            .setImageSubresource( vk::ImageSubresourceLayers{}
+                                          .setMipLevel( 0 )
+                                          .setAspectMask( mImage->GetAspectFlags() )
+                                          .setLayerCount( 1 )
+                                          .setBaseArrayLayer( 0 ) );
 
     auto commandBuffer = mGraphics.CreateCommandBuffer( true );
 
-    commandBuffer->Begin(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-
-    // change layout
-    auto barrier = std::vector<vk::ImageMemoryBarrier>{commandBuffer->ImageLayoutTransitionBarrier(
-      mImage, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferDstOptimal, vk::ImageAspectFlagBits::eColor )};
+    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
 
     // change layout to prepare image to transfer data
-    commandBuffer->PipelineBarrier(
-      vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, {barrier} );
+    commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe,
+                                    vk::PipelineStageFlagBits::eTransfer,
+                                    {},
+                                    {},
+                                    {},
+                                    { mGraphics.CreateImageMemoryBarrier( mImage,
+                                                                          mImage->GetImageLayout(),
+                                                                          vk::ImageLayout::eTransferDstOptimal ) } );
 
     // copy image
-    commandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, {copy} );
+    commandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, { copy } );
 
     // change layout to shader read-only optimal
     commandBuffer->PipelineBarrier(
-      vk::PipelineStageFlagBits::eVertexShader,
-      vk::PipelineStageFlagBits::eVertexShader,
-      {},
-      {},
-      {},
-      {commandBuffer->ImageLayoutTransitionBarrier(
-        mImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageAspectFlagBits::eColor )} );
+            vk::PipelineStageFlagBits::eVertexShader,
+            vk::PipelineStageFlagBits::eVertexShader,
+            {},
+            {},
+            {},
+            { mGraphics.CreateImageMemoryBarrier( mImage,
+                                                  vk::ImageLayout::eTransferDstOptimal,
+                                                  vk::ImageLayout::eShaderReadOnlyOptimal ) } );
 
     commandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = mGraphics.CreateFence({});
-    VkAssert(mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { SubmissionData{}.SetCommandBuffers( { commandBuffer } ) }, fence ));
-    VkAssert(mGraphics.WaitForFence(fence, std::numeric_limits<uint32_t>::max()));
+    auto fence = mGraphics.CreateFence( {} );
+    VkAssert( mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ),
+                                { SubmissionData{}.SetCommandBuffers( { commandBuffer } ) }, fence ) );
+    VkAssert( mGraphics.WaitForFence( fence, std::numeric_limits< uint32_t >::max() ) );
+
+    // Update the image with its new layout
+    mImage->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+
     return true;
   }
 
@@ -158,7 +167,7 @@ struct Texture::Impl
             .setSamples( vk::SampleCountFlagBits::e1 )
             .setSharingMode( vk::SharingMode::eExclusive )
             .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
-            .setExtent( {mPixmap.width, mPixmap.height, 1} )
+            .setExtent( { mPixmap.width, mPixmap.height, 1 } )
             .setArrayLayers( 1 )
             .setImageType( vk::ImageType::e2D )
             .setTiling( vk::ImageTiling::eOptimal )
@@ -169,14 +178,14 @@ struct Texture::Impl
 
     // allocate memory for the image
     auto memory = mGraphics.GetDeviceMemoryManager()
-            .GetDefaultAllocator()
-            .Allocate(mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+                           .GetDefaultAllocator()
+                           .Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
     // bind the allocated memory to the image
     mGraphics.BindImageMemory( mImage, memory, 0 );
 
     // create default image view
-    mImageView = mGraphics.CreateImageView(mImage);
+    mImageView = mGraphics.CreateImageView( mImage );
 
     // create basic sampler
     CreateSampler();
@@ -204,17 +213,17 @@ struct Texture::Impl
     return mSampler;
   }
 
-  Graphics&    mGraphics;
-  RefCountedImage     mImage;
+  Graphics& mGraphics;
+  RefCountedImage mImage;
   RefCountedImageView mImageView;
-  RefCountedSampler   mSampler;
+  RefCountedSampler mSampler;
 
   // layouts
   vk::ImageLayout mOldLayout;
   vk::ImageLayout mNewLayout;
 
-  uint32_t mWidth { 0u }, mHeight { 0u };
-  vk::Format mFormat {};
+  uint32_t mWidth{ 0u }, mHeight{ 0u };
+  vk::Format mFormat{};
   // Command pool
   Pixmap mPixmap;
 };
@@ -226,7 +235,7 @@ struct Texture::Impl
 
 RefCountedTexture Texture::New( Graphics& graphics, uint32_t width, uint32_t height, vk::Format format )
 {
-  auto result = RefCountedTexture( new Texture( graphics, width, height, format ));
+  auto result = RefCountedTexture( new Texture( graphics, width, height, format ) );
   if( !result->mImpl->Initialise() )
   {
     result.Reset();
@@ -248,7 +257,7 @@ Texture::Texture( Graphics& graphics, uint32_t width, uint32_t height, vk::Forma
  */
 void Texture::UploadData( const void* data, size_t size, TextureUploadMode mode )
 {
-  mImpl->UploadData( data, 0, U32(size) );
+  mImpl->UploadData( data, 0, U32( size ) );
 }
 
 /**

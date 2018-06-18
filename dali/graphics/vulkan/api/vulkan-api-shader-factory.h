@@ -39,9 +39,9 @@ class ShaderFactory : public Dali::Graphics::API::ShaderFactory
 public:
   explicit ShaderFactory( Vulkan::Graphics& graphics );
 
-  ShaderFactory& SetShaderModule(Graphics::API::ShaderDetails::PipelineStage       pipelineStage,
-                                 Graphics::API::ShaderDetails::Language            language,
-                                 const Graphics::API::ShaderDetails::ShaderSource& source) override;
+  ShaderFactory& SetShaderModule( Graphics::API::ShaderDetails::PipelineStage pipelineStage,
+                                  Graphics::API::ShaderDetails::Language language,
+                                  const Graphics::API::ShaderDetails::ShaderSource& source ) override;
 
   PointerType Create() const override;
 
@@ -60,16 +60,16 @@ private:
     ShaderSource source;
 
     ShaderModuleInfo( PipelineStage stage, Language shaderLanguage, const ShaderSource& shaderSource )
-    : pipelineStage( stage ),
-      language( shaderLanguage ),
-      source( shaderSource )
+            : pipelineStage( stage ),
+              language( shaderLanguage ),
+              source( shaderSource )
     {
     }
 
     ShaderModuleInfo()
-      : pipelineStage( PipelineStage::VERTEX ),
-        language( Language::SPIRV_1_0 ),
-        source( ShaderSource(std::vector<char>()) )
+            : pipelineStage( PipelineStage::VERTEX ),
+              language( Language::SPIRV_1_0 ),
+              source( ShaderSource( std::vector< char >() ) )
     {
     }
 
