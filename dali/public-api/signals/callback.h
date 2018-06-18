@@ -25,12 +25,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-#ifdef WIN32
-#define STDCALL __stdcall
-#else
-#define STDCALL
-#endif
-
 namespace Dali
 {
 /**
@@ -118,7 +112,7 @@ public:
     }
     else if( !callback.mImpl && callback.mFunction )
     {
-      typedef R(STDCALL *Function1)();
+      typedef R(*Function1)();
       returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))();
     }
 
@@ -149,7 +143,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(STDCALL *Function1)(P1);
+      typedef void(*Function1)(P1);
       (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
     }
   }
@@ -180,7 +174,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(STDCALL *Function1)(P1);
+      typedef R(*Function1)(P1);
       returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
     }
 
@@ -212,7 +206,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(STDCALL *Function2)(P1,P2);
+      typedef void(*Function2)(P1,P2);
       (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
     }
   }
@@ -244,7 +238,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(STDCALL *Function2)(P1,P2);
+      typedef R(*Function2)(P1,P2);
       returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
     }
 
@@ -277,7 +271,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(STDCALL *Function2)(P1,P2,P3);
+      typedef void(*Function2)(P1,P2,P3);
       (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
     }
   }
@@ -310,7 +304,7 @@ public:
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(STDCALL *Function2)(P1,P2,P3);
+      typedef R(*Function2)(P1,P2,P3);
       returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
     }
 
@@ -323,13 +317,13 @@ protected: // Constructors for deriving classes
    * @brief Function with static linkage.
    * @SINCE_1_0.0
    */
-  typedef void(STDCALL *Function)(void);
+  typedef void(*Function)(void);
 
   /**
    * @brief Member function.
    * @SINCE_1_0.0
    */
-  typedef void (STDCALL CallbackBase::*MemberFunction)( void );
+  typedef void (CallbackBase::*MemberFunction)( void );
 
   /**
    * @brief Used to call the correct member function.

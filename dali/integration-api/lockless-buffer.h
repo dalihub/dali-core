@@ -25,8 +25,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
-#include <atomic>
-
 namespace Dali
 {
 
@@ -104,7 +102,7 @@ private:
 
 private:
   unsigned char* mBuffer[2];     ///< bitmap buffers
-  volatile std::__atomic_base<BufferState> mState;   ///< readbuffer number and whether we're currently writing into writebuffer or not
+  BufferState volatile mState;   ///< readbuffer number and whether we're currently writing into writebuffer or not
   size_t mSize;                  ///< size of buffers
 };
 
