@@ -34,57 +34,59 @@ namespace
  * Hashing binary data, it may not be the best algorithm
  * @return
  */
-uint32_t HashBinary(const void *dataObj, uint32_t size)
+uint32_t HashBinary( const void* dataObj, uint32_t size )
 {
-  const uint8_t *data = reinterpret_cast<const uint8_t *>(dataObj);
-  uint32_t      hash = 5381u;
-  uint32_t      c;
-  for (uint32_t i    = 0; i < size; ++i)
+  const uint8_t* data = reinterpret_cast<const uint8_t*>(dataObj);
+  uint32_t hash = 5381u;
+  uint32_t c;
+  for( uint32_t i = 0; i < size; ++i )
   {
-    c    = *data++;
-    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    c = *data++;
+    hash = ( ( hash << 5 ) + hash ) + c; /* hash * 33 + c */
   }
   return hash;
 }
 
-uint32_t HashPipeline(const VulkanAPI::PipelineFactory::Info &info)
+uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
 {
-  uint32_t dsHash = HashBinary( &info.depthStencilState, sizeof(info.depthStencilState) );
-  uint32_t cbHash = HashBinary( &info.colorBlendState, sizeof(info.colorBlendState) );
-  uint32_t shHash = HashBinary( &info.shaderState, sizeof(info.shaderState) );
-  uint32_t vpHash = HashBinary( &info.viewportState, sizeof(info.viewportState) );
-  uint32_t rsHash = HashBinary( &info.rasterizationState, sizeof(info.rasterizationState) );
-  uint32_t iaHash = HashBinary( &info.inputAssemblyState, sizeof(info.inputAssemblyState) );
+  uint32_t dsHash = HashBinary( &info.depthStencilState, sizeof( info.depthStencilState ) );
+  uint32_t cbHash = HashBinary( &info.colorBlendState, sizeof( info.colorBlendState ) );
+  uint32_t shHash = HashBinary( &info.shaderState, sizeof( info.shaderState ) );
+  uint32_t vpHash = HashBinary( &info.viewportState, sizeof( info.viewportState ) );
+  uint32_t rsHash = HashBinary( &info.rasterizationState, sizeof( info.rasterizationState ) );
+  uint32_t iaHash = HashBinary( &info.inputAssemblyState, sizeof( info.inputAssemblyState ) );
 
   // vertex input contains std containers so has to be hashed differently
-  uint32_t viStateBindingsHash = HashBinary( info.vertexInputState.bufferBindings.data(), uint32_t(sizeof( API::VertexInputState::Binding )*info.vertexInputState.bufferBindings.size()) );
-  uint32_t viStateAttributesHash = HashBinary( info.vertexInputState.attributes.data(), uint32_t(sizeof( API::VertexInputState::Attribute )*info.vertexInputState.attributes.size()) );
+  uint32_t viStateBindingsHash = HashBinary( info.vertexInputState.bufferBindings.data(), uint32_t(
+          sizeof( API::VertexInputState::Binding ) * info.vertexInputState.bufferBindings.size() ) );
+  uint32_t viStateAttributesHash = HashBinary( info.vertexInputState.attributes.data(), uint32_t(
+          sizeof( API::VertexInputState::Attribute ) * info.vertexInputState.attributes.size() ) );
 
   // rehash all
-  std::array<uint32_t, 8> allHashes = {
-    dsHash, cbHash, shHash, vpHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash
+  std::array< uint32_t, 8 > allHashes = {
+          dsHash, cbHash, shHash, vpHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash
   };
 
-  return HashBinary( allHashes.data(), uint32_t(allHashes.size() * sizeof(uint32_t)));
+  return HashBinary( allHashes.data(), uint32_t( allHashes.size() * sizeof( uint32_t ) ) );
 }
 
 }
 
 PipelineFactory::PipelineFactory( Controller& controller )
-: mController( controller ),
-  mGraphics( controller.GetGraphics() ),
-  mHashCode( 0u )
+        : mController( controller ),
+          mGraphics( controller.GetGraphics() ),
+          mHashCode( 0u )
 {
 }
 
-API::PipelineFactory& PipelineFactory::SetPipelineCache(VulkanAPI::PipelineCache& pipelineCache)
+API::PipelineFactory& PipelineFactory::SetPipelineCache( VulkanAPI::PipelineCache& pipelineCache )
 {
   mPipelineCache = dynamic_cast<VulkanAPI::PipelineCache*>(&pipelineCache);
   return *this;
 }
 
 
-API::PipelineFactory& PipelineFactory::SetColorBlendState(const API::ColorBlendState& state )
+API::PipelineFactory& PipelineFactory::SetColorBlendState( const API::ColorBlendState& state )
 {
   mInfo.colorBlendState = state;
   mHashCode = 0u;
@@ -106,7 +108,7 @@ API::PipelineFactory& PipelineFactory::SetViewportState( const API::ViewportStat
   return *this;
 }
 
-API::PipelineFactory& PipelineFactory::SetBasePipeline(API::Pipeline& pipeline)
+API::PipelineFactory& PipelineFactory::SetBasePipeline( API::Pipeline& pipeline )
 {
   mBasePipeline = dynamic_cast<VulkanAPI::Pipeline*>(&pipeline);
   mHashCode = 0u;
@@ -141,7 +143,7 @@ API::PipelineFactory& PipelineFactory::SetInputAssemblyState( const API::InputAs
   return *this;
 }
 
-std::unique_ptr<API::Pipeline> PipelineFactory::Create() const
+std::unique_ptr< API::Pipeline > PipelineFactory::Create() const
 {
   // todo: validate pipeline
 
@@ -152,11 +154,11 @@ std::unique_ptr<API::Pipeline> PipelineFactory::Create() const
     // if pipeline is already in cache, attach implementation and return unique ptr
     if( ptr )
     {
-      return std::unique_ptr<API::Pipeline>( new VulkanAPI::Pipeline( ptr ) );
+      return std::unique_ptr< API::Pipeline >( new VulkanAPI::Pipeline( ptr ) );
     }
   }
 
-  return std::unique_ptr<API::Pipeline>( new VulkanAPI::Pipeline( mGraphics, mController, this ) );
+  return std::unique_ptr< API::Pipeline >( new VulkanAPI::Pipeline( mGraphics, mController, this ) );
 }
 
 void PipelineFactory::Reset()

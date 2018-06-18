@@ -34,6 +34,7 @@ class Graphics;
 namespace VulkanAPI
 {
 class Controller;
+
 class BufferFactory : public Dali::Graphics::API::BufferFactory
 {
 public:
@@ -48,11 +49,11 @@ public:
 
 private:
 
-  Controller&                 mController;
-  Vulkan::Graphics&           mGraphics;
-  vk::BufferUsageFlagBits     mUsage;
-  API::Buffer::UsageHint      mUsageHints;
-  uint32_t                    mSize;
+  Controller& mController;
+  Vulkan::Graphics& mGraphics;
+  vk::BufferUsageFlagBits mUsage;
+  API::Buffer::UsageHint mUsageHints;
+  uint32_t mSize;
 };
 
 } // namespace VulkanAPI

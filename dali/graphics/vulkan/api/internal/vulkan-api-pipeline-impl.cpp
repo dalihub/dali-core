@@ -29,6 +29,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 
 #include <array>
+
 namespace Dali
 {
 namespace Graphics
@@ -104,9 +105,9 @@ constexpr vk::BlendFactor ConvertBlendFactor( Dali::Graphics::API::BlendFactor b
   return vk::BlendFactor{};
 }
 
-constexpr vk::CompareOp ConvertCompareOp( Dali::Graphics::API::CompareOp compareOp)
+constexpr vk::CompareOp ConvertCompareOp( Dali::Graphics::API::CompareOp compareOp )
 {
-  switch (compareOp)
+  switch( compareOp )
   {
     case API::CompareOp::NEVER:
       return vk::CompareOp::eNever;
@@ -128,10 +129,10 @@ constexpr vk::CompareOp ConvertCompareOp( Dali::Graphics::API::CompareOp compare
   return vk::CompareOp{};
 }
 
-constexpr vk::PrimitiveTopology ConvertPrimitiveTopology( Dali::Graphics::API::PrimitiveTopology topology)
+constexpr vk::PrimitiveTopology ConvertPrimitiveTopology( Dali::Graphics::API::PrimitiveTopology topology )
 {
   using Dali::Graphics::API::Pipeline;
-  switch (topology)
+  switch( topology )
   {
     case API::PrimitiveTopology::POINT_LIST:
       return vk::PrimitiveTopology::ePointList;
@@ -149,9 +150,9 @@ constexpr vk::PrimitiveTopology ConvertPrimitiveTopology( Dali::Graphics::API::P
   return vk::PrimitiveTopology{};
 }
 
-constexpr vk::CullModeFlagBits ConvertCullMode( Dali::Graphics::API::CullMode cullMode)
+constexpr vk::CullModeFlagBits ConvertCullMode( Dali::Graphics::API::CullMode cullMode )
 {
-  switch (cullMode)
+  switch( cullMode )
   {
     case API::CullMode::NONE:
       return vk::CullModeFlagBits::eNone;
@@ -165,9 +166,9 @@ constexpr vk::CullModeFlagBits ConvertCullMode( Dali::Graphics::API::CullMode cu
   return vk::CullModeFlagBits{};
 }
 
-constexpr vk::PolygonMode ConvertPolygonMode( Dali::Graphics::API::PolygonMode polygonMode)
+constexpr vk::PolygonMode ConvertPolygonMode( Dali::Graphics::API::PolygonMode polygonMode )
 {
-  switch (polygonMode)
+  switch( polygonMode )
   {
     case API::PolygonMode::FILL:
       return vk::PolygonMode::eFill;
@@ -179,9 +180,9 @@ constexpr vk::PolygonMode ConvertPolygonMode( Dali::Graphics::API::PolygonMode p
   return vk::PolygonMode{};
 }
 
-constexpr vk::FrontFace ConvertFrontFace( Dali::Graphics::API::FrontFace frontFace)
+constexpr vk::FrontFace ConvertFrontFace( Dali::Graphics::API::FrontFace frontFace )
 {
-  switch (frontFace)
+  switch( frontFace )
   {
     case API::FrontFace::CLOCKWISE:
       return vk::FrontFace::eClockwise;
@@ -201,36 +202,37 @@ struct Pipeline::PipelineCreateInfo
 struct Pipeline::VulkanPipelineState
 {
   VulkanPipelineState() = default;
+
   ~VulkanPipelineState() = default;
 
-  vk::PipelineColorBlendStateCreateInfo              colorBlend;
-  std::vector<vk::PipelineColorBlendAttachmentState> colorBlendAttachmentState;
+  vk::PipelineColorBlendStateCreateInfo colorBlend;
+  std::vector< vk::PipelineColorBlendAttachmentState > colorBlendAttachmentState;
 
-  vk::PipelineDepthStencilStateCreateInfo   depthStencil;
-  vk::PipelineInputAssemblyStateCreateInfo  inputAssembly;
-  vk::PipelineMultisampleStateCreateInfo    multisample;
-  vk::PipelineRasterizationStateCreateInfo  rasterization;
-  vk::PipelineTessellationStateCreateInfo   tesselation;
-  vk::PipelineVertexInputStateCreateInfo    vertexInput;
+  vk::PipelineDepthStencilStateCreateInfo depthStencil;
+  vk::PipelineInputAssemblyStateCreateInfo inputAssembly;
+  vk::PipelineMultisampleStateCreateInfo multisample;
+  vk::PipelineRasterizationStateCreateInfo rasterization;
+  vk::PipelineTessellationStateCreateInfo tesselation;
+  vk::PipelineVertexInputStateCreateInfo vertexInput;
 
   struct ViewportState
   {
     vk::PipelineViewportStateCreateInfo createInfo;
-    std::vector<vk::Viewport>           viewports;
-    std::vector<vk::Rect2D>             scissors;
+    std::vector< vk::Viewport > viewports;
+    std::vector< vk::Rect2D > scissors;
   } viewport;
 
   Vulkan::RefCountedPipeline pipeline{};
 };
 
 Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory )
-: mGraphics( controller.GetGraphics() ),
-  mController( controller )
+        : mGraphics( controller.GetGraphics() ),
+          mController( controller )
 {
   mHashCode = factory->GetHashCode();
 
   // copy info
-  mCreateInfo = std::unique_ptr<PipelineCreateInfo>(new PipelineCreateInfo({factory->GetCreateInfo()}));
+  mCreateInfo = std::unique_ptr< PipelineCreateInfo >( new PipelineCreateInfo( { factory->GetCreateInfo() } ) );
 
   mPipelineCache = factory->mPipelineCache;
 
@@ -242,7 +244,7 @@ Pipeline::~Pipeline()
   // deleting pipeline
 }
 
-uint32_t GetLocationIndex( const std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute>& attribs, uint32_t location )
+uint32_t GetLocationIndex( const std::vector< Vulkan::SpirV::SPIRVVertexInputAttribute >& attribs, uint32_t location )
 {
   auto retval = 0u;
 
@@ -259,20 +261,20 @@ uint32_t GetLocationIndex( const std::vector<Vulkan::SpirV::SPIRVVertexInputAttr
 
 bool Pipeline::Initialise()
 {
-  mVulkanPipelineState = std::unique_ptr<VulkanPipelineState>( new VulkanPipelineState() );
+  mVulkanPipelineState = std::unique_ptr< VulkanPipelineState >( new VulkanPipelineState() );
 
   // get shaders
   const auto& shader = static_cast<const VulkanAPI::Shader*>(mCreateInfo->info.shaderState.shaderProgram);
-  auto vertexShader   = shader->GetShader(vk::ShaderStageFlagBits::eVertex);
-  auto fragmentShader = shader->GetShader(vk::ShaderStageFlagBits::eFragment);
+  auto vertexShader = shader->GetShader( vk::ShaderStageFlagBits::eVertex );
+  auto fragmentShader = shader->GetShader( vk::ShaderStageFlagBits::eFragment );
 
   // retrieve input attributes descriptions
-  std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute> attribs{};
+  std::vector< Vulkan::SpirV::SPIRVVertexInputAttribute > attribs{};
   vertexShader->GetSPIRVReflection()
-              .GetVertexInputAttributes(attribs);
+              .GetVertexInputAttributes( attribs );
 
-  std::vector<vk::VertexInputAttributeDescription>    attributeDescriptions{};
-  std::vector<vk::VertexInputBindingDescription>      bindingDescriptions{};
+  std::vector< vk::VertexInputAttributeDescription > attributeDescriptions{};
+  std::vector< vk::VertexInputBindingDescription > bindingDescriptions{};
 
   const auto& bufferBindings = mCreateInfo->info.vertexInputState.bufferBindings;
   const auto& attributes = mCreateInfo->info.vertexInputState.attributes;
@@ -280,25 +282,26 @@ bool Pipeline::Initialise()
   // vertex buffer bindings match order of buffers
   for( uint32_t bindingIndex = 0u; bindingIndex < bufferBindings.size(); ++bindingIndex )
   {
-    bindingDescriptions.emplace_back(vk::VertexInputBindingDescription{}
-                                       .setBinding(bindingIndex)
-                                       .setInputRate(
-                                         bufferBindings[bindingIndex].inputRate == API::VertexInputRate::PER_VERTEX
-                                         ? vk::VertexInputRate::eVertex
-                                         : vk::VertexInputRate::eInstance)
-                                       .setStride(bufferBindings[bindingIndex].stride));
+    bindingDescriptions.emplace_back( vk::VertexInputBindingDescription{}
+                                              .setBinding( bindingIndex )
+                                              .setInputRate(
+                                                      bufferBindings[bindingIndex].inputRate ==
+                                                      API::VertexInputRate::PER_VERTEX
+                                                      ? vk::VertexInputRate::eVertex
+                                                      : vk::VertexInputRate::eInstance )
+                                              .setStride( bufferBindings[bindingIndex].stride ) );
   }
 
   // create attribute descriptions
   if( !attribs.empty() && attribs.size() == attribs.size() )
   {
-    for (auto&& vb : attributes )
+    for( auto&& vb : attributes )
     {
-      attributeDescriptions.emplace_back(vk::VertexInputAttributeDescription{}
-                                           .setBinding(vb.binding)
-                                           .setFormat(attribs[GetLocationIndex( attribs, vb.location)].format)
-                                           .setLocation(vb.location )
-                                           .setOffset(vb.offset));
+      attributeDescriptions.emplace_back( vk::VertexInputAttributeDescription{}
+                                                  .setBinding( vb.binding )
+                                                  .setFormat( attribs[GetLocationIndex( attribs, vb.location )].format )
+                                                  .setLocation( vb.location )
+                                                  .setOffset( vb.offset ) );
     }
   }
   else // incompatible pipeline
@@ -308,55 +311,54 @@ bool Pipeline::Initialise()
 
   // prepare vertex input state
   auto vertexInputState = vk::PipelineVertexInputStateCreateInfo{}
-    .setVertexBindingDescriptionCount(Vulkan::U32(bindingDescriptions.size()))
-    .setPVertexBindingDescriptions(bindingDescriptions.data())
-    .setVertexAttributeDescriptionCount(Vulkan::U32(attributeDescriptions.size()))
-    .setPVertexAttributeDescriptions(attributeDescriptions.data());
+          .setVertexBindingDescriptionCount( Vulkan::U32( bindingDescriptions.size() ) )
+          .setPVertexBindingDescriptions( bindingDescriptions.data() )
+          .setVertexAttributeDescriptionCount( Vulkan::U32( attributeDescriptions.size() ) )
+          .setPVertexAttributeDescriptions( attributeDescriptions.data() );
 
-  std::vector<vk::PipelineShaderStageCreateInfo> shaderStages =
-                                                   {
-                                                     vk::PipelineShaderStageCreateInfo{}
-                                                       .setModule(vertexShader->GetVkHandle())
-                                                       .setStage(vk::ShaderStageFlagBits::eVertex)
-                                                       .setPName("main"),
-                                                     vk::PipelineShaderStageCreateInfo{}
-                                                       .setModule(fragmentShader->GetVkHandle())
-                                                       .setStage(vk::ShaderStageFlagBits::eFragment)
-                                                       .setPName("main")
-                                                   };
+  std::vector< vk::PipelineShaderStageCreateInfo > shaderStages =
+          {
+                  vk::PipelineShaderStageCreateInfo{}
+                          .setModule( vertexShader->GetVkHandle() )
+                          .setStage( vk::ShaderStageFlagBits::eVertex )
+                          .setPName( "main" ),
+                  vk::PipelineShaderStageCreateInfo{}
+                          .setModule( fragmentShader->GetVkHandle() )
+                          .setStage( vk::ShaderStageFlagBits::eFragment )
+                          .setPName( "main" )
+          };
 
   // @todo use RenderTarget
-  auto swapchain = mGraphics.GetSwapchainForFBID(0);
+  auto swapchain = mGraphics.GetSwapchainForFBID( 0 );
   auto fb = swapchain->GetCurrentFramebuffer();
 
   vk::GraphicsPipelineCreateInfo pipelineInfo;
   pipelineInfo
-    .setSubpass(0)
-    .setRenderPass(fb->GetRenderPassVkHandle()) // based on render target
-    .setBasePipelineHandle(nullptr)
-    .setBasePipelineIndex(0)
-    .setLayout(PreparePipelineLayout())
-    .setPColorBlendState(PrepareColorBlendStateCreateInfo())
-    .setPDepthStencilState(PrepareDepthStencilStateCreateInfo())
-    .setPDynamicState(nullptr)
-    .setPInputAssemblyState(PrepareInputAssemblyStateCreateInfo())
-    .setPMultisampleState(PrepareMultisampleStateCreateInfo())
-    .setPRasterizationState(PrepareRasterizationStateCreateInfo())
-    .setPTessellationState(PrepareTesselationStateCreateInfo())
-      //.setPVertexInputState(PrepareVertexInputStateCreateInfo())
-    .setPVertexInputState(&vertexInputState)
-    .setPViewportState(PrepareViewportStateCreateInfo())
-    .setPStages(shaderStages.data())
-    .setStageCount(Vulkan::U32(shaderStages.size()));
+          .setSubpass( 0 )
+          .setRenderPass( fb->GetRenderPassVkHandle() ) // based on render target
+          .setBasePipelineHandle( nullptr )
+          .setBasePipelineIndex( 0 )
+          .setLayout( PreparePipelineLayout() )
+          .setPColorBlendState( PrepareColorBlendStateCreateInfo() )
+          .setPDepthStencilState( PrepareDepthStencilStateCreateInfo() )
+          .setPDynamicState( nullptr )
+          .setPInputAssemblyState( PrepareInputAssemblyStateCreateInfo() )
+          .setPMultisampleState( PrepareMultisampleStateCreateInfo() )
+          .setPRasterizationState( PrepareRasterizationStateCreateInfo() )
+          .setPTessellationState( PrepareTesselationStateCreateInfo() )
+                  //.setPVertexInputState(PrepareVertexInputStateCreateInfo())
+          .setPVertexInputState( &vertexInputState )
+          .setPViewportState( PrepareViewportStateCreateInfo() )
+          .setPStages( shaderStages.data() )
+          .setStageCount( Vulkan::U32( shaderStages.size() ) );
 
-  auto pipeline = Vulkan::Pipeline::New(mGraphics, pipelineInfo);
+  auto pipeline = Vulkan::Pipeline::New( mGraphics, pipelineInfo );
 
   pipeline->Compile();
 
   mVulkanPipelineState->pipeline = pipeline;
   return true;
 }
-
 
 
 const vk::PipelineColorBlendStateCreateInfo* Pipeline::PrepareColorBlendStateCreateInfo()
@@ -368,10 +370,14 @@ const vk::PipelineColorBlendStateCreateInfo* Pipeline::PrepareColorBlendStateCre
 
   // color write mask
   vk::ColorComponentFlags colorWriteMask{};
-  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 1 ) ? vk::ColorComponentFlagBits::eR : vk::ColorComponentFlagBits{};
-  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 2 ) ? vk::ColorComponentFlagBits::eG : vk::ColorComponentFlagBits{};
-  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 4 ) ? vk::ColorComponentFlagBits::eB : vk::ColorComponentFlagBits{};
-  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 8 ) ? vk::ColorComponentFlagBits::eA : vk::ColorComponentFlagBits{};
+  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 1 ) ? vk::ColorComponentFlagBits::eR
+                                                                                : vk::ColorComponentFlagBits{};
+  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 2 ) ? vk::ColorComponentFlagBits::eG
+                                                                                : vk::ColorComponentFlagBits{};
+  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 4 ) ? vk::ColorComponentFlagBits::eB
+                                                                                : vk::ColorComponentFlagBits{};
+  colorWriteMask |= ( factoryInfo.colorBlendState.colorComponentWriteBits & 8 ) ? vk::ColorComponentFlagBits::eA
+                                                                                : vk::ColorComponentFlagBits{};
 
   auto srcColorBlendFactor = ConvertBlendFactor( factoryInfo.colorBlendState.srcColorBlendFactor );
   auto dstColorBlendFactor = ConvertBlendFactor( factoryInfo.colorBlendState.dstColorBlendFactor );
@@ -381,14 +387,14 @@ const vk::PipelineColorBlendStateCreateInfo* Pipeline::PrepareColorBlendStateCre
   auto alphaBlendOp = ConvertBlendOp( factoryInfo.colorBlendState.alphaBlendOp );
 
   auto blendAttachmentState = vk::PipelineColorBlendAttachmentState{}
-    .setBlendEnable( vk::Bool32( blendEnable ) )
-    .setColorWriteMask( colorWriteMask )
-    .setSrcColorBlendFactor( srcColorBlendFactor )
-    .setDstColorBlendFactor( dstColorBlendFactor )
-    .setSrcAlphaBlendFactor( srcAlphaBlendFactor )
-    .setDstAlphaBlendFactor( dstAlphaBlendFactor )
-    .setColorBlendOp( colorBlendOp )
-    .setAlphaBlendOp( alphaBlendOp );
+          .setBlendEnable( vk::Bool32( blendEnable ) )
+          .setColorWriteMask( colorWriteMask )
+          .setSrcColorBlendFactor( srcColorBlendFactor )
+          .setDstColorBlendFactor( dstColorBlendFactor )
+          .setSrcAlphaBlendFactor( srcAlphaBlendFactor )
+          .setDstAlphaBlendFactor( dstAlphaBlendFactor )
+          .setColorBlendOp( colorBlendOp )
+          .setAlphaBlendOp( alphaBlendOp );
 
   mVulkanPipelineState->colorBlendAttachmentState.emplace_back( blendAttachmentState );
 
@@ -406,45 +412,45 @@ const vk::PipelineColorBlendStateCreateInfo* Pipeline::PrepareColorBlendStateCre
 const vk::PipelineDepthStencilStateCreateInfo* Pipeline::PrepareDepthStencilStateCreateInfo()
 {
   const auto& dsInfo = mCreateInfo->info.depthStencilState;
-  return &(mVulkanPipelineState->depthStencil
-                               .setDepthTestEnable( vk::Bool32(dsInfo.depthTestEnable) )
-                               .setDepthWriteEnable( vk::Bool32(dsInfo.depthWriteEnable) )
-                               .setDepthCompareOp( ConvertCompareOp( dsInfo.depthCompareOp ))
-                               .setDepthBoundsTestEnable( false )
-                               .setStencilTestEnable( false )); //@ todo stencil test
+  return &( mVulkanPipelineState->depthStencil
+                                .setDepthTestEnable( vk::Bool32( dsInfo.depthTestEnable ) )
+                                .setDepthWriteEnable( vk::Bool32( dsInfo.depthWriteEnable ) )
+                                .setDepthCompareOp( ConvertCompareOp( dsInfo.depthCompareOp ) )
+                                .setDepthBoundsTestEnable( false )
+                                .setStencilTestEnable( false ) ); //@ todo stencil test
 }
 
 const vk::PipelineInputAssemblyStateCreateInfo* Pipeline::PrepareInputAssemblyStateCreateInfo()
 {
   const auto& iaInfo = mCreateInfo->info.inputAssemblyState;
   //@todo support topology and restart
-  return &(mVulkanPipelineState->inputAssembly
-                               .setPrimitiveRestartEnable( vk::Bool32( iaInfo.primitiveRestartEnable ) )
-                               .setTopology( ConvertPrimitiveTopology( iaInfo.topology ) ));
+  return &( mVulkanPipelineState->inputAssembly
+                                .setPrimitiveRestartEnable( vk::Bool32( iaInfo.primitiveRestartEnable ) )
+                                .setTopology( ConvertPrimitiveTopology( iaInfo.topology ) ) );
 }
 
 const vk::PipelineMultisampleStateCreateInfo* Pipeline::PrepareMultisampleStateCreateInfo()
 {
-  return &(mVulkanPipelineState->multisample
-                               .setSampleShadingEnable( vk::Bool32(false) )
-                               .setRasterizationSamples( vk::SampleCountFlagBits::e1 )
-                               .setAlphaToCoverageEnable( vk::Bool32(false) )
-                               .setMinSampleShading( 1.0f )
-                               .setPSampleMask( nullptr ));
+  return &( mVulkanPipelineState->multisample
+                                .setSampleShadingEnable( vk::Bool32( false ) )
+                                .setRasterizationSamples( vk::SampleCountFlagBits::e1 )
+                                .setAlphaToCoverageEnable( vk::Bool32( false ) )
+                                .setMinSampleShading( 1.0f )
+                                .setPSampleMask( nullptr ) );
 }
 
 const vk::PipelineRasterizationStateCreateInfo* Pipeline::PrepareRasterizationStateCreateInfo()
 {
   const auto& rsInfo = mCreateInfo->info.rasterizationState;
-  return &(mVulkanPipelineState->rasterization
-                               .setCullMode( ConvertCullMode( rsInfo.cullMode ) )
-                               .setDepthBiasClamp( 0.0f )
-                               .setDepthBiasEnable( vk::Bool32(false) )
-                               .setDepthClampEnable( vk::Bool32(false) )
-                               .setFrontFace( ConvertFrontFace( rsInfo.frontFace ) )
-                               .setPolygonMode( ConvertPolygonMode( rsInfo.polygonMode ) )
-                               .setRasterizerDiscardEnable( vk::Bool32(false) )
-                               .setLineWidth( 1.0f ));
+  return &( mVulkanPipelineState->rasterization
+                                .setCullMode( ConvertCullMode( rsInfo.cullMode ) )
+                                .setDepthBiasClamp( 0.0f )
+                                .setDepthBiasEnable( vk::Bool32( false ) )
+                                .setDepthClampEnable( vk::Bool32( false ) )
+                                .setFrontFace( ConvertFrontFace( rsInfo.frontFace ) )
+                                .setPolygonMode( ConvertPolygonMode( rsInfo.polygonMode ) )
+                                .setRasterizerDiscardEnable( vk::Bool32( false ) )
+                                .setLineWidth( 1.0f ) );
 }
 
 const vk::PipelineViewportStateCreateInfo* Pipeline::PrepareViewportStateCreateInfo()
@@ -454,10 +460,10 @@ const vk::PipelineViewportStateCreateInfo* Pipeline::PrepareViewportStateCreateI
   auto width = vpInfo.viewport.width;
   auto height = vpInfo.viewport.height;
 
-  if( !uint32_t(width) )
+  if( !uint32_t( width ) )
   {
-    width = float(mGraphics.GetSwapchainForFBID(0)->GetCurrentFramebuffer()->GetWidth());
-    height = float(mGraphics.GetSwapchainForFBID(0)->GetCurrentFramebuffer()->GetHeight());
+    width = float( mGraphics.GetSwapchainForFBID( 0 )->GetCurrentFramebuffer()->GetWidth() );
+    height = float( mGraphics.GetSwapchainForFBID( 0 )->GetCurrentFramebuffer()->GetHeight() );
   }
 
   // viewports
@@ -468,17 +474,17 @@ const vk::PipelineViewportStateCreateInfo* Pipeline::PrepareViewportStateCreateI
   // scissors
   // todo: add scissor support
   mVulkanPipelineState->viewport.scissors.emplace_back( vk::Rect2D(
-                        { static_cast<int32_t>(0), static_cast<int32_t>(0) },
-                        { Vulkan::U32(width), Vulkan::U32(height) } )
-                      );
+          { static_cast<int32_t>(0), static_cast<int32_t>(0) },
+          { Vulkan::U32( width ), Vulkan::U32( height ) } )
+  );
 
   auto& viewState = mVulkanPipelineState->viewport;
 
-  return &(mVulkanPipelineState->viewport.createInfo.
-                                 setViewportCount( Vulkan::U32(viewState.viewports.size()) ).
-                                 setPViewports( viewState.viewports.data() ).
-                                 setPScissors( viewState.scissors.data() ).
-                                 setScissorCount( Vulkan::U32(viewState.scissors.size())) );
+  return &( mVulkanPipelineState->viewport.createInfo.
+          setViewportCount( Vulkan::U32( viewState.viewports.size() ) ).
+                                        setPViewports( viewState.viewports.data() ).
+                                        setPScissors( viewState.scissors.data() ).
+                                        setScissorCount( Vulkan::U32( viewState.scissors.size() ) ) );
 }
 
 const vk::PipelineTessellationStateCreateInfo* Pipeline::PrepareTesselationStateCreateInfo()
@@ -490,41 +496,41 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 {
   // descriptor set layout
   const auto& shader = static_cast<const VulkanAPI::Shader*>(mCreateInfo->info.shaderState.shaderProgram);
-  auto vertexShader   = shader->GetShader(vk::ShaderStageFlagBits::eVertex);
-  auto fragmentShader = shader->GetShader(vk::ShaderStageFlagBits::eFragment);
+  auto vertexShader = shader->GetShader( vk::ShaderStageFlagBits::eVertex );
+  auto fragmentShader = shader->GetShader( vk::ShaderStageFlagBits::eFragment );
 
   auto vshDsLayouts = vertexShader->GetSPIRVReflection()
                                   .GenerateDescriptorSetLayoutCreateInfo();
   auto fshDsLayouts = fragmentShader->GetSPIRVReflection()
                                     .GenerateDescriptorSetLayoutCreateInfo();
 
-  decltype(vshDsLayouts) layouts;
-  layouts.resize(std::max(vshDsLayouts.size(), fshDsLayouts.size()));
+  decltype( vshDsLayouts ) layouts;
+  layouts.resize( std::max( vshDsLayouts.size(), fshDsLayouts.size() ) );
 
-  std::vector<vk::DescriptorSetLayout> dsLayouts;
+  std::vector< vk::DescriptorSetLayout > dsLayouts;
 
-  for (auto i = 0u; i < layouts.size(); ++i)
+  for( auto i = 0u; i < layouts.size(); ++i )
   {
-    std::vector<vk::DescriptorSetLayoutBinding> dsBindings;
+    std::vector< vk::DescriptorSetLayoutBinding > dsBindings;
 
     // concatenate bindings per set
-    if (vshDsLayouts[i].bindingCount)
+    if( vshDsLayouts[i].bindingCount )
     {
       dsBindings.insert(
-        dsBindings.end(), vshDsLayouts[i].pBindings, vshDsLayouts[i].pBindings + vshDsLayouts[i].bindingCount);
+              dsBindings.end(), vshDsLayouts[i].pBindings, vshDsLayouts[i].pBindings + vshDsLayouts[i].bindingCount );
     }
-    if (fshDsLayouts[i].bindingCount)
+    if( fshDsLayouts[i].bindingCount )
     {
       dsBindings.insert(
-        dsBindings.end(), fshDsLayouts[i].pBindings, fshDsLayouts[i].pBindings + fshDsLayouts[i].bindingCount);
+              dsBindings.end(), fshDsLayouts[i].pBindings, fshDsLayouts[i].pBindings + fshDsLayouts[i].bindingCount );
     }
 
-    layouts[i].pBindings    = dsBindings.data();
-    layouts[i].bindingCount = Vulkan::U32(dsBindings.size());
+    layouts[i].pBindings = dsBindings.data();
+    layouts[i].bindingCount = Vulkan::U32( dsBindings.size() );
 
 
-    dsLayouts.emplace_back(VkAssert(mGraphics.GetDevice()
-                                             .createDescriptorSetLayout(layouts[i], mGraphics.GetAllocator())));
+    dsLayouts.emplace_back( VkAssert( mGraphics.GetDevice()
+                                               .createDescriptorSetLayout( layouts[i], mGraphics.GetAllocator() ) ) );
 
   }
 
@@ -532,12 +538,12 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 
   // create layout
   auto pipelineLayoutCreateInfo = vk::PipelineLayoutCreateInfo{}
-    .setSetLayoutCount(Vulkan::U32(dsLayouts.size()))
-    .setPSetLayouts(dsLayouts.data())
-    .setPPushConstantRanges(nullptr)
-    .setPushConstantRangeCount(0);
+          .setSetLayoutCount( Vulkan::U32( dsLayouts.size() ) )
+          .setPSetLayouts( dsLayouts.data() )
+          .setPPushConstantRanges( nullptr )
+          .setPushConstantRangeCount( 0 );
 
-  return VkAssert(mGraphics.GetDevice().createPipelineLayout(pipelineLayoutCreateInfo, mGraphics.GetAllocator()));
+  return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator() ) );
 }
 
 void Pipeline::Reference()
@@ -547,9 +553,9 @@ void Pipeline::Reference()
 
 void Pipeline::Dereference()
 {
-  if(mRefCounter)
+  if( mRefCounter )
   {
-    if (--mRefCounter == 0)
+    if( --mRefCounter == 0 )
     {
       Destroy();
     }
@@ -558,7 +564,7 @@ void Pipeline::Dereference()
 
 void Pipeline::Destroy()
 {
-  if(mPipelineCache)
+  if( mPipelineCache )
   {
     mPipelineCache->RemovePipeline( this );
   }
@@ -574,7 +580,7 @@ Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
   return mVulkanPipelineState->pipeline;
 }
 
-const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
+const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mVkDescriptorSetLayouts;
 }

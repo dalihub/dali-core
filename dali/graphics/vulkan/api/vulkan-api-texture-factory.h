@@ -38,28 +38,39 @@ public:
 
   explicit TextureFactory( Vulkan::Graphics& graphics );
 
-  Graphics::API::TextureFactory& SetType(API::TextureDetails::Type type) override;
-  Graphics::API::TextureFactory& SetSize(const API::RectSize& size) override;
-  Graphics::API::TextureFactory& SetFormat(API::TextureDetails::Format format) override;
-  Graphics::API::TextureFactory& SetMipMapFlag(API::TextureDetails::MipMapFlag mipMSapFlag) override;
+  Graphics::API::TextureFactory& SetType( API::TextureDetails::Type type ) override;
+
+  Graphics::API::TextureFactory& SetSize( const API::RectSize& size ) override;
+
+  Graphics::API::TextureFactory& SetFormat( API::TextureDetails::Format format ) override;
+
+  Graphics::API::TextureFactory& SetMipMapFlag( API::TextureDetails::MipMapFlag mipMSapFlag ) override;
+
   Graphics::API::TextureFactory& SetData( void* pData ) override;
+
   Graphics::API::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
 
   // not copyable
-  TextureFactory(const TextureFactory&) = delete;
-  TextureFactory& operator=(const TextureFactory&) = delete;
+  TextureFactory( const TextureFactory& ) = delete;
+
+  TextureFactory& operator=( const TextureFactory& ) = delete;
 
   ~TextureFactory() override;
 
-  std::unique_ptr<Graphics::API::Texture> Create() const override;
+  std::unique_ptr< Graphics::API::Texture > Create() const override;
 
   /** Internal interface */
   const API::TextureDetails::Type& GetType() const;
+
   const API::RectSize& GetSize() const;
+
   const API::TextureDetails::Format& GetFormat() const;
+
   const API::TextureDetails::MipMapFlag& GetMipMapFlag() const;
+
   const void* GetData() const;
-   uint32_t GetDataSize() const;
+
+  uint32_t GetDataSize() const;
 
   Vulkan::Graphics& GetGraphics() const;
 
@@ -68,13 +79,14 @@ protected:
   TextureFactory() = default;
 
   // derived types should not be moved direcly to prevent slicing
-  TextureFactory(TextureFactory&&) = default;
-  TextureFactory& operator=(TextureFactory&&) = default;
+  TextureFactory( TextureFactory&& ) = default;
+
+  TextureFactory& operator=( TextureFactory&& ) = default;
 
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 }

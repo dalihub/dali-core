@@ -17,6 +17,7 @@
 
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 
 namespace Dali
@@ -39,12 +40,39 @@ RefCountedImage Image::NewFromExternal( Graphics& graphics, vk::ImageCreateInfo 
 }
 
 Image::Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage )
-        : mGraphics(&graphics),
-          mCreateInfo(createInfo),
-          mImage(externalImage),
-          mImageLayout(mCreateInfo.initialLayout),
-          mIsExternal( static_cast<bool>(externalImage))
+        : mGraphics( &graphics ),
+          mCreateInfo( createInfo ),
+          mImage( externalImage ),
+          mImageLayout( mCreateInfo.initialLayout ),
+          mIsExternal( static_cast<bool>(externalImage) )
 {
+  auto depthFormats = std::vector< vk::Format >{
+          vk::Format::eD32Sfloat,
+          vk::Format::eD16Unorm,
+          vk::Format::eD32SfloatS8Uint,
+          vk::Format::eD24UnormS8Uint,
+          vk::Format::eD16UnormS8Uint
+  };
+
+  auto hasDepth = std::find( depthFormats.begin(), depthFormats.end(), createInfo.format );
+
+  if( hasDepth != depthFormats.end() )
+  {
+    auto format = *hasDepth;
+
+    if( format == vk::Format::eD32Sfloat || format == vk::Format::eD16Unorm )
+    {
+      mAspectFlags = vk::ImageAspectFlagBits::eDepth;
+    }
+    else
+    {
+      mAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+    }
+  }
+  else
+  {
+    mAspectFlags = vk::ImageAspectFlagBits::eColor;
+  }
 }
 
 vk::Image Image::GetVkHandle() const
@@ -92,9 +120,19 @@ vk::ImageTiling Image::GetImageTiling() const
   return mCreateInfo.tiling;
 }
 
+vk::ImageAspectFlags Image::GetAspectFlags() const
+{
+  return mAspectFlags;
+}
+
 void Image::AssignMemory( RefCountedGpuMemoryBlock memory )
 {
   mDeviceMemory = memory;
+}
+
+void Image::SetImageLayout( vk::ImageLayout imageLayout )
+{
+  mImageLayout = imageLayout;
 }
 
 const Image& Image::ConstRef()
@@ -123,19 +161,18 @@ bool Image::OnDestroy()
   {
     if( !mGraphics->IsShuttingDown() )
     {
-      mGraphics->RemoveImage(*this);
+      mGraphics->RemoveImage( *this );
     }
 
     auto device = mGraphics->GetDevice();
     auto image = mImage;
     auto allocator = &mGraphics->GetAllocator();
 
-    mGraphics->DiscardResource([device, image, allocator]() {
-#ifndef NDEBUG
-      printf("Invoking IMAGE deleter function\n");
-#endif
-      device.destroyImage(image, allocator);
-    });
+    mGraphics->DiscardResource( [ device, image, allocator ]() {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
+                     static_cast< void* >(image) )
+      device.destroyImage( image, allocator );
+    } );
   }
 
   return false;

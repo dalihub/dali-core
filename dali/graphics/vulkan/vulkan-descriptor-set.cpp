@@ -21,6 +21,7 @@
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-sampler.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -33,12 +34,12 @@ namespace Vulkan
  * Class DescriptorPool
  */
 
-Handle<DescriptorPool> DescriptorPool::New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
+Handle< DescriptorPool > DescriptorPool::New( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
 {
-  auto pool = Handle<DescriptorPool>( new DescriptorPool( graphics, createInfo ) );
-  if(pool->Initialise())
+  auto pool = Handle< DescriptorPool >( new DescriptorPool( graphics, createInfo ) );
+  if( pool->Initialise() )
   {
-    graphics.AddDescriptorPool(pool);
+    graphics.AddDescriptorPool( pool );
   }
   return pool;
 }
@@ -52,8 +53,8 @@ bool DescriptorPool::Initialise()
 }
 
 DescriptorPool::DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
-        : mGraphics(&graphics),
-          mCreateInfo(createInfo)
+        : mGraphics( &graphics ),
+          mCreateInfo( createInfo )
 {
 }
 
@@ -62,7 +63,8 @@ vk::DescriptorPool DescriptorPool::GetVkHandle() const
   return mDescriptorPool;
 }
 
-std::vector< RefCountedDescriptorSet > DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
+std::vector< RefCountedDescriptorSet >
+DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
 {
   // all other fields must be set correct
   allocateInfo.setDescriptorPool( mDescriptorPool );
@@ -72,7 +74,7 @@ std::vector< RefCountedDescriptorSet > DescriptorPool::AllocateDescriptorSets( v
   retval.reserve( result.size() );
   for( auto&& item : result )
   {
-    Handle<DescriptorSet> handle( new DescriptorSet(*mGraphics, *this, item, allocateInfo) );
+    Handle< DescriptorSet > handle( new DescriptorSet( *mGraphics, *this, item, allocateInfo ) );
     retval.emplace_back( handle );
     mDescriptorSetCache.emplace_back( handle );
   }
@@ -97,10 +99,9 @@ bool DescriptorPool::OnDestroy()
   auto descriptorPool = mDescriptorPool;
   auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [device, descriptorPool, allocator] () {
-#ifndef NDEBUG
-    printf("Invoking DESCRIPTOR POOL deleter function\n");
-#endif
+  mGraphics->DiscardResource( [ device, descriptorPool, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: descriptor pool->%p\n",
+                   static_cast< void* >(descriptorPool) )
     device.destroyDescriptorPool( descriptorPool, allocator );
   } );
 
@@ -125,15 +126,15 @@ DescriptorSet::DescriptorSet( Graphics& graphics,
 
 DescriptorSet::~DescriptorSet() = default;
 
-void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer, uint32_t offset, uint32_t size )
+void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size )
 {
   // add resource to the list
-  mResources.emplace_back( buffer.StaticCast<VkManaged>() );
+  mResources.emplace_back( buffer.StaticCast< VkManaged >() );
 
   auto bufferInfo = vk::DescriptorBufferInfo{}
-          .setOffset( U32(offset) )
-          .setRange( U32(size) )
-          .setBuffer(buffer->GetVkHandle() );
+          .setOffset( U32( offset ) )
+          .setRange( U32( size ) )
+          .setBuffer( buffer->GetVkHandle() );
 
   auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
                                        .setDescriptorType( vk::DescriptorType::eUniformBuffer )
@@ -143,7 +144,7 @@ void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer,
                                        .setDstArrayElement( 0 );
 
   // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
+  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
 }
 
 vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
@@ -151,16 +152,17 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
   return mDescriptorSet;
 }
 
-void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
+void
+DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
 {
   // add resource to the list
-  mResources.emplace_back( sampler.StaticCast<VkManaged>() );
-  mResources.emplace_back( imageView.StaticCast<VkManaged>() );
+  mResources.emplace_back( sampler.StaticCast< VkManaged >() );
+  mResources.emplace_back( imageView.StaticCast< VkManaged >() );
 
   auto imageViewInfo = vk::DescriptorImageInfo{}
           .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
           .setImageView( imageView->GetVkHandle() )
-          .setSampler(sampler->GetVkHandle() );
+          .setSampler( sampler->GetVkHandle() );
 
   auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
                                        .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
@@ -170,7 +172,7 @@ void DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampl
                                        .setDstArrayElement( 0 );
 
   // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr  );
+  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
 }
 
 void DescriptorSet::WriteStorageBuffer( RefCountedBuffer buffer, uint32_t offset, uint32_t size )

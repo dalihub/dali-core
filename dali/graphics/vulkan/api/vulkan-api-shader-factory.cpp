@@ -28,15 +28,15 @@ namespace VulkanAPI
 {
 
 ShaderFactory::ShaderFactory( Vulkan::Graphics& graphics ) :
-mGraphics( graphics )
+        mGraphics( graphics )
 {
 }
 
 ShaderFactory::~ShaderFactory() = default;
 
-ShaderFactory& ShaderFactory::SetShaderModule( Graphics::API::ShaderDetails::PipelineStage       pipelineStage,
-                                         Graphics::API::ShaderDetails::Language            language,
-                                         const Graphics::API::ShaderDetails::ShaderSource& source )
+ShaderFactory& ShaderFactory::SetShaderModule( Graphics::API::ShaderDetails::PipelineStage pipelineStage,
+                                               Graphics::API::ShaderDetails::Language language,
+                                               const Graphics::API::ShaderDetails::ShaderSource& source )
 {
   using PipelineStage = Graphics::API::ShaderDetails::PipelineStage;
   if( pipelineStage == PipelineStage::VERTEX )
@@ -50,14 +50,14 @@ ShaderFactory& ShaderFactory::SetShaderModule( Graphics::API::ShaderDetails::Pip
   return *this;
 }
 
-std::unique_ptr<Graphics::API::Shader> ShaderFactory::Create() const
+std::unique_ptr< Graphics::API::Shader > ShaderFactory::Create() const
 {
   if( !mVertexShader.source.IsSet() || !mFragmentShader.source.IsSet() )
   {
     return nullptr;
   }
 
-  auto retval = std::make_unique<VulkanAPI::Shader>( mGraphics );
+  auto retval = std::make_unique< VulkanAPI::Shader >( mGraphics );
 
   // add vertex shader
   retval->AddShaderModule( mVertexShader.pipelineStage, mVertexShader.language, mVertexShader.source );
@@ -65,7 +65,7 @@ std::unique_ptr<Graphics::API::Shader> ShaderFactory::Create() const
   // add fragment shader
   retval->AddShaderModule( mFragmentShader.pipelineStage, mFragmentShader.language, mFragmentShader.source );
 
-  return std::move(retval);
+  return std::move( retval );
 }
 
 } // namespace VulkanAPI

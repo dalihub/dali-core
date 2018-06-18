@@ -44,13 +44,14 @@ class UboManager;
 struct BufferMemoryTransfer
 {
   BufferMemoryTransfer() = default;
+
   ~BufferMemoryTransfer() = default;
 
-  std::unique_ptr<char> srcPtr{ nullptr };
+  std::unique_ptr< char > srcPtr{ nullptr };
   uint32_t srcSize{ 0u };
 
-  Vulkan::RefCountedBuffer dstBuffer {};
-  uint32_t          dstOffset { 0u };
+  Vulkan::RefCountedBuffer dstBuffer{};
+  uint32_t dstOffset{ 0u };
 };
 
 
@@ -68,43 +69,43 @@ public:
    * @param vulkanGraphics
    * @return
    */
-  static std::unique_ptr<Controller> New( Vulkan::Graphics& vulkanGraphics );
+  static std::unique_ptr< Controller > New( Vulkan::Graphics& vulkanGraphics );
 
   /**
    * @brief Create a new object
    */
-  API::Accessor<API::Shader> CreateShader( const API::BaseFactory<API::Shader>& factory ) override;
+  API::Accessor< API::Shader > CreateShader( const API::BaseFactory< API::Shader >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  API::Accessor<API::Texture> CreateTexture( const API::BaseFactory<API::Texture>& factory ) override;
+  API::Accessor< API::Texture > CreateTexture( const API::BaseFactory< API::Texture >& factory ) override;
 
   /**
  * @brief Create a new object
  */
-  API::Accessor<API::Buffer> CreateBuffer( const API::BaseFactory<API::Buffer>& factory ) override;
+  API::Accessor< API::Buffer > CreateBuffer( const API::BaseFactory< API::Buffer >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  API::Accessor<API::Sampler> CreateSampler( const API::BaseFactory<API::Sampler>& factory ) override;
+  API::Accessor< API::Sampler > CreateSampler( const API::BaseFactory< API::Sampler >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<API::Pipeline> CreatePipeline( const API::BaseFactory<API::Pipeline>& factory ) override;
+  std::unique_ptr< API::Pipeline > CreatePipeline( const API::BaseFactory< API::Pipeline >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  API::Accessor<API::Framebuffer> CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory ) override;
+  API::Accessor< API::Framebuffer > CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory ) override;
 
-  std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
+  std::unique_ptr< char > CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
 
-  void SubmitCommands( std::vector<API::RenderCommand*> commands ) override;
+  void SubmitCommands( std::vector< API::RenderCommand* > commands ) override;
 
-  std::unique_ptr<API::RenderCommand> AllocateRenderCommand() override;
+  std::unique_ptr< API::RenderCommand > AllocateRenderCommand() override;
 
   virtual void BeginFrame() override;
 
@@ -116,7 +117,7 @@ public:
 
   Vulkan::Graphics& GetGraphics() const;
 
-  void ScheduleBufferMemoryTransfer( std::unique_ptr<VulkanAPI::BufferMemoryTransfer> transferRequest );
+  void ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::BufferMemoryTransfer > transferRequest );
 
   VulkanAPI::UboManager& GetUboManager();
 
@@ -133,6 +134,7 @@ public:
 public:
   // not copyable
   Controller( const Controller& ) = delete;
+
   Controller& operator=( const Controller& ) = delete;
 
   ~Controller() override;
@@ -140,6 +142,7 @@ public:
 protected:
   // derived types should not be moved direcly to prevent slicing
   Controller( Controller&& ) noexcept = default;
+
   Controller& operator=( Controller&& ) noexcept;
 
   /**
@@ -149,7 +152,7 @@ protected:
 
 private:
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 } // namespace VulkanAPI

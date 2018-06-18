@@ -34,8 +34,8 @@ using namespace Dali::Graphics::Vulkan;
 struct Texture::Impl
 {
   Impl( Texture& api, Dali::Graphics::API::TextureFactory& factory )
-  : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
-    mGraphics( mTextureFactory.GetGraphics() )
+          : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
+            mGraphics( mTextureFactory.GetGraphics() )
   {
   }
 
@@ -53,38 +53,38 @@ struct Texture::Impl
 
     auto format = vk::Format::eR8G8B8A8Unorm;
 
-    if(mTextureFactory.GetFormat() == API::TextureDetails::Format::RGBA8 )
+    if( mTextureFactory.GetFormat() == API::TextureDetails::Format::RGBA8 )
     {
       // check bpp, if 24bpp convert
-      if (sizeInBytes == width * height * 3)
+      if( sizeInBytes == width * height * 3 )
       {
 
-        auto inData  = reinterpret_cast<const uint8_t *>(data);
+        auto inData = reinterpret_cast<const uint8_t*>(data);
         auto outData = new uint8_t[width * height * 4];
 
-        auto      outIdx = 0u;
-        for (auto i      = 0u; i < sizeInBytes; i += 3)
+        auto outIdx = 0u;
+        for( auto i = 0u; i < sizeInBytes; i += 3 )
         {
-          outData[outIdx]     = inData[i];
+          outData[outIdx] = inData[i];
           outData[outIdx + 1] = inData[i + 1];
           outData[outIdx + 2] = inData[i + 2];
           outData[outIdx + 3] = 0xff;
           outIdx += 4;
         }
 
-        data        = outData;
-        sizeInBytes = U32(width * height * 4);
+        data = outData;
+        sizeInBytes = U32( width * height * 4 );
       }
 
     }
-    else if(mTextureFactory.GetFormat() == API::TextureDetails::Format::L8 )
+    else if( mTextureFactory.GetFormat() == API::TextureDetails::Format::L8 )
     {
       format = vk::Format::eR8Unorm;
     }
 
     auto textureRef = Dali::Graphics::Vulkan::Texture::New( mGraphics,
-                                                            U32(size.width),
-                                                            U32(size.height),
+                                                            U32( size.width ),
+                                                            U32( size.height ),
                                                             format );
 
 
@@ -102,7 +102,7 @@ struct Texture::Impl
 
 Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 {
-  mImpl = std::make_unique<Impl>( *this, factory );
+  mImpl = std::make_unique< Impl >( *this, factory );
 }
 
 Texture::~Texture() = default;

@@ -52,7 +52,7 @@ Internal::Pipeline* PipelineCache::GetPipeline( const VulkanAPI::PipelineFactory
 
   for( auto&& entry : entries )
   {
-    if( !std::memcmp( &entry.info, &factory.GetCreateInfo(), sizeof(entry.info) ))
+    if( !std::memcmp( &entry.info, &factory.GetCreateInfo(), sizeof( entry.info ) ) )
     {
       return entry.pipelineImpl.get();
     }
@@ -61,16 +61,17 @@ Internal::Pipeline* PipelineCache::GetPipeline( const VulkanAPI::PipelineFactory
   return nullptr;
 }
 
-bool PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr<Internal::Pipeline> pipeline )
+bool
+PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr< Internal::Pipeline > pipeline )
 {
   // hash factory
   auto hashCode = factory.GetHashCode();
   auto iter = mCacheMap.find( hashCode );
-  std::vector<CacheEntry>* cacheEntries { nullptr };
+  std::vector< CacheEntry >* cacheEntries{ nullptr };
 
   if( iter == mCacheMap.end() )
   {
-    mCacheMap[hashCode] = std::vector<CacheEntry>{};
+    mCacheMap[hashCode] = std::vector< CacheEntry >{};
     cacheEntries = &mCacheMap[hashCode];
   }
   else
@@ -80,9 +81,9 @@ bool PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std
 
   // pass the ownership to the cache
   CacheEntry entry;
-  entry.pipelineImpl = std::move(pipeline);
-  entry.info = std::unique_ptr<PipelineFactory::Info>( new PipelineFactory::Info(factory.GetCreateInfo()) );
-  cacheEntries->push_back( std::move(entry) );
+  entry.pipelineImpl = std::move( pipeline );
+  entry.info = std::unique_ptr< PipelineFactory::Info >( new PipelineFactory::Info( factory.GetCreateInfo() ) );
+  cacheEntries->push_back( std::move( entry ) );
   return true;
 }
 
@@ -108,7 +109,7 @@ bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
     {
       if( entry.pipelineImpl.get() == pipeline )
       {
-        iter->second.erase( iter->second.begin()+i );
+        iter->second.erase( iter->second.begin() + i );
         break;
       }
       ++i;

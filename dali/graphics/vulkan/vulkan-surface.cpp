@@ -29,8 +29,8 @@ namespace Vulkan
 
 struct Surface::Impl
 {
-  Impl( Surface& owner, Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory ) :
-  mOwner( owner ), mGraphics( graphics ), mSurfaceFactory( std::move(surfaceFactory) )
+  Impl( Surface& owner, Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory ) :
+          mOwner( owner ), mGraphics( graphics ), mSurfaceFactory( std::move( surfaceFactory ) )
   {
     mVulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>(mSurfaceFactory.get());
   }
@@ -42,16 +42,17 @@ struct Surface::Impl
 
   bool Initialise()
   {
-    if(!mVulkanSurfaceFactory)
+    if( !mVulkanSurfaceFactory )
     {
       return false;
     }
 
     // fixme: should avoid const cast :(
     auto* allocatorCallbacks = const_cast<vk::AllocationCallbacks*>(&mGraphics.GetAllocator());
-    mSurface = mVulkanSurfaceFactory->Create( mGraphics.GetInstance(), allocatorCallbacks, mGraphics.GetPhysicalDevice() );
+    mSurface = mVulkanSurfaceFactory
+            ->Create( mGraphics.GetInstance(), allocatorCallbacks, mGraphics.GetPhysicalDevice() );
 
-    if(!mSurface)
+    if( !mSurface )
     {
       return false;
     }
@@ -67,26 +68,26 @@ struct Surface::Impl
     return mCurrentExtent;
   }
 
-  Surface&                        mOwner;
-  Graphics&                       mGraphics;
-  std::unique_ptr<SurfaceFactory> mSurfaceFactory;
+  Surface& mOwner;
+  Graphics& mGraphics;
+  std::unique_ptr< SurfaceFactory > mSurfaceFactory;
   Dali::Integration::Graphics::Vulkan::VkSurfaceFactory* mVulkanSurfaceFactory;
-  vk::SurfaceKHR   mSurface;
-  vk::Extent2D      mCurrentExtent;
+  vk::SurfaceKHR mSurface;
+  vk::Extent2D mCurrentExtent;
 };
 
 /**
  * Surface
  */
 
-RefCountedSurface Surface::New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory )
+RefCountedSurface Surface::New( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
-  return RefCountedSurface( new Surface( graphics, std::move(surfaceFactory) ));
+  return RefCountedSurface( new Surface( graphics, std::move( surfaceFactory ) ) );
 }
 
-Surface::Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory )
+Surface::Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
-  mImpl = std::make_unique<Impl>( *this, graphics, std::move(surfaceFactory) );
+  mImpl = std::make_unique< Impl >( *this, graphics, std::move( surfaceFactory ) );
 }
 
 Surface::~Surface() = default;

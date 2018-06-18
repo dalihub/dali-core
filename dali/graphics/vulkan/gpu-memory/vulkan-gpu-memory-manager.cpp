@@ -22,6 +22,7 @@
 #include <dali/graphics/vulkan/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
 #include <atomic>
+
 namespace Dali
 {
 namespace Graphics
@@ -38,13 +39,13 @@ const uint32_t INVALID_MEMORY_INDEX = -1u;
  * Helper function which returns GPU heap index that can be used to allocate
  * particular type of resource
  */
-uint32_t GetMemoryIndex(const vk::PhysicalDeviceMemoryProperties &memoryProperties,
-                        uint32_t memoryTypeBits, vk::MemoryPropertyFlags properties)
+uint32_t GetMemoryIndex( const vk::PhysicalDeviceMemoryProperties& memoryProperties,
+                         uint32_t memoryTypeBits, vk::MemoryPropertyFlags properties )
 {
-  for(uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i)
+  for( uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i )
   {
-    if((memoryTypeBits & (1u << i)) &&
-       ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties))
+    if( ( memoryTypeBits & ( 1u << i ) ) &&
+        ( ( memoryProperties.memoryTypes[i].propertyFlags & properties ) == properties ) )
     {
       return i;
     }
@@ -64,18 +65,20 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   struct MemoryBlock
   {
     MemoryBlock() = default;
+
     ~MemoryBlock() = default;
 
-    vk::MemoryRequirements  requirements {};
-    vk::DeviceSize          offset { 0u };
-    vk::DeviceSize          size { 0u };
-    vk::DeviceSize          alignment { 0u };
-    vk::DeviceMemory        memory { nullptr };
+    vk::MemoryRequirements requirements{};
+    vk::DeviceSize offset{ 0u };
+    vk::DeviceSize size{ 0u };
+    vk::DeviceSize alignment{ 0u };
+    vk::DeviceMemory memory{ nullptr };
   };
 
   explicit GpuMemoryDefaultAllocator( GpuMemoryManager& manager )
-    : GpuMemoryAllocator(), mGpuManager( manager ),
-      mGraphics(manager.GetGraphics())
+          : GpuMemoryAllocator(),
+            mGpuManager( manager ),
+            mGraphics( manager.GetGraphics() )
   {
 
   }
@@ -83,29 +86,31 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   ~GpuMemoryDefaultAllocator() override = default;
 
 
-  RefCountedGpuMemoryBlock Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
+  RefCountedGpuMemoryBlock
+  Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
   {
 
-    auto memoryTypeIndex = GetMemoryIndex(mGraphics.GetMemoryProperties(), requirements.memoryTypeBits,
-                                          memoryProperties);
+    auto memoryTypeIndex = GetMemoryIndex( mGraphics.GetMemoryProperties(),
+                                           requirements.memoryTypeBits,
+                                           memoryProperties );
 
     auto memory = VkAssert(
-      mGraphics.GetDevice()
-               .allocateMemory(vk::MemoryAllocateInfo{}
-                                 .setMemoryTypeIndex(memoryTypeIndex)
-                                 .setAllocationSize(requirements.size), mGraphics.GetAllocator()));
+            mGraphics.GetDevice()
+                     .allocateMemory( vk::MemoryAllocateInfo{}
+                                              .setMemoryTypeIndex( memoryTypeIndex )
+                                              .setAllocationSize( requirements.size ), mGraphics.GetAllocator() ) );
 
     // add allocated memory to the heap of memories as a base handle
-    auto handle = RefCountedGpuMemoryBlock( new GpuMemoryBlock( *this, MakeUnique<MemoryBlock>() ) );
+    auto handle = RefCountedGpuMemoryBlock( new GpuMemoryBlock( *this, MakeUnique< MemoryBlock >() ) );
 
-    auto &block = *handle->GetData<MemoryBlock>();
+    auto& block = *handle->GetData< MemoryBlock >();
     block.requirements = requirements;
-    block.offset       = 0u;
-    block.size         = requirements.size;
-    block.alignment    = requirements.alignment;
-    block.memory       = memory;
+    block.offset = 0u;
+    block.size = requirements.size;
+    block.alignment = requirements.alignment;
+    block.memory = memory;
 
-    mUniqueBlocks.emplace_back( MakeUnique<RefCountedGpuMemoryBlock>(handle) );
+    mUniqueBlocks.emplace_back( MakeUnique< RefCountedGpuMemoryBlock >( handle ) );
     return handle;
   }
 
@@ -115,7 +120,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock Allocate( const Handle<Buffer>& buffer, vk::MemoryPropertyFlags memoryProperties ) override
+  virtual RefCountedGpuMemoryBlock
+  Allocate( const Handle< Buffer >& buffer, vk::MemoryPropertyFlags memoryProperties ) override
   {
     vk::Buffer handle = buffer->GetVkHandle();
     vk::MemoryRequirements memReqs = mGraphics.GetDevice().getBufferMemoryRequirements( handle );
@@ -131,8 +137,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    */
   RefCountedGpuMemoryBlock Allocate( const RefCountedImage& image, vk::MemoryPropertyFlags memoryProperties ) override
   {
-    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements(image->GetVkHandle() ),
-                               memoryProperties );
+    return Allocate( mGraphics.GetDevice().getImageMemoryRequirements( image->GetVkHandle() ),
+                     memoryProperties );
   }
 
   /**
@@ -147,7 +153,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   {
     if( block.GetRefCount() == 1 )
     {
-      GC(nullptr);
+      GC( nullptr );
     }
   }
 
@@ -162,7 +168,7 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
       if( block != nullptr && block->GetRefCount() == 1 )
       {
         // collect and make invalid ( maybe freelist or sumtink )
-        mGraphics.GetDevice().freeMemory( (**block.get()), mGraphics.GetAllocator() );
+        mGraphics.GetDevice().freeMemory( ( **block.get() ), mGraphics.GetAllocator() );
         block.reset( nullptr );
       }
     }
@@ -170,18 +176,19 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
 
   vk::DeviceMemory GetVkDeviceMemory( GpuMemoryBlock& block ) const override
   {
-    return block.GetData<MemoryBlock>()->memory;
+    return block.GetData< MemoryBlock >()->memory;
   }
 
   void* Map( GpuMemoryBlock& block, uint32_t offset, uint32_t size ) override
   {
-    return VkAssert( mGraphics.GetDevice().mapMemory( block.GetData<MemoryBlock>()->memory,
-                                offset, size == 0u ? VK_WHOLE_SIZE : static_cast<VkDeviceSize>(size)));
+    return VkAssert( mGraphics.GetDevice().mapMemory( block.GetData< MemoryBlock >()->memory,
+                                                      offset,
+                                                      size == 0u ? VK_WHOLE_SIZE : static_cast<VkDeviceSize>(size) ) );
   }
 
   void Unmap( GpuMemoryBlock& block ) override
   {
-    mGraphics.GetDevice().unmapMemory( block.GetData<MemoryBlock>()->memory );
+    mGraphics.GetDevice().unmapMemory( block.GetData< MemoryBlock >()->memory );
   }
 
   void Flush( GpuMemoryBlock& allocationId ) override
@@ -192,14 +199,14 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   GpuMemoryManager& mGpuManager;
   Graphics& mGraphics;
 
-  std::vector<std::unique_ptr<RefCountedGpuMemoryBlock>> mUniqueBlocks;
+  std::vector< std::unique_ptr< RefCountedGpuMemoryBlock>> mUniqueBlocks;
 };
 
 struct GpuMemoryManager::Impl
 {
   Impl( Graphics& graphics, GpuMemoryManager& interface ) :
-    mGraphics( graphics ),
-    mMemoryManager( interface )
+          mGraphics( graphics ),
+          mMemoryManager( interface )
   {
 
   }
@@ -221,21 +228,21 @@ struct GpuMemoryManager::Impl
 
   void CreateDefaultAllocator()
   {
-    mDefaultAllocator = MakeUnique<GpuMemoryDefaultAllocator>( mMemoryManager );
+    mDefaultAllocator = MakeUnique< GpuMemoryDefaultAllocator >( mMemoryManager );
   }
 
   Graphics& mGraphics;
   GpuMemoryManager& mMemoryManager; // interface to this implementation
-  std::unique_ptr<GpuMemoryAllocator> mDefaultAllocator; // default allocator, brute force allocation
+  std::unique_ptr< GpuMemoryAllocator > mDefaultAllocator; // default allocator, brute force allocation
 };
 
 /**
  * Class: GpuMemoryManager
  */
 
-std::unique_ptr<GpuMemoryManager> GpuMemoryManager::New(Graphics& graphics)
+std::unique_ptr< GpuMemoryManager > GpuMemoryManager::New( Graphics& graphics )
 {
-  auto retval = std::unique_ptr<GpuMemoryManager>(new GpuMemoryManager(graphics));
+  auto retval = std::unique_ptr< GpuMemoryManager >( new GpuMemoryManager( graphics ) );
   if( retval->mImpl->Initialise() )
   {
     return retval;
@@ -247,9 +254,9 @@ GpuMemoryManager::GpuMemoryManager() = default;
 
 GpuMemoryManager::~GpuMemoryManager() = default;
 
-GpuMemoryManager::GpuMemoryManager(Graphics& graphics)
+GpuMemoryManager::GpuMemoryManager( Graphics& graphics )
 {
-  mImpl = std::unique_ptr<Impl, std::default_delete<GpuMemoryManager::Impl>>( new Impl(graphics, *this) );
+  mImpl = std::unique_ptr< Impl, std::default_delete< GpuMemoryManager::Impl>>( new Impl( graphics, *this ) );
 }
 
 GpuMemoryAllocator& GpuMemoryManager::GetDefaultAllocator() const
@@ -258,7 +265,7 @@ GpuMemoryAllocator& GpuMemoryManager::GetDefaultAllocator() const
 }
 
 
-GpuMemoryAllocatorUID GpuMemoryManager::RegisterAllocator( std::unique_ptr<GpuMemoryAllocator> allocator )
+GpuMemoryAllocatorUID GpuMemoryManager::RegisterAllocator( std::unique_ptr< GpuMemoryAllocator > allocator )
 {
   NotImplemented();
   return 0;

@@ -57,29 +57,29 @@ struct Controller::Impl
   {
     // only move semantics
     RenderPassChange( vk::RenderPassBeginInfo _beginInfo,
-                      std::vector<vk::ClearValue>&& _clearColorValues,
+                      std::vector< vk::ClearValue >&& _clearColorValues,
                       const Vulkan::RefCountedFramebuffer& _framebuffer,
                       uint32_t _offset )
-    : beginInfo( std::move(_beginInfo) ),
-      colorValues( std::move(_clearColorValues) ),
-      framebuffer( _framebuffer ),
-      offset( _offset )
-      {
-      }
+            : beginInfo( std::move( _beginInfo ) ),
+              colorValues( std::move( _clearColorValues ) ),
+              framebuffer( _framebuffer ),
+              offset( _offset )
+    {
+    }
 
     // no default constructor!
     RenderPassChange() = delete;
 
-    vk::RenderPassBeginInfo beginInfo     {};
-    std::vector<vk::ClearValue>           colorValues {};
-    Vulkan::RefCountedFramebuffer         framebuffer {};
-    uint32_t offset { 0 };
+    vk::RenderPassBeginInfo beginInfo{};
+    std::vector< vk::ClearValue > colorValues{};
+    Vulkan::RefCountedFramebuffer framebuffer{};
+    uint32_t offset{ 0 };
   };
 
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
-  : mGraphics( graphics ),
-    mOwner( owner ),
-    mDefaultAllocator( mGraphics.GetDeviceMemoryManager().GetDefaultAllocator() )
+          : mGraphics( graphics ),
+            mOwner( owner ),
+            mDefaultAllocator( mGraphics.GetDeviceMemoryManager().GetDefaultAllocator() )
   {
   }
 
@@ -92,14 +92,14 @@ struct Controller::Impl
   bool Initialise()
   {
     // Create factories
-    mShaderFactory = std::make_unique<VulkanAPI::ShaderFactory>( mGraphics );
-    mTextureFactory = std::make_unique<VulkanAPI::TextureFactory>( mGraphics );
-    mBufferFactory = std::make_unique<VulkanAPI::BufferFactory>( mOwner );
-    mPipelineFactory = std::make_unique<VulkanAPI::PipelineFactory>( mOwner );
+    mShaderFactory = std::make_unique< VulkanAPI::ShaderFactory >( mGraphics );
+    mTextureFactory = std::make_unique< VulkanAPI::TextureFactory >( mGraphics );
+    mBufferFactory = std::make_unique< VulkanAPI::BufferFactory >( mOwner );
+    mPipelineFactory = std::make_unique< VulkanAPI::PipelineFactory >( mOwner );
 
-    mUboManager = std::make_unique<VulkanAPI::UboManager>( mOwner );
+    mUboManager = std::make_unique< VulkanAPI::UboManager >( mOwner );
 
-    mDefaultPipelineCache = std::make_unique<VulkanAPI::PipelineCache>( mGraphics, mOwner );
+    mDefaultPipelineCache = std::make_unique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
 
     return true;
   }
@@ -133,10 +133,10 @@ struct Controller::Impl
 
       const auto& rp = mRenderPasses[i];
       uint32_t offset = rp.offset;
-      uint32_t count = uint32_t(
-                 (i == mRenderPasses.size()-1) ?
-                 mSecondaryCommandBufferRefs.size() - rp.offset :
-                 mRenderPasses[i+1].offset - rp.offset );
+      auto count = uint32_t(
+              ( i == mRenderPasses.size() - 1 ) ?
+              mSecondaryCommandBufferRefs.size() - rp.offset :
+              mRenderPasses[i + 1].offset - rp.offset );
 
       primaryCommandBuffer->BeginRenderPass( rp.beginInfo, vk::SubpassContents::eSecondaryCommandBuffers );
       primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs, offset, count );
@@ -151,26 +151,26 @@ struct Controller::Impl
 
   API::TextureFactory& GetTextureFactory() const
   {
-    return *(mTextureFactory.get());
+    return *( mTextureFactory.get() );
   }
 
   API::ShaderFactory& GetShaderFactory() const
   {
-    return *(mShaderFactory.get());
+    return *( mShaderFactory.get() );
   }
 
   API::BufferFactory& GetBufferFactory() const
   {
-    return *(mBufferFactory.get());
+    return *( mBufferFactory.get() );
   }
 
   /**
-   * NEW IMPLEMENTACIONE
+   * NEW IMPLEMENTATION
    */
 
-  std::unique_ptr<API::RenderCommand> AllocateRenderCommand()
+  std::unique_ptr< API::RenderCommand > AllocateRenderCommand()
   {
-    return std::make_unique<VulkanAPI::RenderCommand>( mOwner, mGraphics );
+    return std::make_unique< VulkanAPI::RenderCommand >( mOwner, mGraphics );
   }
 
   bool UpdateRenderPass( const API::RenderCommand::RenderTargetBinding& renderTargetBinding )
@@ -193,7 +193,7 @@ struct Controller::Impl
     // default framebuffer. For now just substitute with surface/swapchain
     if( framebuffer != mCurrentFramebuffer )
     {
-      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID(0)->GetPrimaryCommandBuffer();
+      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID( 0 )->GetPrimaryCommandBuffer();
 
       mCurrentFramebuffer = framebuffer;
       mCurrentFramebuffer->GetRenderPassVkHandle();
@@ -204,22 +204,23 @@ struct Controller::Impl
                                        renderTargetBinding.clearColors[0].a
                                      } );
       mRenderPasses.emplace_back(
-                                // render pass
-                                vk::RenderPassBeginInfo{}
-                                    .setRenderPass( mCurrentFramebuffer->GetRenderPassVkHandle() )
-                                    .setFramebuffer( mCurrentFramebuffer->GetVkHandle() )
-                                    .setRenderArea( vk::Rect2D( {0, 0}, {mCurrentFramebuffer->GetWidth(), mCurrentFramebuffer->GetHeight()} ) )
-                                    .setClearValueCount( uint32_t( mCurrentFramebuffer->GetDefaultClearValues().size() ) )
-                                    .setPClearValues( newColors.data() ),
+              // render pass
+              vk::RenderPassBeginInfo{}
+                      .setRenderPass( mCurrentFramebuffer->GetRenderPassVkHandle() )
+                      .setFramebuffer( mCurrentFramebuffer->GetVkHandle() )
+                      .setRenderArea( vk::Rect2D( { 0, 0 }, { mCurrentFramebuffer->GetWidth(),
+                                                              mCurrentFramebuffer->GetHeight() } ) )
+                      .setClearValueCount( uint32_t( mCurrentFramebuffer->GetDefaultClearValues().size() ) )
+                      .setPClearValues( newColors.data() ),
 
-                                // colors
-                                std::move(newColors),
+              // colors
+              std::move( newColors ),
 
-                                // framebuffer
-                                framebuffer,
+              // framebuffer
+              framebuffer,
 
-                                // offset when to begin new render pass
-                                0 );
+              // offset when to begin new render pass
+              0 );
       return true;
     }
 
@@ -231,12 +232,12 @@ struct Controller::Impl
    * Submits number of commands in one go ( simiar to vkCmdExecuteCommands )
    * @param commands
    */
-  void SubmitCommands( std::vector<Dali::Graphics::API::RenderCommand*> commands )
+  void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
     // if there are any scheduled writes
-    if(!mBufferTransferRequests.empty())
+    if( !mBufferTransferRequests.empty() )
     {
-      for(auto&& req : mBufferTransferRequests )
+      for( auto&& req : mBufferTransferRequests )
       {
         void* dst = req->dstBuffer->GetMemoryHandle()->Map();
         memcpy( dst, &*req->srcPtr, req->srcSize );
@@ -252,7 +253,7 @@ struct Controller::Impl
       return;
     }
 
-    std::vector<Vulkan::RefCountedCommandBuffer> cmdBufRefs{};
+    std::vector< Vulkan::RefCountedCommandBuffer > cmdBufRefs{};
 
     // Update uniform buffers
     for( auto&& command : commands )
@@ -298,7 +299,7 @@ struct Controller::Impl
       auto binding = 0u;
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )
       {
-        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( vb.Get() ).GetBufferRef(), 0 );
+        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( vb.Get()).GetBufferRef(), 0 );
       }
 
       // note: starting set = 0
@@ -312,13 +313,18 @@ struct Controller::Impl
       {
         cmdbuf->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(indexBinding.buffer.Get()).GetBufferRef(),
                                  0, vk::IndexType::eUint16 );
-        cmdbuf->DrawIndexed( drawCommand.indicesCount, drawCommand.instanceCount,
-        drawCommand.firstIndex, 0, drawCommand.firstInstance );
+        cmdbuf->DrawIndexed( drawCommand.indicesCount, 
+                             drawCommand.instanceCount,
+                             drawCommand.firstIndex, 
+                             0, 
+                             drawCommand.firstInstance );
       }
       else
       {
-        cmdbuf->Draw(drawCommand.vertexCount, drawCommand.instanceCount, drawCommand.firstVertex,
-                     drawCommand.firstInstance);
+        cmdbuf->Draw( drawCommand.vertexCount, 
+                      drawCommand.instanceCount, 
+                      drawCommand.firstVertex,
+                      drawCommand.firstInstance );
       }
       cmdbuf->End();
       mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
@@ -327,43 +333,43 @@ struct Controller::Impl
   }
 
   // resources
-  std::vector<Vulkan::RefCountedTexture> mTextures;
-  std::vector<Vulkan::RefCountedShader>  mShaders;
-  std::vector<Vulkan::RefCountedBuffer>  mBuffers;
+  std::vector< Vulkan::RefCountedTexture > mTextures;
+  std::vector< Vulkan::RefCountedShader > mShaders;
+  std::vector< Vulkan::RefCountedBuffer > mBuffers;
 
   // owner objects
-  ObjectOwner<API::Texture>   mTexturesOwner;
-  ObjectOwner<API::Shader>    mShadersOwner;
-  ObjectOwner<API::Buffer>    mBuffersOwner;
+  ObjectOwner< API::Texture > mTexturesOwner;
+  ObjectOwner< API::Shader > mShadersOwner;
+  ObjectOwner< API::Buffer > mBuffersOwner;
 
-  std::unique_ptr<PipelineCache> mDefaultPipelineCache;
+  std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
-  Vulkan::Graphics&           mGraphics;
-  Controller&                 mOwner;
+  Vulkan::Graphics& mGraphics;
+  Controller& mOwner;
   Vulkan::GpuMemoryAllocator& mDefaultAllocator;
 
-  std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
-  std::unique_ptr<VulkanAPI::ShaderFactory> mShaderFactory;
-  std::unique_ptr<VulkanAPI::BufferFactory> mBufferFactory;
-  std::unique_ptr<VulkanAPI::PipelineFactory> mPipelineFactory;
+  std::unique_ptr< VulkanAPI::TextureFactory > mTextureFactory;
+  std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;
+  std::unique_ptr< VulkanAPI::BufferFactory > mBufferFactory;
+  std::unique_ptr< VulkanAPI::PipelineFactory > mPipelineFactory;
 
-  std::vector<std::unique_ptr<VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
+  std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 
-  std::unique_ptr<VulkanAPI::UboManager> mUboManager;
+  std::unique_ptr< VulkanAPI::UboManager > mUboManager;
 
   // Accumulate all the secondary command buffers of the frame here to avoid them being overwritten
   // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
   // and ready to be used for the next frame.
-  std::vector<Vulkan::RefCountedCommandBuffer> mSecondaryCommandBufferRefs;
+  std::vector< Vulkan::RefCountedCommandBuffer > mSecondaryCommandBufferRefs;
 
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
-  std::vector<RenderPassChange> mRenderPasses;
+  std::vector< RenderPassChange > mRenderPasses;
 
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
 
-API::Accessor<API::Shader> Controller::CreateShader( const API::BaseFactory<API::Shader>& factory )
+API::Accessor< API::Shader > Controller::CreateShader( const API::BaseFactory< API::Shader >& factory )
 {
   auto handle = mImpl->mShadersOwner.CreateObject( factory );
   auto& apiShader = static_cast<VulkanAPI::Shader&>(mImpl->mShadersOwner[handle]);
@@ -371,36 +377,36 @@ API::Accessor<API::Shader> Controller::CreateShader( const API::BaseFactory<API:
   auto fragmentShaderRef = apiShader.GetShaderRef( vk::ShaderStageFlagBits::eFragment );
   mImpl->mShaders.push_back( vertexShaderRef );
   mImpl->mShaders.push_back( fragmentShaderRef );
-  return API::Accessor<API::Shader>( mImpl->mShadersOwner, handle);
+  return API::Accessor< API::Shader >( mImpl->mShadersOwner, handle );
 }
 
-API::Accessor<API::Texture> Controller::CreateTexture( const API::BaseFactory<API::Texture>& factory )
+API::Accessor< API::Texture > Controller::CreateTexture( const API::BaseFactory< API::Texture >& factory )
 {
   auto handle = mImpl->mTexturesOwner.CreateObject( factory );
   auto textureRef = static_cast<VulkanAPI::Texture&>(mImpl->mTexturesOwner[handle]).GetTextureRef();
   mImpl->mTextures.push_back( textureRef );
-  return API::Accessor<API::Texture>( mImpl->mTexturesOwner, handle);
+  return API::Accessor< API::Texture >( mImpl->mTexturesOwner, handle );
 }
 
-API::Accessor<API::Buffer> Controller::CreateBuffer( const API::BaseFactory<API::Buffer>& factory )
+API::Accessor< API::Buffer > Controller::CreateBuffer( const API::BaseFactory< API::Buffer >& factory )
 {
   auto handle = mImpl->mBuffersOwner.CreateObject( factory );
   auto bufferRef = static_cast<VulkanAPI::Buffer&>(mImpl->mBuffersOwner[handle]).GetBufferRef();
   mImpl->mBuffers.push_back( bufferRef );
-  return API::Accessor<API::Buffer>( mImpl->mBuffersOwner, handle);
+  return API::Accessor< API::Buffer >( mImpl->mBuffersOwner, handle );
 }
 
-API::Accessor<API::Sampler> Controller::CreateSampler( const API::BaseFactory<API::Sampler>& factory )
+API::Accessor< API::Sampler > Controller::CreateSampler( const API::BaseFactory< API::Sampler >& factory )
 {
   return { nullptr };
 }
 
-std::unique_ptr<API::Pipeline> Controller::CreatePipeline( const API::BaseFactory<API::Pipeline>& factory )
+std::unique_ptr< API::Pipeline > Controller::CreatePipeline( const API::BaseFactory< API::Pipeline >& factory )
 {
   auto& pipelineFactory = const_cast<PipelineFactory&>(dynamic_cast<const PipelineFactory&>( factory ));
 
   // if no custom cache, use default one
-  if(!pipelineFactory.mPipelineCache)
+  if( !pipelineFactory.mPipelineCache )
   {
     pipelineFactory.mPipelineCache = mImpl->mDefaultPipelineCache.get();
   }
@@ -408,28 +414,30 @@ std::unique_ptr<API::Pipeline> Controller::CreatePipeline( const API::BaseFactor
   return mImpl->mPipelineFactory->Create();
 }
 
-API::Accessor<API::Framebuffer> Controller::CreateFramebuffer( const API::BaseFactory<API::Framebuffer>& factory )
+API::Accessor< API::Framebuffer > Controller::CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory )
 {
   return { nullptr };
 }
 
-std::unique_ptr<char> Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
+std::unique_ptr< char > Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
 {
-  return std::unique_ptr<char>( new char[numberOfElements * elementSize] );
+  return std::unique_ptr< char >( new char[numberOfElements * elementSize] );
 }
 
-std::unique_ptr<Controller> Controller::New( Vulkan::Graphics& vulkanGraphics )
+std::unique_ptr< Controller > Controller::New( Vulkan::Graphics& vulkanGraphics )
 {
-  return std::make_unique<Controller>( vulkanGraphics );
+  return std::make_unique< Controller >( vulkanGraphics );
 }
 
-Controller::Controller( Vulkan::Graphics& vulkanGraphics ) : mImpl( std::make_unique<Impl>( *this, vulkanGraphics ) )
+Controller::Controller( Vulkan::Graphics& vulkanGraphics ) : mImpl( std::make_unique< Impl >( *this, vulkanGraphics ) )
 {
   mImpl->Initialise();
 }
 
-Controller::~Controller()       = default;
-Controller::Controller()        = default;
+Controller::~Controller() = default;
+
+Controller::Controller() = default;
+
 Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::BeginFrame()
@@ -468,9 +476,9 @@ Vulkan::Graphics& Controller::GetGraphics() const
   return mImpl->mGraphics;
 }
 
-void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr<VulkanAPI::BufferMemoryTransfer> transferRequest )
+void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::BufferMemoryTransfer > transferRequest )
 {
-  mImpl->mBufferTransferRequests.emplace_back( std::move(transferRequest) );
+  mImpl->mBufferTransferRequests.emplace_back( std::move( transferRequest ) );
 }
 
 VulkanAPI::UboManager& Controller::GetUboManager()
@@ -478,12 +486,12 @@ VulkanAPI::UboManager& Controller::GetUboManager()
   return *mImpl->mUboManager;
 }
 
-void Controller::SubmitCommands( std::vector<API::RenderCommand*> commands )
+void Controller::SubmitCommands( std::vector< API::RenderCommand* > commands )
 {
-  mImpl->SubmitCommands( std::move(commands) );
+  mImpl->SubmitCommands( std::move( commands ) );
 }
 
-std::unique_ptr<API::RenderCommand> Controller::AllocateRenderCommand()
+std::unique_ptr< API::RenderCommand > Controller::AllocateRenderCommand()
 {
   return mImpl->AllocateRenderCommand();
 }

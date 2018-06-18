@@ -33,8 +33,11 @@ class Graphics;
 namespace VulkanAPI
 {
 class Pipeline;
+
 class Controller;
+
 class PipelineFactory;
+
 class PipelineCache;
 namespace Internal
 {
@@ -43,6 +46,7 @@ class Pipeline
 public:
 
   Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory );
+
   ~Pipeline();
 
   uint32_t GetHashCode() const;
@@ -57,18 +61,25 @@ public:
 
   Vulkan::RefCountedPipeline GetVkPipeline() const;
 
-  const std::vector<vk::DescriptorSetLayout>& GetVkDescriptorSetLayouts() const;
+  const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
 private:
 
-  const vk::PipelineColorBlendStateCreateInfo*    PrepareColorBlendStateCreateInfo();
-  const vk::PipelineDepthStencilStateCreateInfo*  PrepareDepthStencilStateCreateInfo();
+  const vk::PipelineColorBlendStateCreateInfo* PrepareColorBlendStateCreateInfo();
+
+  const vk::PipelineDepthStencilStateCreateInfo* PrepareDepthStencilStateCreateInfo();
+
   const vk::PipelineInputAssemblyStateCreateInfo* PrepareInputAssemblyStateCreateInfo();
-  const vk::PipelineMultisampleStateCreateInfo*   PrepareMultisampleStateCreateInfo();
+
+  const vk::PipelineMultisampleStateCreateInfo* PrepareMultisampleStateCreateInfo();
+
   const vk::PipelineRasterizationStateCreateInfo* PrepareRasterizationStateCreateInfo();
-  const vk::PipelineTessellationStateCreateInfo*  PrepareTesselationStateCreateInfo();
-  const vk::PipelineViewportStateCreateInfo*      PrepareViewportStateCreateInfo();
-  const vk::PipelineLayout                        PreparePipelineLayout();
+
+  const vk::PipelineTessellationStateCreateInfo* PrepareTesselationStateCreateInfo();
+
+  const vk::PipelineViewportStateCreateInfo* PrepareViewportStateCreateInfo();
+
+  const vk::PipelineLayout PreparePipelineLayout();
 
 
   Vulkan::Graphics& mGraphics;
@@ -79,12 +90,12 @@ private:
 
   // wrapper for copy of cSreate data
   struct PipelineCreateInfo;
-  std::unique_ptr<PipelineCreateInfo> mCreateInfo;
+  std::unique_ptr< PipelineCreateInfo > mCreateInfo;
 
   struct VulkanPipelineState;
-  std::unique_ptr<VulkanPipelineState> mVulkanPipelineState;
+  std::unique_ptr< VulkanPipelineState > mVulkanPipelineState;
 
-  std::vector<vk::DescriptorSetLayout> mVkDescriptorSetLayouts;
+  std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 
   PipelineCache* mPipelineCache;
 };

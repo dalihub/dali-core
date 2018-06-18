@@ -18,7 +18,9 @@
 #include <dali/graphics/vulkan/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 #include <iostream>
+
 namespace Dali
 {
 namespace Graphics
@@ -32,17 +34,17 @@ namespace Vulkan
 struct Shader::Impl
 {
   Impl( Shader& owner, Graphics& graphics, const vk::ShaderModuleCreateInfo& info ) :
-    mOwner( owner ),
-    mGraphics( graphics ),
-    mCreateInfo( info ),
-    mPipelineShaderStage( vk::ShaderStageFlagBits::eAllGraphics )
+          mOwner( owner ),
+          mGraphics( graphics ),
+          mCreateInfo( info ),
+          mPipelineShaderStage( vk::ShaderStageFlagBits::eAllGraphics )
   {
     mSPIRVShader = SpirV::SPIRVUtils::Parse( info.pCode, info.codeSize, vk::ShaderStageFlagBits::eVertex );
   }
 
   ~Impl()
   {
-    if(mShaderModule)
+    if( mShaderModule )
     {
       mGraphics.GetDevice().destroyShaderModule( mShaderModule, mGraphics.GetAllocator() );
     }
@@ -50,7 +52,8 @@ struct Shader::Impl
 
   vk::Result Initialise()
   {
-    if( (mShaderModule = VkAssert( mGraphics.GetDevice().createShaderModule( mCreateInfo, mGraphics.GetAllocator() ) )))
+    if( ( mShaderModule = VkAssert(
+            mGraphics.GetDevice().createShaderModule( mCreateInfo, mGraphics.GetAllocator() ) ) ) )
     {
       return vk::Result::eSuccess;
     }
@@ -66,17 +69,17 @@ struct Shader::Impl
   Graphics& mGraphics;
   vk::ShaderModuleCreateInfo mCreateInfo;
   vk::ShaderModule mShaderModule;
-  std::unique_ptr<SpirV::SPIRVShader> mSPIRVShader;
+  std::unique_ptr< SpirV::SPIRVShader > mSPIRVShader;
   vk::ShaderStageFlagBits mPipelineShaderStage;
 };
 
 /*
  * Class: Shader
  */
-Handle<Shader> Shader::New(Graphics &graphics, const vk::ShaderModuleCreateInfo &info)
+Handle< Shader > Shader::New( Graphics& graphics, const vk::ShaderModuleCreateInfo& info )
 {
-  auto shader = Handle<Shader>(new Shader(graphics, info)); // can't use make unique because of permissions
-  if(shader)
+  auto shader = Handle< Shader >( new Shader( graphics, info ) ); // can't use make unique because of permissions
+  if( shader )
   {
     if( shader->mImpl->Initialise() == vk::Result::eSuccess )
     {
@@ -86,16 +89,16 @@ Handle<Shader> Shader::New(Graphics &graphics, const vk::ShaderModuleCreateInfo 
   return shader;
 }
 
-Handle<Shader> Shader::New( Graphics& graphics, const void* bytes, std::size_t size )
+Handle< Shader > Shader::New( Graphics& graphics, const void* bytes, std::size_t size )
 {
   return New( graphics, vk::ShaderModuleCreateInfo{}
-                                .setCodeSize( size )
-                                .setPCode(reinterpret_cast<const uint32_t*>(bytes)));
+          .setCodeSize( size )
+          .setPCode( reinterpret_cast<const uint32_t*>(bytes) ) );
 }
 
 Shader::Shader( Graphics& graphics, const vk::ShaderModuleCreateInfo& info )
 {
-  mImpl = MakeUnique<Impl>( *this, graphics, info );
+  mImpl = MakeUnique< Impl >( *this, graphics, info );
 }
 
 Shader::~Shader() = default;
@@ -116,10 +119,9 @@ bool Shader::OnDestroy()
   auto shaderModule = mImpl->mShaderModule;
   auto allocator = &mImpl->mGraphics.GetAllocator();
 
-  mImpl->mGraphics.DiscardResource( [device, shaderModule, allocator]() {
-#ifndef NDEBUG
-    printf("Invoking SHADER MODULE deleter function\n");
-#endif
+  mImpl->mGraphics.DiscardResource( [ device, shaderModule, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: shader module->%p\n",
+                   static_cast< void* >(shaderModule) )
     device.destroyShaderModule( shaderModule, allocator );
   } );
 

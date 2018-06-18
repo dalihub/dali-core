@@ -41,7 +41,9 @@ public:
    * @param info
    * @return
    */
-  static RefCountedImageView New( Graphics& graphics, const RefCountedImage& image, const vk::ImageViewCreateInfo& createInfo);
+  static RefCountedImageView New( Graphics& graphics,
+                                  const RefCountedImage& image,
+                                  const vk::ImageViewCreateInfo& createInfo );
 
 
   ~ImageView() override;
@@ -90,10 +92,10 @@ private:
              vk::ImageViewCreateInfo createInfo );
 
 private:
-  Graphics*                      mGraphics;
-  RefCountedImage                mImage;
-  vk::ImageViewCreateInfo        mCreateInfo;
-  vk::ImageView                  mImageView;
+  Graphics* mGraphics;
+  RefCountedImage mImage;
+  vk::ImageViewCreateInfo mCreateInfo;
+  vk::ImageView mImageView;
 };
 
 } //namespace Vulkan

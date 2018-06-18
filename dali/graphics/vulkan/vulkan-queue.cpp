@@ -65,16 +65,16 @@ SubmissionData& SubmissionData::SetSignalSemaphores( const std::vector< vk::Sema
 }
 
 // queue
-Queue::Queue(Graphics& graphics,
-             vk::Queue queue,
-             uint32_t queueFamilyIndex,
-             uint32_t queueIndex,
-             vk::QueueFlags queueFlags)
-        : mGraphics(graphics),
-          mQueue(queue),
-          mFlags(queueFlags),
-          mQueueFamilyIndex(queueFamilyIndex),
-          mQueueIndex(queueIndex)
+Queue::Queue( Graphics& graphics,
+              vk::Queue queue,
+              uint32_t queueFamilyIndex,
+              uint32_t queueIndex,
+              vk::QueueFlags queueFlags )
+        : mGraphics( graphics ),
+          mQueue( queue ),
+          mFlags( queueFlags ),
+          mQueueFamilyIndex( queueFamilyIndex ),
+          mQueueIndex( queueIndex )
 {
 }
 

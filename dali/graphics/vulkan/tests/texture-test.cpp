@@ -25,10 +25,11 @@ struct Pixel
   Pixel() = default;
 
   explicit Pixel( uint32_t _color )
-    : color(_color)
-  {}
+          : color( _color )
+  {
+  }
 
-  explicit Pixel( uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a)
+  explicit Pixel( uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a )
   {
     r = _r;
     g = _g;
@@ -48,20 +49,25 @@ struct Pixel
 
 struct Pixmap
 {
-  explicit Pixmap( std::vector<Pixel> _data, uint32_t _width, uint32_t _height ) :
-  data(_data), width(_width), height(_height), bytesPerPixel(4), pixelFormat( vk::Format::eR8G8B8A8Unorm )
+  explicit Pixmap( std::vector< Pixel > _data, uint32_t _width, uint32_t _height ) :
+          data( std::move( _data ) ),
+          width( _width ),
+          height( _height ),
+          bytesPerPixel( 4 ),
+          pixelFormat( vk::Format::eR8G8B8A8Unorm )
   {
   }
-  std::vector<Pixel> data;
-  uint32_t          width;
-  uint32_t          height;
-  uint32_t          bytesPerPixel;
-  vk::Format        pixelFormat;
+
+  std::vector< Pixel > data;
+  uint32_t width;
+  uint32_t height;
+  uint32_t bytesPerPixel;
+  vk::Format pixelFormat;
 };
 
 struct Texture
 {
-  Texture( Graphics& graphics, Pixmap pixmap ) : mGraphics( graphics ), mPixmap( pixmap )
+  Texture( Graphics& graphics, Pixmap pixmap ) : mGraphics( graphics ), mPixmap( std::move( pixmap ) )
   {
   }
 
@@ -74,7 +80,7 @@ struct Texture
             .setSamples( vk::SampleCountFlagBits::e1 )
             .setSharingMode( vk::SharingMode::eExclusive )
             .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
-            .setExtent( {mPixmap.width, mPixmap.height, 1} )
+            .setExtent( { mPixmap.width, mPixmap.height, 1 } )
             .setArrayLayers( 1 )
             .setImageType( vk::ImageType::e2D )
             .setTiling( vk::ImageTiling::eOptimal )
@@ -89,40 +95,42 @@ struct Texture
     mGraphics.BindImageMemory( mImage, allocator.Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal ), 0 );
 
     // create transient buffer to copy data
-    auto size = mPixmap.data.size()*sizeof(mPixmap.data[0]);
+    auto size = mPixmap.data.size() * sizeof( mPixmap.data[0] );
     auto buffer = Buffer::New( mGraphics,
                                vk::BufferCreateInfo{}
-                                 .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                 .setSharingMode( vk::SharingMode::eExclusive )
-                                 .setSize( size ) );
+                                       .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
+                                       .setSharingMode( vk::SharingMode::eExclusive )
+                                       .setSize( size ) );
 
     buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
     // copy pixels to the buffer
-    auto ptr = buffer->GetMemoryHandle()->MapTyped<Pixel>();
+    auto ptr = buffer->GetMemoryHandle()->MapTyped< Pixel >();
     std::copy( mPixmap.data.begin(), mPixmap.data.end(), ptr );
     buffer->GetMemoryHandle()->Unmap();
 
     // record copy and layout change
     auto copy = vk::BufferImageCopy{}.setImageExtent( { mPixmap.width, mPixmap.height, 1 } )
-                         .setBufferImageHeight( mPixmap.height )
-                         .setBufferOffset( 0 )
-                         .setBufferRowLength( mPixmap.width )
-                         .setImageOffset( { 0, 0, 0 } )
-                         .setImageSubresource(
-                           vk::ImageSubresourceLayers{}
-                           .setMipLevel( 0 )
-                           .setAspectMask( vk::ImageAspectFlagBits::eColor )
-                           .setLayerCount( 1 )
-                           .setBaseArrayLayer( 0 )
-                         );
+                                     .setBufferImageHeight( mPixmap.height )
+                                     .setBufferOffset( 0 )
+                                     .setBufferRowLength( mPixmap.width )
+                                     .setImageOffset( { 0, 0, 0 } )
+                                     .setImageSubresource(
+                                             vk::ImageSubresourceLayers{}
+                                                     .setMipLevel( 0 )
+                                                     .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                                     .setLayerCount( 1 )
+                                                     .setBaseArrayLayer( 0 )
+                                     );
     mCommandPool = CommandPool::New( mGraphics );
     mCommandBuffer = mCommandPool->NewCommandBuffer( true );
-    mCommandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+    mCommandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
 
     // change layout
-    auto barrier = std::vector<vk::ImageMemoryBarrier>{
-      mCommandBuffer->ImageLayoutTransitionBarrier( mImage, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferDstOptimal, vk::ImageAspectFlagBits::eColor )
+    auto barrier = std::vector< vk::ImageMemoryBarrier >{
+            mGraphics.CreateImageMemoryBarrier( mImage,
+                                                vk::ImageLayout::ePreinitialized,
+                                                vk::ImageLayout::eTransferDstOptimal )
     };
 
     // change layout to prepare image to transfer data
@@ -135,28 +143,32 @@ struct Texture
     // change layout to shader read-only optimal
     mCommandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eVertexShader, vk::PipelineStageFlagBits::eVertexShader,
                                      {}, {}, {}, {
-                                       mCommandBuffer->ImageLayoutTransitionBarrier( mImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageAspectFlagBits::eColor )
+                                             mGraphics.CreateImageMemoryBarrier( mImage,
+                                                                                 vk::ImageLayout::eTransferDstOptimal,
+                                                                                 vk::ImageLayout::eShaderReadOnlyOptimal )
                                      } );
 
     mCommandBuffer->End();
 
     // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = mGraphics.CreateFence({});
-    mGraphics.GetGraphicsQueue(0u).Submit( mCommandBuffer, fence );
-    mGraphics.WaitForFence(fence);
+    auto fence = mGraphics.CreateFence( {} );
+
+    auto submissionData = SubmissionData{}.SetCommandBuffers( { mCommandBuffer } );
+    mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ), { submissionData }, fence );
+    mGraphics.WaitForFence( fence );
 
   }
 
-  Graphics&        mGraphics;
-  RefCountedImage         mImage;
-  RefCountedImageView     mImageView;
+  Graphics& mGraphics;
+  RefCountedImage mImage;
+  RefCountedImageView mImageView;
 
-  RefCountedCommandPool    mCommandPool;
-  RefCountedCommandBuffer  mCommandBuffer; // primary buffer, executed independent
+  RefCountedCommandPool mCommandPool;
+  RefCountedCommandBuffer mCommandBuffer; // primary buffer, executed independent
 
   // layouts
-  vk::ImageLayout mOldLayout;
-  vk::ImageLayout mNewLayout;
+  vk::ImageLayout mOldLayout{ vk::ImageLayout{} };
+  vk::ImageLayout mNewLayout{ vk::ImageLayout{} };
 
   // Command pool
 
@@ -172,14 +184,14 @@ struct Texture
  */
 Pixmap GenerateTexture32BPPRGBA( uint32_t width, uint32_t height )
 {
-  std::vector<Pixel> data;
+  std::vector< Pixel > data;
   data.resize( width * height );
 
-  const Pixel WHITE     { 0xffffffff };
-  const Pixel BLACK     { 0x000000ff };
-  const Pixel RED       { 0xff0000ff };
-  const Pixel GREEN     { 0x00ff00ff };
-  const Pixel BLUE      { 0x0000ffff };
+  const Pixel WHITE{ 0xffffffff };
+  const Pixel BLACK{ 0x000000ff };
+  const Pixel RED{ 0xff0000ff };
+  const Pixel GREEN{ 0x00ff00ff };
+  const Pixel BLUE{ 0x0000ffff };
 
   const Pixel COLORS[] = { WHITE, BLACK, RED, GREEN, BLUE };
   const auto COLORS_COUNT = 5u;
@@ -188,7 +200,7 @@ Pixmap GenerateTexture32BPPRGBA( uint32_t width, uint32_t height )
   {
     for( auto x = 0u; x < width; ++x )
     {
-      data[ x + width * y ] = COLORS[ ((x*x)+(y*y)) % COLORS_COUNT];
+      data[x + width * y] = COLORS[( ( x * x ) + ( y * y ) ) % COLORS_COUNT];
     }
   }
 
@@ -208,7 +220,7 @@ Texture CreateTexture( Graphics& graphics, Pixmap pixmap )
 int TextureTestMain( Dali::Graphics::Vulkan::Graphics& graphics )
 {
   auto pixmap = GenerateTexture32BPPRGBA( 1024, 1024 );
-  auto texture = Dali::Graphics::Vulkan::Texture::New( graphics, 1024, 1024, vk::Format::eR8G8B8A8Unorm);
+  auto texture = Dali::Graphics::Vulkan::Texture::New( graphics, 1024, 1024, vk::Format::eR8G8B8A8Unorm );
 
   return 0;
 }

@@ -29,14 +29,19 @@ namespace Vulkan
 {
 
 class Image;
+
 class Graphics;
+
 class Buffer;
+
 class Pipeline;
+
 class DescriptorSet;
 
 class CommandBuffer : public VkManaged
 {
   friend class CommandPool;
+
   friend struct CommandBufferPool;
 
 public:
@@ -46,8 +51,8 @@ public:
   ~CommandBuffer() override;
 
   /** Begin recording */
-  void Begin(vk::CommandBufferUsageFlags       usageFlags      = vk::CommandBufferUsageFlags{},
-             vk::CommandBufferInheritanceInfo* inheritanceInfo = nullptr);
+  void Begin( vk::CommandBufferUsageFlags usageFlags = vk::CommandBufferUsageFlags{},
+              vk::CommandBufferInheritanceInfo* inheritanceInfo = nullptr );
 
   /** Finish recording */
   void End();
@@ -74,9 +79,9 @@ public:
    * @param buffers
    * @param pOffsets
    */
-  void BindVertexBuffers(uint32_t firstBinding, uint32_t bindingCount,
-                         std::vector<Dali::Graphics::Vulkan::Handle<Buffer>> buffers,
-                         const vk::DeviceSize *pOffsets);
+  void BindVertexBuffers( uint32_t firstBinding, uint32_t bindingCount,
+                          std::vector< Dali::Graphics::Vulkan::Handle< Buffer>> buffers,
+                          const vk::DeviceSize* pOffsets );
 
   /**
    * Binds an index buffer
@@ -84,7 +89,7 @@ public:
    * @param offset
    * @param indexType
    */
-  void BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType);
+  void BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType );
 
   /**
    * Binds single vertex buffer
@@ -92,13 +97,14 @@ public:
    * @param buffer
    * @param offset
    */
-  void BindVertexBuffer(uint32_t binding, const Dali::Graphics::Vulkan::Handle<Buffer>& buffer, vk::DeviceSize offset );
+  void
+  BindVertexBuffer( uint32_t binding, const Dali::Graphics::Vulkan::Handle< Buffer >& buffer, vk::DeviceSize offset );
 
   /**
    * Binds graphics pipeline
    * @param pipeline
    */
-  void BindGraphicsPipeline( Handle<Pipeline> pipeline );
+  void BindGraphicsPipeline( Handle <Pipeline> pipeline );
 
   /**
    *
@@ -107,15 +113,16 @@ public:
    * @param firstSet
    * @param descriptorSetCount
    */
-  void BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets,
-                           Handle<Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount );
+  void BindDescriptorSets( std::vector< Dali::Graphics::Vulkan::Handle< DescriptorSet>> descriptorSets,
+                           Handle <Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount );
 
   /**
    * Binds descriptor sets to the most recently bound Pipeline
    * @param descriptorSets
    * @param firstSet
    */
-  void BindDescriptorSets( std::vector<Dali::Graphics::Vulkan::Handle<DescriptorSet>> descriptorSets, uint32_t firstSet );
+  void
+  BindDescriptorSets( std::vector< Dali::Graphics::Vulkan::Handle< DescriptorSet>> descriptorSets, uint32_t firstSet );
 
   /**
    * Issues draw command
@@ -134,7 +141,8 @@ public:
    * @param vertexOffset
    * @param firstInstance
    */
-  void DrawIndexed( uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance );
+  void DrawIndexed( uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset,
+                    uint32_t firstInstance );
 
   /**
    * Begins render pass using VkRenderPass and VkFramebuffer associated with FBID
@@ -168,21 +176,23 @@ public:
   void PipelineBarrier( vk::PipelineStageFlags srcStageMask,
                         vk::PipelineStageFlags dstStageMask,
                         vk::DependencyFlags dependencyFlags,
-                        std::vector<vk::MemoryBarrier> memoryBarriers,
-                        std::vector<vk::BufferMemoryBarrier> bufferBarriers,
-                        std::vector<vk::ImageMemoryBarrier> imageBarriers );
+                        std::vector< vk::MemoryBarrier > memoryBarriers,
+                        std::vector< vk::BufferMemoryBarrier > bufferBarriers,
+                        std::vector< vk::ImageMemoryBarrier > imageBarriers );
 
   /**
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
-  void ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers );
+  void ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers );
 
   /**
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
-  void ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers, uint32_t offset, uint32_t count );
+  void
+  ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers, uint32_t offset,
+                   uint32_t count );
 
   /**
    * Copies buffer into the specified image
@@ -192,32 +202,7 @@ public:
    * @param regions
    */
   void CopyBufferToImage( RefCountedBuffer srcBuffer, RefCountedImage dstImage, vk::ImageLayout dstLayout,
-                          std::vector<vk::BufferImageCopy> regions );
-
-  /**
-   * Creates layout transition barrier
-   * @return
-   */
-  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( RefCountedImage image,
-                                                  vk::AccessFlags        srcAccessMask,
-                                                  vk::AccessFlags        dstAccessMask,
-                                                  vk::ImageLayout        oldLayout,
-                                                  vk::ImageLayout        newLayout,
-                                                  vk::ImageAspectFlags   aspectMask
-  ) const;
-
-  /**
-   * Simplified version of memory barrier generation based on data stored inside the Image
-   * @param image
-   * @param newLayout
-   * @param aspectMask
-   * @return
-   */
-  vk::ImageMemoryBarrier ImageLayoutTransitionBarrier( RefCountedImage image,
-                                                       vk::ImageLayout        olsLayout,
-                                                       vk::ImageLayout        newLayout,
-                                                       vk::ImageAspectFlags   aspectMask
-  ) const;
+                          std::vector< vk::BufferImageCopy > regions );
 
   /**
    * Implements VkManaged::OnDestroy
@@ -243,9 +228,9 @@ private:
 
 private:
 
-  CommandPool*                  mOwnerCommandPool;
-  Graphics*                     mGraphics;
-  uint32_t                      mPoolAllocationIndex;
+  CommandPool* mOwnerCommandPool;
+  Graphics* mGraphics;
+  uint32_t mPoolAllocationIndex;
   vk::CommandBufferAllocateInfo mAllocateInfo{};
 
   vk::CommandBuffer mCommandBuffer{};

@@ -29,8 +29,8 @@ namespace VulkanAPI
 struct UboManager::Impl
 {
   explicit Impl( UboManager& uboManager, Controller& controller )
-  : mUboManager( uboManager ),
-    mController( controller )
+          : mUboManager( uboManager ),
+            mController( controller )
   {
     Initialise();
   }
@@ -40,11 +40,11 @@ struct UboManager::Impl
   void Initialise()
   {
     // populate pools
-    mPools.emplace( 64, std::make_unique<UboPool>( mController, 64, 64 ) );
-    mPools.emplace( 128, std::make_unique<UboPool>( mController, 128, 64 ) );
-    mPools.emplace( 256, std::make_unique<UboPool>( mController, 256, 64 ) );
-    mPools.emplace( 512, std::make_unique<UboPool>( mController, 512, 64 ) );
-    mPools.emplace( 1024, std::make_unique<UboPool>( mController, 1024, 64 ) );
+    mPools.emplace( 64, std::make_unique< UboPool >( mController, 64, 64 ) );
+    mPools.emplace( 128, std::make_unique< UboPool >( mController, 128, 64 ) );
+    mPools.emplace( 256, std::make_unique< UboPool >( mController, 256, 64 ) );
+    mPools.emplace( 512, std::make_unique< UboPool >( mController, 512, 64 ) );
+    mPools.emplace( 1024, std::make_unique< UboPool >( mController, 1024, 64 ) );
   }
 
   /**
@@ -52,9 +52,9 @@ struct UboManager::Impl
    * @param uboSize
    * @return
    */
-  std::unique_ptr<Ubo> Allocate( uint32_t uboSize )
+  std::unique_ptr< Ubo > Allocate( uint32_t uboSize )
   {
-    UboPool* uboPool { nullptr };
+    UboPool* uboPool{ nullptr };
     for( auto&& pool : mPools )
     {
       if( uboSize < pool.first )
@@ -63,7 +63,7 @@ struct UboManager::Impl
         break;
       }
     }
-    if(!uboPool)
+    if( !uboPool )
     {
       return nullptr;
     }
@@ -99,19 +99,19 @@ struct UboManager::Impl
   UboManager& mUboManager;
   Controller& mController;
 
-  std::unordered_map<uint32_t, std::unique_ptr<UboPool>> mPools;
+  std::unordered_map< uint32_t, std::unique_ptr< UboPool>> mPools;
 };
 
 //
 
-UboManager::UboManager(Controller& controller)
+UboManager::UboManager( Controller& controller )
 {
-  mImpl = std::make_unique<Impl>( *this, controller );
+  mImpl = std::make_unique< Impl >( *this, controller );
 }
 
 UboManager::~UboManager() = default;
 
-std::unique_ptr<Ubo> UboManager::Allocate( uint32_t size )
+std::unique_ptr< Ubo > UboManager::Allocate( uint32_t size )
 {
   return mImpl->Allocate( size );
 }

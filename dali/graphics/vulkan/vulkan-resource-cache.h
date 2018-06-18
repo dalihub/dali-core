@@ -111,7 +111,7 @@ public:
    * @param image The Vulkan handle of the image object to be found
    * @return A handle to the Image object if found. An empty Handle otherwise
    */
-  RefCountedImage FindImage( vk::Image image);
+  RefCountedImage FindImage( vk::Image image );
 
   /**
    * Finds the image view object using the specified Vulkan handle
@@ -213,13 +213,11 @@ public:
 
   void CollectGarbage();
 
-  void EnqueueDiscardOperation( std::function<void()> deleter );
+  void EnqueueDiscardOperation( std::function< void() > deleter );
 
   void Clear();
 
-#ifndef NDEBUG
-  void PrintReferenceCountReport( size_t* outObjectCount = nullptr );
-#endif
+  void PrintReferenceCountReport();
 
   ResourceCache() = default;
 
@@ -234,18 +232,18 @@ public:
   ResourceCache&& operator=( ResourceCache&& other ) = delete;
 
 private:
-  std::vector< RefCountedBuffer >         mBuffers;
-  std::vector< RefCountedImage >          mImages;
-  std::vector< RefCountedImageView >      mImageViews;
-  std::vector< RefCountedShader >         mShaders;
+  std::vector< RefCountedBuffer > mBuffers;
+  std::vector< RefCountedImage > mImages;
+  std::vector< RefCountedImageView > mImageViews;
+  std::vector< RefCountedShader > mShaders;
   std::vector< RefCountedDescriptorPool > mDescriptorPools;
-  std::vector< RefCountedFramebuffer >    mFramebuffers;
-  std::vector< RefCountedSampler >        mSamplers;
+  std::vector< RefCountedFramebuffer > mFramebuffers;
+  std::vector< RefCountedSampler > mSamplers;
 
   // Command pool map using thread IDs as keys
-  CommandPoolMap                          mCommandPools;
+  CommandPoolMap mCommandPools;
 
-  DiscardQueue                            mDiscardQueue;
+  DiscardQueue mDiscardQueue;
 };
 
 } //namespace Vulkan

@@ -32,6 +32,7 @@ namespace SpirV
 {
 
 // include C header
+
 #include "spirv.h"
 
 using SPIRVWord = uint32_t;
@@ -44,9 +45,9 @@ struct SPIRVOpCode;
 
 struct SPIRVVertexInputAttribute
 {
-  uint32_t     location;
-  std::string  name;
-  vk::Format   format;
+  uint32_t location;
+  std::string name;
+  vk::Format format;
 };
 
 /**
@@ -54,10 +55,10 @@ struct SPIRVVertexInputAttribute
  */
 struct SPIRVUniformBlockMember
 {
-  std::string               name;
-  uint32_t                  offset;
-  uint32_t                  location;
-  uint32_t                  blockIndex;
+  std::string name;
+  uint32_t offset;
+  uint32_t location;
+  uint32_t blockIndex;
 };
 
 /**
@@ -66,10 +67,10 @@ struct SPIRVUniformBlockMember
 struct SPIRVUniformBlock
 {
   std::string name;
-  uint32_t    descriptorSet;
-  uint32_t    binding;
-  uint32_t    size;
-  std::vector<SPIRVUniformBlockMember> members;
+  uint32_t descriptorSet;
+  uint32_t binding;
+  uint32_t size;
+  std::vector< SPIRVUniformBlockMember > members;
 };
 
 /**
@@ -77,10 +78,10 @@ struct SPIRVUniformBlock
  */
 struct SPIRVUniformOpaque
 {
-  std::string         name;
-  uint32_t            descriptorSet;
-  uint32_t            binding;
-  vk::DescriptorType  type;
+  std::string name;
+  uint32_t descriptorSet;
+  uint32_t binding;
+  vk::DescriptorType type;
 };
 
 /**
@@ -93,7 +94,9 @@ class SPIRVShader
 public:
 
   SPIRVShader( SPIRVShader&& shader ) noexcept;
+
   SPIRVShader( const SPIRVShader& shader ) = delete;
+
   ~SPIRVShader();
 
   /**
@@ -101,24 +104,24 @@ public:
    * @note This function does not create the layout itself!
    * @return create info structure
    */
-  std::vector<vk::DescriptorSetLayoutCreateInfo> GenerateDescriptorSetLayoutCreateInfo() const;
+  std::vector< vk::DescriptorSetLayoutCreateInfo > GenerateDescriptorSetLayoutCreateInfo() const;
 
   /**
    * Retrieves vertex input attributes ( names and locations ) from the shader
    * @return fills the given vector of attributes
    */
-  void GetVertexInputAttributes( std::vector<SPIRVVertexInputAttribute>& out ) const;
+  void GetVertexInputAttributes( std::vector< SPIRVVertexInputAttribute >& out ) const;
 
   /**
    * Retrieves all uniform block data
    */
-  const std::vector<SPIRVUniformBlock>& GetUniformBlocks() const;
+  const std::vector< SPIRVUniformBlock >& GetUniformBlocks() const;
 
   /**
    *
    * @return
    */
-  const std::vector<SPIRVUniformOpaque>& GetOpaqueUniforms() const;
+  const std::vector< SPIRVUniformOpaque >& GetOpaqueUniforms() const;
 
   /**
    * Looks for uniform by name and retrieves location within
@@ -159,10 +162,10 @@ public:
    * @param index
    * @return
    */
-  template<class T>
+  template< class T >
   T GetOpCodeParameter( const SPIRVOpCode& opCode, uint32_t index ) const
   {
-    return *reinterpret_cast<const T*>( GetOpCodeParameterPtr( opCode, index ) );
+    return *reinterpret_cast<const T*>( GetOpCodeParameterPtr( opCode, index ));
   }
 
   /**
@@ -170,7 +173,7 @@ public:
    * @param index
    * @return
    */
-  SPIRVWord GetOpCodeParameterWord( const SPIRVOpCode& opCode,uint32_t index ) const;
+  SPIRVWord GetOpCodeParameterWord( const SPIRVOpCode& opCode, uint32_t index ) const;
 
   /**
    *
@@ -189,7 +192,7 @@ private:
   const uint32_t* GetOpCodeParameterPtr( const SPIRVOpCode& opCode, uint32_t index ) const;
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 
   explicit SPIRVShader( Impl& impl );
 
@@ -199,7 +202,7 @@ private:
    * Constructor that should be called only from SPIRVUtils
    * @param code
    */
-  explicit SPIRVShader( std::vector<SPIRVWord> code, vk::ShaderStageFlags stages );
+  explicit SPIRVShader( std::vector< SPIRVWord > code, vk::ShaderStageFlags stages );
 
 public:
   /**
@@ -208,7 +211,6 @@ public:
    */
   Impl& GetImplementation() const;
 };
-
 
 
 /**
@@ -223,14 +225,14 @@ public:
    * @param data
    * @return
    */
-  static std::unique_ptr<SPIRVShader> Parse( std::vector<SPIRVWord> data, vk::ShaderStageFlags stages );
+  static std::unique_ptr< SPIRVShader > Parse( std::vector< SPIRVWord > data, vk::ShaderStageFlags stages );
 
-  static std::unique_ptr<SPIRVShader> Parse( const SPIRVWord* data, size_t sizeInBytes, vk::ShaderStageFlags stages );
+  static std::unique_ptr< SPIRVShader > Parse( const SPIRVWord* data, size_t sizeInBytes, vk::ShaderStageFlags stages );
 
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 }

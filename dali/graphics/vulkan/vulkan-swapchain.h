@@ -28,6 +28,7 @@ namespace Graphics
 namespace Vulkan
 {
 class Surface;
+
 class Queue;
 
 /**
@@ -37,11 +38,16 @@ class Swapchain : public VkManaged
 {
 public:
 
-  static RefCountedSwapchain New( Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags );
+  static RefCountedSwapchain New( Graphics& graphics,
+                                  Queue& presentationQueue,
+                                  RefCountedSurface surface,
+                                  uint8_t bufferCount,
+                                  uint32_t flags );
 
 public:
 
   Swapchain( const Swapchain& ) = delete;
+
   Swapchain& operator=( const Swapchain& ) = delete;
 
   /**
@@ -71,17 +77,6 @@ public:
   RefCountedCommandBuffer GetPrimaryCommandBuffer() const;
 
   /**
-   * Begins primary render pass, must be called after acquiring new image
-   */
-  void BeginPrimaryRenderPass();
-
-  /**
-   * Begins primary render pass, must be called after acquiring new image
-   * @param beginInfo custom initialisation structure
-   */
-  void BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors );
-
-  /**
    * Presents using default present queue, asynchronously
    */
   void Present();
@@ -90,18 +85,26 @@ public:
    * Presents using default queue, synchronized with supplied semaphores
    * @param waitSemaphores
    */
-  void Present( std::vector<vk::Semaphore> waitSemaphores );
+  void Present( std::vector< vk::Semaphore > waitSemaphores );
+
+  bool Destroy() override;
 
 private:
 
   Swapchain();
-  Swapchain( Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags );
+
+  Swapchain( Graphics& graphics,
+             Queue& presentationQueue,
+             RefCountedSurface surface,
+             uint8_t bufferCount,
+             uint32_t flags );
+
   ~Swapchain() override;
 
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 } // namespace Vulkan
