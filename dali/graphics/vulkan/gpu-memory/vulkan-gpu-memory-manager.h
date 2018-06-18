@@ -27,14 +27,16 @@ namespace Graphics
 namespace Vulkan
 {
 using GpuMemoryAllocatorUID = uint32_t;
+
 class Graphics;
+
 class GpuMemoryAllocator;
 
 class GpuMemoryManager
 {
 public:
 
-  static std::unique_ptr<GpuMemoryManager> New( Graphics& graphics );
+  static std::unique_ptr< GpuMemoryManager > New( Graphics& graphics );
 
   /**
    *
@@ -52,7 +54,7 @@ public:
    * @param allocator
    * @return
    */
-  GpuMemoryAllocatorUID RegisterAllocator( std::unique_ptr<GpuMemoryAllocator> allocator );
+  GpuMemoryAllocatorUID RegisterAllocator( std::unique_ptr< GpuMemoryAllocator > allocator );
 
   /**
    *
@@ -79,7 +81,7 @@ private:
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 }

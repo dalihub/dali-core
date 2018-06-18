@@ -65,18 +65,18 @@ namespace Vulkan
 
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
-  //"VK_LAYER_LUNARG_screenshot",           // screenshot
-  //"VK_LAYER_RENDERDOC_Capture",
-  "VK_LAYER_LUNARG_parameter_validation", // parameter
-  //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
-  //"VK_LAYER_LUNARG_monitor",             // monitor
-  "VK_LAYER_LUNARG_swapchain",           // swapchain
-  "VK_LAYER_GOOGLE_threading",           // threading
-  //"VK_LAYER_LUNARG_api_dump",            // api
-  "VK_LAYER_LUNARG_object_tracker",      // objects
-  "VK_LAYER_LUNARG_core_validation",     // core
-  "VK_LAYER_GOOGLE_unique_objects",      // unique objects
-  "VK_LAYER_LUNARG_standard_validation", // standard
+        //"VK_LAYER_LUNARG_screenshot",           // screenshot
+        //"VK_LAYER_RENDERDOC_Capture",
+        "VK_LAYER_LUNARG_parameter_validation", // parameter
+        //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+        //"VK_LAYER_LUNARG_monitor",             // monitor
+        "VK_LAYER_LUNARG_swapchain",           // swapchain
+        "VK_LAYER_GOOGLE_threading",           // threading
+        //"VK_LAYER_LUNARG_api_dump",            // api
+        "VK_LAYER_LUNARG_object_tracker",      // objects
+        "VK_LAYER_LUNARG_core_validation",     // core
+        "VK_LAYER_GOOGLE_unique_objects",      // unique objects
+        "VK_LAYER_LUNARG_standard_validation", // standard
 };
 
 Graphics::Graphics() = default;
@@ -93,31 +93,28 @@ Graphics::~Graphics()
   // Manually resetting unique pointer here because we need to control the order of destruction.
   // This defeats the purpose of unique pointers and we might as well use raw pointers. But a unique ptr
   // communicates ownership more clearly (e.g by not allowing copies).
-  mGfxController.reset(nullptr);
+  mGfxController.reset( nullptr );
   mSurfaceFBIDMap.clear();
 
-#ifndef NDEBUG
-  printf("DESTROYING GRAPHICS CONTEXT--------------------------------\n");
-  size_t totalObjCount = 0;
-  mResourceCache->PrintReferenceCountReport( &totalObjCount );
-#endif
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" )
+  mResourceCache->PrintReferenceCountReport();
 
   // Clear the last references of resources in the cache.
   // This should ensure that all resources have been queued for garbage collection
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
   mResourceCache->Clear();
 
-  mDeviceMemoryManager.reset(nullptr);
+  mDeviceMemoryManager.reset( nullptr );
 
   // Collect the garbage! And shut down gracefully...
   CollectGarbage();
 
   // We are done with all resources (technically... . If not we will get a ton of validation layer errors)
   // Kill the Vulkan logical device
-  mDevice.destroy(mAllocator.get());
+  mDevice.destroy( mAllocator.get() );
 
   // Kill the Vulkan instance
-  mInstance.destroy(mAllocator.get());
+  mInstance.destroy( mAllocator.get() );
 
 }
 
@@ -134,7 +131,7 @@ void Graphics::Create()
     for( auto&& prop : layers.value )
     {
       DALI_LOG_STREAM( gVulkanFilter, Debug::General, prop.layerName );
-      if( std::string(prop.layerName) == reqLayer )
+      if( std::string( prop.layerName ) == reqLayer )
       {
         validationLayers.push_back( reqLayer );
       }
@@ -160,19 +157,19 @@ void Graphics::CreateDevice()
 
     for( auto& info : queueInfos )
     {
-      info.setPQueuePriorities( priorities.data());
+      info.setPQueuePriorities( priorities.data() );
     }
 
     std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     auto info = vk::DeviceCreateInfo{};
-    info.setEnabledExtensionCount( U32( extensions.size()))
-        .setPpEnabledExtensionNames( extensions.data())
-        .setPEnabledFeatures( &( *mPhysicalDeviceFeatures ))
-        .setPQueueCreateInfos( queueInfos.data())
-        .setQueueCreateInfoCount( U32( queueInfos.size()));
+    info.setEnabledExtensionCount( U32( extensions.size() ) )
+        .setPpEnabledExtensionNames( extensions.data() )
+        .setPEnabledFeatures( &( *mPhysicalDeviceFeatures ) )
+        .setPQueueCreateInfos( queueInfos.data() )
+        .setQueueCreateInfoCount( U32( queueInfos.size() ) );
 
-    mDevice = VkAssert( mPhysicalDevice.createDevice( info, *mAllocator ));
+    mDevice = VkAssert( mPhysicalDevice.createDevice( info, *mAllocator ) );
   }
 
   // create Queue objects
@@ -187,17 +184,17 @@ void Graphics::CreateDevice()
       if( flags & vk::QueueFlagBits::eGraphics )
       {
         mGraphicsQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ));
+                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
       }
       if( flags & vk::QueueFlagBits::eTransfer )
       {
         mTransferQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ));
+                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
       }
       if( flags & vk::QueueFlagBits::eCompute )
       {
         mComputeQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ));
+                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
       }
 
       // todo: present queue
@@ -210,9 +207,9 @@ void Graphics::CreateDevice()
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
   // create surface from the factory
-  auto surfaceRef = Surface::New( *this, std::move( surfaceFactory ));
+  auto surfaceRef = Surface::New( *this, std::move( surfaceFactory ) );
 
-  if( surfaceRef->Create())
+  if( surfaceRef->Create() )
   {
 
     // map surface to FBID
@@ -227,7 +224,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
 {
   auto swapchain = Swapchain::New( *this,
                                    GetGraphicsQueue( 0u ),
-                                   surface, 4, 0 );
+                                   surface, 3, 0 );
 
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
@@ -258,7 +255,7 @@ RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInf
 {
   auto refCountedFence = Fence::New( *this );
 
-  VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), refCountedFence->Ref()));
+  VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), refCountedFence->Ref() ) );
 
   return refCountedFence;
 }
@@ -298,7 +295,7 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, BufferType type )
 
   auto refCountedBuffer = Buffer::New( *this, info );
 
-  VkAssert( mDevice.createBuffer( &info, mAllocator.get(), refCountedBuffer->Ref()));
+  VkAssert( mDevice.createBuffer( &info, mAllocator.get(), refCountedBuffer->Ref() ) );
 
   AddBuffer( refCountedBuffer );
 
@@ -309,7 +306,7 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
 {
   auto refCountedBuffer = Buffer::New( *this, bufferCreateInfo );
 
-  VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), refCountedBuffer->Ref()));
+  VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), refCountedBuffer->Ref() ) );
 
   AddBuffer( refCountedBuffer );
 
@@ -323,7 +320,7 @@ RefCountedFramebuffer Graphics::CreateFramebuffer()
 
 RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
 {
-  auto refCountedImage = Image::New(*this, imageCreateInfo);
+  auto refCountedImage = Image::New( *this, imageCreateInfo );
 
   VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), refCountedImage->Ref() ) );
 
@@ -341,15 +338,15 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 {
   auto imageViewCreateInfo = vk::ImageViewCreateInfo{}
           .setFlags( flags )
-          .setImage( image->GetVkHandle())
+          .setImage( image->GetVkHandle() )
           .setViewType( viewType )
           .setFormat( format )
           .setComponents( components )
-          .setSubresourceRange( std::move( subresourceRange ));
+          .setSubresourceRange( std::move( subresourceRange ) );
 
   auto refCountedImageView = ImageView::New( *this, image, imageViewCreateInfo );
 
-  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, refCountedImageView->Ref()));
+  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, refCountedImageView->Ref() ) );
 
   AddImageView( refCountedImageView );
 
@@ -360,26 +357,14 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
 {
   vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG,
                                              vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA };
-  vk::ImageAspectFlags aspectFlags{};
-  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment )
-  {
-    aspectFlags |= vk::ImageAspectFlagBits::eColor;
-  }
-  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment )
-  {
-    aspectFlags |= ( vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil );
-  }
-  if( image->GetUsageFlags() & vk::ImageUsageFlagBits::eSampled )
-  {
-    aspectFlags |= vk::ImageAspectFlagBits::eColor;
-  }
+
 
   auto subresourceRange = vk::ImageSubresourceRange{}
-          .setAspectMask( aspectFlags )
+          .setAspectMask( image->GetAspectFlags() )
           .setBaseArrayLayer( 0 )
           .setBaseMipLevel( 0 )
-          .setLevelCount( image->GetMipLevelCount())
-          .setLayerCount( image->GetLayerCount());
+          .setLevelCount( image->GetMipLevelCount() )
+          .setLayerCount( image->GetLayerCount() );
 
   auto refCountedImageView = CreateImageView( {},
                                               image,
@@ -422,9 +407,87 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
 
 RefCountedCommandBuffer Graphics::CreateCommandBuffer( bool primary )
 {
-  auto commandPool = GetCommandPool( std::this_thread::get_id());
+  auto commandPool = GetCommandPool( std::this_thread::get_id() );
 
   return commandPool->NewCommandBuffer( primary );
+}
+
+vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image,
+                                                           vk::ImageLayout oldLayout,
+                                                           vk::ImageLayout newLayout )
+{
+  // This function assumes that all images have 1 mip level and 1 layer
+  auto barrier = vk::ImageMemoryBarrier{}
+          .setOldLayout( oldLayout )
+          .setNewLayout( newLayout )
+          .setSrcQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
+          .setDstQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
+          .setImage( image->GetVkHandle() )
+          .setSubresourceRange( vk::ImageSubresourceRange{}.setBaseMipLevel( 0 )
+                                                           .setLevelCount( 1 )
+                                                           .setBaseArrayLayer( 0 )
+                                                           .setLayerCount( 1 ) );
+
+  barrier.subresourceRange.aspectMask = image->GetAspectFlags();
+
+  // The srcAccessMask of the image memory barrier shows which operation
+  // must be completed using the old layout, before the transition to the
+  // new one happens.
+  switch( oldLayout )
+  {
+    case vk::ImageLayout::eUndefined:
+      barrier.srcAccessMask = vk::AccessFlags{};
+      break;
+    case vk::ImageLayout::ePreinitialized:
+      barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
+      break;
+    case vk::ImageLayout::eColorAttachmentOptimal:
+      barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+      break;
+    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+      barrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+      break;
+    case vk::ImageLayout::eTransferSrcOptimal:
+      barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+      break;
+    case vk::ImageLayout::eTransferDstOptimal:
+      barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+      break;
+    case vk::ImageLayout::eShaderReadOnlyOptimal:
+      barrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
+      break;
+    default:
+      assert( false && "Image layout transition failed: Initial layout not supported." );
+  }
+
+  // Destination access mask controls the dependency for the new image layout
+  switch( newLayout )
+  {
+    case vk::ImageLayout::eTransferDstOptimal:
+      barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+      break;
+    case vk::ImageLayout::eTransferSrcOptimal:
+      barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+      break;
+    case vk::ImageLayout::eColorAttachmentOptimal:
+      barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+      break;
+    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
+      barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+      break;
+    case vk::ImageLayout::eShaderReadOnlyOptimal:
+      if( barrier.srcAccessMask == vk::AccessFlags{} )
+      {
+        barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eTransferWrite;
+      }
+
+      barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+      break;
+    default:
+      assert( false && "Image layout transition failed: Target layout not supported." );
+  }
+
+  return barrier;
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -465,7 +528,7 @@ vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
 vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset )
 {
   auto result = VkAssert( mDevice.bindImageMemory( image->GetVkHandle(), *memory, offset ) );
-  image->AssignMemory(memory);
+  image->AssignMemory( memory );
   return result;
 }
 
@@ -475,37 +538,35 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
   std::vector< vk::CommandBuffer > commandBufferHandles;
 
   // Transform SubmissionData to vk::SubmitInfo
-  std::transform(submissionData.begin(),
-                 submissionData.end(),
-                 std::back_inserter( submitInfos ),
-                 [&]( SubmissionData subData )
-                 {
+  std::transform( submissionData.begin(),
+                  submissionData.end(),
+                  std::back_inserter( submitInfos ),
+                  [ & ]( SubmissionData subData ) {
 
 
-                   //Extract the command buffer handles
-                   std::transform(subData.commandBuffers.begin(),
-                                  subData.commandBuffers.end(),
-                                  std::back_inserter(commandBufferHandles),
-                                  [&]( RefCountedCommandBuffer& entry )
-                                  {
-                                    return entry->GetVkHandle();
-                                  });
+                    //Extract the command buffer handles
+                    std::transform( subData.commandBuffers.begin(),
+                                    subData.commandBuffers.end(),
+                                    std::back_inserter( commandBufferHandles ),
+                                    [ & ]( RefCountedCommandBuffer& entry ) {
+                                      return entry->GetVkHandle();
+                                    } );
 
-                   return vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
-                                          .setPWaitSemaphores( subData.waitSemaphores.data() )
-                                          .setPWaitDstStageMask( &subData.waitDestinationStageMask )
-                                          .setCommandBufferCount( U32( subData.commandBuffers.size() )  )
-                                          .setPCommandBuffers( commandBufferHandles.data() )
-                                          .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
-                                          .setPSignalSemaphores( subData.signalSemaphores.data() );
-                 });
+                    return vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
+                                           .setPWaitSemaphores( subData.waitSemaphores.data() )
+                                           .setPWaitDstStageMask( &subData.waitDestinationStageMask )
+                                           .setCommandBufferCount( U32( subData.commandBuffers.size() ) )
+                                           .setPCommandBuffers( commandBufferHandles.data() )
+                                           .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
+                                           .setPSignalSemaphores( subData.signalSemaphores.data() );
+                  } );
 
   return VkAssert( queue.GetVkHandle().submit( submitInfos, fence ? fence->GetVkHandle() : nullptr ) );
 }
 
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
-  return queue.GetVkHandle().presentKHR(presentInfo);
+  return queue.GetVkHandle().presentKHR( presentInfo );
 }
 
 vk::Result Graphics::QueueWaitIdle( Queue& queue )
@@ -655,43 +716,43 @@ bool Graphics::IsShuttingDown()
 void Graphics::AddBuffer( Handle< Buffer > buffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddBuffer( std::move( buffer ));
+  mResourceCache->AddBuffer( std::move( buffer ) );
 }
 
 void Graphics::AddImage( Handle< Image > image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImage( std::move( image ));
+  mResourceCache->AddImage( std::move( image ) );
 }
 
 void Graphics::AddImageView( RefCountedImageView imageView )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImageView( std::move( imageView ));
+  mResourceCache->AddImageView( std::move( imageView ) );
 }
 
 void Graphics::AddShader( Handle< Shader > shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddShader( std::move( shader ));
+  mResourceCache->AddShader( std::move( shader ) );
 }
 
 void Graphics::AddCommandPool( Handle< CommandPool > pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move( pool ));
+  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move( pool ) );
 }
 
 void Graphics::AddDescriptorPool( Handle< DescriptorPool > pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddDescriptorPool( std::move( pool ));
+  mResourceCache->AddDescriptorPool( std::move( pool ) );
 }
 
 void Graphics::AddFramebuffer( Handle< Framebuffer > framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddFramebuffer( std::move( framebuffer ));
+  mResourceCache->AddFramebuffer( std::move( framebuffer ) );
 }
 
 void Graphics::AddSampler( RefCountedSampler sampler )
@@ -769,7 +830,7 @@ void Graphics::CollectGarbage()
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->EnqueueDiscardOperation( std::move( deleter ));
+  mResourceCache->EnqueueDiscardOperation( std::move( deleter ) );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -780,21 +841,21 @@ Graphics::CreateInstance( const std::vector< const char* >& extensions,
 {
   auto info = vk::InstanceCreateInfo{};
 
-  info.setEnabledExtensionCount(U32(extensions.size()))
-      .setPpEnabledExtensionNames(extensions.data())
-      .setEnabledLayerCount(U32(validationLayers.size()))
-      .setPpEnabledLayerNames(validationLayers.data());
+  info.setEnabledExtensionCount( U32( extensions.size() ) )
+      .setPpEnabledExtensionNames( extensions.data() )
+      .setEnabledLayerCount( U32( validationLayers.size() ) )
+      .setPpEnabledLayerNames( validationLayers.data() );
 
 #if defined(DEBUG_ENABLED)
-  if( ! getenv("LOG_VULKAN") )
+  if( !getenv( "LOG_VULKAN" ) )
   {
-    info.setEnabledLayerCount(0);
+    info.setEnabledLayerCount( 0 );
   }
 #else
   info.setEnabledLayerCount(0);
 #endif
 
-  mInstance = VkAssert(vk::createInstance(info, *mAllocator));
+  mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
 
 void Graphics::DestroyInstance()
@@ -809,7 +870,7 @@ void Graphics::DestroyInstance()
 
 void Graphics::PreparePhysicalDevice()
 {
-  auto devices = VkAssert( mInstance.enumeratePhysicalDevices());
+  auto devices = VkAssert( mInstance.enumeratePhysicalDevices() );
   assert( !devices.empty() && "No Vulkan supported device found!" );
 
   // if only one, pick first
@@ -817,7 +878,8 @@ void Graphics::PreparePhysicalDevice()
   if( devices.size() == 1 )
   {
     mPhysicalDevice = devices[0];
-  }else // otherwise look for one which is a graphics device
+  }
+  else // otherwise look for one which is a graphics device
   {
     for( auto& device : devices )
     {
@@ -844,11 +906,11 @@ void Graphics::GetPhysicalDeviceProperties()
 {
   // store data on heap to keep object smaller
   mPhysicalDeviceProperties =
-          MakeUnique< vk::PhysicalDeviceProperties >( mPhysicalDevice.getProperties());
+          MakeUnique< vk::PhysicalDeviceProperties >( mPhysicalDevice.getProperties() );
   mPhysicalDeviceMemoryProperties =
-          MakeUnique< vk::PhysicalDeviceMemoryProperties >( mPhysicalDevice.getMemoryProperties());
+          MakeUnique< vk::PhysicalDeviceMemoryProperties >( mPhysicalDevice.getMemoryProperties() );
   mPhysicalDeviceFeatures =
-          MakeUnique< vk::PhysicalDeviceFeatures >( mPhysicalDevice.getFeatures());
+          MakeUnique< vk::PhysicalDeviceFeatures >( mPhysicalDevice.getFeatures() );
 }
 
 void Graphics::GetQueueFamilyProperties()
@@ -866,54 +928,58 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
   std::vector< vk::DeviceQueueCreateInfo > queueInfos{};
 
   constexpr uint8_t MAX_QUEUE_TYPES = 3;
+
+
   // find suitable family for each type of queue
-  uint32_t familyIndexType[MAX_QUEUE_TYPES];
-  std::fill( &familyIndexType[0], &familyIndexType[MAX_QUEUE_TYPES], -1u );
+  auto familyIndexTypes = std::array< uint32_t, MAX_QUEUE_TYPES >{};
+  familyIndexTypes.fill( std::numeric_limits< uint32_t >::max() );
 
   // Graphics
-  auto& graphicsFamily = familyIndexType[0];
+  auto& graphicsFamily = familyIndexTypes[0];
 
   // Transfer
-  auto& transferFamily = familyIndexType[1];
+  auto& transferFamily = familyIndexTypes[1];
 
   // Transfer
-  auto& presentFamily = familyIndexType[2];
+  auto& presentFamily = familyIndexTypes[2];
 
   auto queueFamilyIndex = 0u;
   for( auto& prop : mQueueFamilyProperties )
   {
-    if(( prop.queueFlags & vk::QueueFlagBits::eGraphics ) && graphicsFamily == -1u )
+    if( ( prop.queueFlags & vk::QueueFlagBits::eGraphics ) && graphicsFamily == -1u )
     {
       graphicsFamily = queueFamilyIndex;
     }
-    if(( prop.queueFlags & vk::QueueFlagBits::eTransfer ) && transferFamily == -1u )
+    if( ( prop.queueFlags & vk::QueueFlagBits::eTransfer ) && transferFamily == -1u )
     {
       transferFamily = queueFamilyIndex;
     }
     if( mPhysicalDevice.getSurfaceSupportKHR( queueFamilyIndex, mSurfaceFBIDMap.begin()->second.
-            surface->GetSurfaceKHR()).value && presentFamily == -1u )
+            surface->GetSurfaceKHR() ).value && presentFamily == -1u )
     {
       presentFamily = queueFamilyIndex;
     }
     ++queueFamilyIndex;
   }
 
-  assert( graphicsFamily != -1u && "No queue family that supports graphics operations!" );
-  assert( transferFamily != -1u && "No queue family that supports transfer operations!" );
-  assert( presentFamily != -1u && "No queue family that supports present operations!" );
+  assert( graphicsFamily != std::numeric_limits< uint32_t >::max()
+          && "No queue family that supports graphics operations!" );
+  assert( transferFamily != std::numeric_limits< uint32_t >::max()
+          && "No queue family that supports transfer operations!" );
+  assert( presentFamily != std::numeric_limits< uint32_t >::max()
+          && "No queue family that supports present operations!" );
 
   // todo: we may require that the family must be same for all types of operations, it makes
   // easier to handle synchronisation related issues.
 
   // sort queues
-  std::sort( &familyIndexType[0], &familyIndexType[MAX_QUEUE_TYPES] );
+  std::sort( familyIndexTypes.begin(), familyIndexTypes.end() );
 
   // allocate all queues from graphics family
-  uint32_t prevQueueFamilyIndex = -1u;
+  auto prevQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
 
-  for( auto i = 0u; i < MAX_QUEUE_TYPES; ++i )
+  for( const auto& familyIndex : familyIndexTypes )
   {
-    auto& familyIndex = familyIndexType[i];
     if( prevQueueFamilyIndex == familyIndex )
     {
       continue;
@@ -969,35 +1035,35 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
 
   if( platform != Platform::UNDEFINED )
   {
-    if (platform == Platform::XCB && xcbAvailable)
+    if( platform == Platform::XCB && xcbAvailable )
     {
-      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
     }
-    else if (platform == Platform::XLIB && xlibAvailable)
+    else if( platform == Platform::XLIB && xlibAvailable )
     {
-      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_XLIB_SURFACE_EXTENSION_NAME );
     }
-    else if (platform == Platform::WAYLAND && waylandAvailable)
+    else if( platform == Platform::WAYLAND && waylandAvailable )
     {
-      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
     }
   }
   else // try to determine the platform based on available extensions
   {
-    if (xcbAvailable)
+    if( xcbAvailable )
     {
       mPlatform = Platform::XCB;
-      retval.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
     }
-    else if (xlibAvailable)
+    else if( xlibAvailable )
     {
       mPlatform = Platform::XLIB;
-      retval.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_XLIB_SURFACE_EXTENSION_NAME );
     }
-    else if (waylandAvailable)
+    else if( waylandAvailable )
     {
       mPlatform = Platform::WAYLAND;
-      retval.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+      retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
     }
     else
     {
@@ -1024,7 +1090,7 @@ RefCountedCommandPool Graphics::GetCommandPool( std::thread::id )
   if( !commandPool )
   {
     auto&& createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
-    commandPool = CommandPool::New( *this,  createInfo);
+    commandPool = CommandPool::New( *this, createInfo );
   }
 
   return commandPool;

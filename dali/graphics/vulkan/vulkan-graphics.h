@@ -67,6 +67,7 @@ class CommandPool;
 class DescriptorPool;
 
 class GpuMemoryManager;
+
 class ResourceCache;
 
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
@@ -132,18 +133,22 @@ public: // Create methods
 
   RefCountedCommandBuffer CreateCommandBuffer( bool primary );
 
+  vk::ImageMemoryBarrier CreateImageMemoryBarrier( RefCountedImage image,
+                                                   vk::ImageLayout oldLayout,
+                                                   vk::ImageLayout newLayout );
+
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );
 
   vk::Result WaitForFences( const std::vector< RefCountedFence >& fences,
                             bool waitAll = true,
-                            uint32_t timeout = std::numeric_limits< uint32_t >::max());
+                            uint32_t timeout = std::numeric_limits< uint32_t >::max() );
 
   vk::Result ResetFence( RefCountedFence fence );
 
   vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
-  vk::Result BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset);
+  vk::Result BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset );
 
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 

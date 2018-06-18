@@ -29,20 +29,20 @@ namespace VulkanAPI
 struct TextureFactory::Impl
 {
   Impl( TextureFactory& api, Vulkan::Graphics& graphics )
-  : mApi( api ), mGraphics( graphics )
+          : mApi( api ), mGraphics( graphics )
   {
 
   }
 
   ~Impl() = default;
 
-  std::unique_ptr<Graphics::API::Texture> Create()
+  std::unique_ptr< Graphics::API::Texture > Create()
   {
-    auto retval = std::make_unique<VulkanAPI::Texture>( static_cast<Graphics::API::TextureFactory&>(mApi) );
+    auto retval = std::make_unique< VulkanAPI::Texture >( static_cast<Graphics::API::TextureFactory&>(mApi) );
 
-    if(retval->Initialise())
+    if( retval->Initialise() )
     {
-      return std::move(retval);
+      return std::move( retval );
     }
 
     return nullptr;
@@ -51,41 +51,41 @@ struct TextureFactory::Impl
   TextureFactory& mApi;
   Vulkan::Graphics& mGraphics;
 
-  API::TextureDetails::Type       mType;
-  API::RectSize                   mSize;
-  API::TextureDetails::Format     mFormat;
+  API::TextureDetails::Type mType;
+  API::RectSize mSize;
+  API::TextureDetails::Format mFormat;
   API::TextureDetails::MipMapFlag mMipmapFlags;
-  void*                           mData;
-  uint32_t                        mDataSizeInBytes;
+  void* mData;
+  uint32_t mDataSizeInBytes;
 
 };
 
 TextureFactory::TextureFactory( Vulkan::Graphics& graphics )
 {
-  mImpl = std::make_unique<Impl>( *this, graphics );
+  mImpl = std::make_unique< Impl >( *this, graphics );
 }
 
 TextureFactory::~TextureFactory() = default;
 
-Graphics::API::TextureFactory& TextureFactory::SetType(API::TextureDetails::Type type)
+Graphics::API::TextureFactory& TextureFactory::SetType( API::TextureDetails::Type type )
 {
   mImpl->mType = type;
   return *this;
 }
 
-Graphics::API::TextureFactory& TextureFactory::SetSize(const API::RectSize& size)
+Graphics::API::TextureFactory& TextureFactory::SetSize( const API::RectSize& size )
 {
   mImpl->mSize = size;
   return *this;
 }
 
-Graphics::API::TextureFactory& TextureFactory::SetFormat(API::TextureDetails::Format format)
+Graphics::API::TextureFactory& TextureFactory::SetFormat( API::TextureDetails::Format format )
 {
   mImpl->mFormat = format;
   return *this;
 }
 
-Graphics::API::TextureFactory& TextureFactory::SetMipMapFlag(API::TextureDetails::MipMapFlag mipMSapFlag)
+Graphics::API::TextureFactory& TextureFactory::SetMipMapFlag( API::TextureDetails::MipMapFlag mipMSapFlag )
 {
   mImpl->mMipmapFlags = mipMSapFlag;
   return *this;
@@ -103,7 +103,7 @@ Graphics::API::TextureFactory& TextureFactory::SetDataSize( uint32_t dataSizeInB
   return *this;
 }
 
-std::unique_ptr<Graphics::API::Texture> TextureFactory::Create() const
+std::unique_ptr< Graphics::API::Texture > TextureFactory::Create() const
 {
   return mImpl->Create();
 }

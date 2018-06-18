@@ -20,6 +20,7 @@
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 #include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
 
 namespace Dali
@@ -31,7 +32,8 @@ namespace Vulkan
 
 namespace
 {
-static const vk::ShaderStageFlags DEFAULT_SHADER_STAGES{ vk::ShaderStageFlagBits::eVertex|vk::ShaderStageFlagBits::eFragment };
+static const vk::ShaderStageFlags DEFAULT_SHADER_STAGES{
+        vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment };
 }
 
 /**
@@ -43,23 +45,14 @@ struct Pipeline::Impl
 
 
   Impl( Vulkan::Graphics& graphics, vk::GraphicsPipelineCreateInfo info ) :
-    mInfo( std::move(info) ),
-    mGraphics( graphics )
+          mInfo( std::move( info ) ),
+          mGraphics( graphics )
   {
   };
 
   Impl() = default;
-  ~Impl()
-  {
-    if(mPipelineLayout)
-    {
-      mGraphics.GetDevice().destroyPipelineLayout( mPipelineLayout, mGraphics.GetAllocator() );
-    }
-    if(mPipeline)
-    {
-      mGraphics.GetDevice().destroyPipeline( mPipeline, mGraphics.GetAllocator() );
-    }
-  }
+
+  ~Impl() = default;
 
   /**
    *
@@ -77,7 +70,7 @@ struct Pipeline::Impl
       return vk::Result::eErrorInitializationFailed;
     }
 
-    if(!mInfo.layout)
+    if( !mInfo.layout )
     {
       CreatePipelineLayout();
     }
@@ -91,11 +84,11 @@ struct Pipeline::Impl
     // in place of swapchain structures!
     if( !mInfo.renderPass )
     {
-      SetRenderPass(mGraphics.GetSwapchainForFBID(0u)->
-              GetCurrentFramebuffer()->GetRenderPassVkHandle());
+      SetRenderPass( mGraphics.GetSwapchainForFBID( 0u )->
+              GetCurrentFramebuffer()->GetRenderPassVkHandle() );
     }
 
-    if(!mInfo.pRasterizationState)
+    if( !mInfo.pRasterizationState )
     {
       SetRasterizationState();
     }
@@ -104,17 +97,17 @@ struct Pipeline::Impl
       mRasterizationState = *mInfo.pRasterizationState;
     }
 
-    if(!mInfo.pDepthStencilState)
+    if( !mInfo.pDepthStencilState )
     {
       SetDepthStencilState();
     }
 
-    if(!mInfo.pMultisampleState)
+    if( !mInfo.pMultisampleState )
     {
       SetMultisampleState();
     }
 
-    if(!mInfo.pColorBlendState)
+    if( !mInfo.pColorBlendState )
     {
       SetColorBlendState();
     }
@@ -123,7 +116,7 @@ struct Pipeline::Impl
 
     // create pipeline
     mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( nullptr, mInfo, mGraphics.GetAllocator() ) );
-    if(mPipeline)
+    if( mPipeline )
     {
       return vk::Result::eSuccess;
     }
@@ -140,14 +133,14 @@ struct Pipeline::Impl
     mDepthStencilState = vk::PipelineDepthStencilStateCreateInfo{};
     mDepthStencilState.setDepthBoundsTestEnable( false );
     mDepthStencilState.setStencilTestEnable( false );
-    mInfo.setPDepthStencilState( & mDepthStencilState );
+    mInfo.setPDepthStencilState( &mDepthStencilState );
   }
 
   void SetMultisampleState()
   {
     mMultisampleState = vk::PipelineMultisampleStateCreateInfo{};
     mMultisampleState.setSampleShadingEnable( false );
-    mMultisampleState.setRasterizationSamples( vk::SampleCountFlagBits::e1);
+    mMultisampleState.setRasterizationSamples( vk::SampleCountFlagBits::e1 );
     mMultisampleState.setAlphaToCoverageEnable( false );
     mMultisampleState.setMinSampleShading( 1.0f );
     mMultisampleState.setPSampleMask( nullptr );
@@ -155,16 +148,16 @@ struct Pipeline::Impl
   }
 
   void SetVertexInputState(
-    std::vector<vk::VertexInputAttributeDescription> attrDesc,
-    std::vector<vk::VertexInputBindingDescription> bindingDesc)
+          std::vector< vk::VertexInputAttributeDescription > attrDesc,
+          std::vector< vk::VertexInputBindingDescription > bindingDesc )
   {
     mBindingDesc.clear();
     mAttrDesc.clear();
     mVertexInputState = vk::PipelineVertexInputStateCreateInfo{};
-    mVertexInputState.setPVertexAttributeDescriptions( (mAttrDesc = attrDesc).data() );
-    mVertexInputState.setPVertexBindingDescriptions( (mBindingDesc = bindingDesc).data() );
-    mVertexInputState.setVertexAttributeDescriptionCount( U32(mAttrDesc.size()) );
-    mVertexInputState.setVertexBindingDescriptionCount( U32(mBindingDesc.size()) );
+    mVertexInputState.setPVertexAttributeDescriptions( ( mAttrDesc = attrDesc ).data() );
+    mVertexInputState.setPVertexBindingDescriptions( ( mBindingDesc = bindingDesc ).data() );
+    mVertexInputState.setVertexAttributeDescriptionCount( U32( mAttrDesc.size() ) );
+    mVertexInputState.setVertexBindingDescriptionCount( U32( mBindingDesc.size() ) );
     mInfo.setPVertexInputState( &mVertexInputState );
   }
 
@@ -174,7 +167,7 @@ struct Pipeline::Impl
    */
   void SetViewport( float x, float y, float width, float height )
   {
-    assert( !mPipeline && "Pipeline cannot be changed anymore!");
+    assert( !mPipeline && "Pipeline cannot be changed anymore!" );
 
     // AB: add scissor, read data from graphics for fullscreen viewport
     // simplified mode for the demo purposes
@@ -182,12 +175,12 @@ struct Pipeline::Impl
     mViewports[0].setMinDepth( 0.0f );
     mViewports[0].setMaxDepth( 1.0f );
     mScissors = vk::Rect2D( { static_cast<int32_t>(x), static_cast<int32_t>(y) },
-                            { U32(width), U32(height) });
+                            { U32( width ), U32( height ) } );
     mViewportState = vk::PipelineViewportStateCreateInfo{}.
-           setViewportCount( U32(mViewports.size()) ).
-           setPViewports( mViewports.data() ).
-           setPScissors( &mScissors ).
-           setScissorCount( 1 );
+                                                                  setViewportCount( U32( mViewports.size() ) ).
+                                                                  setPViewports( mViewports.data() ).
+                                                                  setPScissors( &mScissors ).
+                                                                  setScissorCount( 1 );
 
     // replace viewport state
     mInfo.setPViewportState( &mViewportState );
@@ -217,7 +210,7 @@ struct Pipeline::Impl
     mRasterizationState.setPolygonMode( vk::PolygonMode::eFill );
     mRasterizationState.setRasterizerDiscardEnable( false );
     mRasterizationState.setLineWidth( 1.0f );
-    mInfo.setPRasterizationState( & mRasterizationState );
+    mInfo.setPRasterizationState( &mRasterizationState );
   }
 
   void SetColorBlendState()
@@ -225,9 +218,9 @@ struct Pipeline::Impl
     mAttachementNoBlendState = vk::PipelineColorBlendAttachmentState{};
     mAttachementNoBlendState.setBlendEnable( true );
     mAttachementNoBlendState.setColorWriteMask( vk::ColorComponentFlagBits::eR |
-                                                  vk::ColorComponentFlagBits::eG |
-                                                  vk::ColorComponentFlagBits::eB |
-                                                  vk::ColorComponentFlagBits::eA );
+                                                vk::ColorComponentFlagBits::eG |
+                                                vk::ColorComponentFlagBits::eB |
+                                                vk::ColorComponentFlagBits::eA );
     mAttachementNoBlendState.setSrcColorBlendFactor( vk::BlendFactor::eSrcAlpha );
     mAttachementNoBlendState.setDstColorBlendFactor( vk::BlendFactor::eOneMinusSrc1Alpha );
     mAttachementNoBlendState.setSrcAlphaBlendFactor( vk::BlendFactor::eOne );
@@ -235,11 +228,11 @@ struct Pipeline::Impl
     mAttachementNoBlendState.setColorBlendOp( vk::BlendOp::eAdd );
     mAttachementNoBlendState.setAlphaBlendOp( vk::BlendOp::eAdd );
 
-    mColorBlendState.setBlendConstants( { 1.0f, 1.0f, 1.0f, 1.0f });
+    mColorBlendState.setBlendConstants( { 1.0f, 1.0f, 1.0f, 1.0f } );
     mColorBlendState = vk::PipelineColorBlendStateCreateInfo{};
     mColorBlendState.setAttachmentCount( 1 );
     mColorBlendState.setPAttachments( &mAttachementNoBlendState );
-    mInfo.setPColorBlendState(&mColorBlendState);
+    mInfo.setPColorBlendState( &mColorBlendState );
   }
 
   /**
@@ -251,7 +244,7 @@ struct Pipeline::Impl
    */
   bool SetShader( RefCountedShader shader, Shader::Type stage )
   {
-    assert( !mPipeline && "Pipeline cannot be changed anymore!");
+    assert( !mPipeline && "Pipeline cannot be changed anymore!" );
 
     // check if shader isn't orphaned for some reason
     if( !mGraphics.FindShader( *shader ) )
@@ -259,10 +252,9 @@ struct Pipeline::Impl
       return false;
     }
 
-    auto info = vk::PipelineShaderStageCreateInfo{}.
-                                                     setModule( *shader ).
-                                                     setStage( static_cast<vk::ShaderStageFlagBits>( stage ) ).
-                                                     setPName( "main" );
+    auto info = vk::PipelineShaderStageCreateInfo{}.setModule( *shader )
+                                                   .setStage( static_cast<vk::ShaderStageFlagBits>( stage ) )
+                                                   .setPName( "main" );
     mShaderStageCreateInfo.push_back( info );
     mShaderResources.push_back( shader );
 
@@ -286,9 +278,9 @@ struct Pipeline::Impl
     // pull desciptor set layouts from shaders
     auto layoutInfo = vk::PipelineLayoutCreateInfo{};
 
-    using DSLayoutBindingArray = std::vector<vk::DescriptorSetLayoutBinding>;
+    using DSLayoutBindingArray = std::vector< vk::DescriptorSetLayoutBinding >;
 
-    std::vector<DSLayoutBindingArray> allDescriptorSetLayouts;
+    std::vector< DSLayoutBindingArray > allDescriptorSetLayouts;
 
     // concatenate all bindings
     // TODO: @todo validate if there are weird overlaps!
@@ -297,32 +289,33 @@ struct Pipeline::Impl
       const auto& reflection = shader->GetSPIRVReflection();
       auto layouts = reflection.GenerateDescriptorSetLayoutCreateInfo();
 
-      if(allDescriptorSetLayouts.size() < layouts.size())
+      if( allDescriptorSetLayouts.size() < layouts.size() )
       {
-        allDescriptorSetLayouts.resize(layouts.size());
+        allDescriptorSetLayouts.resize( layouts.size() );
       }
 
       for( auto i = 0u; i < layouts.size(); ++i )
       {
         auto currIndex = allDescriptorSetLayouts[i].size();
         allDescriptorSetLayouts[i].insert( allDescriptorSetLayouts[i].end(),
-        layouts[i].pBindings, layouts[i].pBindings + layouts[i].bindingCount );
+                                           layouts[i].pBindings, layouts[i].pBindings + layouts[i].bindingCount );
         for( auto j = 0u; j < layouts[i].bindingCount; ++j )
         {
-          allDescriptorSetLayouts[i][j+currIndex].setStageFlags( GetShaderStage( shader ) );
+          allDescriptorSetLayouts[i][j + currIndex].setStageFlags( GetShaderStage( shader ) );
         }
       }
     }
 
     // create descriptor set layouts for the pipeline
-    std::vector<vk::DescriptorSetLayout> dsLayouts{};
+    std::vector< vk::DescriptorSetLayout > dsLayouts{};
     dsLayouts.resize( allDescriptorSetLayouts.size() );
     mDSCreateInfoArray.clear();
     for( auto i = 0u; i < allDescriptorSetLayouts.size(); ++i )
     {
       auto info = vk::DescriptorSetLayoutCreateInfo{}.
-                    setBindingCount( static_cast<uint32_t>(allDescriptorSetLayouts[i].size()) ).
-                    setPBindings( allDescriptorSetLayouts[i].data() );
+                                                             setBindingCount(
+              static_cast<uint32_t>(allDescriptorSetLayouts[i].size()) ).
+                                                             setPBindings( allDescriptorSetLayouts[i].data() );
 
       mDSCreateInfoArray.push_back( info );
       dsLayouts[i] = VkAssert( mGraphics.GetDevice().createDescriptorSetLayout( info, mGraphics.GetAllocator() ) );
@@ -363,17 +356,17 @@ struct Pipeline::Impl
       auto shaderHandle = mGraphics.FindShader( stage.module );
       if( shaderHandle )
       {
-        bool tracked { false };
-        for(auto&& sh : mShaderResources )
+        bool tracked{ false };
+        for( auto&& sh : mShaderResources )
         {
           if( sh == shaderHandle )
           {
             tracked = true;
           }
         }
-        if(!tracked)
+        if( !tracked )
         {
-          mShaderResources.push_back(shaderHandle);
+          mShaderResources.push_back( shaderHandle );
         }
       }
       else
@@ -385,43 +378,43 @@ struct Pipeline::Impl
   }
 
 
-  vk::GraphicsPipelineCreateInfo  mInfo           {    };
-  vk::Pipeline                    mPipeline       { nullptr };
-  uint32_t                        mModified       { 0u };
-  Graphics&                       mGraphics;
+  vk::GraphicsPipelineCreateInfo mInfo{};
+  vk::Pipeline mPipeline{ nullptr };
+  uint32_t mModified{ 0u };
+  Graphics& mGraphics;
 
   // resources
-  std::vector<RefCountedShader>     mShaderResources;
+  std::vector< RefCountedShader > mShaderResources;
 
-  vk::PipelineViewportStateCreateInfo mViewportState {};
-  std::vector<vk::Viewport> mViewports {};
-  vk::Rect2D mScissors {};
+  vk::PipelineViewportStateCreateInfo mViewportState{};
+  std::vector< vk::Viewport > mViewports{};
+  vk::Rect2D mScissors{};
 
-  std::vector<vk::PipelineShaderStageCreateInfo> mShaderStageCreateInfo;
+  std::vector< vk::PipelineShaderStageCreateInfo > mShaderStageCreateInfo;
   vk::PipelineLayout mPipelineLayout{};
-  std::vector<vk::DescriptorSetLayoutCreateInfo>    mDSCreateInfoArray{};
-  std::vector<vk::DescriptorSetLayout>              mDSLayoutArray{};
+  std::vector< vk::DescriptorSetLayoutCreateInfo > mDSCreateInfoArray{};
+  std::vector< vk::DescriptorSetLayout > mDSLayoutArray{};
 
   // vertex input state
-  vk::PipelineVertexInputStateCreateInfo            mVertexInputState {};
-  std::vector<vk::VertexInputAttributeDescription>  mAttrDesc;
-  std::vector<vk::VertexInputBindingDescription>    mBindingDesc;
+  vk::PipelineVertexInputStateCreateInfo mVertexInputState{};
+  std::vector< vk::VertexInputAttributeDescription > mAttrDesc;
+  std::vector< vk::VertexInputBindingDescription > mBindingDesc;
 
   // vertex input assembly state
-  vk::PipelineInputAssemblyStateCreateInfo          mInputAssemblyState {};
+  vk::PipelineInputAssemblyStateCreateInfo mInputAssemblyState{};
 
   // rasterization state
-  vk::PipelineRasterizationStateCreateInfo          mRasterizationState {};
+  vk::PipelineRasterizationStateCreateInfo mRasterizationState{};
 
   // Dpeth/stencil state
-  vk::PipelineDepthStencilStateCreateInfo           mDepthStencilState {};
+  vk::PipelineDepthStencilStateCreateInfo mDepthStencilState{};
 
   // Multisample state
-  vk::PipelineMultisampleStateCreateInfo            mMultisampleState {};
+  vk::PipelineMultisampleStateCreateInfo mMultisampleState{};
 
   // Color blend
-  vk::PipelineColorBlendStateCreateInfo             mColorBlendState {};
-  vk::PipelineColorBlendAttachmentState             mAttachementNoBlendState {};
+  vk::PipelineColorBlendStateCreateInfo mColorBlendState{};
+  vk::PipelineColorBlendAttachmentState mAttachementNoBlendState{};
 
 
 };
@@ -433,7 +426,7 @@ struct Pipeline::Impl
 
 RefCountedPipeline Pipeline::New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info )
 {
-  auto pipeline = Handle<Pipeline>( new Pipeline(graphics, info) );
+  auto pipeline = Handle< Pipeline >( new Pipeline( graphics, info ) );
   //graphics.AddPipeline(pipeline); //TODO: Use the pipeline cache class here?
   return pipeline;
 }
@@ -442,7 +435,7 @@ Pipeline::~Pipeline() = default;
 
 Pipeline::Pipeline( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info )
 {
-  mImpl = MakeUnique<Pipeline::Impl>( graphics, info );
+  mImpl = MakeUnique< Pipeline::Impl >( graphics, info );
 }
 
 vk::Pipeline Pipeline::GetVkHandle() const
@@ -452,6 +445,30 @@ vk::Pipeline Pipeline::GetVkHandle() const
 
 bool Pipeline::OnDestroy()
 {
+  auto device = mImpl->mGraphics.GetDevice();
+  auto pipeline = mImpl->mPipeline;
+  auto pipelineLayout = mImpl->mPipelineLayout;
+  auto descriptorSetLayouts = mImpl->mDSLayoutArray;
+  auto allocator = &mImpl->mGraphics.GetAllocator();
+
+  mImpl->mGraphics.DiscardResource( [ device, pipeline, pipelineLayout, descriptorSetLayouts, allocator ]() {
+
+    for( const auto& descriptorSetLayout : descriptorSetLayouts )
+    {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: descriptor set layout->%p\n",
+                     static_cast< void* >(descriptorSetLayout) )
+      device.destroyDescriptorSetLayout( descriptorSetLayout, allocator );
+    }
+
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: pipeline layout->%p\n",
+                   static_cast< void* >(pipelineLayout) )
+    device.destroyPipelineLayout( pipelineLayout, allocator );
+
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: pipeline->%p\n",
+                   static_cast< void* >(pipeline) )
+    device.destroyPipeline( pipeline, allocator );
+  } );
+
   return false;
 }
 
@@ -462,13 +479,13 @@ void Pipeline::SetViewport( float x, float y, float width, float height )
 
 bool Pipeline::SetShader( RefCountedShader shader, Shader::Type stage )
 {
-  return mImpl->SetShader( shader, stage );
+  return mImpl->SetShader( std::move( shader ), stage );
 }
 
-void Pipeline::SetVertexInputState(std::vector<vk::VertexInputAttributeDescription> attrDesc,
-                         std::vector<vk::VertexInputBindingDescription> bindingDesc)
+void Pipeline::SetVertexInputState( std::vector< vk::VertexInputAttributeDescription > attrDesc,
+                                    std::vector< vk::VertexInputBindingDescription > bindingDesc )
 {
-  mImpl->SetVertexInputState( attrDesc, bindingDesc );
+  mImpl->SetVertexInputState( std::move( attrDesc ), std::move( bindingDesc ) );
 }
 
 void Pipeline::SetInputAssemblyState( vk::PrimitiveTopology topology, bool restartEnable )
@@ -486,12 +503,12 @@ vk::PipelineLayout Pipeline::GetVkPipelineLayout() const
   return mImpl->mPipelineLayout;
 }
 
-const std::vector<vk::DescriptorSetLayoutCreateInfo>& Pipeline::GetVkDescriptorSetLayoutCreateInfo() const
+const std::vector< vk::DescriptorSetLayoutCreateInfo >& Pipeline::GetVkDescriptorSetLayoutCreateInfo() const
 {
   return mImpl->mDSCreateInfoArray;
 }
 
-const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
+const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mImpl->mDSLayoutArray;
 }

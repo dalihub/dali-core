@@ -29,8 +29,15 @@ namespace Graphics
 namespace VulkanAPI
 {
 
-Buffer::Buffer( Controller& controller, vk::BufferUsageFlagBits usage, API::Buffer::UsageHint usageHints, uint32_t size )
-: mController( controller ), mGraphics( controller.GetGraphics() ), mUsage( usage ), mUsageHints( usageHints ), mSize( size )
+Buffer::Buffer( Controller& controller,
+                vk::BufferUsageFlagBits usage,
+                API::Buffer::UsageHint usageHints,
+                uint32_t size )
+        : mController( controller ),
+          mGraphics( controller.GetGraphics() ),
+          mUsage( usage ),
+          mUsageHints( usageHints ),
+          mSize( size )
 {
 
 }
@@ -61,8 +68,8 @@ bool Buffer::Initialise()
 
   // allocate memory
   auto memory =
-    mGraphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( mBufferRef,
-                      vk::MemoryPropertyFlagBits::eHostVisible ); // todo: host visible should be only for dynamic buffers
+          mGraphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( mBufferRef,
+                                                                             vk::MemoryPropertyFlagBits::eHostVisible ); // todo: host visible should be only for dynamic buffers
   mBufferRef->BindMemory( memory );
 
   return true;
@@ -82,14 +89,14 @@ void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
 {
   // depends whether the buffer is host visible or device local
   // TODO: implement in-GPU copying, for now all buffers are host-visible
-  auto transfer = std::make_unique<VulkanAPI::BufferMemoryTransfer>();
+  auto transfer = std::make_unique< VulkanAPI::BufferMemoryTransfer >();
   auto tmp = new char[srcSize];
   memcpy( tmp, src, srcSize );
   transfer->srcPtr.reset( tmp );
   transfer->dstBuffer = mBufferRef;
   transfer->dstOffset = dstOffset;
   transfer->srcSize = srcSize;
-  mController.ScheduleBufferMemoryTransfer( std::move(transfer) );
+  mController.ScheduleBufferMemoryTransfer( std::move( transfer ) );
 }
 
 Vulkan::RefCountedBuffer Buffer::GetBufferRef() const

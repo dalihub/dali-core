@@ -26,7 +26,9 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wswitch-enum"
+
 #include <vulkan/vulkan.hpp>
+
 #pragma GCC diagnostic pop
 
 #endif // DALI_GRAPHICS_VULKAN_HPP_WRAPPER_H

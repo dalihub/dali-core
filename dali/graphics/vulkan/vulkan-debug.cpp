@@ -18,6 +18,32 @@
 
 #if defined(DEBUG_ENABLED)
 
+std::string ArgListToString( const char* format, va_list args )
+{
+  std::string str; // empty string
+  if( format != nullptr )
+  {
+    char* buffer = nullptr;
+    int err = vasprintf( &buffer, format, args );
+    if( err >= 0 ) // No error
+    {
+      str = buffer;
+      free( buffer );
+    }
+  }
+  return str;
+}
+
+std::string FormatToString( const char* format, ... )
+{
+  va_list arg;
+  va_start( arg, format );
+  std::string s = ArgListToString( format, arg );
+  va_end( arg );
+  return s;
+}
+
+
 const char* LOG_VULKAN( getenv( "LOG_VULKAN" ) );
 
 #endif

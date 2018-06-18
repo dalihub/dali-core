@@ -52,7 +52,7 @@ public:
    * @param format
    * @return
    */
-  static Handle<Texture> New( Graphics& graphics, uint32_t width, uint32_t height, vk::Format format );
+  static Handle< Texture > New( Graphics& graphics, uint32_t width, uint32_t height, vk::Format format );
 
   /**
    * Schedules data upload from CPU
@@ -93,7 +93,7 @@ private:
 
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 }

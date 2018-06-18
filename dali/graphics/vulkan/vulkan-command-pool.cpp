@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -32,8 +33,8 @@ namespace Vulkan
  * Struct: InternalPool
  */
 CommandPool::InternalPool::Node::Node( uint32_t _nextFreeIndex, CommandBuffer* _commandBuffer )
-  : nextFreeIndex( _nextFreeIndex ),
-    commandBuffer( _commandBuffer )
+        : nextFreeIndex( _nextFreeIndex ),
+          commandBuffer( _commandBuffer )
 {
 }
 
@@ -42,15 +43,15 @@ CommandPool::InternalPool::InternalPool( CommandPool& owner, Dali::Graphics::Vul
         : mOwner( owner ),
           mGraphics( graphics ),
           mPoolData{},
-          mFirstFree(INVALID_NODE_INDEX),
+          mFirstFree( INVALID_NODE_INDEX ),
           mCapacity( initialCapacity ),
           mAllocationCount( 0u ),
           mIsPrimary( isPrimary )
 {
   // don't allocate anything if initial capacity is 0
-  if(initialCapacity)
+  if( initialCapacity )
   {
-    Resize(initialCapacity);
+    Resize( initialCapacity );
   }
 }
 
@@ -64,7 +65,7 @@ CommandPool::InternalPool::~InternalPool()
 }
 
 std::vector< vk::CommandBuffer >
-        CommandPool::InternalPool::AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo )
+CommandPool::InternalPool::AllocateVkCommandBuffers( vk::CommandBufferAllocateInfo allocateInfo )
 {
   return VkAssert( mGraphics->GetDevice().allocateCommandBuffers( allocateInfo ) );
 }
@@ -79,27 +80,27 @@ void CommandPool::InternalPool::Resize( uint32_t newCapacity )
   auto diff = newCapacity - mPoolData.size();
 
   auto allocateInfo = vk::CommandBufferAllocateInfo{}
-          .setCommandBufferCount( U32(diff) )
-          .setCommandPool(mOwner.GetVkHandle() )
+          .setCommandBufferCount( U32( diff ) )
+          .setCommandPool( mOwner.GetVkHandle() )
           .setLevel( mIsPrimary ? vk::CommandBufferLevel::ePrimary : vk::CommandBufferLevel::eSecondary );
   auto newBuffers = AllocateVkCommandBuffers( allocateInfo );
 
-  uint32_t i = U32(mPoolData.size() + 1);
+  uint32_t i = U32( mPoolData.size() + 1 );
 
-  mFirstFree = U32(mPoolData.size());
-  if(!mPoolData.empty())
+  mFirstFree = U32( mPoolData.size() );
+  if( !mPoolData.empty() )
   {
     mPoolData.back()
-             .nextFreeIndex = U32(mPoolData.size());
+             .nextFreeIndex = U32( mPoolData.size() );
   }
   for( auto&& cmdbuf : newBuffers )
   {
-    auto commandBuffer = new CommandBuffer( mOwner, i-1, allocateInfo, cmdbuf);
+    auto commandBuffer = new CommandBuffer( mOwner, i - 1, allocateInfo, cmdbuf );
     mPoolData.emplace_back( i, commandBuffer );
     ++i;
   }
   mPoolData.back().nextFreeIndex = INVALID_NODE_INDEX;
-  mCapacity = U32(mPoolData.size());
+  mCapacity = U32( mPoolData.size() );
 }
 
 RefCountedCommandBuffer CommandPool::InternalPool::AllocateCommandBuffer( bool reset )
@@ -152,9 +153,9 @@ uint32_t CommandPool::InternalPool::GetAllocationCount() const
  */
 RefCountedCommandPool CommandPool::New( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo )
 {
-  auto retval = Handle<CommandPool>( new CommandPool(graphics, createInfo) );
+  auto retval = Handle< CommandPool >( new CommandPool( graphics, createInfo ) );
 
-  if(retval && retval->Initialize())
+  if( retval && retval->Initialize() )
   {
     graphics.AddCommandPool( retval );
   }
@@ -164,23 +165,23 @@ RefCountedCommandPool CommandPool::New( Graphics& graphics, const vk::CommandPoo
 
 RefCountedCommandPool CommandPool::New( Graphics& graphics )
 {
-  return New( graphics, vk::CommandPoolCreateInfo{});
+  return New( graphics, vk::CommandPoolCreateInfo{} );
 }
 
 bool CommandPool::Initialize()
 {
   mCreateInfo.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
-  mCommandPool = VkAssert(mGraphics->GetDevice().createCommandPool(mCreateInfo, mGraphics->GetAllocator()));
-  mInternalPoolPrimary = std::make_unique<InternalPool>( *this, mGraphics, 0, true );
-  mInternalPoolSecondary = std::make_unique<InternalPool>( *this, mGraphics, 0, false );
+  mCommandPool = VkAssert( mGraphics->GetDevice().createCommandPool( mCreateInfo, mGraphics->GetAllocator() ) );
+  mInternalPoolPrimary = std::make_unique< InternalPool >( *this, mGraphics, 0, true );
+  mInternalPoolSecondary = std::make_unique< InternalPool >( *this, mGraphics, 0, false );
   return true;
 }
 
 CommandPool::CommandPool() = default;
 
-CommandPool::CommandPool(Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo)
-        : mGraphics(&graphics),
-          mCreateInfo(createInfo)
+CommandPool::CommandPool( Graphics& graphics, const vk::CommandPoolCreateInfo& createInfo )
+        : mGraphics( &graphics ),
+          mCreateInfo( createInfo )
 {
 }
 
@@ -217,7 +218,7 @@ void CommandPool::Reset( bool releaseResources )
 
 bool CommandPool::ReleaseCommandBuffer( CommandBuffer& buffer )
 {
-  if(buffer.IsPrimary())
+  if( buffer.IsPrimary() )
   {
     mInternalPoolPrimary->ReleaseCommandBuffer( buffer );
   }
@@ -230,13 +231,13 @@ bool CommandPool::ReleaseCommandBuffer( CommandBuffer& buffer )
 
 uint32_t CommandPool::GetCapacity() const
 {
-  return mInternalPoolPrimary->GetCapacity()+
+  return mInternalPoolPrimary->GetCapacity() +
          mInternalPoolSecondary->GetCapacity();
 }
 
 uint32_t CommandPool::GetAllocationCount() const
 {
-  return mInternalPoolPrimary->GetAllocationCount()+
+  return mInternalPoolPrimary->GetAllocationCount() +
          mInternalPoolSecondary->GetAllocationCount();
 }
 
@@ -258,10 +259,9 @@ bool CommandPool::OnDestroy()
   auto commandPool = mCommandPool;
   auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [device, commandPool, allocator]() {
-#ifndef NDEBUG
-    printf("Invoking COMMAND POOL deleter function\n");
-#endif
+  mGraphics->DiscardResource( [ device, commandPool, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: command pool->%p\n",
+                   static_cast< void* >( commandPool ) )
     device.destroyCommandPool( commandPool, allocator );
   } );
 

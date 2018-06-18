@@ -41,6 +41,7 @@ class Pipeline;
 } // Internal
 
 class Controller;
+
 class PipelineFactory;
 
 class PipelineCache
@@ -62,7 +63,7 @@ public:
    * @param pipeline
    * @return
    */
-  bool SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr<Internal::Pipeline> pipeline );
+  bool SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr< Internal::Pipeline > pipeline );
 
   /**
    * Removes unused pipeline
@@ -74,11 +75,11 @@ private:
 
   struct CacheEntry
   {
-    std::unique_ptr<Internal::Pipeline>     pipelineImpl;
-    std::unique_ptr<PipelineFactory::Info>  info {}; // to compare if hash collision occurs
+    std::unique_ptr< Internal::Pipeline > pipelineImpl;
+    std::unique_ptr< PipelineFactory::Info > info{}; // to compare if hash collision occurs
   };
 
-  std::map<uint32_t, std::vector<CacheEntry>> mCacheMap;
+  std::map< uint32_t, std::vector< CacheEntry>> mCacheMap;
 };
 } // VulkanAPI
 } // Graphics

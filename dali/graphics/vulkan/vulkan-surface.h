@@ -35,14 +35,17 @@ namespace Graphics
 namespace Vulkan
 {
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
+
 class Graphics;
+
 class Surface : public VkManaged
 {
 public:
 
-  static RefCountedSurface New( Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
+  static RefCountedSurface New( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
 
-  Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFactory );
+  Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
+
   ~Surface() final;
 
   /**
@@ -65,7 +68,7 @@ public:
 private:
 
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 } // namespace Vulkan

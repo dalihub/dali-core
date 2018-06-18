@@ -37,6 +37,7 @@ class Shader : public Dali::Graphics::API::Shader
 public:
   // not copyable
   Shader( const Shader& ) = delete;
+
   Shader& operator=( const Shader& ) = delete;
 
   ~Shader() override = default;
@@ -47,7 +48,7 @@ public:
                         Dali::Graphics::API::ShaderDetails::Language language,
                         Dali::Graphics::API::ShaderDetails::ShaderSource shaderSource );
 
-  Vulkan::RefCountedShader GetShader( vk::ShaderStageFlagBits shaderStage ) const ;
+  Vulkan::RefCountedShader GetShader( vk::ShaderStageFlagBits shaderStage ) const;
 
   static Shader& DownCast( Dali::Graphics::API::Shader& shader );
 
@@ -59,21 +60,21 @@ public:
   // Vertex attributes
   bool IsReflectionSupported() const override;
 
-  uint32_t GetVertexAttributeLocation(const std::string &name) const override;
+  uint32_t GetVertexAttributeLocation( const std::string& name ) const override;
 
   API::ShaderDetails::VertexInputAttributeFormat GetVertexAttributeFormat( uint32_t location ) const override;
 
-  std::string GetVertexAttributeName(uint32_t location) const override;
+  std::string GetVertexAttributeName( uint32_t location ) const override;
 
-  std::vector<uint32_t> GetVertexAttributeLocations() const override;
+  std::vector< uint32_t > GetVertexAttributeLocations() const override;
 
   /**
    * Uniforms
    */
 
-  std::vector<uint32_t> GetUniformBlockLocations() const;
+  std::vector< uint32_t > GetUniformBlockLocations() const;
 
-  std::string GetUniformBlockName( uint32_t blockIndex) const;
+  std::string GetUniformBlockName( uint32_t blockIndex ) const;
 
   uint32_t GetUniformBlockMemberCount( uint32_t blockIndex ) const;
 
@@ -83,7 +84,7 @@ public:
 
   bool GetNamedUniform( const std::string& name, API::ShaderDetails::UniformInfo& out ) const override;
 
-  std::vector<API::ShaderDetails::UniformInfo> GetSamplers() const override;
+  std::vector< API::ShaderDetails::UniformInfo > GetSamplers() const override;
 
   uint32_t GetUniformBlockCount() const override;
 
@@ -92,6 +93,7 @@ public:
 protected:
   // derived types should not be moved direcly to prevent slicing
   Shader( Shader&& ) = default;
+
   Shader& operator=( Shader&& ) = default;
 
   Shader() = default;
@@ -102,9 +104,9 @@ private:
   Vulkan::RefCountedShader mVertexShader;
   Vulkan::RefCountedShader mFragmentShader;
 
-  std::vector<Vulkan::SpirV::SPIRVVertexInputAttribute> mVertexInputAttributes;
-  std::vector<Vulkan::SpirV::SPIRVUniformBlock> mUniformBlocks;
-  std::vector<Vulkan::SpirV::SPIRVUniformOpaque> mUniformOpaques;
+  std::vector< Vulkan::SpirV::SPIRVVertexInputAttribute > mVertexInputAttributes;
+  std::vector< Vulkan::SpirV::SPIRVUniformBlock > mUniformBlocks;
+  std::vector< Vulkan::SpirV::SPIRVUniformOpaque > mUniformOpaques;
 };
 
 } // namespace Vulkan

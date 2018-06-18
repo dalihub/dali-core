@@ -27,8 +27,11 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+
 class Buffer;
+
 class Image;
+
 class DescriptorPool;
 
 class DescriptorSet : public VkManaged
@@ -45,7 +48,7 @@ public:
    * @param offset
    * @param size
    */
-  void WriteUniformBuffer( uint32_t binding, Handle<Buffer> buffer, uint32_t offset, uint32_t size );
+  void WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size );
 
   /**
    *
@@ -54,6 +57,7 @@ public:
    * @param imageView
    */
   void WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView );
+
   /**
    *
    * @param buffer
@@ -65,7 +69,7 @@ public:
   /**
    *
    */
-  void WriteImage( Handle<Image> );
+  void WriteImage( Handle< Image > );
 
   /**
    *
@@ -81,15 +85,16 @@ public:
 
 private:
 
-  DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet, vk::DescriptorSetAllocateInfo allocateInfo );
+  DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet,
+                 vk::DescriptorSetAllocateInfo allocateInfo );
 
   Graphics* mGraphics;
   DescriptorPool* mPool;
   vk::DescriptorSetAllocateInfo mAllocateInfo;
-  vk::DescriptorSet             mDescriptorSet;
+  vk::DescriptorSet mDescriptorSet;
 
   // attached resources
-  std::vector<Handle<VkManaged>> mResources;
+  std::vector< Handle< VkManaged>> mResources;
 };
 
 class DescriptorPool : public VkManaged
@@ -123,7 +128,7 @@ private:
   vk::DescriptorPool mDescriptorPool;
 
   // cache
-  std::vector<Handle<DescriptorSet>> mDescriptorSetCache;
+  std::vector< Handle< DescriptorSet>> mDescriptorSetCache;
 };
 
 #if 0

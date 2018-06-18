@@ -39,6 +39,7 @@ class Texture : public Dali::Graphics::API::Texture
 public:
 
   explicit Texture( Dali::Graphics::API::TextureFactory& factory );
+
   ~Texture() override;
 
   bool Initialise();
@@ -47,7 +48,7 @@ public:
 
 private:
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
 } // namespace VulkanAPI

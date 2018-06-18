@@ -28,6 +28,7 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+
 class PipelineCache;
 }
 
@@ -39,7 +40,9 @@ class Pipeline;
 }
 
 class Controller;
+
 class PipelineFactory;
+
 /**
  * Pipeline due to its nature ( it's cached, single ownership ) is only an interface
  */
@@ -53,17 +56,19 @@ public:
 
   // non-copyable
   Pipeline( const Pipeline& ) = delete;
+
   Pipeline& operator=( const Pipeline& ) = delete;
 
   // movable
   Pipeline( Pipeline&& ) = default;
+
   Pipeline& operator=( Pipeline&& ) = default;
 
   Pipeline( Internal::Pipeline* impl );
 
   Vulkan::RefCountedPipeline GetVkPipeline() const;
 
-  const std::vector<vk::DescriptorSetLayout>& GetVkDescriptorSetLayouts() const;
+  const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
 private:
   Internal::Pipeline* mPipelineImpl;

@@ -19,6 +19,7 @@
  */
 #include <dali/graphics/vulkan/vulkan-types.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -26,7 +27,9 @@ namespace Graphics
 namespace Vulkan
 {
 class Buffer;
+
 class Image;
+
 class GpuMemoryBlock;
 /**
  * Interface to Gpu memory allocation, must be overriden.
@@ -50,7 +53,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock
+  Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   /**
    *
@@ -58,7 +62,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock Allocate( const RefCountedBuffer& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock
+  Allocate( const RefCountedBuffer& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   /**
    *
@@ -66,7 +71,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock Allocate( const RefCountedImage& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock
+  Allocate( const RefCountedImage& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   // refcounting managed via allocator which ownes all the blocks, allocator may
   // implement this feature any way ( or simply ignore it )
@@ -74,13 +80,17 @@ public:
    *
    * @param allocationId
    */
-  virtual void Retain( GpuMemoryBlock& allocationId ) {}
+  virtual void Retain( GpuMemoryBlock& allocationId )
+  {
+  }
 
   /**
    *
    * @param allocationId
    */
-  virtual void Release( GpuMemoryBlock& allocationId ) {}
+  virtual void Release( GpuMemoryBlock& allocationId )
+  {
+  }
 
   /**
    *

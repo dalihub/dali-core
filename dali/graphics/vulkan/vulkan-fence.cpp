@@ -18,6 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-fence.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -32,10 +33,10 @@ namespace Vulkan
  */
 RefCountedFence Fence::New( Graphics& graphics )
 {
-  return Handle<Fence>( new Fence(graphics) );
+  return Handle< Fence >( new Fence( graphics ) );
 }
 
-Fence::Fence( Graphics& graphics ) : mGraphics(&graphics)
+Fence::Fence( Graphics& graphics ) : mGraphics( &graphics )
 {
 }
 
@@ -72,10 +73,9 @@ bool Fence::OnDestroy()
   auto allocator = &mGraphics->GetAllocator();
 
   // capture copies of the pointers and handles
-  mGraphics->DiscardResource( [device, fence, allocator]() {
-#ifndef NDEBUG
-    printf("Invoking FENCE deleter function\n");
-#endif
+  mGraphics->DiscardResource( [ device, fence, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: fence->%p\n",
+                   static_cast< void* >(fence) )
     device.destroyFence( fence, allocator );
   } );
 

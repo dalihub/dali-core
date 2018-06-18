@@ -29,6 +29,7 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+
 class Pipeline : public VkManaged
 {
 public:
@@ -39,7 +40,8 @@ public:
    * @param info
    * @return
    */
-  static RefCountedPipeline New( Graphics& graphics, const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
+  static RefCountedPipeline New( Graphics& graphics,
+                                 const vk::GraphicsPipelineCreateInfo& info = vk::GraphicsPipelineCreateInfo{} );
 
   /**
    * Destructor
@@ -68,8 +70,8 @@ public:
    * @param attrDesc
    * @param bindingDesc
    */
-  void SetVertexInputState(std::vector<vk::VertexInputAttributeDescription> attrDesc,
-                           std::vector<vk::VertexInputBindingDescription> bindingDesc);
+  void SetVertexInputState( std::vector< vk::VertexInputAttributeDescription > attrDesc,
+                            std::vector< vk::VertexInputBindingDescription > bindingDesc );
 
   /**
    *
@@ -88,13 +90,13 @@ public:
    *
    * @return
    */
-  const std::vector<vk::DescriptorSetLayoutCreateInfo>& GetVkDescriptorSetLayoutCreateInfo() const;
+  const std::vector< vk::DescriptorSetLayoutCreateInfo >& GetVkDescriptorSetLayoutCreateInfo() const;
 
   /**
    *
    * @return
    */
-  const std::vector<vk::DescriptorSetLayout>& GetVkDescriptorSetLayouts() const;
+  const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
   /**
    * State getters from the pipeline
@@ -136,10 +138,10 @@ public:
 
 private:
   struct Impl;
-  std::unique_ptr<Impl> mImpl;
+  std::unique_ptr< Impl > mImpl;
 };
 
-using RefCountedPipeline = Handle<Pipeline>;
+using RefCountedPipeline = Handle< Pipeline >;
 
 } // Namespace Vulkan
 

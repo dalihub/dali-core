@@ -18,6 +18,7 @@
 #include <dali/graphics/vulkan/vulkan-image-view.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/vulkan-image.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 #include <utility>
 
 namespace Dali
@@ -28,20 +29,20 @@ namespace Vulkan
 {
 
 ImageView::ImageView( Graphics& graphics, RefCountedImage image, vk::ImageViewCreateInfo createInfo )
-        : mGraphics(&graphics),
-          mImage(std::move(image)),
-          mCreateInfo(std::move(createInfo)),
-          mImageView(nullptr)
+        : mGraphics( &graphics ),
+          mImage( std::move( image ) ),
+          mCreateInfo( std::move( createInfo ) ),
+          mImageView( nullptr )
 {
 }
 
 ImageView::~ImageView() = default;
 
 RefCountedImageView ImageView::New( Graphics& graphics,
-                                           const RefCountedImage& image,
-                                           const vk::ImageViewCreateInfo& createInfo )
+                                    const RefCountedImage& image,
+                                    const vk::ImageViewCreateInfo& createInfo )
 {
-  return RefCountedImageView( new ImageView(graphics, image, createInfo) );
+  return RefCountedImageView( new ImageView( graphics, image, createInfo ) );
 }
 
 vk::ImageView ImageView::GetVkHandle() const
@@ -95,11 +96,10 @@ bool ImageView::OnDestroy()
   auto imageView = mImageView;
   auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [device, imageView, allocator]() {
-#ifndef NDEBUG
-    printf("Invoking IMAGE VIEW deleter function\n");
-#endif
-    device.destroyImageView(imageView, allocator);
+  mGraphics->DiscardResource( [ device, imageView, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image view->%p\n",
+                   static_cast< void* >(imageView) )
+    device.destroyImageView( imageView, allocator );
   } );
 
   return VkManaged::OnDestroy();

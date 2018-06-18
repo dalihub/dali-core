@@ -29,6 +29,7 @@
 #include <dali/graphics/vulkan/vulkan-queue.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -71,36 +72,37 @@ struct SwapchainBuffer
 struct Swapchain::Impl
 {
   Impl( Swapchain& owner,
-        Graphics&  graphics,
-        Queue&     presentationQueue,
+        Graphics& graphics,
+        Queue& presentationQueue,
         RefCountedSurface surface,
-        uint32_t   bufferCount,
-        uint32_t   flags )
-  : mOwner( owner ),
-    mGraphics( graphics ),
-    mQueue( presentationQueue ),
-    mSurface( surface ),
-    mBufferCount( bufferCount ),
-    mFlags( flags ),
-    mCurrentBufferIndex( 0u )
+        uint32_t bufferCount,
+        uint32_t flags )
+          : mOwner( owner ),
+            mGraphics( graphics ),
+            mQueue( presentationQueue ),
+            mSurface( std::move( surface ) ),
+            mBufferCount( bufferCount ),
+            mFlags( flags ),
+            mCurrentBufferIndex( 0u )
   {
     mSwapchainCreateInfoKHR.setSurface( mSurface->GetSurfaceKHR() )
-      .setPreTransform( vk::SurfaceTransformFlagBitsKHR::eIdentity )
-      .setPresentMode( vk::PresentModeKHR::eFifo )
-      .setOldSwapchain( nullptr ) //@todo support surface replacement!
-      .setMinImageCount( mBufferCount )
-      .setImageUsage( vk::ImageUsageFlagBits::eColorAttachment )
-      .setImageSharingMode( vk::SharingMode::eExclusive )
-      .setImageArrayLayers( 1 )
-      .setCompositeAlpha( vk::CompositeAlphaFlagBitsKHR::eOpaque )
-      .setClipped( true )
-      .setQueueFamilyIndexCount( 0 )
-      .setPQueueFamilyIndices( nullptr );
+                           .setPreTransform( vk::SurfaceTransformFlagBitsKHR::eIdentity )
+                           .setPresentMode( vk::PresentModeKHR::eFifo )
+                           .setOldSwapchain( nullptr ) //@todo support surface replacement!
+                           .setMinImageCount( mBufferCount )
+                           .setImageUsage( vk::ImageUsageFlagBits::eColorAttachment )
+                           .setImageSharingMode( vk::SharingMode::eExclusive )
+                           .setImageArrayLayers( 1 )
+                           .setCompositeAlpha( vk::CompositeAlphaFlagBitsKHR::eOpaque )
+                           .setClipped( true )
+                           .setQueueFamilyIndexCount( 0 )
+                           .setPQueueFamilyIndices( nullptr );
   }
 
   ~Impl() = default;
 
   Impl( const Impl& ) = delete;
+
   Impl& operator=( const Impl& ) = delete;
 
   bool Initialise()
@@ -121,8 +123,6 @@ struct Swapchain::Impl
 
     InitialiseSwapchainBuffers();
 
-    PrepareFramebuffers();
-
     mFirstPresent = true;
     return true;
   }
@@ -134,132 +134,29 @@ struct Swapchain::Impl
     {
       auto masterCmd = mGraphics.CreateCommandBuffer( true );
 
-      auto swapBuffer              = SwapchainBuffer{};
-      swapBuffer.framebuffer       = fb;
-      swapBuffer.index             = 0;
-      swapBuffer.masterCmdBuffer   = masterCmd;
-      swapBuffer.endOfFrameFence   = mGraphics.CreateFence({});
-      swapBuffer.firstUse          = true;
+      auto swapBuffer = SwapchainBuffer{};
+      swapBuffer.framebuffer = fb;
+      swapBuffer.index = 0;
+      swapBuffer.masterCmdBuffer = masterCmd;
+      swapBuffer.endOfFrameFence = mGraphics.CreateFence( {} );
+      swapBuffer.firstUse = true;
       mSwapchainBuffer.emplace_back( swapBuffer );
     }
 
     return true;
   }
 
-  void PrepareFramebuffers()
-  {
-    /*
-     * After creating the new swapchain we need to make sure
-     * the layout of images is correct to start with. To do so
-     * we will wait till the whole device is idle ( there should
-     * be a mechanism preventing from using the GPU past that point )
-     * and submit pipeline barriers setting up the layouts of
-     * all framebuffer images in one go. There will be no fancy
-     * synchronisation here as it's not really needed at this point.
-     * Waiting for queue or device idle should be enough.
-     */
-
-    const auto& device    = mGraphics.GetDevice();
-
-    device.waitIdle();
-
-    /*
-     * Create temporary command pool
-     */
-    auto cmdBuffer   = mGraphics.CreateCommandBuffer( true );
-
-    std::vector<vk::ImageMemoryBarrier> barriers;
-    RefCountedImageView                        depthStencilImage{};
-
-    for( auto&& buffer : mSwapchainBuffer )
-    {
-      auto colorImages = buffer.framebuffer->GetAttachments( Framebuffer::AttachmentType::COLOR );
-
-      // expecting to use one depth stencil image for all swapbuffers
-      if( !depthStencilImage )
-      {
-        depthStencilImage = buffer.framebuffer->GetAttachment( Framebuffer::AttachmentType::DEPTH_STENCIL, 0u );
-      }
-
-      /*
-       * Add barriers for color images
-       */
-      for( auto&& colorImageView : colorImages )
-      {
-        auto image   = colorImageView->GetImage();
-        auto vkImage = image->GetVkHandle();
-
-        vk::ImageSubresourceRange range;
-        range.setLayerCount( image->GetLayerCount() )
-          .setLevelCount( image->GetMipLevelCount() )
-          .setBaseMipLevel( 0 )
-          .setBaseArrayLayer( 0 )
-          .setAspectMask( vk::ImageAspectFlagBits::eColor );
-        auto colorBarrier = vk::ImageMemoryBarrier{}
-                              .setImage( vkImage )
-                              .setSubresourceRange( range )
-                              .setSrcAccessMask( vk::AccessFlags{} )
-                              .setDstAccessMask( vk::AccessFlags{} )
-                              .setOldLayout( vk::ImageLayout::eUndefined )
-                              .setNewLayout( vk::ImageLayout::eColorAttachmentOptimal );
-
-        barriers.emplace_back( colorBarrier );
-      }
-    }
-
-    /*
-     * Add barrier for depth stencil image
-     */
-    if( depthStencilImage )
-    {
-      auto image   = depthStencilImage->GetImage();
-      auto vkImage = image->GetVkHandle();
-
-      vk::ImageSubresourceRange range;
-      range.setLayerCount( image->GetLayerCount() )
-        .setLevelCount( image->GetMipLevelCount() )
-        .setBaseMipLevel( 0 )
-        .setBaseArrayLayer( 0 )
-        .setAspectMask( vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil );
-      auto depthStencilBarrier = vk::ImageMemoryBarrier{}
-                                   .setImage( vkImage )
-                                   .setSubresourceRange( range )
-                                   .setSrcAccessMask( vk::AccessFlags{} )
-                                   .setDstAccessMask( vk::AccessFlags{} )//vk::AccessFlagBits::eDepthStencilAttachmentWrite )
-                                   .setOldLayout( vk::ImageLayout::eUndefined )
-                                   .setNewLayout( vk::ImageLayout::eDepthStencilAttachmentOptimal );
-      barriers.emplace_back( depthStencilBarrier );
-    }
-
-    /*
-     * Record command buffer with pipeline barrier
-     */
-    cmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
-    cmdBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe,
-                                vk::PipelineStageFlagBits::eTopOfPipe,
-                                vk::DependencyFlags{},
-                                std::vector<vk::MemoryBarrier>{},
-                                std::vector<vk::BufferMemoryBarrier>{},
-                                barriers );
-    cmdBuffer->End();
-
-    // use presentation queue to submit the call
-    auto submissionData = SubmissionData{}.SetCommandBuffers({ cmdBuffer });
-    mGraphics.Submit( mQueue, { submissionData }, RefCountedFence{} );
-    mGraphics.QueueWaitIdle( mQueue ); //TODO: Use a fence. Wait idle is bad
-  }
-
   bool SetImageFormat()
   {
     // obtain supported image format
-    auto formats          = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceFormatsKHR( mSurface->GetSurfaceKHR() ) );
+    auto formats = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceFormatsKHR( mSurface->GetSurfaceKHR() ) );
     mSwapchainImageFormat = vk::Format::eUndefined;
 
     for( auto&& format : formats )
     {
       if( format.format != vk::Format::eUndefined )
       {
-        mSwapchainColorSpace  = format.colorSpace;
+        mSwapchainColorSpace = format.colorSpace;
         mSwapchainImageFormat = format.format;
         break;
       }
@@ -274,7 +171,7 @@ struct Swapchain::Impl
    */
   bool Create()
   {
-    const auto& device    = mGraphics.GetDevice();
+    const auto& device = mGraphics.GetDevice();
     const auto& allocator = mGraphics.GetAllocator();
 
     //@todo validation
@@ -325,14 +222,13 @@ struct Swapchain::Impl
    */
   RefCountedImageView CreateDepthStencil()
   {
-    //TODO: create the image using the Graphics class
     auto imageCreateInfo = vk::ImageCreateInfo{}
             .setFormat( vk::Format::eD24UnormS8Uint )
             .setMipLevels( 1 )
             .setTiling( vk::ImageTiling::eOptimal )
             .setImageType( vk::ImageType::e2D )
             .setArrayLayers( 1 )
-            .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
+            .setExtent( { mSwapchainExtent.width, mSwapchainExtent.height, 1 } )
             .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
             .setSharingMode( vk::SharingMode::eExclusive )
             .setInitialLayout( vk::ImageLayout::eUndefined )
@@ -348,8 +244,7 @@ struct Swapchain::Impl
     mGraphics.BindImageMemory( dsRefCountedImage, memory, 0 );
 
     // create imageview to be used within framebuffer
-    auto dsImageViewRef = mGraphics.CreateImageView(dsRefCountedImage);
-    return dsImageViewRef;
+    return mGraphics.CreateImageView( dsRefCountedImage );
   }
 
   /**
@@ -359,6 +254,7 @@ struct Swapchain::Impl
    */
   RefCountedFramebuffer CreateFramebuffer( vk::Image& image )
   {
+    //TODO: Create the Framebuffer using the graphics class
     auto fbRef = Framebuffer::New( mGraphics, mSwapchainExtent.width, mSwapchainExtent.height );
 
     auto imageCreateInfo = vk::ImageCreateInfo{}
@@ -367,7 +263,7 @@ struct Swapchain::Impl
             .setInitialLayout( vk::ImageLayout::eUndefined )
             .setSharingMode( vk::SharingMode::eExclusive )
             .setUsage( vk::ImageUsageFlagBits::eColorAttachment )
-            .setExtent( {mSwapchainExtent.width, mSwapchainExtent.height, 1} )
+            .setExtent( { mSwapchainExtent.width, mSwapchainExtent.height, 1 } )
             .setArrayLayers( 1 )
             .setImageType( vk::ImageType::e2D )
             .setTiling( vk::ImageTiling::eOptimal )
@@ -379,7 +275,7 @@ struct Swapchain::Impl
     auto refCountedImage = Image::NewFromExternal( mGraphics, imageCreateInfo, image );
 
     // Create basic imageview ( all mipmaps, all layers )
-    auto refCountedImageView = mGraphics.CreateImageView(refCountedImage);
+    auto refCountedImageView = mGraphics.CreateImageView( refCountedImage );
 
     fbRef->SetAttachment( refCountedImageView, Framebuffer::AttachmentType::COLOR, 0u );
 
@@ -388,124 +284,36 @@ struct Swapchain::Impl
 
   /**
    * This function acquires next framebuffer
-   * @todo we should rather use roundrobin method
+   * @todo we should rather use round robin method
    * @return
    */
   RefCountedFramebuffer AcquireNextFramebuffer()
   {
-    const auto& device    = mGraphics.GetDevice();
+    const auto& device = mGraphics.GetDevice();
 
     if( !mFrameFence )
     {
-      mFrameFence = mGraphics.CreateFence({});
+      mFrameFence = mGraphics.CreateFence( {} );
     }
 
     mCurrentBufferIndex =
-      VkAssert( device.acquireNextImageKHR( mSwapchainKHR, 1000000, nullptr, mFrameFence->GetVkHandle() ) );
+            VkAssert( device.acquireNextImageKHR( mSwapchainKHR, 1000000, nullptr, mFrameFence->GetVkHandle() ) );
 
-    mGraphics.WaitForFence(mFrameFence);
-    mGraphics.ResetFence(mFrameFence);
+    mGraphics.WaitForFence( mFrameFence );
+    mGraphics.ResetFence( mFrameFence );
 
     auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
     // start recording
     auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
-      .setFramebuffer(swapBuffer.framebuffer->GetVkHandle() )
-      .setRenderPass(swapBuffer.framebuffer->GetRenderPassVkHandle())
-      .setSubpass( 0 );
+            .setFramebuffer( swapBuffer.framebuffer->GetVkHandle() )
+            .setRenderPass( swapBuffer.framebuffer->GetRenderPassVkHandle() )
+            .setSubpass( 0 );
 
     swapBuffer.masterCmdBuffer->Reset();
     swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
 
-    // change layout from present to color attachment if not done yet
-    // ( swapchain must track that )
-    if(!swapBuffer.firstUse)
-    {
-      UpdateLayoutPresentToColorAttachment(swapBuffer);
-    }
-    swapBuffer.firstUse = false;
-
     return swapBuffer.framebuffer;
-  }
-
-  void BeginPrimaryRenderPass()
-  {
-    auto& currentBuffer = mSwapchainBuffer[mCurrentBufferIndex];
-
-    vk::RenderPassBeginInfo rpInfo{};
-    rpInfo.setRenderPass(currentBuffer.framebuffer->GetRenderPassVkHandle() )
-      .setFramebuffer(currentBuffer.framebuffer->GetVkHandle() )
-      .setPClearValues( currentBuffer.framebuffer->GetDefaultClearValues().data() )
-      .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) )
-      .setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) );
-
-    currentBuffer.masterCmdBuffer->BeginRenderPass( rpInfo, vk::SubpassContents::eSecondaryCommandBuffers );
-  }
-
-  void BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors )
-  {
-    auto& currentBuffer = mSwapchainBuffer[mCurrentBufferIndex];
-
-    vk::RenderPassBeginInfo rpInfo{};
-
-    auto newColors = currentBuffer.framebuffer->GetDefaultClearValues();
-    newColors[0].color.setFloat32( { colors[0][0],
-                                     colors[0][1],
-                                     colors[0][2],
-                                     colors[0][3]
-                                   } );
-
-    rpInfo.setRenderArea( vk::Rect2D( {0, 0}, mSurface->GetSize() ) )
-          .setRenderPass( currentBuffer.framebuffer->GetRenderPassVkHandle() )
-          .setFramebuffer( currentBuffer.framebuffer->GetVkHandle() )
-          .setPClearValues( newColors.data() )
-          .setClearValueCount( U32( currentBuffer.framebuffer->GetDefaultClearValues().size() ) );
-
-    currentBuffer.masterCmdBuffer->BeginRenderPass( rpInfo, vk::SubpassContents::eSecondaryCommandBuffers );
-  }
-
-  void EndPrimaryRenderPass( SwapchainBuffer& currentBuffer )
-  {
-    currentBuffer.masterCmdBuffer->EndRenderPass();
-  }
-
-  /**
-   * Performs layout transition for all the color attachments
-   * in the current framebuffer.
-   * The master command buffer must be in the recording state
-   * @param swapBuffer
-   */
-  void UpdateLayoutPresentToColorAttachment( SwapchainBuffer& swapBuffer )
-  {
-    auto& cmdBuf = swapBuffer.masterCmdBuffer;
-
-    //todo: test the state of th ebuffer, must be recording
-
-    auto attachments = swapBuffer.framebuffer->GetAttachments( Framebuffer::AttachmentType::COLOR );
-
-    std::vector<vk::ImageMemoryBarrier> barriers;
-    vk::ImageMemoryBarrier              barrier;
-    barrier
-      .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eColorAttachmentRead )
-      .setDstAccessMask( vk::AccessFlagBits::eShaderWrite )
-      .setOldLayout( vk::ImageLayout::ePresentSrcKHR )
-      .setNewLayout( vk::ImageLayout::eColorAttachmentOptimal )
-      .setSubresourceRange( vk::ImageSubresourceRange{}.setAspectMask( vk::ImageAspectFlagBits::eColor ).setBaseArrayLayer(0)
-                                                       .setBaseMipLevel(0)
-                                                       .setLevelCount(1)
-                                                       .setLayerCount(1));
-
-    for( auto&& imageView : attachments )
-    {
-      barriers.emplace_back( barrier.setImage( imageView->GetImage()->GetVkHandle() ) );
-    }
-
-    cmdBuf->PipelineBarrier( vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                             vk::PipelineStageFlagBits::eFragmentShader,
-                             vk::DependencyFlags{},
-                             std::vector<vk::MemoryBarrier>{},
-                             std::vector<vk::BufferMemoryBarrier>{},
-                             barriers );
   }
 
   RefCountedCommandBuffer GetPrimaryCommandBuffer() const
@@ -521,11 +329,11 @@ struct Swapchain::Impl
     swapBuffer.masterCmdBuffer->End();
 
     // submit
-    mGraphics.ResetFence(swapBuffer.endOfFrameFence);
+    mGraphics.ResetFence( swapBuffer.endOfFrameFence );
 
-    auto submissionData = SubmissionData{}.SetCommandBuffers({ swapBuffer.masterCmdBuffer });
+    auto submissionData = SubmissionData{}.SetCommandBuffers( { swapBuffer.masterCmdBuffer } );
 
-    mGraphics.Submit( mQueue, { std::move(submissionData) } , swapBuffer.endOfFrameFence );
+    mGraphics.Submit( mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
 
     mGraphics.WaitForFence( swapBuffer.endOfFrameFence );
 
@@ -533,11 +341,11 @@ struct Swapchain::Impl
     vk::PresentInfoKHR presentInfo{};
     vk::Result result;
     presentInfo.setPImageIndices( &mCurrentBufferIndex )
-      .setPResults( &result )
-      .setPSwapchains( &mSwapchainKHR )
-      .setSwapchainCount( 1 )
-      .setPWaitSemaphores( nullptr )
-      .setWaitSemaphoreCount( 0 );
+               .setPResults( &result )
+               .setPSwapchains( &mSwapchainKHR )
+               .setSwapchainCount( 1 )
+               .setPWaitSemaphores( nullptr )
+               .setWaitSemaphoreCount( 0 );
 
     mGraphics.Present( mQueue, presentInfo );
 
@@ -548,16 +356,16 @@ struct Swapchain::Impl
 
   // same as present but additionally waits for semaphores
   // needed when present queue is different from graphics queue
-  bool Present( std::vector<vk::Semaphore> semaphores )
+  bool Present( const std::vector< vk::Semaphore >& semaphores )
   {
     vk::PresentInfoKHR presentInfo{};
-    vk::Result         result{};
+    vk::Result result{};
     presentInfo.setPImageIndices( &mCurrentBufferIndex )
-      .setPResults( &result )
-      .setPSwapchains( &mSwapchainKHR )
-      .setSwapchainCount( 1 )
-      .setPWaitSemaphores( nullptr )
-      .setWaitSemaphoreCount( 0 );
+               .setPResults( &result )
+               .setPSwapchains( &mSwapchainKHR )
+               .setSwapchainCount( 1 )
+               .setPWaitSemaphores( nullptr )
+               .setWaitSemaphoreCount( 0 );
 
     mGraphics.Present( mQueue, presentInfo );
 
@@ -567,8 +375,8 @@ struct Swapchain::Impl
   }
 
   Swapchain& mOwner;
-  Graphics&  mGraphics;
-  Queue&     mQueue;
+  Graphics& mGraphics;
+  Queue& mQueue;
   RefCountedSurface mSurface;
 
   uint32_t mBufferCount;
@@ -578,16 +386,16 @@ struct Swapchain::Impl
   RefCountedFence mFrameFence;
 
   // swapchain framebuffers
-  std::vector<RefCountedFramebuffer> mFramebuffers;
+  std::vector< RefCountedFramebuffer > mFramebuffers;
 
-  vk::SwapchainKHR           mSwapchainKHR;
+  vk::SwapchainKHR mSwapchainKHR;
   vk::SwapchainCreateInfoKHR mSwapchainCreateInfoKHR;
 
-  vk::Format        mSwapchainImageFormat;
+  vk::Format mSwapchainImageFormat;
   vk::ColorSpaceKHR mSwapchainColorSpace;
-  vk::Extent2D      mSwapchainExtent;
+  vk::Extent2D mSwapchainExtent;
 
-  std::vector<SwapchainBuffer> mSwapchainBuffer;
+  std::vector< SwapchainBuffer > mSwapchainBuffer;
 
   bool mFirstPresent;
 };
@@ -596,7 +404,7 @@ struct Swapchain::Impl
  * Swapchain API
  */
 RefCountedSwapchain Swapchain::New(
-  Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
+        Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
 {
   auto retval = RefCountedSwapchain( new Swapchain( graphics, presentationQueue, surface, bufferCount, flags ) );
 
@@ -609,12 +417,13 @@ RefCountedSwapchain Swapchain::New(
 }
 
 Swapchain::Swapchain(
-  Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
+        Graphics& graphics, Queue& presentationQueue, RefCountedSurface surface, uint8_t bufferCount, uint32_t flags )
 {
-  mImpl = std::make_unique<Impl>( *this, graphics, presentationQueue, surface, bufferCount, flags );
+  mImpl = std::make_unique< Impl >( *this, graphics, presentationQueue, surface, bufferCount, flags );
 }
 
-Swapchain::Swapchain()  = default;
+Swapchain::Swapchain() = default;
+
 Swapchain::~Swapchain() = default;
 
 RefCountedFramebuffer Swapchain::GetCurrentFramebuffer() const
@@ -637,7 +446,7 @@ void Swapchain::Present()
   mImpl->Present();
 }
 
-void Swapchain::Present( std::vector<vk::Semaphore> waitSemaphores )
+void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
 {
   mImpl->Present( waitSemaphores );
 }
@@ -647,14 +456,20 @@ RefCountedCommandBuffer Swapchain::GetPrimaryCommandBuffer() const
   return mImpl->GetPrimaryCommandBuffer();
 }
 
-void Swapchain::BeginPrimaryRenderPass()
+bool Swapchain::Destroy()
 {
-  mImpl->BeginPrimaryRenderPass( );
-}
+  auto& graphics = mImpl->mGraphics;
+  auto device = graphics.GetDevice();
+  auto swapchain = mImpl->mSwapchainKHR;
+  auto allocator = &graphics.GetAllocator();
 
-void Swapchain::BeginPrimaryRenderPass( std::vector<std::array<float,4>> colors )
-{
-  mImpl->BeginPrimaryRenderPass( colors );
+  graphics.DiscardResource( [ device, swapchain, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: swap chain->%p\n",
+                   static_cast< void* >(swapchain) )
+    device.destroySwapchainKHR( swapchain, allocator );
+  } );
+
+  return false;
 }
 
 

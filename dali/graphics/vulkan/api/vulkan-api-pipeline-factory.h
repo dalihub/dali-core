@@ -33,8 +33,11 @@ class Graphics;
 namespace VulkanAPI
 {
 class Controller;
+
 class Pipeline;
+
 class PipelineCache;
+
 /**
  * @brief Interface class for ShaderFactory types in the graphics API.
  */
@@ -65,18 +68,18 @@ public:
   // To be called when getting new factory
   void Reset();
 
-  std::unique_ptr<API::Pipeline> Create() const override;
+  std::unique_ptr< API::Pipeline > Create() const override;
 
   uint32_t GetHashCode() const;
 
   struct Info
   {
-    API::DepthStencilState  depthStencilState;
-    API::ColorBlendState    colorBlendState;
-    API::ShaderState        shaderState;
-    API::ViewportState      viewportState;
+    API::DepthStencilState depthStencilState;
+    API::ColorBlendState colorBlendState;
+    API::ShaderState shaderState;
+    API::ViewportState viewportState;
     API::RasterizationState rasterizationState;
-    API::VertexInputState   vertexInputState;
+    API::VertexInputState vertexInputState;
     API::InputAssemblyState inputAssemblyState;
   };
 
@@ -87,12 +90,12 @@ public:
 
 public:
 
-  Info                              mInfo;
-  Controller&                       mController;
-  Vulkan::Graphics&                 mGraphics;
-  VulkanAPI::PipelineCache*         mPipelineCache;
-  VulkanAPI::Pipeline*              mBasePipeline;
-  mutable uint32_t                  mHashCode;
+  Info mInfo;
+  Controller& mController;
+  Vulkan::Graphics& mGraphics;
+  VulkanAPI::PipelineCache* mPipelineCache;
+  VulkanAPI::Pipeline* mBasePipeline;
+  mutable uint32_t mHashCode;
 };
 
 } // namespace API

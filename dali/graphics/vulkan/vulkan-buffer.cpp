@@ -20,6 +20,7 @@
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 #include <utility>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -30,7 +31,7 @@ namespace Vulkan
 
 RefCountedBuffer Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
 {
-  return RefCountedBuffer(new Buffer(graphics, info));
+  return RefCountedBuffer( new Buffer( graphics, info ) );
 }
 
 const Buffer& Buffer::ConstRef()
@@ -45,9 +46,9 @@ Buffer& Buffer::Ref()
 
 Buffer::Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo )
         : VkManaged(),
-          mGraphics(&graphics),
-          mDeviceMemory(nullptr),
-          mInfo(createInfo)
+          mGraphics( &graphics ),
+          mDeviceMemory( nullptr ),
+          mInfo( createInfo )
 {
 }
 
@@ -75,8 +76,8 @@ vk::Buffer Buffer::GetVkHandle() const
 
 void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
 {
-  assert(mBuffer && "Buffer not initialised!");
-  VkAssert(mGraphics->GetDevice().bindBufferMemory(mBuffer, (*handle), 0));
+  assert( mBuffer && "Buffer not initialised!" );
+  VkAssert( mGraphics->GetDevice().bindBufferMemory( mBuffer, ( *handle ), 0 ) );
   mDeviceMemory = handle;
 }
 
@@ -91,11 +92,10 @@ bool Buffer::OnDestroy()
   auto buffer = mBuffer;
   auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [device, buffer, allocator]() {
-#ifndef NDEBUG
-    printf("Invoking BUFFER deleter function\n");
-#endif
-    device.destroyBuffer(buffer, allocator);
+  mGraphics->DiscardResource( [ device, buffer, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: buffer->%p\n",
+                   static_cast< void* >(buffer) )
+    device.destroyBuffer( buffer, allocator );
   } );
 
   return false;

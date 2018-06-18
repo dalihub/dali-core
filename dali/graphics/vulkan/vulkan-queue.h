@@ -57,18 +57,23 @@ class Queue
 {
 public:
   Queue() = delete;
-  Queue(Graphics& graphics, vk::Queue queue, uint32_t queueFamilyIndex, uint32_t queueIndex,
-        vk::QueueFlags queueFlags);
+
+  Queue( Graphics& graphics,
+         vk::Queue queue,
+         uint32_t queueFamilyIndex,
+         uint32_t queueIndex,
+         vk::QueueFlags queueFlags );
+
   ~Queue(); // queues are non-destructible
 
   vk::Queue GetVkHandle();
 
 private:
-  Graphics&                  mGraphics;
-  vk::Queue                  mQueue;
-  vk::QueueFlags             mFlags;
-  uint32_t                   mQueueFamilyIndex;
-  uint32_t                   mQueueIndex;
+  Graphics& mGraphics;
+  vk::Queue mQueue;
+  vk::QueueFlags mFlags;
+  uint32_t mQueueFamilyIndex;
+  uint32_t mQueueIndex;
 };
 
 } // namespace Vulkan

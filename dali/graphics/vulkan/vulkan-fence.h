@@ -29,6 +29,7 @@ namespace Vulkan
 {
 
 class Graphics;
+
 class Fence : public VkManaged
 {
 public:

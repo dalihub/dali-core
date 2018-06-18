@@ -27,6 +27,7 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+
 class GpuMemoryBlock;
 
 class Buffer : public VkManaged
@@ -87,7 +88,8 @@ public:
   bool OnDestroy() override;
 
   Buffer( const Buffer& ) = delete;
-  Buffer& operator =( const Buffer& ) = delete;
+
+  Buffer& operator=( const Buffer& ) = delete;
 
   operator vk::Buffer*();
 
@@ -102,10 +104,10 @@ private:
   Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo );
 
 private:
-  Graphics*                             mGraphics;
-  RefCountedGpuMemoryBlock              mDeviceMemory;
-  vk::BufferCreateInfo                  mInfo;
-  vk::Buffer                            mBuffer;
+  Graphics* mGraphics;
+  RefCountedGpuMemoryBlock mDeviceMemory;
+  vk::BufferCreateInfo mInfo;
+  vk::Buffer mBuffer;
 };
 
 

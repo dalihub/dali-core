@@ -18,6 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-sampler.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -41,8 +42,8 @@ RefCountedSampler Sampler::New( Graphics& graphics, const vk::SamplerCreateInfo&
 }
 
 Sampler::Sampler( Graphics& graphics, const vk::SamplerCreateInfo& createInfo )
-        : mGraphics(&graphics),
-          mCreateInfo(createInfo)
+        : mGraphics( &graphics ),
+          mCreateInfo( createInfo )
 {
 }
 
@@ -159,8 +160,9 @@ bool Sampler::OnDestroy()
   auto sampler = mSampler;
   auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [device, sampler, allocator]() {
-    printf("Invoking SAMPLER deleter function\n");
+  mGraphics->DiscardResource( [ device, sampler, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: sampler->%p\n",
+                   static_cast< void* >(sampler) )
     device.destroySampler( sampler, allocator );
   } );
 

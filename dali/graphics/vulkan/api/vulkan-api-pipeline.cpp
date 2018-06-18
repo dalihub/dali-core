@@ -32,7 +32,7 @@ Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const Pi
   mPipelineImpl = new Internal::Pipeline( graphics, controller, factory );
 
   // ownership on the implementation is given away to cache
-  factory->mPipelineCache->SavePipeline( *factory, std::unique_ptr<Internal::Pipeline>( mPipelineImpl ) );
+  factory->mPipelineCache->SavePipeline( *factory, std::unique_ptr< Internal::Pipeline >( mPipelineImpl ) );
 
   mPipelineImpl->Reference();
 }
@@ -43,7 +43,7 @@ Pipeline::~Pipeline()
 }
 
 Pipeline::Pipeline( Internal::Pipeline* impl ) :
-mPipelineImpl( impl )
+        mPipelineImpl( impl )
 {
   mPipelineImpl->Reference();
 }
@@ -53,7 +53,7 @@ Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
   return mPipelineImpl->GetVkPipeline();
 }
 
-const std::vector<vk::DescriptorSetLayout>& Pipeline::GetVkDescriptorSetLayouts() const
+const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mPipelineImpl->GetVkDescriptorSetLayouts();
 }

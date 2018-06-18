@@ -27,6 +27,7 @@
 #include <dali/graphics/vulkan/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/vulkan-surface.h>
 #include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -45,7 +46,7 @@ CommandBuffer::CommandBuffer( CommandPool& commandPool,
                               const vk::CommandBufferAllocateInfo& allocateInfo,
                               vk::CommandBuffer vulkanHandle )
         : mOwnerCommandPool( &commandPool ),
-          mGraphics( &mOwnerCommandPool->GetGraphics()),
+          mGraphics( &mOwnerCommandPool->GetGraphics() ),
           mPoolAllocationIndex( poolIndex ),
           mAllocateInfo( allocateInfo ),
           mCommandBuffer( vulkanHandle )
@@ -71,11 +72,11 @@ void CommandBuffer::Begin( vk::CommandBufferUsageFlags usageFlags,
     // Render pass is obtained from the default framebuffer
     // it's a legacy but little nicer
     auto swapchain = mGraphics->GetSwapchainForFBID( 0u );
-    inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPassVkHandle());
+    inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPassVkHandle() );
     info.setPInheritanceInfo( &inheritance );
   }
 
-  VkAssert( mCommandBuffer.begin( info ));
+  VkAssert( mCommandBuffer.begin( info ) );
 
   mRecording = true;
 }
@@ -84,7 +85,7 @@ void CommandBuffer::Begin( vk::CommandBufferUsageFlags usageFlags,
 void CommandBuffer::End()
 {
   assert( mRecording && "CommandBuffer is not in the recording state!" );
-  VkAssert( mCommandBuffer.end());
+  VkAssert( mCommandBuffer.end() );
   mRecording = false;
 }
 
@@ -120,10 +121,10 @@ void CommandBuffer::BindVertexBuffers( uint32_t firstBinding,
 {
   // update list of used resources and create an array of VkBuffers
   std::vector< vk::Buffer > vkBuffers;
-  vkBuffers.reserve( buffers.size());
+  vkBuffers.reserve( buffers.size() );
   for( auto&& buffer : buffers )
   {
-    vkBuffers.emplace_back( buffer->GetVkHandle());
+    vkBuffers.emplace_back( buffer->GetVkHandle() );
   }
 
   mCommandBuffer.bindVertexBuffers( firstBinding, bindingCount, vkBuffers.data(), pOffsets );
@@ -132,8 +133,8 @@ void CommandBuffer::BindVertexBuffers( uint32_t firstBinding,
 void CommandBuffer::BindIndexBuffer( RefCountedBuffer buffer, uint32_t offset, vk::IndexType indexType )
 {
   // validate
-  assert(( buffer->GetUsage() & vk::BufferUsageFlagBits::eIndexBuffer ) &&
-         "The buffer used as index buffer has wrong usage flags!" );
+  assert( ( buffer->GetUsage() & vk::BufferUsageFlagBits::eIndexBuffer ) &&
+          "The buffer used as index buffer has wrong usage flags!" );
 
   mCommandBuffer.bindIndexBuffer( buffer->GetVkHandle(), offset, indexType );
 }
@@ -148,7 +149,7 @@ void CommandBuffer::BindVertexBuffer( uint32_t binding,
 void CommandBuffer::BindGraphicsPipeline( Handle< Pipeline > pipeline )
 {
   mCurrentPipeline = pipeline;
-  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkHandle());
+  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkHandle() );
 }
 
 void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
@@ -158,10 +159,10 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
 {
   // update resources
   std::vector< vk::DescriptorSet > vkSets;
-  vkSets.reserve( descriptorSets.size());
+  vkSets.reserve( descriptorSets.size() );
   for( auto&& set : descriptorSets )
   {
-    vkSets.emplace_back( set->GetVkDescriptorSet());
+    vkSets.emplace_back( set->GetVkDescriptorSet() );
   }
 
   // TODO: support dynamic offsets
@@ -174,12 +175,11 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
                                      nullptr );
 }
 
-//TODO: Fix this. It looks wrong.
 void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
                                         uint32_t firstSet )
 {
   BindDescriptorSets(
-          descriptorSets, mCurrentPipeline, 0, static_cast<uint32_t>( descriptorSets.size()));
+          descriptorSets, mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
 }
 
 void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
@@ -209,11 +209,11 @@ void CommandBuffer::BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   auto clearValues = frameBuffer->GetDefaultClearValues();
 
   auto info = vk::RenderPassBeginInfo{};
-  info.setFramebuffer( frameBuffer->GetVkHandle());
+  info.setFramebuffer( frameBuffer->GetVkHandle() );
   info.setRenderPass( renderPass );
-  info.setClearValueCount( U32( clearValues.size()));
-  info.setPClearValues( clearValues.data());
-  info.setRenderArea( vk::Rect2D( { 0, 0 }, surface->GetSize()));
+  info.setClearValueCount( U32( clearValues.size() ) );
+  info.setPClearValues( clearValues.data() );
+  info.setRenderArea( vk::Rect2D( { 0, 0 }, surface->GetSize() ) );
 
   mCurrentRenderPass = renderPass;
   mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );
@@ -231,33 +231,36 @@ void CommandBuffer::EndRenderPass()
   mCommandBuffer.endRenderPass();
 }
 
-void CommandBuffer::ExecuteCommands( const std::vector<Dali::Graphics::Vulkan::Handle<CommandBuffer>>& commandBuffers, uint32_t offset, uint32_t count )
+void CommandBuffer::ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers,
+                                     uint32_t offset, uint32_t count )
 {
   assert( mAllocateInfo.level == vk::CommandBufferLevel::ePrimary
-          && "Cannot record command: ExecuteCommands\tReason: The command buffer recording this command is not primary" );
+          &&
+          "Cannot record command: ExecuteCommands\tReason: The command buffer recording this command is not primary" );
 
   auto vkBuffers = std::vector< vk::CommandBuffer >{};
-  vkBuffers.reserve( commandBuffers.size());
+  vkBuffers.reserve( commandBuffers.size() );
 
   auto iter = commandBuffers.begin();
-  std::advance(iter, offset);
+  std::advance( iter, offset );
 
   for( uint32_t i = 0; i < count; ++i )
   {
     const auto& buf = *iter;
-    assert(buf->mAllocateInfo.level == vk::CommandBufferLevel::eSecondary &&
-           "Cannot record command: Execute Commands\tReason: A command buffer provided for execution is not secondary" );
+    assert( buf->mAllocateInfo.level == vk::CommandBufferLevel::eSecondary &&
+            "Cannot record command: Execute Commands\tReason: A command buffer provided for execution is not secondary" );
 
-    vkBuffers.emplace_back( buf->GetVkHandle());
+    vkBuffers.emplace_back( buf->GetVkHandle() );
     ++iter;
   }
 
   mCommandBuffer.executeCommands( vkBuffers );
 }
 
-void CommandBuffer::ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers )
+void
+CommandBuffer::ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers )
 {
-  ExecuteCommands( commandBuffers, 0, uint32_t(commandBuffers.size()) );
+  ExecuteCommands( commandBuffers, 0, uint32_t( commandBuffers.size() ) );
 }
 
 void CommandBuffer::PipelineBarrier( vk::PipelineStageFlags srcStageMask,
@@ -284,125 +287,6 @@ void CommandBuffer::CopyBufferToImage( RefCountedBuffer srcBuffer,
                                     dstImage->GetVkHandle(),
                                     dstLayout,
                                     regions );
-}
-
-vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( RefCountedImage image,
-                                                                    vk::AccessFlags srcAccessMask,
-                                                                    vk::AccessFlags dstAccessMask,
-                                                                    vk::ImageLayout oldLayout,
-                                                                    vk::ImageLayout newLayout,
-                                                                    vk::ImageAspectFlags aspectMask ) const
-{
-  return vk::ImageMemoryBarrier{}
-          .setNewLayout( newLayout )
-          .setImage( image->GetVkHandle())
-          .setOldLayout( oldLayout )
-          .setSrcAccessMask( srcAccessMask )
-          .setDstAccessMask( dstAccessMask )
-          .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask,
-                                                           0,
-                                                           image->GetMipLevelCount(),
-                                                           0,
-                                                           image->GetLayerCount() } );
-
-}
-
-vk::ImageMemoryBarrier CommandBuffer::ImageLayoutTransitionBarrier( RefCountedImage image,
-                                                                    vk::ImageLayout oldLayout,
-                                                                    vk::ImageLayout newLayout,
-                                                                    vk::ImageAspectFlags aspectMask ) const
-{
-
-  vk::AccessFlags srcAccessMask, dstAccessMask;
-  vk::PipelineStageFlags srcStageMask, dstStageMask;
-
-  switch( oldLayout )
-  {
-    case vk::ImageLayout::ePreinitialized:
-    case vk::ImageLayout::eUndefined:
-    {
-      srcAccessMask = {};
-      srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
-      break;
-    }
-    case vk::ImageLayout::ePresentSrcKHR:
-    {
-      srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead;
-      srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-      break;
-    }
-    case vk::ImageLayout::eTransferSrcOptimal:
-    {
-      srcAccessMask = vk::AccessFlagBits::eMemoryRead;
-      srcStageMask = vk::PipelineStageFlagBits::eTransfer;
-      break;
-    }
-    case vk::ImageLayout::eTransferDstOptimal:
-    {
-      srcAccessMask = vk::AccessFlagBits::eMemoryWrite;
-      srcStageMask = vk::PipelineStageFlagBits::eTransfer;
-      break;
-    }
-    case vk::ImageLayout::eGeneral:
-    case vk::ImageLayout::eColorAttachmentOptimal:
-    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-    case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-    case vk::ImageLayout::eShaderReadOnlyOptimal:
-    case vk::ImageLayout::eSharedPresentKHR:
-    {
-      break;
-    }
-  }
-
-  switch( newLayout )
-  {
-    case vk::ImageLayout::ePresentSrcKHR:
-    {
-      dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-      dstStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
-      break;
-    }
-    case vk::ImageLayout::eTransferSrcOptimal:
-    {
-      dstAccessMask = vk::AccessFlagBits::eMemoryRead;
-      dstStageMask = vk::PipelineStageFlagBits::eTransfer;
-      break;
-    }
-    case vk::ImageLayout::eTransferDstOptimal:
-    {
-      dstAccessMask = vk::AccessFlagBits::eMemoryWrite;
-      dstStageMask = vk::PipelineStageFlagBits::eTransfer;
-      break;
-    }
-    case vk::ImageLayout::eShaderReadOnlyOptimal:
-    {
-      dstAccessMask = vk::AccessFlagBits::eMemoryRead;
-      dstStageMask = vk::PipelineStageFlagBits::eVertexShader;
-      break;
-    }
-    case vk::ImageLayout::eUndefined:
-    case vk::ImageLayout::eGeneral:
-    case vk::ImageLayout::eColorAttachmentOptimal:
-    case vk::ImageLayout::eDepthStencilAttachmentOptimal:
-    case vk::ImageLayout::eDepthStencilReadOnlyOptimal:
-    case vk::ImageLayout::ePreinitialized:
-    case vk::ImageLayout::eSharedPresentKHR:
-    {
-      break;
-    }
-  }
-
-  return vk::ImageMemoryBarrier{}
-          .setNewLayout( newLayout )
-          .setImage( image->GetVkHandle())
-          .setOldLayout( oldLayout )
-          .setSrcAccessMask( srcAccessMask )
-          .setDstAccessMask( dstAccessMask )
-          .setSubresourceRange( vk::ImageSubresourceRange{ aspectMask,
-                                                           0,
-                                                           image->GetMipLevelCount(),
-                                                           0,
-                                                           image->GetLayerCount() } );
 }
 
 uint32_t CommandBuffer::GetPoolAllocationIndex() const
