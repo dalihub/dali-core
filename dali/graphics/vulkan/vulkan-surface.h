@@ -48,7 +48,7 @@ public:
   /**
    * Creates surface from given factory
    */
-  bool Create();
+  bool Create( vk::Extent2D surfaceSize );
 
   /**
    *

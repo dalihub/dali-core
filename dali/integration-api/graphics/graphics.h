@@ -64,11 +64,15 @@ public:
 
 
   /**
-   * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )
+   * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode ) with window's size
    * @param surfaceFactory
+   * @param window's width
+   * @param window's height
    * @return
    */
-  Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory );
+  Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory,
+                                                                                        unsigned int width,
+                                                                                        unsigned int height);
 
   /**
    * Prerender

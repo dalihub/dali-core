@@ -40,7 +40,7 @@ struct Surface::Impl
 
   }
 
-  bool Initialise()
+  bool Initialise( vk::Extent2D surfSize )
   {
     if(!mVulkanSurfaceFactory)
     {
@@ -58,6 +58,13 @@ struct Surface::Impl
 
     auto caps = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
     mCurrentExtent = caps.currentExtent;
+
+    if (mCurrentExtent.width == static_cast<unsigned int>(-1)
+       || mCurrentExtent.height == static_cast<unsigned int>(-1))
+    {
+        mCurrentExtent.width = surfSize.width;
+        mCurrentExtent.height = surfSize.height;
+    }
 
     return true;
   }
@@ -91,9 +98,9 @@ Surface::Surface(Graphics& graphics, std::unique_ptr<SurfaceFactory> surfaceFact
 
 Surface::~Surface() = default;
 
-bool Surface::Create()
+bool Surface::Create( vk::Extent2D surfaceSize )
 {
-  return mImpl->Initialise();
+  return mImpl->Initialise( surfaceSize );
 }
 
 vk::SurfaceKHR Surface::GetSurfaceKHR() const

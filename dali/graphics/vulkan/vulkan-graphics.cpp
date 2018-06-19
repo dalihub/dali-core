@@ -207,12 +207,16 @@ void Graphics::CreateDevice()
   mResourceCache = MakeUnique< ResourceCache >();
 }
 
-FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
+FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
+                                       unsigned int width, unsigned int height )
 {
   // create surface from the factory
   auto surfaceRef = Surface::New( *this, std::move( surfaceFactory ));
+  vk::Extent2D surf_size;
+  surf_size.width = width;
+  surf_size.height = height;
 
-  if( surfaceRef->Create())
+  if( surfaceRef->Create(surf_size))
   {
 
     // map surface to FBID

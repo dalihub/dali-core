@@ -55,12 +55,14 @@ Graphics::~Graphics()
 }
 
 Dali::Graphics::FBID Graphics::Create(
-  std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory)
+  std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory,
+                                                           unsigned int width,
+                                                           unsigned int height)
 {
   //@todo do we really need to have a surface that early???
 
   // create surface
-  auto retval = mGraphicsImpl->CreateSurface(std::move(surfaceFactory));
+  auto retval = mGraphicsImpl->CreateSurface(std::move(surfaceFactory), width, height);
 
   // create device
   mGraphicsImpl->CreateDevice();
