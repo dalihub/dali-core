@@ -122,7 +122,7 @@ struct Controller::Impl
     // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    auto primaryCommandBuffer = swapchain->GetPrimaryCommandBuffer();
+    auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
 
     for( auto i = 0u; i < mRenderPasses.size(); ++i )
     {
@@ -193,7 +193,7 @@ struct Controller::Impl
     // default framebuffer. For now just substitute with surface/swapchain
     if( framebuffer != mCurrentFramebuffer )
     {
-      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID( 0 )->GetPrimaryCommandBuffer();
+      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID( 0 )->GetCurrentCommandBuffer();
 
       mCurrentFramebuffer = framebuffer;
       mCurrentFramebuffer->GetRenderPassVkHandle();

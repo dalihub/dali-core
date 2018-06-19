@@ -63,7 +63,7 @@ public:
    * Returns size of surface
    * @return
    */
-  vk::Extent2D GetSize() const;
+  vk::SurfaceCapabilitiesKHR GetCapabilities() const;
 
 private:
 

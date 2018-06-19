@@ -36,6 +36,7 @@
 #include <dali/graphics/vulkan/vulkan-resource-cache.h>
 #include <dali/graphics/vulkan/vulkan-debug.h>
 #include <dali/graphics/vulkan/vulkan-fence.h>
+#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -222,9 +223,11 @@ FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
-  auto swapchain = Swapchain::New( *this,
-                                   GetGraphicsQueue( 0u ),
-                                   surface, 3, 0 );
+  auto swapchain = CreateSwapchain( surface,
+                                    vk::Format::eB8G8R8A8Unorm,
+                                    vk::PresentModeKHR::eFifo,
+                                    3,
+                                    Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
@@ -301,6 +304,35 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
   AddBuffer( refCountedBuffer );
 
   return refCountedBuffer;
+}
+
+RefCountedFramebuffer Graphics::CreateFramebuffer( vk::Image image, vk::Format imageFormat, vk::Extent2D extent )
+{
+  auto fbRef = Framebuffer::New( *this, extent.width, extent.height );
+
+  auto imageCreateInfo = vk::ImageCreateInfo{}
+          .setFormat( imageFormat )
+          .setSamples( vk::SampleCountFlagBits::e1 )
+          .setInitialLayout( vk::ImageLayout::eUndefined )
+          .setSharingMode( vk::SharingMode::eExclusive )
+          .setUsage( vk::ImageUsageFlagBits::eColorAttachment )
+          .setExtent( { extent.width, extent.height, 1 } )
+          .setArrayLayers( 1 )
+          .setImageType( vk::ImageType::e2D )
+          .setTiling( vk::ImageTiling::eOptimal )
+          .setMipLevels( 1 );
+
+  // Create external Image reference
+  // Note that despite we don't create VkImage, we still fill the createinfo structure
+  // as this data will be used later
+  auto refCountedImage = Image::NewFromExternal( *this, imageCreateInfo, image );
+
+  // Create basic imageview ( all mipmaps, all layers )
+  auto refCountedImageView = CreateImageView( refCountedImage );
+
+  fbRef->SetAttachment( refCountedImageView, Framebuffer::AttachmentType::COLOR, 0u );
+
+  return fbRef;
 }
 
 RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
@@ -458,6 +490,239 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
   }
 
   return barrier;
+}
+
+RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
+                                               vk::Format requestedFormat,
+                                               vk::PresentModeKHR presentMode,
+                                               uint32_t bufferCount, RefCountedSwapchain oldSwapchain )
+{
+  // obtain supported image format
+  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetSurfaceKHR() ) );
+
+  vk::Format swapchainImageFormat{};
+  vk::ColorSpaceKHR swapchainColorSpace{};
+
+  // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
+  // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
+  if( supportedFormats.size() == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+  {
+    swapchainColorSpace = supportedFormats[0].colorSpace;
+    swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+  }
+  else // Try to find the requested format in the list
+  {
+    auto found = std::find_if( supportedFormats.begin(),
+                               supportedFormats.end(),
+                               [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
+                                 return requestedFormat == supportedFormat.format;
+                               } );
+
+    // If found assign it.
+    if( found != supportedFormats.end() )
+    {
+      auto surfaceFormat = *found;
+      swapchainColorSpace = surfaceFormat.colorSpace;
+      swapchainImageFormat = surfaceFormat.format;
+    }
+    else // Requested format not found...attempt to use the first one on the list
+    {
+      auto surfaceFormat = supportedFormats[0];
+      swapchainColorSpace = surfaceFormat.colorSpace;
+      swapchainImageFormat = surfaceFormat.format;
+    }
+
+  }
+
+  assert( swapchainImageFormat != vk::Format::eUndefined && "Could not find a supported swap chain image format." );
+
+  // Get the surface capabilities to determine some settings of the swap chain
+  auto surfaceCapabilities = surface->GetCapabilities();
+
+  // Determine the swap chain extent
+  auto swapchainExtent = surfaceCapabilities.currentExtent;
+
+  // If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
+  if( surfaceCapabilities.currentExtent.width == std::numeric_limits< uint32_t >::max() )
+  {
+    auto actualExtent = swapchainExtent;
+
+    actualExtent.width = std::max( surfaceCapabilities.minImageExtent.width,
+                                   std::min( surfaceCapabilities.maxImageExtent.width, actualExtent.width ) );
+
+    actualExtent.height = std::max( surfaceCapabilities.minImageExtent.height,
+                                    std::min( surfaceCapabilities.maxImageExtent.height, actualExtent.height ) );
+
+    swapchainExtent = actualExtent;
+  }
+
+  // Find a supported composite alpha format (not all devices support alpha opaque)
+  auto compositeAlpha = vk::CompositeAlphaFlagBitsKHR{};
+
+  // Simply select the first composite alpha format available
+  auto compositeAlphaFlags = std::vector< vk::CompositeAlphaFlagBitsKHR >{
+          vk::CompositeAlphaFlagBitsKHR::eOpaque,
+          vk::CompositeAlphaFlagBitsKHR::ePreMultiplied,
+          vk::CompositeAlphaFlagBitsKHR::ePostMultiplied,
+          vk::CompositeAlphaFlagBitsKHR::eInherit
+  };
+
+
+  for( const auto& compositeAlphaFlag : compositeAlphaFlags )
+  {
+
+    if( surfaceCapabilities.supportedCompositeAlpha & compositeAlphaFlag )
+    {
+      compositeAlpha = compositeAlphaFlag;
+      break;
+    }
+
+  }
+
+  // Determine the number of images
+  if( surfaceCapabilities.maxImageCount > 0 &&
+      bufferCount > surfaceCapabilities.maxImageCount )
+  {
+    bufferCount = surfaceCapabilities.maxImageCount;
+  }
+
+  // Find the transformation of the surface
+  vk::SurfaceTransformFlagBitsKHR preTransform;
+  if( surfaceCapabilities.supportedTransforms & vk::SurfaceTransformFlagBitsKHR::eIdentity )
+  {
+    // We prefer a non-rotated transform
+    preTransform = vk::SurfaceTransformFlagBitsKHR::eIdentity;
+  }
+  else
+  {
+    preTransform = surfaceCapabilities.currentTransform;
+  }
+
+
+  // Check if the requested present mode is supported
+  auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetSurfaceKHR() ).value;
+
+  auto found = std::find_if( presentModes.begin(),
+                             presentModes.end(),
+                             [ & ]( vk::PresentModeKHR mode ) {
+                               return presentMode == mode;
+                             } );
+
+  if( found == presentModes.end() )
+  {
+    // Requested present mode not supported. Default to FIFO. FIFO is always supported as per spec.
+    presentMode = vk::PresentModeKHR::eFifo;
+  }
+
+  // Creation settings have been determined. Fill in the create info struct.
+  auto swapChainCreateInfo = vk::SwapchainCreateInfoKHR{}.setSurface( surface->GetSurfaceKHR() )
+                                                         .setPreTransform( preTransform )
+                                                         .setPresentMode( presentMode )
+                                                         .setOldSwapchain( oldSwapchain ? oldSwapchain->GetVkHandle()
+                                                                                        : vk::SwapchainKHR{} )
+                                                         .setMinImageCount( bufferCount )
+                                                         .setImageUsage( vk::ImageUsageFlagBits::eColorAttachment )
+                                                         .setImageSharingMode( vk::SharingMode::eExclusive )
+                                                         .setImageArrayLayers( 1 )
+                                                         .setImageColorSpace( swapchainColorSpace )
+                                                         .setImageFormat( swapchainImageFormat )
+                                                         .setImageExtent( swapchainExtent )
+                                                         .setCompositeAlpha( compositeAlpha )
+                                                         .setClipped( static_cast<vk::Bool32>(true) )
+                                                         .setQueueFamilyIndexCount( 0 )
+                                                         .setPQueueFamilyIndices( nullptr );
+
+
+  // Create the swap chain
+  auto swapChainVkHandle = VkAssert( mDevice.createSwapchainKHR( swapChainCreateInfo, mAllocator.get() ) );
+
+  if( oldSwapchain )
+  {
+    // The old Swapchain HAS to die here
+    while( oldSwapchain->GetRefCount() > 0 )
+    {
+      oldSwapchain->Release();
+    }
+  }
+
+
+  // pull images and create Framebuffers
+  auto images = VkAssert( mDevice.getSwapchainImagesKHR( swapChainVkHandle ) );
+
+  // number of images must match requested buffering mode
+  if( images.size() != bufferCount )
+  {
+    DALI_LOG_STREAM( gVulkanFilter,
+                     Debug::General,
+                     "Swapchain creation failed: Swapchain images are less than the requested amount" );
+    mDevice.destroySwapchainKHR( swapChainVkHandle );
+    return RefCountedSwapchain();
+  }
+
+  // Create a Depth/Stencil
+
+  auto imageCreateInfo = vk::ImageCreateInfo{}
+          .setFormat( vk::Format::eD24UnormS8Uint )
+          .setMipLevels( 1 )
+          .setTiling( vk::ImageTiling::eOptimal )
+          .setImageType( vk::ImageType::e2D )
+          .setArrayLayers( 1 )
+          .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
+          .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
+          .setSharingMode( vk::SharingMode::eExclusive )
+          .setInitialLayout( vk::ImageLayout::eUndefined )
+          .setSamples( vk::SampleCountFlagBits::e1 );
+
+  auto dsRefCountedImage = CreateImage( imageCreateInfo );
+
+  auto memory = mDeviceMemoryManager->GetDefaultAllocator().Allocate( dsRefCountedImage,
+                                                                      vk::MemoryPropertyFlagBits::eDeviceLocal );
+
+  BindImageMemory( dsRefCountedImage, memory, 0 );
+
+  // create the depth stencil ImageView to be used within framebuffer
+  auto depthStencilImageView = CreateImageView( dsRefCountedImage );
+
+
+  auto framebuffers = std::vector< RefCountedFramebuffer >{};
+
+  /*
+   * CREATE FRAMEBUFFERS
+   */
+  for( auto&& image : images )
+  {
+    framebuffers.emplace_back( CreateFramebuffer( image, swapchainImageFormat, swapchainExtent ) );
+
+    // set depth/stencil if supported
+    if( depthStencilImageView )
+    {
+      framebuffers.back()->SetAttachment( depthStencilImageView, Framebuffer::AttachmentType::DEPTH_STENCIL, 0u );
+    }
+
+    // create framebuffer and compatible render pass right now, no need to defer it
+    framebuffers.back()->Commit();
+  }
+
+  auto swapChainBuffers = std::vector< SwapchainBuffer >{};
+
+  for( const auto& framebuffer : framebuffers )
+  {
+    auto masterCmd = CreateCommandBuffer( true );
+
+    auto swapBuffer = SwapchainBuffer{};
+    swapBuffer.framebuffer = framebuffer;
+    swapBuffer.index = 0;
+    swapBuffer.masterCmdBuffer = masterCmd;
+    swapBuffer.endOfFrameFence = CreateFence( {} );
+    swapChainBuffers.push_back( swapBuffer );
+  }
+
+  return Swapchain::New( *this,
+                         GetPresentQueue(),
+                         surface,
+                         swapChainBuffers,
+                         swapChainCreateInfo,
+                         swapChainVkHandle );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -946,7 +1211,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
   std::sort( familyIndexTypes.begin(), familyIndexTypes.end() );
 
   // allocate all queues from graphics family
-  auto prevQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
+  auto prevQueueFamilyIndex = std::numeric_limits< uint32_t >::max();
 
   for( const auto& familyIndex : familyIndexTypes )
   {
