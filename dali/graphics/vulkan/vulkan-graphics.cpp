@@ -244,16 +244,6 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   return swapchain;
 }
 
-RefCountedShader Graphics::CreateShader()
-{
-  NotImplemented()
-}
-
-RefCountedPipeline Graphics::CreatePipeline()
-{
-  NotImplemented()
-}
-
 RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInfo )
 {
   auto refCountedFence = Fence::New( *this );
@@ -314,11 +304,6 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
   AddBuffer( refCountedBuffer );
 
   return refCountedBuffer;
-}
-
-RefCountedFramebuffer Graphics::CreateFramebuffer()
-{
-  NotImplemented()
 }
 
 RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
@@ -391,21 +376,6 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
   AddImageView( refCountedImageView );
 
   return refCountedImageView;
-}
-
-RefCountedDescriptorPool Graphics::CreateDescriptorPool()
-{
-  NotImplemented()
-}
-
-RefCountedGpuMemoryBlock Graphics::CreateGpuMemoryBlock()
-{
-  NotImplemented()
-}
-
-RefCountedDescriptorSet Graphics::CreateDescriptorSet()
-{
-  NotImplemented()
 }
 
 RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo )

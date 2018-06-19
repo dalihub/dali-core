@@ -291,13 +291,6 @@ private:
 
 using FBID = int32_t;
 
-#define NotImplemented() \
-{\
-printf("Function %s isn't implemented!\n", __FUNCTION__);\
-assert( false && "Function no implemented" );\
-}
-
-
 enum class BufferType
 {
   VERTEX,
