@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7badc7b_d334dfa9",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-buffer.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-19T14:06:19Z",
+      "side": 1,
+      "message": "No trailing whitespace",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 10
+      },
+      "revId": "010136f353b36518736d918a2a1dd4bd2b393c6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b1b3363f_f8bd9ed3",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-19T14:06:19Z",
+      "side": 1,
+      "message": "No trailing whitespace",
+      "range": {
+        "startLine": 318,
+        "startChar": 52,
+        "endLine": 318,
+        "endChar": 53
+      },
+      "revId": "010136f353b36518736d918a2a1dd4bd2b393c6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b51b8fb0_055d843a",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-19T14:06:19Z",
+      "side": 1,
+      "message": "What\u0027s the rationale for switching?",
+      "range": {
+        "startLine": 63,
+        "startChar": 29,
+        "endLine": 63,
+        "endChar": 38
+      },
+      "revId": "010136f353b36518736d918a2a1dd4bd2b393c6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
