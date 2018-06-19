@@ -213,7 +213,7 @@ void CommandBuffer::BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   info.setRenderPass( renderPass );
   info.setClearValueCount( U32( clearValues.size() ) );
   info.setPClearValues( clearValues.data() );
-  info.setRenderArea( vk::Rect2D( { 0, 0 }, surface->GetSize() ) );
+  info.setRenderArea( vk::Rect2D( { 0, 0 }, surface->GetCapabilities().currentExtent ) );
 
   mCurrentRenderPass = renderPass;
   mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );

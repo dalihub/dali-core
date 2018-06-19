@@ -110,7 +110,9 @@ public: // Create methods
 
   RefCountedBuffer CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo );
 
-  RefCountedFramebuffer CreateFramebuffer();
+  RefCountedFramebuffer CreateFramebuffer( vk::Image image,
+                                           vk::Format imageFormat,
+                                           vk::Extent2D extent );
 
   RefCountedImage CreateImage( const vk::ImageCreateInfo& imageCreateInfo );
 
@@ -136,6 +138,10 @@ public: // Create methods
   vk::ImageMemoryBarrier CreateImageMemoryBarrier( RefCountedImage image,
                                                    vk::ImageLayout oldLayout,
                                                    vk::ImageLayout newLayout );
+
+  RefCountedSwapchain CreateSwapchain( RefCountedSurface surface, vk::Format requestedFormat,
+                                       vk::PresentModeKHR presentMode,
+                                       uint32_t bufferCount, RefCountedSwapchain oldSwapchain );
 
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );
