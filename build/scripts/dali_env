@@ -724,7 +724,7 @@ EOF
         ;
 
         # write additional pkg-config file for local Vulkan
-        open(my $file2, '>', "$dev_env_root/opt/lib/pkgconfig/vulkan-1.0.pc") or die;
+        open(my $file2, '>', "$dev_env_root/opt/lib/pkgconfig/vulkan.pc") or die;
         print $file2 $pkg_config_body;
         close( $file2 );
     }

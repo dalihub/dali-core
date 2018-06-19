@@ -11,6 +11,8 @@ Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
+BuildRequires:  Vulkan-LoaderAndValidationLayers
+BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -104,8 +106,8 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -Wl,-Bsymbolic-functions "
+CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -std=gnu++14 "
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions "
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
@@ -146,6 +148,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
       --enable-gles=%{target_gles_version} \
+      --enable-vulkan=yes \
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
@@ -185,6 +188,7 @@ make clean
       --mandir=%{_mandir} \
       --enable-cxx03-abi=yes  \
       --enable-gles=%{target_gles_version} \
+      --enable-vulkan=yes \
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
