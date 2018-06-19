@@ -70,7 +70,7 @@ struct ImageAttributes::ImageAttributesImpl
   unsigned int  width : 16;       ///< image width in pixels
   unsigned int  height : 16;      ///< image height in pixels
   ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
-  FilterMode    filtering : 3;    ///< filtering option. Box is the default
+  FilterMode    filtering : 4;    ///< filtering option. Box is the default
   bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
 };
 
