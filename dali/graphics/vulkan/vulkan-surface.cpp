@@ -57,15 +57,14 @@ struct Surface::Impl
       return false;
     }
 
-    auto caps = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
-    mCurrentExtent = caps.currentExtent;
+    mCapabilities = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
 
     return true;
   }
 
-  vk::Extent2D GetSize() const
+  vk::SurfaceCapabilitiesKHR GetCapabilities() const
   {
-    return mCurrentExtent;
+    return VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
   }
 
   Surface& mOwner;
@@ -73,7 +72,7 @@ struct Surface::Impl
   std::unique_ptr< SurfaceFactory > mSurfaceFactory;
   Dali::Integration::Graphics::Vulkan::VkSurfaceFactory* mVulkanSurfaceFactory;
   vk::SurfaceKHR mSurface;
-  vk::Extent2D mCurrentExtent;
+  vk::SurfaceCapabilitiesKHR mCapabilities;
 };
 
 /**
@@ -102,9 +101,9 @@ vk::SurfaceKHR Surface::GetSurfaceKHR() const
   return mImpl->mSurface;
 }
 
-vk::Extent2D Surface::GetSize() const
+vk::SurfaceCapabilitiesKHR Surface::GetCapabilities() const
 {
-  return mImpl->GetSize();
+  return mImpl->GetCapabilities();
 }
 
 } // namespace Vulkan

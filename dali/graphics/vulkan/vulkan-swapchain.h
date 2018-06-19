@@ -32,17 +32,40 @@ class Surface;
 class Queue;
 
 /**
+   * SwapchainBuffer stores all per-buffer data
+   */
+struct SwapchainBuffer
+{
+  /*
+   * Each buffer has own master command buffer which executes
+   * secondary buffers
+   */
+  RefCountedCommandBuffer masterCmdBuffer;
+
+  /*
+   * Framebuffer object associated with the buffer
+   */
+  RefCountedFramebuffer framebuffer;
+
+  /*
+   * Sync primitives
+   */
+  RefCountedFence endOfFrameFence;
+
+  /*
+   * Buffer index
+   */
+  uint32_t index;
+};
+
+/**
  * Creates swapchain for given surface and queue
  */
 class Swapchain : public VkManaged
 {
-public:
 
-  static RefCountedSwapchain New( Graphics& graphics,
-                                  Queue& presentationQueue,
-                                  RefCountedSurface surface,
-                                  uint8_t bufferCount,
-                                  uint32_t flags );
+  friend class Graphics;
+
 
 public:
 
@@ -64,7 +87,8 @@ public:
   RefCountedFramebuffer GetFramebuffer( uint32_t index ) const;
 
   /**
-   * Requests for next framebuffer
+   * This function acquires next framebuffer
+   * @todo we should rather use round robin method
    * @return
    */
   RefCountedFramebuffer AcquireNextFramebuffer();
@@ -74,7 +98,7 @@ public:
    * being recorded frame
    * @return
    */
-  RefCountedCommandBuffer GetPrimaryCommandBuffer() const;
+  RefCountedCommandBuffer GetCurrentCommandBuffer() const;
 
   /**
    * Presents using default present queue, asynchronously
@@ -87,7 +111,9 @@ public:
    */
   void Present( std::vector< vk::Semaphore > waitSemaphores );
 
-  bool Destroy() override;
+  bool OnDestroy() override;
+
+  vk::SwapchainKHR GetVkHandle();
 
 private:
 
@@ -96,15 +122,32 @@ private:
   Swapchain( Graphics& graphics,
              Queue& presentationQueue,
              RefCountedSurface surface,
-             uint8_t bufferCount,
-             uint32_t flags );
+             std::vector< SwapchainBuffer > framebuffers,
+             vk::SwapchainCreateInfoKHR createInfo,
+             vk::SwapchainKHR vkHandle );
 
   ~Swapchain() override;
 
-private:
+  static RefCountedSwapchain New( Graphics& graphics,
+                                  Queue& presentationQueue,
+                                  RefCountedSurface surface,
+                                  std::vector< SwapchainBuffer > framebuffers,
+                                  vk::SwapchainCreateInfoKHR createInfo,
+                                  vk::SwapchainKHR vkHandle );
 
-  struct Impl;
-  std::unique_ptr< Impl > mImpl;
+private:
+  Graphics* mGraphics;
+  Queue* mQueue;
+  RefCountedSurface mSurface;
+
+  uint32_t mCurrentBufferIndex;
+
+  RefCountedFence mFrameFence;
+
+  vk::SwapchainKHR mSwapchainKHR;
+  vk::SwapchainCreateInfoKHR mSwapchainCreateInfoKHR;
+
+  std::vector< SwapchainBuffer > mSwapchainBuffer;
 };
 
 } // namespace Vulkan

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="dali-core"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\dali\;CMake Files\..\..\dali\internal\;CMake Files\..\..\dali\integration-api\;CMake Files\..\..\dali\public-api\;CMake Files\..\..\dali\devel-api\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="reset_coverage">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 reset_coverage"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cov_data">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 cov_data"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="distclean">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 distclean"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="coverage">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 coverage"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="dali-core">
+				<Option output="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/libdali-core.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DPLATFORM_TIZEN"/>
+					<Add option="-DDALI_COMPILATION"/>
+					<Add option="-DDALI_GLES_VERSION=20"/>
+					<Add option="-DPIC"/>
+					<Add option="-DSTDC_HEADERS"/>
+					<Add directory="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../.."/>
+					<Add directory="/usr/include/c++/8"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/8"/>
+					<Add directory="/usr/include/c++/8/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 dali-core"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="dali-core/fast">
+				<Option output="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/libdali-core.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DPLATFORM_TIZEN"/>
+					<Add option="-DDALI_COMPILATION"/>
+					<Add option="-DDALI_GLES_VERSION=20"/>
+					<Add option="-DPIC"/>
+					<Add option="-DSTDC_HEADERS"/>
+					<Add directory="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../.."/>
+					<Add directory="/usr/include/c++/8"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/8"/>
+					<Add directory="/usr/include/c++/8/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 dali-core/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/dali-core.pc.in">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../../dali/internal/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\..\..\dali\internal\"/>
+		</Unit>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../../dali/integration-api/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\..\..\dali\integration-api\"/>
+		</Unit>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../../dali/public-api/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\..\..\dali\public-api\"/>
+		</Unit>
+		<Unit filename="/home/SERILOCAL/a.gkountis/code/DALi/dali-core/build/tizen-cmake/../../dali/devel-api/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\..\..\dali\devel-api\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -99,6 +99,8 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
 {
   auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
   swapchain->Present();
+
+  mGraphicsImpl->CollectGarbage();
 }
 
 void IncludeThisLibrary()

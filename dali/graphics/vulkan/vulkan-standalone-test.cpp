@@ -557,7 +557,7 @@ int RunTestMain()
     // queue submit draw
 
     auto cmdbuf = gr.GetSwapchainForFBID( fbid )
-                    ->GetPrimaryCommandBuffer();
+                    ->GetCurrentCommandBuffer();
 
     // get command buffer for current frame and execute the draw call
     cmdbuf->ExecuteCommands( { cmdDraw } );
