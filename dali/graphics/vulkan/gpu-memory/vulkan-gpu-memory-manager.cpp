@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,6 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
 
   void Flush( GpuMemoryBlock& allocationId ) override
   {
-    NotImplemented();
   }
 
   GpuMemoryManager& mGpuManager;
@@ -262,19 +261,6 @@ GpuMemoryManager::GpuMemoryManager( Graphics& graphics )
 GpuMemoryAllocator& GpuMemoryManager::GetDefaultAllocator() const
 {
   return mImpl->GetDefaultAllocator();
-}
-
-
-GpuMemoryAllocatorUID GpuMemoryManager::RegisterAllocator( std::unique_ptr< GpuMemoryAllocator > allocator )
-{
-  NotImplemented();
-  return 0;
-}
-
-bool GpuMemoryManager::UnregisterAllocator( GpuMemoryAllocatorUID allocatorHandle )
-{
-  NotImplemented();
-  return false;
 }
 
 Graphics& GpuMemoryManager::GetGraphics() const

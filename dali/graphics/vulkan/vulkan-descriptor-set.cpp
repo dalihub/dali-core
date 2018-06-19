@@ -175,20 +175,6 @@ DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sa
   mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
 }
 
-void DescriptorSet::WriteStorageBuffer( RefCountedBuffer buffer, uint32_t offset, uint32_t size )
-{
-  NotImplemented()
-}
-
-void DescriptorSet::WriteImage( Handle< Image > )
-{
-  NotImplemented()
-}
-
-void DescriptorSet::Write( vk::WriteDescriptorSet writeDescriptorSet )
-{
-  NotImplemented()
-}
 
 #if 0
 struct DescriptorSetLayout::Impl
