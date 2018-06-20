@@ -345,6 +345,7 @@ void ResourceCache::Clear()
 
 void ResourceCache::PrintReferenceCountReport()
 {
+#if defined(DEBUG_ENABLED)
   auto totalObjectCount = mBuffers.size() +
                           mImages.size() +
                           mImageViews.size() +
@@ -437,6 +438,7 @@ void ResourceCache::PrintReferenceCountReport()
   }
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal reference count: %d\n", totalRefCount )
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal object count: %ld\n\n", mSamplers.size() )
+#endif
 }
 
 } //namespace Vulkan

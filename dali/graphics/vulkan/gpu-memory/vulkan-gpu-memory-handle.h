@@ -20,6 +20,8 @@
 
 #include <dali/graphics/vulkan/vulkan-types.h>
 
+#pragma GCC diagnostic ignored "-Wcast-align"
+
 namespace Dali
 {
 namespace Graphics

@@ -104,7 +104,7 @@ bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
   }
   else
   {
-    uint32_t i = 0;
+    int32_t i = 0;
     for( auto&& entry : iter->second )
     {
       if( entry.pipelineImpl.get() == pipeline )

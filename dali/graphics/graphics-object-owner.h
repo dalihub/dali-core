@@ -48,8 +48,7 @@ public:
     auto id = mNextObjecId++;
 
     auto&& object = factory.Create();
-    auto   it     = mObjects.emplace(std::make_pair(id, std::move(object)));
-    assert(it.second);
+    mObjects.emplace(std::make_pair(id, std::move(object)));
 
     return Handle{id};
   }
