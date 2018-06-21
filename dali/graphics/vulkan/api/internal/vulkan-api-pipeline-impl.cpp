@@ -335,7 +335,7 @@ bool Pipeline::Initialise()
   vk::GraphicsPipelineCreateInfo pipelineInfo;
   pipelineInfo
           .setSubpass( 0 )
-          .setRenderPass( fb->GetRenderPassVkHandle() ) // based on render target
+          .setRenderPass( fb->GetRenderPass() ) // based on render target
           .setBasePipelineHandle( nullptr )
           .setBasePipelineIndex( 0 )
           .setLayout( PreparePipelineLayout() )

@@ -92,14 +92,14 @@ struct Controller::Impl
   bool Initialise()
   {
     // Create factories
-    mShaderFactory = std::make_unique< VulkanAPI::ShaderFactory >( mGraphics );
-    mTextureFactory = std::make_unique< VulkanAPI::TextureFactory >( mGraphics );
-    mBufferFactory = std::make_unique< VulkanAPI::BufferFactory >( mOwner );
-    mPipelineFactory = std::make_unique< VulkanAPI::PipelineFactory >( mOwner );
+    mShaderFactory = MakeUnique< VulkanAPI::ShaderFactory >( mGraphics );
+    mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mGraphics );
+    mBufferFactory = MakeUnique< VulkanAPI::BufferFactory >( mOwner );
+    mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
 
-    mUboManager = std::make_unique< VulkanAPI::UboManager >( mOwner );
+    mUboManager = MakeUnique< VulkanAPI::UboManager >( mOwner );
 
-    mDefaultPipelineCache = std::make_unique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
+    mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
 
     return true;
   }
@@ -196,8 +196,8 @@ struct Controller::Impl
       auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID( 0 )->GetCurrentCommandBuffer();
 
       mCurrentFramebuffer = framebuffer;
-      mCurrentFramebuffer->GetRenderPassVkHandle();
-      auto newColors = mCurrentFramebuffer->GetDefaultClearValues();
+
+      auto newColors = mCurrentFramebuffer->GetClearValues();
       newColors[0].color.setFloat32( { renderTargetBinding.clearColors[0].r,
                                        renderTargetBinding.clearColors[0].g,
                                        renderTargetBinding.clearColors[0].b,
@@ -206,11 +206,11 @@ struct Controller::Impl
       mRenderPasses.emplace_back(
               // render pass
               vk::RenderPassBeginInfo{}
-                      .setRenderPass( mCurrentFramebuffer->GetRenderPassVkHandle() )
+                      .setRenderPass( mCurrentFramebuffer->GetRenderPass() )
                       .setFramebuffer( mCurrentFramebuffer->GetVkHandle() )
                       .setRenderArea( vk::Rect2D( { 0, 0 }, { mCurrentFramebuffer->GetWidth(),
                                                               mCurrentFramebuffer->GetHeight() } ) )
-                      .setClearValueCount( uint32_t( mCurrentFramebuffer->GetDefaultClearValues().size() ) )
+                      .setClearValueCount( uint32_t( newColors.size() ) )
                       .setPClearValues( newColors.data() ),
 
               // colors
