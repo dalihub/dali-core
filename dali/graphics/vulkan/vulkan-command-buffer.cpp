@@ -72,7 +72,7 @@ void CommandBuffer::Begin( vk::CommandBufferUsageFlags usageFlags,
     // Render pass is obtained from the default framebuffer
     // it's a legacy but little nicer
     auto swapchain = mGraphics->GetSwapchainForFBID( 0u );
-    inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPassVkHandle() );
+    inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPass() );
     info.setPInheritanceInfo( &inheritance );
   }
 
@@ -205,8 +205,8 @@ void CommandBuffer::BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   auto swapchain = mGraphics->GetSwapchainForFBID( 0u );
   auto surface = mGraphics->GetSurface( 0u );
   auto frameBuffer = swapchain->GetCurrentFramebuffer();
-  auto renderPass = frameBuffer->GetRenderPassVkHandle();
-  auto clearValues = frameBuffer->GetDefaultClearValues();
+  auto renderPass = frameBuffer->GetRenderPass();
+  auto clearValues = frameBuffer->GetClearValues();
 
   auto info = vk::RenderPassBeginInfo{};
   info.setFramebuffer( frameBuffer->GetVkHandle() );
