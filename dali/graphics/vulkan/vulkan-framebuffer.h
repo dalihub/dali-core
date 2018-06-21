@@ -29,6 +29,53 @@ namespace Vulkan
 
 class Image;
 
+enum class AttachmentType
+{
+  COLOR,
+  DEPTH_STENCIL,
+  DEPTH,
+  INPUT,
+  RESOLVE,
+  PRESERVE,
+  UNDEFINED
+};
+
+class Framebuffer;
+
+class FramebufferAttachment : public VkManaged
+{
+public:
+  friend class Framebuffer;
+
+  static RefCountedFramebufferAttachment NewColorAttachment( RefCountedImageView imageView,
+                                                             vk::ClearColorValue clearColorValue,
+                                                             bool presentable );
+
+  static RefCountedFramebufferAttachment NewDepthAttachment( RefCountedImageView imageView,
+                                                             vk::ClearDepthStencilValue clearDepthStencilValue );
+
+  RefCountedImageView GetImageView() const;
+
+  const vk::AttachmentDescription& GetDescription() const;
+
+  const vk::ClearValue& GetClearValue() const;
+
+  bool IsValid() const;
+
+private:
+  FramebufferAttachment() = default;
+
+  FramebufferAttachment( RefCountedImageView imageView,
+                         vk::ClearValue clearColor,
+                         bool presentable = false );
+
+  RefCountedImageView mImageView;
+
+  vk::AttachmentDescription mDescription;
+
+  vk::ClearValue mClearValue;
+};
+
 /**
  * Framebuffer encapsulates following objects:
  * - Images ( attachments )
@@ -38,50 +85,60 @@ class Image;
 class Framebuffer : public VkManaged
 {
 public:
-
-  enum class AttachmentType
-  {
-    COLOR,
-    DEPTH_STENCIL,
-    DEPTH,
-    INPUT,
-    RESOLVE,
-    PRESERVE
-  };
-
-  static RefCountedFramebuffer New( Graphics& graphics, uint32_t width, uint32_t height );
+  friend class Graphics;
 
   uint32_t GetWidth() const;
 
   uint32_t GetHeight() const;
 
-  RefCountedImageView GetAttachment( AttachmentType type, uint32_t index ) const;
+  RefCountedFramebufferAttachment GetAttachment( AttachmentType type, uint32_t index ) const;
 
-  std::vector< RefCountedImageView > GetAttachments( AttachmentType type ) const;
+  std::vector< RefCountedFramebufferAttachment > GetAttachments( AttachmentType type ) const;
 
   uint32_t GetAttachmentCount( AttachmentType type ) const;
 
-  void SetAttachment( RefCountedImageView imageViewRef, Framebuffer::AttachmentType type, uint32_t index );
-
-  void SetExternalRenderPass( vk::RenderPass externalRenderPass );
-
-  void Commit();
-
-  vk::RenderPass GetRenderPassVkHandle() const;
+  vk::RenderPass GetRenderPass() const;
 
   vk::Framebuffer GetVkHandle() const;
 
-  const std::vector< vk::ClearValue >& GetDefaultClearValues() const;
+  std::vector< vk::ClearValue > GetClearValues() const;
 
   bool OnDestroy() override;
 
 private:
+  static RefCountedFramebuffer New( Graphics& graphics,
+                                    const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
+                                    const RefCountedFramebufferAttachment& depthAttachment,
+                                    vk::Framebuffer vkHandle,
+                                    vk::RenderPass renderPass,
+                                    uint32_t width,
+                                    uint32_t height,
+                                    bool externalRenderPass = false );
 
-  Framebuffer( Graphics& graphics, uint32_t width, uint32_t height );
+  Framebuffer( Graphics& graphics,
+               const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
+               const RefCountedFramebufferAttachment& depthAttachment,
+               vk::Framebuffer vkHandle,
+               vk::RenderPass renderPass,
+               uint32_t width,
+               uint32_t height,
+               bool externalRenderPass = false );
 
-  struct Impl;
-  std::unique_ptr< Impl > mImpl;
+private:
+  Graphics* mGraphics;
 
+  uint32_t mWidth;
+  uint32_t mHeight;
+
+  std::vector< RefCountedFramebufferAttachment > mColorAttachments;
+
+  RefCountedFramebufferAttachment mDepthAttachment;
+
+  vk::Framebuffer mFramebuffer;
+
+  vk::RenderPass mRenderPass;
+
+  bool mExternalRenderPass;
 };
 
 

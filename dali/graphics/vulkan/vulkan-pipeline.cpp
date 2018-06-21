@@ -85,7 +85,7 @@ struct Pipeline::Impl
     if( !mInfo.renderPass )
     {
       SetRenderPass( mGraphics.GetSwapchainForFBID( 0u )->
-              GetCurrentFramebuffer()->GetRenderPassVkHandle() );
+              GetCurrentFramebuffer()->GetRenderPass() );
     }
 
     if( !mInfo.pRasterizationState )

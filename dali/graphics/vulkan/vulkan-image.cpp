@@ -155,6 +155,11 @@ vk::ImageUsageFlags Image::GetUsageFlags() const
   return mCreateInfo.usage;
 }
 
+vk::SampleCountFlagBits Image::GetSampleCount() const
+{
+  return mCreateInfo.samples;
+}
+
 bool Image::OnDestroy()
 {
   if( !mIsExternal )

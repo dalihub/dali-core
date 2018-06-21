@@ -70,6 +70,8 @@ class GpuMemoryManager;
 
 class ResourceCache;
 
+class FramebufferAttachment;
+
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
 
 struct SwapchainSurfacePair
@@ -110,11 +112,17 @@ public: // Create methods
 
   RefCountedBuffer CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo );
 
-  RefCountedFramebuffer CreateFramebuffer( vk::Image image,
-                                           vk::Format imageFormat,
-                                           vk::Extent2D extent );
+
+
+  RefCountedFramebuffer CreateFramebuffer( const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
+                                           RefCountedFramebufferAttachment depthAttachment,
+                                           uint32_t width,
+                                           uint32_t height,
+                                           vk::RenderPass externalRenderPass = nullptr );
 
   RefCountedImage CreateImage( const vk::ImageCreateInfo& imageCreateInfo );
+
+  RefCountedImage CreateImageFromExternal( vk::Image externalImage, vk::Format imageFormat, vk::Extent2D extent );
 
   RefCountedImageView CreateImageView( const vk::ImageViewCreateFlags& flags,
                                        const RefCountedImage& image,

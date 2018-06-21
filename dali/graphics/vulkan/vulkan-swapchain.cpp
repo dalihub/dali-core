@@ -107,7 +107,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   // start recording
   auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
           .setFramebuffer( swapBuffer.framebuffer->GetVkHandle() )
-          .setRenderPass( swapBuffer.framebuffer->GetRenderPassVkHandle() )
+          .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
           .setSubpass( 0 );
 
   swapBuffer.masterCmdBuffer->Reset();
