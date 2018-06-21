@@ -341,6 +341,7 @@ using RefCountedSwapchain = Handle< class Swapchain >;
 using RefCountedSurface = Handle< class Surface >;
 using RefCountedSampler = Handle< class Sampler >;
 using RefCountedTexture = Handle< class Texture >;
+using RefCountedFramebufferAttachment = Handle< class FramebufferAttachment >;
 
 } // namespace Vulkan
 } // namespace Graphics
