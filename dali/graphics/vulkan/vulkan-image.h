@@ -115,6 +115,8 @@ public:
    */
   vk::ImageUsageFlags GetUsageFlags() const;
 
+  vk::SampleCountFlagBits GetSampleCount() const;
+
   /**
    * Assigns the specified image memory to the image
    * @warning This method does NOT bind the memory. Use Graphics::BindImageMemory instead
