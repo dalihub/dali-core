@@ -155,7 +155,7 @@ private:
   uint16_t mWidth;                      ///< Width of the texture
   uint16_t mHeight;                     ///< Height of the texture
   uint16_t mMaxMipMapLevel;             ///< Maximum mipmap level
-  Type mType:2;                         ///< Type of the texture
+  Type mType:3;                         ///< Type of the texture
   bool mHasAlpha : 1;                   ///< Whether the format has an alpha channel
   bool mIsCompressed : 1;               ///< Whether the format is compressed
 
