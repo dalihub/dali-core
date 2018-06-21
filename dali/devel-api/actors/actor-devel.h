@@ -196,6 +196,24 @@ DALI_CORE_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
 DALI_CORE_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
 
 
+typedef Signal< void (void) > ChildOrderChangedSignalType; ///< Used when the actor's children have changed order
+
+/**
+ * @brief This signal is emitted when an actor's children change their sibling order
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void MyCallbackName( Actor parent );
+ * @endcode
+ * parent The parent actor of the moved children
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized
+ */
+DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal( Actor actor );
+
+
+
 } // namespace DevelActor
 
 } // namespace Dali

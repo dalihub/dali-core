@@ -246,6 +246,20 @@ struct VisibilityChangedVoidFunctor
   bool& mSignalCalled;
 };
 
+struct ChildOrderChangedFunctor
+{
+  ChildOrderChangedFunctor(bool& signalCalled)
+  : mSignalCalled( signalCalled )
+  { }
+
+  void operator()()
+  {
+    mSignalCalled  = true;
+  }
+
+  bool& mSignalCalled;
+};
+
 } // anonymous namespace
 
 
@@ -5112,6 +5126,10 @@ int UtcDaliActorRaiseAbove(void)
   actorB.TouchSignal().Connect( TestTouchCallback2 );
   actorC.TouchSignal().Connect( TestTouchCallback3 );
 
+  bool orderChangedSignal(false);
+  ChildOrderChangedFunctor f(orderChangedSignal);
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
@@ -5129,10 +5147,12 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor B Above Actor C\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
-
   application.ProcessEvent( touchEvent );
 
   DALI_TEST_EQUALS( gTouchCallBackCalled,  false, TEST_LOCATION );
