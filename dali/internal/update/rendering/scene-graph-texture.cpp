@@ -27,7 +27,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
@@ -128,7 +127,6 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mGraphicsTexture( nullptr ),
   mNativeImage(),
   mSampler(),
-  mId( 0 ),
   mWidth( size.GetWidth() ),
   mHeight( size.GetHeight() ),
   mMaxMipMapLevel( 0 ),
@@ -143,7 +141,6 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mGraphicsTexture( nullptr ),
   mNativeImage( nativeImageInterface ),
   mSampler(),
-  mId( 0 ),
   mWidth( nativeImageInterface->GetWidth() ),
   mHeight( nativeImageInterface->GetHeight() ),
   mMaxMipMapLevel( 0 ),
@@ -161,9 +158,9 @@ void Texture::Initialize( Integration::Graphics::Graphics& graphics )
   mGraphics = &graphics;
 }
 
-const Graphics::API::Accessor<Graphics::API::Texture>& Texture::GetGfxObject() const
+const Graphics::API::Texture* Texture::GetGfxObject() const
 {
-  return mGraphicsTexture;
+  return mGraphicsTexture.get();
 }
 
 void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
@@ -188,8 +185,6 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
                                                  .SetData( pixelData->GetBuffer() )
                                                  .SetDataSize( pixelData->GetBufferSize() )
                                                  );
-
-    mId = static_cast< uint32_t >( mGraphicsTexture.GetHandle() );
   }
 }
 

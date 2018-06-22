@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
@@ -54,27 +53,27 @@ public:
   /**
    * @brief Create a new object
    */
-  virtual Accessor<Shader> CreateShader( const BaseFactory<Shader>& factory ) = 0;
+  virtual std::unique_ptr<Shader> CreateShader( const BaseFactory<Shader>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor<Texture> CreateTexture( const BaseFactory<Texture>& factory ) = 0;
+  virtual std::unique_ptr<Texture> CreateTexture( const BaseFactory<Texture>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor<Buffer> CreateBuffer( const BaseFactory<Buffer>& factory ) = 0;
+  virtual std::unique_ptr<Buffer> CreateBuffer( const BaseFactory<Buffer>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor<Sampler> CreateSampler( const BaseFactory<Sampler>& factory ) = 0;
+  virtual std::unique_ptr<Sampler> CreateSampler( const BaseFactory<Sampler>& factory ) = 0;
 
   /**
    * @brief Create a new object
    */
-  virtual Accessor<Framebuffer> CreateFramebuffer( const BaseFactory<Framebuffer>& factory ) = 0;
+  virtual std::unique_ptr<Framebuffer> CreateFramebuffer( const BaseFactory<Framebuffer>& factory ) = 0;
 
   /**
    * Creates new pipeline
@@ -142,11 +141,6 @@ protected:
    * Objects of this type should not directly.
    */
   Controller() = default;
-
-  /**
-   * @brief create an element for the given number of elements and element size
-   */
-  virtual std::unique_ptr<char> CreateBuffer( size_t numberOfElements, size_t elementSize ) = 0;
 
 private:
 };

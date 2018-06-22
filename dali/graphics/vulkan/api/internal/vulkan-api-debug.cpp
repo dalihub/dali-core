@@ -78,16 +78,6 @@ std::string APItoVK( const Texture* texture)
   return ss.str();
 }
 
-template <class T>
-std::string APItoVK( const Accessor<T>& accessor )
-{
-  if( !accessor.Exists() )
-  {
-    return "nullptr";
-  }
-  return APItoVK(&accessor.Get());
-}
-
 std::ostream& operator<<(std::ostream& ss, const RenderCommand::UniformBufferBinding& object)
 {
   ss << "    UniformBufferBinding = " << &object << " { " << std::endl;
