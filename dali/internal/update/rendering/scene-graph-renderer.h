@@ -493,6 +493,7 @@ private:
   std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
   std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
   std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
+
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
