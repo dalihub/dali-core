@@ -17,7 +17,7 @@
 
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics/vulkan/vulkan-shader.h>
+#include <dali/graphics/vulkan/internal/vulkan-shader.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 
 namespace Dali

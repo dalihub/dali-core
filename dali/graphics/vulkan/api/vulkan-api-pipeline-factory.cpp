@@ -19,7 +19,7 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 
 namespace Dali
 {

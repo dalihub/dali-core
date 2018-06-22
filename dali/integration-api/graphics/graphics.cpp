@@ -15,10 +15,10 @@
  *
  */
 
-#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-surface.h>
-#include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-surface.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/integration-api/graphics/graphics.h>
 
