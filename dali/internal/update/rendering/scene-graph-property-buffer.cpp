@@ -95,7 +95,7 @@ bool PropertyBuffer::Update( Dali::Graphics::API::Controller& controller )
     }
 
     // schedule deferred write
-    mGraphicsBuffer.Get().Write( mData.Get()->begin(), GetDataSize(), 0u );
+    mGraphicsBuffer->Write( mData.Get()->begin(), GetDataSize(), 0u );
 
     mDataChanged = false;
   }

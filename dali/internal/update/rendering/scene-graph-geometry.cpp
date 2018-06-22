@@ -72,9 +72,9 @@ void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
   );
 
   // transfer data
-  indexBuffer.Get().Write( indices.begin(), sizeInBytes, 0u );
+  indexBuffer->Write( indices.begin(), sizeInBytes, 0u );
 
-  mIndexBuffer = indexBuffer;
+  mIndexBuffer = std::move(indexBuffer);
 
   mIndexBufferElementCount = uint32_t(indices.Size());
 

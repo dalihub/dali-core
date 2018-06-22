@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 
 #include <dali/integration-api/graphics/graphics.h>
@@ -93,13 +92,13 @@ public:
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  const Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject() const;
+  const Graphics::API::Shader* GetGfxObject() const;
 
   /**
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  Graphics::API::Accessor<Graphics::API::Shader>& GetGfxObject();
+  Graphics::API::Shader* GetGfxObject();
 
 public: // Messages
   /**
@@ -131,7 +130,7 @@ public: // UniformMap::Observer
 
 private: // Data
   Integration::Graphics::Graphics*               mGraphics; ///< Graphics interface object
-  Graphics::API::Accessor<Graphics::API::Shader> mGraphicsShader; ///< The graphics object
+  Graphics::API::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
   ShaderCache*                                   mShaderCache;
   Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader
   ConnectionChangePropagator                     mConnectionObservers; ///< Watch for connection changes

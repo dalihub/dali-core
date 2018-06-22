@@ -114,9 +114,9 @@ public:
     return mVertexBuffers;
   }
 
-  Graphics::API::Accessor<Graphics::API::Buffer> GetIndexBuffer()
+  Graphics::API::Buffer* GetIndexBuffer()
   {
-    return mIndexBuffer;
+    return mIndexBuffer.get();
   }
 
   bool HasIndexBuffer() const
@@ -141,7 +141,7 @@ private:
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;
-  Graphics::API::Accessor<Graphics::API::Buffer> mIndexBuffer;
+  std::unique_ptr<Graphics::API::Buffer> mIndexBuffer;
   uint32_t mIndexBufferElementCount;
   Type mGeometryType;
 
