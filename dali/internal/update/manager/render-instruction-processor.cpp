@@ -175,6 +175,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       RenderItem& item = renderList.GetNextFreeItem();
 
       item.mNode = renderable.mNode;
+      item.mRenderer = renderable.mRenderer;
       item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
       item.mDepthIndex = 0;
 

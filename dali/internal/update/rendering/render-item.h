@@ -75,6 +75,7 @@ struct RenderItem
   Matrix            mModelViewMatrix;
   Vector3           mSize;
   Node*             mNode;
+  Renderer*         mRenderer;
   const void*       mTextureSet;        //< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque:1;

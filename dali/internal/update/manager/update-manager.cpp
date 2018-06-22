@@ -819,8 +819,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       cameraIterator->Update( bufferIndex );
     }
 
-    auto* impl = mImpl.get();
-    impl = impl;
     //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
     //reset the update buffer index and make sure there is enough room in the instruction container
     if( mImpl->renderersAdded )
@@ -852,11 +850,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-      // Prepare pipelines
-
-
       // generate graphics objects
-
       SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
