@@ -176,7 +176,7 @@ struct Controller::Impl
   bool UpdateRenderPass( const API::RenderCommand::RenderTargetBinding& renderTargetBinding )
   {
     Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
-    if( renderTargetBinding.framebuffer.Exists() )
+    if( renderTargetBinding.framebuffer )
     {
       // @todo use VulkanAPI::Framebuffer when available
       //framebuffer = static_cast<VulkanAPI::Framebuffer&>(renderTargetBinding.framebuffer.Get()).GetVkHandle();
@@ -307,7 +307,7 @@ struct Controller::Impl
       auto binding = 0u;
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )
       {
-        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( vb.Get()).GetBufferRef(), 0 );
+        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
       }
 
       // note: starting set = 0
@@ -317,9 +317,9 @@ struct Controller::Impl
       const auto& drawCommand = apiCommand->GetDrawCommand();
 
       const auto& indexBinding = apiCommand->GetIndexBufferBinding();
-      if( indexBinding.buffer.Exists() )
+      if( indexBinding.buffer )
       {
-        cmdbuf->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(indexBinding.buffer.Get()).GetBufferRef(),
+        cmdbuf->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
                                  0, vk::IndexType::eUint16 );
         cmdbuf->DrawIndexed( drawCommand.indicesCount,
                              drawCommand.instanceCount,
@@ -339,16 +339,6 @@ struct Controller::Impl
     }
 
   }
-
-  // resources
-  std::vector< Vulkan::RefCountedTexture > mTextures;
-  std::vector< Vulkan::RefCountedShader > mShaders;
-  std::vector< Vulkan::RefCountedBuffer > mBuffers;
-
-  // owner objects
-  ObjectOwner< API::Texture > mTexturesOwner;
-  ObjectOwner< API::Shader > mShadersOwner;
-  ObjectOwner< API::Buffer > mBuffersOwner;
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
@@ -377,36 +367,24 @@ struct Controller::Impl
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
 
-API::Accessor< API::Shader > Controller::CreateShader( const API::BaseFactory< API::Shader >& factory )
+std::unique_ptr< API::Shader > Controller::CreateShader( const API::BaseFactory< API::Shader >& factory )
 {
-  auto handle = mImpl->mShadersOwner.CreateObject( factory );
-  auto& apiShader = static_cast<VulkanAPI::Shader&>(mImpl->mShadersOwner[handle]);
-  auto vertexShaderRef = apiShader.GetShaderRef( vk::ShaderStageFlagBits::eVertex );
-  auto fragmentShaderRef = apiShader.GetShaderRef( vk::ShaderStageFlagBits::eFragment );
-  mImpl->mShaders.push_back( vertexShaderRef );
-  mImpl->mShaders.push_back( fragmentShaderRef );
-  return API::Accessor< API::Shader >( mImpl->mShadersOwner, handle );
+  return factory.Create();
 }
 
-API::Accessor< API::Texture > Controller::CreateTexture( const API::BaseFactory< API::Texture >& factory )
+std::unique_ptr< API::Texture > Controller::CreateTexture( const API::BaseFactory< API::Texture >& factory )
 {
-  auto handle = mImpl->mTexturesOwner.CreateObject( factory );
-  auto textureRef = static_cast<VulkanAPI::Texture&>(mImpl->mTexturesOwner[handle]).GetTextureRef();
-  mImpl->mTextures.push_back( textureRef );
-  return API::Accessor< API::Texture >( mImpl->mTexturesOwner, handle );
+  return factory.Create();
 }
 
-API::Accessor< API::Buffer > Controller::CreateBuffer( const API::BaseFactory< API::Buffer >& factory )
+std::unique_ptr< API::Buffer > Controller::CreateBuffer( const API::BaseFactory< API::Buffer >& factory )
 {
-  auto handle = mImpl->mBuffersOwner.CreateObject( factory );
-  auto bufferRef = static_cast<VulkanAPI::Buffer&>(mImpl->mBuffersOwner[handle]).GetBufferRef();
-  mImpl->mBuffers.push_back( bufferRef );
-  return API::Accessor< API::Buffer >( mImpl->mBuffersOwner, handle );
+  return factory.Create();
 }
 
-API::Accessor< API::Sampler > Controller::CreateSampler( const API::BaseFactory< API::Sampler >& factory )
+std::unique_ptr< API::Sampler > Controller::CreateSampler( const API::BaseFactory< API::Sampler >& factory )
 {
-  return { nullptr };
+  return factory.Create();
 }
 
 std::unique_ptr< API::Pipeline > Controller::CreatePipeline( const API::BaseFactory< API::Pipeline >& factory )
@@ -422,14 +400,9 @@ std::unique_ptr< API::Pipeline > Controller::CreatePipeline( const API::BaseFact
   return mImpl->mPipelineFactory->Create();
 }
 
-API::Accessor< API::Framebuffer > Controller::CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory )
+std::unique_ptr< API::Framebuffer > Controller::CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory )
 {
-  return { nullptr };
-}
-
-std::unique_ptr< char > Controller::CreateBuffer( size_t numberOfElements, size_t elementSize )
-{
-  return std::unique_ptr< char >( new char[numberOfElements * elementSize] );
+  return factory.Create();
 }
 
 std::unique_ptr< Controller > Controller::New( Vulkan::Graphics& vulkanGraphics )

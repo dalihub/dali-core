@@ -48,16 +48,15 @@ void Shader::Initialize( Integration::Graphics::Graphics& graphics, ShaderCache&
   mShaderCache = &shaderCache;
 }
 
-const Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject() const
+const Graphics::API::Shader* Shader::GetGfxObject() const
 {
   return mGraphicsShader;
 }
 
-Graphics::API::Accessor<Graphics::API::Shader>& Shader::GetGfxObject()
+Graphics::API::Shader* Shader::GetGfxObject()
 {
   return mGraphicsShader;
 }
-
 
 void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
@@ -82,7 +81,7 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
   // that is passed by the caller
   if (shaderData->GetType() == ShaderData::Type::BINARY)
   {
-    mGraphicsShader = mShaderCache->GetShader(
+    mGraphicsShader = &mShaderCache->GetShader(
       Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
       Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
   }

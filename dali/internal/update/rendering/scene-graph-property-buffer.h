@@ -19,7 +19,6 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/message.h>
@@ -166,9 +165,9 @@ public:
   {
     return mFormat.Get();
   }
-  inline Graphics::API::Accessor<Graphics::API::Buffer> GetGfxObject() const
+  inline Graphics::API::Buffer* GetGfxObject() const
   {
-    return mGraphicsBuffer;
+    return mGraphicsBuffer.get();
   }
 
   void SetUsage( Graphics::API::Buffer::UsageHint usage );
@@ -182,7 +181,7 @@ private:
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
 
   // GRAPHICS
-  Graphics::API::Accessor<Graphics::API::Buffer> mGraphicsBuffer;
+  std::unique_ptr<Graphics::API::Buffer> mGraphicsBuffer;
   Graphics::API::Buffer::UsageHint mGraphicsBufferUsage;
 };
 

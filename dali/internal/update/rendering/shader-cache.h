@@ -18,7 +18,6 @@
  */
 
 #include <dali/integration-api/graphics/graphics.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 
@@ -37,8 +36,20 @@ struct ShaderCache
   struct Item
   {
     Item() = default;
+    Item( const Item& ) = delete;
+    Item( Item&& ) = default;
+
+    Item( std::unique_ptr<Dali::Graphics::API::Shader> _shader,
+          Dali::Graphics::API::ShaderDetails::ShaderSource _vertexSource,
+          Dali::Graphics::API::ShaderDetails::ShaderSource _fragmentSource )
+    : shader(std::move(_shader)),
+      vertexSource( _vertexSource ),
+      fragmentSource( _fragmentSource )
+    {}
+
     ~Item() = default;
-    Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> shader{ nullptr };
+
+    std::unique_ptr<Dali::Graphics::API::Shader>               shader{ nullptr };
     Dali::Graphics::API::ShaderDetails::ShaderSource           vertexSource{""};
     Dali::Graphics::API::ShaderDetails::ShaderSource           fragmentSource{""};
   };
@@ -53,7 +64,7 @@ struct ShaderCache
   /**
    * Get a shader from it's source code
    */
-  Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> GetShader(
+  Dali::Graphics::API::Shader& GetShader(
     const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
     const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh );
 
