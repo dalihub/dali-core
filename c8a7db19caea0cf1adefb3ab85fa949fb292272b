@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "559793ea_23da932f",
+        "filename": "dali/graphics/vulkan/vulkan-surface.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T14:42:47Z",
+      "side": 1,
+      "message": "Why not call GetCapabilities()?",
+      "range": {
+        "startLine": 60,
+        "startChar": 19,
+        "endLine": 60,
+        "endChar": 100
+      },
+      "revId": "c8a7db19caea0cf1adefb3ab85fa949fb292272b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
