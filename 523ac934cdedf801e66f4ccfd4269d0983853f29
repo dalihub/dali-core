@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ab89417_70fafc10",
+        "filename": "dali/graphics-api/graphics-api-render-command.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T15:34:26Z",
+      "side": 1,
+      "message": "Should wrap with #if defined(DEBUG_ENABLED)",
+      "revId": "523ac934cdedf801e66f4ccfd4269d0983853f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a839c2a0_75c92151",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T15:34:26Z",
+      "side": 1,
+      "message": "We need a new macro. Probably should do something like:\n\nconst char* gVulkanApiFilter( getenv(\"LOG_VULKAN_API\") );\n\n#define DALI_LOG_STREAM( filter, level, stream )\\\n  if( nullptr !\u003d filter \u0026\u0026 filter[0]\u003clevel+\u00270\u0027 )\\\n  {\\\n    std::cout \u003c\u003c stream;\\\n  }\n\nso can do DALI_LOG_STREAM( gVulkanApiFilter, 2, *command); without guards.",
+      "range": {
+        "startLine": 283,
+        "startChar": 1,
+        "endLine": 288,
+        "endChar": 6
+      },
+      "revId": "523ac934cdedf801e66f4ccfd4269d0983853f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
