@@ -17,11 +17,11 @@
 
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 
 #include <deque>
 
