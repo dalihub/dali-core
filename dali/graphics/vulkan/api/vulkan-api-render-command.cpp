@@ -171,7 +171,7 @@ void RenderCommand::BindTexturesAndSamplers()
   // only if textures/samplers changed, rewrite
   for( auto&& texture : mTextureBindings )
   {
-    auto& image = static_cast<VulkanAPI::Texture&>( texture.texture.Get());
+    auto& image = static_cast<const VulkanAPI::Texture&>(*texture.texture);
     DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                      "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
     mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetTextureRef()->GetSampler(),
