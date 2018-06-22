@@ -18,7 +18,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 namespace Dali

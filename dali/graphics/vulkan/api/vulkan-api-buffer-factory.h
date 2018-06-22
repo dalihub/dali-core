@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 

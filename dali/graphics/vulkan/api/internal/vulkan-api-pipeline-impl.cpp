@@ -21,10 +21,10 @@
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 
