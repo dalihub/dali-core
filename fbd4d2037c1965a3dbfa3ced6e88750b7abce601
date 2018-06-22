@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebf61167_89b60db9",
+        "filename": "dali/graphics/vulkan/vulkan-resource-cache.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T16:35:46Z",
+      "side": 1,
+      "message": "ResourceRegister? It no longer owns resources.",
+      "range": {
+        "startLine": 43,
+        "startChar": 6,
+        "endLine": 43,
+        "endChar": 19
+      },
+      "revId": "fbd4d2037c1965a3dbfa3ced6e88750b7abce601",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2687e450_27c43bf0",
+        "filename": "dali/graphics/vulkan/vulkan-resource-cache.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T16:35:46Z",
+      "side": 1,
+      "message": "Really?!",
+      "range": {
+        "startLine": 235,
+        "startChar": 15,
+        "endLine": 235,
+        "endChar": 22
+      },
+      "revId": "fbd4d2037c1965a3dbfa3ced6e88750b7abce601",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
