@@ -45,8 +45,8 @@ RenderItem::RenderItem()
 : mModelMatrix( false ),
   mModelViewMatrix( false ),
   mSize(),
-  //mRenderer( NULL ),
   mNode( NULL ),
+  mRenderer( NULL ),
   mTextureSet( NULL ),
   mDepthIndex( 0 ),
   mIsOpaque( true )
