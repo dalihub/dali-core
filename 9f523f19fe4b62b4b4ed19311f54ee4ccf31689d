@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ff6c8cf_76d7da8f",
+        "filename": "dali/graphics/vulkan/vulkan-framebuffer.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T15:01:10Z",
+      "side": 1,
+      "message": "We will want to use an FBO with a native texture in the future (Or some other means of reading the texture back into CPU memory), so it may never be drawn, i.e. sampled would be false, but we\u0027d still want the storeOp to be eStore.",
+      "range": {
+        "startLine": 62,
+        "startChar": 46,
+        "endLine": 62,
+        "endChar": 58
+      },
+      "revId": "9f523f19fe4b62b4b4ed19311f54ee4ccf31689d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d0d2396e_b5ee4e1e",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-22T15:01:10Z",
+      "side": 1,
+      "message": "Not on separate line",
+      "range": {
+        "startLine": 309,
+        "startChar": 0,
+        "endLine": 309,
+        "endChar": 21
+      },
+      "revId": "9f523f19fe4b62b4b4ed19311f54ee4ccf31689d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
