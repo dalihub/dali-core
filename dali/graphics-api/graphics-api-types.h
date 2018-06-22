@@ -265,11 +265,11 @@ struct ColorBlendState
  */
 struct ShaderState
 {
-  Shader* shaderProgram { nullptr };
+  const Shader* shaderProgram { nullptr };
 
   Extension   extension             { nullptr };
 
-  ShaderState& SetShaderProgram( Shader& value )
+  ShaderState& SetShaderProgram( const Shader& value )
   {
     shaderProgram = &value;
     return *this;

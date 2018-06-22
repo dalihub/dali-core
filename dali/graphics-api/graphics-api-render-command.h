@@ -25,7 +25,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
@@ -81,13 +80,13 @@ public:
   {
     UniformBufferBinding() :
     buffer( nullptr ), offset( 0u ), dataSize( 0u ), binding( 0u ) {}
-    Accessor<Buffer> buffer;
+    const Buffer*  buffer;
     uint32_t offset;
     uint32_t dataSize;
     uint32_t binding;
     void*    pNext{ nullptr };
 
-    UniformBufferBinding& SetBuffer( Accessor<Buffer> value )
+    UniformBufferBinding& SetBuffer( const Buffer* value )
     {
       buffer = value;
       return *this;
@@ -116,22 +115,24 @@ public:
    */
   struct TextureBinding
   {
-    const Texture* texture;
-    Accessor<Sampler> sampler;
-    uint32_t binding;
-    void*    pNext{ nullptr };
-    TextureBinding() : texture(nullptr), sampler( nullptr ), binding( 0u ) {}
+    const Texture*  texture { nullptr };
+    const Sampler*  sampler { nullptr };
+    uint32_t        binding { 0u };
+    void*           pNext   { nullptr };
+    TextureBinding() = default;
 
-    TextureBinding& SetTexture( const Texture& value )
+    TextureBinding& SetTexture( const Texture* value )
     {
-      texture = &value;
+      texture = value;
       return *this;
     }
-    TextureBinding& SetSampler( Accessor<Sampler> value )
+
+    TextureBinding& SetSampler( const Sampler* value )
     {
       sampler = value;
       return *this;
     }
+
     TextureBinding& SetBinding( uint32_t value )
     {
       binding = value;
@@ -147,10 +148,11 @@ public:
    */
   struct SamplerBinding
   {
-    Accessor<Sampler> sampler;
-    uint32_t binding;
-    void*    pNext{ nullptr };
-    SamplerBinding& SetSampler( Accessor<Sampler> value )
+    const Sampler* sampler { nullptr };
+    uint32_t       binding { 0u };
+    void*          pNext   { nullptr };
+
+    SamplerBinding& SetSampler( const Sampler* value )
     {
       sampler = value;
       return *this;
@@ -168,13 +170,14 @@ public:
    */
   struct IndexBufferBinding
   {
-    Accessor<Buffer> buffer { nullptr };
-    uint32_t offset { 0u };
-    IndexType type { IndexType::INDEX_TYPE_UINT16 };
-    void*    pNext{ nullptr };
+    const Buffer* buffer { nullptr };
+    uint32_t      offset { 0u };
+    IndexType     type   { IndexType::INDEX_TYPE_UINT16 };
+    void*         pNext  { nullptr };
+
     IndexBufferBinding() = default;
 
-    IndexBufferBinding& SetBuffer( Accessor<Buffer> value )
+    IndexBufferBinding& SetBuffer( const Buffer* value )
     {
       buffer = value;
       return *this;
@@ -197,13 +200,13 @@ public:
 
   struct RenderTargetBinding
   {
-    Accessor<Framebuffer>                 framebuffer { nullptr };
+    const Framebuffer*                    framebuffer { nullptr };
     std::vector<Framebuffer::ClearColor>  clearColors {};
     Framebuffer::DepthStencilClearColor   dsClearColor {};
     void*    pNext{ nullptr };
     RenderTargetBinding() = default;
 
-    RenderTargetBinding& SetFramebuffer( Accessor<Framebuffer> value )
+    RenderTargetBinding& SetFramebuffer( const Framebuffer* value )
     {
       framebuffer = value;
       return *this;
@@ -226,8 +229,9 @@ public:
 
   struct DrawCommand
   {
-    DrawCommand() :
-     drawType( DrawType::UNDEFINED_DRAW ){}
+    DrawCommand() : drawType( DrawType::UNDEFINED_DRAW )
+    {}
+
     DrawType drawType;
     union
     {
@@ -286,10 +290,11 @@ public:
    */
   struct PushConstantsBinding
   {
-    void*     data;
-    uint32_t  size;
-    uint32_t  binding;
-    void*    pNext{ nullptr };
+    void*     data      { nullptr };
+    uint32_t  size      { 0u };
+    uint32_t  binding   { 0u };
+    void*     pNext     { nullptr };
+
     PushConstantsBinding() = default;
 
     PushConstantsBinding& SetData( void* value )
@@ -337,7 +342,7 @@ public:
   /**
    * Resource binding API
    */
-  RenderCommand& BindVertexBuffers( std::vector<Accessor<Buffer>>&& buffers )
+  RenderCommand& BindVertexBuffers( std::vector<const Buffer*>&& buffers )
   {
     mVertexBufferBindings = std::move( buffers );
     mUpdateFlags |= RENDER_COMMAND_UPDATE_VERTEX_ATTRIBUTE_BIT;
@@ -420,7 +425,7 @@ public:
   }
 
   // Getters
-  const std::vector<Accessor<Buffer>>& GetVertexBufferBindings() const
+  const std::vector<const Buffer*>& GetVertexBufferBindings() const
   {
     return mVertexBufferBindings;
   }
@@ -465,7 +470,7 @@ public:
 public:
 
   // list of resources
-  std::vector<Accessor<Buffer>>             mVertexBufferBindings;
+  std::vector<const Buffer*>                mVertexBufferBindings;
   std::vector<UniformBufferBinding>         mUniformBufferBindings;
   std::vector<TextureBinding>               mTextureBindings;
   std::vector<SamplerBinding>               mSamplerBindings;
