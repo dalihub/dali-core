@@ -29,7 +29,7 @@ ShaderCache::ShaderCache( Dali::Graphics::API::Controller& controller )
 {
 }
 
-Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShader(
+Dali::Graphics::API::Shader& ShaderCache::GetShader(
   const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
   const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh )
 {
@@ -37,10 +37,10 @@ Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShade
   {
     if( item.vertexSource == vsh && item.fragmentSource == fsh )
     {
-      return item.shader;
+      return *item.shader.get();
     }
   }
-  auto shaderRef =
+  auto shader =
     mController.CreateShader( mController.GetShaderFactory()
                               .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
                                                 Graphics::API::ShaderDetails::Language::SPIRV_1_0,
@@ -48,8 +48,10 @@ Dali::Graphics::API::Accessor<Dali::Graphics::API::Shader> ShaderCache::GetShade
                               .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
                                                 Graphics::API::ShaderDetails::Language::SPIRV_1_0,
                                                 fsh ) );
-  mItems.emplace_back( Item() = { shaderRef, vsh, fsh } );
-  return shaderRef;
+
+  auto retval = shader.get();
+  mItems.emplace_back( std::move(shader), vsh, fsh );
+  return *retval;
 }
 
 } // namespace SceneGraph

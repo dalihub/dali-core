@@ -24,7 +24,6 @@
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali/graphics-api/graphics-api-accessor.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/message.h>
@@ -101,15 +100,7 @@ public:
    * Get the Graphics object associated with this texture
    * @return The graphics object.
    */
-  const Graphics::API::Accessor<Graphics::API::Texture>& GetGfxObject() const;
-
-  /**
-   * Get the texture id associated with the graphics texture
-   */
-  uint32_t GetId()
-  {
-    return mId;
-  }
+  const Graphics::API::Texture* GetGfxObject() const;
 
 public: // From messages
   /**
@@ -124,14 +115,12 @@ public: // From messages
    */
   void GenerateMipmaps();
 
-
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
-  Graphics::API::Accessor<Graphics::API::Texture> mGraphicsTexture; ///< Graphics texture
+  std::unique_ptr<Graphics::API::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
   SceneGraph::Sampler     mSampler;          ///< The current sampler state
-  uint32_t                mId;               ///< The Graphics texture handle
   uint16_t                mWidth;            ///< Width of the texture
   uint16_t                mHeight;           ///< Height of the texture
   uint16_t                mMaxMipMapLevel;   ///< Maximum mipmap level
