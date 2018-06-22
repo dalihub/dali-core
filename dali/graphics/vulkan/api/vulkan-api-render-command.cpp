@@ -54,7 +54,7 @@ namespace VulkanAPI
 RenderCommand::~RenderCommand() = default;
 
 RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
-        : mController( controller ), mGraphics( graphics ), mCommandBuffer(), mUpdateFlags( UPDATE_ALL )
+        : mController( controller ), mGraphics( graphics ), mCommandBuffer()
 {
 }
 
@@ -63,53 +63,59 @@ void RenderCommand::PrepareResources()
 {
   if( mUpdateFlags )
   {
-    if( !mVulkanPipeline )
+    if( !mVulkanPipeline || mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT )
     {
-      auto pipeline = dynamic_cast<const VulkanAPI::Pipeline*>( mPipeline );
-      if( !pipeline )
+      auto pipeline = dynamic_cast<const VulkanAPI::Pipeline *>( mPipeline );
+      if (!pipeline)
       {
         return;
       }
       mVkDescriptorSetLayouts.clear();
       mVkDescriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
-      mVulkanPipeline = pipeline->GetVkPipeline();
+      mVulkanPipeline         = pipeline->GetVkPipeline();
+
+      // based on pipeline recreate descriptor pool
+      auto poolSizes = std::vector<vk::DescriptorPoolSize>{
+        vk::DescriptorPoolSize{}
+          .setDescriptorCount(10)
+          .setType(vk::DescriptorType::eUniformBuffer),
+        vk::DescriptorPoolSize{}
+          .setDescriptorCount(10)
+          .setType(vk::DescriptorType::eCombinedImageSampler),
+        vk::DescriptorPoolSize{}
+          .setDescriptorCount(10)
+          .setType(vk::DescriptorType::eSampledImage)
+      };
+
+
+      // create descriptor pool
+      mDescriptorPool = Vulkan::DescriptorPool::New(mGraphics, vk::DescriptorPoolCreateInfo{}
+        .setMaxSets(Vulkan::U32(mVkDescriptorSetLayouts.size() + 1))
+        .setPPoolSizes(poolSizes.data())
+        .setPoolSizeCount(Vulkan::U32(poolSizes.size())));
+
+
+      // allocate descriptor sets. we need a descriptors for each descriptorset
+      // in the shader
+      // allocate descriptor sets for given pipeline layout
+
+      mDescriptorSets = mDescriptorPool->AllocateDescriptorSets(
+        vk::DescriptorSetAllocateInfo{}
+          .setPSetLayouts(mVkDescriptorSetLayouts.data())
+          .setDescriptorPool(nullptr)
+          .setDescriptorSetCount(uint32_t(mVkDescriptorSetLayouts.size()))
+      );
+
+      AllocateUniformBufferMemory();
+
     }
-
-    // based on pipeline recreate descriptor pool
-    auto poolSizes = std::vector< vk::DescriptorPoolSize >{
-            vk::DescriptorPoolSize{}
-                    .setDescriptorCount( 10 )
-                    .setType( vk::DescriptorType::eUniformBuffer ),
-            vk::DescriptorPoolSize{}
-                    .setDescriptorCount( 10 )
-                    .setType( vk::DescriptorType::eCombinedImageSampler ),
-            vk::DescriptorPoolSize{}
-                    .setDescriptorCount( 10 )
-                    .setType( vk::DescriptorType::eSampledImage )
-    };
-
-    // create descriptor pool
-    mDescriptorPool = Vulkan::DescriptorPool::New( mGraphics, vk::DescriptorPoolCreateInfo{}
-            .setMaxSets( Vulkan::U32( mVkDescriptorSetLayouts.size() + 1 ) )
-            .setPPoolSizes( poolSizes.data() )
-            .setPoolSizeCount( Vulkan::U32( poolSizes.size() ) ) );
-
-    // allocate descriptor sets. we need a descriptors for each descriptorset
-    // in the shader
-    // allocate descriptor sets for given pipeline layout
-    mDescriptorSets = mDescriptorPool->AllocateDescriptorSets(
-            vk::DescriptorSetAllocateInfo{}
-                    .setPSetLayouts( mVkDescriptorSetLayouts.data() )
-                    .setDescriptorPool( nullptr )
-                    .setDescriptorSetCount( uint32_t( mVkDescriptorSetLayouts.size() ) )
-    );
-
-    AllocateUniformBufferMemory();
 
     BindUniformBuffers();
 
-    BindTexturesAndSamplers();
-
+    if( mUpdateFlags & ( API::RENDER_COMMAND_UPDATE_TEXTURE_BIT|API::RENDER_COMMAND_UPDATE_SAMPLER_BIT) )
+    {
+      BindTexturesAndSamplers();
+    }
     mUpdateFlags = 0u;
   }
 }
