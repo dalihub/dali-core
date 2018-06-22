@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 
 namespace Dali

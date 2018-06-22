@@ -20,8 +20,8 @@
 
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics/vulkan/vulkan-types.h>
-#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
 
 namespace Dali
 {

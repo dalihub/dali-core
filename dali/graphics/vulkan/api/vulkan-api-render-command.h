@@ -20,7 +20,7 @@
 
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics/vulkan/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
 {
