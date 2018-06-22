@@ -20,7 +20,7 @@
 
 #include <cstdint>
 #include <memory>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 
 namespace Dali
 {
