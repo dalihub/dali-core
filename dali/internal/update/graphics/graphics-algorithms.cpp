@@ -135,50 +135,46 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   {
     auto& item = renderItemList.GetItem( i );
     auto color = item.mNode->GetWorldColor( bufferIndex );
+    auto renderer = item.mRenderer;
 
-    for( auto j = 0u; j < item.mNode->GetRendererCount(); ++j )
+    auto &cmd = renderer->GetGfxRenderCommand();
+    if (cmd.GetVertexBufferBindings()
+           .empty())
     {
-      auto sgRenderer = item.mNode
-                            ->GetRendererAt(j);
-      auto &cmd = sgRenderer->GetGfxRenderCommand();
-      if (cmd.GetVertexBufferBindings()
-             .empty())
-      {
-        continue;
-      }
-      cmd.BindRenderTarget(renderTargetBinding);
-
-      auto opacity = sgRenderer->GetOpacity( bufferIndex );
-
-      if( sgRenderer->IsPreMultipliedAlphaEnabled() )
-      {
-        float alpha = color.a * opacity;
-        color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
-      }
-      else
-      {
-        color.a *= opacity;
-      }
-
-      Matrix mvp, mvp2;
-      Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
-      Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-      sgRenderer->WriteUniform("uModelMatrix", item.mModelMatrix);
-      sgRenderer->WriteUniform("uMvpMatrix", mvp2);
-      sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
-      sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
-
-      Matrix3 uNormalMatrix( item.mModelViewMatrix );
-      uNormalMatrix.Invert();
-      uNormalMatrix.Transpose();
-
-      sgRenderer->WriteUniform("uNormalMatrix", uNormalMatrix);
-      sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
-      sgRenderer->WriteUniform("uSize", item.mSize);
-      sgRenderer->WriteUniform("uColor", color );
-
-      commandList.push_back(&cmd);
+      continue;
     }
+    cmd.BindRenderTarget(renderTargetBinding);
+
+    auto opacity = renderer->GetOpacity( bufferIndex );
+
+    if( renderer->IsPreMultipliedAlphaEnabled() )
+    {
+      float alpha = color.a * opacity;
+      color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
+    }
+    else
+    {
+      color.a *= opacity;
+    }
+
+    Matrix mvp, mvp2;
+    Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
+    Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
+    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform("uMvpMatrix", mvp2);
+    renderer->WriteUniform("uViewMatrix", *viewMatrix);
+    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
+
+    Matrix3 uNormalMatrix( item.mModelViewMatrix );
+    uNormalMatrix.Invert();
+    uNormalMatrix.Transpose();
+
+    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform("uSize", item.mSize);
+    renderer->WriteUniform("uColor", color );
+
+    commandList.push_back(&cmd);
   }
 
   graphics.SubmitCommands( std::move(commandList) );
