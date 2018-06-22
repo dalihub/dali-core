@@ -199,21 +199,21 @@ public: // Getters
 
 public: //Cache management methods
 
-  void AddBuffer( RefCountedBuffer buffer );
+  void AddBuffer( Buffer& buffer );
 
-  void AddImage( RefCountedImage image );
+  void AddImage( Image& image );
 
-  void AddImageView( RefCountedImageView imageView );
+  void AddImageView( ImageView& imageView );
 
-  void AddShader( RefCountedShader shader );
+  void AddShader( Shader& shader );
 
   void AddCommandPool( RefCountedCommandPool pool );
 
-  void AddDescriptorPool( RefCountedDescriptorPool pool );
+  void AddDescriptorPool( DescriptorPool& pool );
 
-  void AddFramebuffer( RefCountedFramebuffer framebuffer );
+  void AddFramebuffer( Framebuffer& framebuffer );
 
-  void AddSampler( RefCountedSampler sampler );
+  void AddSampler( Sampler& sampler );
 
   RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
