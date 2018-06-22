@@ -17,27 +17,27 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-command-pool.h>
-#include <dali/graphics/vulkan/vulkan-command-buffer.h>
-#include <dali/graphics/vulkan/vulkan-queue.h>
-#include <dali/graphics/vulkan/vulkan-surface.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-queue.h>
+#include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 
-#include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-image.h>
-#include <dali/graphics/vulkan/vulkan-image-view.h>
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
-#include <dali/graphics/vulkan/vulkan-shader.h>
-#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
-#include <dali/graphics/vulkan/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-image-view.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-shader.h>
+#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/vulkan-sampler.h>
-#include <dali/graphics/vulkan/vulkan-resource-cache.h>
-#include <dali/graphics/vulkan/vulkan-debug.h>
-#include <dali/graphics/vulkan/vulkan-fence.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-resource-cache.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-fence.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
