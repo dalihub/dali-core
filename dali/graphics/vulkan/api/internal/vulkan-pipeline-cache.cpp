@@ -15,7 +15,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-api-pipeline-impl.h>
 

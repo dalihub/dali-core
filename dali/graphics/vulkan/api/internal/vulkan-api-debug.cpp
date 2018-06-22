@@ -21,13 +21,13 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-image.h>
-#include <dali/graphics/vulkan/vulkan-image-view.h>
-#include <dali/graphics/vulkan/vulkan-sampler.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-image-view.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 
 // EXTERNAL INCLUDES
 #include <sstream>

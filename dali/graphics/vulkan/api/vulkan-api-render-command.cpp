@@ -22,24 +22,24 @@
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
-#include <dali/graphics/vulkan/spirv/vulkan-spirv.h>
-#include <dali/graphics/vulkan/vulkan-command-buffer.h>
-#include <dali/graphics/vulkan/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
-#include <dali/graphics/vulkan/vulkan-sampler.h>
-#include <dali/graphics/vulkan/vulkan-image.h>
-#include <dali/graphics/vulkan/vulkan-image-view.h>
-#include <dali/graphics/vulkan/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-image-view.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 
-#include <dali/graphics/vulkan/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-pool.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 
 namespace Dali

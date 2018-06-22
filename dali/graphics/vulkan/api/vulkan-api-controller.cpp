@@ -15,21 +15,23 @@
  *
  */
 
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-handle.h>
-#include <dali/graphics/vulkan/gpu-memory/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/vulkan-buffer.h>
-#include <dali/graphics/vulkan/vulkan-command-buffer.h>
-#include <dali/graphics/vulkan/vulkan-command-pool.h>
-#include <dali/graphics/vulkan/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
+
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/vulkan-pipeline.h>
-#include <dali/graphics/vulkan/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/vulkan-surface.h>
-#include <dali/graphics/vulkan/vulkan-sampler.h>
-#include <dali/graphics/vulkan/vulkan-image.h>
-#include <dali/graphics/vulkan/vulkan-graphics-texture.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
+#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-surface.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-graphics-texture.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 // API
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
@@ -42,7 +44,6 @@
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
-#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {

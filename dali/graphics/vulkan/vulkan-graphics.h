@@ -24,9 +24,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/graphics/surface-factory.h>
-#include <dali/graphics/vulkan/vulkan-types.h>
-#include <dali/graphics/vulkan/vulkan-queue.h>
-#include <dali/graphics/vulkan/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/vulkan-queue.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <thread>
 #include <mutex>

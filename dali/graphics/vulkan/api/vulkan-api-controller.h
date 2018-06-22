@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
 {
@@ -50,7 +51,7 @@ struct BufferMemoryTransfer
   std::unique_ptr< char > srcPtr{ nullptr };
   uint32_t srcSize{ 0u };
 
-  Vulkan::RefCountedBuffer dstBuffer{};
+  Vulkan::RefCountedBuffer dstBuffer;
   uint32_t dstOffset{ 0u };
 };
 
