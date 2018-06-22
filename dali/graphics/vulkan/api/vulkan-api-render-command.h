@@ -129,8 +129,6 @@ private:
   std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
 
   std::vector< std::unique_ptr< Ubo>> mUboBuffers;
-
-  uint32_t mUpdateFlags;
 };
 
 }
