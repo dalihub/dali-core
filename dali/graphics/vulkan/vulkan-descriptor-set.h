@@ -92,9 +92,6 @@ private:
   DescriptorPool* mPool;
   vk::DescriptorSetAllocateInfo mAllocateInfo;
   vk::DescriptorSet mDescriptorSet;
-
-  // attached resources
-  std::vector< Handle< VkManaged>> mResources;
 };
 
 class DescriptorPool : public VkManaged
