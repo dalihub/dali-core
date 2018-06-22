@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <atomic>
 
 namespace Dali
 {
@@ -78,7 +77,8 @@ private:
   SceneGraphBuffers& operator=(const SceneGraphBuffers& rhs);
 
 private:
-  std::atomic<BufferIndex> mEventBufferIndex;  ///< 0 or 1 (opposite of mUpdateBufferIndex)
+
+  BufferIndex mEventBufferIndex;  ///< 0 or 1 (opposite of mUpdateBufferIndex)
   BufferIndex mUpdateBufferIndex; ///< 0 or 1 (opposite of mEventBufferIndex)
 };
 

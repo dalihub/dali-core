@@ -111,44 +111,44 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for global error level messages
  */
-#define DALI_LOG_ERROR(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError,   "%s " format, __FUNCTION__, ## __VA_ARGS__)
+#define DALI_LOG_ERROR(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError,   "%s " format, __PRETTY_FUNCTION__, ## args)
 
-#define DALI_LOG_ERROR_NOFN(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ## __VA_ARGS__)
+#define DALI_LOG_ERROR_NOFN(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ## args)
 
-#define DALI_LOG_WARNING_NOFN(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, format, ## __VA_ARGS__)
+#define DALI_LOG_WARNING_NOFN(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, format, ## args)
 
 /**
  * Provides unfiltered logging for fps monitor
  */
-#define DALI_LOG_FPS(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_FPS(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
 /**
  * Provides unfiltered logging for update status
  */
-#define DALI_LOG_UPDATE_STATUS(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_UPDATE_STATUS(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
 /**
  * Provides unfiltered logging for render information
  */
-#define DALI_LOG_RENDER_INFO(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_RENDER_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
 /**
  * Provides unfiltered logging for release
  */
-#define DALI_LOG_RELEASE_INFO(format, args, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_RELEASE_INFO(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## args)
 
 #ifdef DEBUG_ENABLED
 
 /**
  * Provides unfiltered logging for global warning level messages
  */
-#define DALI_LOG_WARNING(format, ...)   Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, __PRETTY_FUNCTION__, ## __VA_ARGS__)
+#define DALI_LOG_WARNING(format, args...)   Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, __PRETTY_FUNCTION__, ## args)
 
 
 #else // DEBUG_ENABLED
 
 // Don't warn on release build
-#define DALI_LOG_WARNING(format, ...)
+#define DALI_LOG_WARNING(format, args...)
 
 #endif
 
@@ -311,8 +311,8 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-#define DALI_LOG_INFO(filter, level, format, ...)                        \
-  if(filter && filter->IsEnabledFor(level)) { filter->Log(level, format,  ## __VA_ARGS__); }
+#define DALI_LOG_INFO(filter, level, format, args...)                        \
+  if(filter && filter->IsEnabledFor(level)) { filter->Log(level, format,  ## args); }
 
 #define DALI_LOG_STREAM( filter, level, stream )  \
   if(filter && filter->IsEnabledFor(level))       \
@@ -324,7 +324,7 @@ public:
 
 #else // DEBUG_ENABLED
 
-#define DALI_LOG_INFO(filter, level, format, ...)
+#define DALI_LOG_INFO(filter, level, format, args...)
 #define DALI_LOG_STREAM( filter, level, stream )
 
 #endif // DEBUG_ENABLED
@@ -353,8 +353,8 @@ public:
 };
 
 
-#define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...)                 \
-  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, __PRETTY_FUNCTION__, ## __VA_ARGS__)
+#define DALI_LOG_TRACE_METHOD_FMT(filter, format, args...)                 \
+  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, __PRETTY_FUNCTION__, ## args)
 
 #define DALI_LOG_TRACE_METHOD(filter)                                      \
   Dali::Integration::Log::TraceObj debugTraceObj(filter, __PRETTY_FUNCTION__)
@@ -362,7 +362,7 @@ public:
 
 #else // DEBUG_ENABLED
 
-#define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...)
+#define DALI_LOG_TRACE_METHOD_FMT(filter, format, args...)
 #define DALI_LOG_TRACE_METHOD(filter)
 
 
@@ -406,7 +406,7 @@ public: \
 /**
  * Allows one object to set another object's std::string easily
  */
-#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, ...) (object->mDebugString = FormatToString(fmt, ## __VA_ARGS__))
+#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, args...) (object->mDebugString = FormatToString(fmt, ## args))
 
 /**
  * Allows one object to get another object's debug string
@@ -429,7 +429,7 @@ public: \
 #define DALI_LOG_OBJECT_STRING_DECLARATION
 #define DALI_LOG_ACTOR_TREE(node)
 #define DALI_LOG_SET_OBJECT_STRING(object, string)
-#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, ...)
+#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, args...)
 #define DALI_LOG_GET_OBJECT_STRING(object)
 #define DALI_LOG_GET_OBJECT_C_STR(object) ""
 #define DALI_LOG_OBJECT(filter, object)
