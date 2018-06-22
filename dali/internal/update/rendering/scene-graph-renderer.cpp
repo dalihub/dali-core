@@ -379,7 +379,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         auto gfxTexture = texture->GetGfxObject();
         auto binding    = Graphics::API::RenderCommand::TextureBinding{}
           .SetBinding(samplers[i].binding)
-          .SetTexture(texture->GetGfxObject())
+          .SetTexture(texture->GetGfxObject().Get())
           .SetSampler(nullptr);
 
         textureBindings.emplace_back(binding);
