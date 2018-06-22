@@ -48,28 +48,28 @@ public:
    * @param buffer The buffer object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddBuffer( RefCountedBuffer buffer );
+  ResourceCache& AddBuffer( Buffer& buffer );
 
   /**
    * Adds the provided image object to the image cache
    * @param image The image object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddImage( RefCountedImage image );
+  ResourceCache& AddImage( Image& image );
 
   /**
    * Adds the provided image view object to the image view cache
    * @param imageView The image view object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddImageView( RefCountedImageView imageView );
+  ResourceCache& AddImageView( ImageView& imageView );
 
   /**
    * Adds the provided shader object to the pipeline cache
    * @param shader The shader object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddShader( RefCountedShader shader );
+  ResourceCache& AddShader( Shader& shader );
 
   /**
    * Adds the provided command pool object to the command pool cache
@@ -83,21 +83,21 @@ public:
    * @param pool The descriptor pool object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddDescriptorPool( RefCountedDescriptorPool pool );
+  ResourceCache& AddDescriptorPool( DescriptorPool& pool );
 
   /**
    * Adds the provided framebuffer object to the framebuffer cache
    * @param framebuffer The framebuffer object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddFramebuffer( RefCountedFramebuffer framebuffer );
+  ResourceCache& AddFramebuffer( Framebuffer& framebuffer );
 
   /**
    * Adds the provided sampler object to the sampler cache
    * @param sampler The sampler object to be added to the cache
    * @return A reference to the ResourceCache
    */
-  ResourceCache& AddSampler( RefCountedSampler sampler );
+  ResourceCache& AddSampler( Sampler& sampler );
 
   /**
    * Finds the buffer object using the specified Vulkan handle in the cache
@@ -232,13 +232,13 @@ public:
   ResourceCache&& operator=( ResourceCache&& other ) = delete;
 
 private:
-  std::vector< RefCountedBuffer > mBuffers;
-  std::vector< RefCountedImage > mImages;
-  std::vector< RefCountedImageView > mImageViews;
-  std::vector< RefCountedShader > mShaders;
-  std::vector< RefCountedDescriptorPool > mDescriptorPools;
-  std::vector< RefCountedFramebuffer > mFramebuffers;
-  std::vector< RefCountedSampler > mSamplers;
+  std::vector< Buffer* >          mBuffers;
+  std::vector< Image* >           mImages;
+  std::vector< ImageView* >       mImageViews;
+  std::vector< Shader* >          mShaders;
+  std::vector< DescriptorPool* >  mDescriptorPools;
+  std::vector< Framebuffer* >     mFramebuffers;
+  std::vector< Sampler* >         mSamplers;
 
   // Command pool map using thread IDs as keys
   CommandPoolMap mCommandPools;

@@ -39,7 +39,7 @@ Handle< DescriptorPool > DescriptorPool::New( Graphics& graphics, const vk::Desc
   auto pool = Handle< DescriptorPool >( new DescriptorPool( graphics, createInfo ) );
   if( pool->Initialise() )
   {
-    graphics.AddDescriptorPool( pool );
+    graphics.AddDescriptorPool( *pool );
   }
   return pool;
 }
@@ -128,9 +128,6 @@ DescriptorSet::~DescriptorSet() = default;
 
 void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size )
 {
-  // add resource to the list
-  mResources.emplace_back( buffer.StaticCast< VkManaged >() );
-
   auto bufferInfo = vk::DescriptorBufferInfo{}
           .setOffset( U32( offset ) )
           .setRange( U32( size ) )
@@ -155,10 +152,6 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
 void
 DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
 {
-  // add resource to the list
-  mResources.emplace_back( sampler.StaticCast< VkManaged >() );
-  mResources.emplace_back( imageView.StaticCast< VkManaged >() );
-
   auto imageViewInfo = vk::DescriptorImageInfo{}
           .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
           .setImageView( imageView->GetVkHandle() )
