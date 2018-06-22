@@ -41,158 +41,25 @@ class Buffer;
 class Sampler;
 class Pipeline;
 
-
 /**
- * @brief Interface class for RenderCommand types in the graphics API.
- *
- * @startuml
- *
- * skinparam defaultFontName Ubuntu Mono
- * class RenderCommand {
- *  -- protected --
- *  #VertexAttributeBufferBinding[]  mVertexBufferBindings
- *  #UniformBufferBinding[]          mUniformBufferBindings
- *  #TextureBinding[]                mTextureBindings
- *  #SamplerBinding[]                mSamplerBindings
- *  #IndexBufferBinding              mIndexBufferBinding
- *  #RenderTargetBinding             mRenderTargetBinding
- *  #DrawCommand                     mDrawCommand
- *  #PushConstantsBinding[]          mPushConstantsBindings
- *  #RenderState                     mRenderState
- *
- * -- public API --
- *  +RenderCommand& BindVertextBuffers()
- *  +RenderCommand& BindUniformBuffers()
- *  +RenderCommand& BindTextures()
- *  +RenderCommand& BindSamplers()
- *  +RenderCommand& PushConstants()
- *  +RenderCommand& BindRenderState()
- *  +RenderCommand& Draw()
- *  -- static API ( helper functions )--
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewTextureBindings()
- *  {static} NewPushConstantsBindings()
- * }
- *
- * class VertexAttributeBufferBinding {
- * Accessor<Buffer>   buffer
- * uint32_t           location
- * uint32_t           offset
- * uint32_t           stride
- * InputAttributeRate rate
- * void*              pNext
- * }
- *
- * class UniformBufferBinding {
- *   #Accessor<Buffer> buffer
- *   #uint32_t         offset
- *   #uint32_t         dataSize
- *   #uint32_t         binding
- *   #void*            pNext
- * }
- *
-  class IndexBufferBinding {
-    #Accessor<Buffer> buffer
-    #uint32_t         offset
-    #IndexType        type
-    #void*            pNext
-  }
-
-  class RenderTargetBinding {
-    #Accessor<Framebuffer>                 framebuffer
-    #std::vector<Framebuffer::ClearColor>  clearColors
-    #Framebuffer::DepthStencilClearColor   dsClearColor
-    #void*                                 pNext
-  }
-
-  class DrawCommand {
-      #DrawType drawType;
-      #uint32_t firstVertex
-      #uint32_t firstIndex
-      #uint32_t vertexCount
-      #uint32_t indicesCount
-      #uint32_t firstInstance
-      #uint32_t instanceCount
-      #void*    pNext
-  }
-
-  class PushConstantsBinding {
-    #void*     data
-    #uint32_t  size
-    #uint32_t  binding
-    #void*    pNext
-  }
-
-  class RenderState {
-    #Accessor<Shader> shader
-    #void*    pNext
-  }
-
-  class TextureBinding {
-    #Accessor<Texture> texture
-    #Accessor<Sampler> sampler
-    #uint32_t          binding
-    #void*             pNext
-  }
-
-  class SamplerBinding {
-    #Accessor<Sampler> sampler
-    #uint32_t binding
-    #void*    pNext
-  }
-
- note as RenderStateWIP
- Other render states like
- blending etc. should be added
- as public fields of this structure.
- end note
-
- RenderStateWIP .. RenderState
-
- * note as N1
- * Each state is described as POD
- * structure which is a Vulkan
- * approach.
- * end note
- *
- * note as N2
- * Field pNext may be used by the
- * implementation to pass additional
- * data.
- * end note
- *
- * N2 .. VertexAttributeBufferBinding::pNext
- * N1 .. VertexAttributeBufferBinding
- * N1 .. UniformBufferBinding
- * N1 .. IndexBufferBinding
- * N1 .. RenderTargetBinding
- *
-
- *
- * RenderCommand *-right- VertexAttributeBufferBinding
- * RenderCommand *-right- UniformBufferBinding
- * RenderCommand *-left- IndexBufferBinding
- * RenderCommand *-left- RenderTargetBinding
- * RenderCommand *-up- RenderState
- * RenderCommand *-up- DrawCommand
- * RenderCommand *-down- PushConstantsBinding
- * RenderCommand *-down- SamplerBinding
- * RenderCommand *-down- TextureBinding
- * @enduml
+ * RenderCOmmand update flag bits
  */
+constexpr uint32_t RENDER_COMMAND_UPDATE_PIPELINE_BIT           = 1 << 0;
+constexpr uint32_t RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT     = 1 << 1;
+constexpr uint32_t RENDER_COMMAND_UPDATE_VERTEX_ATTRIBUTE_BIT   = 1 << 2;
+constexpr uint32_t RENDER_COMMAND_UPDATE_TEXTURE_BIT            = 1 << 3;
+constexpr uint32_t RENDER_COMMAND_UPDATE_SAMPLER_BIT            = 1 << 4;
+constexpr uint32_t RENDER_COMMAND_UPDATE_INDEX_BUFFER_BIT       = 1 << 5;
+constexpr uint32_t RENDER_COMMAND_UPDATE_RENDER_TARGET_BIT      = 1 << 6;
+constexpr uint32_t RENDER_COMMAND_UPDATE_DRAW_BIT               = 1 << 7;
+constexpr uint32_t RENDER_COMMAND_UPDATE_PUSH_CONSTANTS_BIT     = 1 << 8;
+constexpr uint32_t RENDER_COMMAND_UPDATE_ALL_BITS               = 0xffff;
+
 class RenderCommand
 {
 public:
 
   static constexpr uint32_t BINDING_INDEX_DONT_CARE { 0xffffffff };
-
-  enum class InputAttributeRate
-  {
-    PER_VERTEX,
-    PER_INSTANCE
-  };
 
   enum class IndexType
   {
@@ -205,63 +72,6 @@ public:
     UNDEFINED_DRAW,
     VERTEX_DRAW,
     INDEXED_DRAW,
-  };
-
-  enum class Topology
-  {
-    TRIANGLES,
-    TRIANGLE_FAN,
-    TRIANGLE_STRIP,
-    LINES
-  };
-
-  /**
-   * Describes buffer attribute binding
-   *
-   */
-  struct VertexAttributeBufferBinding
-  {
-    VertexAttributeBufferBinding() = default;
-
-    Accessor<Buffer> buffer{ nullptr };
-    uint32_t location { 0u };
-    uint32_t offset { 0u };
-    uint32_t stride { 0u };
-    InputAttributeRate rate { InputAttributeRate::PER_VERTEX };
-
-    uint32_t binding { 0u };
-    void*    pNext{ nullptr };
-
-    VertexAttributeBufferBinding& SetBuffer( Accessor<Buffer> value )
-    {
-      buffer = value;
-      return *this;
-    }
-    VertexAttributeBufferBinding& SetLocation( uint32_t value )
-    {
-      location = value;
-      return *this;
-    }
-    VertexAttributeBufferBinding& SetOffset( uint32_t value )
-    {
-      offset = value;
-      return *this;
-    }
-    VertexAttributeBufferBinding& SetStride( uint32_t value )
-    {
-      stride = value;
-      return *this;
-    }
-    VertexAttributeBufferBinding& SetBinding( uint32_t value )
-    {
-      binding = value;
-      return *this;
-    }
-    VertexAttributeBufferBinding& SetInputAttributeRate( InputAttributeRate value)
-    {
-      rate = value;
-      return *this;
-    }
   };
 
   /**
@@ -297,6 +107,8 @@ public:
       binding = value;
       return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const UniformBufferBinding& object);
   };
 
   /**
@@ -304,15 +116,15 @@ public:
    */
   struct TextureBinding
   {
-    Accessor<Texture> texture;
+    const Texture* texture;
     Accessor<Sampler> sampler;
     uint32_t binding;
     void*    pNext{ nullptr };
     TextureBinding() : texture(nullptr), sampler( nullptr ), binding( 0u ) {}
 
-    TextureBinding& SetTexture( Accessor<Texture> value )
+    TextureBinding& SetTexture( const Texture& value )
     {
-      texture = value;
+      texture = &value;
       return *this;
     }
     TextureBinding& SetSampler( Accessor<Sampler> value )
@@ -325,6 +137,9 @@ public:
       binding = value;
       return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const TextureBinding& object);
+
   };
 
   /**
@@ -345,6 +160,7 @@ public:
       binding = value;
       return *this;
     }
+    friend std::ostream& operator<<(std::ostream& ss, const SamplerBinding& object);
   };
 
   /**
@@ -375,6 +191,8 @@ public:
       type = value;
       return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const IndexBufferBinding&);
   };
 
   struct RenderTargetBinding
@@ -397,11 +215,13 @@ public:
       return *this;
     }
 
-    RenderTargetBinding& SetFramebuffer( Framebuffer::DepthStencilClearColor value )
+    RenderTargetBinding& SetDepthStencilClearColor( Framebuffer::DepthStencilClearColor value )
     {
       dsClearColor = value;
       return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const RenderTargetBinding&);
   };
 
   struct DrawCommand
@@ -457,6 +277,8 @@ public:
       instanceCount = value;
       return *this;
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const DrawCommand&);
   };
 
   /**
@@ -485,43 +307,8 @@ public:
       binding = value;
       return *this;
     }
-  };
 
-  /**
-   *
-   */
-  struct RenderState
-  {
-    struct BlendState
-    {
-      bool blendingEnabled { false };
-    };
-
-    RenderState() = default;
-
-    Accessor<Shader> shader { nullptr };
-    BlendState blendState {};
-    Topology topology{ Topology::TRIANGLES };
-
-    RenderState& SetShader( Accessor<Shader> value )
-    {
-      shader = value;
-      return *this;
-    }
-
-    RenderState& SetBlendState( BlendState value )
-    {
-      blendState = value;
-      return *this;
-    }
-
-    RenderState& SetTopology( Topology value )
-    {
-      topology = value;
-      return *this;
-    }
-
-    void*    pNext{ nullptr };
+    friend std::ostream& operator<<(std::ostream& ss, const PushConstantsBinding&);
   };
 
   RenderCommand()
@@ -532,8 +319,8 @@ public:
     mRenderTargetBinding(),
     mDrawCommand(),
     mPushConstantsBindings(),
-    mRenderState(),
-    mPipeline( nullptr )
+    mPipeline( nullptr ),
+    mUpdateFlags( 0u )
   {
   }
 
@@ -553,87 +340,71 @@ public:
   RenderCommand& BindVertexBuffers( std::vector<Accessor<Buffer>>&& buffers )
   {
     mVertexBufferBindings = std::move( buffers );
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_VERTEX_ATTRIBUTE_BIT;
     return *this;
   }
 
   RenderCommand& BindUniformBuffers( std::vector<UniformBufferBinding>&& bindings )
   {
     mUniformBufferBindings = std::move( bindings );
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
     return *this;
   }
 
   RenderCommand& BindTextures( std::vector<TextureBinding>&& bindings )
   {
     mTextureBindings = std::move( bindings );
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_TEXTURE_BIT;
     return *this;
   }
 
   RenderCommand& BindSamplers( std::vector<SamplerBinding>&& bindings )
   {
     mSamplerBindings = std::move( bindings );
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_SAMPLER_BIT;
     return *this;
   }
 
   RenderCommand& PushConstants( std::vector<PushConstantsBinding>&& bindings )
   {
     mPushConstantsBindings = bindings;
-    return *this;
-  }
-
-  RenderCommand& BindRenderState( RenderState& renderState )
-  {
-    mRenderState = renderState;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_PUSH_CONSTANTS_BIT;
     return *this;
   }
 
   RenderCommand& BindRenderTarget( const RenderTargetBinding& binding )
   {
     mRenderTargetBinding = binding;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_RENDER_TARGET_BIT;
     return *this;
   }
 
   RenderCommand& BindRenderTarget( RenderTargetBinding&& binding )
   {
     mRenderTargetBinding = std::move(binding);
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_RENDER_TARGET_BIT;
     return *this;
   }
 
   RenderCommand& Draw( DrawCommand&& drawCommand )
   {
     mDrawCommand = drawCommand;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_DRAW_BIT;
     return *this;
   }
 
   RenderCommand& BindPipeline( const Pipeline& pipeline )
   {
     mPipeline = &pipeline;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_PIPELINE_BIT;
     return *this;
   }
 
   RenderCommand& BindIndexBuffer( const IndexBufferBinding& binding )
   {
     mIndexBufferBinding = binding;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_INDEX_BUFFER_BIT;
     return *this;
-  }
-
-  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings()
-  {
-    return std::vector<VertexAttributeBufferBinding>{};
-  }
-
-  /**
-   * Makes a copy ( or moves ) all bindings from the source array
-   * @param bindings
-   * @return
-   */
-  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings( std::vector<VertexAttributeBufferBinding>&& bindings )
-  {
-    return std::vector<VertexAttributeBufferBinding>{ std::move(bindings) };
-  }
-
-  static std::vector<VertexAttributeBufferBinding> NewVertexAttributeBufferBindings( const std::vector<VertexAttributeBufferBinding>& bindings )
-  {
-    return std::vector<VertexAttributeBufferBinding>{ bindings };
   }
 
   static std::vector<TextureBinding> NewTextureBindings()
@@ -684,15 +455,12 @@ public:
     return mPushConstantsBindings;
   }
 
-  const RenderState& GetRenderState() const
-  {
-    return mRenderState;
-  }
-
   const Pipeline* GetPipeline() const
   {
     return mPipeline;
   }
+
+  friend std::ostream& operator<<(std::ostream& ss, const RenderCommand& object);
 
 public:
 
@@ -707,8 +475,17 @@ public:
   RenderTargetBinding                       mRenderTargetBinding;
   DrawCommand                               mDrawCommand;
   std::vector<PushConstantsBinding>         mPushConstantsBindings;
-  RenderState                               mRenderState;
   const Pipeline*                           mPipeline;
+
+#if defined(DEBUG_ENABLED)
+  // Debug
+  std::string                               mDebugString{""};
+  void*                                     mDebugObject{nullptr};
+#endif
+
+protected:
+
+  uint32_t mUpdateFlags; // update flags to be handled by implementation
 
 };
 
@@ -718,145 +495,3 @@ public:
 
 
 #endif // DALI_GRAPHICS_API_RENDER_COMMAND_H
-
-
-/**
- * @brief Interface class for RenderCommand types in the graphics API.
- *
- * @startuml
- *
- * skinparam defaultFontName Ubuntu Mono
- * class RenderCommand {
- *  -- protected --
- *  #VertexAttributeBufferBinding[]  mVertexBufferBindings
- *  #UniformBufferBinding[]          mUniformBufferBindings
- *  #TextureBinding[]                mTextureBindings
- *  #SamplerBinding[]                mSamplerBindings
- *  #IndexBufferBinding              mIndexBufferBinding
- *  #RenderTargetBinding             mRenderTargetBinding
- *  #DrawCommand                     mDrawCommand
- *  #PushConstantsBinding[]          mPushConstantsBindings
- *  #RenderState                     mRenderState
- *
- * -- public API --
- *  +RenderCommand& BindVertextBuffers()
- *  +RenderCommand& BindUniformBuffers()
- *  +RenderCommand& BindTextures()
- *  +RenderCommand& BindSamplers()
- *  +RenderCommand& PushConstants()
- *  +RenderCommand& BindRenderState()
- *  +RenderCommand& Draw()
- *  -- static API ( helper functions )--
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewVertexAttributeBufferBindings()
- *  {static} NewTextureBindings()
- *  {static} NewPushConstantsBindings()
- * }
- *
- * class VertexAttributeBufferBinding {
- * Accessor<Buffer>   buffer
- * uint32_t           location
- * uint32_t           offset
- * uint32_t           stride
- * InputAttributeRate rate
- * void*              pNext
- * }
- *
- * class UniformBufferBinding {
- *   #Accessor<Buffer> buffer
- *   #uint32_t         offset
- *   #uint32_t         dataSize
- *   #uint32_t         binding
- *   #void*            pNext
- * }
- *
-  class IndexBufferBinding {
-    #Accessor<Buffer> buffer
-    #uint32_t         offset
-    #IndexType        type
-    #void*            pNext
-  }
-
-  class RenderTargetBinding {
-    #Accessor<Framebuffer>                 framebuffer
-    #std::vector<Framebuffer::ClearColor>  clearColors
-    #Framebuffer::DepthStencilClearColor   dsClearColor
-    #void*                                 pNext
-  }
-
-  class DrawCommand {
-      #DrawType drawType;
-      #uint32_t firstVertex
-      #uint32_t firstIndex
-      #uint32_t vertexCount
-      #uint32_t indicesCount
-      #uint32_t firstInstance
-      #uint32_t instanceCount
-      #void*    pNext
-  }
-
-  class PushConstantsBinding {
-    #void*     data
-    #uint32_t  size
-    #uint32_t  binding
-    #void*    pNext
-  }
-
-  class RenderState {
-    #Accessor<Shader> shader
-    #void*    pNext
-  }
-
-  class TextureBinding {
-    #Accessor<Texture> texture
-    #Accessor<Sampler> sampler
-    #uint32_t          binding
-    #void*             pNext
-  }
-
-  class SamplerBinding {
-    #Accessor<Sampler> sampler
-    #uint32_t binding
-    #void*    pNext
-  }
-
- note as RenderStateWIP
- Other render states like
- blending etc. should be added
- as public fields of this structure.
- end note
-
- RenderStateWIP .. RenderState
-
- * note as N1
- * Each state is described as POD
- * structure which is a Vulkan
- * approach.
- * end note
- *
- * note as N2
- * Field pNext may be used by the
- * implementation to pass additional
- * data.
- * end note
- *
- * N2 .. VertexAttributeBufferBinding::pNext
- * N1 .. VertexAttributeBufferBinding
- * N1 .. UniformBufferBinding
- * N1 .. IndexBufferBinding
- * N1 .. RenderTargetBinding
- *
-
- *
- * RenderCommand *-right- VertexAttributeBufferBinding
- * RenderCommand *-right- UniformBufferBinding
- * RenderCommand *-left- IndexBufferBinding
- * RenderCommand *-left- RenderTargetBinding
- * RenderCommand *-up- RenderState
- * RenderCommand *-up- DrawCommand
- * RenderCommand *-down- PushConstantsBinding
- * RenderCommand *-down- SamplerBinding
- * RenderCommand *-down- TextureBinding
- * @enduml
- */

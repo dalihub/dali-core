@@ -135,9 +135,9 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   {
     auto& item = renderItemList.GetItem( i );
     auto color = item.mNode->GetWorldColor( bufferIndex );
-    auto renderer = item.mRenderer;
+    auto sgRenderer = item.mRenderer;
 
-    auto &cmd = renderer->GetGfxRenderCommand();
+    auto &cmd = sgRenderer->GetGfxRenderCommand();
     if (cmd.GetVertexBufferBindings()
            .empty())
     {
@@ -145,9 +145,9 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     }
     cmd.BindRenderTarget(renderTargetBinding);
 
-    auto opacity = renderer->GetOpacity( bufferIndex );
+    auto opacity = sgRenderer->GetOpacity( bufferIndex );
 
-    if( renderer->IsPreMultipliedAlphaEnabled() )
+    if( sgRenderer->IsPreMultipliedAlphaEnabled() )
     {
       float alpha = color.a * opacity;
       color = Vector4( color.r * alpha, color.g * alpha, color.b * alpha, alpha );
@@ -160,19 +160,19 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform("uMvpMatrix", mvp2);
-    renderer->WriteUniform("uViewMatrix", *viewMatrix);
-    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
+    sgRenderer->WriteUniform("uModelMatrix", item.mModelMatrix);
+    sgRenderer->WriteUniform("uMvpMatrix", mvp2);
+    sgRenderer->WriteUniform("uViewMatrix", *viewMatrix);
+    sgRenderer->WriteUniform("uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform("uSize", item.mSize);
-    renderer->WriteUniform("uColor", color );
+    sgRenderer->WriteUniform("uNormalMatrix", uNormalMatrix);
+    sgRenderer->WriteUniform("uProjection", vulkanProjectionMatrix);
+    sgRenderer->WriteUniform("uSize", item.mSize);
+    sgRenderer->WriteUniform("uColor", color );
 
     commandList.push_back(&cmd);
   }
