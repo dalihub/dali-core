@@ -287,7 +287,7 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, BufferType type )
 
   VkAssert( mDevice.createBuffer( &info, mAllocator.get(), refCountedBuffer->Ref() ) );
 
-  AddBuffer( refCountedBuffer );
+  AddBuffer( *refCountedBuffer );
 
   return refCountedBuffer;
 }
@@ -298,7 +298,7 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
 
   VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), refCountedBuffer->Ref() ) );
 
-  AddBuffer( refCountedBuffer );
+  AddBuffer( *refCountedBuffer );
 
   return refCountedBuffer;
 }
@@ -309,7 +309,7 @@ RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInf
 
   VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), refCountedImage->Ref() ) );
 
-  AddImage( refCountedImage );
+  AddImage( *refCountedImage );
 
   return refCountedImage;
 }
@@ -333,7 +333,7 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 
   VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, refCountedImageView->Ref() ) );
 
-  AddImageView( refCountedImageView );
+  AddImageView( *refCountedImageView );
 
   return refCountedImageView;
 }
@@ -358,7 +358,7 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
                                               componentsMapping,
                                               subresourceRange );
 
-  AddImageView( refCountedImageView );
+  AddImageView( *refCountedImageView );
 
   return refCountedImageView;
 }
@@ -369,7 +369,7 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
 
   VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), refCountedSampler->Ref() ) );
 
-  AddSampler( refCountedSampler );
+  AddSampler( *refCountedSampler );
 
   return refCountedSampler;
 
@@ -683,52 +683,52 @@ bool Graphics::IsShuttingDown()
 // --------------------------------------------------------------------------------------------------------------
 
 // Cache manipulation methods -----------------------------------------------------------------------------------
-void Graphics::AddBuffer( Handle< Buffer > buffer )
+void Graphics::AddBuffer( Buffer& buffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddBuffer( std::move( buffer ) );
+  mResourceCache->AddBuffer( buffer );
 }
 
-void Graphics::AddImage( Handle< Image > image )
+void Graphics::AddImage( Image& image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImage( std::move( image ) );
+  mResourceCache->AddImage( image );
 }
 
-void Graphics::AddImageView( RefCountedImageView imageView )
+void Graphics::AddImageView( ImageView& imageView )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImageView( std::move( imageView ) );
+  mResourceCache->AddImageView( imageView );
 }
 
-void Graphics::AddShader( Handle< Shader > shader )
+void Graphics::AddShader( Shader& shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddShader( std::move( shader ) );
+  mResourceCache->AddShader( shader );
 }
 
-void Graphics::AddCommandPool( Handle< CommandPool > pool )
+void Graphics::AddCommandPool( RefCountedCommandPool pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move( pool ) );
+  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move(pool) );
 }
 
-void Graphics::AddDescriptorPool( Handle< DescriptorPool > pool )
+void Graphics::AddDescriptorPool( DescriptorPool& pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddDescriptorPool( std::move( pool ) );
+  mResourceCache->AddDescriptorPool( pool );
 }
 
-void Graphics::AddFramebuffer( Handle< Framebuffer > framebuffer )
+void Graphics::AddFramebuffer( Framebuffer& framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddFramebuffer( std::move( framebuffer ) );
+  mResourceCache->AddFramebuffer( framebuffer );
 }
 
-void Graphics::AddSampler( RefCountedSampler sampler )
+void Graphics::AddSampler( Sampler& sampler )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddSampler( std::move( sampler ) );
+  mResourceCache->AddSampler( sampler );
 }
 
 RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )

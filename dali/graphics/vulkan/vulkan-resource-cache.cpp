@@ -38,51 +38,51 @@ namespace Graphics
 namespace Vulkan
 {
 
-ResourceCache& ResourceCache::AddBuffer( RefCountedBuffer buffer )
+ResourceCache& ResourceCache::AddBuffer( Buffer& buffer )
 {
-  mBuffers.push_back( buffer );
+  mBuffers.push_back( &buffer );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddImage( RefCountedImage image )
+ResourceCache& ResourceCache::AddImage( Image& image )
 {
-  mImages.push_back( image );
+  mImages.push_back( &image );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddImageView( RefCountedImageView imageView )
+ResourceCache& ResourceCache::AddImageView( ImageView& imageView )
 {
-  mImageViews.push_back( imageView );
+  mImageViews.push_back( &imageView );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddShader( RefCountedShader shader )
+ResourceCache& ResourceCache::AddShader( Shader& shader )
 {
-  mShaders.push_back( shader );
+  mShaders.push_back( &shader );
   return *this;
 }
 
 ResourceCache& ResourceCache::AddCommandPool( std::thread::id currentThreadId, RefCountedCommandPool pool )
 {
-  mCommandPools[currentThreadId] = pool;
+  mCommandPools[currentThreadId] = std::move(pool);
   return *this;
 }
 
-ResourceCache& ResourceCache::AddDescriptorPool( RefCountedDescriptorPool pool )
+ResourceCache& ResourceCache::AddDescriptorPool( DescriptorPool& pool )
 {
-  mDescriptorPools.push_back( pool );
+  mDescriptorPools.push_back( &pool );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddFramebuffer( RefCountedFramebuffer framebuffer )
+ResourceCache& ResourceCache::AddFramebuffer( Framebuffer& framebuffer )
 {
-  mFramebuffers.push_back( framebuffer );
+  mFramebuffers.push_back( &framebuffer );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddSampler( RefCountedSampler sampler )
+ResourceCache& ResourceCache::AddSampler( Sampler& sampler )
 {
-  mSamplers.push_back( sampler );
+  mSamplers.push_back( &sampler );
   return *this;
 }
 
@@ -90,11 +90,11 @@ RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
 {
   auto iterator = std::find_if( mShaders.begin(),
                                 mShaders.end(),
-                                [ & ]( const RefCountedShader entry ) {
+                                [ & ]( const Shader* entry ) {
                                   return entry->GetVkHandle() == shaderModule;
                                 } );
 
-  return iterator == mShaders.end() ? RefCountedShader() : RefCountedShader( &**iterator );
+  return iterator == mShaders.end() ? RefCountedShader() : RefCountedShader( *iterator );
 }
 
 RefCountedCommandPool ResourceCache::FindCommandPool( std::thread::id currentThreadId )
@@ -107,29 +107,29 @@ RefCountedDescriptorPool ResourceCache::FindDescriptorPool( vk::DescriptorPool d
 {
   auto iterator = std::find_if( mDescriptorPools.begin(),
                                 mDescriptorPools.end(),
-                                [ & ]( const RefCountedDescriptorPool entry ) {
+                                [ & ]( const DescriptorPool* entry ) {
                                   return entry->GetVkHandle() == descriptorPool;
                                 } );
 
-  return iterator == mDescriptorPools.end() ? RefCountedDescriptorPool() : RefCountedDescriptorPool( &**iterator );
+  return iterator == mDescriptorPools.end() ? RefCountedDescriptorPool() : RefCountedDescriptorPool( *iterator );
 }
 
 RefCountedFramebuffer ResourceCache::FindFramebuffer( vk::Framebuffer framebuffer )
 {
   auto iterator = std::find_if( mFramebuffers.begin(),
                                 mFramebuffers.end(),
-                                [ & ]( const RefCountedFramebuffer entry ) {
+                                [ & ]( const Framebuffer* entry ) {
                                   return entry->GetVkHandle() == framebuffer;
                                 } );
 
-  return iterator == mFramebuffers.end() ? RefCountedFramebuffer() : RefCountedFramebuffer( &**iterator );
+  return iterator == mFramebuffers.end() ? RefCountedFramebuffer() : RefCountedFramebuffer( *iterator );
 }
 
 RefCountedSampler ResourceCache::FindSampler( vk::Sampler sampler )
 {
   auto iterator = std::find_if( mSamplers.begin(),
                                 mSamplers.end(),
-                                [ & ]( const RefCountedSampler entry ) { return entry->GetVkHandle() == sampler; } );
+                                [ & ]( const Sampler* entry ) { return entry->GetVkHandle() == sampler; } );
 
   return iterator == mSamplers.end() ? RefCountedSampler() : RefCountedSampler( &**iterator );
 }
@@ -138,29 +138,29 @@ RefCountedBuffer ResourceCache::FindBuffer( vk::Buffer buffer )
 {
   auto iterator = std::find_if( mBuffers.begin(),
                                 mBuffers.end(),
-                                [ & ]( const RefCountedBuffer entry ) { return entry->GetVkHandle() == buffer; } );
+                                [ & ]( const Buffer* entry ) { return entry->GetVkHandle() == buffer; } );
 
-  return iterator == mBuffers.end() ? RefCountedBuffer() : RefCountedBuffer( &**iterator );
+  return iterator == mBuffers.end() ? RefCountedBuffer() : RefCountedBuffer( *iterator );
 }
 
 RefCountedImage ResourceCache::FindImage( vk::Image image )
 {
   auto iterator = std::find_if( mImages.begin(),
                                 mImages.end(),
-                                [ & ]( const RefCountedImage entry ) { return entry->GetVkHandle() == image; } );
+                                [ & ]( const Image* entry ) { return entry->GetVkHandle() == image; } );
 
-  return iterator == mImages.end() ? RefCountedImage() : RefCountedImage( &**iterator );
+  return iterator == mImages.end() ? RefCountedImage() : RefCountedImage( *iterator );
 }
 
 RefCountedImageView ResourceCache::FindImageView( vk::ImageView imageView )
 {
   auto iterator = std::find_if( mImageViews.begin(),
                                 mImageViews.end(),
-                                [ & ]( const RefCountedImageView entry ) {
+                                [ & ]( const ImageView* entry ) {
                                   return entry->GetVkHandle() == imageView;
                                 } );
 
-  return iterator == mImageViews.end() ? RefCountedImageView() : RefCountedImageView( &**iterator );
+  return iterator == mImageViews.end() ? RefCountedImageView() : RefCountedImageView( *iterator );
 }
 
 ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
@@ -169,12 +169,11 @@ ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
   {
     auto found = std::find_if( mBuffers.begin(),
                                mBuffers.end(),
-                               [ & ]( const RefCountedBuffer& entry ) {
+                               [ & ]( const Buffer* entry ) {
                                  return entry->GetVkHandle() == buffer.GetVkHandle();
                                } );
 
     std::iter_swap( found, std::prev( mBuffers.end() ) );
-    mBuffers.back().Reset();
     mBuffers.pop_back();
   }
   return *this;
@@ -186,12 +185,11 @@ ResourceCache& ResourceCache::RemoveImage( Image& image )
   {
     auto found = std::find_if( mImages.begin(),
                                mImages.end(),
-                               [ & ]( const RefCountedImage& entry ) {
+                               [ & ]( const Image* entry ) {
                                  return entry->GetVkHandle() == image.GetVkHandle();
                                } );
 
     std::iter_swap( found, std::prev( mImages.end() ) );
-    mImages.back().Reset();
     mImages.pop_back();
   }
   return *this;
@@ -203,12 +201,11 @@ ResourceCache& ResourceCache::RemoveImageView( ImageView& imageView )
   {
     auto found = std::find_if( mImageViews.begin(),
                                mImageViews.end(),
-                               [ & ]( const RefCountedImageView& entry ) {
+                               [ & ]( const ImageView* entry ) {
                                  return entry->GetVkHandle() == imageView.GetVkHandle();
                                } );
 
     std::iter_swap( found, std::prev( mImageViews.end() ) );
-    mImageViews.back().Reset();
     mImageViews.pop_back();
   }
   return *this;
@@ -220,12 +217,11 @@ ResourceCache& ResourceCache::RemoveShader( Shader& shader )
   {
     auto iterator = std::find_if( mShaders.begin(),
                                   mShaders.end(),
-                                  [ & ]( const RefCountedShader& entry ) {
+                                  [ & ]( const Shader* entry ) {
                                     return &*entry == &shader;
                                   } );
 
     std::iter_swap( iterator, std::prev( mShaders.end() ) );
-    mShaders.back().Reset();
     mShaders.pop_back();
   }
   return *this;
@@ -241,8 +237,8 @@ ResourceCache& ResourceCache::RemoveCommandPool( CommandPool& commandPool )
     auto it = mCommandPools.begin();
     while( it != mCommandPools.end() )
     {
-      auto& refcounted = ( *it ).second;
-      if( refcounted->GetVkHandle() == commandPool.GetVkHandle() )
+      auto pool = ( *it ).second;
+      if( pool->GetVkHandle() == commandPool.GetVkHandle() )
       {
         found = it;
         break;
@@ -262,12 +258,11 @@ ResourceCache& ResourceCache::RemoveDescriptorPool( DescriptorPool& descriptorPo
   {
     auto iterator = std::find_if( mDescriptorPools.begin(),
                                   mDescriptorPools.end(),
-                                  [ & ]( const RefCountedDescriptorPool& entry ) {
+                                  [ & ]( const DescriptorPool* entry ) {
                                     return entry->GetVkHandle() == descriptorPool.GetVkHandle();
                                   } );
 
     std::iter_swap( iterator, std::prev( mDescriptorPools.end() ) );
-    mDescriptorPools.back().Reset();
     mDescriptorPools.pop_back();
   }
   return *this;
@@ -279,12 +274,11 @@ ResourceCache& ResourceCache::RemoveFramebuffer( Framebuffer& framebuffer )
   {
     auto iterator = std::find_if( mFramebuffers.begin(),
                                   mFramebuffers.end(),
-                                  [ & ]( const RefCountedFramebuffer& entry ) {
+                                  [ & ]( const Framebuffer* entry ) {
                                     return entry->GetVkHandle() == framebuffer.GetVkHandle();
                                   } );
 
     std::iter_swap( iterator, std::prev( mFramebuffers.end() ) );
-    mFramebuffers.back().Reset();
     mFramebuffers.pop_back();
   }
   return *this;
@@ -296,12 +290,11 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler& sampler )
   {
     auto iterator = std::find_if( mSamplers.begin(),
                                   mSamplers.end(),
-                                  [ & ]( const RefCountedSampler& entry ) {
+                                  [ & ]( const Sampler* entry ) {
                                     return entry->GetVkHandle() == sampler.GetVkHandle();
                                   } );
 
     std::iter_swap( iterator, std::prev( mSamplers.end() ) );
-    mSamplers.back().Reset();
     mSamplers.pop_back();
   }
   return *this;

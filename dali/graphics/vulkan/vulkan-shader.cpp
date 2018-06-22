@@ -83,7 +83,7 @@ Handle< Shader > Shader::New( Graphics& graphics, const vk::ShaderModuleCreateIn
   {
     if( shader->mImpl->Initialise() == vk::Result::eSuccess )
     {
-      graphics.AddShader( shader );
+      graphics.AddShader( *shader );
     }
   }
   return shader;
