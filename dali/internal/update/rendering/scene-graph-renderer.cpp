@@ -217,8 +217,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     mGfxRenderCommand = controller.AllocateRenderCommand();
   }
 
-  if (!mShader->GetGfxObject()
-              .Exists())
+  if (!mShader->GetGfxObject())
   {
     return;
   }
@@ -226,14 +225,14 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   /**
    * Prepare vertex attribute buffer bindings
    */
-  std::vector<Graphics::API::Accessor<Graphics::API::Buffer>> vertexBuffers{};
+  std::vector<const Graphics::API::Buffer*> vertexBuffers{};
 
   for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
   {
     vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
   }
 
-  auto &shader = mShader->GetGfxObject().Get();
+  auto& shader = *mShader->GetGfxObject();
   auto uboCount = shader.GetUniformBlockCount();
 
   auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
@@ -379,7 +378,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         auto gfxTexture = texture->GetGfxObject();
         auto binding    = Graphics::API::RenderCommand::TextureBinding{}
           .SetBinding(samplers[i].binding)
-          .SetTexture(texture->GetGfxObject().Get())
+          .SetTexture(texture->GetGfxObject())
           .SetSampler(nullptr);
 
         textureBindings.emplace_back(binding);
@@ -404,7 +403,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
 
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
-  mGfxRenderCommand->BindVertexBuffers( std::move( vertexBuffers ) );
+  mGfxRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
   mGfxRenderCommand->BindTextures( std::move(textureBindings) );
 
   if(usesIndexBuffer)
@@ -430,12 +429,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
 void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t size )
 {
-  if( !mShader->GetGfxObject().Exists() )
+  if( !mShader->GetGfxObject() )
   {
     // Invalid pipeline
     return;
   }
-  auto& gfxShader = mShader->GetGfxObject().Get();
+  auto& gfxShader = *mShader->GetGfxObject();
   auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
   if( gfxShader.GetNamedUniform( name, uniformInfo ) )
   {

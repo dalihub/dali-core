@@ -222,7 +222,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
     auto gfxShader = renderer->GetShader()
                              .GetGfxObject();
 
-    if( !gfxShader.Exists() )
+    if( !gfxShader )
     {
       continue;
     }
@@ -230,7 +230,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
      * Prepare vertex attribute buffer bindings
      */
     uint32_t                                                    bindingIndex{0u};
-    std::vector<Graphics::API::Accessor<Graphics::API::Buffer>> vertexBuffers{};
+    std::vector<Graphics::API::Buffer*> vertexBuffers{};
 
     for (auto &&vertexBuffer : geometry->GetVertexBuffers())
     {
@@ -250,8 +250,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
         // create attribute description
         vi.attributes
           .emplace_back(
-            gfxShader.Get()
-                     .GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
+            gfxShader->GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
             bindingIndex, (vertexBuffer->GetFormat()
                                        ->components[i]).offset,
             VertexInputFormat::UNDEFINED);
@@ -261,12 +260,10 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
     }
 
     // Invalid input attributes!
-    if (gfxShader
-          .Get()
-          .GetVertexAttributeLocations()
-          .size() != vi.attributes
-                       .size())
+    if (gfxShader->GetVertexAttributeLocations().size() != vi.attributes.size())
+    {
       continue; // incompatible pipeline!
+    }
 
     // set optional index buffer
     auto topology         = PrimitiveTopology::TRIANGLE_STRIP;
@@ -350,7 +347,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
 
                 // shaders
               .SetShaderState(ShaderState()
-                                .SetShaderProgram(gfxShader.Get()))
+                                .SetShaderProgram(*gfxShader))
 
                 // input assembly
               .SetInputAssemblyState(InputAssemblyState()

@@ -74,22 +74,22 @@ public:
   /**
    * @brief Create a new object
    */
-  API::Accessor< API::Shader > CreateShader( const API::BaseFactory< API::Shader >& factory ) override;
+  std::unique_ptr< API::Shader > CreateShader( const API::BaseFactory< API::Shader >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  API::Accessor< API::Texture > CreateTexture( const API::BaseFactory< API::Texture >& factory ) override;
+  std::unique_ptr< API::Texture > CreateTexture( const API::BaseFactory< API::Texture >& factory ) override;
 
   /**
  * @brief Create a new object
  */
-  API::Accessor< API::Buffer > CreateBuffer( const API::BaseFactory< API::Buffer >& factory ) override;
+  std::unique_ptr< API::Buffer > CreateBuffer( const API::BaseFactory< API::Buffer >& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  API::Accessor< API::Sampler > CreateSampler( const API::BaseFactory< API::Sampler >& factory ) override;
+  std::unique_ptr< API::Sampler > CreateSampler( const API::BaseFactory< API::Sampler >& factory ) override;
 
   /**
    * @brief Create a new object
@@ -99,9 +99,7 @@ public:
   /**
    * @brief Create a new object
    */
-  API::Accessor< API::Framebuffer > CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory ) override;
-
-  std::unique_ptr< char > CreateBuffer( size_t numberOfElements, size_t elementSize ) override;
+  std::unique_ptr< API::Framebuffer > CreateFramebuffer( const API::BaseFactory< API::Framebuffer >& factory ) override;
 
   void SubmitCommands( std::vector< API::RenderCommand* > commands ) override;
 
