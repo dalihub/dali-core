@@ -41,8 +41,8 @@
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
-
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
+#include <dali/graphics/vulkan/vulkan-debug.h>
 
 namespace Dali
 {
@@ -280,6 +280,14 @@ struct Controller::Impl
     // set up writes
     for( auto&& command : commands )
     {
+#if defined(DEBUG_ENABLED)
+      if( getenv( "LOG_VULKAN_API" ) )
+      {
+        DALI_LOG_STREAM( gVulkanFilter, Debug::General, *command );
+      }
+#endif
+
+
       //const auto& vertexBufferBindings = command->GetVertexBufferBindings();
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
