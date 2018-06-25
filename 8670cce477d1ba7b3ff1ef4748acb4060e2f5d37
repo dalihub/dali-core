@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5db28420_e36afcb2",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-06-25T13:54:04Z",
+      "side": 1,
+      "message": "Because it\u0027s a bad practice and not correct by the standard",
+      "parentUuid": "7a19d95b_d9f5342e",
+      "range": {
+        "startLine": 437,
+        "startChar": 2,
+        "endLine": 437,
+        "endChar": 45
+      },
+      "revId": "8670cce477d1ba7b3ff1ef4748acb4060e2f5d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3d31f809_0840522b",
         "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2018-06-25T13:39:41Z",
       "side": 1,
       "message": "Method should be GetDataBuffer() or some such.",
+      "range": {
+        "startLine": 441,
+        "startChar": 52,
+        "endLine": 441,
+        "endChar": 58
+      },
+      "revId": "8670cce477d1ba7b3ff1ef4748acb4060e2f5d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd1bf67f_cb622e64",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-06-25T13:54:04Z",
+      "side": 1,
+      "message": "it\u0027s std::vector::data().",
+      "parentUuid": "3d31f809_0840522b",
       "range": {
         "startLine": 441,
         "startChar": 52,
