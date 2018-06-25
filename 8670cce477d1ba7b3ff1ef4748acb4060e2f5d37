@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a19d95b_d9f5342e",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-25T13:39:41Z",
+      "side": 1,
+      "message": "Rather than passing raw pointers, how about passing const ref to std::unique_ptr?",
+      "range": {
+        "startLine": 437,
+        "startChar": 2,
+        "endLine": 437,
+        "endChar": 45
+      },
+      "revId": "8670cce477d1ba7b3ff1ef4748acb4060e2f5d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d31f809_0840522b",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-25T13:39:41Z",
+      "side": 1,
+      "message": "Method should be GetDataBuffer() or some such.",
+      "range": {
+        "startLine": 441,
+        "startChar": 52,
+        "endLine": 441,
+        "endChar": 58
+      },
+      "revId": "8670cce477d1ba7b3ff1ef4748acb4060e2f5d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
