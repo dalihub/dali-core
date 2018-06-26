@@ -255,6 +255,13 @@ struct Controller::Impl
 
     std::vector< Vulkan::RefCountedCommandBuffer > cmdBufRefs{};
 
+    // bind resources
+    for( auto&& command : commands )
+    {
+      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+      apiCommand->PrepareResources();
+    }
+
     // Update uniform buffers
     for( auto&& command : commands )
     {
@@ -264,13 +271,6 @@ struct Controller::Impl
     }
 
     mUboManager->UnmapAllBuffers();
-
-    // bind resources
-    for( auto&& command : commands )
-    {
-      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-      apiCommand->PrepareResources();
-    }
 
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
