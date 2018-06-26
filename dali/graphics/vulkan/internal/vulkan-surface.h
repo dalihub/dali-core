@@ -23,18 +23,31 @@
 
 namespace Dali
 {
+
+// Forward declarations
 namespace Integration
 {
+
 namespace Graphics
 {
+
 class SurfaceFactory;
-}
-}
+
+namespace Vulkan
+{
+class VkSurfaceFactory;
+} // namespace Vulkan
+
+} // namespace Graphics
+
+} // namespace Integration
+
 namespace Graphics
 {
 namespace Vulkan
 {
-using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
+using Dali::Integration::Graphics::SurfaceFactory;
+using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 
 class Graphics;
 
@@ -47,30 +60,28 @@ public:
   ~Surface() final;
 
   /**
-   * Creates surface from given factory
-   */
-  bool Create();
-
-  /**
    *
    * @return
    */
-  vk::SurfaceKHR GetSurfaceKHR() const;
+  vk::SurfaceKHR GetVkHandle() const;
 
   /**
    * Returns size of surface
    * @return
    */
-  vk::SurfaceCapabilitiesKHR GetCapabilities() const;
+  const vk::SurfaceCapabilitiesKHR& GetCapabilities() const;
+
+  bool OnDestroy() override;
 
 private:
   Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
 
 private:
-
-  //TODO: Remove the PIMPL
-  struct Impl;
-  std::unique_ptr< Impl > mImpl;
+  Graphics* mGraphics;
+  std::unique_ptr< SurfaceFactory > mSurfaceFactory;
+  VkSurfaceFactory* mVulkanSurfaceFactory;
+  vk::SurfaceKHR mSurface;
+  vk::SurfaceCapabilitiesKHR mCapabilities;
 };
 
 } // namespace Vulkan
