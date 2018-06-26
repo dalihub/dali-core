@@ -83,9 +83,7 @@ struct Controller::Impl
   {
   }
 
-  ~Impl()
-  {
-  }
+  ~Impl() = default;
 
   // TODO: @todo this function initialises basic buffers, shaders and pipeline
   // for the prototype ONLY
@@ -103,7 +101,6 @@ struct Controller::Impl
 
     return true;
   }
-
 
   void BeginFrame()
   {
@@ -163,10 +160,6 @@ struct Controller::Impl
   {
     return *( mBufferFactory.get() );
   }
-
-  /**
-   * NEW IMPLEMENTATION
-   */
 
   std::unique_ptr< API::RenderCommand > AllocateRenderCommand()
   {
@@ -253,7 +246,12 @@ struct Controller::Impl
       return;
     }
 
-    std::vector< Vulkan::RefCountedCommandBuffer > cmdBufRefs{};
+    // bind resources
+    for( auto&& command : commands )
+    {
+      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+      apiCommand->PrepareResources();
+    }
 
     // Update uniform buffers
     for( auto&& command : commands )
@@ -264,13 +262,6 @@ struct Controller::Impl
     }
 
     mUboManager->UnmapAllBuffers();
-
-    // bind resources
-    for( auto&& command : commands )
-    {
-      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-      apiCommand->PrepareResources();
-    }
 
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
@@ -287,8 +278,6 @@ struct Controller::Impl
       }
 #endif
 
-
-      //const auto& vertexBufferBindings = command->GetVertexBufferBindings();
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
       // skip if there's no valid pipeline
@@ -337,7 +326,6 @@ struct Controller::Impl
       cmdbuf->End();
       mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
     }
-
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
