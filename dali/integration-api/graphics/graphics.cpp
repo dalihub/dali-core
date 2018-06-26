@@ -37,8 +37,8 @@ namespace Integration
 {
 namespace Graphics
 {
-using Swapchain = Dali::Graphics::Vulkan::Swapchain;
-using SwapchainRef = Dali::Graphics::Vulkan::RefCountedSwapchain;
+
+using Dali::Integration::Graphics::SurfaceFactory;
 
 Graphics::Graphics()
 {
@@ -50,13 +50,10 @@ Graphics::Graphics()
   mGraphicsImpl = std::move(impl);
 }
 
-Graphics::~Graphics()
-{
+Graphics::~Graphics() = default;
 
-}
 
-Dali::Graphics::FBID Graphics::Create(
-  std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory)
+Dali::Graphics::FBID Graphics::Create( std::unique_ptr< SurfaceFactory > surfaceFactory)
 {
   //@todo do we really need to have a surface that early???
 
@@ -75,8 +72,7 @@ Dali::Graphics::FBID Graphics::Create(
   return retval;
 }
 
-Dali::Graphics::FBID Graphics::CreateSurface(
-  std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory)
+Dali::Graphics::FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory)
 {
   return 0u;
 }

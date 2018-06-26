@@ -40,8 +40,9 @@ public:
 
   VkSurfaceFactory() = default;
 
-  virtual vk::SurfaceKHR Create(vk::Instance instance, vk::AllocationCallbacks *allocCallbacks,
-                                vk::PhysicalDevice physicalDevice) const = 0;
+  virtual vk::SurfaceKHR Create( vk::Instance instance,
+                                 const vk::AllocationCallbacks* allocCallbacks,
+                                 vk::PhysicalDevice physicalDevice ) const = 0;
 };
 
 } // namespace Vulkan
