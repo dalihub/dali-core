@@ -177,12 +177,13 @@ struct UboPool::Impl
                                                           .setUsage( vk::BufferUsageFlagBits::eUniformBuffer )
                                                           .setSharingMode( vk::SharingMode::eExclusive )
                                                           .setSize( mBlockSize * mInitialCapacity ) ) );
-    mBuffers.back().buffer->BindMemory(
-            graphics
-                    .GetDeviceMemoryManager()
-                    .GetDefaultAllocator()
-                    .Allocate( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible ) );
 
+    auto memory = graphics.GetDeviceMemoryManager()
+                          .GetDefaultAllocator()
+                          .Allocate( mBuffers.back().buffer,
+                                     vk::MemoryPropertyFlagBits::eHostVisible );
+
+    graphics.BindBufferMemory( mBuffers.back().buffer, memory, 0 );
 
     auto startIndex = ( ( mBuffers.size() - 1 ) * mInitialCapacity );
     for( uint32_t i = 0u; i < mInitialCapacity; ++i )
@@ -209,7 +210,8 @@ struct UboPool::Impl
     if( !mBuffers[bufferIndex].mappedPtr )
     {
       DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Mapping PAGE = " << bufferIndex );
-      mBuffers[bufferIndex].mappedPtr = mBuffers[bufferIndex].buffer->GetMemoryHandle()->Map();
+      const auto& graphics = mController.GetGraphics();
+      mBuffers[bufferIndex].mappedPtr = graphics.MapMemory( mBuffers[bufferIndex].buffer->GetMemoryHandle() );
     }
 
     return reinterpret_cast<T*>(mBuffers[bufferIndex].mappedPtr);
@@ -220,7 +222,8 @@ struct UboPool::Impl
     if( mBuffers[bufferIndex].mappedPtr )
     {
       DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[POOL] Unmapping PAGE = " << bufferIndex );
-      mBuffers[bufferIndex].buffer->GetMemoryHandle()->Unmap();
+      const auto& graphics = mController.GetGraphics();
+      graphics.UnmapMemory( mBuffers[bufferIndex].buffer->GetMemoryHandle() );
       mBuffers[bufferIndex].mappedPtr = nullptr;
     }
   }

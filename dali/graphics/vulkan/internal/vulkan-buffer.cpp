@@ -29,11 +29,6 @@ namespace Graphics
 namespace Vulkan
 {
 
-RefCountedBuffer Buffer::New( Graphics& graphics, vk::BufferCreateInfo info )
-{
-  return RefCountedBuffer( new Buffer( graphics, info ) );
-}
-
 const Buffer& Buffer::ConstRef()
 {
   return *this;
@@ -51,8 +46,6 @@ Buffer::Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo )
           mInfo( createInfo )
 {
 }
-
-Buffer::~Buffer() = default;
 
 vk::BufferUsageFlags Buffer::GetUsage() const
 {
@@ -74,13 +67,6 @@ vk::Buffer Buffer::GetVkHandle() const
   return mBuffer;
 }
 
-void Buffer::BindMemory( const RefCountedGpuMemoryBlock& handle )
-{
-  assert( mBuffer && "Buffer not initialised!" );
-  VkAssert( mGraphics->GetDevice().bindBufferMemory( mBuffer, ( *handle ), 0 ) );
-  mDeviceMemory = handle;
-}
-
 bool Buffer::OnDestroy()
 {
   if( !mGraphics->IsShuttingDown() )
@@ -99,11 +85,6 @@ bool Buffer::OnDestroy()
   } );
 
   return false;
-}
-
-Buffer::operator vk::Buffer*()
-{
-  return &mBuffer;
 }
 
 

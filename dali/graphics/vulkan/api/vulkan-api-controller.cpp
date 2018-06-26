@@ -30,6 +30,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-graphics-texture.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 

@@ -21,6 +21,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/integration-api/graphics/graphics.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 extern "C" std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
 

@@ -38,23 +38,6 @@ namespace Graphics
 namespace Vulkan
 {
 
-/**
- * Swapchain API
- */
-RefCountedSwapchain Swapchain::New( Graphics& graphics,
-                                    Queue& presentationQueue,
-                                    RefCountedSurface surface,
-                                    std::vector< SwapchainBuffer > framebuffers,
-                                    vk::SwapchainCreateInfoKHR createInfo,
-                                    vk::SwapchainKHR vkHandle )
-{
-  return RefCountedSwapchain( new Swapchain( graphics, presentationQueue,
-                                             std::move( surface ),
-                                             std::move( framebuffers ),
-                                             std::move( createInfo ),
-                                             vkHandle ) );
-}
-
 Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
                       RefCountedSurface surface,
                       std::vector< SwapchainBuffer > framebuffers,
@@ -70,8 +53,6 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
 
 {
 }
-
-Swapchain::Swapchain() = default;
 
 Swapchain::~Swapchain() = default;
 

@@ -53,20 +53,24 @@ struct SubmissionData
   std::vector< vk::Semaphore > signalSemaphores;
 };
 
+class Graphics;
+
 class Queue
 {
-public:
-  Queue() = delete;
+  friend class Graphics;
 
+public:
+
+  ~Queue(); // queues are non-destructible
+
+  vk::Queue GetVkHandle();
+
+private:
   Queue( Graphics& graphics,
          vk::Queue queue,
          uint32_t queueFamilyIndex,
          uint32_t queueIndex,
          vk::QueueFlags queueFlags );
-
-  ~Queue(); // queues are non-destructible
-
-  vk::Queue GetVkHandle();
 
 private:
   Graphics& mGraphics;

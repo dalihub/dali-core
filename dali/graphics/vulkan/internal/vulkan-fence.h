@@ -32,9 +32,9 @@ class Graphics;
 
 class Fence : public VkManaged
 {
-public:
+  friend class Graphics;
 
-  static RefCountedFence New( Graphics& graphics );
+public:
 
   ~Fence() override;
 
@@ -43,8 +43,6 @@ public:
   Fence& Ref();
 
   vk::Fence GetVkHandle() const;
-
-  operator vk::Fence*();
 
   bool OnDestroy() override;
 

@@ -27,18 +27,6 @@ namespace Graphics
 namespace Vulkan
 {
 
-Image::~Image() = default;
-
-RefCountedImage Image::New( Graphics& graphics, vk::ImageCreateInfo createInfo )
-{
-  return RefCountedImage( new Image( graphics, createInfo, nullptr ) );
-}
-
-RefCountedImage Image::NewFromExternal( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage )
-{
-  return RefCountedImage( new Image( graphics, createInfo, externalImage ) );
-}
-
 Image::Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage )
         : mGraphics( &graphics ),
           mCreateInfo( createInfo ),
@@ -125,11 +113,6 @@ vk::ImageAspectFlags Image::GetAspectFlags() const
   return mAspectFlags;
 }
 
-void Image::AssignMemory( RefCountedGpuMemoryBlock memory )
-{
-  mDeviceMemory = memory;
-}
-
 void Image::SetImageLayout( vk::ImageLayout imageLayout )
 {
   mImageLayout = imageLayout;
@@ -143,11 +126,6 @@ const Image& Image::ConstRef()
 Image& Image::Ref()
 {
   return *this;
-}
-
-Image::operator vk::Image*()
-{
-  return &mImage;
 }
 
 vk::ImageUsageFlags Image::GetUsageFlags() const

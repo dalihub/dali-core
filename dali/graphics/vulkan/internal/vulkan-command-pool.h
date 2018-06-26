@@ -38,6 +38,7 @@ class CommandPool : public VkManaged
 
   friend class Graphics;
 
+  //TODO: Move logic to the Graphics class
 public:
 
   ~CommandPool() override;

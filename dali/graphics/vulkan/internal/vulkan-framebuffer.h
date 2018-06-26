@@ -106,14 +106,6 @@ public:
   bool OnDestroy() override;
 
 private:
-  static RefCountedFramebuffer New( Graphics& graphics,
-                                    const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
-                                    const RefCountedFramebufferAttachment& depthAttachment,
-                                    vk::Framebuffer vkHandle,
-                                    vk::RenderPass renderPass,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    bool externalRenderPass = false );
 
   Framebuffer( Graphics& graphics,
                const std::vector< RefCountedFramebufferAttachment >& colorAttachments,

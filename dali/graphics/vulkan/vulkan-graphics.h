@@ -26,7 +26,7 @@
 #include <dali/integration-api/graphics/surface-factory.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
-#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 
 #include <thread>
 #include <mutex>
@@ -163,6 +163,20 @@ public: // Actions
   vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
   vk::Result BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset );
+
+  vk::Result BindBufferMemory( RefCountedBuffer buffer, RefCountedGpuMemoryBlock memory, uint32_t offset );
+
+  void* MapMemory( RefCountedGpuMemoryBlock memory ) const;
+
+  void* MapMemory( RefCountedGpuMemoryBlock memory, uint32_t size, uint32_t offset ) const;
+
+  void UnmapMemory( RefCountedGpuMemoryBlock memory ) const;
+
+  template< typename T >
+  T* MapMemoryTyped( RefCountedGpuMemoryBlock memory ) const
+  {
+    return memory->MapTyped<T>();
+  }
 
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 

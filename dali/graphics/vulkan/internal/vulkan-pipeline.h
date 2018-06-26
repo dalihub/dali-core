@@ -141,8 +141,6 @@ private:
   std::unique_ptr< Impl > mImpl;
 };
 
-using RefCountedPipeline = Handle< Pipeline >;
-
 } // Namespace Vulkan
 
 } // Namespace Graphics

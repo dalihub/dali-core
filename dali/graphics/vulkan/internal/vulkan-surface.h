@@ -40,11 +40,9 @@ class Graphics;
 
 class Surface : public VkManaged
 {
+  friend class Graphics;
+
 public:
-
-  static RefCountedSurface New( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
-
-  Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
 
   ~Surface() final;
 
@@ -66,7 +64,11 @@ public:
   vk::SurfaceCapabilitiesKHR GetCapabilities() const;
 
 private:
+  Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
 
+private:
+
+  //TODO: Remove the PIMPL
   struct Impl;
   std::unique_ptr< Impl > mImpl;
 };

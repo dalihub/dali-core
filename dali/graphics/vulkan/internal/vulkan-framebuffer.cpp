@@ -103,26 +103,6 @@ bool FramebufferAttachment::IsValid() const
 
 
 //Framebuffer -------------------------------
-RefCountedFramebuffer Framebuffer::New( Graphics& graphics,
-                                        const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
-                                        const RefCountedFramebufferAttachment& depthAttachment,
-                                        vk::Framebuffer vkHandle,
-                                        vk::RenderPass renderPass,
-                                        uint32_t width,
-                                        uint32_t height,
-                                        bool externalRenderPass )
-{
-  return RefCountedFramebuffer( new Framebuffer( graphics,
-                                                 colorAttachments,
-                                                 depthAttachment,
-                                                 vkHandle,
-                                                 renderPass,
-                                                 width,
-                                                 height,
-                                                 externalRenderPass ) );
-}
-
-
 Framebuffer::Framebuffer( Graphics& graphics,
                           const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
                           const RefCountedFramebufferAttachment& depthAttachment,
