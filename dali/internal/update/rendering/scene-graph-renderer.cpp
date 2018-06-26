@@ -366,14 +366,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
    */
   auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
   auto samplers        = shader.GetSamplers();
-
-  if (mTextureSet)
+  if(mTextureSet)
   {
     if (!samplers.empty())
     {
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
-
         auto texture    = mTextureSet->GetTexture(i);
         auto gfxTexture = texture->GetGfxObject();
         auto binding    = Graphics::API::RenderCommand::TextureBinding{}
@@ -385,6 +383,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       }
     }
   }
+  mGfxRenderCommand->BindTextures( std::move(textureBindings) );
 
   // Build render command
   // todo: this may be deferred until all render items are sorted, otherwise
@@ -404,7 +403,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
   mGfxRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
-  mGfxRenderCommand->BindTextures( std::move(textureBindings) );
+
 
   if(usesIndexBuffer)
   {
