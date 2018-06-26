@@ -30,17 +30,6 @@ namespace Vulkan
 /**
  * Sampler
  */
-
-/**
- * Creates new mutable sampler
- * @param graphics
- * @return
- */
-RefCountedSampler Sampler::New( Graphics& graphics, const vk::SamplerCreateInfo& createInfo )
-{
-  return RefCountedSampler( new Sampler( graphics, createInfo ) );
-}
-
 Sampler::Sampler( Graphics& graphics, const vk::SamplerCreateInfo& createInfo )
         : mGraphics( &graphics ),
           mCreateInfo( createInfo )
@@ -142,11 +131,6 @@ const Sampler& Sampler::ConstRef()
 Sampler& Sampler::Ref()
 {
   return *this;
-}
-
-Sampler::operator vk::Sampler*()
-{
-  return &mSampler;
 }
 
 bool Sampler::OnDestroy()

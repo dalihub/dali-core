@@ -32,14 +32,9 @@ class Graphics;
 
 class Sampler : public VkManaged
 {
-public:
+  friend class Graphics;
 
-  /**
-   * Creates a new Sampler
-   * @param graphics
-   * @return
-   */
-  static RefCountedSampler New( Graphics& graphics, const vk::SamplerCreateInfo& createInfo );
+public:
 
   vk::SamplerCreateFlags GetCreateFlags() const;
 
@@ -82,8 +77,6 @@ public:
   const Sampler& ConstRef();
 
   Sampler& Ref();
-
-  operator vk::Sampler*();
 
   bool OnDestroy() override;
 

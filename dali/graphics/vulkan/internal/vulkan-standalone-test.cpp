@@ -27,7 +27,9 @@ using namespace glm;
 #include <xcb/xcb.h>
 
 // internals
-#include "generated/spv-shaders-gen.h"
+//#include "generated/spv-shaders-gen.h"
+#include "vulkan-types.h"
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
@@ -47,6 +49,7 @@ using namespace glm;
 #define USE_XLIB 0
 
 #include <iostream>
+#include <dali/integration-api/debug.h>
 
 using Dali::Graphics::Vulkan::Buffer;
 using Dali::Graphics::Vulkan::CommandBuffer;
@@ -306,7 +309,7 @@ Dali::Graphics::Vulkan::RefCountedBuffer create_uniform_buffer( Dali::Graphics::
   // bind memory
   uniformBuffer->BindMemory( memory );
 
-  auto ub = reinterpret_cast<UniformData*>( memory->Map());
+  auto ub = gr.MapMemoryTyped< UniformData* >( memory );
 
   ub->mvp = mat4{ 1.0f } * ortho( 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 100.0f ) *
             lookAt( vec3( 0.0f, 0.0f, 10.0f ), vec3( 0.0f, 0.0f, 0.0f ), vec3( 0.0f, 1.0f, 0.0f ) );
@@ -324,7 +327,7 @@ Dali::Graphics::Vulkan::RefCountedBuffer create_clip_buffer( Dali::Graphics::Vul
           1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f );
 
   // create uniform buffer
-  auto uniformBuffer = Buffer::New( gr, sizeof( UniformClipData ), Buffer::Type::UNIFORM );
+  auto uniformBuffer = gr.CreateBuffer( sizeof( UniformClipData ), BufferType::UNIFORM );
 
   // allocate memory
   auto memory = gr.GetDeviceMemoryManager()
@@ -503,7 +506,7 @@ int RunTestMain()
   auto bufferMemory = test_gpu_memory_manager( gr, gpuManager, vertexBuffer );
   vertexBuffer->BindMemory( bufferMemory );
 
-  auto ptr = static_cast<uint8_t*>( bufferMemory->Map());
+  auto ptr = gr.MapMemoryTyped< uint8_t* >( bufferMemory );
   std::copy( reinterpret_cast<const uint8_t*>( VERTICES ),
              reinterpret_cast<const uint8_t*>( VERTICES ) + ( sizeof( float ) * 9 ),
              ptr );

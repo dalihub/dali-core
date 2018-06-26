@@ -22,6 +22,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-pipeline.h>

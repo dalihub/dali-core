@@ -23,6 +23,7 @@
 
 #include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 

@@ -26,26 +26,14 @@ namespace Graphics
 {
 namespace Vulkan
 {
-class Graphics;
 
 class GpuMemoryBlock;
 
 class Buffer : public VkManaged
 {
+  friend class Graphics;
+
 public:
-
-  /**
-   * Destructor
-   */
-  ~Buffer() override;
-
-  /**
-   *
-   * @param graphics
-   * @param info
-   * @return
-   */
-  static RefCountedBuffer New( Graphics& graphics, vk::BufferCreateInfo info );
 
   const Buffer& ConstRef();
 
@@ -76,12 +64,6 @@ public:
   const RefCountedGpuMemoryBlock& GetMemoryHandle() const;
 
   /**
-   * Binds buffer memory
-   * @param handle
-   */
-  void BindMemory( const RefCountedGpuMemoryBlock& handle );
-
-  /**
    *
    * @return
    */
@@ -90,8 +72,6 @@ public:
   Buffer( const Buffer& ) = delete;
 
   Buffer& operator=( const Buffer& ) = delete;
-
-  operator vk::Buffer*();
 
 private:
 

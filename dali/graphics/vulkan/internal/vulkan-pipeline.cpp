@@ -21,6 +21,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
 
 namespace Dali

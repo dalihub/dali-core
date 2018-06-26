@@ -35,10 +35,7 @@ struct Surface::Impl
     mVulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>(mSurfaceFactory.get());
   }
 
-  ~Impl()
-  {
-
-  }
+  ~Impl() = default;
 
   bool Initialise()
   {
@@ -74,15 +71,6 @@ struct Surface::Impl
   vk::SurfaceKHR mSurface;
   vk::SurfaceCapabilitiesKHR mCapabilities;
 };
-
-/**
- * Surface
- */
-
-RefCountedSurface Surface::New( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
-{
-  return RefCountedSurface( new Surface( graphics, std::move( surfaceFactory ) ) );
-}
 
 Surface::Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
 {

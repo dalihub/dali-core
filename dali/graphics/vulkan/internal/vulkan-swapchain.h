@@ -66,8 +66,9 @@ class Swapchain : public VkManaged
 
   friend class Graphics;
 
-
 public:
+
+  ~Swapchain() override;
 
   Swapchain( const Swapchain& ) = delete;
 
@@ -117,23 +118,12 @@ public:
 
 private:
 
-  Swapchain();
-
   Swapchain( Graphics& graphics,
              Queue& presentationQueue,
              RefCountedSurface surface,
              std::vector< SwapchainBuffer > framebuffers,
              vk::SwapchainCreateInfoKHR createInfo,
              vk::SwapchainKHR vkHandle );
-
-  ~Swapchain() override;
-
-  static RefCountedSwapchain New( Graphics& graphics,
-                                  Queue& presentationQueue,
-                                  RefCountedSurface surface,
-                                  std::vector< SwapchainBuffer > framebuffers,
-                                  vk::SwapchainCreateInfoKHR createInfo,
-                                  vk::SwapchainKHR vkHandle );
 
 private:
   Graphics* mGraphics;

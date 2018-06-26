@@ -38,6 +38,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -185,30 +186,30 @@ void Graphics::CreateDevice()
       if( flags & vk::QueueFlagBits::eGraphics )
       {
         mGraphicsQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
+                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
       if( flags & vk::QueueFlagBits::eTransfer )
       {
         mTransferQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
+                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
       if( flags & vk::QueueFlagBits::eCompute )
       {
         mComputeQueues.emplace_back(
-                MakeUnique< Queue >( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
+                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
 
       // todo: present queue
     }
   }
 
-  mResourceCache = MakeUnique< ResourceCache >();
+  mResourceCache = std::unique_ptr< ResourceCache >( new ResourceCache );
 }
 
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
   // create surface from the factory
-  auto surfaceRef = Surface::New( *this, std::move( surfaceFactory ) );
+  auto surfaceRef = RefCountedSurface( new Surface( *this, std::move( surfaceFactory ) ) );
 
   if( surfaceRef->Create() )
   {
@@ -246,9 +247,11 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
 
 RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInfo )
 {
-  auto refCountedFence = Fence::New( *this );
+  auto fence = new Fence( *this );
 
-  VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), refCountedFence->Ref() ) );
+  VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), &fence->mFence ) );
+
+  auto refCountedFence = RefCountedFence( fence );
 
   return refCountedFence;
 }
@@ -286,22 +289,25 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, BufferType type )
   info.setSize( size );
   info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
 
-  auto refCountedBuffer = Buffer::New( *this, info );
+  auto buffer = new Buffer( *this, info );
 
-  VkAssert( mDevice.createBuffer( &info, mAllocator.get(), refCountedBuffer->Ref() ) );
+  VkAssert( mDevice.createBuffer( &info, mAllocator.get(), &buffer->mBuffer ) );
 
-  AddBuffer( *refCountedBuffer );
+  auto refCountedBuffer = RefCountedBuffer( buffer );
+  AddBuffer( *buffer );
 
   return refCountedBuffer;
 }
 
 RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo )
 {
-  auto refCountedBuffer = Buffer::New( *this, bufferCreateInfo );
+  auto buffer = new Buffer( *this, bufferCreateInfo );
 
-  VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), refCountedBuffer->Ref() ) );
+  VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), &buffer->mBuffer ) );
 
-  AddBuffer( *refCountedBuffer );
+  auto refCountedBuffer = RefCountedBuffer( buffer );
+
+  AddBuffer( *buffer );
 
   return refCountedBuffer;
 }
@@ -459,23 +465,24 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
 
   auto framebuffer = VkAssert( mDevice.createFramebuffer( framebufferCreateInfo, mAllocator.get() ) );
 
-  return Framebuffer::New( *this,
-                           colorAttachments,
-                           depthAttachment,
-                           framebuffer,
-                           renderPass,
-                           width,
-                           height,
-                           isRenderPassExternal );
+  return RefCountedFramebuffer( new Framebuffer( *this,
+                                                 colorAttachments,
+                                                 depthAttachment,
+                                                 framebuffer,
+                                                 renderPass,
+                                                 width,
+                                                 height,
+                                                 isRenderPassExternal ) );
 }
 
 RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
 {
-  auto refCountedImage = Image::New( *this, imageCreateInfo );
+  auto image = new Image( *this, imageCreateInfo );
 
-  VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), refCountedImage->Ref() ) );
+  VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), &image->mImage ) );
 
-  AddImage( *refCountedImage );
+  auto refCountedImage = RefCountedImage( image );
+  AddImage( *image );
 
   return refCountedImage;
 }
@@ -496,7 +503,7 @@ RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
           .setTiling( vk::ImageTiling::eOptimal )
           .setMipLevels( 1 );
 
-  return Image::NewFromExternal( *this, std::move( imageCreateInfo ), externalImage );
+  return RefCountedImage(new Image( *this, imageCreateInfo, externalImage ) );
 }
 
 RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& flags,
@@ -514,19 +521,23 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
           .setComponents( components )
           .setSubresourceRange( std::move( subresourceRange ) );
 
-  auto refCountedImageView = ImageView::New( *this, image, imageViewCreateInfo );
+  auto imageView = new ImageView( *this, image, imageViewCreateInfo );
 
-  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, refCountedImageView->Ref() ) );
+  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, &imageView->mImageView ) );
 
-  AddImageView( *refCountedImageView );
+  auto refCountedImageView = RefCountedImageView( imageView );
+
+  AddImageView( *imageView );
 
   return refCountedImageView;
 }
 
 RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
 {
-  vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR, vk::ComponentSwizzle::eG,
-                                             vk::ComponentSwizzle::eB, vk::ComponentSwizzle::eA };
+  vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR,
+                                             vk::ComponentSwizzle::eG,
+                                             vk::ComponentSwizzle::eB,
+                                             vk::ComponentSwizzle::eA };
 
 
   auto subresourceRange = vk::ImageSubresourceRange{}
@@ -550,11 +561,13 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
 
 RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo )
 {
-  auto refCountedSampler = Sampler::New( *this, samplerCreateInfo );
+  auto sampler = new Sampler( *this, samplerCreateInfo );
 
-  VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), refCountedSampler->Ref() ) );
+  VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), &sampler->mSampler ) );
 
-  AddSampler( *refCountedSampler );
+  auto refCountedSampler = RefCountedSampler( sampler );
+
+  AddSampler( *sampler );
 
   return refCountedSampler;
 
@@ -880,19 +893,19 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     swapChainBuffers.push_back( swapBuffer );
   }
 
-  return Swapchain::New( *this,
-                         GetPresentQueue(),
-                         surface,
-                         swapChainBuffers,
-                         swapChainCreateInfo,
-                         swapChainVkHandle );
+  return RefCountedSwapchain( new Swapchain( *this,
+                                             GetPresentQueue(),
+                                             surface,
+                                             swapChainBuffers,
+                                             swapChainCreateInfo,
+                                             swapChainVkHandle ) );
 }
 // --------------------------------------------------------------------------------------------------------------
 
 // Actions ------------------------------------------------------------------------------------------------------
 vk::Result Graphics::WaitForFence( RefCountedFence fence, uint32_t timeout )
 {
-  return mDevice.waitForFences( 1, *fence, VK_TRUE, timeout );
+  return mDevice.waitForFences( 1, &fence->mFence, VK_TRUE, timeout );
 }
 
 vk::Result Graphics::WaitForFences( const std::vector< RefCountedFence >& fences, bool waitAll, uint32_t timeout )
@@ -901,7 +914,7 @@ vk::Result Graphics::WaitForFences( const std::vector< RefCountedFence >& fences
   std::transform( fences.begin(),
                   fences.end(),
                   std::back_inserter( vkFenceHandles ),
-                  []( RefCountedFence entry ) { return entry->GetVkHandle(); } );
+                  []( RefCountedFence entry ) { return entry->mFence; } );
 
 
   return mDevice.waitForFences( vkFenceHandles, vk::Bool32( waitAll ), timeout );
@@ -909,7 +922,7 @@ vk::Result Graphics::WaitForFences( const std::vector< RefCountedFence >& fences
 
 vk::Result Graphics::ResetFence( RefCountedFence fence )
 {
-  return mDevice.resetFences( 1, *fence );
+  return mDevice.resetFences( 1, &fence->mFence );
 }
 
 vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
@@ -918,22 +931,45 @@ vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
   std::transform( fences.begin(),
                   fences.end(),
                   std::back_inserter( vkFenceHandles ),
-                  []( RefCountedFence entry ) { return entry->GetVkHandle(); } );
+                  []( RefCountedFence entry ) { return entry->mFence; } );
 
   return mDevice.resetFences( vkFenceHandles );
 }
 
 vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset )
 {
-  auto result = VkAssert( mDevice.bindImageMemory( image->GetVkHandle(), *memory, offset ) );
-  image->AssignMemory( memory );
+  auto result = VkAssert( mDevice.bindImageMemory( image->mImage, *memory, offset ) );
+  image->mDeviceMemory = memory;
   return result;
+}
+
+vk::Result Graphics::BindBufferMemory( RefCountedBuffer buffer, RefCountedGpuMemoryBlock memory, uint32_t offset )
+{
+  assert( buffer->mBuffer && "Buffer not initialised!" );
+  auto result = VkAssert( mDevice.bindBufferMemory( buffer->mBuffer, *memory, offset ) );
+  buffer->mDeviceMemory = memory;
+  return result;
+}
+
+void* Graphics::MapMemory( RefCountedGpuMemoryBlock memory ) const
+{
+  return memory->Map();
+}
+
+void* Graphics::MapMemory( RefCountedGpuMemoryBlock memory, uint32_t size, uint32_t offset ) const
+{
+  return memory->Map( offset, size );
+}
+
+void Graphics::UnmapMemory( RefCountedGpuMemoryBlock memory ) const
+{
+  memory->Unmap();
 }
 
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
-  std::vector< vk::SubmitInfo > submitInfos;
-  std::vector< vk::CommandBuffer > commandBufferHandles;
+  auto submitInfos = std::vector< vk::SubmitInfo >{};
+  auto commandBufferHandles = std::vector< vk::CommandBuffer >{};
 
   // Transform SubmissionData to vk::SubmitInfo
   std::transform( submissionData.begin(),
@@ -959,17 +995,17 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
                                            .setPSignalSemaphores( subData.signalSemaphores.data() );
                   } );
 
-  return VkAssert( queue.GetVkHandle().submit( submitInfos, fence ? fence->GetVkHandle() : vk::Fence{} ) );
+  return VkAssert( queue.mQueue.submit( submitInfos, fence ? fence->GetVkHandle() : vk::Fence{} ) );
 }
 
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
-  return queue.GetVkHandle().presentKHR( presentInfo );
+  return queue.mQueue.presentKHR( presentInfo );
 }
 
 vk::Result Graphics::QueueWaitIdle( Queue& queue )
 {
-  return queue.GetVkHandle().waitIdle();
+  return queue.mQueue.waitIdle();
 }
 
 vk::Result Graphics::DeviceWaitIdle()

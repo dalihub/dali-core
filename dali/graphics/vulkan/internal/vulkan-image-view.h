@@ -27,24 +27,16 @@ namespace Graphics
 namespace Vulkan
 {
 
+class Graphics;
+
 /*
  * ImageView
  */
 class ImageView : public VkManaged
 {
+  friend class Graphics;
+
 public:
-
-  /**
-   * Creates ImageView according to the given spec
-   * @param graphics
-   * @param image
-   * @param info
-   * @return
-   */
-  static RefCountedImageView New( Graphics& graphics,
-                                  const RefCountedImage& image,
-                                  const vk::ImageViewCreateInfo& createInfo );
-
 
   ~ImageView() override;
 
@@ -81,8 +73,6 @@ public:
   const ImageView& ConstRef();
 
   ImageView& Ref();
-
-  operator vk::ImageView*();
 
   bool OnDestroy() override;
 

@@ -27,15 +27,6 @@ namespace Graphics
 namespace Vulkan
 {
 
-/**
- * Class: Fence
- *
- */
-RefCountedFence Fence::New( Graphics& graphics )
-{
-  return Handle< Fence >( new Fence( graphics ) );
-}
-
 Fence::Fence( Graphics& graphics ) : mGraphics( &graphics )
 {
 }
@@ -55,11 +46,6 @@ Fence::~Fence() = default;
 vk::Fence Fence::GetVkHandle() const
 {
   return mFence;
-}
-
-Fence::operator vk::Fence*()
-{
-  return &mFence;
 }
 
 bool Fence::OnDestroy()

@@ -37,11 +37,15 @@ namespace Vulkan
 using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
 using DiscardQueue = std::vector< std::function< void() > >;
 
+class Graphics;
+
 /**
  * Stores and manages Vulkan resources
  */
 class ResourceCache final
 {
+  friend class Graphics;
+
 public:
   /**
    * Adds the provided buffer object to the buffer cache
@@ -219,8 +223,6 @@ public:
 
   void PrintReferenceCountReport();
 
-  ResourceCache() = default;
-
   // The cache should not be copyable
   ResourceCache( const ResourceCache& other ) = delete;
 
@@ -230,6 +232,9 @@ public:
   ResourceCache( ResourceCache&& other ) = delete;
 
   ResourceCache&& operator=( ResourceCache&& other ) = delete;
+
+private:
+  ResourceCache() = default;
 
 private:
   std::vector< Buffer* >          mBuffers;

@@ -70,7 +70,7 @@ bool Buffer::Initialise()
   auto memory =
           mGraphics.GetDeviceMemoryManager().GetDefaultAllocator().Allocate( mBufferRef,
                                                                              vk::MemoryPropertyFlagBits::eHostVisible ); // todo: host visible should be only for dynamic buffers
-  mBufferRef->BindMemory( memory );
+  mGraphics.BindBufferMemory( mBufferRef, memory, 0 );
 
   return true;
 }

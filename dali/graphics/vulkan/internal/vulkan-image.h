@@ -27,32 +27,13 @@ namespace Graphics
 namespace Vulkan
 {
 
+class Graphics;
+
 class Image : public VkManaged
 {
+  friend class Graphics;
+
 public:
-  /**
-   * Creates new managed Image object
-   * @param graphics
-   * @param createInfo
-   * @return
-   */
-  static RefCountedImage New( Graphics& graphics, vk::ImageCreateInfo createInfo );
-
-  /**
-   * Creates new managed object from external image, lifecycle must be managed
-   * explicitly, as well as any data
-   * @param graphics
-   * @param createInfo
-   * @param image
-   * @return
-   */
-  static RefCountedImage NewFromExternal( Graphics& graphics, vk::ImageCreateInfo createInfo, vk::Image externalImage );
-
-  /**
-   * Destructor
-   */
-  ~Image() override;
-
   /**
    * Returns underlying Vulkan object
    * @return
@@ -117,20 +98,11 @@ public:
 
   vk::SampleCountFlagBits GetSampleCount() const;
 
-  /**
-   * Assigns the specified image memory to the image
-   * @warning This method does NOT bind the memory. Use Graphics::BindImageMemory instead
-   * @param memory The device memory to be assigned to the image
-   */
-  void AssignMemory( RefCountedGpuMemoryBlock memory );
-
   void SetImageLayout( vk::ImageLayout imageLayout );
 
   const Image& ConstRef();
 
   Image& Ref();
-
-  operator vk::Image*();
 
   bool OnDestroy() override;
 

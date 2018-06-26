@@ -38,13 +38,6 @@ ImageView::ImageView( Graphics& graphics, RefCountedImage image, vk::ImageViewCr
 
 ImageView::~ImageView() = default;
 
-RefCountedImageView ImageView::New( Graphics& graphics,
-                                    const RefCountedImage& image,
-                                    const vk::ImageViewCreateInfo& createInfo )
-{
-  return RefCountedImageView( new ImageView( graphics, image, createInfo ) );
-}
-
 vk::ImageView ImageView::GetVkHandle() const
 {
   return mImageView;
@@ -78,11 +71,6 @@ const ImageView& ImageView::ConstRef()
 ImageView& ImageView::Ref()
 {
   return *this;
-}
-
-ImageView::operator vk::ImageView*()
-{
-  return &mImageView;
 }
 
 bool ImageView::OnDestroy()

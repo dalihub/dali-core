@@ -934,11 +934,14 @@ struct Texture::Impl
                                             .setSharingMode( vk::SharingMode::eExclusive )
                                             .setSize( size ) );
 
-    buffer->BindMemory( allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
-                                                    vk::MemoryPropertyFlagBits::eHostCoherent ) );
+    auto memory = allocator.Allocate( buffer,
+                                      vk::MemoryPropertyFlagBits::eHostVisible |
+                                      vk::MemoryPropertyFlagBits::eHostCoherent );
+
+    mGraphics.BindBufferMemory( buffer, memory, 0 );
 
     // copy pixels to the buffer
-    auto ptr = buffer->GetMemoryHandle()->MapTyped< char >();
+    auto ptr = mGraphics.MapMemoryTyped< char >( buffer->GetMemoryHandle() );
     std::copy( reinterpret_cast<const char*>(data),
                reinterpret_cast<const char*>(data) + sizeInBytes,
                ptr );
