@@ -31,40 +31,47 @@ namespace Vulkan
 
 //FramebufferAttachment ------------------------
 RefCountedFramebufferAttachment FramebufferAttachment::NewColorAttachment( RefCountedImageView imageView,
-                                                                 vk::ClearColorValue clearColorValue,
-                                                                 bool presentable )
+                                                                           vk::ClearColorValue clearColorValue,
+                                                                           bool presentable )
 {
   assert( imageView->GetImage()->GetUsageFlags() & vk::ImageUsageFlagBits::eColorAttachment );
 
-  auto attachment = new FramebufferAttachment( std::move( imageView ), clearColorValue, presentable );
+  auto attachment = new FramebufferAttachment( std::move( imageView ),
+                                               clearColorValue,
+                                               AttachmentType::COLOR,
+                                               presentable );
 
   return RefCountedFramebufferAttachment( attachment );
 }
 
 RefCountedFramebufferAttachment FramebufferAttachment::NewDepthAttachment( RefCountedImageView imageView,
-                                                                 vk::ClearDepthStencilValue clearDepthStencilValue )
+                                                                           vk::ClearDepthStencilValue clearDepthStencilValue )
 {
   assert( imageView->GetImage()->GetUsageFlags() & vk::ImageUsageFlagBits::eDepthStencilAttachment );
 
-  auto attachment = new FramebufferAttachment( std::move( imageView ), clearDepthStencilValue, false );
+  auto attachment = new FramebufferAttachment( std::move( imageView ),
+                                               clearDepthStencilValue,
+                                               AttachmentType::DEPTH_STENCIL,
+                                               false /* presentable */ );
 
   return RefCountedFramebufferAttachment( attachment );
 }
 
-FramebufferAttachment::FramebufferAttachment( RefCountedImageView imageView,
+FramebufferAttachment::FramebufferAttachment( const RefCountedImageView& imageView,
                                               vk::ClearValue clearColor,
+                                              AttachmentType type,
                                               bool presentable )
-        : mImageView( imageView ),
-          mClearValue( clearColor )
+: mImageView( imageView ),
+  mClearValue( clearColor ),
+  mType( type )
 {
   auto image = imageView->GetImage();
-  auto usage = image->GetUsageFlags();
 
   auto sampleCountFlags = image->GetSampleCount();
 
   mDescription.setSamples( sampleCountFlags );
 
-  if( usage & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  if( type == AttachmentType::DEPTH_STENCIL )
   {
     mDescription.setStoreOp( vk::AttachmentStoreOp::eDontCare );
   }
@@ -78,7 +85,7 @@ FramebufferAttachment::FramebufferAttachment( RefCountedImageView imageView,
   mDescription.setInitialLayout( vk::ImageLayout::eUndefined );
   mDescription.setLoadOp( vk::AttachmentLoadOp::eClear );
 
-  if( usage & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  if( type == AttachmentType::DEPTH_STENCIL )
   {
     mDescription.finalLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
   }
@@ -103,6 +110,11 @@ const vk::ClearValue& FramebufferAttachment::GetClearValue() const
   return mClearValue;
 }
 
+AttachmentType FramebufferAttachment::GetType() const
+{
+  return mType;
+}
+
 bool FramebufferAttachment::IsValid() const
 {
   return mImageView;
@@ -118,14 +130,14 @@ Framebuffer::Framebuffer( Graphics& graphics,
                           uint32_t width,
                           uint32_t height,
                           bool externalRenderPass )
-        : mGraphics( &graphics ),
-          mWidth( width ),
-          mHeight( height ),
-          mColorAttachments( std::move( colorAttachments ) ),
-          mDepthAttachment( std::move( depthAttachment ) ),
-          mFramebuffer( vkHandle ),
-          mRenderPass( renderPass ),
-          mExternalRenderPass( externalRenderPass )
+: mGraphics( &graphics ),
+  mWidth( width ),
+  mHeight( height ),
+  mColorAttachments( colorAttachments ),
+  mDepthAttachment( depthAttachment ),
+  mFramebuffer( vkHandle ),
+  mRenderPass( renderPass ),
+  mExternalRenderPass( externalRenderPass )
 {
 }
 
@@ -151,7 +163,6 @@ RefCountedFramebufferAttachment Framebuffer::GetAttachment( AttachmentType type,
     {
       return mDepthAttachment;
     }
-    case AttachmentType::DEPTH:
     case AttachmentType::INPUT:
     case AttachmentType::RESOLVE:
     case AttachmentType::PRESERVE:
@@ -179,7 +190,6 @@ std::vector< RefCountedFramebufferAttachment > Framebuffer::GetAttachments( Atta
       retval.push_back( mDepthAttachment );
       return std::move( retval );
     }
-    case AttachmentType::DEPTH:
     case AttachmentType::INPUT:
     case AttachmentType::RESOLVE:
     case AttachmentType::PRESERVE:
@@ -203,7 +213,6 @@ uint32_t Framebuffer::GetAttachmentCount( AttachmentType type ) const
     {
       return mDepthAttachment->IsValid() ? 1u : 0u;
     }
-    case AttachmentType::DEPTH:
     case AttachmentType::INPUT:
     case AttachmentType::RESOLVE:
     case AttachmentType::PRESERVE:
@@ -227,15 +236,14 @@ std::vector< vk::ClearValue > Framebuffer::GetClearValues() const
 {
   auto result = std::vector< vk::ClearValue >{};
 
-  std::transform(mColorAttachments.begin(),
-                 mColorAttachments.end(),
-                 std::back_inserter( result ),
-                 []( const RefCountedFramebufferAttachment& attachment )
-                 {
-                   return attachment->GetClearValue();
-                 });
+  std::transform( mColorAttachments.begin(),
+                  mColorAttachments.end(),
+                  std::back_inserter( result ),
+                  []( const RefCountedFramebufferAttachment& attachment ) {
+                    return attachment->GetClearValue();
+                  } );
 
-  if( mDepthAttachment->IsValid() )
+  if( mDepthAttachment && mDepthAttachment->IsValid() )
   {
     result.push_back( mDepthAttachment->GetClearValue() );
   }
@@ -253,15 +261,7 @@ bool Framebuffer::OnDestroy()
   auto device = mGraphics->GetDevice();
   auto frameBuffer = mFramebuffer;
 
-  vk::RenderPass renderPass;
-  if( mExternalRenderPass )
-  {
-    renderPass = nullptr;
-  }
-  else
-  {
-    renderPass = mRenderPass;
-  }
+  vk::RenderPass renderPass = mExternalRenderPass ? vk::RenderPass{} : mRenderPass;
 
   auto allocator = &mGraphics->GetAllocator();
 

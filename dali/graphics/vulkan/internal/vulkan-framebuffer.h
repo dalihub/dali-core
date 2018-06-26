@@ -27,25 +27,23 @@ namespace Graphics
 namespace Vulkan
 {
 
-class Image;
-
 enum class AttachmentType
 {
   COLOR,
   DEPTH_STENCIL,
-  DEPTH,
   INPUT,
   RESOLVE,
   PRESERVE,
   UNDEFINED
 };
 
-class Framebuffer;
+class Graphics;
 
 class FramebufferAttachment : public VkManaged
 {
+  friend class Graphics;
+
 public:
-  friend class Framebuffer;
 
   static RefCountedFramebufferAttachment NewColorAttachment( RefCountedImageView imageView,
                                                              vk::ClearColorValue clearColorValue,
@@ -60,13 +58,16 @@ public:
 
   const vk::ClearValue& GetClearValue() const;
 
+  AttachmentType GetType() const;
+
   bool IsValid() const;
 
 private:
   FramebufferAttachment() = default;
 
-  FramebufferAttachment( RefCountedImageView imageView,
+  FramebufferAttachment( const RefCountedImageView& imageView,
                          vk::ClearValue clearColor,
+                         AttachmentType type,
                          bool presentable  );
 
   RefCountedImageView mImageView;
@@ -74,6 +75,8 @@ private:
   vk::AttachmentDescription mDescription;
 
   vk::ClearValue mClearValue;
+
+  AttachmentType mType;
 };
 
 /**

@@ -186,17 +186,17 @@ void Graphics::CreateDevice()
       if( flags & vk::QueueFlagBits::eGraphics )
       {
         mGraphicsQueues.emplace_back(
-                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
       if( flags & vk::QueueFlagBits::eTransfer )
       {
         mTransferQueues.emplace_back(
-                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
       if( flags & vk::QueueFlagBits::eCompute )
       {
         mComputeQueues.emplace_back(
-                std::unique_ptr<Queue>( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
       }
 
       // todo: present queue
@@ -227,7 +227,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    3,
+                                    3 /* number of images */,
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
