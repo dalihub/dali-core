@@ -17,6 +17,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
 
@@ -27,71 +28,40 @@ namespace Graphics
 namespace Vulkan
 {
 
-struct Surface::Impl
-{
-  Impl( Surface& owner, Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory ) :
-          mOwner( owner ), mGraphics( graphics ), mSurfaceFactory( std::move( surfaceFactory ) )
-  {
-    mVulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>(mSurfaceFactory.get());
-  }
-
-  ~Impl() = default;
-
-  bool Initialise()
-  {
-    if( !mVulkanSurfaceFactory )
-    {
-      return false;
-    }
-
-    // fixme: should avoid const cast :(
-    auto* allocatorCallbacks = const_cast<vk::AllocationCallbacks*>(&mGraphics.GetAllocator());
-    mSurface = mVulkanSurfaceFactory
-            ->Create( mGraphics.GetInstance(), allocatorCallbacks, mGraphics.GetPhysicalDevice() );
-
-    if( !mSurface )
-    {
-      return false;
-    }
-
-    mCapabilities = VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
-
-    return true;
-  }
-
-  vk::SurfaceCapabilitiesKHR GetCapabilities() const
-  {
-    return VkAssert( mGraphics.GetPhysicalDevice().getSurfaceCapabilitiesKHR( mSurface ) );
-  }
-
-  Surface& mOwner;
-  Graphics& mGraphics;
-  std::unique_ptr< SurfaceFactory > mSurfaceFactory;
-  Dali::Integration::Graphics::Vulkan::VkSurfaceFactory* mVulkanSurfaceFactory;
-  vk::SurfaceKHR mSurface;
-  vk::SurfaceCapabilitiesKHR mCapabilities;
-};
+using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 
 Surface::Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
+: mGraphics( &graphics ),
+  mSurfaceFactory( std::move( surfaceFactory ) ),
+  mVulkanSurfaceFactory( dynamic_cast<VkSurfaceFactory*>( mSurfaceFactory.get() ) )
 {
-  mImpl = std::make_unique< Impl >( *this, graphics, std::move( surfaceFactory ) );
 }
 
 Surface::~Surface() = default;
 
-bool Surface::Create()
+vk::SurfaceKHR Surface::GetVkHandle() const
 {
-  return mImpl->Initialise();
+  return mSurface;
 }
 
-vk::SurfaceKHR Surface::GetSurfaceKHR() const
+const vk::SurfaceCapabilitiesKHR& Surface::GetCapabilities() const
 {
-  return mImpl->mSurface;
+  return mCapabilities;
 }
 
-vk::SurfaceCapabilitiesKHR Surface::GetCapabilities() const
+bool Surface::OnDestroy()
 {
-  return mImpl->GetCapabilities();
+  auto instance = mGraphics->GetInstance();
+  auto surface = mSurface;
+  auto allocator = &mGraphics->GetAllocator();
+
+  mGraphics->DiscardResource( [ instance, surface, allocator ]() {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: surface->%p\n",
+                   static_cast< void* >( surface ) )
+    instance.destroySurfaceKHR( surface, allocator );
+  } );
+
+  return false;
 }
 
 } // namespace Vulkan

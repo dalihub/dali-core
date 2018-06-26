@@ -61,7 +61,6 @@ namespace Dali
 {
 namespace Graphics
 {
-using VkSurfaceFactory = Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
 namespace Vulkan
 {
 
@@ -116,7 +115,7 @@ Graphics::~Graphics()
   mDevice.destroy( mAllocator.get() );
 
   // Kill the Vulkan instance
-  mInstance.destroy( mAllocator.get() );
+  DestroyInstance();
 
 }
 
@@ -209,21 +208,35 @@ void Graphics::CreateDevice()
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
   // create surface from the factory
-  auto surfaceRef = RefCountedSurface( new Surface( *this, std::move( surfaceFactory ) ) );
+  auto surface = new Surface( *this, std::move( surfaceFactory ) );
 
-  if( surfaceRef->Create() )
+  if( !surface->mVulkanSurfaceFactory )
   {
-
-    // map surface to FBID
-    auto fbid = ++mBaseFBID;
-    mSurfaceFBIDMap[fbid] = SwapchainSurfacePair{ RefCountedSwapchain{}, surfaceRef };
-    return fbid;
+    return -1;
   }
-  return -1;
+
+  surface->mSurface = surface->mVulkanSurfaceFactory->Create( mInstance,
+                                                              mAllocator.get(),
+                                                              mPhysicalDevice );
+
+  if( !surface->mSurface )
+  {
+    return -1;
+  }
+
+  surface->mCapabilities = VkAssert( mPhysicalDevice.getSurfaceCapabilitiesKHR( surface->mSurface ) );
+
+  // map surface to FBID
+  auto fbid = ++mBaseFBID;
+
+  mSurfaceFBIDMap[ fbid ] = SwapchainSurfacePair{ RefCountedSwapchain{}, RefCountedSurface( surface ) };
+
+  return fbid;
 }
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
+  //TODO: propagate the format and presentation mode to higher layers to allow for more control?
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
@@ -233,11 +246,9 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   // store swapchain in the correct pair
   for( auto&& val : mSurfaceFBIDMap )
   {
-    if( val.second
-           .surface == surface )
+    if( val.second.surface == surface )
     {
-      val.second
-         .swapchain = swapchain;
+      val.second.swapchain = swapchain;
       break;
     }
   }
@@ -664,7 +675,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                uint32_t bufferCount, RefCountedSwapchain oldSwapchain )
 {
   // obtain supported image format
-  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetSurfaceKHR() ) );
+  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
 
   vk::Format swapchainImageFormat{};
   vk::ColorSpaceKHR swapchainColorSpace{};
@@ -766,7 +777,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Check if the requested present mode is supported
-  auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetSurfaceKHR() ).value;
+  auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
 
   auto found = std::find_if( presentModes.begin(),
                              presentModes.end(),
@@ -781,7 +792,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   }
 
   // Creation settings have been determined. Fill in the create info struct.
-  auto swapChainCreateInfo = vk::SwapchainCreateInfoKHR{}.setSurface( surface->GetSurfaceKHR() )
+  auto swapChainCreateInfo = vk::SwapchainCreateInfoKHR{}.setSurface( surface->GetVkHandle() )
                                                          .setPreTransform( preTransform )
                                                          .setPresentMode( presentMode )
                                                          .setOldSwapchain( oldSwapchain ? oldSwapchain->GetVkHandle()
@@ -1389,7 +1400,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
       transferFamily = queueFamilyIndex;
     }
     if( mPhysicalDevice.getSurfaceSupportKHR( queueFamilyIndex, mSurfaceFBIDMap.begin()->second.
-            surface->GetSurfaceKHR() ).value && presentFamily == -1u )
+    surface->GetVkHandle() ).value && presentFamily == -1u )
     {
       presentFamily = queueFamilyIndex;
     }

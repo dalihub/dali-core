@@ -93,7 +93,7 @@ public:
   }
 
   virtual vk::SurfaceKHR Create( vk::Instance instance,
-                                 vk::AllocationCallbacks* allocCallbacks,
+                                 const vk::AllocationCallbacks* allocCallbacks,
                                  vk::PhysicalDevice physicalDevice ) const override
   {
     vk::XlibSurfaceCreateInfoKHR info;
@@ -122,7 +122,7 @@ public:
   }
 
   virtual vk::SurfaceKHR Create( vk::Instance instance,
-                                 vk::AllocationCallbacks* allocCallbacks,
+                                 const vk::AllocationCallbacks* allocCallbacks,
                                  vk::PhysicalDevice physicalDevice ) const override
   {
     vk::XcbSurfaceCreateInfoKHR info;
