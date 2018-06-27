@@ -250,11 +250,6 @@ uint32_t CommandPool::GetAllocationCount( vk::CommandBufferLevel level ) const
 
 bool CommandPool::OnDestroy()
 {
-  if( !mGraphics->IsShuttingDown() )
-  {
-    mGraphics->RemoveCommandPool( *this );
-  }
-
   auto device = mGraphics->GetDevice();
   auto commandPool = mCommandPool;
   auto allocator = &mGraphics->GetAllocator();

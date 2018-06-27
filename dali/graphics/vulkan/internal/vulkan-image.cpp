@@ -142,10 +142,7 @@ bool Image::OnDestroy()
 {
   if( !mIsExternal )
   {
-    if( !mGraphics->IsShuttingDown() )
-    {
-      mGraphics->RemoveImage( *this );
-    }
+    mGraphics->RemoveImage( *this );
 
     auto device = mGraphics->GetDevice();
     auto image = mImage;

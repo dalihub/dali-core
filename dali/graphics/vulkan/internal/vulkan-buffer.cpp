@@ -69,10 +69,7 @@ vk::Buffer Buffer::GetVkHandle() const
 
 bool Buffer::OnDestroy()
 {
-  if( !mGraphics->IsShuttingDown() )
-  {
-    mGraphics->RemoveBuffer( *this );
-  }
+  mGraphics->RemoveBuffer( *this );
 
   auto device = mGraphics->GetDevice();
   auto buffer = mBuffer;

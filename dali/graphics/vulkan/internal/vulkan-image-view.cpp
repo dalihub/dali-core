@@ -75,10 +75,7 @@ ImageView& ImageView::Ref()
 
 bool ImageView::OnDestroy()
 {
-  if( !mGraphics->IsShuttingDown() )
-  {
-    mGraphics->RemoveImageView( *this );
-  }
+  mGraphics->RemoveImageView( *this );
 
   auto device = mGraphics->GetDevice();
   auto imageView = mImageView;

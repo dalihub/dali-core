@@ -135,10 +135,7 @@ Sampler& Sampler::Ref()
 
 bool Sampler::OnDestroy()
 {
-  if( mGraphics->IsShuttingDown() )
-  {
-    mGraphics->RemoveSampler( *this );
-  }
+  mGraphics->RemoveSampler( *this );
 
   auto device = mGraphics->GetDevice();
   auto sampler = mSampler;
