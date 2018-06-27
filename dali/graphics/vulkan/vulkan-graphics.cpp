@@ -33,7 +33,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
-#include <dali/graphics/vulkan/internal/vulkan-resource-cache.h>
+#include <dali/graphics/vulkan/internal/vulkan-resource-register.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
@@ -87,23 +87,21 @@ Graphics::~Graphics()
   // Wait for everything to finish on the GPU
   DeviceWaitIdle();
 
-  // We are shutting down. This flag is used to avoid cache manipulation by Handles' OnDestroy function calls.
-  // The cache will do its own house keeping on teardown
-  mShuttingDown = true;
-
   // Manually resetting unique pointer here because we need to control the order of destruction.
   // This defeats the purpose of unique pointers and we might as well use raw pointers. But a unique ptr
   // communicates ownership more clearly (e.g by not allowing copies).
   mGfxController.reset( nullptr );
   mSurfaceFBIDMap.clear();
 
+  mCommandPools.clear();
+
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" )
-  mResourceCache->PrintReferenceCountReport();
+  mResourceRegister->PrintReferenceCountReport();
 
   // Clear the last references of resources in the cache.
   // This should ensure that all resources have been queued for garbage collection
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
-  mResourceCache->Clear();
+  mResourceRegister->Clear();
 
   mDeviceMemoryManager.reset( nullptr );
 
@@ -202,7 +200,7 @@ void Graphics::CreateDevice()
     }
   }
 
-  mResourceCache = std::unique_ptr< ResourceCache >( new ResourceCache );
+  mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
 }
 
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
@@ -564,8 +562,6 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
                                               image->GetFormat(),
                                               componentsMapping,
                                               subresourceRange );
-
-  AddImageView( *refCountedImageView );
 
   return refCountedImageView;
 }
@@ -1150,132 +1146,130 @@ Dali::Graphics::API::Controller& Graphics::GetController()
   return *mGfxController;
 }
 
-bool Graphics::IsShuttingDown()
-{
-  return mShuttingDown;
-}
-
 // --------------------------------------------------------------------------------------------------------------
 
 // Cache manipulation methods -----------------------------------------------------------------------------------
 void Graphics::AddBuffer( Buffer& buffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddBuffer( buffer );
+  mResourceRegister->AddBuffer( buffer );
 }
 
 void Graphics::AddImage( Image& image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImage( image );
+  mResourceRegister->AddImage( image );
 }
 
 void Graphics::AddImageView( ImageView& imageView )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddImageView( imageView );
+  mResourceRegister->AddImageView( imageView );
 }
 
 void Graphics::AddShader( Shader& shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddShader( shader );
+  mResourceRegister->AddShader( shader );
 }
 
 void Graphics::AddCommandPool( RefCountedCommandPool pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddCommandPool( std::this_thread::get_id(), std::move(pool) );
+  mCommandPools[ std::this_thread::get_id() ] = std::move(pool);
 }
 
 void Graphics::AddDescriptorPool( DescriptorPool& pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddDescriptorPool( pool );
+  mResourceRegister->AddDescriptorPool( pool );
 }
 
 void Graphics::AddFramebuffer( Framebuffer& framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddFramebuffer( framebuffer );
+  mResourceRegister->AddFramebuffer( framebuffer );
 }
 
 void Graphics::AddSampler( Sampler& sampler )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->AddSampler( sampler );
+  mResourceRegister->AddSampler( sampler );
 }
 
 RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  return mResourceCache->FindShader( shaderModule );
+  return mResourceRegister->FindShader( shaderModule );
 }
 
 RefCountedImage Graphics::FindImage( vk::Image image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  return mResourceCache->FindImage( image );
+  return mResourceRegister->FindImage( image );
 }
 
 void Graphics::RemoveBuffer( Buffer& buffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveBuffer( buffer );
+  mResourceRegister->RemoveBuffer( buffer );
 }
 
 void Graphics::RemoveImage( Image& image )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveImage( image );
+  mResourceRegister->RemoveImage( image );
 }
 
 void Graphics::RemoveImageView( ImageView& imageView )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveImageView( imageView );
+  mResourceRegister->RemoveImageView( imageView );
 }
 
 void Graphics::RemoveShader( Shader& shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveShader( shader );
-}
-
-void Graphics::RemoveCommandPool( CommandPool& commandPool )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveCommandPool( commandPool );
+  mResourceRegister->RemoveShader( shader );
 }
 
 void Graphics::RemoveDescriptorPool( DescriptorPool& pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveDescriptorPool( pool );
+  mResourceRegister->RemoveDescriptorPool( pool );
 }
 
 void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveFramebuffer( framebuffer );
+  mResourceRegister->RemoveFramebuffer( framebuffer );
 }
 
 void Graphics::RemoveSampler( Sampler& sampler )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->RemoveSampler( sampler );
+  mResourceRegister->RemoveSampler( sampler );
 }
 
 void Graphics::CollectGarbage()
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->CollectGarbage();
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                   "Beginning graphics garbage collection---------------------------------------" )
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue.size() )
+  for( const auto& deleter : mDiscardQueue )
+  {
+    deleter();
+  }
+  mDiscardQueue.clear();
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                   "Graphics garbage collection complete---------------------------------------" )
 }
 
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceCache->EnqueueDiscardOperation( std::move( deleter ) );
+  mDiscardQueue.push_back( std::move( deleter ) );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -1524,12 +1518,14 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
   return retval;
 }
 
-RefCountedCommandPool Graphics::GetCommandPool( std::thread::id )
+RefCountedCommandPool Graphics::GetCommandPool( std::thread::id threadId )
 {
-  RefCountedCommandPool commandPool;
+  auto commandPool = RefCountedCommandPool{};
+
   {
     std::lock_guard< std::mutex > lock{ mMutex };
-    commandPool = mResourceCache->FindCommandPool( std::this_thread::get_id() );
+    commandPool = mCommandPools.find( threadId ) == mCommandPools.end() ? RefCountedCommandPool()
+                                                                        : mCommandPools[threadId];
   }
 
   if( !commandPool )

@@ -110,10 +110,7 @@ vk::ShaderModule Shader::GetVkHandle() const
 
 bool Shader::OnDestroy()
 {
-  if( !mImpl->mGraphics.IsShuttingDown() )
-  {
-    mImpl->mGraphics.RemoveShader( *this );
-  }
+  mImpl->mGraphics.RemoveShader( *this );
 
   auto device = mImpl->mGraphics.GetDevice();
   auto shaderModule = mImpl->mShaderModule;
