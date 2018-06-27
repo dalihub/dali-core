@@ -265,6 +265,7 @@ public:
   void Release()
   {
     OnRelease( --mRefCount );
+
     if( mRefCount == 0 )
     {
       // orphaned

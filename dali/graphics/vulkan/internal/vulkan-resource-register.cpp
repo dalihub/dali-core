@@ -15,7 +15,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/internal/vulkan-resource-cache.h>
+#include <dali/graphics/vulkan/internal/vulkan-resource-register.h>
 
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
@@ -38,55 +38,49 @@ namespace Graphics
 namespace Vulkan
 {
 
-ResourceCache& ResourceCache::AddBuffer( Buffer& buffer )
+ResourceRegister& ResourceRegister::AddBuffer( Buffer& buffer )
 {
   mBuffers.push_back( &buffer );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddImage( Image& image )
+ResourceRegister& ResourceRegister::AddImage( Image& image )
 {
   mImages.push_back( &image );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddImageView( ImageView& imageView )
+ResourceRegister& ResourceRegister::AddImageView( ImageView& imageView )
 {
   mImageViews.push_back( &imageView );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddShader( Shader& shader )
+ResourceRegister& ResourceRegister::AddShader( Shader& shader )
 {
   mShaders.push_back( &shader );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddCommandPool( std::thread::id currentThreadId, RefCountedCommandPool pool )
-{
-  mCommandPools[currentThreadId] = std::move(pool);
-  return *this;
-}
-
-ResourceCache& ResourceCache::AddDescriptorPool( DescriptorPool& pool )
+ResourceRegister& ResourceRegister::AddDescriptorPool( DescriptorPool& pool )
 {
   mDescriptorPools.push_back( &pool );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddFramebuffer( Framebuffer& framebuffer )
+ResourceRegister& ResourceRegister::AddFramebuffer( Framebuffer& framebuffer )
 {
   mFramebuffers.push_back( &framebuffer );
   return *this;
 }
 
-ResourceCache& ResourceCache::AddSampler( Sampler& sampler )
+ResourceRegister& ResourceRegister::AddSampler( Sampler& sampler )
 {
   mSamplers.push_back( &sampler );
   return *this;
 }
 
-RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
+RefCountedShader ResourceRegister::FindShader( vk::ShaderModule shaderModule )
 {
   auto iterator = std::find_if( mShaders.begin(),
                                 mShaders.end(),
@@ -97,13 +91,7 @@ RefCountedShader ResourceCache::FindShader( vk::ShaderModule shaderModule )
   return iterator == mShaders.end() ? RefCountedShader() : RefCountedShader( *iterator );
 }
 
-RefCountedCommandPool ResourceCache::FindCommandPool( std::thread::id currentThreadId )
-{
-  return mCommandPools.find( currentThreadId ) == mCommandPools.end() ? RefCountedCommandPool()
-                                                                      : mCommandPools[currentThreadId];
-}
-
-RefCountedDescriptorPool ResourceCache::FindDescriptorPool( vk::DescriptorPool descriptorPool )
+RefCountedDescriptorPool ResourceRegister::FindDescriptorPool( vk::DescriptorPool descriptorPool )
 {
   auto iterator = std::find_if( mDescriptorPools.begin(),
                                 mDescriptorPools.end(),
@@ -114,7 +102,7 @@ RefCountedDescriptorPool ResourceCache::FindDescriptorPool( vk::DescriptorPool d
   return iterator == mDescriptorPools.end() ? RefCountedDescriptorPool() : RefCountedDescriptorPool( *iterator );
 }
 
-RefCountedFramebuffer ResourceCache::FindFramebuffer( vk::Framebuffer framebuffer )
+RefCountedFramebuffer ResourceRegister::FindFramebuffer( vk::Framebuffer framebuffer )
 {
   auto iterator = std::find_if( mFramebuffers.begin(),
                                 mFramebuffers.end(),
@@ -125,7 +113,7 @@ RefCountedFramebuffer ResourceCache::FindFramebuffer( vk::Framebuffer framebuffe
   return iterator == mFramebuffers.end() ? RefCountedFramebuffer() : RefCountedFramebuffer( *iterator );
 }
 
-RefCountedSampler ResourceCache::FindSampler( vk::Sampler sampler )
+RefCountedSampler ResourceRegister::FindSampler( vk::Sampler sampler )
 {
   auto iterator = std::find_if( mSamplers.begin(),
                                 mSamplers.end(),
@@ -134,7 +122,7 @@ RefCountedSampler ResourceCache::FindSampler( vk::Sampler sampler )
   return iterator == mSamplers.end() ? RefCountedSampler() : RefCountedSampler( &**iterator );
 }
 
-RefCountedBuffer ResourceCache::FindBuffer( vk::Buffer buffer )
+RefCountedBuffer ResourceRegister::FindBuffer( vk::Buffer buffer )
 {
   auto iterator = std::find_if( mBuffers.begin(),
                                 mBuffers.end(),
@@ -143,7 +131,7 @@ RefCountedBuffer ResourceCache::FindBuffer( vk::Buffer buffer )
   return iterator == mBuffers.end() ? RefCountedBuffer() : RefCountedBuffer( *iterator );
 }
 
-RefCountedImage ResourceCache::FindImage( vk::Image image )
+RefCountedImage ResourceRegister::FindImage( vk::Image image )
 {
   auto iterator = std::find_if( mImages.begin(),
                                 mImages.end(),
@@ -152,7 +140,7 @@ RefCountedImage ResourceCache::FindImage( vk::Image image )
   return iterator == mImages.end() ? RefCountedImage() : RefCountedImage( *iterator );
 }
 
-RefCountedImageView ResourceCache::FindImageView( vk::ImageView imageView )
+RefCountedImageView ResourceRegister::FindImageView( vk::ImageView imageView )
 {
   auto iterator = std::find_if( mImageViews.begin(),
                                 mImageViews.end(),
@@ -163,7 +151,7 @@ RefCountedImageView ResourceCache::FindImageView( vk::ImageView imageView )
   return iterator == mImageViews.end() ? RefCountedImageView() : RefCountedImageView( *iterator );
 }
 
-ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
+ResourceRegister& ResourceRegister::RemoveBuffer( Buffer& buffer )
 {
   if( !mBuffers.empty() )
   {
@@ -179,7 +167,7 @@ ResourceCache& ResourceCache::RemoveBuffer( Buffer& buffer )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveImage( Image& image )
+ResourceRegister& ResourceRegister::RemoveImage( Image& image )
 {
   if( !mImages.empty() )
   {
@@ -195,7 +183,7 @@ ResourceCache& ResourceCache::RemoveImage( Image& image )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveImageView( ImageView& imageView )
+ResourceRegister& ResourceRegister::RemoveImageView( ImageView& imageView )
 {
   if( !mImageViews.empty() )
   {
@@ -211,7 +199,7 @@ ResourceCache& ResourceCache::RemoveImageView( ImageView& imageView )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveShader( Shader& shader )
+ResourceRegister& ResourceRegister::RemoveShader( Shader& shader )
 {
   if( !mShaders.empty() )
   {
@@ -227,32 +215,7 @@ ResourceCache& ResourceCache::RemoveShader( Shader& shader )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveCommandPool( CommandPool& commandPool )
-{
-  if( !mCommandPools.empty() )
-  {
-
-    auto found = mCommandPools.end();
-
-    auto it = mCommandPools.begin();
-    while( it != mCommandPools.end() )
-    {
-      auto pool = ( *it ).second;
-      if( pool->GetVkHandle() == commandPool.GetVkHandle() )
-      {
-        found = it;
-        break;
-      }
-
-      ++it;
-    }
-
-    mCommandPools.erase( found );
-  }
-  return *this;
-}
-
-ResourceCache& ResourceCache::RemoveDescriptorPool( DescriptorPool& descriptorPool )
+ResourceRegister& ResourceRegister::RemoveDescriptorPool( DescriptorPool& descriptorPool )
 {
   if( !mDescriptorPools.empty() )
   {
@@ -268,7 +231,7 @@ ResourceCache& ResourceCache::RemoveDescriptorPool( DescriptorPool& descriptorPo
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveFramebuffer( Framebuffer& framebuffer )
+ResourceRegister& ResourceRegister::RemoveFramebuffer( Framebuffer& framebuffer )
 {
   if( !mFramebuffers.empty() )
   {
@@ -284,7 +247,7 @@ ResourceCache& ResourceCache::RemoveFramebuffer( Framebuffer& framebuffer )
   return *this;
 }
 
-ResourceCache& ResourceCache::RemoveSampler( Sampler& sampler )
+ResourceRegister& ResourceRegister::RemoveSampler( Sampler& sampler )
 {
   if( !mSamplers.empty() )
   {
@@ -300,27 +263,8 @@ ResourceCache& ResourceCache::RemoveSampler( Sampler& sampler )
   return *this;
 }
 
-void ResourceCache::CollectGarbage()
-{
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Beginning graphics garbage collection---------------------------------------" )
-  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue.size() )
-  for( const auto& deleter : mDiscardQueue )
-  {
-    deleter();
-  }
-  mDiscardQueue.clear();
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Graphics garbage collection complete---------------------------------------" )
-}
-
-void ResourceCache::EnqueueDiscardOperation( std::function< void() > deleter )
-{
-  mDiscardQueue.push_back( std::move( deleter ) );
-}
-
 // Called only by the Graphics class destructor
-void ResourceCache::Clear()
+void ResourceRegister::Clear()
 {
   //This call assumes that all possible render threads have been joined by this point.
   //This function is called by the Graphics class destructor. At this point the caches
@@ -333,10 +277,9 @@ void ResourceCache::Clear()
   mShaders.clear();
   mSamplers.clear();
   mFramebuffers.clear();
-  mCommandPools.clear();
 }
 
-void ResourceCache::PrintReferenceCountReport()
+void ResourceRegister::PrintReferenceCountReport()
 {
 #if defined(DEBUG_ENABLED)
   auto totalObjectCount = mBuffers.size() +
@@ -350,7 +293,7 @@ void ResourceCache::PrintReferenceCountReport()
   uint32_t totalRefCount = 0;
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "TOTAL OBJECT COUNT: %ld\n", totalObjectCount )
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "BUFFER REFERENCES:" )
-  for( auto& buffer : mBuffers )
+  for( auto* buffer : mBuffers )
   {
     auto refCount = buffer->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tbuffer->%p : %d\n", static_cast< void* >(buffer->GetVkHandle()),
@@ -362,7 +305,7 @@ void ResourceCache::PrintReferenceCountReport()
   totalRefCount = 0;
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "IMAGE REFERENCES:" )
-  for( auto& image : mImages )
+  for( auto* image : mImages )
   {
     auto refCount = image->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\timage->%p : %d\n", static_cast< void* >(image->GetVkHandle()),

@@ -90,10 +90,7 @@ void DescriptorPool::Reset()
 
 bool DescriptorPool::OnDestroy()
 {
-  if( !mGraphics->IsShuttingDown() )
-  {
-    mGraphics->RemoveDescriptorPool( *this );
-  }
+  mGraphics->RemoveDescriptorPool( *this );
 
   auto device = mGraphics->GetDevice();
   auto descriptorPool = mDescriptorPool;
