@@ -468,6 +468,7 @@ private:
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+  RenderDataProvider*          mRenderDataProvider;               ///< The render data provider
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options

@@ -998,6 +998,17 @@ inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyRes
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
 }
 
+inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyResetterBase> resetter )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer<PropertyResetterBase> > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
+}
+
 
 } // namespace SceneGraph
 

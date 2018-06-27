@@ -108,6 +108,12 @@ public:
    */
   float GetOpacity( BufferIndex bufferIndex );
 
+  /**
+   * Get the opacity
+   * @return The opacity
+   */
+  float GetOpacity( BufferIndex bufferIndex );
+
 private:
 
   const UniformMapDataProvider*    mUniformMapDataProvider;

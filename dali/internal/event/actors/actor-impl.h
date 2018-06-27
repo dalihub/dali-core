@@ -1492,6 +1492,11 @@ public:
   DevelActor::ChildChangedSignalType& ChildRemovedSignal();
 
   /**
+   * @copydoc DevelActor::ChildOrderChangedSignal
+   */
+  DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -1612,7 +1617,6 @@ public:
   void RebuildDepthTree();
 
 protected:
-
   /**
    * Traverse the actor tree, inserting actors into the depth tree in sibling order.
    * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
@@ -1986,6 +1990,7 @@ protected:
   Dali::Actor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
   DevelActor::ChildChangedSignalType       mChildAddedSignal;
   DevelActor::ChildChangedSignalType       mChildRemovedSignal;
+  DevelActor::ChildOrderChangedSignalType  mChildOrderChangedSignal;
 
   Quaternion      mTargetOrientation; ///< Event-side storage for orientation
   Vector4         mTargetColor;       ///< Event-side storage for color

@@ -33,6 +33,14 @@ namespace Dali
 namespace Integration
 {
 
+/**
+ * Returns GL data type and internal format for specified pixel format
+ * @param[in]  pixelformat    pixel format (eg. Pixel::RGBA32)
+ * @param[out] pixelDataType  pixel data type (eg. GL_UNSIGNED_BYTE)
+ * @param[out] internalFormat pixel internal format (eg. GL_RGBA)
+ */
+DALI_CORE_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
+
 class Bitmap;
 typedef IntrusivePtr<Bitmap>    BitmapPtr;
 typedef unsigned char                 PixelBuffer;  ///< Pixel data buffers are composed of these

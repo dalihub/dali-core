@@ -337,6 +337,7 @@ public:
    * Render the next frame. This method should be preceded by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @param[out] status showing whether update is required to run.
+   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
   void Render( RenderStatus& status, bool forceClear );
 

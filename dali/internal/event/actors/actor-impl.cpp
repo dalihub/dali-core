@@ -2088,6 +2088,11 @@ DevelActor::ChildChangedSignalType& Actor::ChildRemovedSignal()
   return mChildRemovedSignal;
 }
 
+DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
+{
+  return mChildOrderChangedSignal;
+}
+
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
@@ -2166,6 +2171,7 @@ Actor::Actor( DerivedType derivedType )
   mLayoutDirectionChangedSignal(),
   mChildAddedSignal(),
   mChildRemovedSignal(),
+  mChildOrderChangedSignal(),
   mTargetOrientation( Quaternion::IDENTITY ),
   mTargetColor( Color::WHITE ),
   mTargetSize( Vector3::ZERO ),
@@ -5261,6 +5267,7 @@ void Actor::Raise()
         }
       }
     }
+    mParent->mChildOrderChangedSignal.Emit();
     RequestRebuildDepthTree();
   }
   else
@@ -5288,6 +5295,7 @@ void Actor::Lower()
         }
       }
     }
+    mParent->mChildOrderChangedSignal.Emit();
     RequestRebuildDepthTree();
   }
   else
@@ -5310,6 +5318,7 @@ void Actor::RaiseToTop()
         siblings.push_back(ActorPtr(this));
       }
     }
+    mParent->mChildOrderChangedSignal.Emit();
     RequestRebuildDepthTree();
   }
   else
@@ -5334,6 +5343,7 @@ void Actor::LowerToBottom()
         siblings.insert(siblings.begin(), thisPtr);
       }
     }
+    mParent->mChildOrderChangedSignal.Emit();
     RequestRebuildDepthTree();
   }
   else
@@ -5362,6 +5372,8 @@ void Actor::RaiseAbove( Internal::Actor& target )
         ++targetIter;
         siblings.insert(targetIter, thisPtr);
       }
+
+      mParent->mChildOrderChangedSignal.Emit();
       RequestRebuildDepthTree();
     }
   }
@@ -5388,6 +5400,8 @@ void Actor::LowerBelow( Internal::Actor& target )
         siblings.erase(thisIter); // this only invalidates iterators at or after this point.
         siblings.insert(targetIter, thisPtr);
       }
+
+      mParent->mChildOrderChangedSignal.Emit();
       RequestRebuildDepthTree();
     }
   }

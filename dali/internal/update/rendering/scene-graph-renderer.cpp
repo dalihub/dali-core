@@ -115,6 +115,7 @@ Renderer::Renderer()
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
+  mRenderDataProvider( NULL ),
   mBlendColor( NULL ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
@@ -491,6 +492,11 @@ FaceCullingMode::Type Renderer::GetFaceCullingMode() const
   return mFaceCullingMode;
 }
 
+FaceCullingMode::Type Renderer::GetFaceCullingMode() const
+{
+  return mFaceCullingMode;
+}
+
 void Renderer::SetBlendMode( BlendMode::Type blendingMode )
 {
   mBlendMode = blendingMode;
@@ -550,9 +556,23 @@ const Vector4& Renderer::GetBlendColor() const
   return Color::TRANSPARENT;
 }
 
+Vector4 Renderer::GetBlendColor() const
+{
+  if( mBlendColor )
+  {
+    return *mBlendColor;
+  }
+  return Color::TRANSPARENT;
+}
+
 void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
+}
+
+size_t Renderer::GetIndexedDrawFirstElement() const
+{
+  return mIndexedDrawFirstElement;
 }
 
 size_t Renderer::GetIndexedDrawFirstElement() const
@@ -570,9 +590,19 @@ size_t Renderer::GetIndexedDrawElementsCount() const
   return mIndexedDrawElementsCount;
 }
 
+size_t Renderer::GetIndexedDrawElementsCount() const
+{
+  return mIndexedDrawElementsCount;
+}
+
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
   mPremultipledAlphaEnabled = preMultipled;
+}
+
+bool Renderer::IsPreMultipliedAlphaEnabled() const
+{
+  return mPremultipledAlphaEnabled;
 }
 
 bool Renderer::IsPreMultipliedAlphaEnabled() const
@@ -590,6 +620,11 @@ DepthWriteMode::Type Renderer::GetDepthWriteMode() const
   return mDepthWriteMode;
 }
 
+DepthWriteMode::Type Renderer::GetDepthWriteMode() const
+{
+  return mDepthWriteMode;
+}
+
 void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
 {
   mDepthTestMode = depthTestMode;
@@ -600,9 +635,19 @@ DepthTestMode::Type Renderer::GetDepthTestMode() const
   return mDepthTestMode;
 }
 
+DepthTestMode::Type Renderer::GetDepthTestMode() const
+{
+  return mDepthTestMode;
+}
+
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
+}
+
+DepthFunction::Type Renderer::GetDepthFunction() const
+{
+  return mDepthFunction;
 }
 
 DepthFunction::Type Renderer::GetDepthFunction() const
