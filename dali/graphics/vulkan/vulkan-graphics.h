@@ -68,11 +68,13 @@ class DescriptorPool;
 
 class GpuMemoryManager;
 
-class ResourceCache;
+class ResourceRegister;
 
 class FramebufferAttachment;
 
 using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
+using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
+using DiscardQueue = std::vector< std::function< void() > >;
 
 struct SwapchainSurfacePair
 {
@@ -217,8 +219,6 @@ public: // Getters
 
   Dali::Graphics::API::Controller& GetController();
 
-  bool IsShuttingDown();
-
 public: //Cache management methods
 
   void AddBuffer( Buffer& buffer );
@@ -249,8 +249,6 @@ public: //Cache management methods
 
   void RemoveShader( Shader& shader );
 
-  void RemoveCommandPool( CommandPool& commandPool );
-
   void RemoveDescriptorPool( DescriptorPool& pool );
 
   void RemoveFramebuffer( Framebuffer& framebuffer );
@@ -279,7 +277,7 @@ private: // Methods
 
   std::vector< const char* > PrepareDefaultInstanceExtensions();
 
-  RefCountedCommandPool GetCommandPool( std::thread::id );
+  RefCountedCommandPool GetCommandPool( std::thread::id threadId );
 
 private: // Members
 
@@ -307,7 +305,7 @@ private: // Members
   std::vector< std::unique_ptr< Queue > > mComputeQueues;
   //std::unique_ptr< Queue > mPresentQueue;
 
-  std::unique_ptr< ResourceCache > mResourceCache;
+  std::unique_ptr< ResourceRegister > mResourceRegister;
 
   std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
   FBID mBaseFBID{ 0u };
@@ -320,8 +318,10 @@ private: // Members
 
   std::unique_ptr< Dali::Graphics::VulkanAPI::Controller > mGfxController;
 
-  bool mShuttingDown = false;
+  // Command pool map using thread IDs as keys
+  CommandPoolMap mCommandPools;
 
+  DiscardQueue mDiscardQueue;
 };
 
 } // namespace Vulkan
