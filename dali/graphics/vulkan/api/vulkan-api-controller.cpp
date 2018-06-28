@@ -78,8 +78,7 @@ struct Controller::Impl
 
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
           : mGraphics( graphics ),
-            mOwner( owner ),
-            mDefaultAllocator( mGraphics.GetDeviceMemoryManager().GetDefaultAllocator() )
+            mOwner( owner )
   {
   }
 
@@ -350,7 +349,6 @@ struct Controller::Impl
 
   Vulkan::Graphics& mGraphics;
   Controller& mOwner;
-  Vulkan::GpuMemoryAllocator& mDefaultAllocator;
 
   std::unique_ptr< VulkanAPI::TextureFactory > mTextureFactory;
   std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;

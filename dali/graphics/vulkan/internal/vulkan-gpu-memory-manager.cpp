@@ -86,8 +86,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
   ~GpuMemoryDefaultAllocator() override = default;
 
 
-  RefCountedGpuMemoryBlock
-  Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) override
+  RefCountedGpuMemoryBlock Allocate( const vk::MemoryRequirements& requirements,
+                                     vk::MemoryPropertyFlags memoryProperties ) override
   {
 
     auto memoryTypeIndex = GetMemoryIndex( mGraphics.GetMemoryProperties(),
@@ -120,8 +120,8 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock
-  Allocate( const Handle< Buffer >& buffer, vk::MemoryPropertyFlags memoryProperties ) override
+  virtual RefCountedGpuMemoryBlock Allocate( const RefCountedBuffer& buffer,
+                                             vk::MemoryPropertyFlags memoryProperties ) override
   {
     vk::Buffer handle = buffer->GetVkHandle();
     vk::MemoryRequirements memReqs = mGraphics.GetDevice().getBufferMemoryRequirements( handle );

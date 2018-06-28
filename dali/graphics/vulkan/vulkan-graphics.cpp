@@ -973,6 +973,16 @@ void Graphics::UnmapMemory( RefCountedGpuMemoryBlock memory ) const
   memory->Unmap();
 }
 
+RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties )
+{
+  return mDeviceMemoryManager->GetDefaultAllocator().Allocate( std::move( buffer ) , memoryProperties );
+}
+
+RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties )
+{
+  return mDeviceMemoryManager->GetDefaultAllocator().Allocate( std::move( image ), memoryProperties );
+}
+
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
   auto submitInfos = std::vector< vk::SubmitInfo >{};
@@ -1078,11 +1088,6 @@ vk::Instance Graphics::GetInstance() const
 const vk::AllocationCallbacks& Graphics::GetAllocator() const
 {
   return *mAllocator;
-}
-
-GpuMemoryManager& Graphics::GetDeviceMemoryManager() const
-{
-  return *mDeviceMemoryManager;
 }
 
 const vk::PhysicalDeviceMemoryProperties& Graphics::GetMemoryProperties() const
@@ -1274,9 +1279,8 @@ void Graphics::DiscardResource( std::function< void() > deleter )
 // --------------------------------------------------------------------------------------------------------------
 
 
-void
-Graphics::CreateInstance( const std::vector< const char* >& extensions,
-                          const std::vector< const char* >& validationLayers )
+void Graphics::CreateInstance( const std::vector< const char* >& extensions,
+                               const std::vector< const char* >& validationLayers )
 {
   auto info = vk::InstanceCreateInfo{};
 
