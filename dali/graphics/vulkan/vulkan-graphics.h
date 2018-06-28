@@ -72,7 +72,7 @@ class ResourceRegister;
 
 class FramebufferAttachment;
 
-using SurfaceFactory = Dali::Integration::Graphics::SurfaceFactory;
+using Dali::Integration::Graphics::SurfaceFactory;
 using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
 using DiscardQueue = std::vector< std::function< void() > >;
 
@@ -180,6 +180,10 @@ public: // Actions
     return memory->MapTyped<T>();
   }
 
+  RefCountedGpuMemoryBlock AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties );
+
+  RefCountedGpuMemoryBlock AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties );
+
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 
   vk::Result Present( Queue& queue, vk::PresentInfoKHR presentInfo );
@@ -202,8 +206,6 @@ public: // Getters
   vk::Instance GetInstance() const;
 
   const vk::AllocationCallbacks& GetAllocator() const;
-
-  GpuMemoryManager& GetDeviceMemoryManager() const;
 
   const vk::PhysicalDeviceMemoryProperties& GetMemoryProperties() const;
 

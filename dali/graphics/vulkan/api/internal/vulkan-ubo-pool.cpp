@@ -178,10 +178,7 @@ struct UboPool::Impl
                                                           .setSharingMode( vk::SharingMode::eExclusive )
                                                           .setSize( mBlockSize * mInitialCapacity ) ) );
 
-    auto memory = graphics.GetDeviceMemoryManager()
-                          .GetDefaultAllocator()
-                          .Allocate( mBuffers.back().buffer,
-                                     vk::MemoryPropertyFlagBits::eHostVisible );
+    auto memory = graphics.AllocateMemory( mBuffers.back().buffer, vk::MemoryPropertyFlagBits::eHostVisible );
 
     graphics.BindBufferMemory( mBuffers.back().buffer, memory, 0 );
 

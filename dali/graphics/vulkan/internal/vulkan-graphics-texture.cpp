@@ -83,15 +83,14 @@ struct Texture::Impl
   bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
   {
     // create buffer
-    auto& allocator = mGraphics.GetDeviceMemoryManager().GetDefaultAllocator();
     auto size = sizeInBytes;
     auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
                                                   .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
                                                   .setSharingMode( vk::SharingMode::eExclusive )
                                                   .setSize( size ) );
 
-    auto memory = allocator.Allocate( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
-                                              vk::MemoryPropertyFlagBits::eHostCoherent );
+    auto memory = mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
+                                                    vk::MemoryPropertyFlagBits::eHostCoherent );
 
     mGraphics.BindBufferMemory( buffer, memory, 0 );
 
@@ -179,9 +178,7 @@ struct Texture::Impl
     mImage = mGraphics.CreateImage( imageCreateInfo );
 
     // allocate memory for the image
-    auto memory = mGraphics.GetDeviceMemoryManager()
-                           .GetDefaultAllocator()
-                           .Allocate( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+    auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
     // bind the allocated memory to the image
     mGraphics.BindImageMemory( mImage, memory, 0 );

@@ -53,8 +53,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock
-  Allocate( const vk::MemoryRequirements& requirements, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock Allocate( const vk::MemoryRequirements& requirements,
+                                             vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   /**
    *
@@ -62,8 +62,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock
-  Allocate( const RefCountedBuffer& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock Allocate( const RefCountedBuffer& buffer,
+                                             vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   /**
    *
@@ -71,8 +71,8 @@ public:
    * @param memoryProperties
    * @return
    */
-  virtual RefCountedGpuMemoryBlock
-  Allocate( const RefCountedImage& buffer, vk::MemoryPropertyFlags memoryProperties ) = 0;
+  virtual RefCountedGpuMemoryBlock Allocate( const RefCountedImage& buffer,
+                                             vk::MemoryPropertyFlags memoryProperties ) = 0;
 
   // refcounting managed via allocator which ownes all the blocks, allocator may
   // implement this feature any way ( or simply ignore it )
