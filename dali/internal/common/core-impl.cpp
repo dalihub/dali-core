@@ -227,6 +227,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
 
+  // Check if the default surface is changed
+  status.surfaceRectChanged = mUpdateManager->IsDefaultSurfaceRectChanged();
+
   // No need to keep update running if there are notifications to process.
   // Any message to update will wake it up anyways
 }
