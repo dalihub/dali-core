@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#pragma GCC diagnostic ignored "-Wunused-function"
-
 // CLASS HEADER
 #include "scene-graph-renderer.h"
 
@@ -209,9 +204,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   auto &controller = mGraphics->GetController();
 
-  // prepare all stuff
-  auto gfxShader                   = mShader->GetGfxObject();
-
   if (!mGfxRenderCommand)
   {
     mGfxRenderCommand = controller.AllocateRenderCommand();
@@ -277,7 +269,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     auto        arrayLeftBracket = uniformMap->uniformName .find('[');
     if (arrayLeftBracket != std::string::npos)
     {
-      auto arrayRightBracket = uniformMap->uniformName.find(']');
       arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
       DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
       uniformName = uniformName.substr(0, arrayLeftBracket);
@@ -373,13 +364,15 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
         auto texture    = mTextureSet->GetTexture(i);
-        auto gfxTexture = texture->GetGfxObject();
-        auto binding    = Graphics::API::RenderCommand::TextureBinding{}
-          .SetBinding(samplers[i].binding)
-          .SetTexture(texture->GetGfxObject())
-          .SetSampler(nullptr);
+        if( texture )
+        {
+          auto binding    = Graphics::API::RenderCommand::TextureBinding{}
+            .SetBinding(samplers[i].binding)
+            .SetTexture(texture->GetGfxObject())
+            .SetSampler(nullptr);
 
-        textureBindings.emplace_back(binding);
+          textureBindings.emplace_back(binding);
+        }
       }
     }
   }
@@ -754,5 +747,3 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
-
-#pragma GCC diagnostic pop
