@@ -19,7 +19,6 @@
 
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
@@ -30,7 +29,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
-#include <dali/graphics/vulkan/internal/vulkan-graphics-texture.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 // API

@@ -67,9 +67,9 @@ std::string APItoVK( const Texture* texture)
   }
   const auto& apiTexture = static_cast<const VulkanAPI::Texture&>(*texture);
 
-  auto imageRef = apiTexture.GetTextureRef()->GetImage();
-  auto imageViewRef = apiTexture.GetTextureRef()->GetImageView();
-  auto samplerRef = apiTexture.GetTextureRef()->GetSampler();
+  auto imageRef = apiTexture.GetImageRef();
+  auto imageViewRef = apiTexture.GetImageViewRef();
+  auto samplerRef = apiTexture.GetSamplerRef();
 
   ss << "VulkanAPI::Texture(" << &apiTexture << ") {" << std::endl;
   ss << "         vk::Image = " << static_cast<VkImage>(imageRef->GetVkHandle()) << std::endl;

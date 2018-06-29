@@ -373,13 +373,16 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
         auto texture    = mTextureSet->GetTexture(i);
-        auto gfxTexture = texture->GetGfxObject();
-        auto binding    = Graphics::API::RenderCommand::TextureBinding{}
-          .SetBinding(samplers[i].binding)
-          .SetTexture(texture->GetGfxObject())
-          .SetSampler(nullptr);
+        if( texture )
+        {
+          auto gfxTexture = texture->GetGfxObject();
+          auto binding    = Graphics::API::RenderCommand::TextureBinding{}
+            .SetBinding(samplers[i].binding)
+            .SetTexture(texture->GetGfxObject())
+            .SetSampler(nullptr);
 
-        textureBindings.emplace_back(binding);
+          textureBindings.emplace_back(binding);
+        }
       }
     }
   }
