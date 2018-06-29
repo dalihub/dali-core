@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "211feda4_4f458997",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-29T16:35:08Z",
+      "side": 1,
+      "message": "I guess we\u0027re going to need a load of these conversion functions... maybe put them in another file?",
+      "revId": "a95289fbbbc3928f4ef375052e74213b15589191",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "240a8b28_ba97cb5d",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-29T16:35:08Z",
+      "side": 1,
+      "message": "could use gfxTexture, or remove it.",
+      "range": {
+        "startLine": 381,
+        "startChar": 24,
+        "endLine": 381,
+        "endChar": 47
+      },
+      "revId": "a95289fbbbc3928f4ef375052e74213b15589191",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
