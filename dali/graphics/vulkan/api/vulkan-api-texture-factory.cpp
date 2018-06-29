@@ -53,7 +53,7 @@ struct TextureFactory::Impl
 
   API::TextureDetails::Type mType;
   API::RectSize mSize;
-  API::TextureDetails::Format mFormat;
+  API::Format mFormat;
   API::TextureDetails::MipMapFlag mMipmapFlags;
   void* mData;
   uint32_t mDataSizeInBytes;
