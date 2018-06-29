@@ -180,8 +180,8 @@ void RenderCommand::BindTexturesAndSamplers()
     auto& image = static_cast<const VulkanAPI::Texture&>(*texture.texture);
     DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                      "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
-    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetTextureRef()->GetSampler(),
-                                                   image.GetTextureRef()->GetImageView() );
+    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetSamplerRef(),
+                                                   image.GetImageViewRef() );
   }
 }
 
