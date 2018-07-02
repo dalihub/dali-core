@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f17ee749_178d35a1",
+        "filename": "dali/graphics/vulkan/internal/vulkan-standalone-test.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-02T14:44:42Z",
+      "side": 1,
+      "message": "in the future, this file should be removed. it\u0027s not a part of the library",
+      "revId": "b1f2bf626d19e90ffc628a6c50fea960a62392ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
