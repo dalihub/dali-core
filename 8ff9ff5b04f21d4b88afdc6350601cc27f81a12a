@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "160734fc_8b48e4d2",
+        "filename": "dali/graphics/vulkan/internal/vulkan-framebuffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-02T14:29:41Z",
+      "side": 1,
+      "message": "we should support DALi renderer\u0027s cleareEnabled flag somehow.",
+      "revId": "8ff9ff5b04f21d4b88afdc6350601cc27f81a12a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
