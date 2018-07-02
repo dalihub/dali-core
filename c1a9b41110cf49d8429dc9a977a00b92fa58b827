@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d6f41e7d_a2d0d000",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-02T14:36:12Z",
+      "side": 1,
+      "message": "and number of images in the swapchain, too.",
+      "revId": "c1a9b41110cf49d8429dc9a977a00b92fa58b827",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
