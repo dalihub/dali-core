@@ -38,6 +38,7 @@ namespace SceneGraph
 {
 class PropertyBuffer;
 class Shader;
+class Renderer;
 
 /**
  * Wraps all the data providers for the renderer. This allows the
