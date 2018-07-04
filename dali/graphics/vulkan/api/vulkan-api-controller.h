@@ -130,6 +130,8 @@ public:
 
   API::PipelineFactory& GetPipelineFactory() override;
 
+  API::FramebufferFactory& GetFramebufferFactory() const override;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

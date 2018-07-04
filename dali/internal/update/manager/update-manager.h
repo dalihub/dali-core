@@ -541,6 +541,11 @@ private:
    */
   void UpdateRenderers( BufferIndex bufferIndex );
 
+  /**
+   * Prepare renderer graphics
+   */
+  void PrepareRenderers( BufferIndex bufferIndex );
+
 private:
 
   // needs to be direct member so that getter for event buffer can be inlined

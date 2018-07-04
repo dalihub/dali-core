@@ -15,6 +15,7 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/internal/vulkan-pipeline.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-buffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-debug.cpp \
+    $(graphics_src_dir)/vulkan/internal/vulkan-framebuffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-shader.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-swapchain.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-sampler.cpp \
@@ -26,6 +27,8 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/api/vulkan-api-texture.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-buffer.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-buffer-factory.cpp \
+    $(graphics_src_dir)/vulkan/api/vulkan-api-framebuffer.cpp \
+    $(graphics_src_dir)/vulkan/api/vulkan-api-framebuffer-factory.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-texture-factory.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-shader-factory.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-render-command.cpp \

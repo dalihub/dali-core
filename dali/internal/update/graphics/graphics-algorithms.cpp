@@ -210,6 +210,7 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
 
 void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&           graphics,
                            BufferIndex                          bufferIndex,
+                           Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
                            Matrix                               viewProjection,
                            RenderInstruction&                   instruction,
                            const RenderList&                    renderItemList )
@@ -223,15 +224,6 @@ void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&       
   Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
 
   std::vector<Graphics::API::RenderCommand*> commandList;
-
-  // @todo: this should be probably separated ???
-  auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{}
-  .SetClearColors( {
-                     { instruction.mClearColor.r,
-                       instruction.mClearColor.g,
-                       instruction.mClearColor.b,
-                       instruction.mClearColor.a
-                     }});
 
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
@@ -299,11 +291,26 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
   Matrix        viewProjection;
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
+
+  auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{}
+  .SetClearColors( {{ instruction.mClearColor.r,
+                    instruction.mClearColor.g,
+                    instruction.mClearColor.b,
+                    instruction.mClearColor.a }} );
+
+  if( !instruction.mIgnoreRenderToFbo )
+  {
+    if( instruction.mFrameBuffer != 0 )
+    {
+      renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
+    }
+  }
+
   auto numberOfRenderLists = instruction.RenderListCount();
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
-    SubmitRenderItemList(
-      graphics, bufferIndex, viewProjection, instruction, *instruction.GetRenderList( i ) );
+    SubmitRenderItemList( graphics, bufferIndex, renderTargetBinding,
+                          viewProjection, instruction, *instruction.GetRenderList( i ) );
   }
 }
 
@@ -570,4 +577,3 @@ void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  c
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
-
