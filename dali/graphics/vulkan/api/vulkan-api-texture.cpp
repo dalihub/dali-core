@@ -921,7 +921,7 @@ struct Texture::Impl
 
     if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
     {
-      //if( data && sizeInBytes > 0 )
+      if( data && sizeInBytes > 0 )
       {
         assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
 
@@ -946,7 +946,7 @@ struct Texture::Impl
 
     InitialiseTexture();
 
-    //if( data && sizeInBytes > 0 )
+    if( data && sizeInBytes )
     {
       UploadData( data, 0, sizeInBytes );
     }
@@ -1038,10 +1038,10 @@ struct Texture::Impl
     // create image
     auto imageCreateInfo = vk::ImageCreateInfo{}
       .setFormat( mFormat )
-      .setInitialLayout( vk::ImageLayout::ePreinitialized /* mLayout */)
+      .setInitialLayout( mLayout )
       .setSamples( vk::SampleCountFlagBits::e1 )
       .setSharingMode( vk::SharingMode::eExclusive )
-      .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst/*mUsage*/)
+      .setUsage( mUsage )
       .setExtent( { mWidth, mHeight, 1 } )
       .setArrayLayers( 1 )
       .setImageType( vk::ImageType::e2D )
