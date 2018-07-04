@@ -64,7 +64,14 @@ FramebufferAttachment::FramebufferAttachment( RefCountedImageView imageView,
 
   mDescription.setSamples( sampleCountFlags );
 
-  mDescription.setStoreOp( vk::AttachmentStoreOp::eStore );
+  if( usage & vk::ImageUsageFlagBits::eDepthStencilAttachment )
+  {
+    mDescription.setStoreOp( vk::AttachmentStoreOp::eDontCare );
+  }
+  else
+  {
+    mDescription.setStoreOp( vk::AttachmentStoreOp::eStore );
+  }
   mDescription.setStencilStoreOp( vk::AttachmentStoreOp::eDontCare );
   mDescription.setStencilLoadOp( vk::AttachmentLoadOp::eDontCare );
   mDescription.setFormat( image->GetFormat() );

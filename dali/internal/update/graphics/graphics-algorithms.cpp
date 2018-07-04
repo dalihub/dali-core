@@ -212,169 +212,157 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
   using namespace Dali::Graphics::API;
 
   // for each renderer within node
-  for( auto rendererIndex = 0u; rendererIndex < item.mNode->GetRendererCount(); ++rendererIndex )
+  // vertex input state
+  VertexInputState vi{};
+
+  auto *renderer = item.mRenderer;
+  auto *geometry = renderer->GetGeometry();
+  auto gfxShader = renderer->GetShader()
+                           .GetGfxObject();
+
+  if( !gfxShader )
   {
-    // vertex input state
-    VertexInputState vi{};
-
-    auto *renderer = item.mNode->GetRendererAt(rendererIndex);
-    auto *geometry = renderer->GetGeometry();
-    auto gfxShader = renderer->GetShader()
-                             .GetGfxObject();
-
-    if( !gfxShader )
-    {
-      continue;
-    }
-    /**
-     * Prepare vertex attribute buffer bindings
-     */
-    uint32_t                                                    bindingIndex{0u};
-    std::vector<Graphics::API::Buffer*> vertexBuffers{};
-
-    for (auto &&vertexBuffer : geometry->GetVertexBuffers())
-    {
-      vertexBuffers.push_back(vertexBuffer->GetGfxObject());
-      auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
-
-      // update vertex buffer if necessary
-      vertexBuffer->Update(controller);
-
-      // store buffer binding
-      vi.bufferBindings
-        .emplace_back(vertexBuffer->GetFormat()
-                                  ->size, VertexInputRate::PER_VERTEX);
-
-      for (auto i = 0u; i < attributeCountInForBuffer; ++i)
-      {
-        // create attribute description
-        vi.attributes
-          .emplace_back(
-            gfxShader->GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
-            bindingIndex, (vertexBuffer->GetFormat()
-                                       ->components[i]).offset,
-            VertexInputFormat::UNDEFINED);
-
-      }
-      bindingIndex++;
-    }
-
-    // Invalid input attributes!
-    if (gfxShader->GetVertexAttributeLocations().size() != vi.attributes.size())
-    {
-      continue; // incompatible pipeline!
-    }
-
-    // set optional index buffer
-    auto topology         = PrimitiveTopology::TRIANGLE_STRIP;
-    auto geometryTopology = geometry->GetType();
-    switch (geometryTopology)
-    {
-      case Dali::Geometry::Type::TRIANGLE_STRIP:
-      {
-        topology = PrimitiveTopology::TRIANGLE_STRIP;
-        break;
-      }
-      default:
-      {
-        topology = PrimitiveTopology::TRIANGLE_LIST;
-      }
-    }
-
-    /**
-     * 1. DEPTH MDOE
-     */
-    // use correct depth mode
-    DepthStencilState depthStencilState;
-    depthStencilState.SetDepthTestEnable(false)
-                     .SetDepthCompareOp(CompareOp::GREATER_OR_EQUAL);
-
-    if ((renderer->GetDepthTestMode() == DepthTestMode::AUTO && !renderList->GetSourceLayer()
-                                                                           ->IsDepthTestDisabled())
-        || (renderer->GetDepthTestMode() == DepthTestMode::ON))
-    {
-      depthStencilState.SetDepthTestEnable(true);
-      if (renderer->GetDepthWriteMode() == DepthWriteMode::ON)
-      {
-        depthStencilState.SetDepthWriteEnable(true);
-      }
-    }
-
-    /**
-     * 2. BLENDING
-     */
-    ColorBlendState colorBlendState{};
-    colorBlendState.SetBlendEnable(false);
-    if( renderer->GetBlendMode() != BlendMode::OFF)
-    {
-      colorBlendState.SetBlendEnable(true);
-      const auto& options = renderer->GetBlendingOptions();
-      colorBlendState
-        .SetSrcColorBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorRgb()))
-        .SetSrcAlphaBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorAlpha()))
-        .SetDstColorBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorRgb()))
-        .SetDstAlphaBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorAlpha()))
-        .SetColorBlendOp(ConvertBlendEquation(options.GetBlendEquationRgb()))
-        .SetAlphaBlendOp(ConvertBlendEquation(options.GetBlendEquationAlpha()));
-    }
-
-    /**
-     * 3. VIEWPORT
-     */
-    ViewportState viewportState{};
-    if (instruction.mIsViewportSet)
-    {
-      viewportState.SetViewport({float(instruction.mViewport
-                                                  .x), float(instruction.mViewport
-                                                                        .y),
-                                  float(instruction.mViewport
-                                                   .width), float(instruction.mViewport
-                                                                             .height),
-                                  0.0, 1.0});
-    }
-    else
-    {
-      viewportState.SetViewport({0.0, 0.0, 0.0, 0.0,
-                                  0.0, 1.0});
-    }
-
-
-    // create pipeline
-    auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
-
-                // vertex input
-              .SetVertexInputState(vi)
-
-                // shaders
-              .SetShaderState(ShaderState()
-                                .SetShaderProgram(*gfxShader))
-
-                // input assembly
-              .SetInputAssemblyState(InputAssemblyState()
-                                       .SetTopology(topology)
-                                       .SetPrimitiveRestartEnable(true))
-
-                // viewport ( if zeroes then framebuffer size used )
-              .SetViewportState(viewportState)
-
-                // depth stencil
-              .SetDepthStencilState(depthStencilState)
-
-
-                // color blend
-              .SetColorBlendState(colorBlendState
-                                    .SetColorComponentsWriteBits(0xff)
-                                    .SetLogicOpEnable(false))
-
-                // rasterization
-              .SetRasterizationState(RasterizationState()
-                                       .SetCullMode(CullMode::BACK)
-                                       .SetPolygonMode(PolygonMode::FILL)
-                                       .SetFrontFace(FrontFace::COUNTER_CLOCKWISE)));
-
-    // bind pipeline to the renderer
-    renderer->BindPipeline(std::move(pipeline));
+    return false;
   }
+  /**
+   * Prepare vertex attribute buffer bindings
+   */
+  uint32_t                                                    bindingIndex{0u};
+  std::vector<Graphics::API::Buffer*> vertexBuffers{};
+
+  for (auto &&vertexBuffer : geometry->GetVertexBuffers())
+  {
+    vertexBuffers.push_back(vertexBuffer->GetGfxObject());
+    auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
+
+    // update vertex buffer if necessary
+    vertexBuffer->Update(controller);
+
+    // store buffer binding
+    vi.bufferBindings
+      .emplace_back(vertexBuffer->GetFormat()
+                                ->size, VertexInputRate::PER_VERTEX);
+
+    for (auto i = 0u; i < attributeCountInForBuffer; ++i)
+    {
+      // create attribute description
+      vi.attributes
+        .emplace_back(
+          gfxShader->GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
+          bindingIndex, (vertexBuffer->GetFormat()
+                                     ->components[i]).offset,
+          VertexInputFormat::UNDEFINED);
+
+    }
+    bindingIndex++;
+  }
+
+  // set optional index buffer
+  auto topology         = PrimitiveTopology::TRIANGLE_STRIP;
+  auto geometryTopology = geometry->GetType();
+  switch (geometryTopology)
+  {
+    case Dali::Geometry::Type::TRIANGLE_STRIP:
+    {
+      topology = PrimitiveTopology::TRIANGLE_STRIP;
+      break;
+    }
+    default:
+    {
+      topology = PrimitiveTopology::TRIANGLE_LIST;
+    }
+  }
+
+  /**
+   * 1. DEPTH MDOE
+   */
+  // use correct depth mode
+  DepthStencilState depthStencilState;
+  depthStencilState.SetDepthCompareOp( CompareOp::GREATER );
+
+  const bool depthTestEnable( !renderList->GetSourceLayer()->IsDepthTestDisabled() && renderList->HasColorRenderItems() );
+  depthStencilState.SetDepthTestEnable( depthTestEnable );
+
+  const bool enableDepthWrite = ( ( renderer->GetDepthWriteMode() == DepthWriteMode::AUTO )
+                                  && depthTestEnable && item.mIsOpaque ) ||
+                                ( renderer->GetDepthWriteMode() == DepthWriteMode::ON );
+
+  depthStencilState.SetDepthWriteEnable( enableDepthWrite );
+
+  /**
+   * 2. BLENDING
+   */
+  ColorBlendState colorBlendState{};
+  colorBlendState.SetBlendEnable(false);
+  if( renderer->GetBlendMode() != BlendMode::OFF)
+  {
+    colorBlendState.SetBlendEnable(true);
+    const auto& options = renderer->GetBlendingOptions();
+    colorBlendState
+      .SetSrcColorBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorRgb()))
+      .SetSrcAlphaBlendFactor(ConvertBlendFactor(options.GetBlendSrcFactorAlpha()))
+      .SetDstColorBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorRgb()))
+      .SetDstAlphaBlendFactor(ConvertBlendFactor(options.GetBlendDestFactorAlpha()))
+      .SetColorBlendOp(ConvertBlendEquation(options.GetBlendEquationRgb()))
+      .SetAlphaBlendOp(ConvertBlendEquation(options.GetBlendEquationAlpha()));
+  }
+
+  /**
+   * 3. VIEWPORT
+   */
+  ViewportState viewportState{};
+  if (instruction.mIsViewportSet)
+  {
+    viewportState.SetViewport({float(instruction.mViewport
+                                                .x), float(instruction.mViewport
+                                                                      .y),
+                                float(instruction.mViewport
+                                                 .width), float(instruction.mViewport
+                                                                           .height),
+                                0.0, 1.0});
+  }
+  else
+  {
+    viewportState.SetViewport({0.0, 0.0, 0.0, 0.0,
+                                0.0, 1.0});
+  }
+
+
+  // create pipeline
+  auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
+
+              // vertex input
+            .SetVertexInputState(vi)
+
+              // shaders
+            .SetShaderState(ShaderState()
+                              .SetShaderProgram(*gfxShader))
+
+              // input assembly
+            .SetInputAssemblyState(InputAssemblyState()
+                                     .SetTopology(topology)
+                                     .SetPrimitiveRestartEnable(true))
+
+              // viewport ( if zeroes then framebuffer size used )
+            .SetViewportState(viewportState)
+
+              // depth stencil
+            .SetDepthStencilState(depthStencilState)
+
+
+              // color blend
+            .SetColorBlendState(colorBlendState
+                                  .SetColorComponentsWriteBits(0xff)
+                                  .SetLogicOpEnable(false))
+
+              // rasterization
+            .SetRasterizationState(RasterizationState()
+                                     .SetCullMode(CullMode::BACK)
+                                     .SetPolygonMode(PolygonMode::FILL)
+                                     .SetFrontFace(FrontFace::COUNTER_CLOCKWISE)));
+
+  // bind pipeline to the renderer
+  renderer->BindPipeline(std::move(pipeline));
 
   return true;
 }

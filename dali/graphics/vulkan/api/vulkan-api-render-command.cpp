@@ -63,7 +63,7 @@ void RenderCommand::PrepareResources()
 {
   if( mUpdateFlags )
   {
-    if( !mVulkanPipeline )
+    if( mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT )
     {
       auto pipeline = dynamic_cast<const VulkanAPI::Pipeline *>( mPipeline );
       if( !pipeline )
@@ -74,27 +74,33 @@ void RenderCommand::PrepareResources()
       mVkDescriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
       mVulkanPipeline         = pipeline->GetVkPipeline();
 
-      // based on pipeline recreate descriptor pool
-      auto poolSizes = std::vector<vk::DescriptorPoolSize>{
-        vk::DescriptorPoolSize{}
-          .setDescriptorCount(10)
-          .setType(vk::DescriptorType::eUniformBuffer),
-        vk::DescriptorPoolSize{}
-          .setDescriptorCount(10)
-          .setType(vk::DescriptorType::eCombinedImageSampler),
-        vk::DescriptorPoolSize{}
-          .setDescriptorCount(10)
-          .setType(vk::DescriptorType::eSampledImage)
-      };
+      // todo: make descriptor pools allocated from global allocator
+      if(!mDescriptorPool)
+      {
+        // based on pipeline recreate descriptor pool
+        auto poolSizes = std::vector<vk::DescriptorPoolSize>{
+          vk::DescriptorPoolSize{}
+            .setDescriptorCount(10)
+            .setType(vk::DescriptorType::eUniformBuffer),
+          vk::DescriptorPoolSize{}
+            .setDescriptorCount(10)
+            .setType(vk::DescriptorType::eCombinedImageSampler),
+          vk::DescriptorPoolSize{}
+            .setDescriptorCount(10)
+            .setType(vk::DescriptorType::eSampledImage)
+        };
 
 
-      // create descriptor pool
-      mDescriptorPool = Vulkan::DescriptorPool::New(mGraphics, vk::DescriptorPoolCreateInfo{}
-        .setMaxSets(Vulkan::U32(mVkDescriptorSetLayouts.size() + 1))
-        .setPPoolSizes(poolSizes.data())
-        .setPoolSizeCount(Vulkan::U32(poolSizes.size())));
-
-
+        // create descriptor pool
+        mDescriptorPool = Vulkan::DescriptorPool::New(mGraphics, vk::DescriptorPoolCreateInfo{}
+          .setMaxSets(Vulkan::U32(mVkDescriptorSetLayouts.size() + 1))
+          .setPPoolSizes(poolSizes.data())
+          .setPoolSizeCount(Vulkan::U32(poolSizes.size())));
+      }
+      else
+      {
+        mDescriptorPool->Reset();
+      }
       // allocate descriptor sets. we need a descriptors for each descriptorset
       // in the shader
       // allocate descriptor sets for given pipeline layout
