@@ -149,7 +149,8 @@ std::ostream& operator<<(std::ostream& ss, const RenderCommand::RenderTargetBind
     }
     return s.str();
   })() << std::endl;
-  ss << "      dsClearColor = [ d = " << object.dsClearColor.depth << ", s = " << object.dsClearColor.stencil << "]\n";
+  ss << "      dsClearColor = [ d = " << object.depthStencilClearColor.depth <<
+                             ", s = " << object.depthStencilClearColor.stencil << "]\n";
   ss << "    }" << std::endl;
   return ss;
 }

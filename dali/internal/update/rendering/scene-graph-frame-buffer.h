@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
+#include <dali/graphics-api/graphics-api-framebuffer.h>
 
 namespace Dali
 {
@@ -55,12 +56,23 @@ public:
 
   /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
-   * param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
   void AttachColorTexture( SceneGraph::Texture* texture, unsigned int mipmapLevel, unsigned int layer );
+
+  /**
+   * @brief Attach a texture for depth/stencil rendering.
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] format Whether the buffer is for depth and/or stencil channels
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
+   */
+  void AttachDepthStencilTexture( SceneGraph::Texture* texture,
+                                  Dali::FrameBuffer::Attachment::Mask format,
+                                  unsigned int mipmapLevel,
+                                  unsigned int layer );
 
   /**
    * @brief Get the width of the FrameBuffer
@@ -74,8 +86,39 @@ public:
    */
   unsigned int GetHeight() const;
 
+  /**
+   * Prepare the Graphics API framebuffer object when it's required
+   */
+  void PrepareFramebuffer();
+
+  /**
+   * Get the graphics object associated with this framebuffer
+   */
+  const Graphics::API::Framebuffer* GetGfxObject() const;
+
+
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
+  std::unique_ptr<Graphics::API::Framebuffer> mGraphicsFramebuffer;
+
+  struct Attachment
+  {
+    Attachment()
+    : texture( nullptr ),
+      format( Dali::FrameBuffer::Attachment::NONE ),
+      mipmapLevel( 0u ),
+      layer( 0u )
+    {
+    }
+
+    SceneGraph::Texture* texture;
+    Dali::FrameBuffer::Attachment::Mask format;
+    unsigned int mipmapLevel;
+    unsigned int layer;
+  };
+
+  Attachment mColorAttachment;
+  Attachment mDepthAttachment; // Should also specify depth/stencil choice in DALi API.
 
   unsigned int mWidth;
   unsigned int mHeight;

@@ -36,10 +36,12 @@
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
+#include <dali/graphics/vulkan/api/vulkan-api-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-framebuffer-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
@@ -92,6 +94,7 @@ struct Controller::Impl
     mShaderFactory = MakeUnique< VulkanAPI::ShaderFactory >( mGraphics );
     mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mGraphics );
     mBufferFactory = MakeUnique< VulkanAPI::BufferFactory >( mOwner );
+    mFramebufferFactory = MakeUnique< VulkanAPI::FramebufferFactory >( mOwner );
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
 
     mUboManager = MakeUnique< VulkanAPI::UboManager >( mOwner );
@@ -175,6 +178,13 @@ struct Controller::Impl
     return *( mBufferFactory.get() );
   }
 
+  API::FramebufferFactory& GetFramebufferFactory() const
+  {
+    mFramebufferFactory->Reset();
+    return *( mFramebufferFactory.get() );
+  }
+
+
   std::unique_ptr< API::RenderCommand > AllocateRenderCommand()
   {
     return std::make_unique< VulkanAPI::RenderCommand >( mOwner, mGraphics );
@@ -185,8 +195,7 @@ struct Controller::Impl
     Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
     if( renderTargetBinding.framebuffer )
     {
-      // @todo use VulkanAPI::Framebuffer when available
-      //framebuffer = static_cast<VulkanAPI::Framebuffer&>(renderTargetBinding.framebuffer.Get()).GetVkHandle();
+      framebuffer = static_cast<const VulkanAPI::Framebuffer&>(*renderTargetBinding.framebuffer).GetFramebufferRef();
     }
     else
     {
@@ -366,6 +375,7 @@ struct Controller::Impl
   std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;
   std::unique_ptr< VulkanAPI::BufferFactory > mBufferFactory;
   std::unique_ptr< VulkanAPI::PipelineFactory > mPipelineFactory;
+  std::unique_ptr< VulkanAPI::FramebufferFactory > mFramebufferFactory;
 
   std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 
@@ -460,6 +470,11 @@ API::ShaderFactory& Controller::GetShaderFactory() const
 API::BufferFactory& Controller::GetBufferFactory() const
 {
   return mImpl->GetBufferFactory();
+}
+
+API::FramebufferFactory& Controller::GetFramebufferFactory() const
+{
+  return mImpl->GetFramebufferFactory();
 }
 
 API::PipelineFactory& Controller::GetPipelineFactory()
