@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b2c43833_9ca19296",
+        "filename": "dali/graphics-api/graphics-api-types.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-04T16:19:07Z",
+      "side": 1,
+      "message": "We normally push debug methods into a separate _debug.h/_debug.cpp file associated with the main file, e.g. graphics-api-types-debug.cpp/h...",
+      "range": {
+        "startLine": 646,
+        "startChar": 0,
+        "endLine": 646,
+        "endChar": 1
+      },
+      "revId": "c94031040ffd13c9f6f8f8965a01177b75aa87f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de99e6a2_1b88ff1c",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-04T16:19:07Z",
+      "side": 1,
+      "message": "Should try and avoid changing class signatures with debug enabled - using friend class for debug is an acceptable use.",
+      "range": {
+        "startLine": 73,
+        "startChar": 4,
+        "endLine": 73,
+        "endChar": 17
+      },
+      "revId": "c94031040ffd13c9f6f8f8965a01177b75aa87f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
