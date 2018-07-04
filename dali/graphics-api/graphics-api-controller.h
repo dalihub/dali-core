@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
+#include <dali/graphics-api/graphics-api-framebuffer-factory.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-sampler.h>
 #include <dali/graphics-api/graphics-api-shader.h>
@@ -94,7 +95,13 @@ public:
   virtual ShaderFactory& GetShaderFactory() const = 0;
 
   /**
-   * @brief Returns buffer factory
+   * @brief Returns Framebuffer factory
+   * @return
+   */
+  virtual FramebufferFactory& GetFramebufferFactory() const = 0;
+
+  /**
+   * @brief Returns shader factory
    * @return
    */
   virtual BufferFactory& GetBufferFactory() const = 0;

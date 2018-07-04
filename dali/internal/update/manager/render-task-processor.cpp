@@ -251,6 +251,12 @@ void ProcessTasks( BufferIndex updateBufferIndex,
       continue;
     }
 
+    // Ensure framebuffer graphics objects are created if needed
+    if( hasFrameBuffer )
+    {
+      renderTask.GetFrameBuffer()->PrepareFramebuffer();
+    }
+
     const unsigned int currentNumberOfInstructions = instructions.Count( updateBufferIndex );
 
     if( renderTask.IsRenderRequired() )

@@ -62,6 +62,7 @@ private:
 
   void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                              BufferIndex                          bufferIndex,
+                             Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
                              Matrix                               viewProjection,
                              RenderInstruction&                   instruction,
                              const RenderList&                    renderItemList );

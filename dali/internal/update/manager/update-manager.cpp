@@ -63,6 +63,7 @@
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
+
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -717,7 +718,14 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   {
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
+  }
+}
 
+void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
+{
+  auto rendererCount = mImpl->renderers.Count();
+  for( auto i = 0u; i < rendererCount; ++i )
+  {
     mImpl->renderers[i]->PrepareRender( bufferIndex );
   }
 }
@@ -853,6 +861,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       }
 
       // generate graphics objects
+      PrepareRenderers( bufferIndex );
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }

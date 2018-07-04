@@ -203,7 +203,8 @@ public:
   {
     const Framebuffer*                    framebuffer { nullptr };
     std::vector<Framebuffer::ClearColor>  clearColors {};
-    Framebuffer::DepthStencilClearColor   dsClearColor {};
+    Framebuffer::DepthStencilClearColor   depthStencilClearColor {};
+
     void*    pNext{ nullptr };
     RenderTargetBinding() = default;
 
@@ -221,7 +222,7 @@ public:
 
     RenderTargetBinding& SetDepthStencilClearColor( Framebuffer::DepthStencilClearColor value )
     {
-      dsClearColor = value;
+      depthStencilClearColor = value;
       return *this;
     }
 
