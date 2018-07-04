@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_FRAMEBUFFER_FACTORY_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 #include <dali/graphics-api/graphics-api-base-factory.h>
+#include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-utility.h>
@@ -33,26 +34,30 @@ namespace API
 /**
  * @brief Interface class for FramebufferFactory types in the graphics API.
  */
-class FramebufferFactory : BaseFactory< Framebuffer >
+class FramebufferFactory : public BaseFactory< API::Framebuffer >
 {
 public:
   /**
    * @brief Set the size of framebuffer
    */
-  virtual void SetSize(const RectSize& size) = 0;
+  virtual FramebufferFactory& SetSize( const RectSize& size ) = 0;
 
   /**
-   *@brief Set a color attachment texture on the framebuffer
+   * @brief Set a color attachment texture on the framebuffer
    */
-  virtual void SetColorAttachment(TextureDetails::AttachmentId attachment,
-                                  const Texture&               texture,
-                                  TextureDetails::LayerId      layer,
-                                  TextureDetails::LevelId      level) = 0;
+  virtual FramebufferFactory& SetColorAttachment( TextureDetails::AttachmentId attachmentIndex,
+                                                  const Texture&               texture,
+                                                  TextureDetails::LayerId      layer,
+                                                  TextureDetails::LevelId      level ) = 0;
 
   /**
-   * @brief Set the depth stencil flags on the framebuffer
+   * @brief Set a depth/stencil attachment texture on the framebuffer. Queries driver to provide
+   * optimal format.
    */
-  virtual void SetDepthStencilFlag(TextureDetails::DepthStencilFlag depthStencilFlag) = 0;
+  virtual FramebufferFactory& SetDepthStencilAttachment( const Texture&                   texture,
+                                                         TextureDetails::LayerId          layer,
+                                                         TextureDetails::LevelId          level,
+                                                         TextureDetails::DepthStencilFlag depthStencilFlag ) = 0;
 
   // not copyable
   FramebufferFactory(const FramebufferFactory&) = delete;

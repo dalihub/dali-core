@@ -73,7 +73,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_monitor",             // monitor
         "VK_LAYER_LUNARG_swapchain",           // swapchain
         "VK_LAYER_GOOGLE_threading",           // threading
-        //"VK_LAYER_LUNARG_api_dump",            // api
+        "VK_LAYER_LUNARG_api_dump",            // api
         "VK_LAYER_LUNARG_object_tracker",      // objects
         "VK_LAYER_LUNARG_core_validation",     // core
         "VK_LAYER_GOOGLE_unique_objects",      // unique objects
@@ -447,8 +447,11 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
     // Creating a single subpass per framebuffer
     auto subpassDesc = vk::SubpassDescription{};
     subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
-    subpassDesc.setColorAttachmentCount( U32( colorAttachments.size() ) );
-    subpassDesc.setPDepthStencilAttachment( &depthAttachmentReference );
+    subpassDesc.setColorAttachmentCount( U32( colorAttachments.size()));
+    if( hasDepth )
+    {
+      subpassDesc.setPDepthStencilAttachment( &depthAttachmentReference );
+    }
     subpassDesc.setPColorAttachments( colorAttachmentReferences.data() );
 
     // Creating 2 subpass dependencies using VK_SUBPASS_EXTERNAL to leverage the implicit image layout
