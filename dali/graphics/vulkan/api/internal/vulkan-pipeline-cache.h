@@ -41,8 +41,8 @@ class Pipeline;
 } // Internal
 
 class Controller;
-
 class PipelineFactory;
+class Pipeline;
 
 class PipelineCache
 {
@@ -70,6 +70,27 @@ public:
    */
   bool RemovePipeline( Internal::Pipeline* pipeline );
 
+#if DEBUG_ENABLED
+  /**
+   * Returns debug string containing all pipelines data
+   * @return
+   */
+  std::string DebugPrint() const;
+
+  /**
+   * Returns debug string of particular pipeline
+   * @param pipeline
+   * @return
+   */
+  std::string DebugPrintPipeline( const VulkanAPI::Pipeline& pipeline ) const;
+
+  /**
+   * Returns debug string generated from Info structure
+   * @param info
+   * @return
+   */
+  std::string DebugPrintPipelineInfo( const PipelineFactory::Info& info ) const;
+#endif
 
 private:
 
