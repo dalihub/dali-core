@@ -26,7 +26,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
-#include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
@@ -49,6 +48,7 @@ static constexpr float CLIP_MATRIX_DATA[] = {
   0.0f, 0.0f, -0.5f, 0.0f,
   0.0f, 0.0f, 0.5f, 1.0f
 };
+
 static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
 
 
@@ -105,7 +105,110 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   return Graphics::API::BlendOp{};
 }
 
-void SubmitRenderItemList( Graphics::API::Controller&           graphics,
+}
+
+ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
+{
+  ClippingBox intersectionBox;
+
+  // First calculate the largest starting positions in X and Y.
+  intersectionBox.x = std::max( aabbA.x, aabbB.x );
+  intersectionBox.y = std::max( aabbA.y, aabbB.y );
+
+  // Now calculate the smallest ending positions, and take the largest starting
+  // positions from the result, to get the width and height respectively.
+  // If the two boxes do not intersect at all, then we need a 0 width and height clipping area.
+  // We use max here to clamp both width and height to >= 0 for this use-case.
+  intersectionBox.width =  std::max( std::min( aabbA.x + aabbA.width,  aabbB.x + aabbB.width  ) - intersectionBox.x, 0 );
+  intersectionBox.height = std::max( std::min( aabbA.y + aabbA.height, aabbB.y + aabbB.height ) - intersectionBox.y, 0 );
+
+  return intersectionBox;
+}
+
+bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics::API::ViewportState& viewportState )
+{
+  // Get the number of child scissors in the stack (do not include layer or root box).
+  size_t childStackDepth = mScissorStack.size() - 1u;
+  const uint32_t scissorDepth = item.mNode->GetScissorDepth();
+  const bool clippingNode = item.mNode->GetClippingMode() == Dali::ClippingMode::CLIP_TO_BOUNDING_BOX;
+  bool traversedUpTree = false;
+
+  // If we are using scissor clipping and we are at the same depth (or less), we need to undo previous clips.
+  // We do this by traversing up the scissor clip stack and then apply the appropriate clip for the current render item.
+  // To know this, we use clippingDepth. This value is set on *every* node, but only increased as clipping nodes are hit depth-wise.
+  // So we know if we are at depth 4 and the stackDepth is 5, that we have gone up.
+  // If the depth is the same then we are effectively part of a different sub-tree from the parent, we must also remove the current clip.
+  // Note: Stack depth must always be at least 1, as we will have the layer or stage size as the root value.
+  if( ( childStackDepth > 0u ) && ( scissorDepth < childStackDepth ) )
+  {
+    while( scissorDepth < childStackDepth )
+    {
+      mScissorStack.pop_back();
+      --childStackDepth;
+    }
+
+    // We traversed up the tree, we need to apply a new scissor rectangle (unless we are at the root).
+    traversedUpTree = true;
+  }
+  if( clippingNode && childStackDepth > 0u && childStackDepth == scissorDepth ) // case of sibling clip area
+  {
+    mScissorStack.pop_back();
+    --childStackDepth;
+  }
+
+  // If we are on a clipping node, or we have traveled up the tree and gone back past a clipping node, may need to apply a new scissor clip.
+  if( clippingNode || traversedUpTree )
+  {
+    // First, check if we are a clipping node.
+    if( clippingNode )
+    {
+      // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
+
+      // Get the AABB bounding box for the current render item.
+      const ClippingBox scissorBox( item.CalculateViewportSpaceAABB( int(viewportState.viewport.width), int(viewportState.viewport.height)) );
+
+      // Get the AABB for the parent item that we must intersect with.
+      const ClippingBox& parentBox( mScissorStack.back() );
+
+      // We must reduce the clipping area based on the parents area to allow nested clips. This is a set intersection function.
+      // We add the new scissor box to the stack so we can return to it if needed.
+      mScissorStack.emplace_back( IntersectAABB( parentBox, scissorBox ) );
+    }
+
+    // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
+    // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
+    const bool scissorEnabled = ( mScissorStack.size() > 0u );// || mHasLayerScissor;
+
+    // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
+    if( scissorEnabled )
+    {
+      ClippingBox useScissorBox( mScissorStack.back() );
+      viewportState.SetScissorTestEnable( true  );
+      viewportState.SetScissor( { useScissorBox.x,
+                                  int32_t(viewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
+                                  uint32_t(useScissorBox.width),
+                                  uint32_t(useScissorBox.height) } );
+    }
+    else
+    {
+      viewportState.SetScissorTestEnable( false );
+      viewportState.SetScissor({});
+    }
+  }
+  else if( mScissorStack.size() > 1 )
+  {
+    ClippingBox useScissorBox( mScissorStack.back() );
+    viewportState.SetScissorTestEnable( true  );
+    viewportState.SetScissor( { useScissorBox.x,
+                                int32_t(viewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
+                                uint32_t(useScissorBox.width),
+                                uint32_t(useScissorBox.height) } );
+  }
+
+  return viewportState.scissorTestEnable;
+}
+
+void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&           graphics,
                            BufferIndex                          bufferIndex,
                            Matrix                               viewProjection,
                            RenderInstruction&                   instruction,
@@ -180,7 +283,7 @@ void SubmitRenderItemList( Graphics::API::Controller&           graphics,
   graphics.SubmitCommands( std::move(commandList) );
 }
 
-void SubmitInstruction( Graphics::API::Controller& graphics,
+void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
                         BufferIndex                bufferIndex,
                         RenderInstruction&         instruction )
 {
@@ -199,11 +302,8 @@ void SubmitInstruction( Graphics::API::Controller& graphics,
       graphics, bufferIndex, viewProjection, instruction, *instruction.GetRenderList( i ) );
   }
 }
-} // namespace
 
-
-
-bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& controller,
                               RenderInstruction& instruction,
                               const RenderList* renderList,
                               RenderItem& item,
@@ -223,6 +323,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
   {
     return false;
   }
+
   /**
    * Prepare vertex attribute buffer bindings
    */
@@ -319,12 +420,9 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
   ViewportState viewportState{};
   if (instruction.mIsViewportSet)
   {
-    viewportState.SetViewport({float(instruction.mViewport
-                                                .x), float(instruction.mViewport
-                                                                      .y),
-                                float(instruction.mViewport
-                                                 .width), float(instruction.mViewport
-                                                                           .height),
+    // scissor test only when we have viewport
+    viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
+                                float(instruction.mViewport.width), float(instruction.mViewport.height),
                                 0.0, 1.0});
   }
   else
@@ -333,39 +431,62 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
                                 0.0, 1.0});
   }
 
+  /**
+   * Scissor test is represented only by the dynamic state as it can be transformed
+   * any time.
+   */
+  Graphics::API::PipelineDynamicStateMask dynamicStateMask{ 0u };
+  if( SetupScissorClipping( item, viewportState ) )
+  {
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissor( viewportState.scissor );
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( true );
+    dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
+  }
+  else
+  {
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( false );
+  }
+
+  // disable scissors per-pipeline
+  viewportState.SetScissorTestEnable( false );
+  viewportState.SetScissor( {} );
 
   // create pipeline
   auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
 
-              // vertex input
+            // vertex input
             .SetVertexInputState(vi)
 
-              // shaders
+            // shaders
             .SetShaderState(ShaderState()
                               .SetShaderProgram(*gfxShader))
 
-              // input assembly
+            // input assembly
             .SetInputAssemblyState(InputAssemblyState()
                                      .SetTopology(topology)
                                      .SetPrimitiveRestartEnable(true))
 
-              // viewport ( if zeroes then framebuffer size used )
+            // viewport ( if zeroes then framebuffer size used )
             .SetViewportState(viewportState)
 
-              // depth stencil
+            // depth stencil
             .SetDepthStencilState(depthStencilState)
 
-
-              // color blend
+            // color blend
             .SetColorBlendState(colorBlendState
                                   .SetColorComponentsWriteBits(0xff)
                                   .SetLogicOpEnable(false))
 
-              // rasterization
+            // rasterization
             .SetRasterizationState(RasterizationState()
                                      .SetCullMode(CullMode::BACK)
                                      .SetPolygonMode(PolygonMode::FILL)
-                                     .SetFrontFace(FrontFace::COUNTER_CLOCKWISE)));
+                                     .SetFrontFace(FrontFace::COUNTER_CLOCKWISE))
+
+            // dynamic state mask
+            .SetDynamicStateMask( dynamicStateMask )
+  );
+
 
   // bind pipeline to the renderer
   renderer->BindPipeline(std::move(pipeline));
@@ -373,7 +494,7 @@ bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
   return true;
 }
 
-void PrepareRendererPipelines( Graphics::API::Controller& controller,
+void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex bufferIndex )
 {
@@ -383,6 +504,8 @@ void PrepareRendererPipelines( Graphics::API::Controller& controller,
     for (auto renderListIndex = 0u; renderListIndex < ri.RenderListCount(); ++renderListIndex)
     {
       const auto *renderList = ri.GetRenderList(renderListIndex);
+      mScissorStack.clear();
+      mScissorStack.push_back( ri.mViewport );
       for (auto renderItemIndex = 0u; renderItemIndex < renderList->Count(); ++renderItemIndex)
       {
         auto &item = renderList->GetItem(renderItemIndex);
@@ -392,7 +515,7 @@ void PrepareRendererPipelines( Graphics::API::Controller& controller,
   }
 }
 
-void SubmitRenderInstructions( Graphics::API::Controller&  controller,
+void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  controller,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex                 bufferIndex )
 {

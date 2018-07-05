@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/rendering/render-instruction-container.h>
+#include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/common/buffer-index.h>
 
 namespace Dali
@@ -31,10 +32,59 @@ namespace Internal
 {
 namespace SceneGraph
 {
-void SubmitRenderInstructions( Graphics::API::Controller& graphics,
-                               SceneGraph::RenderInstructionContainer& renderInstructions,
-                               BufferIndex                 bufferIndex );
+class GraphicsAlgorithms
+{
+public:
 
+  GraphicsAlgorithms() = default;
+  ~GraphicsAlgorithms() = default;
+
+  GraphicsAlgorithms(const GraphicsAlgorithms&) = delete;
+  GraphicsAlgorithms& operator=(const GraphicsAlgorithms&) = delete;
+
+  GraphicsAlgorithms(GraphicsAlgorithms&&) = default;
+  GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = default;
+
+
+  /**
+   * Submits render instructions
+   * @param graphics Instance of the Graphics object
+   * @param renderInstructions container of render instructions
+   * @param bufferIndex current buffer index
+   */
+  void SubmitRenderInstructions(Graphics::API::Controller &graphics,
+                                SceneGraph::RenderInstructionContainer &renderInstructions,
+                                BufferIndex bufferIndex);
+
+private:
+
+  bool SetupScissorClipping( const RenderItem& item, Graphics::API::ViewportState& viewportState );
+
+  void SubmitRenderItemList( Graphics::API::Controller&           graphics,
+                             BufferIndex                          bufferIndex,
+                             Matrix                               viewProjection,
+                             RenderInstruction&                   instruction,
+                             const RenderList&                    renderItemList );
+
+  void SubmitInstruction( Graphics::API::Controller& graphics,
+                          BufferIndex                bufferIndex,
+                          RenderInstruction&         instruction );
+
+  bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+                                RenderInstruction& instruction,
+                                const RenderList* renderList,
+                                RenderItem& item,
+                                BufferIndex bufferIndex );
+
+  void PrepareRendererPipelines( Graphics::API::Controller& controller,
+                                 RenderInstructionContainer& renderInstructions,
+                                 BufferIndex bufferIndex );
+
+  using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
+
+  ScissorStackType                        mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+
+};
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali

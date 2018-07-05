@@ -289,6 +289,11 @@ void CommandBuffer::CopyBufferToImage( RefCountedBuffer srcBuffer,
                                     regions );
 }
 
+void CommandBuffer::SetScissor( uint32_t firstScissor, uint32_t scissorCount, const vk::Rect2D* pScissors )
+{
+  mCommandBuffer.setScissor( firstScissor, scissorCount, pScissors );
+}
+
 uint32_t CommandBuffer::GetPoolAllocationIndex() const
 {
   return mPoolAllocationIndex;

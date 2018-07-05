@@ -63,8 +63,8 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
           sizeof( API::VertexInputState::Attribute ) * info.vertexInputState.attributes.size() ) );
 
   // rehash all
-  std::array< uint32_t, 8 > allHashes = {
-          dsHash, cbHash, shHash, vpHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash
+  std::array< uint32_t, 9 > allHashes = {
+          dsHash, cbHash, shHash, vpHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask
   };
 
   return HashBinary( allHashes.data(), uint32_t( allHashes.size() * sizeof( uint32_t ) ) );
@@ -143,6 +143,13 @@ API::PipelineFactory& PipelineFactory::SetInputAssemblyState( const API::InputAs
   return *this;
 }
 
+API::PipelineFactory& PipelineFactory::SetDynamicStateMask( const API::PipelineDynamicStateMask mask )
+{
+  mInfo.dynamicStateMask = mask;
+  mHashCode = 0;
+  return *this;
+}
+
 std::unique_ptr< API::Pipeline > PipelineFactory::Create() const
 {
   // todo: validate pipeline
@@ -170,6 +177,7 @@ void PipelineFactory::Reset()
   mInfo.rasterizationState = {};
   mInfo.vertexInputState = {};
   mInfo.inputAssemblyState = {};
+  mInfo.dynamicStateMask = 0u;
   mPipelineCache = nullptr;
   mBasePipeline = nullptr;
 }

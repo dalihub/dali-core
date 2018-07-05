@@ -181,6 +181,7 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
+    graphicsAlgorithms(),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphics( graphics ),
@@ -263,6 +264,7 @@ struct UpdateManager::Impl
   DiscardQueue&                        discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&                    renderController;              ///< render controller
   SceneControllerImpl*                 sceneController;               ///< scene controller
+  GraphicsAlgorithms                   graphicsAlgorithms;            ///< Graphics algorithms
   RenderInstructionContainer           renderInstructions;            ///< Used to prepare the render instructions @todo GRAPHICS Remove
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
@@ -851,7 +853,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       }
 
       // generate graphics objects
-      SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
+      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
 

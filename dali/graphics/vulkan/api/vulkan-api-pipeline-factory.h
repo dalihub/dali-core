@@ -65,6 +65,8 @@ public:
 
   API::PipelineFactory& SetInputAssemblyState( const API::InputAssemblyState& state ) override;
 
+  API::PipelineFactory& SetDynamicStateMask( const API::PipelineDynamicStateMask mask );
+
   // To be called when getting new factory
   void Reset();
 
@@ -81,6 +83,7 @@ public:
     API::RasterizationState rasterizationState;
     API::VertexInputState vertexInputState;
     API::InputAssemblyState inputAssemblyState;
+    API::PipelineDynamicStateMask dynamicStateMask;
   };
 
   const Info& GetCreateInfo() const

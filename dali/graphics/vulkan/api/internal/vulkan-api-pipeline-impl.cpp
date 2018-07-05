@@ -215,6 +215,18 @@ struct Pipeline::VulkanPipelineState
   vk::PipelineTessellationStateCreateInfo tesselation;
   vk::PipelineVertexInputStateCreateInfo vertexInput;
 
+  /**
+   * Dynamic state configuration
+   */
+  struct DynamicState
+  {
+    vk::PipelineDynamicStateCreateInfo stateCreateInfo;
+    std::vector<vk::DynamicState>      stateList;
+  } dynamicState;
+
+  /**
+   * Viewport state configuration
+   */
   struct ViewportState
   {
     vk::PipelineViewportStateCreateInfo createInfo;
@@ -341,7 +353,7 @@ bool Pipeline::Initialise()
           .setLayout( PreparePipelineLayout() )
           .setPColorBlendState( PrepareColorBlendStateCreateInfo() )
           .setPDepthStencilState( PrepareDepthStencilStateCreateInfo() )
-          .setPDynamicState( nullptr )
+          .setPDynamicState( PrepareDynamicStateCreatInfo() )
           .setPInputAssemblyState( PrepareInputAssemblyStateCreateInfo() )
           .setPMultisampleState( PrepareMultisampleStateCreateInfo() )
           .setPRasterizationState( PrepareRasterizationStateCreateInfo() )
@@ -420,6 +432,45 @@ const vk::PipelineDepthStencilStateCreateInfo* Pipeline::PrepareDepthStencilStat
                                 .setStencilTestEnable( false ) ); //@ todo stencil test
 }
 
+const vk::PipelineDynamicStateCreateInfo* Pipeline::PrepareDynamicStateCreatInfo()
+{
+  // if no mask set, disable dynamic states
+  if( !mCreateInfo->info.dynamicStateMask )
+  {
+    return nullptr;
+  }
+
+  mVulkanPipelineState->dynamicState = {};
+
+  const vk::DynamicState STATES[] =
+  {
+    vk::DynamicState::eViewport,
+    vk::DynamicState::eScissor,
+    vk::DynamicState::eLineWidth,
+    vk::DynamicState::eDepthBias,
+    vk::DynamicState::eBlendConstants,
+    vk::DynamicState::eDepthBounds,
+    vk::DynamicState::eStencilCompareMask,
+    vk::DynamicState::eStencilWriteMask,
+    vk::DynamicState::eStencilReference
+  };
+
+  std::vector<vk::DynamicState> dynamicStates{};
+
+  for( auto i = 0u; i < API::PIPELINE_DYNAMIC_STATE_COUNT; ++i )
+  {
+    if(mCreateInfo->info.dynamicStateMask & (1u << i))
+    {
+      dynamicStates.push_back(STATES[i]);
+    }
+  }
+
+  mVulkanPipelineState->dynamicState.stateList = std::move(dynamicStates);
+  mVulkanPipelineState->dynamicState.stateCreateInfo.setDynamicStateCount( uint32_t(mVulkanPipelineState->dynamicState.stateList.size()) );
+  mVulkanPipelineState->dynamicState.stateCreateInfo.setPDynamicStates( mVulkanPipelineState->dynamicState.stateList.data() );
+  return &mVulkanPipelineState->dynamicState.stateCreateInfo;
+}
+
 const vk::PipelineInputAssemblyStateCreateInfo* Pipeline::PrepareInputAssemblyStateCreateInfo()
 {
   const auto& iaInfo = mCreateInfo->info.inputAssemblyState;
@@ -472,12 +523,24 @@ const vk::PipelineViewportStateCreateInfo* Pipeline::PrepareViewportStateCreateI
   mVulkanPipelineState->viewport.viewports[0].setMaxDepth( vpInfo.viewport.maxDepth );
 
   // scissors
-  // todo: add scissor support
-  mVulkanPipelineState->viewport.scissors.emplace_back( vk::Rect2D(
-          { static_cast<int32_t>(0), static_cast<int32_t>(0) },
-          { Vulkan::U32( width ), Vulkan::U32( height ) } )
-  );
-
+  if( vpInfo.scissorTestEnable )
+  {
+    mVulkanPipelineState->viewport.scissors.emplace_back(vk::Rect2D({
+                                                                      static_cast<int32_t>(vpInfo.scissor.x),
+                                                                      static_cast<int32_t>(vpInfo.scissor.y)
+                                                                    },
+                                                                    {
+                                                                      Vulkan::U32(vpInfo.scissor.width),
+                                                                      Vulkan::U32(vpInfo.scissor.height)
+                                                                    }));
+  }
+  else
+  {
+    mVulkanPipelineState->viewport.scissors.emplace_back(vk::Rect2D(
+                          { static_cast<int32_t>(0), static_cast<int32_t>(0) },
+                          { Vulkan::U32(width), Vulkan::U32(height) })
+                        );
+  }
   auto& viewState = mVulkanPipelineState->viewport;
 
   return &( mVulkanPipelineState->viewport.createInfo.

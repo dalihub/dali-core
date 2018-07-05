@@ -58,6 +58,8 @@ public:
 
   virtual PipelineFactory& SetInputAssemblyState( const InputAssemblyState& state ) = 0;
 
+  virtual PipelineFactory& SetDynamicStateMask( const PipelineDynamicStateMask mask ) = 0;
+
 protected:
   /// @brief default constructor
   PipelineFactory() = default;
