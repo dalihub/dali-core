@@ -237,8 +237,12 @@ void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&       
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
-    auto color = item.mNode->GetWorldColor( bufferIndex );
     auto renderer = item.mRenderer;
+    if( !renderer )
+    {
+      continue;
+    }
+    auto color = item.mNode->GetWorldColor( bufferIndex );
 
     auto &cmd = renderer->GetGfxRenderCommand();
     if (cmd.GetVertexBufferBindings()
@@ -509,7 +513,10 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
       for (auto renderItemIndex = 0u; renderItemIndex < renderList->Count(); ++renderItemIndex)
       {
         auto &item = renderList->GetItem(renderItemIndex);
-        PrepareGraphicsPipeline(controller, ri, renderList, item, bufferIndex);
+        if( item.mRenderer )
+        {
+          PrepareGraphicsPipeline(controller, ri, renderList, item, bufferIndex);
+        }
       }
     }
   }

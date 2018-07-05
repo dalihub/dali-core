@@ -138,7 +138,10 @@ struct Controller::Impl
       primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs, offset, count );
     }
 
-    primaryCommandBuffer->EndRenderPass();
+    if( !mRenderPasses.empty() )
+    {
+      primaryCommandBuffer->EndRenderPass();
+    }
 
     swapchain->Present();
     mSecondaryCommandBufferRefs.clear();
