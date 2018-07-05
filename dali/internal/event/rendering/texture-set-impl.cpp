@@ -24,6 +24,13 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_TEXTURE_SET" );
+#endif
+}
+
 namespace Dali
 {
 namespace Internal
@@ -38,6 +45,9 @@ TextureSetPtr TextureSet::New()
 
 void TextureSet::SetTexture( size_t index, TexturePtr texture )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TS::SetTexture( T:%p )  SG::TS:%p SG:T:%p\n",
+                 texture, mSceneObject, texture?texture->GetRenderObject():nullptr );
+
   size_t textureCount( mTextures.size() );
   if( index >= textureCount )
   {
