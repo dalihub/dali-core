@@ -22,11 +22,16 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
+#include <dali/integration-api/debug.h>
 
 namespace //Unnamed namespace
 {
 //Memory pool used to allocate new texture sets. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet> gTextureSetMemoryPool;
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
+#endif
 }
 
 namespace Dali
@@ -82,6 +87,9 @@ void TextureSet::SetSampler( size_t index, SceneGraph::Sampler* sampler )
 
 void TextureSet::SetTexture( size_t index, SceneGraph::Texture* texture )
 {
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::TS(%p)::SetTexture( SG::T:%p )\n  GfxTexture:%p\n",
+                 this, texture, texture?texture->GetGfxObject():nullptr );
+
   const size_t textureCount( mTextures.Size() );
   if( textureCount < index + 1 )
   {

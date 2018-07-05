@@ -38,11 +38,13 @@
 #include <dali/graphics-api/graphics-api-sampler-factory.h>
 
 #include <cstring>
+#include <dali/integration-api/debug.h>
 
 namespace // unnamed namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN_UNIFORMS");
+Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
 #endif
 
 
@@ -467,6 +469,11 @@ void Renderer::SetTextures( TextureSet* textureSet )
 
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
+
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
+                 "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
+                 textureSet?textureSet->GetTexture(0):nullptr,
+                 textureSet?(textureSet->GetTexture(0)?textureSet->GetTexture(0)->GetGfxObject():nullptr):nullptr );
 }
 
 void Renderer::SetShader( Shader* shader )
