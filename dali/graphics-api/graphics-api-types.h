@@ -395,6 +395,26 @@ struct InputAssemblyState
 };
 
 /**
+ * Pipeline dynamic state bits
+ */
+namespace PipelineDynamicStateBits
+{
+const uint32_t VIEWPORT_BIT                   = 1 << 0;
+const uint32_t SCISSOR_BIT                    = 1 << 1;
+const uint32_t LINE_WIDTH_BIT                 = 1 << 2;
+const uint32_t DEPTH_BIAS_BIT                 = 1 << 3;
+const uint32_t BLEND_CONSTANTS_BIT            = 1 << 4;
+const uint32_t DEPTH_BOUNDS_BIT               = 1 << 5;
+const uint32_t STENCIL_COMPARE_MASK_BIT       = 1 << 6;
+const uint32_t STENCIL_WRITE_MASK_BIT         = 1 << 7;
+const uint32_t STENCIL_REFERENCE_BIT          = 1 << 8;
+}
+
+const uint32_t PIPELINE_DYNAMIC_STATE_COUNT( 9u );
+
+using PipelineDynamicStateMask = uint32_t;
+
+/**
  *
  */
 struct VertexInputState

@@ -205,6 +205,14 @@ public:
                           std::vector< vk::BufferImageCopy > regions );
 
   /**
+   * Sets scissors when VK_DYNAMIC_STATE_SCISSOR used
+   * @param firstScissor
+   * @param scissorCount
+   * @param pScissors
+   */
+  void SetScissor( uint32_t firstScissor, uint32_t scissorCount, const vk::Rect2D* pScissors );
+
+  /**
    * Implements VkManaged::OnDestroy
    * @return
    */

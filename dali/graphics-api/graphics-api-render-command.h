@@ -27,6 +27,7 @@
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-api-utility.h>
 
 namespace Dali
 {
@@ -245,6 +246,11 @@ public:
     };
     uint32_t firstInstance;
     uint32_t instanceCount;
+
+    // dynamic scissor state
+    bool        scissorTestEnable { false };
+    Rect2D      scissor {};
+
     void*    pNext{ nullptr };
     DrawCommand& SetDrawType( DrawType value )
     {
@@ -279,6 +285,18 @@ public:
     DrawCommand& SetInstanceCount( uint32_t value )
     {
       instanceCount = value;
+      return *this;
+    }
+
+    DrawCommand& SetScissor( Rect2D value )
+    {
+      scissor = value;
+      return *this;
+    }
+
+    DrawCommand& SetScissorTestEnable( bool value )
+    {
+      scissorTestEnable = value;
       return *this;
     }
 

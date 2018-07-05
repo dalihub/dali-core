@@ -295,6 +295,17 @@ struct Controller::Impl
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
 
+      // set dynamic state
+      if( apiCommand->mDrawCommand.scissorTestEnable )
+      {
+        vk::Rect2D scissorRect( { apiCommand->mDrawCommand.scissor.x,
+                                  apiCommand->mDrawCommand.scissor.y },
+                                { apiCommand->mDrawCommand.scissor.width,
+                                  apiCommand->mDrawCommand.scissor.height } );
+
+        cmdbuf->SetScissor( 0, 1, &scissorRect );
+      }
+
       // bind vertex buffers
       auto binding = 0u;
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )

@@ -79,6 +79,8 @@ private:
 
   const vk::PipelineViewportStateCreateInfo* PrepareViewportStateCreateInfo();
 
+  const vk::PipelineDynamicStateCreateInfo* PrepareDynamicStateCreatInfo();
+
   const vk::PipelineLayout PreparePipelineLayout();
 
 
