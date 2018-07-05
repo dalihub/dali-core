@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TEXTURE_DETAILS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,20 +33,30 @@ using AttachmentId = size_t;
 using LayerId = size_t;
 using LevelId = size_t;
 
-enum class Type {
+enum class Type
+{
   TEXTURE_2D,
   TEXTURE_3D,
   TEXTURE_CUBEMAP,
 };
 
+enum class Usage
+{
+  SAMPLE,
+  COLOR_ATTACHMENT,
+  DEPTH_ATTACHMENT
+};
+
 using Format = API::Format;
 
-enum class MipMapFlag {
+enum class MipMapFlag
+{
   ENABLED,
   DISABLED,
 };
 
-enum class DepthStencilFlag {
+enum class DepthStencilFlag
+{
   NONE,
   DEPTH,
   STENCIL,

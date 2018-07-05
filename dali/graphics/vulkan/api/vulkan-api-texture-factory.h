@@ -46,6 +46,8 @@ public:
 
   Graphics::API::TextureFactory& SetMipMapFlag( API::TextureDetails::MipMapFlag mipMSapFlag ) override;
 
+  Graphics::API::TextureFactory& SetUsage( API::TextureDetails::Usage usage ) override;
+
   Graphics::API::TextureFactory& SetData( void* pData ) override;
 
   Graphics::API::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
@@ -65,6 +67,8 @@ public:
   const API::RectSize& GetSize() const;
 
   const API::TextureDetails::Format& GetFormat() const;
+
+  const API::TextureDetails::Usage& GetUsage() const;
 
   const API::TextureDetails::MipMapFlag& GetMipMapFlag() const;
 

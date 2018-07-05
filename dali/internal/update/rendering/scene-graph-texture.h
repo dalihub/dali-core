@@ -46,6 +46,13 @@ class Texture
 public:
   typedef Dali::TextureType::Type Type;
 
+  enum class Usage
+  {
+    SAMPLE,
+    COLOR_ATTACHMENT,
+    DEPTH_ATTACHMENT
+  };
+
   /**
    * Constructor
    * @param[in] type The type of the texture
@@ -115,12 +122,25 @@ public: // From messages
    */
   void GenerateMipmaps();
 
+  /**
+   * Create a graphics texture using the parameters defined in this object
+   */
+  void CreateTexture(Usage usage);
+
+public:
+  /**
+   * Creates a texture with the specified buffer and buffer size.
+   * Buffer may be null.
+   */
+    void CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize );
+
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
   std::unique_ptr<Graphics::API::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
   SceneGraph::Sampler     mSampler;          ///< The current sampler state
+  Pixel::Format           mFormat;           ///< The pixel format of the texture
   uint16_t                mWidth;            ///< Width of the texture
   uint16_t                mHeight;           ///< Height of the texture
   uint16_t                mMaxMipMapLevel;   ///< Maximum mipmap level

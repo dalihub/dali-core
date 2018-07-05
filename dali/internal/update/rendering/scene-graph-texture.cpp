@@ -40,6 +40,9 @@ namespace SceneGraph
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
+#endif
 
 /**
  * @brief Whether specified pixel format is compressed.
@@ -255,6 +258,7 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mGraphicsTexture( nullptr ),
   mNativeImage(),
   mSampler(),
+  mFormat( format ),
   mWidth( size.GetWidth() ),
   mHeight( size.GetHeight() ),
   mMaxMipMapLevel( 0 ),
@@ -269,6 +273,7 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mGraphicsTexture( nullptr ),
   mNativeImage( nativeImageInterface ),
   mSampler(),
+  mFormat( Pixel::RGBA8888 ),
   mWidth( nativeImageInterface->GetWidth() ),
   mHeight( nativeImageInterface->GetHeight() ),
   mMaxMipMapLevel( 0 ),
@@ -288,24 +293,67 @@ void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
 {
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::GetGfxObject() = %p\n", this, mGraphicsTexture.get() );
+
   return mGraphicsTexture.get();
 }
 
 void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
 {
+  if( ! mGraphicsTexture )
+  {
+    DALI_ASSERT_DEBUG(pixelData->GetPixelFormat() == mFormat && "Pixel format is different");
+    DALI_ASSERT_DEBUG(pixelData->GetWidth() == mWidth && "Pixel buffer width is different");
+    DALI_ASSERT_DEBUG(pixelData->GetHeight() == mHeight && "Pixel buffer height is different");
+    CreateTextureInternal( Usage::SAMPLE, pixelData->GetBuffer(), pixelData->GetBufferSize() );
+  }
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::UploadTexture() GfxTexture: %p\n", this, mGraphicsTexture.get() );
+}
+
+void Texture::CreateTexture( Usage usage )
+{
+  if( ! mGraphicsTexture )
+  {
+    CreateTextureInternal( usage, nullptr, 0 );
+  }
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::CreateTexture(Usage:%s) GfxTexture: %p\n", this, (usage==Usage::COLOR_ATTACHMENT?"ColorAttachment":(usage==Usage::DEPTH_ATTACHMENT?"DepthAttachment":"SAMPLE")), mGraphicsTexture.get() );
+}
+
+void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize )
+{
   if( mGraphics )
   {
     auto& controller = mGraphics->GetController();
 
+    Graphics::API::TextureDetails::Usage graphicsUsage;
+    switch( usage )
+    {
+      case Usage::SAMPLE:
+      {
+        graphicsUsage = Graphics::API::TextureDetails::Usage::SAMPLE;
+        break;
+      }
+      case Usage::COLOR_ATTACHMENT:
+      {
+        graphicsUsage = Graphics::API::TextureDetails::Usage::COLOR_ATTACHMENT;
+        break;
+      }
+      case Usage::DEPTH_ATTACHMENT:
+      {
+        graphicsUsage = Graphics::API::TextureDetails::Usage::DEPTH_ATTACHMENT;
+        break;
+      }
+    }
+
     // Convert DALi format to Graphics API format
     mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
-                                                 .SetFormat( ConvertPixelFormat( pixelData->GetPixelFormat() ) )
-                                                 .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
-                                                 .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
-                                                 .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
-                                                 .SetData( pixelData->GetBuffer() )
-                                                 .SetDataSize( pixelData->GetBufferSize() )
-                                                 );
+                                                           .SetFormat( ConvertPixelFormat( mFormat ) )
+                                                           .SetUsage( graphicsUsage )
+                                                           .SetSize( { mWidth, mHeight } )
+                                                           .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
+                                                           .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
+                                                           .SetData( buffer )
+                                                           .SetDataSize( bufferSize ) );
   }
 }
 

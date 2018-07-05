@@ -29,7 +29,8 @@ namespace VulkanAPI
 struct TextureFactory::Impl
 {
   Impl( TextureFactory& api, Vulkan::Graphics& graphics )
-          : mApi( api ), mGraphics( graphics )
+  : mApi( api ),
+    mGraphics( graphics )
   {
 
   }
@@ -52,6 +53,7 @@ struct TextureFactory::Impl
   Vulkan::Graphics& mGraphics;
 
   API::TextureDetails::Type mType;
+  API::TextureDetails::Usage mUsage;
   API::RectSize mSize;
   API::Format mFormat;
   API::TextureDetails::MipMapFlag mMipmapFlags;
@@ -76,6 +78,12 @@ Graphics::API::TextureFactory& TextureFactory::SetType( API::TextureDetails::Typ
 Graphics::API::TextureFactory& TextureFactory::SetSize( const API::RectSize& size )
 {
   mImpl->mSize = size;
+  return *this;
+}
+
+Graphics::API::TextureFactory& TextureFactory::SetUsage( API::TextureDetails::Usage usage )
+{
+  mImpl->mUsage = usage;
   return *this;
 }
 
@@ -113,6 +121,11 @@ const API::TextureDetails::Type& TextureFactory::GetType() const
   return mImpl->mType;
 }
 
+const API::TextureDetails::Usage& TextureFactory::GetUsage() const
+{
+  return mImpl->mUsage;
+}
+
 const API::RectSize& TextureFactory::GetSize() const
 {
   return mImpl->mSize;
@@ -147,4 +160,3 @@ Vulkan::Graphics& TextureFactory::GetGraphics() const
 }
 }
 }
-
