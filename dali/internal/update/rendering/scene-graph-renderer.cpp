@@ -36,11 +36,13 @@
 #include <dali/graphics-api/graphics-api-pipeline-factory.h>
 
 #include <cstring>
+#include <dali/integration-api/debug.h>
 
 namespace // unnamed namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN_UNIFORMS");
+Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
 #endif
 
 
@@ -364,7 +366,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         auto texture    = mTextureSet->GetTexture(i);
         if( texture )
         {
-          auto binding    = Graphics::API::RenderCommand::TextureBinding{}
+          DALI_ASSERT_DEBUG( texture->GetGfxObject() != nullptr && "Texture has empty graphics object");
+
+          auto binding = Graphics::API::RenderCommand::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
             .SetSampler(nullptr);
@@ -445,6 +449,11 @@ void Renderer::SetTextures( TextureSet* textureSet )
 
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
+
+  DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
+                 "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
+                 textureSet?textureSet->GetTexture(0):nullptr,
+                 textureSet?(textureSet->GetTexture(0)?textureSet->GetTexture(0)->GetGfxObject():nullptr):nullptr );
 }
 
 void Renderer::SetShader( Shader* shader )
