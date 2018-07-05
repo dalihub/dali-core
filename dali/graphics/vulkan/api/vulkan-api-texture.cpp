@@ -870,15 +870,17 @@ constexpr vk::Format ConvertApiToVk( API::Format format )
 struct Texture::Impl
 {
   Impl( Texture& api, Dali::Graphics::API::TextureFactory& factory )
-          : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
-            mGraphics( mTextureFactory.GetGraphics() ),
-            mImage(),
-            mImageView(),
-            mSampler(),
-            mWidth( 0u ),
-            mHeight( 0u ),
-            mFormat( vk::Format::eUndefined ),
-            mComponentMapping()
+  : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
+    mGraphics( mTextureFactory.GetGraphics() ),
+    mImage(),
+    mImageView(),
+    mSampler(),
+    mWidth( 0u ),
+    mHeight( 0u ),
+    mFormat( vk::Format::eUndefined ),
+    mUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst ),
+    mLayout( vk::ImageLayout::eUndefined ),
+    mComponentMapping()
   {
   }
 
@@ -887,39 +889,67 @@ struct Texture::Impl
   bool Initialise()
   {
     auto size = mTextureFactory.GetSize();
-    mWidth = uint32_t(size.width);
-    mHeight = uint32_t(size.height);
+    mWidth = uint32_t( size.width );
+    mHeight = uint32_t( size.height );
     auto sizeInBytes = mTextureFactory.GetDataSize();
     auto data = mTextureFactory.GetData();
+
+    switch( mTextureFactory.GetUsage())
+    {
+      case API::TextureDetails::Usage::COLOR_ATTACHMENT:
+      {
+        mUsage = vk::ImageUsageFlagBits::eColorAttachment;
+        mLayout = vk::ImageLayout::eUndefined;
+        break;
+      }
+      case API::TextureDetails::Usage::DEPTH_ATTACHMENT:
+      {
+        mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+        mLayout = vk::ImageLayout::eUndefined;
+        break;
+      }
+      case API::TextureDetails::Usage::SAMPLE:
+      {
+        mUsage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+        mLayout = vk::ImageLayout::ePreinitialized;
+        break;
+      }
+    }
 
     mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
     mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
 
     if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
     {
-      assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
-
-      auto inData = reinterpret_cast<const uint8_t*>(data);
-      auto outData = new uint8_t[mWidth * mHeight * 4];
-
-      auto outIdx = 0u;
-      for( auto i = 0u; i < sizeInBytes; i += 3 )
+      if( data && sizeInBytes > 0 )
       {
-        outData[outIdx] = inData[i];
-        outData[outIdx + 1] = inData[i + 1];
-        outData[outIdx + 2] = inData[i + 2];
-        outData[outIdx + 3] = 0xff;
-        outIdx += 4;
-      }
+        assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
 
-      data = outData;
-      sizeInBytes = uint32_t(mWidth * mHeight * 4);
-      mFormat = vk::Format::eR8G8B8A8Unorm;
+        auto inData = reinterpret_cast<const uint8_t*>(data);
+        auto outData = new uint8_t[mWidth * mHeight * 4];
+
+        auto outIdx = 0u;
+        for( auto i = 0u; i < sizeInBytes; i += 3 )
+        {
+          outData[outIdx] = inData[i];
+          outData[outIdx + 1] = inData[i + 1];
+          outData[outIdx + 2] = inData[i + 2];
+          outData[outIdx + 3] = 0xff;
+          outIdx += 4;
+        }
+
+        data = outData;
+        sizeInBytes = uint32_t(mWidth * mHeight * 4);
+        mFormat = vk::Format::eR8G8B8A8Unorm;
+      }
     }
 
     InitialiseTexture();
 
-    UploadData( data, 0, sizeInBytes );
+    if( data && sizeInBytes )
+    {
+      UploadData( data, 0, sizeInBytes );
+    }
 
     return true;
   }
@@ -1008,10 +1038,10 @@ struct Texture::Impl
     // create image
     auto imageCreateInfo = vk::ImageCreateInfo{}
       .setFormat( mFormat )
-      .setInitialLayout( vk::ImageLayout::ePreinitialized )
+      .setInitialLayout( mLayout )
       .setSamples( vk::SampleCountFlagBits::e1 )
       .setSharingMode( vk::SharingMode::eExclusive )
-      .setUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst )
+      .setUsage( mUsage )
       .setExtent( { mWidth, mHeight, 1 } )
       .setArrayLayers( 1 )
       .setImageType( vk::ImageType::e2D )
@@ -1074,6 +1104,8 @@ struct Texture::Impl
   uint32_t    mWidth;
   uint32_t    mHeight;
   vk::Format  mFormat;
+  vk::ImageUsageFlags mUsage;
+  vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
 };
 
