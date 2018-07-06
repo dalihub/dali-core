@@ -172,6 +172,14 @@ public:
    */
   Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
 
+  /**
+   * @brief Get mouse's button value (ex: right/left button)
+   *
+   * @return The value of mouse button
+   */
+  MouseButton::Type GetMouseButton( std::size_t point ) const;
+
+
 private:
 
   /// Undefined Copy constructor

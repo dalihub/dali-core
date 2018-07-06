@@ -271,11 +271,12 @@ void Core::ProcessEvents()
   // Emit signal here to inform listeners that event processing has finished.
   mStage->EmitEventProcessingFinishedSignal();
 
+  // Run any registered processors
+  RunProcessors();
+
   // Run the size negotiation after event processing finished signal
   mRelayoutController->Relayout();
 
-  // Run any registered processors
-  RunProcessors();
 
   // Rebuild depth tree after event processing has finished
   mStage->RebuildDepthTree();

@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/integration-api/events/point.h>
+#include <dali/public-api/events/mouse-button.h>
 
 namespace Dali
 {
@@ -31,7 +32,8 @@ Point::Point()
   mDeviceClass( Device::Class::NONE ),
   mDeviceSubclass( Device::Subclass::NONE ),
   mPressure( 1.0f ),
-  mRadius( 0.0f )
+  mRadius( 0.0f ),
+  mMouseButton( MouseButton::INVALID )
 {
 }
 
@@ -42,7 +44,8 @@ Point::Point( const TouchPoint& touchPoint )
   mDeviceClass( Device::Class::NONE ),
   mDeviceSubclass( Device::Subclass::NONE ),
   mPressure( 1.0f ),
-  mRadius( 0.0f )
+  mRadius( 0.0f ),
+  mMouseButton( MouseButton::INVALID )
 {
 }
 
@@ -165,6 +168,17 @@ Device::Subclass::Type Point::GetDeviceSubclass() const
 {
   return mDeviceSubclass;
 }
+
+MouseButton::Type Point::GetMouseButton() const
+{
+  return mMouseButton;
+}
+
+void Point::SetMouseButton(MouseButton::Type button)
+{
+  mMouseButton = button;
+}
+
 
 } // namespace Integration
 
