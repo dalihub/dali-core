@@ -200,6 +200,10 @@ Handle< T >::operator bool() const
 template< class T >
 Handle< T >& Handle< T >::operator=( Handle&& handle )
 {
+  if( mObject )
+  {
+    mObject->Release();
+  }
   mObject = handle.mObject;
   handle.mObject = nullptr;
   return *this;
