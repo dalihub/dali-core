@@ -400,8 +400,11 @@ public:
 
   RenderCommand& BindPipeline( const Pipeline& pipeline )
   {
-    mPipeline = &pipeline;
-    mUpdateFlags |= RENDER_COMMAND_UPDATE_PIPELINE_BIT;
+    if( mPipeline != &pipeline)
+    {
+      mPipeline = &pipeline;
+      mUpdateFlags |= RENDER_COMMAND_UPDATE_PIPELINE_BIT;
+    }
     return *this;
   }
 

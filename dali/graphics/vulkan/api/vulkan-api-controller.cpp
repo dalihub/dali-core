@@ -195,6 +195,10 @@ struct Controller::Impl
                                        renderTargetBinding.clearColors[0].b,
                                        renderTargetBinding.clearColors[0].a
                                      } );
+      newColors[1].setDepthStencil( vk::ClearDepthStencilValue{}
+         .setDepth( 0.0f )
+         .setStencil( 0 ) );
+
       mRenderPasses.emplace_back(
               // render pass
               vk::RenderPassBeginInfo{}
