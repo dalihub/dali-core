@@ -18,6 +18,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-api-pipeline-impl.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 
 namespace Dali
 {
@@ -61,8 +62,7 @@ Internal::Pipeline* PipelineCache::GetPipeline( const VulkanAPI::PipelineFactory
   return nullptr;
 }
 
-bool
-PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr< Internal::Pipeline > pipeline )
+bool PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std::unique_ptr< Internal::Pipeline > pipeline )
 {
   // hash factory
   auto hashCode = factory.GetHashCode();

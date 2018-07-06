@@ -41,8 +41,8 @@ class Pipeline;
 } // Internal
 
 class Controller;
-
 class PipelineFactory;
+class Pipeline;
 
 class PipelineCache
 {
@@ -70,6 +70,9 @@ public:
    */
   bool RemovePipeline( Internal::Pipeline* pipeline );
 
+private:
+
+  friend class PipelineCacheDebug;
 
 private:
 

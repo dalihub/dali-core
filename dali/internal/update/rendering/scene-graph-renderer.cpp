@@ -200,8 +200,6 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
-  using namespace Dali::Graphics::API;
-
   auto &controller = mGraphics->GetController();
 
   if (!mGfxRenderCommand)

@@ -20,6 +20,7 @@
 
 #include <dali/graphics-api/graphics-api-utility.h>
 #include <vector>
+#include <string>
 
 namespace Dali
 {
@@ -320,7 +321,6 @@ struct DepthStencilState
 
   Extension   extension       { nullptr };
 
-
   DepthStencilState& SetDepthTestEnable( bool value )
   {
     depthTestEnable = value;
@@ -348,7 +348,6 @@ struct RasterizationState
 {
   CullMode              cullMode        {};
   PolygonMode           polygonMode     {};
-  PrimitiveTopology     topology        {};
   FrontFace             frontFace       {};
 
   Extension             extension       { nullptr };

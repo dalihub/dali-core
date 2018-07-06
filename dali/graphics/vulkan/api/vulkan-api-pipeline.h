@@ -70,6 +70,13 @@ public:
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
+public:
+
+  Internal::Pipeline* GetImplementation() const
+  {
+    return mPipelineImpl;
+  }
+
 private:
   Internal::Pipeline* mPipelineImpl;
 };
