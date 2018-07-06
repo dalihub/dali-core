@@ -22,6 +22,30 @@
       "revId": "14b639db92d98caec47b4426b8604fef6918ee9e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef5f90b2_32f62b85",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-06T13:56:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dee05ea3_c8b86460",
+      "range": {
+        "startLine": 214,
+        "startChar": 2,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "revId": "14b639db92d98caec47b4426b8604fef6918ee9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
