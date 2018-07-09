@@ -115,6 +115,12 @@ public:
 
   vk::SwapchainKHR GetVkHandle();
 
+  /**
+   * Returns true when swapchain expired
+   * @return
+   */
+  bool IsValid() const;
+
 private:
 
   Swapchain();
@@ -148,6 +154,8 @@ private:
   vk::SwapchainCreateInfoKHR mSwapchainCreateInfoKHR;
 
   std::vector< SwapchainBuffer > mSwapchainBuffer;
+
+  bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
 };
 
 } // namespace Vulkan
