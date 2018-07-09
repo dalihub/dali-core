@@ -45,16 +45,15 @@ public:
   GraphicsAlgorithms(GraphicsAlgorithms&&) = default;
   GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = default;
 
-
   /**
    * Submits render instructions
    * @param graphics Instance of the Graphics object
    * @param renderInstructions container of render instructions
    * @param bufferIndex current buffer index
    */
-  void SubmitRenderInstructions(Graphics::API::Controller &graphics,
-                                SceneGraph::RenderInstructionContainer &renderInstructions,
-                                BufferIndex bufferIndex);
+  void SubmitRenderInstructions( Graphics::API::Controller &graphics,
+                                 SceneGraph::RenderInstructionContainer &renderInstructions,
+                                 BufferIndex bufferIndex);
 
 private:
 
@@ -62,6 +61,7 @@ private:
 
   void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                              BufferIndex                          bufferIndex,
+                             Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
                              Matrix                               viewProjection,
                              RenderInstruction&                   instruction,
                              const RenderList&                    renderItemList );
