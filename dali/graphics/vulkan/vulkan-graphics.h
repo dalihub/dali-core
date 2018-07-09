@@ -104,6 +104,8 @@ public: // Create methods
 
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
+  RefCountedSwapchain ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain);
+
   RefCountedShader CreateShader(); //will see if this will work
 
   RefCountedPipeline CreatePipeline();
@@ -151,7 +153,7 @@ public: // Create methods
 
   RefCountedSwapchain CreateSwapchain( RefCountedSurface surface, vk::Format requestedFormat,
                                        vk::PresentModeKHR presentMode,
-                                       uint32_t bufferCount, RefCountedSwapchain oldSwapchain );
+                                       uint32_t bufferCount, RefCountedSwapchain&& oldSwapchain );
 
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );

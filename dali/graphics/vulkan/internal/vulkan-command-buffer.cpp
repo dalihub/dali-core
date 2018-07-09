@@ -74,6 +74,7 @@ void CommandBuffer::Begin( vk::CommandBufferUsageFlags usageFlags,
     // it's a legacy but little nicer
     auto swapchain = mGraphics->GetSwapchainForFBID( 0u );
     inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPass() );
+    inheritance.setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() );
     info.setPInheritanceInfo( &inheritance );
   }
 
