@@ -34,11 +34,11 @@ Debug::Filter* gRenderTrackerLogFilter = Debug::Filter::New(Debug::NoLogging, fa
 #define TRACKER_LOG(level)                                              \
   DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p\n", __FUNCTION__, this)
 
-#define TRACKER_LOG_FMT(level, format, ...) \
-  DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p " format, __FUNCTION__, this, ## __VA_ARGS__)
+#define TRACKER_LOG_FMT(level, format, args...) \
+  DALI_LOG_INFO(gRenderTrackerLogFilter, level, "RenderTracker::%s: this:%p " format, __FUNCTION__, this, ## args)
 #else
 #define TRACKER_LOG(level)
-#define TRACKER_LOG_FMT(level, format, ...)
+#define TRACKER_LOG_FMT(level, format, args...)
 #endif
 
 } // Render
