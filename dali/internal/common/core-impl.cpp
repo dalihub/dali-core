@@ -227,6 +227,9 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
 
+  // Check if the default surface is changed
+  status.surfaceRectChanged = mUpdateManager->IsDefaultSurfaceRectChanged();
+
   // No need to keep update running if there are notifications to process.
   // Any message to update will wake it up anyways
 }
@@ -271,11 +274,12 @@ void Core::ProcessEvents()
   // Emit signal here to inform listeners that event processing has finished.
   mStage->EmitEventProcessingFinishedSignal();
 
+  // Run any registered processors
+  RunProcessors();
+
   // Run the size negotiation after event processing finished signal
   mRelayoutController->Relayout();
 
-  // Run any registered processors
-  RunProcessors();
 
   // Rebuild depth tree after event processing has finished
   mStage->RebuildDepthTree();

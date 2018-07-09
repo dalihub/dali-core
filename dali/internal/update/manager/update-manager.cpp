@@ -201,7 +201,8 @@ struct UpdateManager::Impl
     animationFinishedDuringUpdate( false ),
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
-    renderersAdded( false )
+    renderersAdded( false ),
+    surfaceRectChanged( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -306,6 +307,7 @@ struct UpdateManager::Impl
   bool                                 previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
+  bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
 
 private:
 
@@ -1006,6 +1008,8 @@ void UpdateManager::SetBackgroundColor( const Vector4& color )
 
 void UpdateManager::SetDefaultSurfaceRect( const Rect<int>& rect )
 {
+  mImpl->surfaceRectChanged = true;
+
   typedef MessageValue1< RenderManager, Rect<int> > DerivedType;
 
   // Reserve some memory inside the render queue
@@ -1044,6 +1048,16 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
 
   // Go through node hierarchy and rearrange siblings according to depth-index
   SortSiblingNodesRecursively( *( mImpl->root ) );
+}
+
+bool UpdateManager::IsDefaultSurfaceRectChanged()
+{
+  bool surfaceRectChanged = mImpl->surfaceRectChanged;
+
+  // Reset the flag
+  mImpl->surfaceRectChanged = false;
+
+  return surfaceRectChanged;
 }
 
 void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )

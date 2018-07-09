@@ -597,6 +597,12 @@ public:
    */
   void SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths );
 
+  /**
+   * Query wheter the default surface rect is changed or not.
+   * @return true if the default surface rect is changed.
+   */
+  bool IsDefaultSurfaceRectChanged();
+
 private:
 
   // Undefined
