@@ -455,6 +455,31 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   viewportState.SetScissorTestEnable( false );
   viewportState.SetScissor( {} );
 
+  // set face culling
+  auto cullMode { CullMode::NONE };
+  switch( renderer->GetFaceCullingMode() )
+  {
+    case FaceCullingMode::BACK:
+    {
+      cullMode = CullMode::BACK;
+      break;
+    }
+    case FaceCullingMode::FRONT:
+    {
+      cullMode = CullMode::FRONT;
+      break;
+    }
+    case FaceCullingMode::FRONT_AND_BACK:
+    {
+      cullMode = CullMode::FRONT_AND_BACK;
+      break;
+    }
+    case FaceCullingMode::NONE:
+    {
+      cullMode = CullMode::NONE;
+    }
+  }
+
   // create pipeline
   auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
 
@@ -483,7 +508,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
             // rasterization
             .SetRasterizationState(RasterizationState()
-                                     .SetCullMode(CullMode::BACK)
+                                     .SetCullMode(cullMode)
                                      .SetPolygonMode(PolygonMode::FILL)
                                      .SetFrontFace(FrontFace::COUNTER_CLOCKWISE))
 
