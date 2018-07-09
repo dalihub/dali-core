@@ -327,11 +327,12 @@ struct Controller::Impl
       {
         continue;
       }
+      auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}.setRenderPass( mCurrentFramebuffer->GetRenderPass() );
 
       // start new command buffer
       auto cmdbuf = mGraphics.CreateCommandBuffer( false );
       cmdbuf->Reset();
-      cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
+      cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
 
       // set dynamic state
