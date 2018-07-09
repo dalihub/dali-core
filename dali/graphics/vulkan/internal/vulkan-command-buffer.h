@@ -51,8 +51,7 @@ public:
   ~CommandBuffer() override;
 
   /** Begin recording */
-  void Begin( vk::CommandBufferUsageFlags usageFlags = vk::CommandBufferUsageFlags{},
-              vk::CommandBufferInheritanceInfo* inheritanceInfo = nullptr );
+  void Begin( vk::CommandBufferUsageFlags usageFlags, vk::CommandBufferInheritanceInfo* inheritanceInfo );
 
   /** Finish recording */
   void End();

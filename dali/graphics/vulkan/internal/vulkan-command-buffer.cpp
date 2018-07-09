@@ -65,19 +65,6 @@ void CommandBuffer::Begin( vk::CommandBufferUsageFlags usageFlags,
   info.setPInheritanceInfo( inheritanceInfo );
   info.setFlags( usageFlags );
 
-  // set the inheritance option
-  auto inheritance = vk::CommandBufferInheritanceInfo{}.setSubpass( 0 );
-
-  if( mAllocateInfo.level == vk::CommandBufferLevel::eSecondary )
-  {
-    // Render pass is obtained from the default framebuffer
-    // it's a legacy but little nicer
-    auto swapchain = mGraphics->GetSwapchainForFBID( 0u );
-    inheritance.setRenderPass( swapchain->GetCurrentFramebuffer()->GetRenderPass() );
-    inheritance.setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() );
-    info.setPInheritanceInfo( &inheritance );
-  }
-
   VkAssert( mCommandBuffer.begin( info ) );
 
   mRecording = true;

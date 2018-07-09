@@ -208,12 +208,13 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
   return viewportState.scissorTestEnable;
 }
 
-void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&           graphics,
-                           BufferIndex                          bufferIndex,
-                           Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
-                           Matrix                               viewProjection,
-                           RenderInstruction&                   instruction,
-                           const RenderList&                    renderItemList )
+void GraphicsAlgorithms::SubmitRenderItemList(
+  Graphics::API::Controller&                         graphics,
+  BufferIndex                                        bufferIndex,
+  Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
+  Matrix                                             viewProjection,
+  RenderInstruction&                                 instruction,
+  const RenderList&                                  renderItemList )
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -280,8 +281,8 @@ void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&       
 }
 
 void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
-                        BufferIndex                bufferIndex,
-                        RenderInstruction&         instruction )
+                                            BufferIndex                bufferIndex,
+                                            RenderInstruction&         instruction )
 {
   using namespace Graphics::API;
 
@@ -290,7 +291,6 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
   const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
   Matrix        viewProjection;
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
-
 
   auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{}
   .SetClearColors( {{ instruction.mClearColor.r,

@@ -991,7 +991,7 @@ struct Texture::Impl
 
     auto commandBuffer = mGraphics.CreateCommandBuffer( true );
 
-    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
     // change layout to prepare image to transfer data
     commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe,
