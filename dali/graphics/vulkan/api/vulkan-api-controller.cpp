@@ -146,6 +146,18 @@ struct Controller::Impl
     swapchain->Present();
     mSecondaryCommandBufferRefs.clear();
     mRenderPasses.clear();
+
+    if( !swapchain->IsValid() )
+    {
+      // get surface associated with 'main' framebuffer
+      auto surface = mGraphics.GetSurface( 0u );
+
+      // wait till device is idle, no more GPU work done
+      mGraphics.DeviceWaitIdle();
+
+      // replace swapchain
+      mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
+    }
   }
 
   API::TextureFactory& GetTextureFactory() const

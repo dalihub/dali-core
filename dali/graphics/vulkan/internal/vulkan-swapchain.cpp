@@ -66,8 +66,8 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
           mCurrentBufferIndex( 0u ),
           mSwapchainKHR( vkHandle ),
           mSwapchainCreateInfoKHR( std::move( createInfo ) ),
-          mSwapchainBuffer( std::move( framebuffers ) )
-
+          mSwapchainBuffer( std::move( framebuffers ) ),
+          mIsValid( true )
 {
 }
 
@@ -87,6 +87,13 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
+  // prevent from using invalid swapchain
+  if( !mIsValid )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    return RefCountedFramebuffer();
+  }
+
   const auto& device = mGraphics->GetDevice();
 
   if( !mFrameFence )
@@ -118,6 +125,13 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
 void Swapchain::Present()
 {
+  // prevent from using invalid swapchain
+  if( !mIsValid )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    return;
+  }
+
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
   // end command buffer
@@ -145,10 +159,25 @@ void Swapchain::Present()
   mGraphics->Present( *mQueue, presentInfo );
 
   mGraphics->CollectGarbage();
+
+  // handle error
+  if( presentInfo.pResults[0] != vk::Result::eSuccess )
+  {
+    // invalidate swapchain
+    mIsValid = false;
+  }
+
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
 {
+  // prevent from using invalid swapchain
+  if( !mIsValid )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    return;
+  }
+
   vk::PresentInfoKHR presentInfo{};
   vk::Result result{};
   presentInfo.setPImageIndices( &mCurrentBufferIndex )
@@ -168,17 +197,19 @@ RefCountedCommandBuffer Swapchain::GetCurrentCommandBuffer() const
 
 bool Swapchain::OnDestroy()
 {
-  auto graphics = mGraphics;
-  auto device = graphics->GetDevice();
-  auto swapchain = mSwapchainKHR;
-  auto allocator = &graphics->GetAllocator();
+  if( mSwapchainKHR )
+  {
+    auto graphics = mGraphics;
+    auto device = graphics->GetDevice();
+    auto swapchain = mSwapchainKHR;
+    auto allocator = &graphics->GetAllocator();
 
-  graphics->DiscardResource( [ device, swapchain, allocator ]() {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: swap chain->%p\n",
-                   static_cast< void* >(swapchain) )
-    device.destroySwapchainKHR( swapchain, allocator );
-  } );
-
+    graphics->DiscardResource( [ device, swapchain, allocator ]() {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: swap chain->%p\n",
+                     static_cast< void* >(swapchain) )
+      device.destroySwapchainKHR( swapchain, allocator );
+    } );
+  }
   return false;
 }
 

@@ -226,7 +226,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    3,
+                                    2, // double buffered
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -243,6 +243,29 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
 
   return swapchain;
 }
+
+RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
+{
+  auto swapchain = CreateSwapchain( surface,
+                                    vk::Format::eB8G8R8A8Unorm,
+                                    vk::PresentModeKHR::eFifo,
+                                    2, // double buffered
+                                    std::move(oldSwapchain) );
+
+
+  // store swapchain in the correct pair
+  for( auto&& val : mSurfaceFBIDMap )
+  {
+    if( val.second.surface == surface )
+    {
+      val.second.swapchain = swapchain;
+      break;
+    }
+  }
+
+  return swapchain;
+}
+
 
 RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInfo )
 {
@@ -316,12 +339,12 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
   assert( ( !colorAttachments.empty() || depthAttachment )
           && "Cannot create framebuffer. Please provide at least one attachment" );
 
-  auto colorAttachmentsValid = true;
+//  auto colorAttachmentsValid = true;
   for( auto& attachment : colorAttachments )
   {
     if( !attachment->IsValid() )
     {
-      colorAttachmentsValid = false;
+  //    colorAttachmentsValid = false;
       break;
     }
   }
@@ -648,7 +671,8 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
 RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                vk::Format requestedFormat,
                                                vk::PresentModeKHR presentMode,
-                                               uint32_t bufferCount, RefCountedSwapchain oldSwapchain )
+                                               uint32_t bufferCount,
+                                               RefCountedSwapchain&& oldSwapchain )
 {
   // obtain supported image format
   auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetSurfaceKHR() ) );
@@ -791,13 +815,26 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
   if( oldSwapchain )
   {
-    // The old Swapchain HAS to die here
-    while( oldSwapchain->GetRefCount() > 0 )
+    for( auto&& i : mSurfaceFBIDMap )
     {
-      oldSwapchain->Release();
+      if( i.second.swapchain == oldSwapchain )
+      {
+        i.second.swapchain = RefCountedSwapchain();
+        break;
+      }
     }
   }
 
+  if( oldSwapchain )
+  {
+    // prevent destroying the swapchain as it is handled automatically
+    // during replacing the swapchain
+    auto khr = oldSwapchain->mSwapchainKHR;
+    oldSwapchain->mSwapchainKHR = nullptr;
+    oldSwapchain.Reset();
+
+    mDevice.destroySwapchainKHR( khr, *mAllocator );
+  }
 
   // pull images and create Framebuffers
   auto images = VkAssert( mDevice.getSwapchainImagesKHR( swapChainVkHandle ) );
@@ -964,7 +1001,7 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
 
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
-  return queue.GetVkHandle().presentKHR( presentInfo );
+  return queue.GetVkHandle().presentKHR( &presentInfo );
 }
 
 vk::Result Graphics::QueueWaitIdle( Queue& queue )
