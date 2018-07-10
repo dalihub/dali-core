@@ -55,6 +55,8 @@ public:
 
   API::PipelineFactory& SetViewportState( const API::ViewportState& state ) override;
 
+  API::PipelineFactory& SetFramebufferState( const API::FramebufferState& state ) override;
+
   API::PipelineFactory& SetBasePipeline( API::Pipeline& pipeline ) override;
 
   API::PipelineFactory& SetDepthStencilState( API::DepthStencilState state ) override;
@@ -80,6 +82,7 @@ public:
     API::ColorBlendState colorBlendState;
     API::ShaderState shaderState;
     API::ViewportState viewportState;
+    API::FramebufferState framebufferState;
     API::RasterizationState rasterizationState;
     API::VertexInputState vertexInputState;
     API::InputAssemblyState inputAssemblyState;

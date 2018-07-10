@@ -236,14 +236,14 @@ std::vector< vk::ClearValue > Framebuffer::GetClearValues() const
 {
   auto result = std::vector< vk::ClearValue >{};
 
-  std::transform( mColorAttachments.begin(),
+  std::transform( mColorAttachments.begin(), // @todo & color clear enabled
                   mColorAttachments.end(),
                   std::back_inserter( result ),
                   []( const RefCountedFramebufferAttachment& attachment ) {
                     return attachment->GetClearValue();
                   } );
 
-  if( mDepthAttachment && mDepthAttachment->IsValid() )
+  if( mDepthAttachment && mDepthAttachment->IsValid() ) // @todo & depth clear enabled
   {
     result.push_back( mDepthAttachment->GetClearValue() );
   }

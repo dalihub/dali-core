@@ -53,6 +53,7 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
   uint32_t cbHash = HashBinary( &info.colorBlendState, sizeof( info.colorBlendState ) );
   uint32_t shHash = HashBinary( &info.shaderState, sizeof( info.shaderState ) );
   uint32_t vpHash = HashBinary( &info.viewportState, sizeof( info.viewportState ) );
+  uint32_t fbHash = HashBinary( &info.framebufferState, sizeof( info.framebufferState ) );
   uint32_t rsHash = HashBinary( &info.rasterizationState, sizeof( info.rasterizationState ) );
   uint32_t iaHash = HashBinary( &info.inputAssemblyState, sizeof( info.inputAssemblyState ) );
 
@@ -63,8 +64,8 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
           sizeof( API::VertexInputState::Attribute ) * info.vertexInputState.attributes.size() ) );
 
   // rehash all
-  std::array< uint32_t, 9 > allHashes = {
-          dsHash, cbHash, shHash, vpHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask
+  std::array< uint32_t, 10 > allHashes = {
+          dsHash, cbHash, shHash, vpHash, fbHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask
   };
 
   return HashBinary( allHashes.data(), uint32_t( allHashes.size() * sizeof( uint32_t ) ) );
@@ -104,6 +105,13 @@ API::PipelineFactory& PipelineFactory::SetShaderState( const API::ShaderState& s
 API::PipelineFactory& PipelineFactory::SetViewportState( const API::ViewportState& state )
 {
   mInfo.viewportState = state;
+  mHashCode = 0u;
+  return *this;
+}
+
+API::PipelineFactory& PipelineFactory::SetFramebufferState( const API::FramebufferState& state )
+{
+  mInfo.framebufferState = state;
   mHashCode = 0u;
   return *this;
 }
@@ -174,6 +182,7 @@ void PipelineFactory::Reset()
   mInfo.colorBlendState = {};
   mInfo.shaderState = {};
   mInfo.viewportState = {};
+  mInfo.framebufferState = {};
   mInfo.rasterizationState = {};
   mInfo.vertexInputState = {};
   mInfo.inputAssemblyState = {};
