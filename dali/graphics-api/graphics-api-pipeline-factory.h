@@ -48,6 +48,8 @@ public:
 
   virtual PipelineFactory& SetViewportState( const ViewportState& state ) = 0;
 
+  virtual PipelineFactory& SetFramebufferState( const FramebufferState& state ) = 0;
+
   virtual PipelineFactory& SetBasePipeline( Pipeline& pipeline ) = 0;
 
   virtual PipelineFactory& SetDepthStencilState( DepthStencilState state ) = 0;

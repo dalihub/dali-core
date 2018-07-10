@@ -29,6 +29,7 @@ namespace Graphics
 namespace API
 {
 class Shader;
+class Framebuffer;
 using Extension = void*;
 
 /**
@@ -307,6 +308,21 @@ struct ShaderState
     return *this;
   }
 };
+
+struct FramebufferState
+{
+  const Framebuffer *framebuffer{ nullptr };
+
+  Extension extension{ nullptr };
+
+  FramebufferState& SetFramebuffer( const Framebuffer& value )
+  {
+
+    framebuffer = &value;
+    return *this;
+  }
+};
+
 
 /**
  * Describes pipeline's viewport and scissor state

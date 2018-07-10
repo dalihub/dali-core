@@ -448,6 +448,12 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
                                 0.0, 1.0});
   }
 
+  FramebufferState framebufferState{};
+  if( instruction.mFrameBuffer )
+  {
+    framebufferState.SetFramebuffer( *instruction.mFrameBuffer->GetGfxObject() );
+  }
+
   /**
    * Scissor test is represented only by the dynamic state as it can be transformed
    * any time.
@@ -514,6 +520,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
             // viewport ( if zeroes then framebuffer size used )
             .SetViewportState(viewportState)
 
+            .SetFramebufferState( framebufferState )
+
             // depth stencil
             .SetDepthStencilState(depthStencilState)
 
@@ -545,6 +553,7 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
   for( auto i = 0u; i < renderInstructions.Count( bufferIndex ); ++i )
   {
     RenderInstruction &ri = renderInstructions.At(bufferIndex, i);
+
     for (auto renderListIndex = 0u; renderListIndex < ri.RenderListCount(); ++renderListIndex)
     {
       const auto *renderList = ri.GetRenderList(renderListIndex);

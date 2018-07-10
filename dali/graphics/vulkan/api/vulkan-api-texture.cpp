@@ -898,13 +898,13 @@ struct Texture::Impl
     {
       case API::TextureDetails::Usage::COLOR_ATTACHMENT:
       {
-        mUsage = vk::ImageUsageFlagBits::eColorAttachment;
+        mUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
         mLayout = vk::ImageLayout::eUndefined;
         break;
       }
       case API::TextureDetails::Usage::DEPTH_ATTACHMENT:
       {
-        mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+        mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled;
         mLayout = vk::ImageLayout::eUndefined;
         break;
       }
