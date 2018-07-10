@@ -32,6 +32,7 @@
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-pipeline-factory.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
+#include <dali/graphics-api/graphics-api-sampler-factory.h>
 #include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
@@ -104,6 +105,11 @@ public:
    */
   virtual PipelineFactory& GetPipelineFactory() = 0;
 
+  /**
+   * @brief Returns sampler factory
+   * @return
+   */
+  virtual SamplerFactory& GetSamplerFactory() = 0;
 
   /**
    * @brief alAllocates render command ( depends on implementation );

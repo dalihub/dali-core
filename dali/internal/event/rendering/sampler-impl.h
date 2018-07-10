@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
+#include <dali/integration-api/graphics/graphics.h> // Graphics interface
 
 namespace Dali
 {
@@ -76,7 +77,7 @@ private:
   /**
    * Second stage initialization
    */
-  void Initialize( );
+  void Initialize(  );
 
 protected:
   /**
