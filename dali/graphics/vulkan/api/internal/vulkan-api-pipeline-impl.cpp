@@ -30,6 +30,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 
 #include <array>
+#include <dali/graphics/vulkan/api/vulkan-api-framebuffer.h>
 
 namespace Dali
 {
@@ -341,14 +342,14 @@ bool Pipeline::Initialise()
                           .setPName( "main" )
           };
 
-  // @todo use RenderTarget
+  auto framebuffer = static_cast<const VulkanAPI::Framebuffer*>(mCreateInfo->info.framebufferState.framebuffer);
   auto swapchain = mGraphics.GetSwapchainForFBID( 0 );
-  auto fb = swapchain->GetCurrentFramebuffer();
+  auto framebufferObject = framebuffer ? framebuffer->GetFramebufferRef() : swapchain->GetCurrentFramebuffer();
 
   vk::GraphicsPipelineCreateInfo pipelineInfo;
   pipelineInfo
           .setSubpass( 0 )
-          .setRenderPass( fb->GetRenderPass() ) // based on render target
+          .setRenderPass( framebufferObject->GetRenderPass() )
           .setBasePipelineHandle( nullptr )
           .setBasePipelineIndex( 0 )
           .setLayout( PreparePipelineLayout() )

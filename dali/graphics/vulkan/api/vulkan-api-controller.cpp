@@ -205,23 +205,23 @@ struct Controller::Impl
       framebuffer = swapchain->GetCurrentFramebuffer();
     }
 
-    // If there is no framebuffer the it means DALi tries to use
-    // default framebuffer. For now just substitute with surface/swapchain
     if( framebuffer != mCurrentFramebuffer )
     {
-      auto primaryCommandBuffer = mGraphics.GetSwapchainForFBID( 0 )->GetCurrentCommandBuffer();
-
       mCurrentFramebuffer = framebuffer;
 
+      // @todo Only do if there is a color attachment and color clear is enabled and there is a clear color
       auto newColors = mCurrentFramebuffer->GetClearValues();
       newColors[0].color.setFloat32( { renderTargetBinding.clearColors[0].r,
                                        renderTargetBinding.clearColors[0].g,
                                        renderTargetBinding.clearColors[0].b,
                                        renderTargetBinding.clearColors[0].a
                                      } );
-      newColors[1].setDepthStencil( vk::ClearDepthStencilValue{}
-         .setDepth( 0.0f )
-         .setStencil( 0 ) );
+      if( 0 ) // @todo Only do if there is a depth buffer & depth clear is enabled
+      {
+        newColors[1].setDepthStencil( vk::ClearDepthStencilValue{}
+                                      .setDepth( 0.0f )
+                                      .setStencil( 0 ));
+      }
 
       mRenderPasses.emplace_back(
               // render pass
@@ -312,10 +312,12 @@ struct Controller::Impl
       {
         continue;
       }
-      auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}.setRenderPass( mCurrentFramebuffer->GetRenderPass() );
+      auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
+         .setRenderPass( mCurrentFramebuffer->GetRenderPass() )
+         .setFramebuffer( mCurrentFramebuffer->GetVkHandle() );
 
       // start new command buffer
-      auto cmdbuf = mGraphics.CreateCommandBuffer( false );//mCommandPool->NewCommandBuffer( false );
+      auto cmdbuf = mGraphics.CreateCommandBuffer( false );
       cmdbuf->Reset();
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
