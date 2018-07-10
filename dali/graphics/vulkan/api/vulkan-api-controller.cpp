@@ -41,6 +41,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-sampler-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
@@ -94,6 +95,7 @@ struct Controller::Impl
     mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mGraphics );
     mBufferFactory = MakeUnique< VulkanAPI::BufferFactory >( mOwner );
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
+    mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
 
     mUboManager = MakeUnique< VulkanAPI::UboManager >( mOwner );
 
@@ -318,7 +320,7 @@ struct Controller::Impl
       }
 
       // start new command buffer
-      auto cmdbuf = mGraphics.CreateCommandBuffer( false );//mCommandPool->NewCommandBuffer( false );
+      auto cmdbuf = mGraphics.CreateCommandBuffer( false );
       cmdbuf->Reset();
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue );
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
@@ -392,6 +394,7 @@ struct Controller::Impl
   std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;
   std::unique_ptr< VulkanAPI::BufferFactory > mBufferFactory;
   std::unique_ptr< VulkanAPI::PipelineFactory > mPipelineFactory;
+  std::unique_ptr< VulkanAPI::SamplerFactory > mSamplerFactory;
 
   std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
 
@@ -492,6 +495,11 @@ API::PipelineFactory& Controller::GetPipelineFactory()
 {
   mImpl->mPipelineFactory->Reset();
   return *mImpl->mPipelineFactory;
+}
+
+API::SamplerFactory& Controller::GetSamplerFactory()
+{
+  return mImpl->mSamplerFactory->Reset();
 }
 
 Vulkan::Graphics& Controller::GetGraphics() const
