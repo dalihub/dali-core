@@ -130,6 +130,8 @@ public:
 
   API::PipelineFactory& GetPipelineFactory() override;
 
+  API::SamplerFactory& GetSamplerFactory() override;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;
