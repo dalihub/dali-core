@@ -175,6 +175,37 @@ enum class PrimitiveTopology
   TRIANGLE_FAN
 };
 
+
+/**
+ * Sampler address ( wapping ) mode
+ */
+enum class SamplerAddressMode
+{
+  REPEAT,
+  MIRRORED_REPEAT,
+  CLAMP_TO_EDGE,
+  CLAMP_TO_BORDER,
+  MIRROR_CLAMP_TO_EDGE
+};
+
+/**
+ * Filtering
+ */
+enum class SamplerFilter
+{
+  NEAREST,
+  LINEAR
+};
+
+/**
+ * Mipmap mode
+ */
+enum class SamplerMipmapMode
+{
+  NEAREST,
+  LINEAR
+};
+
 /**
  * Describes pipeline's color blend state
  */
