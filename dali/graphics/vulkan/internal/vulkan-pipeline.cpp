@@ -81,12 +81,9 @@ struct Pipeline::Impl
     }
 
     // use default render pass for default framebuffer
-    // TODO: swapchain/surface should use vulkan-framebuffer object
-    // in place of swapchain structures!
     if( !mInfo.renderPass )
     {
-      SetRenderPass( mGraphics.GetSwapchainForFBID( 0u )->
-              GetCurrentFramebuffer()->GetRenderPass() );
+      SetRenderPass( mGraphics.GetSwapchainForFBID( 0u )->GetCurrentFramebuffer()->GetRenderPass() );
     }
 
     if( !mInfo.pRasterizationState )

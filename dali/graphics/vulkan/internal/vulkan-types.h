@@ -136,6 +136,13 @@ public:
   }
 
   template< class K >
+  bool operator!=( const Handle< K >& object ) const
+  {
+    return !(mObject == &*object);
+  }
+
+
+  template< class K >
   Handle< K > DynamicCast();
 
   void Reset()
