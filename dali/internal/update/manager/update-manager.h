@@ -463,6 +463,12 @@ public:
    */
   void SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths );
 
+  /**
+   * Returns Graphics interface
+   * @return Reference to the Graphics interface
+   */
+  Dali::Integration::Graphics::Graphics& GetGraphics();
+
 private:
 
   // Undefined
