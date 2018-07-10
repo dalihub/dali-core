@@ -1,5 +1,5 @@
-#ifndef DALI_GRAPHICS_API_SAMPLER_H
-#define DALI_GRAPHICS_API_SAMPLER_H
+#ifndef DALI_VULKAN_API_SAMPLER_H
+#define DALI_VULKAN_API_SAMPLER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -18,38 +18,39 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+
 namespace Dali
 {
 namespace Graphics
 {
-namespace API
+namespace VulkanAPI
 {
-
+class SamplerFactory;
+class Controller;
 /**
  * @brief Interface class for Sampler types in the graphics API.
  */
-class Sampler
+class Sampler : public API::Sampler
 {
 public:
-  // not copyable
-  Sampler(const Sampler&) = delete;
-  Sampler& operator=(const Sampler&) = delete;
 
-  virtual ~Sampler() = default;
+  Sampler( Controller& controller, const SamplerFactory& factory );
+
+  const Vulkan::RefCountedSampler& GetSampler() const
+  {
+    return mSampler;
+  }
 
 protected:
-  // derived types should not be moved directly to prevent slicing
-  Sampler(Sampler&&) = default;
-  Sampler& operator=(Sampler&&) = default;
 
-  /**
-   * Objects of this type should not directly.
-   */
-  Sampler() = default;
+  Controller& mController;
+  Vulkan::RefCountedSampler mSampler;
 };
 
-} // namespace API
+} // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali
 
-#endif // DALI_GRAPHICS_API_SAMPLER_H
+#endif // DALI_VULKAN_API_SAMPLER_H

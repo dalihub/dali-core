@@ -22,6 +22,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
+#include <dali/graphics/vulkan/api/vulkan-api-sampler.h>
 #include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
@@ -80,13 +81,13 @@ void RenderCommand::PrepareResources()
         // based on pipeline recreate descriptor pool
         auto poolSizes = std::vector<vk::DescriptorPoolSize>{
           vk::DescriptorPoolSize{}
-            .setDescriptorCount(10)
+            .setDescriptorCount(4)
             .setType(vk::DescriptorType::eUniformBuffer),
           vk::DescriptorPoolSize{}
-            .setDescriptorCount(10)
+            .setDescriptorCount(4)
             .setType(vk::DescriptorType::eCombinedImageSampler),
           vk::DescriptorPoolSize{}
-            .setDescriptorCount(10)
+            .setDescriptorCount(4)
             .setType(vk::DescriptorType::eSampledImage)
         };
 
@@ -186,7 +187,10 @@ void RenderCommand::BindTexturesAndSamplers()
     auto& image = static_cast<const VulkanAPI::Texture&>(*texture.texture);
     DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                      "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
-    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding, image.GetSamplerRef(),
+    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding,
+                                                   !texture.sampler ?
+                                                   image.GetSamplerRef() :
+                                                   static_cast<const VulkanAPI::Sampler*>( texture.sampler )->GetSampler(),
                                                    image.GetImageViewRef() );
   }
 }

@@ -34,6 +34,8 @@
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics-api/graphics-api-pipeline-factory.h>
+#include <dali/graphics-api/graphics-api-sampler.h>
+#include <dali/graphics-api/graphics-api-sampler-factory.h>
 
 #include <cstring>
 
@@ -361,13 +363,33 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     {
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
-        auto texture    = mTextureSet->GetTexture(i);
+        auto texture = mTextureSet->GetTexture(i);
         if( texture )
         {
+          auto sampler = mTextureSet->GetTextureSampler( i );
+
+          if( sampler && sampler->mIsDirty )
+          {
+            // if default sampler
+            if( sampler->mMagnificationFilter == FilterMode::DEFAULT && sampler->mMinificationFilter == FilterMode::DEFAULT &&
+                sampler->mSWrapMode == WrapMode::DEFAULT &&
+                sampler->mTWrapMode == WrapMode::DEFAULT &&
+                sampler->mRWrapMode == WrapMode::DEFAULT )
+            {
+              sampler->mGfxSampler.reset( nullptr );
+            }
+            else
+            {
+              // reinitialize sampler
+              sampler->Initialize( *mGraphics );
+            }
+            sampler->mIsDirty = false;
+          }
+
           auto binding    = Graphics::API::RenderCommand::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
-            .SetSampler(nullptr);
+            .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
 
           textureBindings.emplace_back(binding);
         }

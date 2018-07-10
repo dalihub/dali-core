@@ -722,6 +722,11 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   }
 }
 
+Dali::Integration::Graphics::Graphics& UpdateManager::GetGraphics()
+{
+  return mImpl->graphics;
+}
+
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NothingFlag;
