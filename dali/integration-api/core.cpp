@@ -84,6 +84,11 @@ void Core::SurfaceResized(unsigned int width, unsigned int height)
   mImpl->SurfaceResized(width, height);
 }
 
+void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation )
+{
+  mImpl->SurfaceResized(width, height, orientation);
+}
+
 void Core::SetTopMargin( unsigned int margin )
 {
   mImpl->SetTopMargin(margin);

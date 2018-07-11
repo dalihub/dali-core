@@ -288,6 +288,18 @@ public:
    */
   void SurfaceResized(unsigned int width, unsigned int height);
 
+
+  /**
+   * Notify the Core that the GL surface has been resized and rotated.
+   * This should be done at least once i.e. after the first call to ContextCreated().
+   * The Core will use the surface size or orientation for camera calculations, and to set the GL viewport.
+   * Multi-threading note: this method should be called from the main thread
+   * @param[in] width The new surface width.
+   * @param[in] height The new surface height.
+   * @param[in] orientation The new surface orientation.
+   */
+  void SurfaceResized( unsigned int width, unsigned int height, int orientation );
+
   /**
    * Notify the Core about the top margin size.
    * Available stage size is reduced by this size.

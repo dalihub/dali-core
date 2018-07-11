@@ -150,6 +150,14 @@ public:
   void SurfaceResized( float width, float height );
 
   /**
+   * Used to calculate the size and orientation of the stage and indirectly, the root actor.
+   * @param [in] width  The new surface width.
+   * @param [in] height The new surface height.
+   * @param [in] orientation The new surface orientation.
+   */
+  void SurfaceResized( float width, float height, int orientation );
+
+  /**
    * Sets the top margin size.
    * Available stage size is reduced by this size.
    * The stage is located below the size at the top of the display
@@ -548,6 +556,9 @@ private:
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
   bool mForceNextUpdate:1; ///< True if the next rendering is really required.
   bool mRenderToFbo:1;     ///< Whether to render to a Frame Buffer Object.
+
+  bool mNeedToRotation:1;
+  int mCurrentOrientation;
 };
 
 } // namespace Internal

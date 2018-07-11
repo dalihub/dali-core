@@ -196,6 +196,15 @@ void Core::SurfaceResized( unsigned int width, unsigned int height )
   mRelayoutController->SetStageSize( size.width, size.height );
 }
 
+void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation )
+{
+  mStage->SurfaceResized( width, height, orientation );
+
+  // The stage-size may be less than surface-size (reduced by top-margin)
+  Vector2 size = mStage->GetSize();
+  mRelayoutController->SetStageSize( size.width, size.height );
+}
+
 void Core::SetTopMargin( unsigned int margin )
 {
   mStage->SetTopMargin( margin );

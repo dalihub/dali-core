@@ -116,6 +116,11 @@ public:
   void SurfaceResized(unsigned int width, unsigned int height);
 
   /**
+   * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int, int orientation)
+   */
+  void SurfaceResized( unsigned int width, unsigned int height, int orientation );
+
+  /**
    * @copydoc Dali::Integration::Core::SetTopMargin( unsigned int margin )
    */
   void SetTopMargin( unsigned int margin );
