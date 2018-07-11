@@ -193,6 +193,22 @@ constexpr vk::FrontFace ConvertFrontFace( Dali::Graphics::API::FrontFace frontFa
   return vk::FrontFace{};
 }
 
+constexpr vk::StencilOp ConvertStencilOp( Dali::Graphics::API::StencilOp stencilOp )
+{
+  switch( stencilOp )
+  {
+    case API::StencilOp::KEEP: return vk::StencilOp::eKeep;
+    case API::StencilOp::ZERO: return vk::StencilOp::eZero;
+    case API::StencilOp::REPLACE: return vk::StencilOp::eReplace;
+    case API::StencilOp::INCREMENT_AND_CLAMP: return vk::StencilOp::eIncrementAndClamp;
+    case API::StencilOp::DECREMENT_AND_CLAMP: return vk::StencilOp::eDecrementAndClamp;
+    case API::StencilOp::INVERT: return vk::StencilOp::eInvert;
+    case API::StencilOp::INCREMENT_AND_WRAP: return vk::StencilOp::eIncrementAndWrap;
+    case API::StencilOp::DECREMENT_AND_WRAP: return vk::StencilOp::eDecrementAndWrap;
+  }
+  return {};
+}
+
 }
 
 struct Pipeline::PipelineCreateInfo
@@ -359,7 +375,6 @@ bool Pipeline::Initialise()
           .setPMultisampleState( PrepareMultisampleStateCreateInfo() )
           .setPRasterizationState( PrepareRasterizationStateCreateInfo() )
           .setPTessellationState( PrepareTesselationStateCreateInfo() )
-                  //.setPVertexInputState(PrepareVertexInputStateCreateInfo())
           .setPVertexInputState( &vertexInputState )
           .setPViewportState( PrepareViewportStateCreateInfo() )
           .setPStages( shaderStages.data() )
@@ -425,12 +440,28 @@ const vk::PipelineColorBlendStateCreateInfo* Pipeline::PrepareColorBlendStateCre
 const vk::PipelineDepthStencilStateCreateInfo* Pipeline::PrepareDepthStencilStateCreateInfo()
 {
   const auto& dsInfo = mCreateInfo->info.depthStencilState;
-  return &( mVulkanPipelineState->depthStencil
+  auto retval =  &( mVulkanPipelineState->depthStencil
                                 .setDepthTestEnable( vk::Bool32( dsInfo.depthTestEnable ) )
                                 .setDepthWriteEnable( vk::Bool32( dsInfo.depthWriteEnable ) )
                                 .setDepthCompareOp( ConvertCompareOp( dsInfo.depthCompareOp ) )
                                 .setDepthBoundsTestEnable( false )
-                                .setStencilTestEnable( false ) ); //@ todo stencil test
+                                .setStencilTestEnable( vk::Bool32(dsInfo.stencilTestEnable) ) );
+  if( dsInfo.stencilTestEnable )
+  {
+    auto frontOpState = vk::StencilOpState{}
+         .setCompareOp( ConvertCompareOp( dsInfo.front.compareOp ) )
+         .setCompareMask( dsInfo.front.compareMask )
+         .setDepthFailOp( ConvertStencilOp( dsInfo.front.depthFailOp ) )
+         .setFailOp( ConvertStencilOp( dsInfo.front.failOp ) )
+         .setPassOp( ConvertStencilOp( dsInfo.front.passOp ) )
+         .setReference( dsInfo.front.reference )
+         .setWriteMask( dsInfo.front.writeMask );
+
+    retval->setFront( frontOpState );
+    retval->setBack( frontOpState );
+  }
+  //retval->setStencilTestEnable( false );
+  return retval;
 }
 
 const vk::PipelineDynamicStateCreateInfo* Pipeline::PrepareDynamicStateCreatInfo()
