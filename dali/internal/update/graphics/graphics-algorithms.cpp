@@ -105,7 +105,38 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   return Graphics::API::BlendOp{};
 }
 
+constexpr Graphics::API::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
+{
+  switch( stencilOp )
+  {
+    case StencilOperation::ZERO: return Graphics::API::StencilOp::ZERO;
+    case StencilOperation::DECREMENT: return Graphics::API::StencilOp::DECREMENT_AND_CLAMP;
+    case StencilOperation::DECREMENT_WRAP: return Graphics::API::StencilOp::DECREMENT_AND_WRAP;
+    case StencilOperation::INCREMENT: return Graphics::API::StencilOp::INCREMENT_AND_CLAMP;
+    case StencilOperation::INCREMENT_WRAP: return Graphics::API::StencilOp::INCREMENT_AND_WRAP;
+    case StencilOperation::INVERT: return Graphics::API::StencilOp::INVERT;
+    case StencilOperation::KEEP: return Graphics::API::StencilOp::KEEP;
+    case StencilOperation::REPLACE: return Graphics::API::StencilOp::REPLACE;
+  }
+  return {};
 }
+
+constexpr Graphics::API::CompareOp ConvertStencilFunc( StencilFunction::Type stencilFunc )
+{
+  switch( stencilFunc )
+  {
+    case StencilFunction::NEVER: return Graphics::API::CompareOp::NEVER;
+    case StencilFunction::LESS: return Graphics::API::CompareOp::LESS;
+    case StencilFunction::EQUAL: return Graphics::API::CompareOp::EQUAL;
+    case StencilFunction::LESS_EQUAL: return Graphics::API::CompareOp::LESS_OR_EQUAL;
+    case StencilFunction::GREATER: return Graphics::API::CompareOp::GREATER;
+    case StencilFunction::NOT_EQUAL: return Graphics::API::CompareOp::NOT_EQUAL;
+    case StencilFunction::GREATER_EQUAL: return Graphics::API::CompareOp::GREATER_OR_EQUAL;
+    case StencilFunction::ALWAYS: return Graphics::API::CompareOp::ALWAYS;
+  }
+  return {};
+}
+
 
 ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
 {
@@ -123,6 +154,8 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
   intersectionBox.height = std::max( std::min( aabbA.y + aabbA.height, aabbB.y + aabbB.height ) - intersectionBox.y, 0 );
 
   return intersectionBox;
+}
+
 }
 
 bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics::API::ViewportState& viewportState )
@@ -403,6 +436,27 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   depthStencilState.SetDepthTestEnable( enableDepthTest );
   depthStencilState.SetDepthWriteEnable( enableDepthWrite );
+
+  // Stencil setup
+  const auto& stencilParameters = renderer->GetStencilParameters();
+  bool stencilEnabled = (( stencilParameters.renderMode  == RenderMode::STENCIL ) ||
+                         ( stencilParameters.renderMode  == RenderMode::COLOR_STENCIL ) );
+  if( stencilEnabled)
+  {
+    auto frontAndBack = Graphics::API::StencilOpState{}
+         .SetCompareOp( ConvertStencilFunc( stencilParameters.stencilFunction ) )
+         .SetCompareMask( uint32_t( stencilParameters.stencilFunctionMask ) )
+         .SetDepthFailOp( ConvertStencilOp( stencilParameters.stencilOperationOnZFail ) )
+         .SetFailOp( ConvertStencilOp( stencilParameters.stencilOperationOnFail) )
+         .SetPassOp( ConvertStencilOp( stencilParameters.stencilOperationOnZPass) )
+         .SetReference( uint32_t( stencilParameters.stencilFunctionReference ) )
+         .SetWriteMask( uint32_t( stencilParameters.stencilMask ) );
+
+    depthStencilState
+      .SetStencilTestEnable( stencilEnabled )
+      .SetFront( frontAndBack )
+      .SetBack( frontAndBack );
+  }
 
   /**
    * 2. BLENDING

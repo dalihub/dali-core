@@ -79,8 +79,8 @@ FramebufferAttachment::FramebufferAttachment( const RefCountedImageView& imageVi
   {
     mDescription.setStoreOp( vk::AttachmentStoreOp::eStore );
   }
-  mDescription.setStencilStoreOp( vk::AttachmentStoreOp::eDontCare );
-  mDescription.setStencilLoadOp( vk::AttachmentLoadOp::eDontCare );
+  mDescription.setStencilStoreOp( vk::AttachmentStoreOp::eStore );
+  mDescription.setStencilLoadOp( vk::AttachmentLoadOp::eClear );
   mDescription.setFormat( image->GetFormat() );
   mDescription.setInitialLayout( vk::ImageLayout::eUndefined );
   mDescription.setLoadOp( vk::AttachmentLoadOp::eClear );
