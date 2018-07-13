@@ -20,6 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
@@ -30,6 +32,8 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+class Buffer;
+class Image;
 }
 
 namespace VulkanAPI
@@ -46,15 +50,45 @@ struct BufferMemoryTransfer
 {
   BufferMemoryTransfer() = default;
 
-  ~BufferMemoryTransfer() = default;
+  ~BufferMemoryTransfer()
+  {
+    delete [] srcPtr;
+  }
 
-  std::unique_ptr< char > srcPtr{ nullptr };
+  char* srcPtr{ nullptr };
   uint32_t srcSize{ 0u };
 
   Vulkan::RefCountedBuffer dstBuffer;
   uint32_t dstOffset{ 0u };
 };
 
+
+struct BufferToImageTransfer
+{
+  BufferToImageTransfer() = default;
+  Vulkan::RefCountedBuffer                    srcBuffer{ nullptr };  /// Source buffer, takes ownership
+  Vulkan::RefCountedImage                     dstImage{ nullptr };   /// Destination image
+  vk::BufferImageCopy                         copyInfo{};   /// Vulkan specific copy info
+
+  // delete copy
+  BufferToImageTransfer( const BufferToImageTransfer& ) = delete;
+  BufferToImageTransfer& operator=( const BufferToImageTransfer& ) = delete;
+
+  BufferToImageTransfer( BufferToImageTransfer&& obj )
+  {
+    srcBuffer = std::move( obj.srcBuffer );
+    dstImage = std::move( obj.dstImage );
+    copyInfo = std::move( obj.copyInfo );
+  }
+
+  BufferToImageTransfer& operator=( BufferToImageTransfer&& obj )
+  {
+    srcBuffer = std::move( obj.srcBuffer );
+    dstImage = std::move( obj.dstImage );
+    copyInfo = std::move( obj.copyInfo );
+    return *this;
+  }
+};
 
 /**
  * @brief Interface class for Manager types in the graphics API.
@@ -117,6 +151,8 @@ public:
   Vulkan::Graphics& GetGraphics() const;
 
   void ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::BufferMemoryTransfer > transferRequest );
+
+  void ScheduleBufferToImageTransfer( VulkanAPI::BufferToImageTransfer&& transferRequest );
 
   VulkanAPI::UboManager& GetUboManager();
 

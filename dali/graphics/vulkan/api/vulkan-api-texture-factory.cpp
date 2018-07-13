@@ -17,6 +17,7 @@
 
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 
 namespace Dali
@@ -28,8 +29,8 @@ namespace VulkanAPI
 
 struct TextureFactory::Impl
 {
-  Impl( TextureFactory& api, Vulkan::Graphics& graphics )
-          : mApi( api ), mGraphics( graphics )
+  Impl( TextureFactory& api, VulkanAPI::Controller& controller )
+          : mApi( api ), mController( controller ), mGraphics( controller.GetGraphics() )
   {
 
   }
@@ -49,6 +50,7 @@ struct TextureFactory::Impl
   }
 
   TextureFactory& mApi;
+  VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
 
   API::TextureDetails::Type mType;
@@ -60,9 +62,9 @@ struct TextureFactory::Impl
 
 };
 
-TextureFactory::TextureFactory( Vulkan::Graphics& graphics )
+TextureFactory::TextureFactory( VulkanAPI::Controller& controller )
 {
-  mImpl = std::make_unique< Impl >( *this, graphics );
+  mImpl = std::make_unique< Impl >( *this, controller );
 }
 
 TextureFactory::~TextureFactory() = default;
@@ -141,6 +143,11 @@ uint32_t TextureFactory::GetDataSize() const
 Vulkan::Graphics& TextureFactory::GetGraphics() const
 {
   return mImpl->mGraphics;
+}
+
+VulkanAPI::Controller& TextureFactory::GetController() const
+{
+  return mImpl->mController;
 }
 
 

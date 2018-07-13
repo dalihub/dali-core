@@ -31,6 +31,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-fence.h>
 
 // API
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
@@ -91,7 +92,7 @@ struct Controller::Impl
   {
     // Create factories
     mShaderFactory = MakeUnique< VulkanAPI::ShaderFactory >( mGraphics );
-    mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mGraphics );
+    mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mOwner );
     mBufferFactory = MakeUnique< VulkanAPI::BufferFactory >( mOwner );
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
     mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
@@ -259,6 +260,91 @@ struct Controller::Impl
       mBufferTransferRequests.clear();
     }
 
+    // the main command buffer may need to way for the semaphore signaling that all the transfers
+    // are complete
+    if( !mBufferImageTransferRequests.empty() )
+    {
+      auto fence = mGraphics.CreateFence( vk::FenceCreateInfo{} );
+
+      // change layouts of all images
+      auto layoutfrom = vk::ImageMemoryBarrier{}
+        .setSubresourceRange( vk::ImageSubresourceRange{}
+                                .setLayerCount( 1 )
+                                .setBaseArrayLayer( 0 )
+                                .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                .setBaseMipLevel( 0 )
+                                .setLevelCount( 1 ))
+        .setImage( nullptr )
+        .setOldLayout( {} )
+        .setNewLayout( vk::ImageLayout::eTransferDstOptimal )
+        .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
+        .setDstAccessMask( vk::AccessFlagBits::eMemoryWrite );
+
+      auto layoutto = vk::ImageMemoryBarrier{}
+        .setSubresourceRange( vk::ImageSubresourceRange{}
+                                .setLayerCount( 1 )
+                                .setBaseArrayLayer( 0 )
+                                .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                .setBaseMipLevel( 0 )
+                                .setLevelCount( 1 ))
+        .setImage( nullptr )
+        .setOldLayout( vk::ImageLayout::eTransferDstOptimal )
+        .setNewLayout( {} )
+        .setSrcAccessMask( vk::AccessFlagBits::eMemoryWrite )
+        .setDstAccessMask( vk::AccessFlagBits::eMemoryRead );
+
+      std::vector<vk::ImageMemoryBarrier> layoutTransitionTransfer;
+      std::vector<vk::ImageMemoryBarrier> layoutTransitionOriginal;
+
+      std::map<vk::Image, vk::ImageLayout> originalLayoutMap;
+
+      for( auto&& req : mBufferImageTransferRequests )
+      {
+        if( originalLayoutMap.find( req.dstImage->GetVkHandle() ) == originalLayoutMap.end() && req.dstImage->GetImageLayout() != vk::ImageLayout::eTransferDstOptimal )
+        {
+          layoutfrom.setImage( req.dstImage->GetVkHandle() );
+          layoutfrom.setOldLayout( req.dstImage->GetImageLayout() );
+
+          layoutto.setImage( req.dstImage->GetVkHandle() );
+          layoutto.setNewLayout( req.dstImage->GetImageLayout() );
+
+          layoutTransitionTransfer.push_back( layoutfrom );
+          layoutTransitionOriginal.push_back( layoutto );
+
+          originalLayoutMap[ req.dstImage->GetVkHandle() ] = req.dstImage->GetImageLayout();
+        }
+      }
+
+      // record memory transfers buffer
+      auto cmdbuf = mGraphics.CreateCommandBuffer( true );
+      cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+      cmdbuf->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, layoutTransitionTransfer );
+
+      for( auto&& req : mBufferImageTransferRequests )
+      {
+        cmdbuf->CopyBufferToImage( req.srcBuffer,
+                                   req.dstImage, vk::ImageLayout::eTransferDstOptimal,
+                                   { req.copyInfo } );
+      }
+
+      cmdbuf->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, layoutTransitionOriginal );
+      cmdbuf->End();
+
+      auto transferQueue = mGraphics.GetTransferQueue(0u);
+
+      // no fence, just semaphore
+      auto vkCmdBuf = cmdbuf->GetVkHandle();
+      transferQueue.GetVkHandle().submit( {
+                                            vk::SubmitInfo{}
+                                              .setCommandBufferCount( 1 )
+                                              .setPCommandBuffers( &vkCmdBuf )
+                                          }, fence->GetVkHandle() );
+
+      mGraphics.WaitForFence( fence );
+
+      mBufferImageTransferRequests.clear();
+    }
+
     // the list of commands may be empty, but still we may have scheduled memory
     // transfers
     if( commands.empty() )
@@ -370,7 +456,8 @@ struct Controller::Impl
   std::unique_ptr< VulkanAPI::PipelineFactory > mPipelineFactory;
   std::unique_ptr< VulkanAPI::SamplerFactory > mSamplerFactory;
 
-  std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
+  std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer > > mBufferTransferRequests;
+  std::vector< VulkanAPI::BufferToImageTransfer >                   mBufferImageTransferRequests;
 
   std::unique_ptr< VulkanAPI::UboManager > mUboManager;
 
@@ -485,6 +572,12 @@ void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::Buffe
 {
   mImpl->mBufferTransferRequests.emplace_back( std::move( transferRequest ) );
 }
+
+void Controller::ScheduleBufferToImageTransfer( VulkanAPI::BufferToImageTransfer&& transferRequest )
+{
+  mImpl->mBufferImageTransferRequests.emplace_back( std::move(transferRequest) );
+}
+
 
 VulkanAPI::UboManager& Controller::GetUboManager()
 {
