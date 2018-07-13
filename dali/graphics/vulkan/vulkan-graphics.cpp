@@ -203,7 +203,8 @@ void Graphics::CreateDevice()
   mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
 }
 
-FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
+FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
+                                       unsigned int width, unsigned int height )
 {
   // create surface from the factory
   auto surface = new Surface( *this, std::move( surfaceFactory ) );
@@ -223,6 +224,17 @@ FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory )
   }
 
   surface->mCapabilities = VkAssert( mPhysicalDevice.getSurfaceCapabilitiesKHR( surface->mSurface ) );
+
+   // If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
+  if( surface->mCapabilities.currentExtent.width == std::numeric_limits< uint32_t >::max() )
+  {
+    surface->mCapabilities.currentExtent.width = std::max( surface->mCapabilities.minImageExtent.width,
+                                   std::min( surface->mCapabilities.maxImageExtent.width, width ) );
+
+    surface->mCapabilities.currentExtent.height = std::max( surface->mCapabilities.minImageExtent.height,
+                                    std::min( surface->mCapabilities.maxImageExtent.height, height ) );
+
+  }
 
   // map surface to FBID
   auto fbid = ++mBaseFBID;
@@ -738,20 +750,6 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
   // Determine the swap chain extent
   auto swapchainExtent = surfaceCapabilities.currentExtent;
-
-  // If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
-  if( surfaceCapabilities.currentExtent.width == std::numeric_limits< uint32_t >::max() )
-  {
-    auto actualExtent = swapchainExtent;
-
-    actualExtent.width = std::max( surfaceCapabilities.minImageExtent.width,
-                                   std::min( surfaceCapabilities.maxImageExtent.width, actualExtent.width ) );
-
-    actualExtent.height = std::max( surfaceCapabilities.minImageExtent.height,
-                                    std::min( surfaceCapabilities.maxImageExtent.height, actualExtent.height ) );
-
-    swapchainExtent = actualExtent;
-  }
 
   // Find a supported composite alpha format (not all devices support alpha opaque)
   auto compositeAlpha = vk::CompositeAlphaFlagBitsKHR{};
