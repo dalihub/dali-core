@@ -27,7 +27,7 @@
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/graphics-api/graphics-api-utility.h>
+#include <dali/graphics-api/graphics-api-types.h>
 
 namespace Dali
 {

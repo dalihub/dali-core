@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 
 namespace Dali
@@ -871,6 +872,7 @@ struct Texture::Impl
 {
   Impl( Texture& api, Dali::Graphics::API::TextureFactory& factory )
           : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
+            mController( mTextureFactory.GetController() ),
             mGraphics( mTextureFactory.GetGraphics() ),
             mImage(),
             mImageView(),
@@ -922,6 +924,52 @@ struct Texture::Impl
     UploadData( data, 0, sizeInBytes );
 
     return true;
+  }
+
+  void BlitMemory( void* srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
+  {
+    // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
+
+    // schedule transfer to the texture
+    uint32_t allocationSize = srcExtent.width * srcExtent.height * 4u; // RGBA, need to know pixel size internally!
+
+    // allocate transient buffer
+    auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
+                              .setSize( allocationSize )
+                              .setSharingMode( vk::SharingMode::eExclusive )
+                              .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
+
+    // bind memory
+    mGraphics.BindBufferMemory( buffer,
+                                mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                                0u );
+
+    // write into the buffer
+    auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
+    std::copy( reinterpret_cast<char*>(srcMemory), reinterpret_cast<char*>(srcMemory)+allocationSize, ptr );
+    buffer->GetMemoryHandle()->Unmap();
+
+    BufferToImageTransfer transferRequest;
+
+    transferRequest.copyInfo
+      .setImageSubresource( vk::ImageSubresourceLayers{}
+                                .setBaseArrayLayer( layer )
+                                .setLayerCount( 1 )
+                                .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                .setMipLevel( level ) )
+      .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+      .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+      .setBufferRowLength({ 0u })
+      .setBufferOffset({ 0u })
+      .setBufferImageHeight({ srcExtent.height });
+
+    transferRequest.dstImage = mImage;
+    transferRequest.srcBuffer = std::move(buffer);
+
+    assert(  transferRequest.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
+
+    // schedule transfer
+    mController.ScheduleBufferToImageTransfer( std::move(transferRequest) );
   }
 
   bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
@@ -1065,6 +1113,7 @@ struct Texture::Impl
   }
 
   VulkanAPI::TextureFactory& mTextureFactory;
+  VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
 
   RefCountedImage       mImage;
@@ -1079,7 +1128,7 @@ struct Texture::Impl
 
 Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 {
-  mImpl = std::make_unique< Impl >( *this, factory );
+  mImpl = std::unique_ptr< Impl >( new Impl( *this, static_cast<VulkanAPI::TextureFactory&>(factory) ) );
 }
 
 Texture::~Texture() = default;
@@ -1103,6 +1152,22 @@ bool Texture::Initialise()
 {
   return mImpl->Initialise();
 }
+
+void Texture::BlitMemory( void* srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
+{
+  mImpl->BlitMemory( srcMemory, srcExtent, dstOffset, layer, level );
+}
+
+void Texture::BlitTexture( API::Texture& srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
+{
+
+}
+
+void Texture::BlitBuffer( API::Buffer& srcBuffer, API::Extent2D srcExtent, API::Rect2D srcRegion, API::Rect2D dstRegion, uint32_t layer, uint32_t level )
+{
+
+}
+
 
 } // namespace VulkanAPI
 } // namespace Graphics
