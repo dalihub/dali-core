@@ -213,6 +213,14 @@ public:
   void SetScissor( uint32_t firstScissor, uint32_t scissorCount, const vk::Rect2D* pScissors );
 
   /**
+   * Sets viewport when VK_DYNAMIC_STATE_VIEWPORT used
+   * @param firstViewport
+   * @param viewportCount
+   * @param pViewports
+   */
+  void SetViewport( uint32_t firstViewport, uint32_t viewportCount, const vk::Viewport* pViewports );
+
+  /**
    * Implements VkManaged::OnDestroy
    * @return
    */

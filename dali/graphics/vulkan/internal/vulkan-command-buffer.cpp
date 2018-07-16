@@ -296,6 +296,11 @@ void CommandBuffer::SetScissor( uint32_t firstScissor, uint32_t scissorCount, co
   mCommandBuffer.setScissor( firstScissor, scissorCount, pScissors );
 }
 
+void CommandBuffer::SetViewport( uint32_t firstViewport, uint32_t viewportCount, const vk::Viewport* pViewports )
+{
+  mCommandBuffer.setViewport( firstViewport, viewportCount, pViewports );
+}
+
 uint32_t CommandBuffer::GetPoolAllocationIndex() const
 {
   return mPoolAllocationIndex;

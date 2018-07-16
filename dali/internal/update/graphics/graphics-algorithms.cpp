@@ -252,6 +252,10 @@ void GraphicsAlgorithms::SubmitRenderItemList( Graphics::API::Controller&       
     }
     cmd.BindRenderTarget(renderTargetBinding);
 
+    cmd.mDrawCommand.SetViewport( { instruction.mViewport.x, instruction.mViewport.y,
+                                    uint32_t(instruction.mViewport.width), uint32_t(instruction.mViewport.height) } )
+                    .SetVieportEnable( true );
+
     auto opacity = renderer->GetOpacity( bufferIndex );
 
     if( renderer->IsPreMultipliedAlphaEnabled() )
@@ -422,6 +426,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    * 3. VIEWPORT
    */
   ViewportState viewportState{};
+
   if (instruction.mIsViewportSet)
   {
     // scissor test only when we have viewport
@@ -450,6 +455,9 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   {
     renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( false );
   }
+
+  // todo: make it possible to decide earlier whether we want dynamic or static viewport
+  dynamicStateMask |= Graphics::API::PipelineDynamicStateBits::VIEWPORT_BIT;
 
   // disable scissors per-pipeline
   viewportState.SetScissorTestEnable( false );
@@ -519,7 +527,6 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   // bind pipeline to the renderer
   renderer->BindPipeline(std::move(pipeline));
-
   return true;
 }
 
