@@ -82,10 +82,19 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
     mFrameFence = mGraphics->CreateFence( {} );
   }
 
-  mCurrentBufferIndex = VkAssert( device.acquireNextImageKHR( mSwapchainKHR,
-                                                              1000000,
-                                                              nullptr,
-                                                              mFrameFence->GetVkHandle() ) );
+  auto result = device.acquireNextImageKHR( mSwapchainKHR,
+                                            1000000,
+                                            nullptr,
+                                            mFrameFence->GetVkHandle(), &mCurrentBufferIndex );
+
+
+  // swapchain either not optimal or expired, returning nullptr and
+  // setting validity to false
+  if( result != vk::Result::eSuccess )
+  {
+    mIsValid = false;
+    return RefCountedFramebuffer();
+  }
 
   mGraphics->WaitForFence( mFrameFence );
   mGraphics->ResetFence( mFrameFence );

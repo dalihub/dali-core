@@ -111,6 +111,18 @@ struct Controller::Impl
 
     swapchain->AcquireNextFramebuffer();
 
+    if( !swapchain->IsValid() )
+    {
+      // make sure device doesn't do any work before replacing swapchain
+      mGraphics.DeviceWaitIdle();
+
+      // replace swapchain
+      swapchain = mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
+
+      // get new valid framebuffer
+      swapchain->AcquireNextFramebuffer();
+    }
+
     mCurrentFramebuffer.Reset();
   }
 
