@@ -63,6 +63,8 @@ public:
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
+  API::PipelineDynamicStateMask GetDynamicStateMask() const;
+
 private:
 
   const vk::PipelineColorBlendStateCreateInfo* PrepareColorBlendStateCreateInfo();
