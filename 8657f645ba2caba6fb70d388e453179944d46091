@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e7df25bf_450e1aca",
+        "filename": "dali/internal/event/rendering/sampler-impl.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-17T19:31:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6b36eed_cd08cf89",
+      "range": {
+        "startLine": 70,
+        "startChar": 43,
+        "endLine": 70,
+        "endChar": 71
+      },
+      "revId": "8657f645ba2caba6fb70d388e453179944d46091",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bb38fc70_2339091a",
         "filename": "dali/internal/update/manager/update-manager.h",
         "patchSetId": 7
@@ -45,6 +69,30 @@
       "revId": "8657f645ba2caba6fb70d388e453179944d46091",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "436f7f52_9f270a2d",
+        "filename": "dali/internal/update/manager/update-manager.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-17T19:31:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb38fc70_2339091a",
+      "range": {
+        "startLine": 470,
+        "startChar": 1,
+        "endLine": 470,
+        "endChar": 55
+      },
+      "revId": "8657f645ba2caba6fb70d388e453179944d46091",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
