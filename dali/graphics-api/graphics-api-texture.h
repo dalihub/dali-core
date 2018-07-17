@@ -18,13 +18,15 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-types.h>
+
 namespace Dali
 {
 namespace Graphics
 {
 namespace API
 {
-
+class Buffer;
 /**
  * @brief Interface class for Texture types in the graphics API.
  */
@@ -37,6 +39,40 @@ public:
   Texture& operator=(const Texture&) = delete;
 
   virtual ~Texture() = default;
+
+  /**
+   * Blits memory into specified region of texture. The format of source data
+   * must match the texture format.
+   *
+   * @param srcMemory Valid pointer to the memory containing image data
+   * @param srcExtent Image dimensions
+   * @param dstOffset Destination offset
+   * @param layer Layer
+   * @param level Mipmap level
+   */
+  virtual void BlitMemory( const void* srcMemory, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level ) = 0;
+
+  /**
+   * Blits region of source texture at the offset.
+   *
+   * @param srcTexture Source texture
+   * @param srcRegion Source region
+   * @param dstOffset Destination offset
+   * @param layer Layer to copy
+   * @param level Mipmap level to copy
+   */
+  virtual void BlitTexture( const Texture& srcTexture, Rect2D srcRegion, Offset2D dstOffset, uint32_t layer, uint32_t level ) = 0;
+
+  /**
+   * Blits buffer to the texture
+   *
+   * @param srcBuffer Source buffer, the format of data must match the texture
+   * @param srcExtent Source dimensions
+   * @param dstOffset Destination offset
+   * @param layer Destination layer
+   * @param level Mipmap level
+   */
+  virtual void BlitBuffer( const API::Buffer& srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level ) = 0;
 
 protected:
   // derived types should not be moved directly to prevent slicing

@@ -38,26 +38,6 @@ struct RectSize {
   size_t height = 0;
 };
 
-struct Rect2D {
-  int32_t x = 0;
-  int32_t y = 0;
-  uint32_t width = 0;
-  uint32_t height = 0;
-};
-
-/**
- * Structure represents area of viewport
- */
-struct Viewport
-{
-  float x = 0.0f;
-  float y = 0.0f;
-  float width = 0.0f;
-  float height = 0.0f;
-  float minDepth = 0.0f;
-  float maxDepth = 0.0f;
-};
-
 } // namespace API
 } // namespace Graphics
 } // namespace Dali
