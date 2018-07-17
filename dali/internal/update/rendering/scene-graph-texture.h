@@ -127,6 +127,12 @@ public: // From messages
    */
   void CreateTexture(Usage usage);
 
+  /**
+   * Called when the texture is about to be used for drawing.
+   */
+  void PrepareTexture();
+
+
 public:
   /**
    * Creates a texture with the specified buffer and buffer size.
