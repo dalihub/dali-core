@@ -32,6 +32,45 @@ class Shader;
 using Extension = void*;
 
 /**
+ *
+ */
+struct Offset2D
+{
+  int32_t x = 0;
+  int32_t y = 0;
+};
+
+struct Extent2D
+{
+  uint32_t width;
+  uint32_t height;
+};
+
+/**
+ *
+ */
+struct Rect2D
+{
+  int32_t x = 0;
+  int32_t y = 0;
+  uint32_t width = 0;
+  uint32_t height = 0;
+};
+
+/**
+ * Structure represents area of viewport
+ */
+struct Viewport
+{
+  float x = 0.0f;
+  float y = 0.0f;
+  float width = 0.0f;
+  float height = 0.0f;
+  float minDepth = 0.0f;
+  float maxDepth = 0.0f;
+};
+
+/**
  * Describes vertex attribute input rate
  */
 enum class VertexInputRate
