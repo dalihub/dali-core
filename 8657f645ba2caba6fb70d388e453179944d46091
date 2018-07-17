@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6b36eed_cd08cf89",
+        "filename": "dali/internal/event/rendering/sampler-impl.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-17T19:19:20Z",
+      "side": 1,
+      "message": "Event objects shouldn\u0027t know about graphics.\nIn UpdateManager::AddSampler, call Initialize with this graphics object on the SceneGraph::Sampler.",
+      "range": {
+        "startLine": 70,
+        "startChar": 43,
+        "endLine": 70,
+        "endChar": 71
+      },
+      "revId": "8657f645ba2caba6fb70d388e453179944d46091",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb38fc70_2339091a",
+        "filename": "dali/internal/update/manager/update-manager.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-17T19:19:20Z",
+      "side": 1,
+      "message": "Don\u0027t expose this method.",
+      "range": {
+        "startLine": 470,
+        "startChar": 1,
+        "endLine": 470,
+        "endChar": 55
+      },
+      "revId": "8657f645ba2caba6fb70d388e453179944d46091",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
