@@ -21,6 +21,12 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-api-types.h>
+#include <dali/integration-api/graphics/graphics.h>
+
+#include <memory>
+
 
 namespace Dali
 {
@@ -39,11 +45,14 @@ struct Sampler
    * Constructor
    */
   Sampler()
-  :mMinificationFilter(FilterMode::DEFAULT),
-   mMagnificationFilter(FilterMode::DEFAULT),
-   mSWrapMode(WrapMode::DEFAULT),
-   mTWrapMode(WrapMode::DEFAULT),
-   mRWrapMode(WrapMode::DEFAULT)
+  : mGraphics( nullptr ),
+    mGfxSampler( nullptr ),
+    mMinificationFilter(FilterMode::DEFAULT),
+    mMagnificationFilter(FilterMode::DEFAULT),
+    mSWrapMode(WrapMode::DEFAULT),
+    mTWrapMode(WrapMode::DEFAULT),
+    mRWrapMode(WrapMode::DEFAULT),
+    mIsDirty(true)
   {}
 
   /**
@@ -51,7 +60,6 @@ struct Sampler
    */
   ~Sampler()
   {}
-
 
   /**
    * Sets the filter modes for an existing sampler
@@ -63,6 +71,7 @@ struct Sampler
   {
     mMinificationFilter = static_cast<Dali::FilterMode::Type>(minFilterMode);
     mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode );
+    mIsDirty = true;
   }
 
   /**
@@ -77,6 +86,7 @@ struct Sampler
     mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
     mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
     mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
+    mIsDirty = true;
   }
 
   bool operator==(const Sampler& rhs) const
@@ -93,11 +103,78 @@ struct Sampler
     return !(*this == rhs);
   }
 
+  /**
+   * Returns Graphics API sampler object
+   * @return Pointer to API sampler or nullptr
+   */
+  const Dali::Graphics::API::Sampler* GetGfxObject() const
+  {
+    return mGfxSampler.get();
+  }
+
+  inline Graphics::API::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
+  {
+    switch(mode)
+    {
+      case WrapMode::REPEAT: return Graphics::API::SamplerAddressMode::REPEAT;
+      case WrapMode::MIRRORED_REPEAT: return Graphics::API::SamplerAddressMode::MIRRORED_REPEAT;
+      case WrapMode::CLAMP_TO_EDGE: return Graphics::API::SamplerAddressMode::CLAMP_TO_EDGE;
+      case WrapMode::DEFAULT: return Graphics::API::SamplerAddressMode::CLAMP_TO_EDGE;
+    }
+    return {};
+  }
+
+  inline Graphics::API::SamplerMipmapMode GetGfxSamplerMipmapMode( FilterMode mode ) const
+  {
+    switch(mode)
+    {
+      case FilterMode::LINEAR_MIPMAP_LINEAR: return Graphics::API::SamplerMipmapMode::LINEAR;
+      case FilterMode::NEAREST_MIPMAP_LINEAR: return Graphics::API::SamplerMipmapMode::LINEAR;
+      case FilterMode::NEAREST_MIPMAP_NEAREST: return Graphics::API::SamplerMipmapMode::NEAREST;
+      case FilterMode::LINEAR_MIPMAP_NEAREST: return Graphics::API::SamplerMipmapMode::NEAREST;
+      case FilterMode::DEFAULT: return Graphics::API::SamplerMipmapMode::LINEAR;
+      default: return {};
+    }
+    return {};
+  }
+
+  inline Graphics::API::SamplerFilter GetGfxFilter( FilterMode mode ) const
+  {
+    switch(mode)
+    {
+      case FilterMode::LINEAR: return Graphics::API::SamplerFilter::LINEAR;
+      case FilterMode::NEAREST: return Graphics::API::SamplerFilter::NEAREST;
+      case FilterMode::DEFAULT: return Graphics::API::SamplerFilter::LINEAR;
+      case FilterMode::NONE: return Graphics::API::SamplerFilter::NEAREST;
+      default: return {};
+    }
+    return {};
+  }
+
+  void Initialize( Integration::Graphics::Graphics& graphics )
+  {
+    mGraphics = &graphics;
+    mGfxSampler.reset( nullptr );
+    mGfxSampler = mGraphics->GetController().CreateSampler(
+                    mGraphics->GetController().GetSamplerFactory()
+                    .SetMinFilter( GetGfxFilter( mMinificationFilter ) )
+                    .SetMagFilter( GetGfxFilter( mMagnificationFilter ) )
+                    .SetAddressModeU( GetGfxSamplerAddressMode( mSWrapMode ) )
+                    .SetAddressModeV( GetGfxSamplerAddressMode( mTWrapMode ) )
+                    .SetAddressModeW( GetGfxSamplerAddressMode( mRWrapMode ) )
+                    .SetMipmapMode( GetGfxSamplerMipmapMode( mMinificationFilter ) )
+                    );
+  }
+
+  Integration::Graphics::Graphics*              mGraphics;   ///< Graphics interface
+  std::unique_ptr<Dali::Graphics::API::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
+
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter
   FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
   WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
   WrapMode    mTWrapMode            : 4;    ///< The vertical wrap mode
   WrapMode    mRWrapMode            : 4;    ///< The vertical wrap mode
+  bool        mIsDirty              : 1;    ///< The 'dirty' flag
 };
 
 

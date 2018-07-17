@@ -980,6 +980,7 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
 
 void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )
 {
+  sampler->Initialize( mImpl->graphics );
   mImpl->samplerContainer.PushBack( sampler.Release() );
 }
 
