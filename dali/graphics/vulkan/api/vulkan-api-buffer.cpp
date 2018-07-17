@@ -89,9 +89,8 @@ void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
   // depends whether the buffer is host visible or device local
   // TODO: implement in-GPU copying, for now all buffers are host-visible
   auto transfer = std::make_unique< VulkanAPI::BufferMemoryTransfer >();
-  auto tmp = new char[srcSize];
-  memcpy( tmp, src, srcSize );
-  transfer->srcPtr.reset( tmp );
+  transfer->srcPtr = new char[srcSize];
+  memcpy( transfer->srcPtr, src, srcSize );
   transfer->dstBuffer = mBufferRef;
   transfer->dstOffset = dstOffset;
   transfer->srcSize = srcSize;

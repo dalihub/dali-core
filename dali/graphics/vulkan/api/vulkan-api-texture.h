@@ -49,6 +49,12 @@ public:
 
   Vulkan::RefCountedSampler GetSamplerRef() const;
 
+  void BlitMemory( const void* srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level ) override;
+
+  void BlitTexture( const API::Texture& srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level ) override;
+
+  void BlitBuffer( const API::Buffer& srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level ) override;
+
 private:
   struct Impl;
   std::unique_ptr< Impl > mImpl;
