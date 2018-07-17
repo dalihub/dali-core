@@ -388,6 +388,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
             sampler->mIsDirty = false;
           }
 
+          texture->PrepareTexture(); // Ensure that a native texture is ready to be drawn
+
           auto binding    = Graphics::API::RenderCommand::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
