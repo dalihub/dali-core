@@ -251,6 +251,9 @@ public:
     bool        scissorTestEnable { false };
     Rect2D      scissor {};
 
+    bool        viewportEnable { false };
+    Rect2D      viewport {};
+
     void*    pNext{ nullptr };
     DrawCommand& SetDrawType( DrawType value )
     {
@@ -299,6 +302,19 @@ public:
       scissorTestEnable = value;
       return *this;
     }
+
+    DrawCommand& SetViewport( Rect2D value )
+    {
+      viewport = value;
+      return *this;
+    }
+
+    DrawCommand& SetVieportEnable( bool value )
+    {
+      viewportEnable = value;
+      return *this;
+    }
+
 
     friend std::ostream& operator<<(std::ostream& ss, const DrawCommand&);
   };

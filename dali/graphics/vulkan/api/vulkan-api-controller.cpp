@@ -39,6 +39,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
@@ -319,6 +320,38 @@ struct Controller::Impl
                                   apiCommand->mDrawCommand.scissor.height } );
 
         cmdbuf->SetScissor( 0, 1, &scissorRect );
+      }
+
+      // dynamic state: viewport
+      auto vulkanApiPipeline = static_cast<const VulkanAPI::Pipeline*>(apiCommand->GetPipeline());
+      auto dynamicStateMask = vulkanApiPipeline->GetDynamicStateMask();
+      if( (dynamicStateMask & API::PipelineDynamicStateBits::VIEWPORT_BIT) && apiCommand->mDrawCommand.viewportEnable )
+      {
+        auto viewportRect = apiCommand->mDrawCommand.viewport;
+
+        // Use default swapchain size in case there is no width/height provided
+        if( viewportRect.width == 0 || viewportRect.height == 0 )
+        {
+          auto currentFramebuffer = apiCommand->GetRenderTargetBinding().framebuffer;
+          if( !currentFramebuffer )
+          {
+            viewportRect.width = mGraphics.GetSwapchainForFBID(0)->GetCurrentFramebuffer()->GetWidth();
+            viewportRect.height = mGraphics.GetSwapchainForFBID(0)->GetCurrentFramebuffer()->GetHeight();
+          }
+          else
+          {
+            // @todo add missing bit when framebuffer implementation is ready
+            //viewportRect.width = currentFramebuffer->width;
+            //viewportRect.height = currentFramebuffer->height;
+          }
+        }
+
+        vk::Viewport viewport( float(viewportRect.x),
+                               float(viewportRect.y),
+                               float(viewportRect.width),
+                               float(viewportRect.height), 0.0f, 1.0f );
+
+        cmdbuf->SetViewport( 0, 1, &viewport );
       }
 
       // bind vertex buffers

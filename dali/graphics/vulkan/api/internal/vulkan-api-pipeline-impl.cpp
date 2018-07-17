@@ -649,6 +649,11 @@ const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayout
   return mVkDescriptorSetLayouts;
 }
 
+API::PipelineDynamicStateMask Pipeline::GetDynamicStateMask() const
+{
+  return mCreateInfo->info.dynamicStateMask;
+}
+
 } // Internal
 } // VulkanAPI
 } // Graphics
