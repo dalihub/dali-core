@@ -357,6 +357,14 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
   }
 }
 
+void Texture::PrepareTexture()
+{
+  if( mNativeImage )
+  {
+    mNativeImage->PrepareTexture();
+  }
+}
+
 bool Texture::HasAlphaChannel()
 {
   return mHasAlpha;

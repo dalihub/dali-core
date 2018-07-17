@@ -368,6 +368,8 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         {
           DALI_ASSERT_DEBUG( texture->GetGfxObject() != nullptr && "Texture has empty graphics object");
 
+          texture->PrepareTexture(); // Ensure that a native texture is ready to be drawn
+
           auto binding = Graphics::API::RenderCommand::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
