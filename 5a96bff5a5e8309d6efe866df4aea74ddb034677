@@ -16,6 +16,24 @@
       "revId": "5a96bff5a5e8309d6efe866df4aea74ddb034677",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de44fbf1_0ffb4ffe",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-18T18:12:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e60b433_86e1edac",
+      "revId": "5a96bff5a5e8309d6efe866df4aea74ddb034677",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
