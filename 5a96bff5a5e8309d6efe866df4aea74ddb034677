@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e60b433_86e1edac",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-18T13:05:56Z",
+      "side": 1,
+      "message": "code formatting",
+      "revId": "5a96bff5a5e8309d6efe866df4aea74ddb034677",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
