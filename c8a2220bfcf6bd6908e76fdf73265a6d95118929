@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c56affd0_a7d32194",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1014280
+      },
+      "writtenOn": "2018-07-18T12:14:10Z",
+      "side": 1,
+      "message": "Instead of calling submit directly on the queue, the Graphics::Submit(...) function could be used.",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e327820b_3678ee9a",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1014280
+      },
+      "writtenOn": "2018-07-18T12:14:10Z",
+      "side": 1,
+      "message": "Blit technically means copy, do you think that the alternative names CopyFromMemory, CopyFromTexture/CopyPixels, CopyFromBuffer or BlitFromMemory, BlitFromTexture/BlitPixels, BlitFromBuffer would be \"cleaner\" as API names?\n\nWould also be usefull to have static versions of these methods that accepts the source/destination as arguments e.g Texture::Copy(Memory src, Texture dst, ...).",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2f47cda_c16fb50b",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1014280
+      },
+      "writtenOn": "2018-07-18T12:14:10Z",
+      "side": 1,
+      "message": "Add support for immediate copies.",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
