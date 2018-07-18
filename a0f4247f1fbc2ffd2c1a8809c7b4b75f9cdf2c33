@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dde28458_7891db53",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-framebuffer-factory.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-18T13:26:34Z",
+      "side": 1,
+      "message": "Can texture field in DepthAttachment be const? You would avoid calling const_cast\u003c\u003e ( you can still assign to const pointer ).",
+      "revId": "a0f4247f1fbc2ffd2c1a8809c7b4b75f9cdf2c33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "472c0c5e_f1c0a109",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-framebuffer-factory.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-18T13:26:34Z",
+      "side": 1,
+      "message": "if it\u0027s commented out maybe it should be removed",
+      "revId": "a0f4247f1fbc2ffd2c1a8809c7b4b75f9cdf2c33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "322458b1_8ce5c682",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-framebuffer-factory.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-18T13:26:34Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "a0f4247f1fbc2ffd2c1a8809c7b4b75f9cdf2c33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a70c900_5daab593",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-18T13:26:34Z",
+      "side": 1,
+      "message": "full path of include",
+      "revId": "a0f4247f1fbc2ffd2c1a8809c7b4b75f9cdf2c33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
