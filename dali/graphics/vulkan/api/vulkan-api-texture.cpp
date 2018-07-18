@@ -15,20 +15,24 @@
  *
  */
 
+// CLASS HEADER
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
-#include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
-#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
-
+#include <dali/graphics/vulkan/internal/vulkan-utils.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 
 namespace Dali
 {
@@ -871,6 +875,7 @@ struct Texture::Impl
 {
   Impl( Texture& api, Dali::Graphics::API::TextureFactory& factory )
           : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
+            mController( mTextureFactory.GetController() ),
             mGraphics( mTextureFactory.GetGraphics() ),
             mImage(),
             mImageView(),
@@ -913,92 +918,105 @@ struct Texture::Impl
       }
 
       data = outData;
-      sizeInBytes = uint32_t(mWidth * mHeight * 4);
       mFormat = vk::Format::eR8G8B8A8Unorm;
     }
 
     InitialiseTexture();
 
-    UploadData( data, 0, sizeInBytes );
+    // blit data to the image
+    BlitMemory( data, { mWidth, mHeight }, { 0, 0 }, 0, 0 );
 
     return true;
   }
 
-  bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
+  void BlitMemory( const void* srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
   {
-    // create buffer
-    auto size = sizeInBytes;
+    // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
+    uint32_t allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
+
+    // allocate transient buffer
     auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
-                                            .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                            .setSharingMode( vk::SharingMode::eExclusive )
-                                            .setSize( size ) );
+                              .setSize( allocationSize )
+                              .setSharingMode( vk::SharingMode::eExclusive )
+                              .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
 
-    auto memory = mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
-                                                    vk::MemoryPropertyFlagBits::eHostCoherent );
+    // bind memory
+    mGraphics.BindBufferMemory( buffer,
+                                mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                                0u );
 
-    mGraphics.BindBufferMemory( buffer, memory, 0 );
-
-    // copy pixels to the buffer
-    auto ptr = mGraphics.MapMemoryTyped< char >( buffer->GetMemoryHandle() );
-    std::copy( reinterpret_cast<const char*>(data),
-               reinterpret_cast<const char*>(data) + sizeInBytes,
-               ptr );
-
+    // write into the buffer
+    auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
+    std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+allocationSize, ptr );
     buffer->GetMemoryHandle()->Unmap();
 
-    // record copy and layout change
-    auto copy = vk::BufferImageCopy{}
-      .setImageExtent( { mWidth, mHeight, 1 } )
-      .setBufferImageHeight( mHeight )
-      .setBufferOffset( 0 )
-      .setBufferRowLength( mWidth )
-      .setImageOffset( { 0, 0, 0 } )
-      .setImageSubresource( vk::ImageSubresourceLayers{}
-                              .setMipLevel( 0 )
-                              .setAspectMask( mImage->GetAspectFlags() )
-                              .setLayerCount( 1 )
-                              .setBaseArrayLayer( 0 ) );
+    ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
 
-    auto commandBuffer = mGraphics.CreateCommandBuffer( true );
+    transferRequest.bufferToImageInfo.copyInfo
+            .setImageSubresource( vk::ImageSubresourceLayers{}
+                                      .setBaseArrayLayer( layer )
+                                      .setLayerCount( 1 )
+                                      .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                      .setMipLevel( level ) )
+            .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+            .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+            .setBufferRowLength({ 0u })
+            .setBufferOffset({ 0u })
+            .setBufferImageHeight({ srcExtent.height });
 
-    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+    transferRequest.bufferToImageInfo.dstImage = mImage;
+    transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
 
-    // change layout to prepare image to transfer data
-    commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe,
-                                    vk::PipelineStageFlagBits::eTransfer,
-                                    {},
-                                    {},
-                                    {},
-                                    { mGraphics.CreateImageMemoryBarrier( mImage,
-                                                                          mImage->GetImageLayout(),
-                                                                          vk::ImageLayout::eTransferDstOptimal ) } );
+    assert( transferRequest.bufferToImageInfo.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
 
-    // copy image
-    commandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, { copy } );
+    // schedule transfer
+    mController.ScheduleResourceTransfer( std::move(transferRequest) );
+  }
 
-    // change layout to shader read-only optimal
-    commandBuffer->PipelineBarrier(
-      vk::PipelineStageFlagBits::eVertexShader,
-      vk::PipelineStageFlagBits::eVertexShader,
-      {},
-      {},
-      {},
-      { mGraphics.CreateImageMemoryBarrier( mImage,
-                                            vk::ImageLayout::eTransferDstOptimal,
-                                            vk::ImageLayout::eShaderReadOnlyOptimal ) } );
+  void BlitTexture( const API::Texture& srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
+  {
+    ResourceTransferRequest transferRequest( TransferRequestType::IMAGE_TO_IMAGE );
 
-    commandBuffer->End();
+    auto imageSubresourceLayers = vk::ImageSubresourceLayers{}
+         .setAspectMask( vk::ImageAspectFlagBits::eColor )
+         .setBaseArrayLayer( layer )
+         .setLayerCount( 1 )
+         .setMipLevel( level );
 
-    // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = mGraphics.CreateFence( {} );
-    VkAssert( mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ),
-                                { SubmissionData{}.SetCommandBuffers( { commandBuffer } ) }, fence ) );
-    VkAssert( mGraphics.WaitForFence( fence, std::numeric_limits< uint32_t >::max() ) );
+    transferRequest.imageToImageInfo.srcImage = static_cast<const VulkanAPI::Texture&>( srcTexture ).GetImageRef();
+    transferRequest.imageToImageInfo.dstImage = mImage;
+    transferRequest.imageToImageInfo.copyInfo
+                   .setSrcOffset( { srcRegion.x, srcRegion.y, 0 } )
+                   .setDstOffset( { dstOffset.x, dstOffset.y, 0 } )
+                   .setExtent( { srcRegion.width, srcRegion.height } )
+                   .setSrcSubresource( imageSubresourceLayers  )
+                   .setDstSubresource( imageSubresourceLayers );
 
-    // Update the image with its new layout
-    mImage->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+    // schedule transfer
+    mController.ScheduleResourceTransfer( std::move(transferRequest) );
+  }
 
-    return true;
+  void BlitBuffer( const API::Buffer& srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level )
+  {
+    ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
+
+    transferRequest.bufferToImageInfo.copyInfo
+                   .setImageSubresource( vk::ImageSubresourceLayers{}
+                                           .setBaseArrayLayer( layer )
+                                           .setLayerCount( 1 )
+                                           .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                           .setMipLevel( level ) )
+                   .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+                   .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+                   .setBufferRowLength({ 0u })
+                   .setBufferOffset({ 0u })
+                   .setBufferImageHeight({ srcExtent.height });
+
+    transferRequest.bufferToImageInfo.dstImage = mImage;
+    transferRequest.bufferToImageInfo.srcBuffer = static_cast<const VulkanAPI::Buffer&>(srcBuffer).GetBufferRef();
+
+    // schedule transfer
+    mController.ScheduleResourceTransfer( std::move(transferRequest) );
   }
 
   // creates image with pre-allocated memory and default sampler, no data
@@ -1065,6 +1083,7 @@ struct Texture::Impl
   }
 
   VulkanAPI::TextureFactory& mTextureFactory;
+  VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
 
   RefCountedImage       mImage;
@@ -1079,7 +1098,7 @@ struct Texture::Impl
 
 Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 {
-  mImpl = std::make_unique< Impl >( *this, factory );
+  mImpl = std::unique_ptr< Impl >( new Impl( *this, static_cast<VulkanAPI::TextureFactory&>(factory) ) );
 }
 
 Texture::~Texture() = default;
@@ -1103,6 +1122,22 @@ bool Texture::Initialise()
 {
   return mImpl->Initialise();
 }
+
+void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level)
+{
+  mImpl->BlitMemory( srcMemory, srcExtent, dstOffset, layer, level );
+}
+
+void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level)
+{
+  mImpl->BlitTexture( srcTexture, srcRegion, dstOffset, layer, level );
+}
+
+void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level)
+{
+  mImpl->BlitBuffer( srcBuffer, srcExtent, dstOffset, layer, level );
+}
+
 
 } // namespace VulkanAPI
 } // namespace Graphics

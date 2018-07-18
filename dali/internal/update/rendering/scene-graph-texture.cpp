@@ -297,15 +297,28 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   {
     auto& controller = mGraphics->GetController();
 
-    // Convert DALi format to Graphics API format
-    mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
-                                                 .SetFormat( ConvertPixelFormat( pixelData->GetPixelFormat() ) )
-                                                 .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
-                                                 .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
-                                                 .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
-                                                 .SetData( pixelData->GetBuffer() )
-                                                 .SetDataSize( pixelData->GetBufferSize() )
-                                                 );
+    if( !mGraphicsTexture )
+    {
+      // Convert DALi format to Graphics API format
+      mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
+                                                   .SetFormat( ConvertPixelFormat( pixelData->GetPixelFormat() ) )
+                                                   .SetSize( { pixelData->GetWidth(), pixelData->GetHeight() } )
+                                                   .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
+                                                   .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
+                                                   .SetData( pixelData->GetBuffer() )
+                                                   .SetDataSize( pixelData->GetBufferSize() )
+                                                   );
+    }
+    else
+    {
+      // schedule upload
+      mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
+                                   { params.width, params.height },
+                                   { params.xOffset, params.yOffset },
+                                   params.layer,
+                                   params.mipmap );
+    }
+
   }
 }
 
