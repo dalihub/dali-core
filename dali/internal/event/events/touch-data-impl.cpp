@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,15 @@ Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
     return mPoints[ point ].GetDeviceSubclass();
   }
   return Device::Subclass::NONE;
+}
+
+MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
+{
+  if( point < mPoints.size() )
+  {
+    return mPoints[ point ].GetMouseButton();
+  }
+  return MouseButton::INVALID;
 }
 
 } // namsespace Internal

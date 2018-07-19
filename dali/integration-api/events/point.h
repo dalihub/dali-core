@@ -24,6 +24,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/events/device.h>
+#include <dali/public-api/events/mouse-button.h>
 
 namespace Dali
 {
@@ -178,6 +179,16 @@ struct DALI_CORE_API Point
    */
   Device::Subclass::Type GetDeviceSubclass() const;
 
+  /**
+   * @brief Get Mouse Button value. (ex: right/left button)
+   * @return The mouse button value.
+   */
+  MouseButton::Type GetMouseButton() const;
+
+  /**
+   * @brief Set Mouse Button value. (ex: right/left button)
+   */
+  void SetMouseButton(MouseButton::Type button);
 
 
 public: // Not intended for Integration API developers
@@ -223,6 +234,7 @@ private:
   Device::Subclass::Type mDeviceSubclass;
   float mPressure; ///< The touch pressure.
   float mRadius; ///< Radius of the press point, an average of the ellipse radius.
+  MouseButton::Type mMouseButton; /// < mouse button value.
 };
 
 } // namespace Integration

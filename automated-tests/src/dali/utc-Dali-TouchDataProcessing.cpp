@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2010,3 +2010,63 @@ int UtcDaliTouchDataGetDeviceAPINegative(void)
   DALI_TEST_EQUALS( data.GetDeviceSubclass( -1 ), Device::Subclass::NONE, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliTouchDataGetMouseButtonPositive(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  HandleData handleData;
+  TouchDataHandleFunctor functor( handleData );
+  actor.TouchSignal().Connect( &application, functor );
+
+  // Emit a down signal with MouseButton
+  Integration::TouchEvent touchEvent = GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+  touchEvent.points[ 0 ].SetMouseButton( static_cast< MouseButton::Type >( 3 ) );
+  application.ProcessEvent( touchEvent );
+
+  TouchData data = handleData.touchData;
+  DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::SECONDARY, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTouchDataGetMouseButtonNagative(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  HandleData handleData;
+  TouchDataHandleFunctor functor( handleData );
+  actor.TouchSignal().Connect( &application, functor );
+
+  // Emit a down signal with MouseButton
+  Integration::TouchEvent touchEvent = GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+  touchEvent.points[ 0 ].SetMouseButton( static_cast< MouseButton::Type >( 2 ) );
+  application.ProcessEvent( touchEvent );
+
+  TouchData data = handleData.touchData;
+  DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::TERTIARY, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.GetMouseButton( 3 ), MouseButton::INVALID, TEST_LOCATION );
+
+  END_TEST;
+}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,11 @@ Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
 Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
 {
   return GetImplementation( *this ).GetDeviceSubclass( point );
+}
+
+MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetMouseButton( point );
 }
 
 TouchData::TouchData( Internal::TouchData* internal )

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TOUCH_DATA_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,6 +171,14 @@ public:
    * @return The device subclass
    */
   Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
+
+  /**
+   * @brief Get mouse's button value (ex: right/left button)
+   *
+   * @return The value of mouse button
+   */
+  MouseButton::Type GetMouseButton( std::size_t point ) const;
+
 
 private:
 

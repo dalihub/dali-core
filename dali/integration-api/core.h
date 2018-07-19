@@ -75,6 +75,7 @@ public:
   UpdateStatus()
   : keepUpdating(false),
     needsNotification(false),
+    surfaceRectChanged(false),
     secondsFromLastFrame( 0.0f )
   {
   }
@@ -95,6 +96,12 @@ public:
   bool NeedsNotification() { return needsNotification; }
 
   /**
+   * Query wheter the default surface rect is changed or not.
+   * @return true if the default surface rect is changed.
+   */
+  bool SurfaceRectChanged() { return surfaceRectChanged; }
+
+  /**
    * This method is provided so that FPS can be easily calculated with a release version
    * of Core.
    * @return the seconds from last frame as float
@@ -105,6 +112,7 @@ public:
 
   unsigned int keepUpdating; ///< A bitmask of KeepUpdating values
   bool needsNotification;
+  bool surfaceRectChanged;
   float secondsFromLastFrame;
 };
 
