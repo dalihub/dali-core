@@ -100,7 +100,7 @@ public: // Create methods
 
   void CreateDevice();
 
-  FBID CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory );
+  FBID CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory, unsigned int width, unsigned int height );
 
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
