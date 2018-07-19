@@ -31,12 +31,12 @@ class Graphics;
 }
 namespace VulkanAPI
 {
-
+class Controller;
 class TextureFactory : public Dali::Graphics::API::TextureFactory
 {
 public:
 
-  explicit TextureFactory( Vulkan::Graphics& graphics );
+  explicit TextureFactory( VulkanAPI::Controller& controller );
 
   Graphics::API::TextureFactory& SetType( API::TextureDetails::Type type ) override;
 
@@ -77,6 +77,8 @@ public:
   uint32_t GetDataSize() const;
 
   Vulkan::Graphics& GetGraphics() const;
+
+  VulkanAPI::Controller& GetController() const;
 
 protected:
   /// @brief default constructor

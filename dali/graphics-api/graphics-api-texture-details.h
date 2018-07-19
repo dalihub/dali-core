@@ -63,6 +63,36 @@ enum class DepthStencilFlag
   DEPTH_STENCIL,
 };
 
+/**
+ * Texture update mode
+ */
+enum class UpdateMode
+{
+  /**
+   * Update mode preferred by the Texture implementation.
+   * Setting mode as UNDEFINED allows the implementation to decide
+   * whether the texture data update will be deferred or immediate.
+   * It may heavily depend on the use cases. If possible, the UNDEFINED
+   * mode should be preferred by the developers.
+   */
+  UNDEFINED,
+
+  /**
+   * Textures are updated on the render commands submission ( bulk update ).
+   * In certain cases it may allow the implementation to optimize the way
+   * the resources are accessed and synchronize writes more efficiently.
+   */
+  DEFERRED,
+
+  /**
+   * Textures are updated when any Copy...() function is called.
+   * This mode may be useful whenever we want to make sure the texture
+   * data has been uploaded early and upload has finished before using
+   * the resource for other purposes ( ie. generating mipmaps ).
+   */
+  IMMEDIATE,
+};
+
 } // namespace TextureDetails
 } // namespace API
 } // namespace Graphics

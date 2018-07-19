@@ -20,6 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
@@ -30,11 +32,13 @@ namespace Graphics
 namespace Vulkan
 {
 class Graphics;
+class Buffer;
+class Image;
 }
 
 namespace VulkanAPI
 {
-
+class Controller;
 class UboManager;
 
 /**
@@ -46,15 +50,79 @@ struct BufferMemoryTransfer
 {
   BufferMemoryTransfer() = default;
 
-  ~BufferMemoryTransfer() = default;
+  ~BufferMemoryTransfer()
+  {
+    delete [] srcPtr;
+  }
 
-  std::unique_ptr< char > srcPtr{ nullptr };
+  char* srcPtr{ nullptr };
   uint32_t srcSize{ 0u };
 
   Vulkan::RefCountedBuffer dstBuffer;
   uint32_t dstOffset{ 0u };
 };
 
+enum class TransferRequestType
+{
+  BUFFER_TO_IMAGE,
+  IMAGE_TO_IMAGE,
+  BUFFER_TO_BUFFER,
+  IMAGE_TO_BUFFER,
+  UNDEFINED
+};
+
+/**
+ * Structure describing blitting request Buffer to Image
+ */
+struct ResourceTransferRequest
+{
+  ResourceTransferRequest( TransferRequestType type )
+  : requestType( type )
+  {}
+
+  TransferRequestType requestType;
+
+  struct
+  {
+    Vulkan::RefCountedBuffer                    srcBuffer   { nullptr };  /// Source buffer
+    Vulkan::RefCountedImage                     dstImage    { nullptr };  /// Destination image
+    vk::BufferImageCopy                         copyInfo    { };          /// Vulkan specific copy info
+  } bufferToImageInfo;
+
+  struct
+  {
+    Vulkan::RefCountedImage                    srcImage    { nullptr };  /// Source image
+    Vulkan::RefCountedImage                    dstImage    { nullptr };  /// Destination image
+    vk::ImageCopy                              copyInfo    { };          /// Vulkan specific copy info
+  } imageToImageInfo;
+
+  bool                                         deferredTransferMode{ true }; // Vulkan implementation prefers deferred mode
+
+  // delete copy
+  ResourceTransferRequest( const ResourceTransferRequest& ) = delete;
+  ResourceTransferRequest& operator=( const ResourceTransferRequest& ) = delete;
+  ResourceTransferRequest& operator=( ResourceTransferRequest&& obj ) = delete;
+
+  ResourceTransferRequest( ResourceTransferRequest&& obj )
+  {
+    requestType = obj.requestType;
+    deferredTransferMode = obj.deferredTransferMode;
+
+    if( requestType == TransferRequestType::BUFFER_TO_IMAGE )
+    {
+      bufferToImageInfo.srcBuffer = std::move( obj.bufferToImageInfo.srcBuffer );
+      bufferToImageInfo.dstImage = std::move( obj.bufferToImageInfo.dstImage );
+      bufferToImageInfo.copyInfo = std::move (obj.bufferToImageInfo.copyInfo );
+    }
+    else if( requestType == TransferRequestType::BUFFER_TO_IMAGE )
+    {
+      imageToImageInfo.srcImage = std::move( obj.imageToImageInfo.srcImage );
+      imageToImageInfo.dstImage = std::move( obj.imageToImageInfo.dstImage );
+      imageToImageInfo.copyInfo = std::move (obj.imageToImageInfo.copyInfo );
+    }
+  }
+
+};
 
 /**
  * @brief Interface class for Manager types in the graphics API.
@@ -117,6 +185,8 @@ public:
   Vulkan::Graphics& GetGraphics() const;
 
   void ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::BufferMemoryTransfer > transferRequest );
+
+  void ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& transferRequest );
 
   VulkanAPI::UboManager& GetUboManager();
 

@@ -334,6 +334,17 @@ enum class Platform
   WAYLAND,
 };
 
+struct FormatInfo
+{
+  bool packed     { false };
+  bool compressed { false };
+  unsigned int paletteSizeInBits { 0u };
+  unsigned int blockSizeInBits   { 0u };
+  unsigned int blockWidth        { 0u };
+  unsigned int blockHeight       { 0u };
+  unsigned int blockDepth        { 0u };
+};
+
 /*
  * Forward declarations of reference types
  */
