@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6a0743fd_81dd5282",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-19T10:56:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c56affd0_a7d32194",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e327820b_3678ee9a",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "01128439_0ba1e38c",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-19T10:56:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e327820b_3678ee9a",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2f47cda_c16fb50b",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
         "patchSetId": 6
@@ -47,6 +83,24 @@
       "writtenOn": "2018-07-18T12:14:10Z",
       "side": 1,
       "message": "Add support for immediate copies.",
+      "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa4b41cc_45a3973d",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-19T10:56:11Z",
+      "side": 1,
+      "message": "added UpdateMode enum. Update mode can be specified as immediate, deferred or undefined ( preferred by implementation )",
+      "parentUuid": "a2f47cda_c16fb50b",
       "revId": "c8a2220bfcf6bd6908e76fdf73265a6d95118929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
