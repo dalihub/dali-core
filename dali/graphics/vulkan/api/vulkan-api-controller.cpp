@@ -31,6 +31,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-fence.h>
 
 // API
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
@@ -94,7 +95,7 @@ struct Controller::Impl
   {
     // Create factories
     mShaderFactory = MakeUnique< VulkanAPI::ShaderFactory >( mGraphics );
-    mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mGraphics );
+    mTextureFactory = MakeUnique< VulkanAPI::TextureFactory >( mOwner );
     mBufferFactory = MakeUnique< VulkanAPI::BufferFactory >( mOwner );
     mFramebufferFactory = MakeUnique< VulkanAPI::FramebufferFactory >( mOwner );
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
@@ -278,6 +279,9 @@ struct Controller::Impl
       mBufferTransferRequests.clear();
     }
 
+    // execute all scheduled resource transfers
+    ProcessResourceTransferRequests();
+
     // the list of commands may be empty, but still we may have scheduled memory
     // transfers
     if( commands.empty() )
@@ -405,6 +409,110 @@ struct Controller::Impl
     }
   }
 
+  void ProcessResourceTransferRequests()
+  {
+    if(!mResourceTransferRequests.empty())
+    {
+      // for images we need to generate all the barriers to make sure the layouts
+      // are correct.
+      std::vector<vk::ImageMemoryBarrier> preLayoutBarriers;
+      std::vector<vk::ImageMemoryBarrier> postLayoutBarriers;
+
+      auto layout = vk::ImageMemoryBarrier{}
+        .setSubresourceRange( vk::ImageSubresourceRange{}
+                                .setLayerCount( 1 )
+                                .setBaseArrayLayer( 0 )
+                                .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                .setBaseMipLevel( 0 )
+                                .setLevelCount( 1 ))
+        .setImage( nullptr )
+        .setOldLayout( {} )
+        .setNewLayout( vk::ImageLayout::eTransferDstOptimal )
+        .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
+        .setDstAccessMask( vk::AccessFlagBits::eMemoryWrite );
+
+      // Create barriers for unique images
+      for(const auto& req : mResourceTransferRequests)
+      {
+        if( req.requestType == TransferRequestType::BUFFER_TO_IMAGE )
+        {
+          // add barrier
+          auto image = req.bufferToImageInfo.dstImage;
+          preLayoutBarriers.push_back( layout.setImage( image->GetVkHandle() )
+                                             .setOldLayout( image->GetImageLayout() )
+                                             .setNewLayout( vk::ImageLayout::eTransferDstOptimal ));
+          postLayoutBarriers.push_back( layout.setImage( image->GetVkHandle() )
+                                             .setNewLayout( image->GetImageLayout() )
+                                             .setOldLayout( vk::ImageLayout::eTransferDstOptimal ));
+        }
+        else if( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
+        {
+          auto dstImage = req.imageToImageInfo.dstImage;
+          auto srcImage = req.imageToImageInfo.srcImage;
+          preLayoutBarriers.push_back( layout.setImage( dstImage->GetVkHandle() )
+                                             .setOldLayout( dstImage->GetImageLayout() )
+                                             .setNewLayout( vk::ImageLayout::eTransferDstOptimal ));
+          postLayoutBarriers.push_back( layout.setImage( dstImage->GetVkHandle() )
+                                             .setNewLayout( dstImage->GetImageLayout() )
+                                             .setOldLayout( vk::ImageLayout::eTransferDstOptimal ));
+
+          preLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                             .setOldLayout( srcImage->GetImageLayout() )
+                                             .setNewLayout( vk::ImageLayout::eTransferSrcOptimal ));
+          postLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                             .setNewLayout( srcImage->GetImageLayout() )
+                                             .setOldLayout( vk::ImageLayout::eTransferSrcOptimal ));
+        }
+      }
+
+      auto commandBuffer = mGraphics.CreateCommandBuffer( true );
+      commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+
+      // issue memory barrier
+      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, preLayoutBarriers );
+
+      // issue blit or copy commands
+      for(const auto& req : mResourceTransferRequests)
+      {
+        if( req.requestType == TransferRequestType::BUFFER_TO_IMAGE )
+        {
+          commandBuffer->CopyBufferToImage( req.bufferToImageInfo.srcBuffer,
+                                            req.bufferToImageInfo.dstImage, vk::ImageLayout::eTransferDstOptimal,
+                                            { req.bufferToImageInfo.copyInfo } );
+        }
+        else if( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
+        {
+          commandBuffer->CopyImage( req.imageToImageInfo.srcImage,
+                                    vk::ImageLayout::eTransferSrcOptimal,
+                                    req.imageToImageInfo.dstImage,
+                                    vk::ImageLayout::eTransferDstOptimal,
+                                    { req.imageToImageInfo.copyInfo });
+        }
+      }
+
+      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, postLayoutBarriers );
+      commandBuffer->End();
+
+      // submit to the queue
+      auto transferQueue = mGraphics.GetTransferQueue( 0u );
+
+      // no fence, just semaphore
+      auto fence = mGraphics.CreateFence( {} );
+      const auto vkCommandBuffer = commandBuffer->GetVkHandle();
+      transferQueue.GetVkHandle().submit( {
+                                            vk::SubmitInfo{}
+                                              .setCommandBufferCount( 1 )
+                                              .setPCommandBuffers( &vkCommandBuffer )
+                                          }, fence->GetVkHandle() );
+
+      // @todo use semaphores rather than fences
+      mGraphics.WaitForFence( fence );
+
+      mResourceTransferRequests.clear();
+    }
+
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
   Vulkan::Graphics& mGraphics;
@@ -417,7 +525,11 @@ struct Controller::Impl
   std::unique_ptr< VulkanAPI::FramebufferFactory > mFramebufferFactory;
   std::unique_ptr< VulkanAPI::SamplerFactory > mSamplerFactory;
 
-  std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer>> mBufferTransferRequests;
+  // used for UBOs
+  std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer > > mBufferTransferRequests;
+
+  // used for texture<->buffer<->memory transfers
+  std::vector< ResourceTransferRequest >                            mResourceTransferRequests;
 
   std::unique_ptr< VulkanAPI::UboManager > mUboManager;
 
@@ -536,6 +648,11 @@ Vulkan::Graphics& Controller::GetGraphics() const
 void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::BufferMemoryTransfer > transferRequest )
 {
   mImpl->mBufferTransferRequests.emplace_back( std::move( transferRequest ) );
+}
+
+void Controller::ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& transferRequest )
+{
+  mImpl->mResourceTransferRequests.emplace_back( std::move(transferRequest) );
 }
 
 VulkanAPI::UboManager& Controller::GetUboManager()

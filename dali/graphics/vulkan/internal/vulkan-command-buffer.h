@@ -189,8 +189,7 @@ public:
    * Executes secondary command buffers within primary command buffer
    * @param commandBuffers
    */
-  void
-  ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers, uint32_t offset,
+  void ExecuteCommands( const std::vector< Dali::Graphics::Vulkan::Handle< CommandBuffer>>& commandBuffers, uint32_t offset,
                    uint32_t count );
 
   /**
@@ -202,6 +201,20 @@ public:
    */
   void CopyBufferToImage( RefCountedBuffer srcBuffer, RefCountedImage dstImage, vk::ImageLayout dstLayout,
                           std::vector< vk::BufferImageCopy > regions );
+
+  /**
+   * Copies image to image
+   * @param srcImage
+   * @param srcLayout
+   * @param dstImage
+   * @param dstLAyout
+   * @param regions
+   */
+  void CopyImage( RefCountedImage srcImage,
+                  vk::ImageLayout srcLayout,
+                  RefCountedImage dstImage,
+                  vk::ImageLayout dstLayout,
+                  const std::vector<vk::ImageCopy>& regions );
 
   /**
    * Sets scissors when VK_DYNAMIC_STATE_SCISSOR used
