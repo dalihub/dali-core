@@ -15,6 +15,8 @@
 /missing
 /demo/dali-demo
 /dali-core.pc
+/dali-core-vk.pc
+/dali-core-vk-cxx03.pc
 /dali.pc
 /dali-core/dali-shaders.cpp
 /dali-core/dali-shaders.h
