@@ -127,6 +127,26 @@ public: // UniformMap::Observer
    */
   virtual void UniformMappingsChanged( const UniformMap& mappings );
 
+  /**
+   * Retrieves uniform data.
+   * The lookup tries to minimise string comparisons. Ideally, when the hashedName is known
+   * and there are no hash collisions in the reflection it's the most optimal case.
+   *
+   * @param name Name of uniform
+   * @param hashedName Hash value from name or 0 if unknown
+   * @param arrayIndex Index within array elements or 0 if the uniform is not an array
+   * @param out Reference to output structure
+   *
+   * @return False when uniform is not found or due to hash collision the result is ambiguous
+   */
+  bool GetUniform( const std::string& name, size_t hashedName, Graphics::API::ShaderDetails::UniformInfo& out );
+
+private:
+
+  /**
+   * Build optimized shader reflection of uniforms
+   */
+  void BuildReflection();
 
 private: // Data
   Integration::Graphics::Graphics*               mGraphics; ///< Graphics interface object
@@ -134,6 +154,18 @@ private: // Data
   ShaderCache*                                   mShaderCache;
   Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader
   ConnectionChangePropagator                     mConnectionObservers; ///< Watch for connection changes
+
+  /**
+   * Type ReflectionUniformInfo
+   * size_t - hashed name
+   * bool - hash collision within reflection
+   * Graphics::API::Shader* - link to the shader program
+   * Graphics::API::ShaderDetails::UniformInfo - uniform details
+   */
+  using ReflectionUniformInfo = std::tuple<size_t, bool, Graphics::API::Shader*, Graphics::API::ShaderDetails::UniformInfo>;
+  using UniformReflectionContainer = std::vector< ReflectionUniformInfo >;
+
+  UniformReflectionContainer                     mReflection; ///< Contains reflection build per shader
 };
 
 

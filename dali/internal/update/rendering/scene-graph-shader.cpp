@@ -17,6 +17,10 @@
 
 // CLASS HEADER
 #include <dali/internal/update/rendering/scene-graph-shader.h>
+#include <dali/graphics-api/graphics-api-shader-details.h>
+
+#include <tuple>
+#include <map>
 
 namespace Dali
 {
@@ -85,8 +89,96 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
       Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
       Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
   }
+
+  if( mGraphicsShader )
+  {
+    BuildReflection();
+  }
 }
 
+void Shader::BuildReflection()
+{
+  if( mGraphicsShader )
+  {
+    auto uniformBlockCount = mGraphicsShader->GetUniformBlockCount();
+
+    // add uniform block fields
+    for( auto i = 0u; i < uniformBlockCount; ++i )
+    {
+      Graphics::API::ShaderDetails::UniformBlockInfo uboInfo;
+      mGraphicsShader->GetUniformBlock( i, uboInfo );
+
+      // for each member store data
+      for( const auto& item : uboInfo.members )
+      {
+        mReflection.emplace_back( ReflectionUniformInfo( CalculateHash( item.name ), false, mGraphicsShader, item ) );
+
+        // update buffer index
+        std::get<3>( mReflection.back() ).bufferIndex = i;
+      }
+    }
+
+    // add samplers
+    auto samplers = mGraphicsShader->GetSamplers();
+    for( const auto& sampler : samplers )
+    {
+      mReflection.emplace_back( ReflectionUniformInfo( CalculateHash( sampler.name ), false, mGraphicsShader, sampler ) );
+    }
+
+    // check for potential collisions
+    std::map<size_t, bool> hashTest;
+    bool hasCollisions( false );
+    for( auto&& item : mReflection )
+    {
+      auto hashValue = std::get<0>(item);
+      if( hashTest.find( hashValue ) == hashTest.end() )
+      {
+        hashTest[ hashValue ] = false;
+      }
+      else
+      {
+        hashTest[ hashValue ] = true;
+        hasCollisions = true;
+      }
+    }
+
+    // update collision flag for further use
+    if( hasCollisions )
+    {
+      for( auto&& item : mReflection )
+      {
+        std::get<1>( item ) = hashTest[ std::get<0>( item ) ];
+      }
+    }
+  }
+}
+
+bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::API::ShaderDetails::UniformInfo& out )
+{
+  if( mReflection.empty() )
+  {
+    return false;
+  }
+
+  hashedName = !hashedName ? CalculateHash( name ) : hashedName;
+
+  for( ReflectionUniformInfo& item : mReflection )
+  {
+    if( std::get<0>( item ) == hashedName )
+    {
+      if( !std::get<1>( item ) || std::get<3>( item ).name == name )
+      {
+        out = std::get<3>( item );
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return false;
+}
 
 } // namespace SceneGraph
 
