@@ -307,6 +307,16 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
     DALI_ASSERT_DEBUG(pixelData->GetHeight() == mHeight && "Pixel buffer height is different");
     CreateTextureInternal( Usage::SAMPLE, pixelData->GetBuffer(), pixelData->GetBufferSize() );
   }
+  else
+  {
+    // schedule upload
+    mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
+                                  { params.width, params.height },
+                                  { params.xOffset, params.yOffset },
+                                  params.layer,
+                                  params.mipmap,
+                                  {} );
+  }
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::UploadTexture() GfxTexture: %p\n", this, mGraphicsTexture.get() );
 }
 
