@@ -162,86 +162,99 @@ constexpr Graphics::API::Format ConvertPixelFormat( Pixel::Format format )
       return Graphics::API::Format::R8G8B8A8_UNORM;
     case Pixel::BGRA8888:
       return Graphics::API::Format::B8G8R8A8_UNORM;
+
+    // EAC
     case Pixel::COMPRESSED_R11_EAC:
       return Graphics::API::Format::EAC_R11_UNORM_BLOCK;
     case Pixel::COMPRESSED_SIGNED_R11_EAC:
-      return Graphics::API::Format::EAC_R11_SNORM_BLOCK;;
+      return Graphics::API::Format::EAC_R11_SNORM_BLOCK;
     case Pixel::COMPRESSED_RG11_EAC:
       return Graphics::API::Format::EAC_R11G11_UNORM_BLOCK;
     case Pixel::COMPRESSED_SIGNED_RG11_EAC:
       return Graphics::API::Format::EAC_R11G11_SNORM_BLOCK;
+
+    // ETC
     case Pixel::COMPRESSED_RGB8_ETC2:
       return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ETC2:
       return Graphics::API::Format::ETC2_R8G8B8_SRGB_BLOCK;
+
     case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8A1_UNORM_BLOCK;
+      return Graphics::API::Format::UNDEFINED; // no 'punchthrough' format, unknown
+
     case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8A1_SRGB_BLOCK;
+      return Graphics::API::Format::UNDEFINED; // no 'punchthrough' format, unknown
+
     case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::UNDEFINED; // doesn't seem to map onto any format
+
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::UNDEFINED; // doesn't seem to map onto any format
+
     case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::UNDEFINED; // doesn't seem to be supported at all
+
     case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
+
+    // ASTC
     case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
     case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_5x4_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_5x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_6x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_6x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x8_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x8_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x10_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_12x10_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_12x12_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-      return Graphics::API::Format::UNDEFINED;
+
+      return Graphics::API::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_5x4_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_5x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_6x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_6x6_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_8x8_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x6_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x8_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_10x10_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_12x10_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::API::Format::ASTC_12x12_SRGB_BLOCK;
     case Pixel::RGB16F:
       return Graphics::API::Format::R16G16B16_SFLOAT;
     case Pixel::RGB32F:
