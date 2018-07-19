@@ -18,9 +18,9 @@ SUBDIRS = dali-core/graphics dali-core
 pkgconfigdir = $(libdir)/pkgconfig
 
 if ENABLE_CXX03_ABI
-pkgconfig_DATA = dali-core-cxx03.pc
+pkgconfig_DATA = dali-core-vk-cxx03.pc
 else
-pkgconfig_DATA = dali-core.pc
+pkgconfig_DATA = dali-core-vk.pc
 endif
 
 

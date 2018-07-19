@@ -1,4 +1,4 @@
-Name:       dali
+Name:       dali-vk
 Summary:    DALi 3D Engine
 Version:    1.3.33
 Release:    1
@@ -165,8 +165,8 @@ pushd %{_builddir}/%{name}-%{version}/build/tizen
 popd
 
 pushd %{buildroot}%{_libdir}
-for FILE in libdali-core-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
-mv pkgconfig/dali-core.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-core.pc
+for FILE in libdali-core-vk-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
+mv pkgconfig/dali-core-vk.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-core-vk.pc
 popd
 
 %if !0%{?disable_cxx03_build}
@@ -212,19 +212,19 @@ pushd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
 for FILE in libdali-*.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
-mv dali-core.pc %{buildroot}%{_libdir}/pkgconfig/dali-core.pc
+mv dali-core-vk.pc %{buildroot}%{_libdir}/pkgconfig/dali-core-vk.pc
 popd
 
 #############################
 #rename
 #############################
 pushd  %{buildroot}%{_libdir}
-rm -rf libdali-core.so
-rm -rf libdali-core-cxx11.so
+rm -rf libdali-core-vk.so
+rm -rf libdali-core-vk-cxx11.so
 %if !0%{?disable_cxx03_build}
-ln -s libdali-core.so.0.0.* libdali-core-cxx03.so
+ln -s libdali-core-vk.so.0.0.* libdali-core-vk-cxx03.so
 %endif
-ln -s libdali-core-cxx11.so.0.0.* libdali-core.so
+ln -s libdali-core-vk-cxx11.so.0.0.* libdali-core-vk.so
 popd
 
 
@@ -254,8 +254,8 @@ exit 0
 %manifest dali.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-core.so.*
-%{_libdir}/libdali-core-cxx03.so
+%{_libdir}/libdali-core-vk.so.*
+%{_libdir}/libdali-core-vk-cxx03.so
 %defattr(-,app,app,-)
 %license LICENSE
 %endif
@@ -267,15 +267,15 @@ exit 0
 %manifest dali.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-core-cxx11.so.*
-%{_libdir}/libdali-core.so
+%{_libdir}/libdali-core-vk-cxx11.so.*
+%{_libdir}/libdali-core-vk.so
 %defattr(-,app,app,-)
 %license LICENSE
 
 %if !0%{?disable_cxx03_build}
 %files devel-cxx03
 %defattr(-,root,root,-)
-%{_libdir}/pkgconfig/dali-core-cxx03.pc
+%{_libdir}/pkgconfig/dali-core-vk-cxx03.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/devel-api/*
 %{dev_include_path}/dali/doc/*
@@ -287,7 +287,7 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
-%{_libdir}/pkgconfig/dali-core.pc
+%{_libdir}/pkgconfig/dali-core-vk.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/devel-api/*
 %{dev_include_path}/dali/doc/*

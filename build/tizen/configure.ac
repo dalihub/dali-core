@@ -155,11 +155,11 @@ AC_SUBST(devincludepath)
 AC_CONFIG_FILES([Makefile dali-core/Makefile dali-core/graphics/Makefile])
 
 if test "x$enable_cxx03_abi" = "xyes"; then
-AC_CONFIG_FILES([dali-core-cxx03.pc])
+AC_CONFIG_FILES([dali-core-vk-cxx03.pc])
 fi
 
 if test "x$enable_cxx03_abi" != "xyes"; then
-AC_CONFIG_FILES([dali-core.pc])
+AC_CONFIG_FILES([dali-core-vk.pc])
 fi
 
 AC_OUTPUT

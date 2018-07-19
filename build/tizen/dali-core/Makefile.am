@@ -58,19 +58,19 @@ dali_core_includes = \
 
 if ENABLE_CXX03_ABI
 
-lib_LTLIBRARIES = libdali-core.la
+lib_LTLIBRARIES = libdali-core-vk.la
 
-libdali_core_la_SOURCES = $(DALI_CORE_LA_SOURCES)
-libdali_core_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
+libdali_core_vk_la_SOURCES = $(DALI_CORE_LA_SOURCES)
+libdali_core_vk_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
+libdali_core_vk_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 else
 
-lib_LTLIBRARIES = libdali-core-cxx11.la
+lib_LTLIBRARIES = libdali-core-vk-cxx11.la
 
-libdali_core_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
-libdali_core_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
+libdali_core_vk_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
+libdali_core_vk_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
+libdali_core_vk_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
 
 endif
 
@@ -163,32 +163,32 @@ linker_test_CXXFLAGS = \
 
 if ENABLE_CXX03_ABI
 
-linker_test_DEPENDENCIES = libdali-core.la
+linker_test_DEPENDENCIES = libdali-core-vk.la
 linker_test_LDADD = \
-  libdali-core.la \
+  libdali-core-vk.la \
   $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename
 install: install-am
-	rm -rf $(libdir)/libdali-core.so
-	rm -rf $(libdir)/libdali-core-cxx03.so
-	ln -s $(libdir)/libdali-core.so.0.0.* $(libdir)/libdali-core-cxx03.so
+	rm -rf $(libdir)/libdali-core-vk.so
+	rm -rf $(libdir)/libdali-core-vk-cxx03.so
+	ln -s $(libdir)/libdali-core-vk.so.0.0.* $(libdir)/libdali-core-vk-cxx03.so
 endif
 
 else
 
-linker_test_DEPENDENCIES = libdali-core-cxx11.la
+linker_test_DEPENDENCIES = libdali-core-vk-cxx11.la
 linker_test_LDADD = \
-  libdali-core-cxx11.la \
+  libdali-core-vk-cxx11.la \
   $(VULKAN_LIBS)
 
 if ENABLE_RENAME_SO
 #rename
 install: install-am
-	rm -rf $(libdir)/libdali-core-cxx11.so
-	rm -rf $(libdir)/libdali-core.so
-	ln -s $(libdir)/libdali-core-cxx11.so.0.0.* $(libdir)/libdali-core.so
+	rm -rf $(libdir)/libdali-core-vk-cxx11.so
+	rm -rf $(libdir)/libdali-core-vk.so
+	ln -s $(libdir)/libdali-core-vk-cxx11.so.0.0.* $(libdir)/libdali-core-vk.so
 endif
 
 endif
