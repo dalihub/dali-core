@@ -15,20 +15,24 @@
  *
  */
 
+// CLASS HEADER
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
-#include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
+// INTERNAL INCLUDES
+#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
-#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
-
+#include <dali/graphics/vulkan/internal/vulkan-utils.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
+#include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 
 namespace Dali
 {
@@ -867,10 +871,9 @@ constexpr vk::Format ConvertApiToVk( API::Format format )
   return {};
 }
 
-struct Texture::Impl
-{
-  Impl( Texture& api, Dali::Graphics::API::TextureFactory& factory )
+Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
   : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
+    mController( mTextureFactory.GetController() ),
     mGraphics( mTextureFactory.GetGraphics() ),
     mImage(),
     mImageView(),
@@ -881,259 +884,248 @@ struct Texture::Impl
     mUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst ),
     mLayout( vk::ImageLayout::eUndefined ),
     mComponentMapping()
-  {
-  }
-
-  ~Impl() = default;
-
-  bool Initialise()
-  {
-    auto size = mTextureFactory.GetSize();
-    mWidth = uint32_t( size.width );
-    mHeight = uint32_t( size.height );
-    auto sizeInBytes = mTextureFactory.GetDataSize();
-    auto data = mTextureFactory.GetData();
-
-    switch( mTextureFactory.GetUsage())
-    {
-      case API::TextureDetails::Usage::COLOR_ATTACHMENT:
-      {
-        mUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
-        mLayout = vk::ImageLayout::eUndefined;
-        break;
-      }
-      case API::TextureDetails::Usage::DEPTH_ATTACHMENT:
-      {
-        mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled;
-        mLayout = vk::ImageLayout::eUndefined;
-        break;
-      }
-      case API::TextureDetails::Usage::SAMPLE:
-      {
-        mUsage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
-        mLayout = vk::ImageLayout::ePreinitialized;
-        break;
-      }
-    }
-
-    mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
-    mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
-
-    if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
-    {
-      if( data && sizeInBytes > 0 )
-      {
-        assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
-
-        auto inData = reinterpret_cast<const uint8_t*>(data);
-        auto outData = new uint8_t[mWidth * mHeight * 4];
-
-        auto outIdx = 0u;
-        for( auto i = 0u; i < sizeInBytes; i += 3 )
-        {
-          outData[outIdx] = inData[i];
-          outData[outIdx + 1] = inData[i + 1];
-          outData[outIdx + 2] = inData[i + 2];
-          outData[outIdx + 3] = 0xff;
-          outIdx += 4;
-        }
-
-        data = outData;
-        sizeInBytes = uint32_t(mWidth * mHeight * 4);
-        mFormat = vk::Format::eR8G8B8A8Unorm;
-      }
-    }
-
-    InitialiseTexture();
-
-    if( data && sizeInBytes )
-    {
-      UploadData( data, 0, sizeInBytes );
-    }
-
-    return true;
-  }
-
-  bool UploadData( const void* data, uint32_t offsetInBytes, uint32_t sizeInBytes )
-  {
-    // create buffer
-    auto size = sizeInBytes;
-    auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
-                                            .setUsage( vk::BufferUsageFlagBits::eTransferSrc )
-                                            .setSharingMode( vk::SharingMode::eExclusive )
-                                            .setSize( size ) );
-
-    auto memory = mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible |
-                                                    vk::MemoryPropertyFlagBits::eHostCoherent );
-
-    mGraphics.BindBufferMemory( buffer, memory, 0 );
-
-    // copy pixels to the buffer
-    auto ptr = mGraphics.MapMemoryTyped< char >( buffer->GetMemoryHandle() );
-    std::copy( reinterpret_cast<const char*>(data),
-               reinterpret_cast<const char*>(data) + sizeInBytes,
-               ptr );
-
-    buffer->GetMemoryHandle()->Unmap();
-
-    // record copy and layout change
-    auto copy = vk::BufferImageCopy{}
-      .setImageExtent( { mWidth, mHeight, 1 } )
-      .setBufferImageHeight( mHeight )
-      .setBufferOffset( 0 )
-      .setBufferRowLength( mWidth )
-      .setImageOffset( { 0, 0, 0 } )
-      .setImageSubresource( vk::ImageSubresourceLayers{}
-                              .setMipLevel( 0 )
-                              .setAspectMask( mImage->GetAspectFlags() )
-                              .setLayerCount( 1 )
-                              .setBaseArrayLayer( 0 ) );
-
-    auto commandBuffer = mGraphics.CreateCommandBuffer( true );
-
-    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
-
-    // change layout to prepare image to transfer data
-    commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe,
-                                    vk::PipelineStageFlagBits::eTransfer,
-                                    {},
-                                    {},
-                                    {},
-                                    { mGraphics.CreateImageMemoryBarrier( mImage,
-                                                                          mImage->GetImageLayout(),
-                                                                          vk::ImageLayout::eTransferDstOptimal ) } );
-
-    // copy image
-    commandBuffer->CopyBufferToImage( buffer, mImage, vk::ImageLayout::eTransferDstOptimal, { copy } );
-
-    // change layout to shader read-only optimal
-    commandBuffer->PipelineBarrier(
-      vk::PipelineStageFlagBits::eVertexShader,
-      vk::PipelineStageFlagBits::eVertexShader,
-      {},
-      {},
-      {},
-      { mGraphics.CreateImageMemoryBarrier( mImage,
-                                            vk::ImageLayout::eTransferDstOptimal,
-                                            vk::ImageLayout::eShaderReadOnlyOptimal ) } );
-
-    commandBuffer->End();
-
-    // submit and wait till image is uploaded so temporary buffer can be destroyed safely
-    auto fence = mGraphics.CreateFence( {} );
-    VkAssert( mGraphics.Submit( mGraphics.GetGraphicsQueue( 0u ),
-                                { SubmissionData{}.SetCommandBuffers( { commandBuffer } ) }, fence ) );
-    VkAssert( mGraphics.WaitForFence( fence, std::numeric_limits< uint32_t >::max() ) );
-
-    // Update the image with its new layout
-    mImage->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
-
-    return true;
-  }
-
-  // creates image with pre-allocated memory and default sampler, no data
-  // uploaded at this point
-  bool InitialiseTexture()
-  {
-    // create image
-    auto imageCreateInfo = vk::ImageCreateInfo{}
-      .setFormat( mFormat )
-      .setInitialLayout( mLayout )
-      .setSamples( vk::SampleCountFlagBits::e1 )
-      .setSharingMode( vk::SharingMode::eExclusive )
-      .setUsage( mUsage )
-      .setExtent( { mWidth, mHeight, 1 } )
-      .setArrayLayers( 1 )
-      .setImageType( vk::ImageType::e2D )
-      .setTiling( vk::ImageTiling::eOptimal )
-      .setMipLevels( 1 );
-
-    // Create the image handle
-    mImage = mGraphics.CreateImage( imageCreateInfo );
-
-    // allocate memory for the image
-    auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-    // bind the allocated memory to the image
-    mGraphics.BindImageMemory( mImage, memory, 0 );
-
-    // create default image view
-    CreateImageView();
-
-    // create basic sampler
-    CreateSampler();
-
-    return true;
-  }
-
-  void CreateImageView()
-  {
-    mImageView = mGraphics.CreateImageView(
-      {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
-      vk::ImageSubresourceRange{}
-        .setAspectMask( mImage->GetAspectFlags() )
-        .setBaseArrayLayer( 0 )
-        .setBaseMipLevel( 0 )
-        .setLevelCount( mImage->GetMipLevelCount() )
-        .setLayerCount( mImage->GetLayerCount() )
-    );
-  }
-
-  void CreateSampler()
-  {
-    auto samplerCreateInfo = vk::SamplerCreateInfo()
-      .setAddressModeU( vk::SamplerAddressMode::eClampToEdge )
-      .setAddressModeV( vk::SamplerAddressMode::eClampToEdge )
-      .setAddressModeW( vk::SamplerAddressMode::eClampToEdge )
-      .setBorderColor( vk::BorderColor::eFloatOpaqueBlack )
-      .setCompareOp( vk::CompareOp::eNever )
-      .setMinFilter( vk::Filter::eLinear )
-      .setMagFilter( vk::Filter::eLinear )
-      .setMipmapMode( vk::SamplerMipmapMode::eLinear );
-
-    mSampler = mGraphics.CreateSampler( samplerCreateInfo );
-  }
-
-  VulkanAPI::TextureFactory& mTextureFactory;
-  Vulkan::Graphics& mGraphics;
-
-  RefCountedImage       mImage;
-  RefCountedImageView   mImageView;
-  RefCountedSampler     mSampler;
-
-  uint32_t    mWidth;
-  uint32_t    mHeight;
-  vk::Format  mFormat;
-  vk::ImageUsageFlags mUsage;
-  vk::ImageLayout mLayout;
-  vk::ComponentMapping mComponentMapping{};
-};
-
-Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 {
-  mImpl = std::make_unique< Impl >( *this, factory );
 }
 
 Texture::~Texture() = default;
 
+bool Texture::Initialise()
+{
+  auto size = mTextureFactory.GetSize();
+  mWidth = uint32_t( size.width );
+  mHeight = uint32_t( size.height );
+  auto sizeInBytes = mTextureFactory.GetDataSize();
+  auto data = mTextureFactory.GetData();
+
+  switch( mTextureFactory.GetUsage())
+  {
+    case API::TextureDetails::Usage::COLOR_ATTACHMENT:
+    {
+      mUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
+      mLayout = vk::ImageLayout::eUndefined;
+      break;
+    }
+    case API::TextureDetails::Usage::DEPTH_ATTACHMENT:
+    {
+      mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled;
+      mLayout = vk::ImageLayout::eUndefined;
+      break;
+    }
+    case API::TextureDetails::Usage::SAMPLE:
+    {
+      mUsage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+      mLayout = vk::ImageLayout::ePreinitialized;
+      break;
+    }
+  }
+
+  mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
+  mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
+
+  if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
+  {
+    if( data && sizeInBytes > 0 )
+    {
+      assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
+
+      auto inData = reinterpret_cast<const uint8_t*>(data);
+      auto outData = new uint8_t[mWidth * mHeight * 4];
+
+      auto outIdx = 0u;
+      for( auto i = 0u; i < sizeInBytes; i += 3 )
+      {
+        outData[outIdx] = inData[i];
+        outData[outIdx + 1] = inData[i + 1];
+        outData[outIdx + 2] = inData[i + 2];
+        outData[outIdx + 3] = 0xff;
+        outIdx += 4;
+      }
+
+      data = outData;
+      mFormat = vk::Format::eR8G8B8A8Unorm;
+    }
+  }
+
+  InitialiseTexture();
+
+  // copy data to the image
+  if( data )
+  {
+    CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+  }
+  return true;
+}
+
+void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+{
+  // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
+  uint32_t allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
+
+  // allocate transient buffer
+  auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
+                            .setSize( allocationSize )
+                            .setSharingMode( vk::SharingMode::eExclusive )
+                            .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
+
+  // bind memory
+  mGraphics.BindBufferMemory( buffer,
+                              mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                              0u );
+
+  // write into the buffer
+  auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
+  std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+allocationSize, ptr );
+  buffer->GetMemoryHandle()->Unmap();
+
+  ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
+
+  transferRequest.bufferToImageInfo.copyInfo
+          .setImageSubresource( vk::ImageSubresourceLayers{}
+                                    .setBaseArrayLayer( layer )
+                                    .setLayerCount( 1 )
+                                    .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                    .setMipLevel( level ) )
+          .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+          .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+          .setBufferRowLength({ 0u })
+          .setBufferOffset({ 0u })
+          .setBufferImageHeight({ srcExtent.height });
+
+  transferRequest.bufferToImageInfo.dstImage = mImage;
+  transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  assert( transferRequest.bufferToImageInfo.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
+void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+{
+  ResourceTransferRequest transferRequest( TransferRequestType::IMAGE_TO_IMAGE );
+
+  auto imageSubresourceLayers = vk::ImageSubresourceLayers{}
+       .setAspectMask( vk::ImageAspectFlagBits::eColor )
+       .setBaseArrayLayer( layer )
+       .setLayerCount( 1 )
+       .setMipLevel( level );
+
+  transferRequest.imageToImageInfo.srcImage = static_cast<const VulkanAPI::Texture&>( srcTexture ).GetImageRef();
+  transferRequest.imageToImageInfo.dstImage = mImage;
+  transferRequest.imageToImageInfo.copyInfo
+                 .setSrcOffset( { srcRegion.x, srcRegion.y, 0 } )
+                 .setDstOffset( { dstOffset.x, dstOffset.y, 0 } )
+                 .setExtent( { srcRegion.width, srcRegion.height } )
+                 .setSrcSubresource( imageSubresourceLayers  )
+                 .setDstSubresource( imageSubresourceLayers );
+
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
+void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+{
+  ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
+
+  transferRequest.bufferToImageInfo.copyInfo
+                 .setImageSubresource( vk::ImageSubresourceLayers{}
+                                         .setBaseArrayLayer( layer )
+                                         .setLayerCount( 1 )
+                                         .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                         .setMipLevel( level ) )
+                 .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+                 .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+                 .setBufferRowLength({ 0u })
+                 .setBufferOffset({ 0u })
+                 .setBufferImageHeight({ srcExtent.height });
+
+  transferRequest.bufferToImageInfo.dstImage = mImage;
+  transferRequest.bufferToImageInfo.srcBuffer = static_cast<const VulkanAPI::Buffer&>(srcBuffer).GetBufferRef();
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
+// creates image with pre-allocated memory and default sampler, no data
+// uploaded at this point
+bool Texture::InitialiseTexture()
+{
+  // create image
+  auto imageCreateInfo = vk::ImageCreateInfo{}
+    .setFormat( mFormat )
+    .setInitialLayout( mLayout )
+    .setSamples( vk::SampleCountFlagBits::e1 )
+    .setSharingMode( vk::SharingMode::eExclusive )
+    .setUsage( mUsage )
+    .setExtent( { mWidth, mHeight, 1 } )
+    .setArrayLayers( 1 )
+    .setImageType( vk::ImageType::e2D )
+    .setTiling( vk::ImageTiling::eOptimal )
+    .setMipLevels( 1 );
+
+  // Create the image handle
+  mImage = mGraphics.CreateImage( imageCreateInfo );
+
+  // allocate memory for the image
+  auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
+  // bind the allocated memory to the image
+  mGraphics.BindImageMemory( mImage, memory, 0 );
+
+  // create default image view
+  CreateImageView();
+
+  // create basic sampler
+  CreateSampler();
+
+  return true;
+}
+
+void Texture::CreateImageView()
+{
+  mImageView = mGraphics.CreateImageView(
+    {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
+    vk::ImageSubresourceRange{}
+      .setAspectMask( mImage->GetAspectFlags() )
+      .setBaseArrayLayer( 0 )
+      .setBaseMipLevel( 0 )
+      .setLevelCount( mImage->GetMipLevelCount() )
+      .setLayerCount( mImage->GetLayerCount() )
+  );
+}
+
+void Texture::CreateSampler()
+{
+  auto samplerCreateInfo = vk::SamplerCreateInfo()
+    .setAddressModeU( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeV( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeW( vk::SamplerAddressMode::eClampToEdge )
+    .setBorderColor( vk::BorderColor::eFloatOpaqueBlack )
+    .setCompareOp( vk::CompareOp::eNever )
+    .setMinFilter( vk::Filter::eLinear )
+    .setMagFilter( vk::Filter::eLinear )
+    .setMipmapMode( vk::SamplerMipmapMode::eLinear );
+
+  mSampler = mGraphics.CreateSampler( samplerCreateInfo );
+}
+
 Vulkan::RefCountedImage Texture::GetImageRef() const
 {
-  return mImpl->mImage;
+  return mImage;
 }
 
 Vulkan::RefCountedImageView Texture::GetImageViewRef() const
 {
-  return mImpl->mImageView;
+  return mImageView;
 }
 
 Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
-  return mImpl->mSampler;
-}
-
-bool Texture::Initialise()
-{
-  return mImpl->Initialise();
+  return mSampler;
 }
 
 } // namespace VulkanAPI

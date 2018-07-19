@@ -18,12 +18,16 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-types.h>
+#include <dali/graphics-api/graphics-api-texture-details.h>
+
 namespace Dali
 {
 namespace Graphics
 {
 namespace API
 {
+class Buffer;
 
 /**
  * @brief Interface class for Texture types in the graphics API.
@@ -37,6 +41,40 @@ public:
   Texture& operator=(const Texture&) = delete;
 
   virtual ~Texture() = default;
+
+  /**
+   * Copies memory into specified region of texture. The format of source data
+   * must match the texture format.
+   *
+   * @param srcMemory Valid pointer to the memory containing image data
+   * @param srcExtent Image dimensions
+   * @param dstOffset Destination offset
+   * @param layer Layer
+   * @param level Mipmap level
+   */
+  virtual void CopyMemory( const void *srcMemory, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level, TextureDetails::UpdateMode updateMode ) = 0;
+
+  /**
+   * Copies region of source texture at the offset.
+   *
+   * @param srcTexture Source texture
+   * @param srcRegion Source region
+   * @param dstOffset Destination offset
+   * @param layer Layer to copy
+   * @param level Mipmap level to copy
+   */
+  virtual void CopyTexture(const Texture &srcTexture, Rect2D srcRegion, Offset2D dstOffset, uint32_t layer, uint32_t level, TextureDetails::UpdateMode updateMode ) = 0;
+
+  /**
+   * Copies buffer to the texture
+   *
+   * @param srcBuffer Source buffer, the format of data must match the texture
+   * @param srcExtent Source dimensions
+   * @param dstOffset Destination offset
+   * @param layer Destination layer
+   * @param level Mipmap level
+   */
+  virtual void CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level,  TextureDetails::UpdateMode updateMode ) = 0;
 
 protected:
   // derived types should not be moved directly to prevent slicing

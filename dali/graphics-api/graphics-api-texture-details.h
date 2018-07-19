@@ -63,6 +63,27 @@ enum class DepthStencilFlag
   DEPTH_STENCIL,
 };
 
+/**
+ * Texture update mode
+ */
+enum class UpdateMode
+{
+  /**
+   * Mode preferred by the implementation
+   */
+  UNDEFINED,
+
+  /**
+   * Textures are updated on the render command submission ( bulk update )
+   */
+  DEFERRED,
+
+  /**
+   * Textures are updated when any Copy...() function is called
+   */
+  IMMEDIATE,
+};
+
 } // namespace TextureDetails
 } // namespace API
 } // namespace Graphics

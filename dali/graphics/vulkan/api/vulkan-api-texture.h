@@ -27,8 +27,15 @@ namespace Dali
 {
 namespace Graphics
 {
+namespace Vulkan
+{
+class Graphics;
+}
 namespace VulkanAPI
 {
+class TextureFactory;
+class Controller;
+
 /**
  * This is temporary implementation. It should be using graphics-texture as base
  * interface.
@@ -49,9 +56,36 @@ public:
 
   Vulkan::RefCountedSampler GetSamplerRef() const;
 
+  void CopyMemory( const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode ) override;
+
+  void CopyTexture( const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode ) override;
+
+  void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
+
 private:
-  struct Impl;
-  std::unique_ptr< Impl > mImpl;
+
+  void CreateSampler();
+  void CreateImageView();
+  bool InitialiseTexture();
+
+private:
+  //struct Impl;
+  //std::unique_ptr< Impl > mImpl;
+
+  VulkanAPI::TextureFactory& mTextureFactory;
+  VulkanAPI::Controller& mController;
+  Vulkan::Graphics& mGraphics;
+
+  Vulkan::RefCountedImage       mImage;
+  Vulkan::RefCountedImageView   mImageView;
+  Vulkan::RefCountedSampler     mSampler;
+
+  uint32_t    mWidth;
+  uint32_t    mHeight;
+  vk::Format  mFormat;
+  vk::ImageUsageFlags mUsage;
+  vk::ImageLayout mLayout;
+  vk::ComponentMapping mComponentMapping{};
 };
 
 } // namespace VulkanAPI

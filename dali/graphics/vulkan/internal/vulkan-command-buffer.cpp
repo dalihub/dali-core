@@ -278,6 +278,15 @@ void CommandBuffer::CopyBufferToImage( RefCountedBuffer srcBuffer,
                                     regions );
 }
 
+void CommandBuffer::CopyImage( RefCountedImage srcImage,
+                               vk::ImageLayout srcLayout,
+                               RefCountedImage dstImage,
+                               vk::ImageLayout dstLayout,
+                               const std::vector<vk::ImageCopy>& regions )
+{
+  mCommandBuffer.copyImage( srcImage->GetVkHandle(), srcLayout, dstImage->GetVkHandle(), dstLayout, regions );
+}
+
 void CommandBuffer::SetScissor( uint32_t firstScissor, uint32_t scissorCount, const vk::Rect2D* pScissors )
 {
   mCommandBuffer.setScissor( firstScissor, scissorCount, pScissors );
