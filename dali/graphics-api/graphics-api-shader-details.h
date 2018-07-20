@@ -169,6 +169,16 @@ struct UniformInfo
   uint32_t      bufferIndex { 0u };
   uint32_t      offset { 0u };
   uint32_t      location { 0u };
+
+  inline bool operator==( const UniformInfo& rhs )
+  {
+    return name == rhs.name &&
+           uniformClass == rhs.uniformClass &&
+           binding == rhs.binding &&
+           bufferIndex == rhs.bufferIndex &&
+           offset == rhs.offset &&
+           location == rhs.location;
+  }
 };
 
 struct UniformBlockInfo
