@@ -348,7 +348,7 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
   {
     auto& controller = mGraphics->GetController();
 
-    Graphics::API::TextureDetails::Usage graphicsUsage;
+    Graphics::API::TextureDetails::Usage graphicsUsage{};
     switch( usage )
     {
       case Usage::SAMPLE:
