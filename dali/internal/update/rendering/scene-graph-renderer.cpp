@@ -261,12 +261,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     pushBinding.binding = ubInfo.binding;
   }
 
-  // add built-in uniforms
-
   // write to memory
   for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
   {
+    // test for array ( special case )
     std::string uniformName(uniformMap->uniformName);
+    auto hashValue = uniformMap->uniformNameHash;
     int         arrayIndex       = 0;
     auto        arrayLeftBracket = uniformMap->uniformName .find('[');
     if (arrayLeftBracket != std::string::npos)
@@ -274,10 +274,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
       DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
       uniformName = uniformName.substr(0, arrayLeftBracket);
+      hashValue = CalculateHash( uniformName );
     }
 
     auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-    if (shader.GetNamedUniform(uniformName, uniformInfo))
+    if( mShader->GetUniform( uniformName, hashValue, uniformInfo ) )
     {
       // write into correct uniform buffer
       auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
@@ -352,7 +353,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       }
     }
   }
-
 
   /**
    * Prepare textures
