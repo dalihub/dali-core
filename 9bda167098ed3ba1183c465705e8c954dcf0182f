@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "26aa51c4_b5777148",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-20T13:05:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a77a773_f27274fc",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 85,
+        "endChar": 33
+      },
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0bb2ac6b_25e3f5dd",
         "filename": "dali/internal/update/rendering/scene-graph-shader.h",
         "patchSetId": 1
@@ -39,6 +63,24 @@
       "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42727a26_ba681712",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-20T13:05:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bb2ac6b_25e3f5dd",
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
@@ -62,6 +104,30 @@
       "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53209c74_6fd1b2cd",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-20T13:05:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "658df5e3_d60f9b5b",
+      "range": {
+        "startLine": 165,
+        "startChar": 32,
+        "endLine": 165,
+        "endChar": 44
+      },
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
