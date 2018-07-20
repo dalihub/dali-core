@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a77a773_f27274fc",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-20T12:37:10Z",
+      "side": 1,
+      "message": "Can you remove/change this comment please?!",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 85,
+        "endChar": 33
+      },
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0bb2ac6b_25e3f5dd",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-20T12:37:10Z",
+      "side": 1,
+      "message": "Should be in the first public section (This section is for UniformMap::Observer methods).",
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "658df5e3_d60f9b5b",
+        "filename": "dali/internal/update/rendering/scene-graph-shader.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-20T12:37:10Z",
+      "side": 1,
+      "message": "Any reason you can\u0027t use a struct? it\u0027s more readable.",
+      "range": {
+        "startLine": 165,
+        "startChar": 32,
+        "endLine": 165,
+        "endChar": 44
+      },
+      "revId": "9bda167098ed3ba1183c465705e8c954dcf0182f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
