@@ -186,6 +186,7 @@ void ResourceImage::Reload()
     mLoadingState = Dali::ResourceLoadingFailed;
   }
 
+  UploadedSignal().Emit( Dali::Image( this ) );
   mLoadingFinished.Emit( Dali::ResourceImage( this ) );
 }
 
