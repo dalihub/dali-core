@@ -113,15 +113,6 @@ void Layer::ClearRenderables()
 
 } // namespace SceneGraph
 
-template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
-{
-  if( mObject != NULL )
-  {
-    Dali::Internal::SceneGraph::Node::Delete( mObject );
-    mObject = NULL;
-  }
-}
 } // namespace Internal
 
 } // namespace Dali
