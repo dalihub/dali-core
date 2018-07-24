@@ -105,6 +105,49 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   return Graphics::API::BlendOp{};
 }
 
+/**
+ * Helper function writing uniform of any type into dedicated uniform buffer memory
+ */
+void WriteUniform( RenderItem& renderItem, const std::string& name, const void* data, uint32_t size )
+{
+  if( !renderItem.mRenderer )
+  {
+    return;
+  }
+
+  const auto& renderShader = renderItem.mRenderer->GetShader();
+  if( !renderShader.GetGfxObject() )
+  {
+    return;
+  }
+
+  auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+  if( renderShader.GetUniform( name, 0u, uniformInfo ) )
+  {
+    auto dst = (renderItem.mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+    memcpy( dst, data, size );
+  }
+}
+
+void WriteUniform( RenderItem& renderItem, const std::string& name, const Matrix3& data )
+{
+  // Matrix3 has to take stride in account ( 16 )
+  float values[12];
+  std::fill( values, values+12, 10.0f );
+
+  std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
+  std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
+  std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
+
+  WriteUniform( renderItem, name, &values, sizeof(float)*12 );
+}
+
+template<class T>
+void WriteUniform( RenderItem& renderItem, const std::string& name, const T& data )
+{
+  WriteUniform( renderItem, name, &data, sizeof(T) );
+}
+
 }
 
 ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
@@ -209,7 +252,7 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
 }
 
 void GraphicsAlgorithms::SubmitRenderItemList(
-  Graphics::API::Controller&           graphics,
+  Graphics::API::Controller&           controller,
   BufferIndex                          bufferIndex,
   Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
   Matrix                               viewProjection,
@@ -226,7 +269,6 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   std::vector<Graphics::API::RenderCommand*> commandList;
 
-
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
@@ -235,14 +277,37 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
-    auto color = item.mNode->GetWorldColor( bufferIndex );
 
-    auto &cmd = renderer->GetGfxRenderCommand();
-    if (cmd.GetVertexBufferBindings()
-           .empty())
+    // Get command from renderer
+    const auto& rendererCommand = renderer->GetGfxRenderCommand();
+
+    if( rendererCommand.GetVertexBufferBindings().empty() )
     {
       continue;
     }
+
+    // update uniform buffer data for this item
+    std::vector<Graphics::API::RenderCommand::PushConstantsBinding> pushConstantsBindings{};
+    renderer->UpdateUniformBuffers( bufferIndex, item.mUboMemory, pushConstantsBindings );
+
+    auto color = item.mNode->GetWorldColor( bufferIndex );
+
+    // Create render command owned by the render item
+    if( !item.mRenderCommand )
+    {
+      item.mRenderCommand = controller.AllocateRenderCommand();
+    }
+
+    auto& cmd = *item.mRenderCommand;
+
+    // clone render command setup
+    // @todo: we may implement 'inheritance' upon allocation with flags of inherited states
+    rendererCommand.Clone( cmd );
+
+    // Store push constants binding
+    // @todo: turn push constants into DALi controller uniform buffers
+    item.mRenderCommand->PushConstants( std::move(pushConstantsBindings) );
+
     cmd.BindRenderTarget(renderTargetBinding);
 
     cmd.mDrawCommand.SetViewport( { instruction.mViewport.x, instruction.mViewport.y,
@@ -264,24 +329,25 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform("uMvpMatrix", mvp2);
-    renderer->WriteUniform("uViewMatrix", *viewMatrix);
-    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
+    WriteUniform( item, "uModelMatrix", item.mModelMatrix);
+    WriteUniform( item, "uMvpMatrix", mvp2);
+    WriteUniform( item, "uViewMatrix", *viewMatrix);
+    WriteUniform( item, "uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform("uSize", item.mSize);
-    renderer->WriteUniform("uColor", color );
+    WriteUniform( item, "uNormalMatrix", uNormalMatrix);
+    WriteUniform( item, "uProjection", vulkanProjectionMatrix);
+    WriteUniform( item, "uSize", item.mSize);
+    WriteUniform( item, "uColor", color );
 
-    commandList.push_back(&cmd);
+    // replace push constants binding pointer
+    commandList.push_back( &cmd );
   }
 
-  graphics.SubmitCommands( std::move(commandList) );
+  controller.SubmitCommands( std::move(commandList) );
 }
 
 void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
@@ -435,17 +501,21 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    */
   ViewportState viewportState{};
 
-  if (instruction.mIsViewportSet)
+  // Set viewport only when not using dynamic viewport state
+  if( !renderer->GetGfxRenderCommand().GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
   {
     // scissor test only when we have viewport
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
                                 float(instruction.mViewport.width), float(instruction.mViewport.height),
                                 0.0, 1.0});
+
+
+
   }
   else
   {
-    viewportState.SetViewport({0.0, 0.0, 0.0, 0.0,
-                                0.0, 1.0});
+    // Use zero-size viewport for dynamic viewport or viewport-less state
+    viewportState.SetViewport( { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } );
   }
 
   FramebufferState framebufferState{};
@@ -472,6 +542,9 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
   dynamicStateMask |= Graphics::API::PipelineDynamicStateBits::VIEWPORT_BIT;
+
+  // reset pipeline's viewport
+  viewportState.SetViewport({0.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 
   // disable scissors per-pipeline
   viewportState.SetScissorTestEnable( false );
@@ -541,8 +614,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   );
 
 
-  // bind pipeline to the renderer
-  renderer->BindPipeline(std::move(pipeline));
+  // bind pipeline to the render command
+  renderer->BindPipeline( std::move(pipeline) );
   return true;
 }
 
@@ -564,7 +637,7 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
         auto &item = renderList->GetItem(renderItemIndex);
         if( item.mRenderer )
         {
-          PrepareGraphicsPipeline(controller, ri, renderList, item, bufferIndex);
+          PrepareGraphicsPipeline( controller, ri, renderList, item, bufferIndex );
         }
       }
     }
