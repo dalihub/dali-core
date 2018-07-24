@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/common/math.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
 
 namespace
 {
@@ -49,7 +50,9 @@ RenderItem::RenderItem()
   mRenderer( NULL ),
   mTextureSet( NULL ),
   mDepthIndex( 0 ),
-  mIsOpaque( true )
+  mIsOpaque( true ),
+  mRenderCommand{ nullptr },
+  mUboMemory()
 {
 }
 
