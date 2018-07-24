@@ -360,7 +360,6 @@ bool Pipeline::Initialise()
           .setPMultisampleState( PrepareMultisampleStateCreateInfo() )
           .setPRasterizationState( PrepareRasterizationStateCreateInfo() )
           .setPTessellationState( PrepareTesselationStateCreateInfo() )
-                  //.setPVertexInputState(PrepareVertexInputStateCreateInfo())
           .setPVertexInputState( &vertexInputState )
           .setPViewportState( PrepareViewportStateCreateInfo() )
           .setPStages( shaderStages.data() )
@@ -509,15 +508,13 @@ const vk::PipelineRasterizationStateCreateInfo* Pipeline::PrepareRasterizationSt
 const vk::PipelineViewportStateCreateInfo* Pipeline::PrepareViewportStateCreateInfo()
 {
   const auto& vpInfo = mCreateInfo->info.viewportState;
+  const auto& dynamicStateInfo = mCreateInfo->info.dynamicStateMask;
 
-  auto width = vpInfo.viewport.width;
-  auto height = vpInfo.viewport.height;
-
-  if( !uint32_t( width ) )
-  {
-    width = float( mGraphics.GetSwapchainForFBID( 0 )->GetCurrentFramebuffer()->GetWidth() );
-    height = float( mGraphics.GetSwapchainForFBID( 0 )->GetCurrentFramebuffer()->GetHeight() );
-  }
+  // Use maximum viewport size in case we use dynamic viewport state
+  auto width = dynamicStateInfo & API::PipelineDynamicStateBits::VIEWPORT_BIT ?
+               float( mGraphics.GetPhysicalDevice().getProperties().limits.maxFramebufferWidth ) : vpInfo.viewport.width;
+  auto height = dynamicStateInfo & API::PipelineDynamicStateBits::VIEWPORT_BIT ?
+                float( mGraphics.GetPhysicalDevice().getProperties().limits.maxFramebufferHeight ) : vpInfo.viewport.height;
 
   // viewports
   mVulkanPipelineState->viewport.viewports.emplace_back( vpInfo.viewport.x, vpInfo.viewport.y, width, height );

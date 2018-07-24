@@ -253,7 +253,7 @@ public:
     Rect2D      scissor {};
 
     bool        viewportEnable { false };
-    Rect2D      viewport {};
+    Viewport    viewport {};
 
     void*    pNext{ nullptr };
     DrawCommand& SetDrawType( DrawType value )
@@ -304,7 +304,7 @@ public:
       return *this;
     }
 
-    DrawCommand& SetViewport( Rect2D value )
+    DrawCommand& SetViewport( Viewport value )
     {
       viewport = value;
       return *this;
@@ -364,7 +364,7 @@ public:
   {
   }
 
-  // derived types should not be moved direcly to prevent slicing
+  // derived types should not be moved directly to prevent slicing
   RenderCommand( RenderCommand&& ) = default;
   RenderCommand& operator=( RenderCommand&& ) = default;
 
@@ -502,6 +502,33 @@ public:
   {
     return mPipeline;
   }
+
+  /**
+   * Clones render command
+   * @param renderCommand
+   */
+  inline void Clone( RenderCommand& renderCommand ) const
+  {
+    renderCommand.mVertexBufferBindings.clear();
+    renderCommand.mUniformBufferBindings.clear();
+    renderCommand.mTextureBindings.clear();
+    renderCommand.mSamplerBindings.clear();
+    renderCommand.mPushConstantsBindings.clear();
+
+    renderCommand.mVertexBufferBindings.insert( renderCommand.mVertexBufferBindings.begin(), mVertexBufferBindings.begin(), mVertexBufferBindings.end() );
+    renderCommand.mUniformBufferBindings.insert( renderCommand.mUniformBufferBindings.begin(), mUniformBufferBindings.begin(), mUniformBufferBindings.end() );
+    renderCommand.mTextureBindings.insert( renderCommand.mTextureBindings.begin(), mTextureBindings.begin(), mTextureBindings.end() );
+    renderCommand.mSamplerBindings.insert( renderCommand.mSamplerBindings.begin(), mSamplerBindings.begin(), mSamplerBindings.end() );
+    renderCommand.mIndexBufferBinding = mIndexBufferBinding;
+    renderCommand.mRenderTargetBinding = mRenderTargetBinding;
+    renderCommand.mDrawCommand = mDrawCommand;
+    renderCommand.mPushConstantsBindings.insert( renderCommand.mPushConstantsBindings.begin(), mPushConstantsBindings.begin(), mPushConstantsBindings.end() );
+    renderCommand.mPipeline = mPipeline;
+
+    // needs to update all for clone command
+    renderCommand.mUpdateFlags = RENDER_COMMAND_UPDATE_ALL_BITS;
+  }
+
 
   friend std::ostream& operator<<(std::ostream& ss, const RenderCommand& object);
 

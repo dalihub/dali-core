@@ -358,17 +358,12 @@ struct Controller::Impl
       {
         auto viewportRect = apiCommand->mDrawCommand.viewport;
 
-        // Use default swapchain size in case there is no width/height provided
-        if( viewportRect.width == 0 || viewportRect.height == 0 )
-        {
-          viewportRect.width = mCurrentFramebuffer->GetWidth();
-          viewportRect.height = mCurrentFramebuffer->GetHeight();
-        }
-
-        vk::Viewport viewport( float(viewportRect.x),
-                               float(viewportRect.y),
-                               float(viewportRect.width),
-                               float(viewportRect.height), 0.0f, 1.0f );
+        vk::Viewport viewport( viewportRect.x,
+                               viewportRect.y,
+                               viewportRect.width,
+                               viewportRect.height,
+                               viewportRect.minDepth,
+                               viewportRect.maxDepth );
 
         cmdbuf->SetViewport( 0, 1, &viewport );
       }
