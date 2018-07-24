@@ -22,6 +22,30 @@
       "revId": "f11b23cb80ecb9df93f72fee36bbb83403405acd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f45a866_dd83791d",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-07-24T18:22:18Z",
+      "side": 1,
+      "message": "fixed. additionally, i changed the type from Rect2D to Viewport for RenderCommand::SetViewport() for consistency.",
+      "parentUuid": "68957f48_71094d29",
+      "range": {
+        "startLine": 364,
+        "startChar": 58,
+        "endLine": 364,
+        "endChar": 69
+      },
+      "revId": "f11b23cb80ecb9df93f72fee36bbb83403405acd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     }
   ]
 }
