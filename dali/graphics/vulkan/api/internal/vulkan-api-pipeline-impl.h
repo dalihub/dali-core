@@ -63,6 +63,8 @@ public:
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
+  const std::vector< Vulkan::DescriptorSetLayoutSignature >& GetDescriptorSetLayoutSignatures() const;
+
   API::PipelineDynamicStateMask GetDynamicStateMask() const;
 
 private:
@@ -85,6 +87,8 @@ private:
 
   const vk::PipelineLayout PreparePipelineLayout();
 
+  void GenerateDescriptorSetLayoutSignatures( const std::vector< vk::DescriptorSetLayoutBinding >& bindings );
+
 
   Vulkan::Graphics& mGraphics;
   Controller& mController;
@@ -99,6 +103,7 @@ private:
   struct VulkanPipelineState;
   std::unique_ptr< VulkanPipelineState > mVulkanPipelineState;
 
+  std::vector< Vulkan::DescriptorSetLayoutSignature > mDescriptorSetLayoutSignatures;
   std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 
   PipelineCache* mPipelineCache;

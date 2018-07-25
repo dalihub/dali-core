@@ -148,6 +148,7 @@ void Swapchain::Present()
 
   mGraphics->Present( *mQueue, presentInfo );
 
+  mGraphics->ExecuteActions();
   mGraphics->CollectGarbage();
 
   // handle error

@@ -97,6 +97,9 @@ Graphics::~Graphics()
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" )
   mResourceRegister->PrintReferenceCountReport();
+  PrintAllocationReport( *mDescriptorAllocator );
+
+  mDescriptorAllocator.reset( nullptr );
 
   // Clear the last references of resources in the cache.
   // This should ensure that all resources have been queued for garbage collection
@@ -104,6 +107,9 @@ Graphics::~Graphics()
   mResourceRegister->Clear();
 
   mDeviceMemoryManager.reset( nullptr );
+
+  // Execute any outstanding actions...
+  ExecuteActions();
 
   // Collect the garbage! And shut down gracefully...
   CollectGarbage();
@@ -201,6 +207,7 @@ void Graphics::CreateDevice()
   }
 
   mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
+  mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
 FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
@@ -1053,6 +1060,13 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
   return VkAssert( queue.mQueue.submit( submitInfos, fence ? fence->GetVkHandle() : vk::Fence{} ) );
 }
 
+std::vector< RefCountedDescriptorSet >
+Graphics::AllocateDescriptorSets( const std::vector< DescriptorSetLayoutSignature >& signatures,
+                                  const std::vector< vk::DescriptorSetLayout >& layouts )
+{
+  return mDescriptorAllocator->AllocateDescriptorSets( signatures, layouts );
+}
+
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
   return queue.mQueue.presentKHR( &presentInfo );
@@ -1309,10 +1323,31 @@ void Graphics::CollectGarbage()
                    "Graphics garbage collection complete---------------------------------------" )
 }
 
+void Graphics::ExecuteActions()
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                   "Beginning graphics action execution---------------------------------------" )
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Action queue size: %ld\n", mActionQueue.size() )
+  for( const auto& action : mActionQueue )
+  {
+    action();
+  }
+  mActionQueue.clear();
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                   "Graphics action execution complete---------------------------------------" )
+}
+
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mDiscardQueue.push_back( std::move( deleter ) );
+}
+
+void Graphics::EnqueueAction( std::function< void() > action )
+{
+  std::lock_guard< std::mutex > lock{ mMutex };
+  mActionQueue.push_back( std::move( action ) );
 }
 // --------------------------------------------------------------------------------------------------------------
 

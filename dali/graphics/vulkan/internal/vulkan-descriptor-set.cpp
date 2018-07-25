@@ -54,7 +54,8 @@ bool DescriptorPool::Initialise()
 
 DescriptorPool::DescriptorPool( Graphics& graphics, const vk::DescriptorPoolCreateInfo& createInfo )
         : mGraphics( &graphics ),
-          mCreateInfo( createInfo )
+          mCreateInfo( createInfo ),
+          mAvailableAllocations( createInfo.maxSets )
 {
 }
 
@@ -66,20 +67,54 @@ vk::DescriptorPool DescriptorPool::GetVkHandle() const
 std::vector< RefCountedDescriptorSet >
 DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
 {
+  assert( allocateInfo.descriptorSetCount <= mAvailableAllocations );
+
   // all other fields must be set correct
   allocateInfo.setDescriptorPool( mDescriptorPool );
-  auto result = VkAssert( mGraphics->GetDevice().allocateDescriptorSets( allocateInfo ) );
 
-  std::vector< RefCountedDescriptorSet > retval;
-  retval.reserve( result.size() );
-  for( auto&& item : result )
+  auto descriptorSetHandles = std::vector< vk::DescriptorSet >{};
+  descriptorSetHandles.resize( allocateInfo.descriptorSetCount );
+  auto result = mGraphics->GetDevice().allocateDescriptorSets( &allocateInfo, descriptorSetHandles.data() );
+
+  if( result != vk::Result::eSuccess )
   {
-    Handle< DescriptorSet > handle( new DescriptorSet( *mGraphics, *this, item, allocateInfo ) );
+    return std::move( std::vector< RefCountedDescriptorSet >{} );
+  }
+
+  auto retval = std::vector< RefCountedDescriptorSet >{};
+  retval.reserve( descriptorSetHandles.size() );
+  for( auto&& item : descriptorSetHandles )
+  {
+    RefCountedDescriptorSet handle( new DescriptorSet( *mGraphics, *this, item, allocateInfo ) );
     retval.emplace_back( handle );
     mDescriptorSetCache.emplace_back( handle );
   }
 
+  if( !retval.empty() )
+  {
+    mAvailableAllocations -= allocateInfo.descriptorSetCount;
+    std::cout << "Available allocations: " << mAvailableAllocations << std::endl;
+  }
+
   return retval;
+}
+
+void DescriptorPool::FreeDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets )
+{
+  assert( mCreateInfo.flags & vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+          && "Cannot call free descriptor sets. Pool has not been created with: eFreeDescriptorSet." );
+  if( !descriptorSets.empty() )
+  {
+    if( mGraphics->GetDevice().freeDescriptorSets( mDescriptorPool, descriptorSets ) == vk::Result::eSuccess )
+    {
+      mAvailableAllocations += U32( descriptorSets.size() );
+    }
+  }
+}
+
+uint32_t DescriptorPool::GetAvailableAllocations() const
+{
+  return mAvailableAllocations;
 }
 
 void DescriptorPool::Reset()
@@ -146,8 +181,9 @@ vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
   return mDescriptorSet;
 }
 
-void
-DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView )
+void DescriptorSet::WriteCombinedImageSampler( uint32_t binding,
+                                               RefCountedSampler sampler,
+                                               RefCountedImageView imageView )
 {
   auto imageViewInfo = vk::DescriptorImageInfo{}
           .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
@@ -163,6 +199,24 @@ DescriptorSet::WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sa
 
   // write descriptor set
   mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
+}
+
+bool DescriptorSet::OnDestroy()
+{
+  auto descriptorPool = mPool;
+  auto descriptorSet = mDescriptorSet;
+
+  mGraphics->EnqueueAction( [ descriptorPool, descriptorSet ]()
+                              {
+                                DALI_LOG_INFO( gVulkanFilter,
+                                               Debug::General,
+                                               "Freeing descriptor set: %p -> Returning set to pool: %p\n",
+                                               static_cast< void* >(descriptorSet),
+                                               static_cast< void* >(descriptorPool))
+                                descriptorPool->FreeDescriptorSets( { descriptorSet } );
+                              } );
+
+  return false;
 }
 
 

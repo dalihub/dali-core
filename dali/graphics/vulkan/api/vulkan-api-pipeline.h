@@ -70,6 +70,8 @@ public:
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
+  const std::vector< Vulkan::DescriptorSetLayoutSignature>& GetDescriptorSetLayoutSignatures() const;
+
   API::PipelineDynamicStateMask GetDynamicStateMask() const;
 
 public:
