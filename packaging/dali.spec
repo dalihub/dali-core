@@ -13,6 +13,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  gawk
 BuildRequires:  Vulkan-LoaderAndValidationLayers
 BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
+BuildRequires:  pkgconfig(libtbm)
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)

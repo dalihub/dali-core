@@ -292,8 +292,10 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
-  mIsCompressed( false )
+  mIsCompressed( false ),
+  mNativeImageExtension( nativeImageInterface->GetNativeImageSource() )
 {
+
 }
 
 Texture::~Texture()
@@ -302,6 +304,7 @@ Texture::~Texture()
 void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
+  auto device = mGraphics->GetDevice();
 }
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
