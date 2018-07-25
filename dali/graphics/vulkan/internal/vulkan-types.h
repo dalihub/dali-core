@@ -22,6 +22,7 @@
 #include <atomic>
 #include <unordered_map>
 #include <memory>
+#include <bitset>
 
 #include <dali/integration-api/graphics/vulkan/vulkan-hpp-wrapper.h>
 
@@ -81,6 +82,12 @@ template< typename T >
 inline uint32_t U32( T value )
 {
   return static_cast< uint32_t >(value);
+}
+
+template <typename T>
+inline int32_t I32( T value )
+{
+  return static_cast< int32_t >( value );
 }
 
 /**
@@ -344,6 +351,133 @@ struct FormatInfo
   unsigned int blockHeight       { 0u };
   unsigned int blockDepth        { 0u };
 };
+
+enum class DescriptorType : size_t
+{
+  STORAGE_IMAGE,
+  SAMPLER,
+  SAMPLED_IMAGE,
+  COMBINED_IMAGE_SAMPLER,
+  UNIFORM_TEXEL_BUFFER,
+  STORAGE_TEXEL_BUFFER,
+  UNIFORM_BUFFER,
+  STORAGE_BUFFER,
+  DYNAMIC_UNIFORM_BUFFER,
+  DYNAMIC_STORAGE_BUFFER,
+  INPUT_ATTACHMENT,
+  DESCRIPTOR_TYPE_COUNT
+};
+
+template< size_t valueSizeInBits, typename EnumT, size_t descriptorTypeCount >
+class TypeValueEncoder final
+{
+private: // Compile time constants
+  static constexpr size_t bitsetSize = descriptorTypeCount + valueSizeInBits * descriptorTypeCount;
+
+public:
+
+  TypeValueEncoder()
+  {
+    static_assert( std::is_same< size_t, UnderlyingEnumType >::value, "Enum class underlying type must be size_t." );
+  }
+
+  bool Contains( EnumT descriptorType ) const
+  {
+    return mMask.test( static_cast< UnderlyingEnumType >( descriptorType ) );
+  }
+
+  uint64_t GetValueFor( EnumT descriptorType ) const
+  {
+    return ( ( mMask >> ( descriptorTypeCount +
+                          ToIntegral( descriptorType ) * valueSizeInBits ) ) &
+             std::bitset< bitsetSize >( std::bitset< valueSizeInBits >().flip().to_ulong() ) ).to_ulong();
+  }
+
+  TypeValueEncoder& EncodeValue( size_t count, EnumT type )
+  {
+    mMask.set( ToIntegral( type ) );
+    EncodeCount( count, type );
+
+    return *this;
+  }
+
+  std::vector< std::tuple< EnumT, uint64_t > > Decode() const
+  {
+    auto result = std::vector< std::tuple< EnumT, uint64_t > >{};
+
+    for( auto i = 0u; i < descriptorTypeCount; ++i)
+    {
+      if( mMask.test( i ) )
+      {
+        auto castEnum = static_cast< EnumT >( i );
+        auto value = GetValueFor( castEnum );
+
+        result.emplace_back( castEnum, value );
+      }
+    }
+
+    return result;
+  };
+
+private: // Functions and aliases
+
+  using UnderlyingEnumType = typename std::underlying_type< EnumT >::type;
+
+  constexpr UnderlyingEnumType ToIntegral( EnumT descriptorType ) const
+  {
+    return static_cast< UnderlyingEnumType >( descriptorType );
+  }
+
+  void EncodeCount( size_t count, DescriptorType descriptorType )
+  {
+    assert(count <= std::bitset< valueSizeInBits >().flip().to_ulong()
+           && "Cannot encode descriptor count. Maximum possible value exceeded.");
+
+    mMask |= std::bitset< bitsetSize >( count ) << descriptorTypeCount
+                                                   + ToIntegral( descriptorType ) * valueSizeInBits;
+  }
+
+  template<size_t valueSizeInBits_, typename EnumT_, size_t descriptorTypeCount_>
+  friend bool operator==(const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& lhs,
+                         const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& rhs);
+
+  template<size_t valueSizeInBits_, typename EnumT_, size_t descriptorTypeCount_>
+  friend bool operator!=(const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& lhs,
+                         const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& rhs);
+
+  template<size_t valueSizeInBits_, typename EnumT_, size_t descriptorTypeCount_>
+  friend std::ostream& operator<<( std::ostream& os,
+                                   const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& rhs );
+
+private: // Members
+
+  std::bitset< bitsetSize > mMask;
+};
+
+template <size_t valueSizeInBits, typename EnumT, size_t descriptorTypeCount>
+bool operator==(const TypeValueEncoder< valueSizeInBits, EnumT, descriptorTypeCount >& lhs,
+                const TypeValueEncoder< valueSizeInBits, EnumT, descriptorTypeCount >& rhs)
+{
+  return lhs.mMask == rhs.mMask;
+}
+
+template <size_t valueSizeInBits, typename EnumT, size_t descriptorTypeCount>
+bool operator!=(const TypeValueEncoder< valueSizeInBits, EnumT, descriptorTypeCount >& lhs,
+                const TypeValueEncoder< valueSizeInBits, EnumT, descriptorTypeCount >& rhs)
+{
+  return lhs.mMask != rhs.mMask;
+}
+
+template<size_t valueSizeInBits_, typename EnumT_, size_t descriptorTypeCount_>
+std::ostream& operator<<( std::ostream& os,
+                          const TypeValueEncoder< valueSizeInBits_, EnumT_, descriptorTypeCount_ >& rhs )
+{
+  os << rhs.mMask.to_string();
+  return os;
+}
+
+using DescriptorSetLayoutSignature =
+TypeValueEncoder< 4, DescriptorType, static_cast< size_t >(DescriptorType::DESCRIPTOR_TYPE_COUNT) >;
 
 /*
  * Forward declarations of reference types

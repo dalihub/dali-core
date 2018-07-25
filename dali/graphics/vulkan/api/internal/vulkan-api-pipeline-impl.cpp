@@ -587,6 +587,8 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
               dsBindings.end(), fshDsLayouts[i].pBindings, fshDsLayouts[i].pBindings + fshDsLayouts[i].bindingCount );
     }
 
+    GenerateDescriptorSetLayoutSignatures( dsBindings );
+
     layouts[i].pBindings = dsBindings.data();
     layouts[i].bindingCount = Vulkan::U32( dsBindings.size() );
 
@@ -604,6 +606,83 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
           .setPushConstantRangeCount( 0 );
 
   return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator() ) );
+}
+
+void Pipeline::GenerateDescriptorSetLayoutSignatures( const std::vector< vk::DescriptorSetLayoutBinding >& bindings )
+{
+  auto descriptorTypesAndCount = std::vector< std::tuple< uint32_t, Vulkan::DescriptorType > >{};
+
+  std::for_each( bindings.cbegin(),
+                 bindings.cend(),
+                 [ & ]( const vk::DescriptorSetLayoutBinding binding ) {
+                   auto value = binding.descriptorCount;
+                   Vulkan::DescriptorType descriptorType;
+
+                   switch( binding.descriptorType )
+                   {
+                     case vk::DescriptorType::eStorageImage:
+                       descriptorType = Vulkan::DescriptorType::STORAGE_IMAGE;
+                       break;
+                     case vk::DescriptorType::eSampler:
+                       descriptorType = Vulkan::DescriptorType::SAMPLER;
+                       break;
+                     case vk::DescriptorType::eSampledImage:
+                       descriptorType = Vulkan::DescriptorType::SAMPLED_IMAGE;
+                       break;
+                     case vk::DescriptorType::eCombinedImageSampler:
+                       descriptorType = Vulkan::DescriptorType::COMBINED_IMAGE_SAMPLER;
+                       break;
+                     case vk::DescriptorType::eUniformTexelBuffer:
+                       descriptorType = Vulkan::DescriptorType::UNIFORM_TEXEL_BUFFER;
+                       break;
+                     case vk::DescriptorType::eStorageTexelBuffer:
+                       descriptorType = Vulkan::DescriptorType::STORAGE_TEXEL_BUFFER;
+                       break;
+                     case vk::DescriptorType::eUniformBuffer:
+                       descriptorType = Vulkan::DescriptorType::UNIFORM_BUFFER;
+                       break;
+                     case vk::DescriptorType::eStorageBuffer:
+                       descriptorType = Vulkan::DescriptorType::STORAGE_BUFFER;
+                       break;
+                     case vk::DescriptorType::eUniformBufferDynamic:
+                       descriptorType = Vulkan::DescriptorType::DYNAMIC_UNIFORM_BUFFER;
+                       break;
+                     case vk::DescriptorType::eStorageBufferDynamic:
+                       descriptorType = Vulkan::DescriptorType::DYNAMIC_STORAGE_BUFFER;
+                       break;
+                     case vk::DescriptorType::eInputAttachment:
+                       descriptorType = Vulkan::DescriptorType::INPUT_ATTACHMENT;
+                       break;
+                   }
+
+                   auto found = std::find_if( descriptorTypesAndCount.begin(),
+                                              descriptorTypesAndCount.end(),
+                                              [ & ]( std::tuple< uint32_t, Vulkan::DescriptorType > tuple )
+                                              {
+                                                return descriptorType == std::get< Vulkan::DescriptorType >( tuple );
+                                              } );
+
+                   if( found == descriptorTypesAndCount.end() )
+                   {
+                     descriptorTypesAndCount.emplace_back( value, descriptorType );
+                   }
+                   else
+                   {
+                     auto& valueRef = std::get< uint32_t >( *found );
+                     valueRef += value;
+                   }
+                 } );
+
+  auto signature = Vulkan::DescriptorSetLayoutSignature{};
+  std::for_each( descriptorTypesAndCount.begin(),
+                 descriptorTypesAndCount.end(),
+                 [ & ]( const std::tuple< uint32_t, Vulkan::DescriptorType > tuple )
+                 {
+                   signature.EncodeValue( std::get< uint32_t >( tuple ),
+                                          std::get< Vulkan::DescriptorType >( tuple ) );
+                 } );
+
+  mDescriptorSetLayoutSignatures.emplace_back( signature );
 }
 
 void Pipeline::Reference()
@@ -643,6 +722,11 @@ Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
 const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
 {
   return mVkDescriptorSetLayouts;
+}
+
+const std::vector< Vulkan::DescriptorSetLayoutSignature >& Pipeline::GetDescriptorSetLayoutSignatures() const
+{
+  return mDescriptorSetLayoutSignatures;
 }
 
 API::PipelineDynamicStateMask Pipeline::GetDynamicStateMask() const

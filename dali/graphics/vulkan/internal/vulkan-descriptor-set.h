@@ -83,6 +83,8 @@ public:
    */
   vk::DescriptorSet GetVkDescriptorSet() const;
 
+  bool OnDestroy() override;
+
 private:
 
   DescriptorSet( Graphics& graphics, DescriptorPool& pool, vk::DescriptorSet descriptorSet,
@@ -108,6 +110,10 @@ public:
 
   std::vector< RefCountedDescriptorSet > AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo );
 
+  void FreeDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets );
+
+  uint32_t GetAvailableAllocations() const;
+
   /**
    * Resets descriptor pool
    */
@@ -124,8 +130,10 @@ private:
 
   vk::DescriptorPool mDescriptorPool;
 
+  uint32_t mAvailableAllocations{ 0u };
+
   // cache
-  std::vector< Handle< DescriptorSet>> mDescriptorSetCache;
+  std::vector< RefCountedDescriptorSet > mDescriptorSetCache;
 };
 
 #if 0

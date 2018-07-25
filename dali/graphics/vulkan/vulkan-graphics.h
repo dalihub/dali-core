@@ -27,6 +27,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
+#include <dali/graphics/vulkan/internal/vulkan-descriptor-allocator.h>
 
 #include <thread>
 #include <mutex>
@@ -71,6 +72,8 @@ class GpuMemoryManager;
 class ResourceRegister;
 
 class FramebufferAttachment;
+
+class DescriptorSetAllocator;
 
 using Dali::Integration::Graphics::SurfaceFactory;
 using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
@@ -188,6 +191,10 @@ public: // Actions
 
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 
+  std::vector< RefCountedDescriptorSet >
+  AllocateDescriptorSets( const std::vector< DescriptorSetLayoutSignature >& signatures,
+                          const std::vector< vk::DescriptorSetLayout >& layouts);
+
   vk::Result Present( Queue& queue, vk::PresentInfoKHR presentInfo );
 
   vk::Result QueueWaitIdle( Queue& queue );
@@ -261,8 +268,11 @@ public: //Cache management methods
 
   void CollectGarbage();
 
+  void ExecuteActions();
+
   void DiscardResource( std::function< void() > deleter );
 
+  void EnqueueAction( std::function< void() > action );
 
 private: // Methods
 
@@ -325,7 +335,10 @@ private: // Members
   // Command pool map using thread IDs as keys
   CommandPoolMap mCommandPools;
 
-  DiscardQueue mDiscardQueue;
+  std::unique_ptr< DescriptorSetAllocator > mDescriptorAllocator;
+
+  std::vector< std::function< void() > > mActionQueue;
+  std::vector< std::function< void() > > mDiscardQueue;
 };
 
 } // namespace Vulkan

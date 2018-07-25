@@ -58,6 +58,11 @@ const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayout
   return mPipelineImpl->GetVkDescriptorSetLayouts();
 }
 
+const std::vector< Vulkan::DescriptorSetLayoutSignature >& Pipeline::GetDescriptorSetLayoutSignatures() const
+{
+  return mPipelineImpl->GetDescriptorSetLayoutSignatures();
+}
+
 API::PipelineDynamicStateMask Pipeline::GetDynamicStateMask() const
 {
   return mPipelineImpl->GetDynamicStateMask();
