@@ -452,6 +452,32 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
       topology = PrimitiveTopology::TRIANGLE_STRIP;
       break;
     }
+    case Dali::Geometry::Type::LINE_LOOP:
+    case Dali::Geometry::Type::LINE_STRIP:
+    {
+      topology = PrimitiveTopology::LINE_STRIP;
+      break;
+    }
+    case Dali::Geometry::Type::LINES:
+    {
+      topology = PrimitiveTopology::LINE_LIST;
+      break;
+    }
+    case Dali::Geometry::Type::TRIANGLE_FAN:
+    {
+      topology = PrimitiveTopology::TRIANGLE_FAN;
+      break;
+    }
+    case Dali::Geometry::Type::POINTS:
+    {
+      topology = PrimitiveTopology::POINT_LIST;
+      break;
+    }
+    case Dali::Geometry::Type::TRIANGLES:
+    {
+      topology = PrimitiveTopology::TRIANGLE_LIST;
+      break;
+    }
     default:
     {
       topology = PrimitiveTopology::TRIANGLE_LIST;
