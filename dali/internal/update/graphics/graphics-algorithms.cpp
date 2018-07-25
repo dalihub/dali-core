@@ -379,11 +379,26 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
 
-  auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{}
-  .SetClearColors( {{ instruction.mClearColor.r,
-                    instruction.mClearColor.g,
-                    instruction.mClearColor.b,
-                    instruction.mClearColor.a }} );
+  auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{};
+
+  std::vector<Framebuffer::ClearColor> clearColors;
+  if( instruction.mIsClearColorSet )
+  {
+    clearColors.push_back({ instruction.mClearColor.r,
+                            instruction.mClearColor.g,
+                            instruction.mClearColor.b,
+                            instruction.mClearColor.a } );
+  }
+
+  if( instruction.mIsDepthClearColorSet )
+  {
+    clearColors.push_back({ instruction.mDepthClearColor.r,
+                            instruction.mDepthClearColor.g,
+                            instruction.mDepthClearColor.b,
+                            instruction.mDepthClearColor.a });
+  }
+  renderTargetBinding.SetClearColors( std::move(clearColors) );
+
 
   if( !instruction.mIgnoreRenderToFbo )
   {

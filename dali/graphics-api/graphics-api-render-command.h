@@ -204,6 +204,7 @@ public:
     const Framebuffer*                    framebuffer { nullptr };
     std::vector<Framebuffer::ClearColor>  clearColors {};
     Framebuffer::DepthStencilClearColor   depthStencilClearColor {};
+    bool depthStencilClearColorSet {false};
     float framebufferWidth; // Store the framebuffer size in case we need to set viewport
     float framebufferHeight;
 
@@ -225,6 +226,7 @@ public:
     RenderTargetBinding& SetDepthStencilClearColor( Framebuffer::DepthStencilClearColor value )
     {
       depthStencilClearColor = value;
+      depthStencilClearColorSet = true;
       return *this;
     }
 

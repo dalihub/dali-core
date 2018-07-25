@@ -225,22 +225,14 @@ struct Controller::Impl
     {
       mCurrentFramebuffer = framebuffer;
 
-      // @todo Add Pipeline Barrier
-
-
-
-      // @todo Only do if there is a color attachment and color clear is enabled and there is a clear color
       auto newColors = mCurrentFramebuffer->GetClearValues();
-      newColors[0].color.setFloat32( { renderTargetBinding.clearColors[0].r,
-                                       renderTargetBinding.clearColors[0].g,
-                                       renderTargetBinding.clearColors[0].b,
-                                       renderTargetBinding.clearColors[0].a
-                                     } );
-      if( 0 ) // @todo Only do if there is a depth buffer & depth clear is enabled
+      for( auto i=0u; i<renderTargetBinding.clearColors.size(); ++i )
       {
-        newColors[1].setDepthStencil( vk::ClearDepthStencilValue{}
-                                      .setDepth( 0.0f )
-                                      .setStencil( 0 ));
+        newColors[i].color.setFloat32( { renderTargetBinding.clearColors[i].r,
+                                         renderTargetBinding.clearColors[i].g,
+                                         renderTargetBinding.clearColors[i].b,
+                                         renderTargetBinding.clearColors[i].a
+                                       } );
       }
 
       mRenderPasses.emplace_back(
@@ -338,7 +330,6 @@ struct Controller::Impl
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
 
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
-      //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
 
       // set dynamic state
       if( apiCommand->mDrawCommand.scissorTestEnable )

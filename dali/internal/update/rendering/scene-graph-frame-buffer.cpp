@@ -93,7 +93,7 @@ void FrameBuffer::PrepareFramebuffer()
     {
       auto graphicsTexture = mColorAttachment.texture->GetGfxObject();
       //@todo check if the texture has the right creation flags - if it's already been uploaded, it
-      // needs the layout & usage changing appropriately.
+      // needs the layout & usage changing appropriately. - does that need doing here?
       if( !graphicsTexture )
       {
         mColorAttachment.texture->CreateTexture( Texture::Usage::COLOR_ATTACHMENT );

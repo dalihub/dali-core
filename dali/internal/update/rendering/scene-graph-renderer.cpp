@@ -329,10 +329,13 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
 
+#if defined(DEBUG_ENABLED)
+  auto texture0 = ((textureSet && textureSet->GetTextureCount() > 0) ? textureSet->GetTexture(0) : nullptr );
+  auto gfxTexture0 = (texture0 != nullptr ? texture0->GetGfxObject() : nullptr );
+
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
-                 "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
-                 textureSet?textureSet->GetTexture(0):nullptr,
-                 textureSet?(textureSet->GetTexture(0)?textureSet->GetTexture(0)->GetGfxObject():nullptr):nullptr );
+                 "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet, texture0, gfxTexture0 );
+#endif
 }
 
 void Renderer::SetShader( Shader* shader )

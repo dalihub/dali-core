@@ -127,9 +127,11 @@ private:
 public: // Data
 
   Viewport mViewport;                   ///< Optional viewport
-  Vector4  mClearColor;                 ///< Optional color to clear with
+  Vector4  mClearColor;                 ///< Optional color to clear color attachment
+  Vector4  mDepthClearColor;            ///< Optional color to clear depth attachment
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
+  bool     mIsClearColorSet:1;          ///< Flag to determine whether the color attachment clearColor is set
+  bool     mIsDepthClearColorSet:1;     ///< Flag to determine whether the depth/stencil clearColor is set
   bool     mIgnoreRenderToFbo:1;        ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   SceneGraph::FrameBuffer* mFrameBuffer;
