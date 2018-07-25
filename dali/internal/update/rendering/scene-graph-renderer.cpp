@@ -297,10 +297,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   {
     mGraphicsRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
-                                        .SetDrawType(Graphics::API::RenderCommand::DrawType::INDEXED_DRAW)
-                                        .SetFirstInstance(0u)
-                                        .SetIndicesCount( mGeometry->GetIndexBufferElementCount() )
-                                        .SetInstanceCount(1u)));
+                                        .SetDrawType( Graphics::API::RenderCommand::DrawType::INDEXED_DRAW )
+                                        .SetFirstInstance( 0u )
+                                        .SetIndicesCount(
+                                          mIndexedDrawElementsCount ?
+                                            uint32_t( mIndexedDrawElementsCount ) :
+                                            mGeometry->GetIndexBufferElementCount() )
+                                        .SetInstanceCount( 1u )));
   }
   else
   {
