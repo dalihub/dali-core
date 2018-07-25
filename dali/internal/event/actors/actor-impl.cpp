@@ -5267,7 +5267,10 @@ void Actor::Raise()
         }
       }
     }
-    mParent->mChildOrderChangedSignal.Emit();
+
+    Dali::Actor handle( this );
+    mParent->mChildOrderChangedSignal.Emit( handle );
+
     RequestRebuildDepthTree();
   }
   else
@@ -5295,7 +5298,10 @@ void Actor::Lower()
         }
       }
     }
-    mParent->mChildOrderChangedSignal.Emit();
+
+    Dali::Actor handle( this );
+    mParent->mChildOrderChangedSignal.Emit( handle );
+
     RequestRebuildDepthTree();
   }
   else
@@ -5318,7 +5324,10 @@ void Actor::RaiseToTop()
         siblings.push_back(ActorPtr(this));
       }
     }
-    mParent->mChildOrderChangedSignal.Emit();
+
+    Dali::Actor handle( this );
+    mParent->mChildOrderChangedSignal.Emit( handle );
+
     RequestRebuildDepthTree();
   }
   else
@@ -5343,7 +5352,10 @@ void Actor::LowerToBottom()
         siblings.insert(siblings.begin(), thisPtr);
       }
     }
-    mParent->mChildOrderChangedSignal.Emit();
+
+    Dali::Actor handle( this );
+    mParent->mChildOrderChangedSignal.Emit( handle );
+
     RequestRebuildDepthTree();
   }
   else
@@ -5373,7 +5385,9 @@ void Actor::RaiseAbove( Internal::Actor& target )
         siblings.insert(targetIter, thisPtr);
       }
 
-      mParent->mChildOrderChangedSignal.Emit();
+      Dali::Actor handle( this );
+      mParent->mChildOrderChangedSignal.Emit( handle );
+
       RequestRebuildDepthTree();
     }
   }
@@ -5401,7 +5415,9 @@ void Actor::LowerBelow( Internal::Actor& target )
         siblings.insert(targetIter, thisPtr);
       }
 
-      mParent->mChildOrderChangedSignal.Emit();
+      Dali::Actor handle( this );
+      mParent->mChildOrderChangedSignal.Emit( handle );
+
       RequestRebuildDepthTree();
     }
   }
