@@ -21,6 +21,7 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/internal/vulkan-sampler.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-resource-register.cpp \
     $(graphics_src_dir)/vulkan/internal/spirv/vulkan-spirv.cpp \
+    $(graphics_src_dir)/vulkan/internal/tizen/native-image-extensions-tizen.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-controller.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-shader.cpp \

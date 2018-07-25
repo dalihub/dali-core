@@ -29,6 +29,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
+#include <dali/graphics/vulkan/internal/tizen/native-image-extensions-tizen.h>
 
 namespace Dali
 {
@@ -153,6 +154,7 @@ private:
   Type                    mType:2;           ///< Type of the texture
   bool                    mHasAlpha : 1;     ///< Whether the format has an alpha channel
   bool                    mIsCompressed : 1; ///< Whether the format is compressed
+  Graphics::Vulkan::NativeImageExtensions   mNativeImageExtension;
 };
 
 

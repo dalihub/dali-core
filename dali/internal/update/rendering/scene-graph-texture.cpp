@@ -277,7 +277,8 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mMaxMipMapLevel( 0 ),
   mType( type ),
   mHasAlpha( HasAlpha( format ) ),
-  mIsCompressed( IsCompressedFormat( format ) )
+  mIsCompressed( IsCompressedFormat( format ) ),
+  mNativeImageExtension(static_cast<Any>( 0 ))
 {
 }
 
@@ -292,8 +293,10 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
-  mIsCompressed( false )
+  mIsCompressed( false ),
+  mNativeImageExtension( nativeImageInterface->GetNativeImageSource() )
 {
+
 }
 
 Texture::~Texture()
@@ -302,6 +305,14 @@ Texture::~Texture()
 void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
+  if (mGraphics)
+  {
+       auto& controller = mGraphics->GetController();
+       VulkanAPI::TextureFactory& factory = dynamic_cast<VulkanAPI::TextureFactory&>( controller.GetTextureFactory() );
+       Vulkan::Graphics& vulkan_graphics = factory.GetGraphics();
+       vk::Device device = vulkan_graphics.getDevice();
+  }
+
 }
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
