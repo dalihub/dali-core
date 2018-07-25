@@ -576,12 +576,12 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
     std::vector< vk::DescriptorSetLayoutBinding > dsBindings;
 
     // concatenate bindings per set
-    if( vshDsLayouts[i].bindingCount )
+    if( !vshDsLayouts.empty() && vshDsLayouts[i].bindingCount )
     {
       dsBindings.insert(
               dsBindings.end(), vshDsLayouts[i].pBindings, vshDsLayouts[i].pBindings + vshDsLayouts[i].bindingCount );
     }
-    if( fshDsLayouts[i].bindingCount )
+    if( !fshDsLayouts.empty() && fshDsLayouts[i].bindingCount )
     {
       dsBindings.insert(
               dsBindings.end(), fshDsLayouts[i].pBindings, fshDsLayouts[i].pBindings + fshDsLayouts[i].bindingCount );
@@ -590,10 +590,8 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
     layouts[i].pBindings = dsBindings.data();
     layouts[i].bindingCount = Vulkan::U32( dsBindings.size() );
 
-
     dsLayouts.emplace_back( VkAssert( mGraphics.GetDevice()
                                                .createDescriptorSetLayout( layouts[i], mGraphics.GetAllocator() ) ) );
-
   }
 
   mVkDescriptorSetLayouts = dsLayouts;
