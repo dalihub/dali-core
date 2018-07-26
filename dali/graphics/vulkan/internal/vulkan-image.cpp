@@ -150,7 +150,7 @@ bool Image::OnDestroy()
 
     mGraphics->DiscardResource( [ device, image, allocator ]() {
       DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
-                     static_cast< void* >(image) )
+                     static_cast< VkImage >(image) )
       device.destroyImage( image, allocator );
     } );
   }

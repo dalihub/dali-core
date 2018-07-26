@@ -143,7 +143,7 @@ bool Sampler::OnDestroy()
 
   mGraphics->DiscardResource( [ device, sampler, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: sampler->%p\n",
-                   static_cast< void* >(sampler) )
+                   static_cast< VkSampler >(sampler) )
     device.destroySampler( sampler, allocator );
   } );
 

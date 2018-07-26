@@ -61,7 +61,7 @@ bool Fence::OnDestroy()
   // capture copies of the pointers and handles
   mGraphics->DiscardResource( [ device, fence, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: fence->%p\n",
-                   static_cast< void* >(fence) )
+                   static_cast< VkFence >(fence) )
     device.destroyFence( fence, allocator );
   } );
 

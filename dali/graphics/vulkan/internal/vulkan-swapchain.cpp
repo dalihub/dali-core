@@ -71,7 +71,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< VkSwapchainKHR >(mSwapchainKHR) );
     return RefCountedFramebuffer();
   }
 
@@ -118,7 +118,7 @@ void Swapchain::Present()
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< VkSwapchainKHR >(mSwapchainKHR) );
     return;
   }
 
@@ -164,7 +164,7 @@ void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< void* >(mSwapchainKHR) );
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Attempt to present invalid/expired swapchain: %p\n", static_cast< VkSwapchainKHR >(mSwapchainKHR) );
     return;
   }
 
@@ -196,7 +196,7 @@ bool Swapchain::OnDestroy()
 
     graphics->DiscardResource( [ device, swapchain, allocator ]() {
       DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: swap chain->%p\n",
-                     static_cast< void* >(swapchain) )
+                     static_cast< VkSwapchainKHR >(swapchain) )
       device.destroySwapchainKHR( swapchain, allocator );
     } );
   }

@@ -265,13 +265,13 @@ bool Framebuffer::OnDestroy()
   mGraphics->DiscardResource( [ device, frameBuffer, renderPass, allocator ]() {
 
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: framebuffer->%p\n",
-                   static_cast< void* >(frameBuffer) )
+                   static_cast< VkFramebuffer >(frameBuffer) )
     device.destroyFramebuffer( frameBuffer, allocator );
 
     if( renderPass )
     {
       DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: render pass->%p\n",
-                     static_cast< void* >(renderPass) )
+                     static_cast< VkRenderPass >(renderPass) )
       device.destroyRenderPass( renderPass, allocator );
     }
 

@@ -296,7 +296,7 @@ void ResourceRegister::PrintReferenceCountReport()
   for( auto* buffer : mBuffers )
   {
     auto refCount = buffer->GetRefCount();
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tbuffer->%p : %d\n", static_cast< void* >(buffer->GetVkHandle()),
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tbuffer->%p : %d\n", static_cast< VkBuffer >(buffer->GetVkHandle()),
                    refCount )
     totalRefCount += refCount;
   }
@@ -308,7 +308,7 @@ void ResourceRegister::PrintReferenceCountReport()
   for( auto* image : mImages )
   {
     auto refCount = image->GetRefCount();
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\timage->%p : %d\n", static_cast< void* >(image->GetVkHandle()),
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\timage->%p : %d\n", static_cast< VkImage >(image->GetVkHandle()),
                    refCount )
     totalRefCount += refCount;
   }
@@ -321,7 +321,7 @@ void ResourceRegister::PrintReferenceCountReport()
   {
     auto refCount = imageView->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\timage view->%p : %d\n",
-                   static_cast< void* >(imageView->GetVkHandle()), refCount )
+                   static_cast< VkImageView >(imageView->GetVkHandle()), refCount )
     totalRefCount += refCount;
   }
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal reference count: %d\n", totalRefCount )
@@ -333,7 +333,7 @@ void ResourceRegister::PrintReferenceCountReport()
   {
     auto refCount = shader->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tshader module->%p : %d\n",
-                   static_cast< void* >(shader->GetVkHandle()), refCount )
+                   static_cast< VkShaderModule >(shader->GetVkHandle()), refCount )
     totalRefCount += refCount;
   }
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal reference count: %d\n", totalRefCount )
@@ -345,7 +345,7 @@ void ResourceRegister::PrintReferenceCountReport()
   {
     auto refCount = descPool->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tdescriptor pool->%p : %d\n",
-                   static_cast< void* >(descPool->GetVkHandle()), refCount )
+                   static_cast< VkDescriptorPool >(descPool->GetVkHandle()), refCount )
     totalRefCount += refCount;
   }
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal reference count: %d\n", totalRefCount )
@@ -357,7 +357,7 @@ void ResourceRegister::PrintReferenceCountReport()
   {
     auto refCount = framebuffer->GetRefCount();
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tframebuffer->%p : %d\n",
-                   static_cast< void* >(framebuffer->GetVkHandle()), refCount )
+                   static_cast< VkFramebuffer >(framebuffer->GetVkHandle()), refCount )
     totalRefCount += refCount;
   }
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tTotal reference count: %d\n", totalRefCount )
@@ -368,7 +368,7 @@ void ResourceRegister::PrintReferenceCountReport()
   for( auto& sampler : mSamplers )
   {
     auto refCount = sampler->GetRefCount();
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tsampler->%p : %d\n", static_cast< void* >(sampler->GetVkHandle()),
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "\tsampler->%p : %d\n", static_cast< VkSampler >(sampler->GetVkHandle()),
                    refCount )
     totalRefCount += refCount;
   }

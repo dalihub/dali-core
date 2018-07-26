@@ -98,7 +98,7 @@ bool DescriptorPool::OnDestroy()
 
   mGraphics->DiscardResource( [ device, descriptorPool, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: descriptor pool->%p\n",
-                   static_cast< void* >(descriptorPool) )
+                   static_cast< VkDescriptorPool >(descriptorPool) )
     device.destroyDescriptorPool( descriptorPool, allocator );
   } );
 

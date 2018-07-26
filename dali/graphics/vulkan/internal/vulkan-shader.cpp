@@ -118,7 +118,7 @@ bool Shader::OnDestroy()
 
   mImpl->mGraphics.DiscardResource( [ device, shaderModule, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: shader module->%p\n",
-                   static_cast< void* >(shaderModule) )
+                   static_cast< VkShaderModule >(shaderModule) )
     device.destroyShaderModule( shaderModule, allocator );
   } );
 
