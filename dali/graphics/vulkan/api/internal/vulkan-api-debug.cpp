@@ -52,7 +52,7 @@ std::string APItoVK( const Buffer* buffer)
   auto vkBuffer = vbufferref->GetVkHandle();
 
   ss << "VulkanAPI::Buffer(" << &vbuffer << ") {" << std::endl;
-  ss << "         vk::Buffer = " << vkBuffer << std::endl;
+  ss << "         vk::Buffer = " << static_cast<VkBuffer>(vkBuffer) << std::endl;
   ss << "      }";
   return ss.str();
 }
@@ -73,8 +73,8 @@ std::string APItoVK( const Texture* texture)
 
   ss << "VulkanAPI::Texture(" << &apiTexture << ") {" << std::endl;
   ss << "         vk::Image = " << static_cast<VkImage>(imageRef->GetVkHandle()) << std::endl;
-  ss << "         vk::ImageView = " << imageViewRef->GetVkHandle() << std::endl;
-  ss << "         vk::Sampler = " << samplerRef->GetVkHandle() << std::endl;
+  ss << "         vk::ImageView = " << static_cast<VkImageView>( imageViewRef->GetVkHandle() ) << std::endl;
+  ss << "         vk::Sampler = " << static_cast<VkSampler>(samplerRef->GetVkHandle()) << std::endl;
   //@ todo: add gpu memory block info too
   ss << "      }";
   return ss.str();

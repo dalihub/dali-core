@@ -77,7 +77,7 @@ bool Buffer::OnDestroy()
 
   mGraphics->DiscardResource( [ device, buffer, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: buffer->%p\n",
-                   static_cast< void* >(buffer) )
+                   static_cast< VkBuffer >(buffer) )
     device.destroyBuffer( buffer, allocator );
   } );
 

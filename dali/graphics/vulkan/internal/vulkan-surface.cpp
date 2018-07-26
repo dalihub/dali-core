@@ -57,7 +57,7 @@ bool Surface::OnDestroy()
 
   mGraphics->DiscardResource( [ instance, surface, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: surface->%p\n",
-                   static_cast< void* >( surface ) )
+                   static_cast< VkSurfaceKHR >( surface ) )
     instance.destroySurfaceKHR( surface, allocator );
   } );
 

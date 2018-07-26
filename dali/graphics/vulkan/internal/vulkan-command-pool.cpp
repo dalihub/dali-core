@@ -256,7 +256,7 @@ bool CommandPool::OnDestroy()
 
   mGraphics->DiscardResource( [ device, commandPool, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: command pool->%p\n",
-                   static_cast< void* >( commandPool ) )
+                   static_cast< VkCommandPool >( commandPool ) )
     device.destroyCommandPool( commandPool, allocator );
   } );
 

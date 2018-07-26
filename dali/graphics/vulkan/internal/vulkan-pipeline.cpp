@@ -454,16 +454,16 @@ bool Pipeline::OnDestroy()
     for( const auto& descriptorSetLayout : descriptorSetLayouts )
     {
       DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: descriptor set layout->%p\n",
-                     static_cast< void* >(descriptorSetLayout) )
+                     static_cast< VkDescriptorSetLayout >(descriptorSetLayout) )
       device.destroyDescriptorSetLayout( descriptorSetLayout, allocator );
     }
 
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: pipeline layout->%p\n",
-                   static_cast< void* >(pipelineLayout) )
+                   static_cast< VkPipelineLayout >(pipelineLayout) )
     device.destroyPipelineLayout( pipelineLayout, allocator );
 
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: pipeline->%p\n",
-                   static_cast< void* >(pipeline) )
+                   static_cast< VkPipeline >(pipeline) )
     device.destroyPipeline( pipeline, allocator );
   } );
 
