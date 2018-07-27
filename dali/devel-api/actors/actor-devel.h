@@ -196,7 +196,7 @@ DALI_CORE_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
 DALI_CORE_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
 
 
-typedef Signal< void (void) > ChildOrderChangedSignalType; ///< Used when the actor's children have changed order
+typedef Signal< void (Actor) > ChildOrderChangedSignalType; ///< Used when the actor's children have changed order
 
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
