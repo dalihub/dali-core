@@ -22,6 +22,7 @@
 // EXTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
+#include <dali/graphics-api/graphics-api-framebuffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
@@ -310,12 +311,24 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
     cmd.BindRenderTarget(renderTargetBinding);
 
+    float width = instruction.mViewport.width;
+    float height = instruction.mViewport.height;
+
+	// If the viewport hasn't been set, and we're rendering to a framebuffer, then
+	// set the size of the viewport to that of the framebuffer.
+    if( !instruction.mIsViewportSet && renderTargetBinding.framebuffer != nullptr )
+    {
+      width = renderTargetBinding.framebufferWidth;
+      height = renderTargetBinding.framebufferHeight;
+    }
     cmd.mDrawCommand.SetViewport( { float( instruction.mViewport.x ),
                                     float( instruction.mViewport.y ),
-                                    float( instruction.mViewport.width ),
-                                    float( instruction.mViewport.height ),
+                                    width,
+                                    height,
                                     0.0f , 1.0f } )
-                    .SetVieportEnable( true );
+                    .SetViewportEnable( true );
+    // Could set to false if we know that we can use the Pipeline viewport rather than the
+    // dynamic viewport.
 
     auto opacity = renderer->GetOpacity( bufferIndex );
 
@@ -377,6 +390,9 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
     if( instruction.mFrameBuffer != 0 )
     {
       renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
+	  // Store the size of the framebuffer in case the viewport isn't set.
+      renderTargetBinding.framebufferWidth = instruction.mFrameBuffer->GetWidth();
+      renderTargetBinding.framebufferHeight = instruction.mFrameBuffer->GetHeight();
     }
   }
 
@@ -401,8 +417,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   auto *renderer = item.mRenderer;
   auto *geometry = renderer->GetGeometry();
-  auto gfxShader = renderer->GetShader()
-                           .GetGfxObject();
+  auto gfxShader = renderer->GetShader().GetGfxObject();
 
   if( !gfxShader )
   {
@@ -537,9 +552,6 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
                                 float(instruction.mViewport.width), float(instruction.mViewport.height),
                                 0.0, 1.0});
-
-
-
   }
   else
   {
@@ -572,7 +584,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
   dynamicStateMask |= Graphics::API::PipelineDynamicStateBits::VIEWPORT_BIT;
 
-  // reset pipeline's viewport
+  // reset pipeline's viewport to prevent hashing function changing due to animated values.
   viewportState.SetViewport({0.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 
   // disable scissors per-pipeline

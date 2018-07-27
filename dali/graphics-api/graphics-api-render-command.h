@@ -204,6 +204,8 @@ public:
     const Framebuffer*                    framebuffer { nullptr };
     std::vector<Framebuffer::ClearColor>  clearColors {};
     Framebuffer::DepthStencilClearColor   depthStencilClearColor {};
+    float framebufferWidth; // Store the framebuffer size in case we need to set viewport
+    float framebufferHeight;
 
     void*    pNext{ nullptr };
     RenderTargetBinding() = default;
@@ -310,7 +312,7 @@ public:
       return *this;
     }
 
-    DrawCommand& SetVieportEnable( bool value )
+    DrawCommand& SetViewportEnable( bool value )
     {
       viewportEnable = value;
       return *this;
