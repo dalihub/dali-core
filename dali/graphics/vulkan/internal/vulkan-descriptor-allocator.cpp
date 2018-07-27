@@ -179,6 +179,8 @@ DescriptorSetAllocator::AllocateDescriptorSets( const std::vector< DescriptorSet
   }
   //endregion
 
+  PrintAllocationReport( *this );
+
   return refCountedDescriptorSets;
 }
 
@@ -195,7 +197,7 @@ const DescriptorSetLayoutSignature& signature )
     auto descriptorType = std::get< DescriptorType >( tuple );
 
     auto value = U32( std::get< uint64_t >( tuple ) );
-    auto descriptorPoolSize = vk::DescriptorPoolSize{}.setDescriptorCount( value );
+    auto descriptorPoolSize = vk::DescriptorPoolSize{}.setDescriptorCount( value * mMaxPoolSize );
 
     switch( descriptorType )
     {
