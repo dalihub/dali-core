@@ -16,6 +16,12 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_tizen.h>
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -40,9 +46,22 @@ namespace Dali
 {
 namespace Graphics
 {
+using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+
+PFN_vkCreateImageFromNativeBufferTIZEN  gCreatePresentableImageProcedure = 0;
+
+#endif
+
+} // anonymous namespace
 
 
 /**
@@ -899,6 +918,8 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -948,20 +969,37 @@ bool Texture::Initialise()
     }
   }
 
-  if( InitialiseTexture() )
+  bool result = false;
+  if (nativeImage)
   {
-    // copy data to the image
-    if( data )
+    mTbmSurface = nativeImage->GetNativeImageSource();
+    InitialiseNativeTexture();
+    result = true;
+  }
+  else
+  {
+    if( InitialiseTexture() )
     {
-      CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      // copy data to the image
+      if( data )
+      {
+        CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      }
+      result = true;
     }
-    return true;
   }
 
-  return false;
+  return result;
 }
 
-void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+
+void Texture::CopyMemory(
+  const void                      *srcMemory,
+  API::Extent2D                    srcExtent,
+  API::Offset2D                    dstOffset,
+  uint32_t                         layer,
+  uint32_t                         level,
+  API::TextureDetails::UpdateMode  updateMode )
 {
   // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
   const auto formatInfo = Vulkan::GetFormatInfo( mFormat );
@@ -986,7 +1024,9 @@ void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Of
 
   // bind memory
   mGraphics.BindBufferMemory( buffer,
-                              mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                              mGraphics.AllocateMemory( buffer,
+                                                        ( vk::MemoryPropertyFlagBits::eHostVisible |
+                                                          vk::MemoryPropertyFlagBits::eHostCoherent ) ),
                               0u );
 
   // write into the buffer
@@ -1071,44 +1111,119 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
 // uploaded at this point
 bool Texture::InitialiseTexture()
 {
-  // Check whether format is supported  by the platform
+  // Check whether format is supported by the platform
+  bool result = false;
   auto properties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
 
-  if( !properties.optimalTilingFeatures )
+  if( properties.optimalTilingFeatures )
   {
-    // terminate if not supported
-    return false;
+    // create image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+      .setFormat( mFormat )
+      .setInitialLayout( mLayout )
+      .setSamples( vk::SampleCountFlagBits::e1 )
+      .setSharingMode( vk::SharingMode::eExclusive )
+      .setUsage( mUsage )
+      .setExtent( { mWidth, mHeight, 1 } )
+      .setArrayLayers( 1 )
+      .setImageType( vk::ImageType::e2D )
+      .setTiling( vk::ImageTiling::eOptimal )
+      .setMipLevels( 1 );
+
+    // Create the image handle
+    mImage = mGraphics.CreateImage( imageCreateInfo );
+
+    // allocate memory for the image
+    auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
+    // bind the allocated memory to the image
+    mGraphics.BindImageMemory( mImage, memory, 0 );
+
+    // create default image view
+    CreateImageView();
+
+    // create basic sampler
+    CreateSampler();
+    result = true;
+  }
+  return result;
+}
+
+void Texture::InitialiseNativeTexture()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  tbm_surface_h tbmSurface = 0;
+  VkImage image = 0;
+
+  char *icdname = NULL;
+  void *lib = NULL;
+#if 0
+  if( ! gCreatePresentableImageProcedure )
+  {
+    gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+      mGraphics.GetProcedureAddress( "vkCreateImageFromNativeBufferTIZEN" ) );
+  }
+#endif
+  if( ! gCreatePresentableImageProcedure )
+  {
+    icdname = getenv("VK_TIZEN_ICD");
+    lib = dlopen(icdname, RTLD_LAZY | RTLD_LOCAL);
+
+    if (lib)
+    {
+      if ( ! gCreatePresentableImageProcedure )
+      {
+        gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+          dlsym(lib,"vkCreateImageFromNativeBufferTIZEN"));
+      }
+    }
   }
 
-  // create image
-  auto imageCreateInfo = vk::ImageCreateInfo{}
-    .setFormat( mFormat )
-    .setInitialLayout( mLayout )
-    .setSamples( vk::SampleCountFlagBits::e1 )
-    .setSharingMode( vk::SharingMode::eExclusive )
-    .setUsage( mUsage )
-    .setExtent( { mWidth, mHeight, 1 } )
-    .setArrayLayers( 1 )
-    .setImageType( vk::ImageType::e2D )
-    .setTiling( vk::ImageTiling::eOptimal )
-    .setMipLevels( 1 );
+  if( gCreatePresentableImageProcedure )
+  {
+    // Enforce format:
+    mFormat = vk::Format::eR8G8B8A8Unorm;  // VK_FORMAT_R8G8B8A8_UNORM;
 
-  // Create the image handle
-  mImage = mGraphics.CreateImage( imageCreateInfo );
+    // create image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+       .setFormat( mFormat )
+       .setInitialLayout( mLayout )
+       .setSamples( vk::SampleCountFlagBits::e1 )
+       .setSharingMode( vk::SharingMode::eExclusive )
+       .setUsage( mUsage )
+       .setExtent( { mWidth, mHeight, 1 } )
+       .setArrayLayers( 1 )
+       .setImageType( vk::ImageType::e2D )
+       .setTiling( vk::ImageTiling::eOptimal )
+       .setMipLevels( 1 );
 
-  // allocate memory for the image
-  auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+    if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+    {
+      tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+    }
+    if (tbmSurface)
+    {
+      // @todo consider adding new CreateTexture() API to NativeImage (like GlExtensionCreate(), but generic)
+      // to perform this from within native image implementation.
 
-  // bind the allocated memory to the image
-  mGraphics.BindImageMemory( mImage, memory, 0 );
+      auto vkImageCreateInfo = reinterpret_cast<const VkImageCreateInfo*>( &imageCreateInfo );
 
-  // create default image view
-  CreateImageView();
+      gCreatePresentableImageProcedure( static_cast<VkDevice>(mGraphics.GetDevice()),
+                                        tbmSurface,
+                                        vkImageCreateInfo,
+                                        0,
+                                        &image );
+    }
 
-  // create basic sampler
-  CreateSampler();
+    vk::Extent2D extent(mWidth, mHeight);
 
-  return true;
+    mImage = mGraphics.CreateImageFromExternal( static_cast<vk::Image>(image), imageCreateInfo, mFormat, extent );
+
+    CreateImageView();
+    CreateSampler();
+
+  }
+#endif
 }
 
 void Texture::CreateImageView()
@@ -1116,12 +1231,11 @@ void Texture::CreateImageView()
   mImageView = mGraphics.CreateImageView(
     {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
     vk::ImageSubresourceRange{}
-      .setAspectMask( mImage->GetAspectFlags() )
-      .setBaseArrayLayer( 0 )
-      .setBaseMipLevel( 0 )
-      .setLevelCount( mImage->GetMipLevelCount() )
-      .setLayerCount( mImage->GetLayerCount() )
-  );
+    .setAspectMask( mImage->GetAspectFlags() )
+    .setBaseArrayLayer( 0 )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( mImage->GetMipLevelCount() )
+    .setLayerCount( mImage->GetLayerCount() ) );
 }
 
 void Texture::CreateSampler()

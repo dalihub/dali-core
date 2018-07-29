@@ -65,8 +65,12 @@ public:
 private:
 
   void CreateSampler();
+
   void CreateImageView();
+
   bool InitialiseTexture();
+
+  void InitialiseNativeTexture();
 
 private:
 
@@ -84,6 +88,8 @@ private:
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
+
+  Any                   mTbmSurface;
 };
 
 } // namespace VulkanAPI
