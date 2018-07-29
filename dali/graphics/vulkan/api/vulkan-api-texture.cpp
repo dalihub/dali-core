@@ -15,7 +15,33 @@
  *
  */
 
+#include <stdlib.h>
+#include <string>
+#include <cstdio>
+
+#include <execinfo.h>
+#include <cxxabi.h>
+
+#include <cstring>
+
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_tizen.h>
+
+#ifdef EXPORT_API
+#undef EXPORT_API
+#endif
+
+#ifndef DRM_FORMAT_MOD_LINEAR
+#define DRM_FORMAT_MOD_LINEAR 0
+#endif
+
+
+#define USING_CSTYLE 1
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -32,15 +58,29 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 
+#include <dali/integration-api/debug.h>
+
 #include <algorithm>
 
 namespace Dali
 {
 namespace Graphics
 {
+using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+PFN_vkCreateSamplerYcbcrConversionKHR        gCreateSamplerYcbcrConversionKHR = 0;       // device
+PFN_vkGetPhysicalDeviceFormatProperties2KHR  gGetPhysicalDeviceFormatProperties2KHR = 0; // instance
+PFN_vkDestroySamplerYcbcrConversionKHR       gDestroySamplerYcbcrConversionKHR = 0;      // device
+#endif
+
+} // anonymous namespace
 
 
 /**
@@ -889,7 +929,10 @@ Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 
 Texture::~Texture()
 {
-
+  if ( mYcbcrConv )
+  {
+    gDestroySamplerYcbcrConversionKHR( static_cast<VkDevice>(mGraphics.GetDevice()), mYcbcrConv, nullptr);
+  }
 }
 
 bool Texture::Initialise()
@@ -900,6 +943,33 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
   mLayout = vk::ImageLayout::eUndefined;
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+  fprintf(stderr,"%s: Texture::Initialise() GetNativeImage()############################################\n",__FUNCTION__);
+
+  if ( !gCreateSamplerYcbcrConversionKHR && !gGetPhysicalDeviceFormatProperties2KHR )
+  {
+    gCreateSamplerYcbcrConversionKHR = reinterpret_cast<PFN_vkCreateSamplerYcbcrConversionKHR>(
+                mGraphics.GetDeviceProcedureAddress( "vkCreateSamplerYcbcrConversionKHR" ) );
+
+    gGetPhysicalDeviceFormatProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFormatProperties2KHR>(
+                mGraphics.GetInstanceProcedureAddress( "vkGetPhysicalDeviceFormatProperties2KHR" ) );
+
+    gDestroySamplerYcbcrConversionKHR = reinterpret_cast<PFN_vkDestroySamplerYcbcrConversionKHR>(
+                mGraphics.GetDeviceProcedureAddress( "vkDestroySamplerYcbcrConversionKHR" ) );
+  }
+
+  if ( gCreateSamplerYcbcrConversionKHR
+       && gGetPhysicalDeviceFormatProperties2KHR
+       && nativeImage )
+  {
+      mIsSupportNativeImage = true;
+      //fprintf(stderr, "Support Native Image now\n");
+  }
+  else
+  {
+      //fprintf(stderr, "Not support Native Image\n");
+  }
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -959,17 +1029,39 @@ bool Texture::Initialise()
     }
   }
 
-  if( InitialiseTexture() )
+  bool result = false;
+  if (mIsSupportNativeImage)
   {
-    // copy data to the image
-    if( data )
+    mUsage = vk::ImageUsageFlagBits::eSampled;
+    mLayout = vk::ImageLayout::eUndefined;
+
+    mComponentMapping.r = vk::ComponentSwizzle::eIdentity;
+    mComponentMapping.g = vk::ComponentSwizzle::eIdentity;
+    mComponentMapping.b = vk::ComponentSwizzle::eIdentity;
+    mComponentMapping.a = vk::ComponentSwizzle::eIdentity;
+
+    mNativeImage = nativeImage->GetNativeImageHandle();
+    //fprintf(stderr,"%s:Texture::Initialise() GetNativeImageHandle()\n",__FUNCTION__);
+    if (InitialiseNativeImage())
     {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      CopyNativeImage( API::TextureDetails::UpdateMode::UNDEFINED );
     }
-    return true;
+    result = true;
+  }
+  else
+  {
+    if( InitialiseTexture() )
+    {
+        // copy data to the image
+      if( data )
+      {
+        CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      }
+      result = true;
+    }
   }
 
-  return false;
+  return result;
 }
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
@@ -1069,6 +1161,17 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
   mController.ScheduleResourceTransfer( std::move(transferRequest) );
 }
 
+void Texture::CopyNativeImage( API::TextureDetails::UpdateMode updateMode )
+{
+  ResourceTransferRequest transferRequest( TransferRequestType::USE_TBM_SURFACE );
+
+  transferRequest.useTBMInfo.srcImage = mImage;
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
 // creates image with pre-allocated memory and default sampler, no data
 // uploaded at this point
 bool Texture::InitialiseTexture()
@@ -1122,7 +1225,8 @@ void Texture::CreateImageView()
       .setBaseArrayLayer( 0 )
       .setBaseMipLevel( 0 )
       .setLevelCount( mImage->GetMipLevelCount() )
-      .setLayerCount( mImage->GetLayerCount() )
+      .setLayerCount( mImage->GetLayerCount() ),
+      nullptr
   );
 }
 
@@ -1138,6 +1242,31 @@ void Texture::CreateSampler()
     .setMagFilter( vk::Filter::eLinear )
     .setMipmapMode( vk::SamplerMipmapMode::eLinear )
     .setMaxAnisotropy( 1.0f ); // must be 1.0f when anisotropy feature isn't enabled
+
+  if (mIsSupportNativeImage)
+  {
+    samplerCreateInfo.setBorderColor( vk::BorderColor::eFloatTransparentBlack );
+    samplerCreateInfo.setMipmapMode( vk::SamplerMipmapMode::eNearest );
+  }
+
+  //auto vkSamplerCreateInfo = reinterpret_cast<const VkSamplerCreateInfo*>( &samplerCreateInfo );
+
+  //fprintf(stderr,"%s:<<---------VkSamplerCreateInfo Information--------->>\n",__FUNCTION__);
+  //fprintf(stderr,"%s:sType %d, pNext %p, flag %d\n",__FUNCTION__, vkSamplerCreateInfo->sType, vkSamplerCreateInfo->pNext, vkSamplerCreateInfo->flags);
+  //fprintf(stderr,"%s:magFilter %d, minFilter %d, mipmapMode %d\n",__FUNCTION__, vkSamplerCreateInfo->magFilter, vkSamplerCreateInfo->minFilter, vkSamplerCreateInfo->mipmapMode);
+  //fprintf(stderr,"%s:addressModeU %d, addressModeV %d, addressModeW %d\n",__FUNCTION__, vkSamplerCreateInfo->addressModeU, vkSamplerCreateInfo->addressModeV, vkSamplerCreateInfo->addressModeW);
+
+  //fprintf(stderr,"%s:mipLodBias %lf\n",__FUNCTION__, static_cast<double>(vkSamplerCreateInfo->mipLodBias));
+  //fprintf(stderr,"%s:anisotropyEnable %d\n",__FUNCTION__, vkSamplerCreateInfo->anisotropyEnable);
+  //fprintf(stderr,"%s:maxAnisotropy %lf\n",__FUNCTION__, static_cast<double>(vkSamplerCreateInfo->maxAnisotropy));
+
+
+  //fprintf(stderr,"%s:addressModeU %d, addressModeV %d, addressModeW %d\n",__FUNCTION__, vkSamplerCreateInfo->addressModeU, vkSamplerCreateInfo->addressModeV, vkSamplerCreateInfo->addressModeW);
+  //fprintf(stderr,"%s:compareEnable %d, compareOp %d\n",__FUNCTION__, vkSamplerCreateInfo->compareEnable, vkSamplerCreateInfo->compareOp);
+  //fprintf(stderr,"%s:minLod %lf, maxLod %lf\n",__FUNCTION__, static_cast<double>(vkSamplerCreateInfo->minLod), static_cast<double>(vkSamplerCreateInfo->maxLod));
+
+  //fprintf(stderr,"%s:borderColor %d, unnormalizedCoordinates %d\n" ,__FUNCTION__, vkSamplerCreateInfo->borderColor, vkSamplerCreateInfo->unnormalizedCoordinates);
+  //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);
 
   mSampler = mGraphics.CreateSampler( samplerCreateInfo );
 }
@@ -1156,6 +1285,365 @@ Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
   return mSampler;
 }
+
+bool Texture::InitialiseNativeImage()
+{
+  //fprintf(stderr,"%s:<<<<<================== InitialiseNativeImage ==================>>>>>\n",__FUNCTION__);
+#ifdef NATIVE_IMAGE_SUPPORT
+  tbm_surface_h tbmSurface = 0;
+  tbm_surface_info_s tbmSurface_info;
+  //fprintf(stderr,"%s:Create VkImage===========================================================\n",__FUNCTION__);
+  VkImage image = 0;
+
+  std::vector <VkSubresourceLayout> plane_layout;
+  VkDrmFormatModifierPropertiesEXT  drm_fmt_modifier;
+
+  if ( mNativeImage.GetType() == typeid( tbm_surface_h ) )
+  {
+    tbmSurface =  AnyCast< tbm_surface_h >( mNativeImage );
+  }
+
+  if (!tbmSurface)
+  {
+    //fprintf(stderr,"%s:tbmSurface is nullptr \n",__FUNCTION__);
+    return false;
+  }
+
+  tbm_surface_get_info(tbmSurface, &tbmSurface_info);
+
+  //fprintf(stderr,"%s:tbmSurface is %p\n",__FUNCTION__, static_cast<void*>(tbmSurface));
+  //fprintf(stderr,"%s:<<---------tbmSurface's information--------->>\n",__FUNCTION__);;
+
+  //fprintf(stderr,"%s:width %d, height %d, size %d\n",__FUNCTION__,tbmSurface_info.width, tbmSurface_info.height, tbmSurface_info.size);
+  //fprintf(stderr,"%s:format %d, bpp %d, num_planes %d\n",__FUNCTION__,tbmSurface_info.format, tbmSurface_info.bpp, tbmSurface_info.num_planes);
+  for (uint32_t i = 0; i < tbmSurface_info.num_planes; i++)
+  {
+      //fprintf(stderr,"%s:index %d\n",__FUNCTION__,i);
+      //fprintf(stderr,"%s:offset %d, size %d\n",__FUNCTION__, tbmSurface_info.planes[i].offset, tbmSurface_info.planes[i].size);
+      //fprintf(stderr,"%s:stride %d, pointer %p\n",__FUNCTION__, tbmSurface_info.planes[i].stride, tbmSurface_info.planes[i].ptr);
+  }
+  //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);;
+
+  // set format
+  if ( tbmSurface_info.format == TBM_FORMAT_NV21
+     || tbmSurface_info.format == TBM_FORMAT_NV12 )
+  {
+    //fprintf(stderr,"%s:tbmSurface's format is TBM_FORMAT_NV21\n",__FUNCTION__);;
+    // VK_FORMAT_G8_B8R8_2PLANE_420_UNORM_KHR
+    mFormat = vk::Format::eG8B8R82Plane420UnormKHR;
+    //fprintf(stderr,"%s:update mFormat with vk::Format::eG8B8R82Plane420UnormKHR\n",__FUNCTION__);;
+  }
+  else if ( tbmSurface_info.format == TBM_FORMAT_RGB888
+      || tbmSurface_info.format == TBM_FORMAT_XRGB8888
+      || tbmSurface_info.format == TBM_FORMAT_RGBX8888
+      || tbmSurface_info.format == TBM_FORMAT_ARGB8888
+      || tbmSurface_info.format == TBM_FORMAT_RGBA8888)
+  {
+    //fprintf(stderr,"%s:tbmSurface's format is the other\n",__FUNCTION__);;
+    // VK_FORMAT_R8G8B8A8_UNORM
+    mFormat = vk::Format::eR8G8B8A8Unorm;
+  }
+  else if ( tbmSurface_info.format == TBM_FORMAT_BGR888
+      || tbmSurface_info.format == TBM_FORMAT_XBGR8888
+      || tbmSurface_info.format == TBM_FORMAT_BGRX8888
+      || tbmSurface_info.format == TBM_FORMAT_ABGR8888
+      || tbmSurface_info.format == TBM_FORMAT_BGRA8888)
+  {
+    // VK_FORMAT_B8G8R8A8_UNORM
+    mFormat = vk::Format::eB8G8R8A8Unorm;
+  }
+
+  mLayout = vk::ImageLayout::eUndefined;
+
+  GetFormatLinearDrmModifierNativeImage( static_cast<VkFormat>(mFormat), drm_fmt_modifier );
+
+  plane_layout.resize (drm_fmt_modifier.drmFormatModifierPlaneCount);
+
+  //fprintf(stderr,"%s:resize to plane_layout with %d\n",__FUNCTION__, drm_fmt_modifier.drmFormatModifierPlaneCount);
+
+  //fprintf(stderr,"%s:---> update plane_layout's data\n",__FUNCTION__);
+  for (uint32_t i = 0; i < tbmSurface_info.num_planes; i++)
+  {
+    //fprintf(stderr,"%s:index %d\n",__FUNCTION__,i);
+    plane_layout[i].offset = tbmSurface_info.planes[i].offset;
+    plane_layout[i].size = tbmSurface_info.planes[i].size;
+    plane_layout[i].rowPitch = tbmSurface_info.planes[i].stride;
+    plane_layout[i].arrayPitch = 0;
+    plane_layout[i].depthPitch = 0;
+    //fprintf(stderr,"%s:offset %lld, size %lld\n",__FUNCTION__,plane_layout[i].offset, plane_layout[i].size);
+    //fprintf(stderr,"%s:rowPitch %lld, arrayPitch %lld, depthPitch %lld\n",__FUNCTION__,plane_layout[i].rowPitch, plane_layout[i].arrayPitch, plane_layout[i].depthPitch);
+  }
+  //fprintf(stderr,"%s:<---\n",__FUNCTION__);
+
+  VkImageDrmFormatModifierExplicitCreateInfoEXT mod_create_info =
+  {
+    static_cast< VkStructureType >(VK_STRUCTURE_TYPE_IMAGE_EXCPLICIT_DRM_FORMAT_MODIFIER_CREATE_INFO_EXT), //VkStructureType sType;
+    nullptr,                                                           //const void*                   pNext;
+    DRM_FORMAT_MOD_LINEAR,                                             //uint64_t                      drmFormatModifier;
+    drm_fmt_modifier.drmFormatModifierPlaneCount,                      //uint32_t                      drmFormatModifierPlaneCount;
+    &plane_layout[0]                                                   //const VkSubresourceLayout*    pPlaneLayouts;
+  };
+
+  VkExternalMemoryImageCreateInfoKHR ext_mem_create_info =
+  {
+    static_cast< VkStructureType >(VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_KHR), //VkStructureType  sType;
+    &mod_create_info,                                                //const void*      pNext;
+    VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT                   //VkExternalMemoryHandleTypeFlags    handleTypes;
+  };
+
+  auto imageCreateInfo = vk::ImageCreateInfo{}
+    .setPNext( static_cast< void * >(&ext_mem_create_info) )
+    .setImageType( vk::ImageType::e2D )
+    .setFormat( mFormat )
+    .setExtent( { mWidth, mHeight, 1 } )
+    .setMipLevels( 1 )
+    .setArrayLayers( 1 )
+    .setSamples( vk::SampleCountFlagBits::e1 )
+    .setTiling( static_cast< vk::ImageTiling >(VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT) )
+    .setUsage( mUsage )
+    .setSharingMode( vk::SharingMode::eExclusive )
+    .setQueueFamilyIndexCount( 0 )
+    .setPQueueFamilyIndices( nullptr )
+    .setInitialLayout( mLayout );
+
+  //auto vkImageCreateInfo = reinterpret_cast<const VkImageCreateInfo*>( &imageCreateInfo );
+
+  //fprintf(stderr,"%s:<<---------VKImageCreate Information--------->>\n",__FUNCTION__);
+  //fprintf(stderr,"%s:sType %d, pNext %p, format %d\n",__FUNCTION__, vkImageCreateInfo->sType, vkImageCreateInfo->pNext, vkImageCreateInfo->format);
+  //fprintf(stderr,"%s:flags %d, mipLevels %d, arrayLayers %d\n",__FUNCTION__, vkImageCreateInfo->flags, vkImageCreateInfo->mipLevels, vkImageCreateInfo->arrayLayers);
+  //fprintf(stderr,"%s:samples %d, tiling %d, usage %d\n",__FUNCTION__, vkImageCreateInfo->samples, vkImageCreateInfo->tiling, vkImageCreateInfo->usage);
+  //fprintf(stderr,"%s:sharingMode %d, queueFamilyIndexCount %d\n",__FUNCTION__, vkImageCreateInfo->sharingMode, vkImageCreateInfo->queueFamilyIndexCount);
+  //if (vkImageCreateInfo->pQueueFamilyIndices)
+    //fprintf(stderr,"%s:pQueueFamilyIndices %d, initialLayout %d\n",__FUNCTION__, *(vkImageCreateInfo->pQueueFamilyIndices), vkImageCreateInfo->initialLayout);
+  //else
+    //fprintf(stderr,"%s:pQueueFamilyIndices NULL, initialLayout %d\n",__FUNCTION__, vkImageCreateInfo->initialLayout);
+  //fprintf(stderr,"%s:width %d, height %d, depht %d\n",__FUNCTION__, vkImageCreateInfo->extent.width, vkImageCreateInfo->extent.height, vkImageCreateInfo->extent.depth);
+  //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);
+
+
+  // Create the image handle
+   Vulkan::RefCountedImage mTmpImage = mGraphics.CreateImage( imageCreateInfo );
+
+  vk::Extent2D extent(mWidth, mHeight);
+
+  //fprintf(stderr,"%s:create extend with w %d, h %d\n",__FUNCTION__, mWidth, mHeight);
+
+  mImage = mGraphics.CreateImageFromExternal( mTmpImage.GetVkHandle(), imageCreateInfo, mFormat, extent );
+
+  //fprintf(stderr,"%s:AllocateMemory===========================================================\n",__FUNCTION__);
+  // allocate memory for the image
+  auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eHostVisible, mNativeImage );
+  if (memory)
+  {
+    fprintf(stderr,"%s:success to AllocateMemory!!\n",__FUNCTION__);
+  }
+  else
+  {
+    fprintf(stderr,"%s:fail to AllocateMemory!!\n",__FUNCTION__);
+    return false;
+  }
+
+  // bind the allocated memory to the image
+  //fprintf(stderr,"%s:BindImageMemory===========================================================\n",__FUNCTION__);
+  mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
+
+  if ( mFormat == vk::Format::eG8B8R82Plane420UnormKHR )
+  {
+    //fprintf(stderr,"%s:CreateSamplerYUVNativeImage===========================================================\n",__FUNCTION__);
+    CreateSamplerYUVNativeImage();
+    //fprintf(stderr,"%s:CreateImageViewYUVNativeImage===========================================================\n",__FUNCTION__);
+    CreateImageViewYUVNativeImage();
+  }
+  else
+  {
+    //fprintf(stderr,"%s:CreateSampler===========================================================\n",__FUNCTION__);
+    CreateSampler();
+    //fprintf(stderr,"%s:CreateImageView===========================================================\n",__FUNCTION__);
+    CreateImageView();
+  }
+#endif
+
+  return true;
+}
+
+bool Texture::GetFormatLinearDrmModifierNativeImage( VkFormat format, VkDrmFormatModifierPropertiesEXT &outMode )
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  //fprintf(stderr,"%s:VkFormat' %d\n",__FUNCTION__, format);
+
+  std::vector<VkDrmFormatModifierPropertiesEXT> drm_format_modifiers;
+
+  VkDrmFormatModifierPropertiesListEXT mod_props =
+  {
+    static_cast< VkStructureType >(VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT),// VkStructureType sType;
+    nullptr,        //  void*                              pNext;
+    0,              //  uint32_t                           drmFormatModifierCount;
+    nullptr         //  VkDrmFormatModifierPropertiesEXT*  pDrmFormatModifierProperties;
+  };
+
+  VkFormatProperties    formatProperties = {};
+  VkFormatProperties2KHR format_props =
+  {
+    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR, // VkStructureType       sType;
+    &mod_props,                                // void*                 pNext;
+    formatProperties                           // VkFormatProperties    formatProperties;
+  };
+
+  VkPhysicalDevice vkPhysicalDevice = static_cast<VkPhysicalDevice>(mGraphics.GetPhysicalDevice());
+  //fprintf(stderr,"%s:call VkGetPhysicalDeviceFormatProperties2KHR with VkPhysicalDevice %p\n",__FUNCTION__, static_cast<void*>(vkPhysicalDevice));
+  gGetPhysicalDeviceFormatProperties2KHR( vkPhysicalDevice, format, &format_props);
+  //mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  //fprintf(stderr,"%s:[-----VkFormatProperties2KHR's information\n",__FUNCTION__);
+  //fprintf(stderr,"%s:sType %d\n",__FUNCTION__, format_props.sType);
+  //fprintf(stderr,"%s:formatProperties' linearTilingFeatures %d\n",__FUNCTION__, formatProperties.linearTilingFeatures);
+  //fprintf(stderr,"%s:formatProperties' optimalTilingFeatures %d\n",__FUNCTION__, formatProperties.optimalTilingFeatures);
+  //fprintf(stderr,"%s:formatProperties' bufferFeatures %d\n",__FUNCTION__, formatProperties.bufferFeatures);
+
+  //fprintf(stderr,"%s:mod_props' sType %d\n",__FUNCTION__, mod_props.sType);
+  //fprintf(stderr,"%s:mod_props' drmFormatModifierCount %d\n",__FUNCTION__, mod_props.drmFormatModifierCount);
+
+  if (mod_props.drmFormatModifierCount <= 0)
+  {
+    std::cout << "Could get drmFormatModifierCount " << std::endl;
+    return false;
+  }
+
+  drm_format_modifiers.resize( mod_props.drmFormatModifierCount);
+  mod_props.pDrmFormatModifierProperties = &drm_format_modifiers[0];
+
+  //fprintf(stderr,"%s:mod_props' pDrmFormatModifierProperties %p\n",__FUNCTION__, static_cast<void*>(mod_props.pDrmFormatModifierProperties));
+
+  //fprintf(stderr,"%s:call VkGetPhysicalDeviceFormatProperties2KHR with VkPhysicalDevice %p\n",__FUNCTION__, static_cast<void*>(vkPhysicalDevice));
+  gGetPhysicalDeviceFormatProperties2KHR( vkPhysicalDevice, format, &format_props);
+  //mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  for( VkDrmFormatModifierPropertiesEXT &mode : drm_format_modifiers )
+  {
+    //fprintf(stderr,"%s:[-----VkDrmFormatModifierPropertiesEXT's information\n",__FUNCTION__);
+    //fprintf(stderr,"%s:drmFormatModifier %lld\n",__FUNCTION__, mode.drmFormatModifier);
+    //fprintf(stderr,"%s:drmFormatModifierPlaneCount %d\n",__FUNCTION__, mode.drmFormatModifierPlaneCount);
+    //fprintf(stderr,"%s:drmFormatModifierTilingFeatures %d\n",__FUNCTION__, mode.drmFormatModifierTilingFeatures);
+
+
+    if( mode.drmFormatModifier == DRM_FORMAT_MOD_LINEAR )
+    {
+      outMode = mode;
+      //fprintf(stderr,"%s:find VkDrmFormatModifierPropertiesEXT -----]\n",__FUNCTION__);
+      //fprintf(stderr,"%s:return TRUE-----]\n",__FUNCTION__);
+      return true;
+    }
+
+    //fprintf(stderr,"%s:not find VkDrmFormatModifierPropertiesEXT -----]\n",__FUNCTION__);
+  }
+
+  //fprintf(stderr,"%s:return FALSE-----]\n",__FUNCTION__);
+#endif
+  return false;
+}
+
+void Texture::CreateImageViewYUVNativeImage()
+{
+  mImageView = mGraphics.CreateImageView(
+    {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
+    vk::ImageSubresourceRange{}
+      .setAspectMask( mImage->GetAspectFlags() )
+      .setBaseArrayLayer( 0 )
+      .setBaseMipLevel( 0 )
+      .setLevelCount( mImage->GetMipLevelCount() )
+      .setLayerCount( mImage->GetLayerCount() ),
+      static_cast<void*>(&mYcbcrConvInfo)
+  );
+  //fprintf(stderr,"%s:Create VkImageView %llud\n",__FUNCTION__, static_cast<VkImageView>(mImageView->GetVkHandle()));
+}
+
+bool Texture::CreateSamplerYUVNativeImage()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+    VkSamplerYcbcrConversionCreateInfoKHR conv_create_info =
+    {
+      VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_CREATE_INFO_KHR, // VkStructureType                  sType;
+      nullptr,                                                    //const void*                      pNext;
+      static_cast<VkFormat>(mFormat),                             //VkFormat                         format;
+      VK_SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_709_KHR,            //VkSamplerYcbcrModelConversion    ycbcrModel;
+      VK_SAMPLER_YCBCR_RANGE_ITU_FULL_KHR,                        // VkSamplerYcbcrRange              ycbcrRange;
+      {
+
+          VK_COMPONENT_SWIZZLE_IDENTITY,                          //VkComponentSwizzle    r;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                          //VkComponentSwizzle    g;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                          //VkComponentSwizzle    b;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                          //VkComponentSwizzle    a;
+      },                                                          // VkComponentMapping   components;
+      VK_CHROMA_LOCATION_MIDPOINT_KHR,                            //VkChromaLocation      xChromaOffset;
+      VK_CHROMA_LOCATION_MIDPOINT_KHR,                            //VkChromaLocation      yChromaOffset;
+      VK_FILTER_NEAREST,                                          //VkFilter              chromaFilter;
+      VK_FALSE                                                    //VkBool32              forceExplicitReconstruction;
+    };
+
+    //fprintf(stderr,"%s:<<---------VkSamplerYcbcrConversionCreateInfoKHR Information--------->>\n",__FUNCTION__);
+    //fprintf(stderr,"%s:sType %d, pNext %p, format %d\n",__FUNCTION__, conv_create_info.sType, conv_create_info.pNext, conv_create_info.format);
+    //fprintf(stderr,"%s:ycbcrModel %d, ycbcrRange %d\n",__FUNCTION__, conv_create_info.ycbcrModel, conv_create_info.ycbcrRange);
+    //fprintf(stderr,"%s:components.r %d, g %d\n",__FUNCTION__, conv_create_info.components.r, conv_create_info.components.g);
+    //fprintf(stderr,"%s:components.b %d, a %d\n",__FUNCTION__, conv_create_info.components.b, conv_create_info.components.a);
+    //fprintf(stderr,"%s:xChromaOffset %d, yChromaOffset %d\n",__FUNCTION__, conv_create_info.xChromaOffset, conv_create_info.yChromaOffset);
+    //fprintf(stderr,"%s:chromaFilter %d, forceExplicitReconstruction %d\n",__FUNCTION__, conv_create_info.chromaFilter, conv_create_info.forceExplicitReconstruction);
+    //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);
+
+   if (VK_SUCCESS != gCreateSamplerYcbcrConversionKHR ( static_cast<VkDevice>(mGraphics.GetDevice()), &conv_create_info, nullptr, &mYcbcrConv))
+   {
+     std::cout << "Could not create vkCreateSamplerYcbcrConversionKHR !" << std::endl;
+     //fprintf(stderr,"%s:Could not create vkCreateSamplerYcbcrConversionKHR !\n",__FUNCTION__);
+     return false;
+   }
+
+   mYcbcrConvInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_INFO_KHR;
+   mYcbcrConvInfo.pNext = nullptr;
+   mYcbcrConvInfo.conversion = mYcbcrConv;
+
+  auto samplerCreateInfo = vk::SamplerCreateInfo{}
+    .setPNext(( static_cast< void * >(&mYcbcrConvInfo) ))
+    .setMagFilter( vk::Filter::eNearest )
+    .setMinFilter( vk::Filter::eNearest )
+    .setMipmapMode( vk::SamplerMipmapMode::eNearest )
+    .setAddressModeU( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeV( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeW( vk::SamplerAddressMode::eClampToEdge )
+    .setMipLodBias( 0.0f )
+    .setAnisotropyEnable( false )
+    .setMaxAnisotropy( 1.0f )
+    .setCompareEnable( false )
+    .setCompareOp( vk::CompareOp::eLessOrEqual )
+    .setMinLod( -1000.0f )
+    .setMaxLod( 1000.0f )
+    .setBorderColor( vk::BorderColor::eFloatTransparentBlack )
+    .setUnnormalizedCoordinates( false);
+
+  //auto sampler_create_info = reinterpret_cast<const VkSamplerCreateInfo*>( &samplerCreateInfo );
+
+  //fprintf(stderr,"%s:<<---------VkSamplerCreateInfo Information--------->>\n",__FUNCTION__);
+  //fprintf(stderr,"%s:sType %d, pNext %p, flag %d\n",__FUNCTION__, sampler_create_info->sType, sampler_create_info->pNext, sampler_create_info->flags);
+  //fprintf(stderr,"%s:magFilter %d, minFilter %d, mipmapMode %d\n",__FUNCTION__, sampler_create_info->magFilter, sampler_create_info->minFilter, sampler_create_info->mipmapMode);
+  //fprintf(stderr,"%s:addressModeU %d, addressModeV %d, addressModeW %d\n",__FUNCTION__, sampler_create_info->addressModeU, sampler_create_info->addressModeV, sampler_create_info->addressModeW);
+
+  //fprintf(stderr,"%s:mipLodBias %lf\n",__FUNCTION__, static_cast<double>(sampler_create_info->mipLodBias));
+  //fprintf(stderr,"%s:anisotropyEnable %d\n",__FUNCTION__, sampler_create_info->anisotropyEnable);
+  //fprintf(stderr,"%s:maxAnisotropy %lf\n",__FUNCTION__, static_cast<double>(sampler_create_info->maxAnisotropy));
+
+
+  //fprintf(stderr,"%s:addressModeU %d, addressModeV %d, addressModeW %d\n",__FUNCTION__, sampler_create_info->addressModeU, sampler_create_info->addressModeV, sampler_create_info->addressModeW);
+  //fprintf(stderr,"%s:compareEnable %d, compareOp %d\n",__FUNCTION__, sampler_create_info->compareEnable, sampler_create_info->compareOp);
+  //fprintf(stderr,"%s:minLod %lf, maxLod %lf\n",__FUNCTION__, static_cast<double>(sampler_create_info->minLod), static_cast<double>(sampler_create_info->maxLod));
+
+  //fprintf(stderr,"%s:borderColor %d, unnormalizedCoordinates %d\n",__FUNCTION__, sampler_create_info->borderColor, sampler_create_info->unnormalizedCoordinates);
+  //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);
+
+  mSampler = mGraphics.CreateSampler( samplerCreateInfo );
+  //fprintf(stderr,"%s:Create VkSampler %llud\n",__FUNCTION__, static_cast<VkSampler>(mSampler->GetVkHandle()));
+#endif
+  return true;
+}
+
+
 
 } // namespace VulkanAPI
 } // namespace Graphics

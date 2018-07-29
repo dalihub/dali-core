@@ -81,6 +81,8 @@ bool ImageView::OnDestroy()
   auto imageView = mImageView;
   auto allocator = &mGraphics->GetAllocator();
 
+  fprintf(stderr,"%s:Invoking deleter function: image view->%llud\n",__FUNCTION__, static_cast< VkImageView >(imageView));
+
   mGraphics->DiscardResource( [ device, imageView, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image view->%p\n",
                    static_cast< VkImageView >(imageView) )

@@ -141,6 +141,8 @@ bool Sampler::OnDestroy()
   auto sampler = mSampler;
   auto allocator = &mGraphics->GetAllocator();
 
+   fprintf(stderr,"%s:Invoking deleter function: sampler->%llud\n",__FUNCTION__, static_cast< VkSampler >(sampler));
+
   mGraphics->DiscardResource( [ device, sampler, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: sampler->%p\n",
                    static_cast< VkSampler >(sampler) )
