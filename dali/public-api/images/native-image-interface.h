@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/any.h>
 
 namespace Dali
 {
@@ -102,6 +103,14 @@ public:
   * @return True if blending is required
   */
   virtual bool RequiresBlending() const = 0;
+
+  /**
+   * @brief Retrieves the internal native image.
+   *
+   * @SINCE_1_0.0
+   * @return Any object containing the internal native image source
+   */
+  virtual Any GetNativeImageHandle() const = 0;
 
   /**
    * @brief Retrieves the extension for the interface.

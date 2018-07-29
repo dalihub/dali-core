@@ -121,6 +121,12 @@ public:
    */
   void DestroyNow();
 
+  /**
+   * Returns external's flag
+   * @return
+   */
+  bool IsNativeImage() const;
+
 private:
 
   /**
@@ -149,6 +155,7 @@ private:
 
   std::unique_ptr<Memory> mDeviceMemory;
   bool mIsExternal;
+  bool IsNativeImage;
 };
 
 } // namespace Vulkan

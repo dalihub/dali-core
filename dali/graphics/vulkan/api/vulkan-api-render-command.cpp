@@ -164,6 +164,15 @@ void RenderCommand::BindTexturesAndSamplers()
                   image->GetSamplerRef()->GetVkHandle() :
                   static_cast<const VulkanAPI::Sampler*>( texture.sampler )->GetSampler()->GetVkHandle() );
 
+    //auto vkDescriptorImageInfo = reinterpret_cast<const VkDescriptorImageInfo*>( &imageViewInfo );
+
+    //fprintf(stderr,"%s:<<---------VkDescriptorImageInfo Information--------->>\n",__FUNCTION__);
+    //fprintf(stderr,"%s:Sampler %llud\n",__FUNCTION__, vkDescriptorImageInfo->sampler);
+    //fprintf(stderr,"%s:ImageView %llud\n",__FUNCTION__, vkDescriptorImageInfo->imageView);
+    //fprintf(stderr,"%s:ImageLayout %d\n",__FUNCTION__, vkDescriptorImageInfo->imageLayout);
+    //fprintf(stderr,"%s:<<------------------------------------------>>\n",__FUNCTION__);
+
+
     mController.PushDescriptorWrite(
       vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
                               .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )

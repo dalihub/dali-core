@@ -15,6 +15,19 @@
  *
  */
 
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <tbm_type_common.h>
+#include <tbm_surface.h>
+#include <tbm_bo.h>
+#include <tbm_surface_internal.h>
+#include <vulkan/vulkan.h>
+
+#ifdef EXPORT_API
+#undef EXPORT_API
+#endif
+
+#endif
+
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
@@ -50,6 +63,10 @@
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
 
+#ifndef VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME
+#define VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME "VK_EXT_image_drm_format_modifier"
+#endif
+
 #include <iostream>
 #include <utility>
 
@@ -59,6 +76,15 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
+namespace
+{
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+PFN_vkGetMemoryFdPropertiesKHR               gGetMemoryFdPropertiesKHR = 0;
+#endif
+
+} // anonymous namespace
 
 const uint32_t INVALID_MEMORY_INDEX = -1u;
 
@@ -108,6 +134,8 @@ Memory::~Memory()
     // Discard unused descriptor set layouts
     graphics->DiscardResource( [ device, deviceMemory, allocator ]() {
       // free memory
+       fprintf(stderr,"%s:call freeMemory DeviceMemory->%llud\n",__FUNCTION__, static_cast< VkDeviceMemory >(deviceMemory));
+
       device.freeMemory( deviceMemory, allocator );
     } );
   }
@@ -172,7 +200,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
         //"VK_LAYER_LUNARG_parameter_validation", // parameter
-        // "VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+        //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
         //"VK_LAYER_LUNARG_swapchain",           // swapchain
         //"VK_LAYER_GOOGLE_threading",           // threading
@@ -256,6 +284,7 @@ void Graphics::Create()
 
 void Graphics::CreateDevice()
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto queueInfos = GetQueueCreateInfos();
   {
     auto maxQueueCountPerFamily = 0u;
@@ -272,7 +301,13 @@ void Graphics::CreateDevice()
       info.setPQueuePriorities( priorities.data() );
     }
 
-    std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                           VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME,
+                                           VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                           VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                           VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                           VK_KHR_MAINTENANCE1_EXTENSION_NAME,
+                                           VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME };
 
     vk::PhysicalDeviceFeatures featuresToEnable{};
 
@@ -337,6 +372,7 @@ void Graphics::CreateDevice()
 FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
                               const Integration::Graphics::GraphicsCreateInfo& createInfo )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto vulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>( &surfaceFactory );
 
   if( !vulkanSurfaceFactory )
@@ -409,7 +445,7 @@ FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
-
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto surfaceCapabilities = surface->GetCapabilities();
 
   //TODO: propagate the format and presentation mode to higher layers to allow for more control?
@@ -439,6 +475,7 @@ void Graphics::InitialiseController()
 
 RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
 {
+  //fprintf(stderr,"%s-------------------------------------------\n",__FUNCTION__);
   auto surfaceCapabilities = surface->GetCapabilities();
 
   mSurfaceResized = false;
@@ -466,6 +503,7 @@ RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surf
 
 RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInfo )
 {
+  //fprintf(stderr,"%s-------------------------------------------\n",__FUNCTION__);
   auto fence = new Fence( *this );
 
   VkAssert( mDevice.createFence( &fenceCreateInfo, mAllocator.get(), &fence->mFence ) );
@@ -477,6 +515,7 @@ RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInf
 
 RefCountedBuffer Graphics::CreateBuffer( size_t size, vk::BufferUsageFlags usageFlags )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto info = vk::BufferCreateInfo{};
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
@@ -494,6 +533,7 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, vk::BufferUsageFlags usage
 
 RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto buffer = new Buffer( *this, bufferCreateInfo );
 
   VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), &buffer->mBuffer ) );
@@ -511,6 +551,7 @@ vk::RenderPass Graphics::CreateCompatibleRenderPass(
   std::vector<vk::ImageView>& attachments
 )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto hasDepth = false;
   if( depthAttachment )
   {
@@ -632,6 +673,7 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
         uint32_t height,
         vk::RenderPass externalRenderPass )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   assert( ( !colorAttachments.empty() || depthAttachment )
           && "Cannot create framebuffer. Please provide at least one attachment" );
 
@@ -691,6 +733,7 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
 
 RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInfo )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto image = new Image( *this, imageCreateInfo );
 
   VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), &image->mImage ) );
@@ -705,6 +748,7 @@ RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
                                                    vk::Format imageFormat,
                                                    vk::Extent2D extent )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto imageCreateInfo = vk::ImageCreateInfo{}
           .setFormat( imageFormat )
           .setSamples( vk::SampleCountFlagBits::e1 )
@@ -717,17 +761,30 @@ RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
           .setTiling( vk::ImageTiling::eOptimal )
           .setMipLevels( 1 );
 
+  return CreateImageFromExternal( externalImage, imageCreateInfo, imageFormat, extent );
+}
+
+RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
+                                                   vk::ImageCreateInfo imageCreateInfo,
+                                                   vk::Format imageFormat,
+                                                   vk::Extent2D extent )
+{
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   return RefCountedImage(new Image( *this, imageCreateInfo, externalImage ) );
 }
+
 
 RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& flags,
                                                const RefCountedImage& image,
                                                vk::ImageViewType viewType,
                                                vk::Format format,
                                                vk::ComponentMapping components,
-                                               vk::ImageSubresourceRange subresourceRange )
+                                               vk::ImageSubresourceRange subresourceRange,
+                                               void* pNext)
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto imageViewCreateInfo = vk::ImageViewCreateInfo{}
+          .setPNext(pNext)
           .setFlags( flags )
           .setImage( image->GetVkHandle() )
           .setViewType( viewType )
@@ -735,9 +792,29 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
           .setComponents( components )
           .setSubresourceRange( std::move( subresourceRange ) );
 
+  //fprintf(stderr,"image->GetVkHandle() %llud\n", static_cast<VkImage>(image->GetVkHandle()));
+
+  // for debugging
+  //auto vkImageViewCreateInfo = reinterpret_cast<const VkImageViewCreateInfo*>( &imageViewCreateInfo );
+
+  //fprintf(stderr,"<<---------VkImageViewCreateInfo Information--------->>\n");
+  //fprintf(stderr,"sType %d, pNext %p, flags %d\n", vkImageViewCreateInfo->sType, vkImageViewCreateInfo->pNext, vkImageViewCreateInfo->flags);
+  //fprintf(stderr,"image %llud, viewType %d, format %d\n", vkImageViewCreateInfo->image, vkImageViewCreateInfo->viewType, vkImageViewCreateInfo->format);
+  //fprintf(stderr,"components r:%d, g:%d\n", vkImageViewCreateInfo->components.r, vkImageViewCreateInfo->components.g);
+  //fprintf(stderr,"components b:%d, a:%d\n", vkImageViewCreateInfo->components.b, vkImageViewCreateInfo->components.a);
+
+  //fprintf(stderr,"subresourceRange aspectMask:%d\n", vkImageViewCreateInfo->subresourceRange.aspectMask);
+  //fprintf(stderr,"subresourceRange baseMipLevel:%d\n", vkImageViewCreateInfo->subresourceRange.baseMipLevel);
+  //fprintf(stderr,"subresourceRange levelCount:%d\n", vkImageViewCreateInfo->subresourceRange.levelCount);
+  //fprintf(stderr,"subresourceRange baseArrayLayer:%d\n", vkImageViewCreateInfo->subresourceRange.baseArrayLayer);
+  //fprintf(stderr,"subresourceRange layerCount:%d\n", vkImageViewCreateInfo->subresourceRange.layerCount);
+
+  //fprintf(stderr,"<<------------------------------------------>>\n");
+
   auto imageView = new ImageView( *this, image, imageViewCreateInfo );
 
   VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, &imageView->mImageView ) );
+  //fprintf(stderr,"%s:Create VkImageView %llud\n",__FUNCTION__, static_cast<VkImage>(imageView->mImageView));
 
   auto refCountedImageView = RefCountedImageView( imageView );
 
@@ -748,6 +825,7 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 
 RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   vk::ComponentMapping componentsMapping = { vk::ComponentSwizzle::eR,
                                              vk::ComponentSwizzle::eG,
                                              vk::ComponentSwizzle::eB,
@@ -766,16 +844,20 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
                                               vk::ImageViewType::e2D,
                                               image->GetFormat(),
                                               componentsMapping,
-                                              subresourceRange );
+                                              subresourceRange,
+                                              nullptr);
 
   return refCountedImageView;
 }
 
 RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto sampler = new Sampler( *this, samplerCreateInfo );
 
   VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), &sampler->mSampler ) );
+
+  //fprintf(stderr,"%s:Create VkSampler %llud\n",__FUNCTION__, static_cast<VkSampler>(sampler->mSampler));
 
   auto refCountedSampler = RefCountedSampler( sampler );
 
@@ -787,6 +869,7 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
 
 RefCountedCommandBuffer Graphics::CreateCommandBuffer( bool primary )
 {
+  //fprintf(stderr,"%s-------------------------------------------\n",__FUNCTION__);
   auto commandPool = GetCommandPool( std::this_thread::get_id() );
 
   return commandPool->NewCommandBuffer( primary );
@@ -796,6 +879,7 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
                                                            vk::ImageLayout oldLayout,
                                                            vk::ImageLayout newLayout )
 {
+  //fprintf(stderr,"%s-------------------------------------------\n",__FUNCTION__);
   // This function assumes that all images have 1 mip level and 1 layer
   auto barrier = vk::ImageMemoryBarrier{}
           .setOldLayout( oldLayout )
@@ -863,9 +947,43 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
 
       barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
       break;
+    case vk::ImageLayout::eUndefined:
+      barrier.dstAccessMask = vk::AccessFlags{};
+      break;
+    case vk::ImageLayout::eGeneral:
+      barrier.dstAccessMask = vk::AccessFlags{};
+      break;
     default:
       assert( false && "Image layout transition failed: Target layout not supported." );
   }
+
+  if (image->IsNativeImage())
+  {
+    //fprintf(stderr,"update barrier for external image!!!!\n");
+    barrier.oldLayout = vk::ImageLayout::eUndefined;
+    barrier.newLayout = vk::ImageLayout::eGeneral;
+    barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eHostRead;
+    barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+    barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    barrier.srcQueueFamilyIndex = 0;//VK_QUEUE_FAMILY_EXTERNAL_KHR;
+    barrier.dstQueueFamilyIndex = 0;
+
+    //auto vkImageMemoryBarrier = reinterpret_cast<const VkImageMemoryBarrier*>( &barrier );
+
+    //fprintf(stderr,"<<---------VkImageMemoryBarrier Information--------->>\n");
+    //fprintf(stderr,"sType %d, pNext %p\n", vkImageMemoryBarrier->sType, vkImageMemoryBarrier->pNext);
+    //fprintf(stderr,"srcAccessMask 0x%x, dstAccessMask 0x%x\n", vkImageMemoryBarrier->srcAccessMask, vkImageMemoryBarrier->dstAccessMask);
+    //fprintf(stderr,"oldLayout %d, newLayout %d\n", vkImageMemoryBarrier->oldLayout, vkImageMemoryBarrier->newLayout);
+    //fprintf(stderr,"srcQueueFamilyIndex %d, dstQueueFamilyIndex %d\n", vkImageMemoryBarrier->srcQueueFamilyIndex, vkImageMemoryBarrier->dstQueueFamilyIndex);
+    //fprintf(stderr,"subresourceRange,s aspectMask %d, baseMipLevel %d\n", vkImageMemoryBarrier->subresourceRange.aspectMask, vkImageMemoryBarrier->subresourceRange.baseMipLevel);
+    //fprintf(stderr,"subresourceRange,s levelCount %d, baseArrayLayer %d\n", vkImageMemoryBarrier->subresourceRange.levelCount, vkImageMemoryBarrier->subresourceRange.baseArrayLayer);
+    //fprintf(stderr,"subresourceRange,s layerCount %d\n", vkImageMemoryBarrier->subresourceRange.layerCount);
+
+    //fprintf(stderr,"VkImage %llud\n", vkImageMemoryBarrier->image);
+    //fprintf(stderr,"<<------------------------------------------>>\n");
+
+  }
+
 
   return barrier;
 }
@@ -876,6 +994,8 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                uint32_t bufferCount,
                                                RefCountedSwapchain&& oldSwapchain )
 {
+  //fprintf(stderr,"%s\n",__FUNCTION__);
+
   // obtain supported image format
   auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
 
@@ -1105,6 +1225,7 @@ vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
 
 vk::Result Graphics::BindImageMemory( RefCountedImage image, std::unique_ptr<Memory> memory, uint32_t offset )
 {
+  //fprintf(stderr,"call bindImageMemory offset %d\n", offset);
   auto result = VkAssert( mDevice.bindImageMemory( image->mImage, memory->memory, offset ) );
   image->mDeviceMemory = std::move(memory);
   return result;
@@ -1193,10 +1314,120 @@ std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::Mem
   );
 }
 
+std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties, Any TBMSurface )
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  vk::MemoryRequirements  image_memory_requirements;
+  vk::PhysicalDeviceMemoryProperties memory_properties;
+  vk::DeviceMemory memory{};
+
+  VkMemoryFdPropertiesKHR mem_prop = {};
+
+  tbm_surface_h      tbmSurface = 0;
+  tbm_surface_info_s tbmSurface_info;
+  tbm_bo             tbmbo;
+  int                tbmFD;
+
+  if (!gGetMemoryFdPropertiesKHR)
+  {
+    gGetMemoryFdPropertiesKHR = reinterpret_cast<PFN_vkGetMemoryFdPropertiesKHR>(
+                GetDeviceProcedureAddress( "vkGetMemoryFdPropertiesKHR" ) );
+  }
+
+  if (!gGetMemoryFdPropertiesKHR)
+  {
+    //fprintf(stderr,"Fail to get vKGetMemoryFdPropertiesKHR symbol\n");
+    return nullptr;
+  }
+
+  if ( TBMSurface.GetType() == typeid( tbm_surface_h ) )
+    tbmSurface =  AnyCast< tbm_surface_h >( TBMSurface );
+
+  if (!tbmSurface)
+  {
+      //fprintf(stderr,"Fail to get tbmSurface\n");
+      return nullptr;
+  }
+
+  tbm_surface_get_info(tbmSurface, &tbmSurface_info);
+  tbmbo = tbm_surface_internal_get_bo(tbmSurface, 0 );
+  tbmFD = static_cast<int>(tbm_bo_get_handle(tbmbo, TBM_DEVICE_3D).u32);
+  fprintf(stderr,"tbm FD %d\n", tbmFD);
+
+  //fprintf(stderr,"call gGetMemoryFdPropertiesKHR\n");
+  gGetMemoryFdPropertiesKHR ( static_cast<VkDevice>(GetDevice()),
+                              static_cast<VkExternalMemoryHandleTypeFlagBitsKHR>(VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT),
+                              tbmFD, &mem_prop);
+
+  //fprintf(stderr,"<<---------VkMemoryFdPropertiesKHR--------->>\n");
+  //fprintf(stderr,"sType %d, pNext %p, memoryTypeBits %d\n", mem_prop.sType, mem_prop.pNext, mem_prop.memoryTypeBits);
+  //fprintf(stderr,"<<------------------------------------------>>\n");
+
+  //fprintf(stderr,"call getImageMemoryRequirements with VkImage %llud\n", static_cast<VkImage>(image->GetVkHandle()));
+  GetDevice().getImageMemoryRequirements( image->GetVkHandle(), &image_memory_requirements );
+
+  //fprintf(stderr,"<<---------getImageMemoryRequirements--------->>\n");
+  //fprintf(stderr,"size %lld, alignment %lld, memoryTypeBits %d\n", image_memory_requirements.size, image_memory_requirements.alignment, image_memory_requirements.memoryTypeBits);
+  //fprintf(stderr,"<<------------------------------------------>>\n");
+
+  image_memory_requirements.memoryTypeBits = mem_prop.memoryTypeBits;
+  //fprintf(stderr,"update image_memory requirement's memoryTypeBits %d\n", image_memory_requirements.memoryTypeBits);
+
+
+  auto import_mem_info = vk::ImportMemoryFdInfoKHR{}
+    .setHandleType( vk::ExternalMemoryHandleTypeFlagBits::eDmaBufEXT )
+    .setFd( tbmFD );
+
+  // for debugging
+  //auto vkimportMemoryInfo = reinterpret_cast<const VkImportMemoryFdInfoKHR*>( &import_mem_info );
+  //fprintf(stderr,"<<---------vkimportMemoryInfo Information--------->>\n");
+  //fprintf(stderr,"sType %d, pNext %p\n", vkimportMemoryInfo->sType, vkimportMemoryInfo->pNext);
+  //fprintf(stderr,"handleType 0x%x, fd %d\n", vkimportMemoryInfo->handleType, vkimportMemoryInfo->fd);
+  //fprintf(stderr,"<<------------------------------------------>>\n");
+
+  memory_properties = GetMemoryProperties();
+
+  //fprintf(stderr,"memory_properties.memoryTypeCount %d\n", memory_properties.memoryTypeCount);
+  //fprintf(stderr,"memory_properties.memoryHeapCount %d\n", memory_properties.memoryHeapCount);
+
+  for( uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i )
+  {
+    //fprintf(stderr,"image_memory_requirements.memoryTypeBits %d\n", image_memory_requirements.memoryTypeBits);
+    if( image_memory_requirements.memoryTypeBits & (static_cast<uint32_t>((1 << i))) )
+    {
+      //fprintf(stderr,"Find out the matched type\n");
+      auto memory_allocate_info = vk::MemoryAllocateInfo{}
+        .setPNext(static_cast<void*>(&import_mem_info))
+        .setAllocationSize(tbmSurface_info.size)
+        .setMemoryTypeIndex(i);
+
+      // for debugging
+      //auto vkMemoryAllocateInfo = reinterpret_cast<const VkMemoryAllocateInfo*>( &memory_allocate_info );
+      //fprintf(stderr,"<<---------vkMemoryAllocateInfo Information--------->>\n");
+      //fprintf(stderr,"sType %d, pNext %p\n", vkMemoryAllocateInfo->sType, vkMemoryAllocateInfo->pNext);
+      //fprintf(stderr,"allocationSize %lld, memoryTypeIndex %d\n", vkMemoryAllocateInfo->allocationSize, vkMemoryAllocateInfo->memoryTypeIndex);
+      //fprintf(stderr,"<<------------------------------------------>>\n");
+
+      GetDevice().allocateMemory(&memory_allocate_info, nullptr, &memory);
+      break;
+    }
+  }
+
+  return std::unique_ptr<Memory>(
+    new Memory( this,
+                memory,
+                uint32_t(image_memory_requirements.size),
+                uint32_t(image_memory_requirements.alignment),
+                ((memoryProperties & vk::MemoryPropertyFlagBits::eHostVisible) == vk::MemoryPropertyFlagBits::eHostVisible) )
+  );
+#else
+  return nullptr;
+#endif
+}
+
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
-
-
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   auto submitInfos = std::vector< vk::SubmitInfo >{};
   submitInfos.reserve( submissionData.size() );
   auto commandBufferHandles = std::vector< vk::CommandBuffer >{};
@@ -1428,6 +1659,17 @@ const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
   return mVulkanPipelineCache;
 }
 
+// External ------------------------------------------------------------------------------------------------------
+PFN_vkVoidFunction Graphics::GetInstanceProcedureAddress( const char* name )
+{
+  return mInstance.getProcAddr( name );
+}
+
+PFN_vkVoidFunction Graphics::GetDeviceProcedureAddress( const char* name )
+{
+  return mDevice.getProcAddr( name );
+}
+
 // Cache manipulation methods -----------------------------------------------------------------------------------
 void Graphics::AddBuffer( Buffer& buffer )
 {
@@ -1653,6 +1895,8 @@ void Graphics::PreparePhysicalDevice()
   }
 
   assert( mPhysicalDevice && "No suitable Physical Device found!" );
+  //VkPhysicalDevice vkPhysicalDevice = static_cast<VkPhysicalDevice>(mPhysicalDevice);
+  ////fprintf(stderr,"%s: VkPhysicalDevice %p\n", __FUNCTION__,static_cast<void*>(vkPhysicalDevice));
 
   GetPhysicalDeviceProperties();
 
@@ -1792,6 +2036,8 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     else if( platform == Platform::WAYLAND && waylandAvailable )
     {
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      retval.push_back( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME );
+      retval.push_back( VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME );
     }
   }
   else // try to determine the platform based on available extensions
@@ -1810,6 +2056,8 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     {
       mPlatform = Platform::WAYLAND;
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      retval.push_back( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME );
+      retval.push_back( VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME );
     }
     else
     {

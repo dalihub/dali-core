@@ -151,22 +151,21 @@ void Image::DestroyNow()
 
 bool Image::OnDestroy()
 {
-  if( !mIsExternal )
+  mGraphics->RemoveImage( *this );
+
+  if( mImage )
   {
-    mGraphics->RemoveImage( *this );
+    auto device = mGraphics->GetDevice();
+    auto image = mImage;
+    auto allocator = &mGraphics->GetAllocator();
+    auto memory = mDeviceMemory->ReleaseVkObject();
 
-    if( mImage )
-    {
-      auto device = mGraphics->GetDevice();
-      auto image = mImage;
-      auto allocator = &mGraphics->GetAllocator();
-      auto memory = mDeviceMemory->ReleaseVkObject();
+    fprintf(stderr,"%s:Invoking deleter function: image->%llud\n",__FUNCTION__, static_cast< VkImage >(image));
 
-      mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
-        DestroyVulkanResources( device, image, memory, allocator );
-      }
-      );
+    mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
+      DestroyVulkanResources( device, image, memory, allocator );
     }
+    );
   }
 
   return false;
@@ -176,11 +175,18 @@ void Image::DestroyVulkanResources( vk::Device device, vk::Image image, vk::Devi
 {
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
                  static_cast< VkImage >(image) )
+
+  fprintf(stderr,"%s:call destroyImage image->%llud\n",__FUNCTION__, static_cast< VkImage >(image));
   device.destroyImage( image, allocator );
 
+  fprintf(stderr,"%s:call freeMemory DeviceMemory->%llud\n",__FUNCTION__, static_cast< VkDeviceMemory >(memory));
   device.freeMemory( memory, allocator );
 }
 
+bool Image::IsNativeImage() const
+{
+    return mIsNativeImage;
+}
 
 } // namespace Vulkan
 
