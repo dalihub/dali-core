@@ -16,6 +16,21 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_tizen.h>
+
+#ifdef EXPORT_API
+#undef EXPORT_API
+#endif
+
+#ifndef DRM_FORMAT_MOD_LINEAR
+#define DRM_FORMAT_MOD_LINEAR 0
+#endif
+
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -32,15 +47,30 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 
+#include <dali/integration-api/debug.h>
+
 #include <algorithm>
 
 namespace Dali
 {
 namespace Graphics
 {
+using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+
+PFN_vkCreateImageFromNativeBufferTIZEN  gCreatePresentableImageProcedure = 0;
+
+#endif
+
+} // anonymous namespace
 
 
 /**
@@ -900,6 +930,8 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
   mLayout = vk::ImageLayout::eUndefined;
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -959,17 +991,31 @@ bool Texture::Initialise()
     }
   }
 
-  if( InitialiseTexture() )
+  bool result = false;
+  if (nativeImage)
   {
-    // copy data to the image
-    if( data )
+    mLayout = vk::ImageLayout::eUndefined;
+    mTbmSurface = nativeImage->GetNativeImageSource();
+    if (InitialiseNativeTexture())
     {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+        TrasferTBM( API::TextureDetails::UpdateMode::UNDEFINED );
     }
-    return true;
+    result = true;
+  }
+  else
+  {
+    if( InitialiseTexture() )
+    {
+        // copy data to the image
+      if( data )
+      {
+        CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      }
+      result = true;
+    }
   }
 
-  return false;
+  return result;
 }
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
@@ -1069,6 +1115,17 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
   mController.ScheduleResourceTransfer( std::move(transferRequest) );
 }
 
+void Texture::TrasferTBM( API::TextureDetails::UpdateMode updateMode )
+{
+  ResourceTransferRequest transferRequest( TransferRequestType::USE_TBM );
+
+  transferRequest.useTBMInfo.srcImage = mImage;
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
 // creates image with pre-allocated memory and default sampler, no data
 // uploaded at this point
 bool Texture::InitialiseTexture()
@@ -1155,6 +1212,154 @@ Vulkan::RefCountedImageView Texture::GetImageViewRef() const
 Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
   return mSampler;
+}
+
+bool Texture::InitialiseNativeTexture()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  tbm_surface_h tbmSurface = 0;
+  tbm_surface_info_s info;
+
+  VkImage image = 0;
+  std::vector <VkSubresourceLayout> plane_layout;
+  VkDrmFormatModifierPropertiesEXT  drm_fmt_modifier;
+
+  if ( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+  {
+    tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+  }
+
+  if (!tbmSurface)
+  {
+    DALI_LOG_ERROR("tbmSurface is NULL %p\n", tbmSurface);
+    return false;
+  }
+
+  tbm_surface_get_info(tbmSurface, &info);
+
+  // set format
+  if (info.format == TBM_FORMAT_NV12)
+  {
+    mFormat = vk::Format::eG8B8R82Plane420UnormKHR;
+  }
+  else
+  {
+    mFormat = vk::Format::eR8G8B8A8Unorm;
+  }
+
+  mLayout = vk::ImageLayout::eUndefined;
+
+  GetFormatLinearDrmModifier( drm_fmt_modifier );
+  plane_layout.resize (drm_fmt_modifier.drmFormatModifierPlaneCount);
+
+  for (uint32_t i = 0; i < info.num_planes; i++) {
+      plane_layout[i].offset = info.planes[i].offset;
+      plane_layout[i].size = 0;
+      plane_layout[i].rowPitch = info.planes[i].stride;
+      plane_layout[i].arrayPitch = 0;
+      plane_layout[i].depthPitch = 0;
+      std::cout << "offset " << plane_layout[i].offset << " size " << plane_layout[i].size << " pitch " << plane_layout[i].rowPitch << std::endl;
+  }
+
+  VkImageDrmFormatModifierExplicitCreateInfoEXT mod_create_info =  {
+      static_cast< VkStructureType >(VK_STRUCTURE_TYPE_IMAGE_EXCPLICIT_DRM_FORMAT_MODIFIER_CREATE_INFO_EXT), //VkStructureType               sType;
+      NULL, 								//const void*                   pNext;
+      DRM_FORMAT_MOD_LINEAR, 						//uint64_t                      drmFormatModifier;
+      drm_fmt_modifier.drmFormatModifierPlaneCount, 			//uint32_t                      drmFormatModifierPlaneCount;
+      &plane_layout[0] 							//const VkSubresourceLayout*    pPlaneLayouts;
+  };
+
+  VkExternalMemoryImageCreateInfoKHR ext_mem_create_info = {
+      static_cast< VkStructureType >(VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_KHR), //VkStructureType                    sType;
+      &mod_create_info, 					//const void*                        pNext;
+      VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT //VkExternalMemoryHandleTypeFlags    handleTypes;
+  };
+
+    // create image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+       .setFormat( mFormat )
+       .setInitialLayout( mLayout )
+       .setSamples( vk::SampleCountFlagBits::e1 )
+       .setSharingMode( vk::SharingMode::eExclusive )
+       .setUsage( mUsage )
+       .setExtent( { mWidth, mHeight, 1 } )
+       .setArrayLayers( 1 )
+       .setImageType( vk::ImageType::e2D )
+       .setTiling( vk::ImageTiling::eOptimal )
+       .setMipLevels( 1 )
+       .setPNext(&ext_mem_create_info);
+
+
+    if (tbmSurface)
+    {
+      // @todo consider adding new CreateTexture() API to NativeImage (like GlExtensionCreate(), but generic)
+      // to perform this from within native image implementation.
+
+      auto vkImageCreateInfo = reinterpret_cast<const VkImageCreateInfo*>( &imageCreateInfo );
+
+      gCreatePresentableImageProcedure( static_cast<VkDevice>(mGraphics.GetDevice()),
+                                        tbmSurface,
+                                        vkImageCreateInfo,
+                                        0,
+                                        &image );
+    }
+
+    vk::Extent2D extent(mWidth, mHeight);
+
+    mImage = mGraphics.CreateImageFromExternal( static_cast<vk::Image>(image), imageCreateInfo, mFormat, extent );
+
+    CreateImageView();
+    CreateSampler();
+
+    return true;
+  }
+#endif
+
+  return false;
+}
+
+bool Texture::GetFormatLinearDrmModifier( VkDrmFormatModifierPropertiesEXT &outMode )
+{
+  std::vector<VkDrmFormatModifierPropertiesEXT> drm_format_modifiers;
+
+  VkDrmFormatModifierPropertiesListEXT mod_props = {
+      static_cast< VkStructureType >(VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT),// VkStructureType                      sType;
+      NULL, //  void* pNext;
+      0, 	//  uint32_t                           drmFormatModifierCount;
+      NULL 	//  VkDrmFormatModifierPropertiesEXT*  pDrmFormatModifierProperties;
+  };
+
+  VkFormatProperties    formatProperties = {};
+  VkFormatProperties2KHR format_props = {
+      VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR, // VkStructureType       sType;
+      &mod_props, 				                 // void*                 pNext;
+      formatProperties 			                 // VkFormatProperties    formatProperties;
+  };
+
+  //vkGetPhysicalDeviceFormatProperties2KHR(mGraphics.GetPhysicalDevice(), format, &format_props);
+  mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  if (mod_props.drmFormatModifierCount <= 0) {
+      std::cout << "Could get drmFormatModifierCount " << std::endl;
+      return false;
+  }
+
+  drm_format_modifiers.resize( mod_props.drmFormatModifierCount);
+  mod_props.pDrmFormatModifierProperties = &drm_format_modifiers[0];
+
+  //vkGetPhysicalDeviceFormatProperties2KHR(mGraphics.GetPhysicalDevice(), format, &format_props);
+  mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  for( VkDrmFormatModifierPropertiesEXT &mode : drm_format_modifiers )
+  {
+    if( mode.drmFormatModifier == DRM_FORMAT_MOD_LINEAR )
+    {
+      outMode = mode;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } // namespace VulkanAPI

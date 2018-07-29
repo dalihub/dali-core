@@ -121,6 +121,12 @@ public:
    */
   void DestroyNow();
 
+  /**
+   * Returns external's flag
+   * @return
+   */
+  bool IsExternal() const;
+
 private:
 
   /**
