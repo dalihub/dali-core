@@ -16,6 +16,12 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_tizen.h>
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -38,9 +44,29 @@ namespace Dali
 {
 namespace Graphics
 {
+using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+#if 0
+typedef VkResult (VKAPI_PTR *PFN_vkCreateImageFromNativeBufferTIZEN)(
+  VkDevice                     device,
+  tbm_surface_h                surface,
+  const VkImageCreateInfo     *pCreateInfo,
+  const VkAllocationCallbacks *pAllocator,
+  VkImage                     *pImage );
+#endif
+PFN_vkCreateImageFromNativeBufferTIZEN  gCreatePresentableImageProcedure = 0;
+//PFN_vkGetInstanceProcAddr               getProcAddr = 0;
+#endif
+
+} // anonymous namespace
 
 
 /**
@@ -897,6 +923,8 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -946,17 +974,32 @@ bool Texture::Initialise()
     }
   }
 
-  InitialiseTexture();
 
-  // copy data to the image
-  if( data )
+  if (nativeImage)
   {
-    CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+    mTbmSurface = nativeImage->GetNativeImageSource();
+    InitialiseNativeTexture();
   }
+  else
+  {
+    InitialiseTexture();
+     if( data )
+     {
+        CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+     }
+  }
+
   return true;
 }
 
-void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+
+void Texture::CopyMemory(
+  const void                      *srcMemory,
+  API::Extent2D                    srcExtent,
+  API::Offset2D                    dstOffset,
+  uint32_t                         layer,
+  uint32_t                         level,
+  API::TextureDetails::UpdateMode  updateMode )
 {
   // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
   uint32_t allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
@@ -969,7 +1012,9 @@ void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Of
 
   // bind memory
   mGraphics.BindBufferMemory( buffer,
-                              mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                              mGraphics.AllocateMemory( buffer,
+                                                        ( vk::MemoryPropertyFlagBits::eHostVisible |
+                                                          vk::MemoryPropertyFlagBits::eHostCoherent ) ),
                               0u );
 
   // write into the buffer
@@ -1052,7 +1097,7 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
 
 // creates image with pre-allocated memory and default sampler, no data
 // uploaded at this point
-bool Texture::InitialiseTexture()
+void Texture::InitialiseTexture()
 {
   // create image
   auto imageCreateInfo = vk::ImageCreateInfo{}
@@ -1081,8 +1126,103 @@ bool Texture::InitialiseTexture()
 
   // create basic sampler
   CreateSampler();
+}
 
-  return true;
+void Texture::InitialiseNativeTexture()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  tbm_surface_h tbmSurface = 0;
+  VkImage image = 0;
+
+  char *icdname = NULL;
+  void *lib = NULL;
+#if 0
+  if( ! gCreatePresentableImageProcedure )
+  {
+    gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+      mGraphics.GetProcedureAddress( "vkCreateImageFromNativeBufferTIZEN" ) );
+  }
+#endif
+  if( ! gCreatePresentableImageProcedure )
+  {
+      icdname = getenv("VK_TIZEN_ICD");
+      lib = dlopen(icdname, RTLD_LAZY | RTLD_LOCAL);
+
+      if (lib)
+      {
+#if 0
+          getProcAddr = reinterpret_cast<PFN_vkGetInstanceProcAddr>(dlsym(lib,"vk_icdGetInstanceProcAddr"));
+          if (getProcAddr)
+          {
+             gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+                getProcAddr(NULL, "vkCreateImageFromNativeBufferTIZEN"));
+          }
+#endif
+          if ( ! gCreatePresentableImageProcedure )
+          {
+             gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+                dlsym(lib,"vkCreateImageFromNativeBufferTIZEN"));
+          }
+      }
+  }
+
+  if( gCreatePresentableImageProcedure )
+  {
+    // Enforce format:
+    mFormat = vk::Format::eR8G8B8A8Unorm;  // VK_FORMAT_R8G8B8A8_UNORM;
+
+    // create image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+       .setFormat( mFormat )
+       .setInitialLayout( mLayout )
+       .setSamples( vk::SampleCountFlagBits::e1 )
+       .setSharingMode( vk::SharingMode::eExclusive )
+       .setUsage( mUsage )
+       .setExtent( { mWidth, mHeight, 1 } )
+       .setArrayLayers( 1 )
+       .setImageType( vk::ImageType::e2D )
+       .setTiling( vk::ImageTiling::eOptimal )
+       .setMipLevels( 1 );
+
+    if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+    {
+      tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+    }
+    if (tbmSurface)
+    {
+      // @todo consider adding new CreateTexture() API to NativeImage (like GlExtensionCreate(), but generic)
+      // to perform this from within native image implementation.
+        VkImageCreateInfo imageInfo {};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+        imageInfo.extent.width = mWidth;
+        imageInfo.extent.height = mHeight;
+        imageInfo.extent.depth = 1;
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+
+       gCreatePresentableImageProcedure( static_cast<VkDevice>(mGraphics.GetDevice()),
+                                                  tbmSurface,
+                                                  &imageInfo,
+                                                  0,
+                                                  &image );
+    }
+
+    vk::Extent2D extent(mWidth, mHeight);
+
+    mImage = mGraphics.CreateImageFromExternal( static_cast<vk::Image>(image), imageCreateInfo, mFormat, extent );
+
+    CreateImageView();
+    CreateSampler();
+
+    if (lib)
+        dlclose(lib);
+  }
+#endif
 }
 
 void Texture::CreateImageView()
@@ -1090,12 +1230,11 @@ void Texture::CreateImageView()
   mImageView = mGraphics.CreateImageView(
     {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
     vk::ImageSubresourceRange{}
-      .setAspectMask( mImage->GetAspectFlags() )
-      .setBaseArrayLayer( 0 )
-      .setBaseMipLevel( 0 )
-      .setLevelCount( mImage->GetMipLevelCount() )
-      .setLayerCount( mImage->GetLayerCount() )
-  );
+    .setAspectMask( mImage->GetAspectFlags() )
+    .setBaseArrayLayer( 0 )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( mImage->GetMipLevelCount() )
+    .setLayerCount( mImage->GetLayerCount() ) );
 }
 
 void Texture::CreateSampler()
