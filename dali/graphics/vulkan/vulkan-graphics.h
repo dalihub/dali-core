@@ -175,6 +175,9 @@ public: // Create methods
 
   RefCountedImage CreateImage( const vk::ImageCreateInfo& imageCreateInfo );
 
+  RefCountedImage CreateImageFromExternal( vk::Image externalImage, vk::ImageCreateInfo imageCreateInfo,
+                                           vk::Format imageFormat, vk::Extent2D extent );
+
   RefCountedImage CreateImageFromExternal( vk::Image externalImage, vk::Format imageFormat, vk::Extent2D extent );
 
   RefCountedImageView CreateImageView( const vk::ImageViewCreateFlags& flags,
@@ -283,6 +286,9 @@ public: // Getters
   bool HasStencilEnabled() const;
 
   bool IsSurfaceResized() const;
+
+public: // Extensions
+  PFN_vkVoidFunction GetProcedureAddress( const char* name );
 
 public: //Cache management methods
 

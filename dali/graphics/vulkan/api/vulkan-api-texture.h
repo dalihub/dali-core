@@ -62,11 +62,16 @@ public:
 
   void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
 
+  void TrasferTBM( API::TextureDetails::UpdateMode updateMode );
 private:
 
   void CreateSampler();
   void CreateImageView();
   bool InitialiseTexture();
+
+  bool InitialiseNativeTexture();
+
+  bool Texture::GetFormatLinearDrmModifier(VkFormat format, VkDrmFormatModifierPropertiesEXT &outMode);
 
 private:
 
@@ -84,6 +89,8 @@ private:
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
+
+  Any                   mTbmSurface;
 };
 
 } // namespace VulkanAPI
