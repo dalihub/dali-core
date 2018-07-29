@@ -19,6 +19,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/integration-api/debug.h>
 #include <utility>
 
 namespace Dali
@@ -80,6 +81,8 @@ bool ImageView::OnDestroy()
   auto device = mGraphics->GetDevice();
   auto imageView = mImageView;
   auto allocator = &mGraphics->GetAllocator();
+
+  DALI_LOG_ERROR("%s:Invoking deleter function: image view->%llu\n",__FUNCTION__, static_cast< VkImageView >(imageView));
 
   mGraphics->DiscardResource( [ device, imageView, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image view->%p\n",

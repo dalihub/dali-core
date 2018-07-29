@@ -18,6 +18,7 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -162,6 +163,8 @@ bool Image::OnDestroy()
       auto allocator = &mGraphics->GetAllocator();
       auto memory = mDeviceMemory->ReleaseVkObject();
 
+      DALI_LOG_ERROR("%s:Invoking deleter function: image->%llu\n",__FUNCTION__, static_cast< VkImage >(image));
+
       mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
         DestroyVulkanResources( device, image, memory, allocator );
       }
@@ -176,11 +179,23 @@ void Image::DestroyVulkanResources( vk::Device device, vk::Image image, vk::Devi
 {
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
                  static_cast< VkImage >(image) )
+
+  DALI_LOG_ERROR("%s:call destroyImage image->%llu\n",__FUNCTION__, static_cast< VkImage >(image));
   device.destroyImage( image, allocator );
 
+  DALI_LOG_ERROR("%s:call freeMemory DeviceMemory->%llu\n",__FUNCTION__, static_cast< VkDeviceMemory >(memory));
   device.freeMemory( memory, allocator );
 }
 
+void Image::SetIsNativeImage( bool flag )
+{
+  mIsNativeImage = flag;
+}
+
+bool Image::GetIsNativeImage() const
+{
+  return mIsNativeImage;
+}
 
 } // namespace Vulkan
 
