@@ -27,6 +27,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/integration-api/debug.h>
 
 #include <algorithm>
 

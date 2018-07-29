@@ -22,6 +22,7 @@
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics-api/graphics-api-utility.h>
+#include <dali/public-api/images/native-image-interface.h>
 
 namespace Dali
 {
@@ -43,6 +44,7 @@ public:
   virtual TextureFactory& SetUsage( TextureDetails::Usage usage )        = 0;
   virtual TextureFactory& SetData( void* pData )                         = 0;
   virtual TextureFactory& SetDataSize( uint32_t dataSizeInBytes )        = 0;
+  virtual TextureFactory& SetNativeImage( NativeImageInterfacePtr nativeImageInterface  ) = 0;
 
   // not copyable
   TextureFactory(const TextureFactory&) = delete;
