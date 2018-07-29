@@ -699,8 +699,17 @@ RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
           .setTiling( vk::ImageTiling::eOptimal )
           .setMipLevels( 1 );
 
+  return CreateImageFromExternal( externalImage, imageCreateInfo, imageFormat, extent );
+}
+
+RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
+                                                   vk::ImageCreateInfo imageCreateInfo,
+                                                   vk::Format imageFormat,
+                                                   vk::Extent2D extent )
+{
   return RefCountedImage(new Image( *this, imageCreateInfo, externalImage ) );
 }
+
 
 RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& flags,
                                                const RefCountedImage& image,
@@ -1440,6 +1449,12 @@ const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
   }
 
   return mVulkanPipelineCache;
+}
+
+// External ------------------------------------------------------------------------------------------------------
+PFN_vkVoidFunction Graphics::GetProcedureAddress( const char* name )
+{
+  return mInstance.getProcAddr( name );
 }
 
 // Cache manipulation methods -----------------------------------------------------------------------------------
