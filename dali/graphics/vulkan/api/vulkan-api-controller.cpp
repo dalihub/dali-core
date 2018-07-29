@@ -460,6 +460,16 @@ struct Controller::Impl
                                                .setNewLayout( srcImage->GetImageLayout() )
                                                .setOldLayout( vk::ImageLayout::eTransferSrcOptimal ));
           }
+          else if ( req.requestType == TransferRequestType::USE_TBM )
+          {
+            auto srcImage = req.useTBMInfo.srcImage;
+            preLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                               .setNewLayout( srcImage->GetImageLayout() )
+                                               .setOldLayout( vk::ImageLayout::eUndefined ));
+            postLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                               .setNewLayout( srcImage->GetImageLayout() )
+                                               .setOldLayout( vk::ImageLayout::eUndefined ));
+          }
         }
       }
 
