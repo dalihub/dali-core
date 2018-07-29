@@ -83,7 +83,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   }
 
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
-                                            1000000,
+                                            UINT64_MAX,
                                             nullptr,
                                             mFrameFence->GetVkHandle(), &mCurrentBufferIndex );
 
