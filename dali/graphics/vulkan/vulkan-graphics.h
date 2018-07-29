@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-allocator.h>
 #include <dali/integration-api/graphics/graphics.h>
+#include <dali/public-api/object/any.h>
 
 #include <thread>
 #include <mutex>
@@ -175,6 +176,9 @@ public: // Create methods
 
   RefCountedImage CreateImage( const vk::ImageCreateInfo& imageCreateInfo );
 
+  RefCountedImage CreateImageFromExternal( vk::Image externalImage, vk::ImageCreateInfo imageCreateInfo,
+                                           vk::Format imageFormat, vk::Extent2D extent );
+
   RefCountedImage CreateImageFromExternal( vk::Image externalImage, vk::Format imageFormat, vk::Extent2D extent );
 
   RefCountedImageView CreateImageView( const vk::ImageViewCreateFlags& flags,
@@ -233,6 +237,8 @@ public: // Actions
 
   std::unique_ptr<Memory> AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties );
 
+  std::unique_ptr<Memory> AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties, Any TBMSurface );
+
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 
   std::vector< RefCountedDescriptorSet >
@@ -283,6 +289,11 @@ public: // Getters
   bool HasStencilEnabled() const;
 
   bool IsSurfaceResized() const;
+
+public: // Extensions
+  PFN_vkVoidFunction GetInstanceProcedureAddress( const char* name );
+
+  PFN_vkVoidFunction GetDeviceProcedureAddress( const char* name );
 
 public: //Cache management methods
 

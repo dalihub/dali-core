@@ -16,6 +16,22 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_tizen.h>
+
+#ifdef EXPORT_API
+#undef EXPORT_API
+#endif
+
+#ifndef DRM_FORMAT_MOD_LINEAR
+#define DRM_FORMAT_MOD_LINEAR 0
+#endif
+
+
+#define USING_CSTYLE 1
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -32,15 +48,28 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
 
+#include <dali/integration-api/debug.h>
+
 #include <algorithm>
 
 namespace Dali
 {
 namespace Graphics
 {
+using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+PFN_vkCreateSamplerYcbcrConversionKHR        gCreateSamplerYcbcrConversionKHR = 0;
+PFN_vkGetPhysicalDeviceFormatProperties2KHR  gGetPhysicalDeviceFormatProperties2KHR = 0;
+#endif
+
+} // anonymous namespace
 
 
 /**
@@ -900,6 +929,23 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
   mLayout = vk::ImageLayout::eUndefined;
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
+#ifdef NATIVE_IMAGE_SUPPORT
+  gCreateSamplerYcbcrConversionKHR = reinterpret_cast<PFN_vkCreateSamplerYcbcrConversionKHR>(
+              mGraphics.GetDeviceProcedureAddress( "vkCreateSamplerYcbcrConversionKHR" ) );
+
+  gGetPhysicalDeviceFormatProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFormatProperties2KHR>(
+              mGraphics.GetDeviceProcedureAddress( "vkGetPhysicalDeviceFormatProperties2KHR" ) );
+
+  if ( gCreateSamplerYcbcrConversionKHR
+       && gGetPhysicalDeviceFormatProperties2KHR
+       && nativeImage )
+  {
+      mIsSupportNativeImage = true;
+  }
+#endif
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -959,17 +1005,32 @@ bool Texture::Initialise()
     }
   }
 
-  if( InitialiseTexture() )
+  bool result = false;
+  if (mIsSupportNativeImage)
   {
-    // copy data to the image
-    if( data )
+    mLayout = vk::ImageLayout::eUndefined;
+    mTbmSurface = nativeImage->GetNativeImageSource();
+    if (InitialiseNativeImage())
     {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+
+        TrasferTBM( API::TextureDetails::UpdateMode::UNDEFINED );
     }
-    return true;
+    result = true;
+  }
+  else
+  {
+    if( InitialiseTexture() )
+    {
+        // copy data to the image
+      if( data )
+      {
+        CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      }
+      result = true;
+    }
   }
 
-  return false;
+  return result;
 }
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
@@ -1069,6 +1130,17 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
   mController.ScheduleResourceTransfer( std::move(transferRequest) );
 }
 
+void Texture::TrasferTBM( API::TextureDetails::UpdateMode updateMode )
+{
+  ResourceTransferRequest transferRequest( TransferRequestType::USE_TBM );
+
+  transferRequest.useTBMInfo.srcImage = mImage;
+  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+}
+
 // creates image with pre-allocated memory and default sampler, no data
 // uploaded at this point
 bool Texture::InitialiseTexture()
@@ -1156,6 +1228,220 @@ Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
   return mSampler;
 }
+
+bool Texture::InitialiseNativeImage()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+    tbm_surface_h tbmSurface = 0;
+    tbm_surface_info_s tbmSurface_info;
+
+    VkImage image = 0;
+
+    std::vector <VkSubresourceLayout> plane_layout;
+    VkDrmFormatModifierPropertiesEXT  drm_fmt_modifier;
+
+    if ( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+    {
+      tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+    }
+
+    if (!tbmSurface)
+    {
+      DALI_LOG_ERROR("tbmSurface is nullptr %p\n", tbmSurface);
+      return false;
+    }
+
+    tbm_surface_get_info(tbmSurface, &tbmSurface_info);
+
+    // set format
+    if (tbmSurface_info.format == TBM_FORMAT_NV12)
+    {
+      // VK_FORMAT_G8_B8R8_2PLANE_420_UNORM_KHR
+      mFormat = vk::Format::eG8B8R82Plane420UnormKHR;
+    }
+    else
+    {
+      // VK_FORMAT_R8G8B8A8_UNORM
+      mFormat = vk::Format::eR8G8B8A8Unorm;
+    }
+
+    mLayout = vk::ImageLayout::eUndefined;
+
+    GetFormatLinearDrmModifierNativeImage( static_cast<VkFormat>(mFormat), drm_fmt_modifier );
+    plane_layout.resize (drm_fmt_modifier.drmFormatModifierPlaneCount);
+
+    for (uint32_t i = 0; i < tbmSurface_info.num_planes; i++) {
+        plane_layout[i].offset = tbmSurface_info.planes[i].offset;
+        plane_layout[i].size = 0;
+        plane_layout[i].rowPitch = tbmSurface_info.planes[i].stride;
+        plane_layout[i].arrayPitch = 0;
+        plane_layout[i].depthPitch = 0;
+        std::cout << "offset " << plane_layout[i].offset << " size " << plane_layout[i].size << " pitch " << plane_layout[i].rowPitch << std::endl;
+    }
+
+    VkImageDrmFormatModifierExplicitCreateInfoEXT mod_create_info =  {
+        static_cast< VkStructureType >(VK_STRUCTURE_TYPE_IMAGE_EXCPLICIT_DRM_FORMAT_MODIFIER_CREATE_INFO_EXT), //VkStructureType               sType;
+        nullptr, 								         //const void*                   pNext;
+        DRM_FORMAT_MOD_LINEAR, 						 //uint64_t                      drmFormatModifier;
+        drm_fmt_modifier.drmFormatModifierPlaneCount,  //uint32_t                      drmFormatModifierPlaneCount;
+        &plane_layout[0] 							     //const VkSubresourceLayout*    pPlaneLayouts;
+    };
+
+    VkExternalMemoryImageCreateInfoKHR ext_mem_create_info = {
+        static_cast< VkStructureType >(VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_KHR), //VkStructureType                    sType;
+        &mod_create_info, 					         //const void*                        pNext;
+        VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT //VkExternalMemoryHandleTypeFlags    handleTypes;
+    };
+
+  auto imageCreateInfo = vk::ImageCreateInfo{}
+    .setPNext( static_cast< void * >(&ext_mem_create_info) )
+    .setImageType( vk::ImageType::e2D )
+    .setFormat( mFormat )
+    .setExtent( { mWidth, mHeight, 1 } )
+    .setMipLevels( 1 )
+    .setArrayLayers( 1 )
+    .setSamples( vk::SampleCountFlagBits::e1 )
+    .setTiling( static_cast< vk::ImageTiling >(VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT) )
+    .setUsage( mUsage )
+    .setSharingMode( vk::SharingMode::eExclusive )
+    .setQueueFamilyIndexCount( 0 )
+    .setPQueueFamilyIndices( nullptr )
+    .setInitialLayout( mLayout );
+
+  auto vkImageCreateInfo = reinterpret_cast<const VkImageCreateInfo*>( &imageCreateInfo );
+  vkCreateImage( static_cast<VkDevice>(mGraphics.GetDevice()),
+                 vkImageCreateInfo,
+                 0,
+                 &image );
+
+    vk::Extent2D extent(mWidth, mHeight);
+
+    mImage = mGraphics.CreateImageFromExternal( static_cast<vk::Image>(image), imageCreateInfo, mFormat, extent );
+
+    // allocate memory for the image
+    auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eHostVisible, mTbmSurface );
+
+    // bind the allocated memory to the image
+    mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
+
+    CreateImageView();
+
+    if ( mFormat == vk::Format::eG8B8R82Plane420UnormKHR )
+    {
+      CreateSamplerYUVNativeImage();
+    }
+    else
+    {
+      CreateSampler();
+    }
+#endif
+
+  return true;
+}
+
+bool Texture::GetFormatLinearDrmModifierNativeImage( VkFormat format, VkDrmFormatModifierPropertiesEXT &outMode )
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  std::vector<VkDrmFormatModifierPropertiesEXT> drm_format_modifiers;
+
+  VkDrmFormatModifierPropertiesListEXT mod_props = {
+      static_cast< VkStructureType >(VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT),// VkStructureType                      sType;
+      nullptr, //  void* pNext;
+      0, 	//  uint32_t                           drmFormatModifierCount;
+      nullptr 	//  VkDrmFormatModifierPropertiesEXT*  pDrmFormatModifierProperties;
+  };
+
+  VkFormatProperties    formatProperties = {};
+  VkFormatProperties2KHR format_props = {
+      VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR, // VkStructureType       sType;
+      &mod_props, 				                 // void*                 pNext;
+      formatProperties 			                 // VkFormatProperties    formatProperties;
+  };
+
+  gGetPhysicalDeviceFormatProperties2KHR( static_cast<VkPhysicalDevice>(mGraphics.GetPhysicalDevice()), format, &format_props);
+  //mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  if (mod_props.drmFormatModifierCount <= 0) {
+      std::cout << "Could get drmFormatModifierCount " << std::endl;
+      return false;
+  }
+
+  drm_format_modifiers.resize( mod_props.drmFormatModifierCount);
+  mod_props.pDrmFormatModifierProperties = &drm_format_modifiers[0];
+
+  gGetPhysicalDeviceFormatProperties2KHR( static_cast<VkPhysicalDevice>(mGraphics.GetPhysicalDevice()), format, &format_props);
+  //mGraphics.GetPhysicalDevice().getFormatProperties2KHR( mFormat, reinterpret_cast<vk::FormatProperties2KHR*>( &format_props ));
+
+  for( VkDrmFormatModifierPropertiesEXT &mode : drm_format_modifiers )
+  {
+    if( mode.drmFormatModifier == DRM_FORMAT_MOD_LINEAR )
+    {
+      outMode = mode;
+      return true;
+    }
+  }
+#endif
+  return false;
+}
+
+bool Texture::CreateSamplerYUVNativeImage()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+    VkSamplerYcbcrConversionCreateInfoKHR conv_create_info = {
+      VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_CREATE_INFO_KHR, // VkStructureType                  sType;
+      nullptr, 						                              //const void*                      pNext;
+      static_cast<VkFormat>(mFormat), 						                              //VkFormat                         format;
+      VK_SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_709_KHR,            //VkSamplerYcbcrModelConversion    ycbcrModel;
+      VK_SAMPLER_YCBCR_RANGE_ITU_FULL_KHR, 				          // VkSamplerYcbcrRange              ycbcrRange;
+      {
+
+          VK_COMPONENT_SWIZZLE_IDENTITY,                            //VkComponentSwizzle    r;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                            //VkComponentSwizzle    g;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                            //VkComponentSwizzle    b;
+          VK_COMPONENT_SWIZZLE_IDENTITY,                            //VkComponentSwizzle    a;
+      },                                                          // VkComponentMapping   components;
+      VK_CHROMA_LOCATION_MIDPOINT_KHR,                            //VkChromaLocation      xChromaOffset;
+      VK_CHROMA_LOCATION_MIDPOINT_KHR,                            //VkChromaLocation      yChromaOffset;
+      VK_FILTER_NEAREST, 						                  //VkFilter              chromaFilter;
+      VK_FALSE                                                    //VkBool32              forceExplicitReconstruction;
+    };
+
+    VkSamplerYcbcrConversionInfoKHR  mYcbcrConvInfo;
+    VkSamplerYcbcrConversionKHR  mYcbcrConv;
+
+   if (VK_SUCCESS != gCreateSamplerYcbcrConversionKHR ( static_cast<VkDevice>(mGraphics.GetDevice()), &conv_create_info, nullptr, &mYcbcrConv)) {
+       std::cout << "Could not create vkCreateSamplerYcbcrConversionKHR !" << std::endl;
+       return false;
+   }
+
+   mYcbcrConvInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_INFO_KHR;
+   mYcbcrConvInfo.pNext = nullptr;
+   mYcbcrConvInfo.conversion = mYcbcrConv;
+
+  auto samplerCreateInfo = vk::SamplerCreateInfo{}
+    .setPNext(( static_cast< void * >(&mYcbcrConvInfo) ))
+    .setMagFilter( vk::Filter::eNearest )
+    .setMinFilter( vk::Filter::eNearest )
+    .setMipmapMode( vk::SamplerMipmapMode::eNearest )
+    .setAddressModeU( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeV( vk::SamplerAddressMode::eClampToEdge )
+    .setAddressModeW( vk::SamplerAddressMode::eClampToEdge )
+    .setMipLodBias( 0.0f )
+    .setAnisotropyEnable( false )
+    .setMaxAnisotropy( 1.0f )
+    .setCompareEnable( false )
+    .setCompareOp( vk::CompareOp::eLessOrEqual )
+    .setMinLod( -1000.0f )
+    .setMaxLod( 1000.0f )
+    .setBorderColor( vk::BorderColor::eFloatTransparentBlack )
+    .setUnnormalizedCoordinates( false);
+
+  mSampler = mGraphics.CreateSampler( samplerCreateInfo );
+#endif
+  return true;
+}
+
+
 
 } // namespace VulkanAPI
 } // namespace Graphics

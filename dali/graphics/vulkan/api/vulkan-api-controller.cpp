@@ -47,6 +47,8 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/thread-pool.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -108,6 +110,8 @@ struct Controller::Impl
   void BeginFrame()
   {
     // for all swapchains acquire new framebuffer
+    DALI_LOG_ERROR("<<----BegineFrame(), thread %lud\n", pthread_self());
+
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
@@ -141,6 +145,8 @@ struct Controller::Impl
   {
     // Update descriptor sets if there are any updates
     // swap all swapchains
+    DALI_LOG_ERROR("<<----EndFrame(), thread %lud\n", pthread_self());
+
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
     auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
@@ -216,6 +222,7 @@ struct Controller::Impl
 
   void UpdateRenderPass( std::vector< Dali::Graphics::API::RenderCommand*  >&& commands )
   {
+    DALI_LOG_ERROR("<<----UpdateRenderPass(), thread %lud\n", pthread_self());
     auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
     auto renderTargetBinding = firstCommand->GetRenderTargetBinding();
 
@@ -273,6 +280,7 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
+    DALI_LOG_ERROR("<<----SubmitCommands(), thread %lud\n", pthread_self());
     mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(0, Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
@@ -325,6 +333,7 @@ struct Controller::Impl
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
   {
+    DALI_LOG_ERROR("<<----ProcessResourceTransferRequests(), thread %lud\n", pthread_self());
     std::lock_guard<std::recursive_mutex> lock(mResourceTransferMutex);
     if(!mResourceTransferRequests.empty())
     {
@@ -362,6 +371,10 @@ struct Controller::Impl
         else if ( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
         {
           image = req.imageToImageInfo.dstImage;
+        }
+        else if ( req.requestType == TransferRequestType::USE_TBM )
+        {
+          image = req.useTBMInfo.srcImage;
         }
 
         assert( image );
@@ -408,9 +421,32 @@ struct Controller::Impl
       {
         auto image = item.image;
         // add barrier
-        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+
+#if 0
+          else if ( req.requestType == TransferRequestType::USE_TBM )
+          {
+            auto srcImage = req.useTBMInfo.srcImage;
+            preLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                               .setNewLayout( srcImage->GetImageLayout() )
+                                               .setOldLayout( vk::ImageLayout::eUndefined ));
+            postLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
+                                               .setNewLayout( srcImage->GetImageLayout() )
+                                               .setOldLayout( vk::ImageLayout::eUndefined ));
+          }
+#endif
+
+        if ( image->IsExternal() )
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eUndefined ) );
+          postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, image->GetImageLayout() ) );
+          image->SetImageLayout( vk::ImageLayout::eUndefined );
+        }
+        else
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+          postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+          image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+        }
       }
 
       // Build command buffer for each image until reaching next sync point
@@ -502,12 +538,14 @@ struct Controller::Impl
 
   void InvalidateSwapchain()
   {
+    DALI_LOG_ERROR("<<----InvalidateSwapchain(), thread %lud\n", pthread_self());
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
     swapchain->Invalidate();
   }
 
   void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer primaryCommandBuffer, const RenderPassData& renderPassData )
   {
+    DALI_LOG_ERROR("<<----ProcessRenderPassData(), thread %lud\n", pthread_self());
     primaryCommandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
 
     // update descriptor sets
@@ -723,6 +761,7 @@ Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::BeginFrame()
 {
+  DALI_LOG_ERROR("[[------- Controller::BeginFrame(), thread %lud\n", pthread_self());
   mStats.samplerTextureBindings = 0;
   mStats.uniformBufferBindings = 0;
 
@@ -734,6 +773,7 @@ void Controller::BeginFrame()
 
 void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
 {
+  DALI_LOG_ERROR("<<----PushDescriptorWrite(), thread %lud\n", pthread_self());
   vk::DescriptorImageInfo* pImageInfo { nullptr };
   vk::DescriptorBufferInfo* pBufferInfo { nullptr };
   std::lock_guard<std::mutex> lock( mImpl->mDescriptorWriteMutex );
@@ -758,17 +798,23 @@ void Controller::EndFrame()
 {
   mImpl->EndFrame();
 
-#if(DEBUG_ENABLED)
+//#if(DEBUG_ENABLED)
   // print stats
   PrintStats();
-#endif
+//#endif
+
+  DALI_LOG_ERROR("Controller::EndFrame(), thread %lud-------]]\n", pthread_self());
 }
 
 void Controller::PrintStats()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Frame: %d\n", int(mStats.frame));
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  UBO bindings: %d\n", int(mStats.uniformBufferBindings));
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Tex bindings: %d\n", int(mStats.samplerTextureBindings));
+  //DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Frame: %d\n", int(mStats.frame));
+  //DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  UBO bindings: %d\n", int(mStats.uniformBufferBindings));
+  //DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Tex bindings: %d\n", int(mStats.samplerTextureBindings));
+
+  DALI_LOG_ERROR("Frame: %d\n", int(mStats.frame));
+  DALI_LOG_ERROR("  UBO bindings: %d\n", int(mStats.uniformBufferBindings));
+  DALI_LOG_ERROR("  Tex bindings: %d\n", int(mStats.samplerTextureBindings));
 }
 
 void Controller::Pause()
