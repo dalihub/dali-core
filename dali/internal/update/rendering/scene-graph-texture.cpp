@@ -302,6 +302,10 @@ Texture::~Texture()
 void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
+  if (mNativeImage)
+  {
+      CreateTexture( Usage::COLOR_ATTACHMENT );
+  }
 }
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
@@ -376,7 +380,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
                                                            .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
-                                                           .SetDataSize( bufferSize ) );
+                                                           .SetDataSize( bufferSize )
+                                                           .SetNativeImage( mNativeImage ));
   }
 }
 

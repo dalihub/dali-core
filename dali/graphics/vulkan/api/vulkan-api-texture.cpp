@@ -16,6 +16,11 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -42,6 +47,12 @@ namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
 
+#ifdef NATIVE_IMAGE_SUPPORT
+typedef VkResult (VKAPI_PTR *PFN_vkCreateImageFromNativeBufferTIZEN)(VkDevice device, tbm_surface_h	surface, const VkImageCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkImage *pImage);
+
+PFN_vkGetInstanceProcAddr               getProcAddr = 0;
+PFN_vkCreateImageFromNativeBufferTIZEN  createPresentableImage = 0;
+#endif
 
 /**
  * Remaps components
@@ -897,6 +908,17 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
+  if (nativeImage)
+  {
+      mTbmSurface = nativeImage->GetNativeImageSource();
+      // convert tbmsurfac
+      mvkDevice = static_cast<VkDevice>(mGraphics.GetDevice());
+      InitializeTBM();
+      return true;
+  }
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -1111,6 +1133,127 @@ void Texture::CreateSampler()
     .setMipmapMode( vk::SamplerMipmapMode::eLinear );
 
   mSampler = mGraphics.CreateSampler( samplerCreateInfo );
+}
+
+std::string Texture::errorString(VkResult errorCode)
+{
+    switch (errorCode)
+    {
+#define STR(r) case VK_ ##r: return #r
+        STR(NOT_READY);
+        STR(TIMEOUT);
+        STR(EVENT_SET);
+        STR(EVENT_RESET);
+        STR(INCOMPLETE);
+        STR(ERROR_OUT_OF_HOST_MEMORY);
+        STR(ERROR_OUT_OF_DEVICE_MEMORY);
+        STR(ERROR_INITIALIZATION_FAILED);
+        STR(ERROR_DEVICE_LOST);
+        STR(ERROR_MEMORY_MAP_FAILED);
+        STR(ERROR_LAYER_NOT_PRESENT);
+        STR(ERROR_EXTENSION_NOT_PRESENT);
+        STR(ERROR_FEATURE_NOT_PRESENT);
+        STR(ERROR_INCOMPATIBLE_DRIVER);
+        STR(ERROR_TOO_MANY_OBJECTS);
+        STR(ERROR_FORMAT_NOT_SUPPORTED);
+        STR(ERROR_SURFACE_LOST_KHR);
+        STR(ERROR_NATIVE_WINDOW_IN_USE_KHR);
+        STR(SUBOPTIMAL_KHR);
+        STR(ERROR_OUT_OF_DATE_KHR);
+        STR(ERROR_INCOMPATIBLE_DISPLAY_KHR);
+        STR(ERROR_VALIDATION_FAILED_EXT);
+        STR(ERROR_INVALID_SHADER_NV);
+#undef STR
+    default:
+        return "UNKNOWN_ERROR";
+    }
+}
+
+#define VK_CHECK_RESULT(f)																				\
+{																										\
+    VkResult res = (f);																					\
+    if (res != VK_SUCCESS)																				\
+    {																									\
+        std::cout << "Fatal : VkResult is \"" << errorString(res) << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl; \
+        assert(res == VK_SUCCESS);																		\
+    }																									\
+}
+
+
+void Texture::InitializeTBM()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+    char *icdname = getenv("VK_TIZEN_ICD");
+    void *lib = dlopen(icdname, RTLD_LAZY | RTLD_LOCAL);
+
+    if (lib)
+    {
+        getProcAddr = reinterpret_cast<PFN_vkGetInstanceProcAddr>(dlsym(lib,"vk_icdGetInstanceProcAddr"));
+        if (getProcAddr)
+        {
+           createPresentableImage = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(getProcAddr(NULL, "vkCreateImageFromNativeBufferTizen"));
+           if (createPresentableImage)
+           {
+               tbm_surface_h tbmSurface = 0;
+               VkImage image;
+               VkImageView imageview;
+               VkSampler sampler;
+
+               // Image
+               VkImageCreateInfo imageInfo {};
+               imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+               imageInfo.imageType = VK_IMAGE_TYPE_2D;
+               imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+               imageInfo.extent.width = mWidth;
+               imageInfo.extent.height = mHeight;
+               imageInfo.extent.depth = 1;
+               imageInfo.mipLevels = 1;
+               imageInfo.arrayLayers = 1;
+               imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+               imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+               imageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+
+               if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+               {
+                 tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+               }
+               if (tbmSurface)
+                  VK_CHECK_RESULT(createPresentableImage(mvkDevice, tbmSurface, &imageInfo, nullptr, &image));
+
+               // ImageView
+               VkImageViewCreateInfo colorImageViewInfo {};
+               colorImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+               colorImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+               colorImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+               colorImageViewInfo.subresourceRange = {};
+               colorImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+               colorImageViewInfo.subresourceRange.baseMipLevel = 0;
+               colorImageViewInfo.subresourceRange.levelCount = 1;
+               colorImageViewInfo.subresourceRange.baseArrayLayer = 0;
+               colorImageViewInfo.subresourceRange.layerCount = 1;
+               colorImageViewInfo.image = image;
+               VK_CHECK_RESULT(vkCreateImageView(mvkDevice, &colorImageViewInfo, nullptr, &imageview));
+
+               //sampler
+               VkSamplerCreateInfo samplerInfo {};
+               samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+               samplerInfo.maxAnisotropy = 1.0f;
+               samplerInfo.magFilter = VK_FILTER_LINEAR;
+               samplerInfo.minFilter = VK_FILTER_LINEAR;
+               samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+               samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+               samplerInfo.addressModeV =samplerInfo.addressModeU;
+               samplerInfo.addressModeW =samplerInfo.addressModeU;
+               samplerInfo.mipLodBias = 0.0f;
+               samplerInfo.maxAnisotropy = 1.0f;
+               samplerInfo.minLod = 0.0f;
+               samplerInfo.maxLod = 1.0f;
+               samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+               VK_CHECK_RESULT(vkCreateSampler(mvkDevice, &samplerInfo, nullptr, &sampler));
+           }
+        }
+    }
+#endif
 }
 
 Vulkan::RefCountedImage Texture::GetImageRef() const

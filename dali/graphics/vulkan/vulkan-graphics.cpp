@@ -1572,7 +1572,7 @@ RefCountedCommandPool Graphics::GetCommandPool( std::thread::id threadId )
 
   if( !commandPool )
   {
-    auto&& createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
+    auto createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
     commandPool = CommandPool::New( *this, createInfo );
   }
 

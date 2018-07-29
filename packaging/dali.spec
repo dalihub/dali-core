@@ -13,6 +13,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  gawk
 BuildRequires:  Vulkan-LoaderAndValidationLayers
 BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
+BuildRequires:  pkgconfig(libtbm)
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -132,6 +133,9 @@ export DALI_DATA_RO_DIR
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
 LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
+
+CFLAGS+=" -DNATIVE_IMAGE_SUPPORT"
+CXXFLAGS+=" -DNATIVE_IMAGE_SUPPORT"
 
 ./configure \
       --program-prefix=%{?_program_prefix} \
