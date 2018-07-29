@@ -16,6 +16,11 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -41,6 +46,34 @@ namespace Graphics
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
+
+namespace
+{
+
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+typedef VkResult (VKAPI_PTR *PFN_vkCreateImageFromNativeBufferTIZEN)(
+  VkDevice                     device,
+  tbm_surface_h                surface,
+  const VkImageCreateInfo     *pCreateInfo,
+  const VkAllocationCallbacks *pAllocator,
+  VkImage                     *pImage );
+
+PFN_vkCreateImageFromNativeBufferTIZEN  gCreatePresentableImageProcedure = 0;
+#endif
+
+
+#define VK_CHECK_RESULT(f)                                              \
+  {                                                                     \
+    VkResult res = (f);                                                 \
+    if (res != VK_SUCCESS)                                              \
+    {                                                                   \
+      std::cout << "Fatal : VkResult is \"" << vk::to_string(res) << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl; \
+      assert(res == VK_SUCCESS);                                        \
+    }                                                                   \
+  }
+
+} // anonymous namespace
 
 
 /**
@@ -897,6 +930,8 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -946,17 +981,32 @@ bool Texture::Initialise()
     }
   }
 
-  InitialiseTexture();
 
-  // copy data to the image
-  if( data )
+  if (nativeImage)
   {
-    CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+    mTbmSurface = nativeImage->GetNativeImageSource();
+    InitialiseNativeTexture();
   }
+  else
+  {
+    InitialiseTexture();
+     if( data )
+     {
+        CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+     }
+  }
+
   return true;
 }
 
-void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+
+void Texture::CopyMemory(
+  const void                      *srcMemory,
+  API::Extent2D                    srcExtent,
+  API::Offset2D                    dstOffset,
+  uint32_t                         layer,
+  uint32_t                         level,
+  API::TextureDetails::UpdateMode  updateMode )
 {
   // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
   uint32_t allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
@@ -969,7 +1019,9 @@ void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Of
 
   // bind memory
   mGraphics.BindBufferMemory( buffer,
-                              mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                              mGraphics.AllocateMemory( buffer,
+                                                        ( vk::MemoryPropertyFlagBits::eHostVisible |
+                                                          vk::MemoryPropertyFlagBits::eHostCoherent ) ),
                               0u );
 
   // write into the buffer
@@ -1052,7 +1104,7 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
 
 // creates image with pre-allocated memory and default sampler, no data
 // uploaded at this point
-bool Texture::InitialiseTexture()
+void Texture::InitialiseTexture()
 {
   // create image
   auto imageCreateInfo = vk::ImageCreateInfo{}
@@ -1081,8 +1133,57 @@ bool Texture::InitialiseTexture()
 
   // create basic sampler
   CreateSampler();
+}
 
-  return true;
+void Texture::InitialiseNativeTexture()
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+
+  if( ! gCreatePresentableImageProcedure )
+  {
+    gCreatePresentableImageProcedure = reinterpret_cast<PFN_vkCreateImageFromNativeBufferTIZEN>(
+      mGraphics.GetProcedureAddress( "vkCreateImageFromNativeBufferTizen" ) );
+  }
+
+  if( gCreatePresentableImageProcedure )
+  {
+    // Enforce format:
+    mFormat = vk::Format::eR8G8B8A8Unorm;  // VK_FORMAT_R8G8B8A8_UNORM;
+
+    vk::Extent2D extent { mWidth, mHeight, 1 };
+
+    // create image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+    .setFormat( mFormat )
+       .setInitialLayout( mLayout )
+       .setSamples( vk::SampleCountFlagBits::e1 )
+       .setSharingMode( vk::SharingMode::eExclusive )
+       .setUsage( mUsage )
+       .setExtent( extent )
+       .setArrayLayers( 1 )
+       .setImageType( vk::ImageType::e2D )
+       .setTiling( vk::ImageTiling::eOptimal )
+       .setMipLevels( 1 );
+
+
+    if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+    {
+      tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+    }
+    if (tbmSurface)
+    {
+      // @todo consider adding new CreateTexture() API to NativeImage (like GlExtensionCreate(), but generic)
+      // to perform this from within native image implementation.
+      VK_CHECK_RESULT( gCreatePresentableImageProc( static_cast<VkDevice>(mGraphics.GetDevice()),
+                                                    tbmSurface, &imageInfo, nullptr, &image ) );
+    }
+
+    mGraphics.CreateImageFromExternal( image, imageCreateInfo, mFormat, mExtent );
+
+    CreateImageView();
+    CreateSampler();
+  }
+#endif
 }
 
 void Texture::CreateImageView()
@@ -1090,12 +1191,11 @@ void Texture::CreateImageView()
   mImageView = mGraphics.CreateImageView(
     {}, mImage, vk::ImageViewType::e2D, mImage->GetFormat(), mComponentMapping,
     vk::ImageSubresourceRange{}
-      .setAspectMask( mImage->GetAspectFlags() )
-      .setBaseArrayLayer( 0 )
-      .setBaseMipLevel( 0 )
-      .setLevelCount( mImage->GetMipLevelCount() )
-      .setLayerCount( mImage->GetLayerCount() )
-  );
+    .setAspectMask( mImage->GetAspectFlags() )
+    .setBaseArrayLayer( 0 )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( mImage->GetMipLevelCount() )
+    .setLayerCount( mImage->GetLayerCount() ) );
 }
 
 void Texture::CreateSampler()
