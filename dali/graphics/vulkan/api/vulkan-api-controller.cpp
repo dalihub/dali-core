@@ -400,6 +400,10 @@ struct Controller::Impl
         {
           image = req.imageToImageInfo.dstImage;
         }
+        else if ( req.requestType == TransferRequestType::USE_TBM )
+        {
+          image = req.useTBMInfo.srcImage;
+        }
 
         assert( image );
 
@@ -445,9 +449,19 @@ struct Controller::Impl
       {
         auto image = item.image;
         // add barrier
-        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+
+        if ( image->IsExternal() )
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral ) );
+          //postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, image->GetImageLayout() ) );
+          image->SetImageLayout( vk::ImageLayout::eUndefined );
+        }
+        else
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+          postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+          image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+        }
       }
 
       // Build command buffer for each image until reaching next sync point
@@ -810,6 +824,7 @@ void Controller::PrintStats()
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Frame: %d\n", int(mStats.frame));
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  UBO bindings: %d\n", int(mStats.uniformBufferBindings));
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Tex bindings: %d\n", int(mStats.samplerTextureBindings));
+
 }
 
 void Controller::Pause()

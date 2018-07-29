@@ -181,6 +181,10 @@ void Image::DestroyVulkanResources( vk::Device device, vk::Image image, vk::Devi
   device.freeMemory( memory, allocator );
 }
 
+bool Image::IsExternal() const
+{
+    return mIsExternal;
+}
 
 } // namespace Vulkan
 
