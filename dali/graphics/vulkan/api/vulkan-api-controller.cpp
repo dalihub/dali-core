@@ -47,6 +47,8 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/thread-pool.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -144,6 +146,8 @@ struct Controller::Impl
   void AcquireNextFramebuffer()
   {
     // for all swapchains acquire new framebuffer
+    //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
+
     auto surface = mGraphics.GetSurface( 0u );
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
@@ -154,6 +158,7 @@ struct Controller::Impl
     }
 
     // We won't run garbage collection in case there are pending resource transfers.
+    //fprintf(stderr,"%s:call AcquireNextFramebuffer---\n",__FUNCTION__);
     swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
 
     if( !swapchain->IsValid() )
@@ -162,9 +167,11 @@ struct Controller::Impl
       mGraphics.DeviceWaitIdle();
 
       // replace swapchain
+     //fprintf(stderr,"%s:call ReplaceSwapchainForSurface---\n",__FUNCTION__);
       swapchain = mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
 
       // get new valid framebuffer
+     //fprintf(stderr,"%s:call AcquireNextFramebuffer---\n",__FUNCTION__);
       swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
     }
   }
@@ -191,6 +198,8 @@ struct Controller::Impl
   {
     // Update descriptor sets if there are any updates
     // swap all swapchains
+    //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
+
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
     if( !mRenderPasses.empty() )
@@ -202,12 +211,14 @@ struct Controller::Impl
       uint32_t index = 0;
       for( auto& renderPassData : mRenderPasses )
       {
+        //fprintf(stderr,"%s:call ProcessRenderPassData---\n",__FUNCTION__);
         ProcessRenderPassData( renderPassBuffers[index], renderPassData );
         ++index;
       }
     }
     else
     {
+      //fprintf(stderr,"%s:BeginRenderPass for empty Renderpass---\n",__FUNCTION__);
       auto primaryCommandBuffer = swapchain->GetLastCommandBuffer();
       primaryCommandBuffer->BeginRenderPass( vk::RenderPassBeginInfo{}
         .setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() )
@@ -215,6 +226,7 @@ struct Controller::Impl
         .setRenderArea( { {0, 0}, { swapchain->GetCurrentFramebuffer()->GetWidth(), swapchain->GetCurrentFramebuffer()->GetHeight() } } )
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
         .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
+      //fprintf(stderr,"%s:EndRenderPass for empty Renderpass---\n",__FUNCTION__);
       primaryCommandBuffer->EndRenderPass();
     }
 
@@ -226,6 +238,7 @@ struct Controller::Impl
 
     mMemoryTransferFutures.clear();
 
+     //fprintf(stderr,"%s:call Present---\n",__FUNCTION__);
     swapchain->Present();
   }
 
@@ -258,6 +271,7 @@ struct Controller::Impl
 
   void UpdateRenderPass( std::vector< Dali::Graphics::API::RenderCommand*  >&& commands )
   {
+        //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
     auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
     auto renderTargetBinding = firstCommand->GetRenderTargetBinding();
 
@@ -311,6 +325,7 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
+       //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
     mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(0, Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
@@ -363,6 +378,7 @@ struct Controller::Impl
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
   {
+    //fprintf(stderr,"%s:ProcessResourceTransferRequests()~~~~~~\n",__FUNCTION__);
     std::lock_guard<std::recursive_mutex> lock(mResourceTransferMutex);
     if(!mResourceTransferRequests.empty())
     {
@@ -400,6 +416,11 @@ struct Controller::Impl
         else if ( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
         {
           image = req.imageToImageInfo.dstImage;
+        }
+        else if ( req.requestType == TransferRequestType::USE_TBM )
+        {
+          //fprintf(stderr,"%s:update by vkImage of TBM!!!!\n",__FUNCTION__);
+          image = req.useTBMInfo.srcImage;
         }
 
         assert( image );
@@ -446,15 +467,30 @@ struct Controller::Impl
       {
         auto image = item.image;
         // add barrier
-        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+
+        if ( image->IsExternal() )
+        {
+          //fprintf(stderr,"%s:call CreateImageMemoryBarrier  preLayout for TBM!!!!\n",__FUNCTION__);
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral ) );
+          //postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, image->GetImageLayout() ) );
+          image->SetImageLayout( vk::ImageLayout::eUndefined );
+        }
+        else
+        {
+           //fprintf(stderr,"%s:call CreateImageMemoryBarrier  preLayout\n",__FUNCTION__);
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+          //fprintf(stderr,"%s:call CreateImageMemoryBarrier  postLayout\n",__FUNCTION__);
+          postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+          image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+        }
       }
 
       // Build command buffer for each image until reaching next sync point
+      //fprintf(stderr,"%s:CreateCommandBuffer---\n",__FUNCTION__);
       auto commandBuffer = mGraphics.CreateCommandBuffer( true );
 
       // Fence between submissions
+       //fprintf(stderr,"%s:CreateFence---\n",__FUNCTION__);
       auto fence = mGraphics.CreateFence( {} );
 
       /**
@@ -465,11 +501,13 @@ struct Controller::Impl
        */
       for( auto i = 0u; i < highestBatchIndex; ++i )
       {
+        //fprintf(stderr,"%s:Begin CommandBuffer---\n",__FUNCTION__);
         commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
         // change image layouts only once
         if( i == 0 )
         {
+          //fprintf(stderr,"%s:PipelineBarrier for preLayoutBarriers---\n",__FUNCTION__);
           commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers );
         }
 
@@ -505,12 +543,15 @@ struct Controller::Impl
         // if this is the last batch restore original layouts
         if( i == highestBatchIndex - 1 )
         {
+          //fprintf(stderr,"%s:PipelineBarrier for postLayoutBarriers---\n",__FUNCTION__);
           commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, postLayoutBarriers );
         }
+        //fprintf(stderr,"%s:End CommandBuffer---\n",__FUNCTION__);
         commandBuffer->End();
 
         // submit to the queue
         auto transferQueue = mGraphics.GetTransferQueue( 0u );
+        //fprintf(stderr,"%s:Submit---\n",__FUNCTION__);
         mGraphics.Submit( mGraphics.GetTransferQueue(0u), { Vulkan::SubmissionData{ {}, {}, { commandBuffer }, {} } }, fence );
         mGraphics.WaitForFence( fence );
         mGraphics.ResetFence( fence );
@@ -540,12 +581,15 @@ struct Controller::Impl
 
   void InvalidateSwapchain()
   {
+     //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
     swapchain->Invalidate();
   }
 
   void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer commandBuffer, const RenderPassData& renderPassData )
   {
+    //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
+    //fprintf(stderr,"%s:BegineRenderPass---\n",__FUNCTION__);
     commandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
 
     // update descriptor sets
@@ -557,6 +601,35 @@ struct Controller::Impl
 
     if( mDescriptorWrites.size() )
     {
+      //fprintf(stderr,"%s: call updateDescriptorSets\n",__FUNCTION__);
+      for(uint32_t i=0; i<uint32_t( mDescriptorWrites.size() ); i++)
+      {
+        vk::WriteDescriptorSet descriptorWrite = mDescriptorWrites[i];
+        //fprintf(stderr,"descriptorWrite.dstBinding :%d\n",descriptorWrite.dstBinding);
+        ////fprintf(stderr,"descriptorWrite.pImageInfo :%p\n",descriptorWrite.pImageInfo);
+        ////fprintf(stderr,"descriptorWrite.pBufferInfo :%p\n",descriptorWrite.pBufferInfo);
+
+        if (descriptorWrite.pImageInfo)
+        {
+            //fprintf(stderr,"pImageInfo.sampler :%llud\n",static_cast<VkSampler>(descriptorWrite.pImageInfo->sampler));
+            //fprintf(stderr,"pImageInfo.imageView :%llud\n",static_cast<VkImage>(descriptorWrite.pImageInfo->imageView));
+            //fprintf(stderr,"pImageInfo.imageLayout :%d\n",static_cast<VkImageLayout>(descriptorWrite.pImageInfo->imageLayout));
+        }
+        else
+        {
+            //fprintf(stderr,"descriptorWrite.pImageInfo is NULL\n");
+        }
+
+      //   descriptorWrite.dstBinding
+      //   descriptorWrite.pImageInfo
+      //   descriptorWrite.pBufferInfo
+
+
+      //   descriptorWrite.pImageInfo.sampler
+      // descriptorWrite.pImageInfo.imageView
+      // descriptorWrite.pImageInfo.imageLayout
+
+      }
       mGraphics.GetDevice().updateDescriptorSets( uint32_t( mDescriptorWrites.size() ), mDescriptorWrites.data(), 0, nullptr );
       mDescriptorWrites.clear();
       mDescriptorInfoStack.clear();
@@ -574,11 +647,13 @@ struct Controller::Impl
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
       // skip if there's no valid pipeline
+      //fprintf(stderr,"%s:GetVulkanPipeline---\n",__FUNCTION__);
       if( !apiCommand->GetVulkanPipeline() )
       {
         continue;
       }
 
+      //fprintf(stderr,"%s:BindPipeline---\n",__FUNCTION__);
       apiCommand->BindPipeline( commandBuffer );
 
       //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
@@ -591,6 +666,7 @@ struct Controller::Impl
                                 { apiCommand->mDrawCommand.scissor.width,
                                   apiCommand->mDrawCommand.scissor.height } );
 
+        //fprintf(stderr,"%s:SetScissor---\n",__FUNCTION__);
         commandBuffer->SetScissor( 0, 1, &scissorRect );
       }
 
@@ -609,28 +685,36 @@ struct Controller::Impl
                                viewportRect.minDepth,
                                viewportRect.maxDepth );
 
+         //fprintf(stderr,"%s:SetViewport---\n",__FUNCTION__);
         commandBuffer->SetViewport( 0, 1, &viewport );
       }
 
       // bind vertex buffers
       auto binding = 0u;
+      //fprintf(stderr,"%s:GetVertexBufferBindings---\n",__FUNCTION__);
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )
       {
+        //fprintf(stderr,"%s:BindVertexBuffer---\n",__FUNCTION__);
         commandBuffer->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
       }
 
       // note: starting set = 0
+       //fprintf(stderr,"%s:GetDescriptorSets---\n",__FUNCTION__);
       const auto& descriptorSets = apiCommand->GetDescriptorSets();
+      //fprintf(stderr,"%s:BindDescriptorSets---\n",__FUNCTION__);
       commandBuffer->BindDescriptorSets( descriptorSets, vulkanApiPipeline->GetVkPipelineLayout(), 0, uint32_t( descriptorSets.size() ) );
 
       // draw
+      //fprintf(stderr,"%s:GetDrawCommand---\n",__FUNCTION__);
       const auto& drawCommand = apiCommand->GetDrawCommand();
 
       const auto& indexBinding = apiCommand->GetIndexBufferBinding();
       if( indexBinding.buffer )
       {
+        //fprintf(stderr,"%s:BindIndexBuffer---\n",__FUNCTION__);
         commandBuffer->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
                                  0, vk::IndexType::eUint16 );
+       //fprintf(stderr,"%s:DrawIndexed---\n",__FUNCTION__);
         commandBuffer->DrawIndexed( drawCommand.indicesCount,
                              drawCommand.instanceCount,
                              drawCommand.firstIndex,
@@ -639,6 +723,7 @@ struct Controller::Impl
       }
       else
       {
+       //fprintf(stderr,"%s:Draw---\n",__FUNCTION__);
         commandBuffer->Draw( drawCommand.vertexCount,
                       drawCommand.instanceCount,
                       drawCommand.firstVertex,
@@ -646,6 +731,7 @@ struct Controller::Impl
       }
     }
 
+   //fprintf(stderr,"%s:EndRenderPass---\n",__FUNCTION__);
     commandBuffer->EndRenderPass();
   }
 
@@ -770,6 +856,7 @@ Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::BeginFrame()
 {
+  //fprintf(stderr,"%s:[[------- Controller::BeginFrame(), thread %lud\n",__FUNCTION__ ,pthread_self());
   mStats.samplerTextureBindings = 0;
   mStats.uniformBufferBindings = 0;
 
@@ -781,6 +868,7 @@ void Controller::BeginFrame()
 
 void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
 {
+    //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
   vk::DescriptorImageInfo* pImageInfo { nullptr };
   vk::DescriptorBufferInfo* pBufferInfo { nullptr };
   std::lock_guard<std::mutex> lock( mImpl->mDescriptorWriteMutex );
@@ -803,12 +891,15 @@ void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
 
 void Controller::EndFrame()
 {
+
   mImpl->EndFrame();
 
 #if(DEBUG_ENABLED)
   // print stats
   PrintStats();
 #endif
+
+     //fprintf(stderr,"%s:<<--\n",__FUNCTION__);
 }
 
 void Controller::PrintStats()

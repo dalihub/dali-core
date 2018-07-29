@@ -62,7 +62,7 @@ struct TextureFactory::Impl
   API::TextureDetails::MipMapFlag mMipmapFlags;
   void* mData;
   uint32_t mDataSizeInBytes;
-
+  NativeImageInterfacePtr mNativeImageInterface;
 };
 
 TextureFactory::TextureFactory( VulkanAPI::Controller& controller )
@@ -108,6 +108,12 @@ Graphics::API::TextureFactory& TextureFactory::SetData( void* pData )
   return *this;
 }
 
+Graphics::API::TextureFactory& TextureFactory::SetNativeImage(  NativeImageInterfacePtr nativeImageInterface )
+{
+  mImpl->mNativeImageInterface = nativeImageInterface;
+  return *this;
+}
+
 Graphics::API::TextureFactory& TextureFactory::SetDataSize( uint32_t dataSizeInBytes )
 {
   mImpl->mDataSizeInBytes = dataSizeInBytes;
@@ -147,6 +153,11 @@ const API::TextureDetails::MipMapFlag& TextureFactory::GetMipMapFlag() const
 const void* TextureFactory::GetData() const
 {
   return mImpl->mData;
+}
+
+const NativeImageInterfacePtr TextureFactory::GetNativeImage() const
+{
+  return mImpl->mNativeImageInterface;
 }
 
 uint32_t TextureFactory::GetDataSize() const
