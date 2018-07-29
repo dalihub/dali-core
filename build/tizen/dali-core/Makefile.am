@@ -51,7 +51,8 @@ DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-grap
 
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
                       $(VULKAN_LIBS) \
-                      -lpthread
+                      -lpthread \
+                      -ltbm
 
 dali_core_includes = \
         -I../../..
