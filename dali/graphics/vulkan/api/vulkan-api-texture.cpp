@@ -16,6 +16,11 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <dlfcn.h>
+#include <tbm_surface.h>
+#include <vulkan/vulkan.h>
+#endif
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -44,6 +49,12 @@ namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
 
+#ifdef NATIVE_IMAGE_SUPPORT
+typedef VkResult (VKAPI_PTR *PFN_vkCreateImageFromNativeBufferTIZEN)(VkDevice device, tbm_surface_h	surface, const VkImageCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkImage *pImage);
+
+PFN_vkGetInstanceProcAddr               getProcAddr = 0;
+PFN_vkCreateImageFromNativeBufferTIZEN  createPresentableImage = 0;
+#endif
 
 /**
  * Remaps components
@@ -899,6 +910,13 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
+  if (nativeImage)
+  {
+      mTbmSurface = nativeImage->GetNativeImageSource();
+  }
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -955,12 +973,35 @@ bool Texture::Initialise()
 
   if( InitialiseTexture() )
   {
-    // copy data to the image
-    if( data )
-    {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
-    }
-    return true;
+      // copy from tbm surface's ptr to the image
+      if ( nativeImage )
+      {
+          tbm_surface_info_s info;
+          tbm_surface_h tbmSurface = 0;
+
+          if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+          {
+            tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+          }
+
+          tbm_surface_map(tbmSurface, TBM_SURF_OPTION_WRITE|TBM_SURF_OPTION_READ, &info);
+          mWidth = info.width;
+          mHeight = info.height;
+          mFormat = vk::Format::eR8G8B8A8Unorm;
+          sizeInBytes = info.planes[0].stride * info.height;
+
+          CopyMemory(info.planes[0].ptr, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+          tbm_surface_unmap(tbmSurface);
+      }
+      else
+      {
+        // copy data to the image
+        if( data )
+        {
+          CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+        }
+      }
+      return true;
   }
 
   return false;
@@ -1002,7 +1043,7 @@ void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Ext
           .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
           .setBufferRowLength({ 0u })
           .setBufferOffset({ 0u })
-          .setBufferImageHeight( 0u );
+          .setBufferImageHeight({ 0u });
 
   transferRequest.bufferToImageInfo.dstImage = mImage;
   transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);

@@ -52,6 +52,8 @@ public:
 
   Graphics::API::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
 
+  Graphics::API::TextureFactory& SetNativeImage( NativeImageInterfacePtr nativeImageInterface ) override;
+
   // not copyable
   TextureFactory( const TextureFactory& ) = delete;
 
@@ -73,6 +75,8 @@ public:
   const API::TextureDetails::MipMapFlag& GetMipMapFlag() const;
 
   const void* GetData() const;
+
+  const NativeImageInterfacePtr GetNativeImage() const;
 
   uint32_t GetDataSize() const;
 

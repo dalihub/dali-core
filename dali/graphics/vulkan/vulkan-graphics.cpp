@@ -1326,7 +1326,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-
+#if 0
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1334,6 +1334,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
   }
 #else
   info.setEnabledLayerCount(0);
+#endif
 #endif
 
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
