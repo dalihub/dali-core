@@ -84,6 +84,9 @@ private:
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
+
+  Any                   mTbmSurface;
+  VkDevice              mvkDevice;
 };
 
 } // namespace VulkanAPI

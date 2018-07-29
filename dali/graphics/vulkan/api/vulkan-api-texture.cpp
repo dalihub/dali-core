@@ -16,6 +16,10 @@
  */
 
 // CLASS HEADER
+#ifdef NATIVE_IMAGE_SUPPORT_COPY_OP
+#include <tbm_surface.h>
+#endif
+
 #include <dali/graphics/vulkan/api/vulkan-api-texture.h>
 
 // INTERNAL INCLUDES
@@ -43,7 +47,6 @@ namespace Graphics
 namespace VulkanAPI
 {
 using namespace Dali::Graphics::Vulkan;
-
 
 /**
  * Remaps components
@@ -899,6 +902,13 @@ bool Texture::Initialise()
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
 
+  NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
+
+  if (nativeImage)
+  {
+      mTbmSurface = nativeImage->GetNativeImageSource();
+  }
+
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
@@ -963,12 +973,39 @@ bool Texture::Initialise()
 
   if( InitialiseTexture() )
   {
-    // copy data to the image
-    if( data )
-    {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
-    }
-    return true;
+      // copy from tbm surface's ptr to the image
+      if ( nativeImage )
+      {
+#ifdef NATIVE_IMAGE_SUPPORT_COPY_OP
+          tbm_surface_info_s info;
+          tbm_surface_h tbmSurface = 0;
+
+          if( mTbmSurface.GetType() == typeid( tbm_surface_h ) )
+          {
+            tbmSurface =  AnyCast< tbm_surface_h >( mTbmSurface );
+          }
+
+          tbm_surface_map(tbmSurface, TBM_SURF_OPTION_WRITE|TBM_SURF_OPTION_READ, &info);
+          mWidth = info.width;
+          mHeight = info.height;
+          mFormat = vk::Format::eR8G8B8A8Unorm;
+          sizeInBytes = info.planes[0].stride * info.height;
+
+          CopyMemory(info.planes[0].ptr, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+          tbm_surface_unmap(tbmSurface);
+#else
+          DALI_LOG_INFO( gVulkanFilter, Debug::General, "the enhanced will be added to use vkImage\n");
+#endif
+      }
+      else
+      {
+        // copy data to the image
+        if( data )
+        {
+          CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+        }
+      }
+      return true;
   }
 
   return false;
