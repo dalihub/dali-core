@@ -68,6 +68,7 @@ enum class TransferRequestType
   IMAGE_TO_IMAGE,
   BUFFER_TO_BUFFER,
   IMAGE_TO_BUFFER,
+  USE_TBM_SURFACE,
   UNDEFINED
 };
 
@@ -96,6 +97,11 @@ struct ResourceTransferRequest
     vk::ImageCopy                              copyInfo    { };          /// Vulkan specific copy info
   } imageToImageInfo;
 
+  struct
+  {
+    Vulkan::RefCountedImage                    srcImage    { nullptr };  /// Source image
+  } useTBMSurfaceInfo;
+
   bool                                         deferredTransferMode{ true }; // Vulkan implementation prefers deferred mode
 
   // delete copy
@@ -119,6 +125,10 @@ struct ResourceTransferRequest
       imageToImageInfo.srcImage = std::move( obj.imageToImageInfo.srcImage );
       imageToImageInfo.dstImage = std::move( obj.imageToImageInfo.dstImage );
       imageToImageInfo.copyInfo = std::move( obj.imageToImageInfo.copyInfo );
+    }
+    else if( requestType == TransferRequestType::USE_TBM_SURFACE )
+    {
+      useTBMSurfaceInfo.srcImage = std::move( obj.useTBMSurfaceInfo.srcImage );
     }
   }
 

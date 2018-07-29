@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -167,6 +168,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   // First frames don't need waiting as they haven't been submitted
   // yet. Note, that waiting on the fence without resetting it may
   // cause a stall ( nvidia, ubuntu )
+  DALI_LOG_ERROR("%s:mFrameCounter %d,  mSwapchainBuffers.size() %d", __FUNCTION__, mFrameCounter, mSwapchainBuffers.size() );
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
     mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );

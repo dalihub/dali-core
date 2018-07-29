@@ -20,6 +20,8 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -141,9 +143,10 @@ bool Sampler::OnDestroy()
   auto sampler = mSampler;
   auto allocator = &mGraphics->GetAllocator();
 
+   DALI_LOG_ERROR("%s:Call Vulkan::Sampler's OnDestroy  sampler->%llu\n",__FUNCTION__, static_cast< VkSampler >(sampler));
+
   mGraphics->DiscardResource( [ device, sampler, allocator ]() {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: sampler->%p\n",
-                   static_cast< VkSampler >(sampler) )
+    DALI_LOG_ERROR("%s:Invoking deleter function: sampler->%llu\n",__FUNCTION__, static_cast< VkSampler >(sampler) );
     device.destroySampler( sampler, allocator );
   } );
 

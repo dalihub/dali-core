@@ -46,6 +46,8 @@
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/thread-pool.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -401,6 +403,10 @@ struct Controller::Impl
         {
           image = req.imageToImageInfo.dstImage;
         }
+        else if ( req.requestType == TransferRequestType::USE_TBM_SURFACE )
+        {
+          image = req.useTBMSurfaceInfo.srcImage;
+        }
 
         assert( image );
 
@@ -446,9 +452,19 @@ struct Controller::Impl
       {
         auto image = item.image;
         // add barrier
-        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+
+        if ( image->GetIsNativeImage() )
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral ) );
+          //postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eUndefined, image->GetImageLayout() ) );
+          image->SetImageLayout( vk::ImageLayout::eUndefined );
+        }
+        else
+        {
+          preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+          postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+          image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+        }
       }
 
       // Build command buffer for each image until reaching next sync point
@@ -803,12 +819,14 @@ void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
 
 void Controller::EndFrame()
 {
+
   mImpl->EndFrame();
 
 #if(DEBUG_ENABLED)
   // print stats
   PrintStats();
 #endif
+
 }
 
 void Controller::PrintStats()

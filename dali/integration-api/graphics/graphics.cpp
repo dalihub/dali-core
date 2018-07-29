@@ -23,6 +23,8 @@
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
+#include <dali/integration-api/debug.h>
+
 extern "C" std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
 
 namespace Dali
@@ -52,6 +54,7 @@ Surface::~Surface()
     auto swapchain = mGraphicsImpl->GetSwapchainForFBID( frambufferId );
     swapchain->Destroy();
     surface->Destroy();
+      DALI_LOG_ERROR("%s:call CollectGarbage()!!!\n",__FUNCTION__);
     mGraphicsImpl->CollectGarbage();
   }
 }
@@ -126,6 +129,8 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
   auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
   swapchain->Present();
 
+  fprintf(stderr,"%s:call CollectGarbage()!!!\n",__FUNCTION__);
+  DALI_LOG_ERROR("%s:call CollectGarbage()!!!\n",__FUNCTION__);
   mGraphicsImpl->CollectGarbage();
 }
 

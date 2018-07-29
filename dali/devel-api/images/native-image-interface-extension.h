@@ -19,6 +19,7 @@
  */
 
 #include <dali/public-api/images/native-image-interface.h>
+#include <dali/public-api/object/any.h>
 
 namespace Dali
 {
@@ -53,6 +54,20 @@ public:
    * @return Texture target.
    */
   virtual int GetEglImageTextureTarget() = 0;
+
+  /**
+   * @brief Retrieves the internal native image.
+   *
+   * @return Any object containing the internal native image source
+   */
+  virtual Any GetNativeImageHandle() const = 0;
+
+  /**
+   * @brief Retrieves the internal native image.
+   *
+   * @return Any object containing the internal native image source
+   */
+  virtual bool IsSetSource() const = 0;
 
   /**
    * @brief Retrieve the extension for the interface.

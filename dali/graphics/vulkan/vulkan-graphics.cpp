@@ -15,6 +15,19 @@
  *
  */
 
+#ifdef NATIVE_IMAGE_SUPPORT
+#include <tbm_type_common.h>
+#include <tbm_surface.h>
+#include <tbm_bo.h>
+#include <tbm_surface_internal.h>
+#include <vulkan/vulkan.h>
+
+#ifdef EXPORT_API
+#undef EXPORT_API
+#endif
+
+#endif
+
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
@@ -38,6 +51,8 @@
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
+#include <dali/integration-api/debug.h>
+
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
 #endif
@@ -50,6 +65,10 @@
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
 
+#ifndef VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME
+#define VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME "VK_EXT_image_drm_format_modifier"
+#endif
+
 #include <iostream>
 #include <utility>
 
@@ -59,6 +78,15 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
+namespace
+{
+// @todo Move to a derived class as a member variable?
+#ifdef NATIVE_IMAGE_SUPPORT
+PFN_vkGetMemoryFdPropertiesKHR               gGetMemoryFdPropertiesKHR = 0;
+#endif
+
+} // anonymous namespace
 
 const uint32_t INVALID_MEMORY_INDEX = -1u;
 
@@ -108,6 +136,8 @@ Memory::~Memory()
     // Discard unused descriptor set layouts
     graphics->DiscardResource( [ device, deviceMemory, allocator ]() {
       // free memory
+      DALI_LOG_ERROR("%s:call freeMemory DeviceMemory->%llu\n", __FUNCTION__, static_cast< VkDeviceMemory >(deviceMemory));
+
       device.freeMemory( deviceMemory, allocator );
     } );
   }
@@ -172,7 +202,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
         //"VK_LAYER_LUNARG_parameter_validation", // parameter
-        // "VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+        //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
         //"VK_LAYER_LUNARG_swapchain",           // swapchain
         //"VK_LAYER_GOOGLE_threading",           // threading
@@ -220,6 +250,7 @@ Graphics::~Graphics()
   mDevice.destroyPipelineCache( mVulkanPipelineCache, mAllocator.get() );
 
   // Collect the garbage ( for each buffer index ) and shut down gracefully...
+  DALI_LOG_ERROR("%s: call CollectGarbage()!!!\n", __FUNCTION__ );
   CollectGarbage();
   CollectGarbage();
 
@@ -272,7 +303,13 @@ void Graphics::CreateDevice()
       info.setPQueuePriorities( priorities.data() );
     }
 
-    std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                           VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME,
+                                           VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                           VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                           VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                           VK_KHR_MAINTENANCE1_EXTENSION_NAME,
+                                           VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME };
 
     vk::PhysicalDeviceFeatures featuresToEnable{};
 
@@ -409,7 +446,6 @@ FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
-
   auto surfaceCapabilities = surface->GetCapabilities();
 
   //TODO: propagate the format and presentation mode to higher layers to allow for more control?
@@ -694,7 +730,7 @@ RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInf
   auto image = new Image( *this, imageCreateInfo );
 
   VkAssert( mDevice.createImage( &imageCreateInfo, mAllocator.get(), &image->mImage ) );
-
+  DALI_LOG_ERROR("%d: Create VkImage %llu\n",__LINE__, static_cast< VkImage >(image->mImage));
   auto refCountedImage = RefCountedImage( image );
   AddImage( *image );
 
@@ -717,17 +753,28 @@ RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
           .setTiling( vk::ImageTiling::eOptimal )
           .setMipLevels( 1 );
 
+  return CreateImageFromExternal( externalImage, imageCreateInfo, imageFormat, extent );
+}
+
+RefCountedImage Graphics::CreateImageFromExternal( vk::Image externalImage,
+                                                   vk::ImageCreateInfo imageCreateInfo,
+                                                   vk::Format imageFormat,
+                                                   vk::Extent2D extent )
+{
   return RefCountedImage(new Image( *this, imageCreateInfo, externalImage ) );
 }
+
 
 RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& flags,
                                                const RefCountedImage& image,
                                                vk::ImageViewType viewType,
                                                vk::Format format,
                                                vk::ComponentMapping components,
-                                               vk::ImageSubresourceRange subresourceRange )
+                                               vk::ImageSubresourceRange subresourceRange,
+                                               void* pNext)
 {
   auto imageViewCreateInfo = vk::ImageViewCreateInfo{}
+          .setPNext(pNext)
           .setFlags( flags )
           .setImage( image->GetVkHandle() )
           .setViewType( viewType )
@@ -738,6 +785,7 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
   auto imageView = new ImageView( *this, image, imageViewCreateInfo );
 
   VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, &imageView->mImageView ) );
+  DALI_LOG_ERROR("%s:Create VkImageView %llu\n",__FUNCTION__, static_cast<VkImage>(imageView->mImageView));
 
   auto refCountedImageView = RefCountedImageView( imageView );
 
@@ -766,7 +814,8 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
                                               vk::ImageViewType::e2D,
                                               image->GetFormat(),
                                               componentsMapping,
-                                              subresourceRange );
+                                              subresourceRange,
+                                              nullptr);
 
   return refCountedImageView;
 }
@@ -776,6 +825,8 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
   auto sampler = new Sampler( *this, samplerCreateInfo );
 
   VkAssert( mDevice.createSampler( &samplerCreateInfo, mAllocator.get(), &sampler->mSampler ) );
+
+  DALI_LOG_ERROR("%s:Create VkSampler %llu\n",__FUNCTION__, static_cast<VkSampler>(sampler->mSampler));
 
   auto refCountedSampler = RefCountedSampler( sampler );
 
@@ -863,9 +914,27 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
 
       barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
       break;
+    case vk::ImageLayout::eUndefined:
+      barrier.dstAccessMask = vk::AccessFlags{};
+      break;
+    case vk::ImageLayout::eGeneral:
+      barrier.dstAccessMask = vk::AccessFlags{};
+      break;
     default:
       assert( false && "Image layout transition failed: Target layout not supported." );
   }
+
+  if (image->GetIsNativeImage())
+  {
+    barrier.oldLayout = vk::ImageLayout::eUndefined;
+    barrier.newLayout = vk::ImageLayout::eGeneral;
+    barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eHostRead;
+    barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+    barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+    barrier.srcQueueFamilyIndex = 0;//VK_QUEUE_FAMILY_EXTERNAL_KHR;
+    barrier.dstQueueFamilyIndex = 0;
+  }
+
 
   return barrier;
 }
@@ -1153,6 +1222,7 @@ std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedBuffer buffer, vk::M
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Unable to allocate memory for the buffer of size %d!", int(requirements.size) );
     return nullptr;
   }
+  DALI_LOG_ERROR("%d: Allocate Device Memory %llu\n",__LINE__, static_cast< VkDeviceMemory >(memory));
 
   return std::unique_ptr<Memory>(
     new Memory( this,
@@ -1183,7 +1253,7 @@ std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::Mem
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Unable to allocate memory for the image of size %d!", int(requirements.size) );
     return nullptr;
   }
-
+  DALI_LOG_ERROR("%d: Allocate Device Memory %llu\n",__LINE__, static_cast< VkDeviceMemory >(memory));
   return std::unique_ptr<Memory>(
     new Memory( this,
                 memory,
@@ -1193,10 +1263,90 @@ std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::Mem
   );
 }
 
+std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties, Any TBMSurface )
+{
+#ifdef NATIVE_IMAGE_SUPPORT
+  vk::MemoryRequirements  image_memory_requirements;
+  vk::PhysicalDeviceMemoryProperties memory_properties;
+  vk::DeviceMemory memory{};
+
+  VkMemoryFdPropertiesKHR mem_prop = {};
+
+  tbm_surface_h      tbmSurface = 0;
+  tbm_surface_info_s tbmSurface_info;
+  tbm_bo             tbmbo;
+  int                tbmFD;
+
+  if (!gGetMemoryFdPropertiesKHR)
+  {
+    gGetMemoryFdPropertiesKHR = reinterpret_cast<PFN_vkGetMemoryFdPropertiesKHR>(
+                GetDeviceProcedureAddress( "vkGetMemoryFdPropertiesKHR" ) );
+  }
+
+  if (!gGetMemoryFdPropertiesKHR)
+  {
+    return nullptr;
+  }
+
+  if ( TBMSurface.GetType() == typeid( tbm_surface_h ) )
+    tbmSurface =  AnyCast< tbm_surface_h >( TBMSurface );
+
+  if (!tbmSurface)
+  {
+      return nullptr;
+  }
+
+  tbm_surface_get_info(tbmSurface, &tbmSurface_info);
+  tbmbo = tbm_surface_internal_get_bo(tbmSurface, 0 );
+  tbmFD = static_cast<int>(tbm_bo_get_handle(tbmbo, TBM_DEVICE_3D).u32);
+
+  gGetMemoryFdPropertiesKHR ( static_cast<VkDevice>(GetDevice()),
+                              static_cast<VkExternalMemoryHandleTypeFlagBitsKHR>(VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT),
+                              tbmFD, &mem_prop);
+
+  GetDevice().getImageMemoryRequirements( image->GetVkHandle(), &image_memory_requirements );
+  image_memory_requirements.memoryTypeBits = mem_prop.memoryTypeBits;
+
+  auto import_mem_info = vk::ImportMemoryFdInfoKHR{}
+    .setHandleType( vk::ExternalMemoryHandleTypeFlagBits::eDmaBufEXT )
+    .setFd( tbmFD );
+
+  memory_properties = GetMemoryProperties();
+
+  for( uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i )
+  {
+    if( image_memory_requirements.memoryTypeBits & (static_cast<uint32_t>((1 << i))) )
+    {
+      auto memory_allocate_info = vk::MemoryAllocateInfo{}
+        .setPNext(static_cast<void*>(&import_mem_info))
+        .setAllocationSize(tbmSurface_info.size)
+        .setMemoryTypeIndex(i);
+
+      auto result = GetDevice().allocateMemory(&memory_allocate_info, nullptr, &memory);
+      if( result != vk::Result::eSuccess )
+      {
+        DALI_LOG_ERROR("%d: Unable to allocate memory for the image of size %d!!!!!!!!!!\n", __LINE__, int(tbmSurface_info.size) );
+        return nullptr;
+      }
+      DALI_LOG_ERROR("%d: Allocate Device Memory for native %llu\n",__LINE__, static_cast< VkDeviceMemory >(memory));
+      break;
+    }
+  }
+
+  return std::unique_ptr<Memory>(
+    new Memory( this,
+                memory,
+                uint32_t(image_memory_requirements.size),
+                uint32_t(image_memory_requirements.alignment),
+                ((memoryProperties & vk::MemoryPropertyFlagBits::eHostVisible) == vk::MemoryPropertyFlagBits::eHostVisible) )
+  );
+#else
+  return nullptr;
+#endif
+}
+
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
-
-
   auto submitInfos = std::vector< vk::SubmitInfo >{};
   submitInfos.reserve( submissionData.size() );
   auto commandBufferHandles = std::vector< vk::CommandBuffer >{};
@@ -1428,6 +1578,17 @@ const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
   return mVulkanPipelineCache;
 }
 
+// External ------------------------------------------------------------------------------------------------------
+PFN_vkVoidFunction Graphics::GetInstanceProcedureAddress( const char* name )
+{
+  return mInstance.getProcAddr( name );
+}
+
+PFN_vkVoidFunction Graphics::GetDeviceProcedureAddress( const char* name )
+{
+  return mDevice.getProcAddr( name );
+}
+
 // Cache manipulation methods -----------------------------------------------------------------------------------
 void Graphics::AddBuffer( Buffer& buffer )
 {
@@ -1534,9 +1695,8 @@ void Graphics::RemoveSampler( Sampler& sampler )
 void Graphics::CollectGarbage()
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Beginning graphics garbage collection---------------------------------------" )
-  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[mCurrentGarbageBufferIndex].size() )
+  DALI_LOG_ERROR("%s:Beginning graphics garbage collection---------------------------------------\n",__FUNCTION__ );
+  DALI_LOG_ERROR("%s:Discard queue size: %ld\n", __FUNCTION__, mDiscardQueue[mCurrentGarbageBufferIndex].size() );
 
   // swap buffer
   mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
@@ -1548,6 +1708,7 @@ void Graphics::CollectGarbage()
 
   for( const auto& deleter : mDiscardQueue[mCurrentGarbageBufferIndex] )
   {
+    DALI_LOG_ERROR("%s:call deleter\n",__FUNCTION__ );
     deleter();
   }
   // collect what's in the queue
@@ -1792,6 +1953,8 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     else if( platform == Platform::WAYLAND && waylandAvailable )
     {
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      retval.push_back( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME );
+      retval.push_back( VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME );
     }
   }
   else // try to determine the platform based on available extensions
@@ -1810,6 +1973,8 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     {
       mPlatform = Platform::WAYLAND;
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      retval.push_back( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME );
+      retval.push_back( VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME );
     }
     else
     {

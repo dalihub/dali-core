@@ -24,6 +24,7 @@
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/devel-api/images/native-image-interface-extension.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
@@ -302,6 +303,10 @@ Texture::~Texture()
 void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
+  if (mNativeImage)
+  {
+      CreateTexture( Usage::SAMPLE );
+  }
 }
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
@@ -377,7 +382,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
                                                            .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
-                                                           .SetDataSize( bufferSize ) );
+                                                           .SetDataSize( bufferSize )
+                                                           .SetNativeImage( mNativeImage ));
   }
 }
 
@@ -385,6 +391,14 @@ void Texture::PrepareTexture()
 {
   if( mNativeImage )
   {
+    NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
+    if( extension != NULL )
+    {
+      bool isSetSource = extension->IsSetSource();
+      DALI_LOG_ERROR("%s:IsSetSource %d\n",__FUNCTION__, isSetSource);
+      // Delete/Re-create Texture
+    }
+
     mNativeImage->PrepareTexture();
   }
 }
