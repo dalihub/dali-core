@@ -53,6 +53,10 @@ DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
                       $(VULKAN_LIBS) \
                       -lpthread
 
+if ENABLE_NATIVE_IMAGE
+DALI_CORE_LA_LIBADD += -ltbm
+endif
+
 dali_core_includes = \
         -I../../..
 

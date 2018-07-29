@@ -13,6 +13,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  gawk
 BuildRequires:  Vulkan-LoaderAndValidationLayers
 BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
+BuildRequires:  pkgconfig(libtbm)
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -133,6 +134,9 @@ CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
 LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 
+CFLAGS+=" -DNATIVE_IMAGE_SUPPORT_COPY_OP"
+CXXFLAGS+=" -DNATIVE_IMAGE_SUPPORT_COPY_OP"
+
 ./configure \
       --program-prefix=%{?_program_prefix} \
       --prefix=%{_prefix} \
@@ -156,7 +160,8 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --enable-trace \
 %endif
       --infodir=%{_infodir} \
-      --enable-rename-so=no
+      --enable-rename-so=no \
+      --enable-native-image=yes
 
 make %{?jobs:-j%jobs}
 
@@ -196,7 +201,8 @@ make clean
       --enable-trace \
 %endif
       --infodir=%{_infodir} \
-      --enable-rename-so=no
+      --enable-rename-so=no \
+      --enable-native-image=yes
 
 make %{?jobs:-j%jobs}
 %endif

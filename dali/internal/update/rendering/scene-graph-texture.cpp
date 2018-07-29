@@ -19,6 +19,9 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#ifdef NATIVE_IMAGE_SUPPORT_COPY_OP
+#include <tbm_surface.h>
+#endif
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
@@ -302,6 +305,10 @@ Texture::~Texture()
 void Texture::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
+  if (mNativeImage)
+  {
+      CreateTexture( Usage::SAMPLE );
+  }
 }
 
 const Graphics::API::Texture* Texture::GetGfxObject() const
@@ -377,7 +384,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
                                                            .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
-                                                           .SetDataSize( bufferSize ) );
+                                                           .SetDataSize( bufferSize )
+                                                           .SetNativeImage( mNativeImage ));
   }
 }
 
@@ -385,7 +393,33 @@ void Texture::PrepareTexture()
 {
   if( mNativeImage )
   {
+#ifdef NATIVE_IMAGE_SUPPORT_COPY_OP
+    Any TbmSurface = mNativeImage->GetNativeImageSource();
+
+    tbm_surface_info_s info;
+    tbm_surface_h tbmSurface = 0;
+
+    if( TbmSurface.GetType() == typeid( tbm_surface_h ) )
+    {
+      tbmSurface =  AnyCast< tbm_surface_h >( TbmSurface );
+    }
+
+    tbm_surface_map(tbmSurface, TBM_SURF_OPTION_WRITE|TBM_SURF_OPTION_READ, &info);
+    uint32_t Width = info.width;
+    uint32_t Height = info.height;
+    auto sizeInBytes = info.planes[0].stride * info.height;
+
+    mGraphicsTexture->CopyMemory(info.planes[0].ptr,
+                                 sizeInBytes,
+                                 {Width, Height},
+                                 {0, 0},
+                                 0,
+                                 0,
+                                 {});
+    tbm_surface_unmap(tbmSurface);
+#else
     mNativeImage->PrepareTexture();
+#endif
   }
 }
 

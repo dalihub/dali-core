@@ -90,6 +90,14 @@ AC_ARG_ENABLE([vulkan],
               [enable_vulkan=$enableval],
               [enable_vulkan=no])
 
+AC_ARG_ENABLE([native_image],
+              [AC_HELP_STRING([--enable-native-image],
+                              [Enables native image support])],
+              [enable_native_image=$enableval],
+              [enable_native_image=no])
+
+AM_CONDITIONAL([ENABLE_NATIVE_IMAGE], [test x$enable_native_image = xyes])
+
 DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
 if test "x$enable_debug" = "xyes"; then
