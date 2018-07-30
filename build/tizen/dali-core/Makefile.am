@@ -159,7 +159,8 @@ linker_test_CXXFLAGS = \
   $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
-  $(VULKAN_CFLAGS)
+  $(VULKAN_CFLAGS) \
+  $(DALI_CFLAGS)
 
 if ENABLE_CXX03_ABI
 
