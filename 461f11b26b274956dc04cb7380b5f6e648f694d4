@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e23a5288_0969de7f",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1211,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-30T14:14:21Z",
+      "side": 1,
+      "message": "Should call dlclose also.",
+      "range": {
+        "startLine": 1211,
+        "startChar": 16,
+        "endLine": 1211,
+        "endChar": 22
+      },
+      "revId": "461f11b26b274956dc04cb7380b5f6e648f694d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8df199f3_80c45fb5",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1215,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-30T14:14:21Z",
+      "side": 1,
+      "message": "vulkan.hpp has Instance::getProcAddr() which would do this for you (Instance is owned by vulkan-graphics)",
+      "range": {
+        "startLine": 1215,
+        "startChar": 8,
+        "endLine": 1215,
+        "endChar": 19
+      },
+      "revId": "461f11b26b274956dc04cb7380b5f6e648f694d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
