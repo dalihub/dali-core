@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "26c9874b_35cba207",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1205,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-30T17:35:51Z",
+      "side": 1,
+      "message": "This method should work like InitializeTexture, with the difference being that instead of calling\n\nmGraphics.CreateImage( imageCreateInfo );\n\nyou call \n\n  createPresentableImage() and create a ref-counted Image using mGraphics.CreateImageFromExternal().\n\nThat way, all the resources are tracked appropriately (i.e. when the Dali::Texture dies, everything should be cleaned up appropriately). We will probably also need some syncing code to ensure the native image doesn\u0027t get accessed after the native texture.\n\n(Image, ImageView and Sampler all need to be tracked with a handle, which the member variables mImage, mImageView and mSampler are).",
+      "range": {
+        "startLine": 1205,
+        "startChar": 14,
+        "endLine": 1205,
+        "endChar": 27
+      },
+      "revId": "461f11b26b274956dc04cb7380b5f6e648f694d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e23a5288_0969de7f",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
         "patchSetId": 3
@@ -36,6 +59,30 @@
       "writtenOn": "2018-07-30T14:14:21Z",
       "side": 1,
       "message": "vulkan.hpp has Instance::getProcAddr() which would do this for you (Instance is owned by vulkan-graphics)",
+      "range": {
+        "startLine": 1215,
+        "startChar": 8,
+        "endLine": 1215,
+        "endChar": 19
+      },
+      "revId": "461f11b26b274956dc04cb7380b5f6e648f694d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4981e6e_1b7af91d",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1215,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-07-30T17:35:51Z",
+      "side": 1,
+      "message": "i.e. you can call mGraphics.GetInstance().getProcAddr( name ), or better still, add a GetProcAddress() API to vulkan-graphics.cpp. You wouldn\u0027t have to use dlopen/dlsym then.",
+      "parentUuid": "8df199f3_80c45fb5",
       "range": {
         "startLine": 1215,
         "startChar": 8,
