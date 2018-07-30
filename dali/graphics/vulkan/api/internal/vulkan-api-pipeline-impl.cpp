@@ -240,8 +240,8 @@ struct Pipeline::VulkanPipelineState
 };
 
 Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory )
-        : mGraphics( controller.GetGraphics() ),
-          mController( controller )
+: mGraphics( controller.GetGraphics() ),
+  mController( controller )
 {
   mHashCode = factory->GetHashCode();
 
@@ -598,10 +598,10 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 
   // create layout
   auto pipelineLayoutCreateInfo = vk::PipelineLayoutCreateInfo{}
-          .setSetLayoutCount( Vulkan::U32( dsLayouts.size() ) )
-          .setPSetLayouts( dsLayouts.data() )
-          .setPPushConstantRanges( nullptr )
-          .setPushConstantRangeCount( 0 );
+    .setSetLayoutCount( Vulkan::U32( dsLayouts.size() ) )
+    .setPSetLayouts( dsLayouts.data() )
+    .setPPushConstantRanges( nullptr )
+    .setPushConstantRangeCount( 0 );
 
   return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator() ) );
 }

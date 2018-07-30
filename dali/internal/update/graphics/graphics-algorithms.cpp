@@ -106,49 +106,6 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   return Graphics::API::BlendOp{};
 }
 
-/**
- * Helper function writing uniform of any type into dedicated uniform buffer memory
- */
-void WriteUniform( RenderItem& renderItem, const std::string& name, const void* data, uint32_t size )
-{
-  if( !renderItem.mRenderer )
-  {
-    return;
-  }
-
-  const auto& renderShader = renderItem.mRenderer->GetShader();
-  if( !renderShader.GetGfxObject() )
-  {
-    return;
-  }
-
-  auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-  if( renderShader.GetUniform( name, 0u, uniformInfo ) )
-  {
-    auto dst = (renderItem.mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
-    memcpy( dst, data, size );
-  }
-}
-
-void WriteUniform( RenderItem& renderItem, const std::string& name, const Matrix3& data )
-{
-  // Matrix3 has to take stride in account ( 16 )
-  float values[12];
-  std::fill( values, values+12, 10.0f );
-
-  std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
-  std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
-  std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
-
-  WriteUniform( renderItem, name, &values, sizeof(float)*12 );
-}
-
-template<class T>
-void WriteUniform( RenderItem& renderItem, const std::string& name, const T& data )
-{
-  WriteUniform( renderItem, name, &data, sizeof(T) );
-}
-
 }
 
 ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
@@ -253,7 +210,7 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
 }
 
 void GraphicsAlgorithms::SubmitRenderItemList(
-  Graphics::API::Controller&           controller,
+  Graphics::API::Controller&           graphics,
   BufferIndex                          bufferIndex,
   Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
   Matrix                               viewProjection,
@@ -270,6 +227,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   std::vector<Graphics::API::RenderCommand*> commandList;
 
+
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
     auto& item = renderItemList.GetItem( i );
@@ -278,37 +236,14 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
+    auto color = item.mNode->GetWorldColor( bufferIndex );
 
-    // Get command from renderer
-    const auto& rendererCommand = renderer->GetGfxRenderCommand();
-
-    if( rendererCommand.GetVertexBufferBindings().empty() )
+    auto &cmd = renderer->GetGfxRenderCommand();
+    if (cmd.GetVertexBufferBindings()
+           .empty())
     {
       continue;
     }
-
-    // update uniform buffer data for this item
-    std::vector<Graphics::API::RenderCommand::PushConstantsBinding> pushConstantsBindings{};
-    renderer->UpdateUniformBuffers( bufferIndex, item.mUboMemory, pushConstantsBindings );
-
-    auto color = item.mNode->GetWorldColor( bufferIndex );
-
-    // Create render command owned by the render item
-    if( !item.mRenderCommand )
-    {
-      item.mRenderCommand = controller.AllocateRenderCommand();
-    }
-
-    auto& cmd = *item.mRenderCommand;
-
-    // clone render command setup
-    // @todo: we may implement 'inheritance' upon allocation with flags of inherited states
-    rendererCommand.Clone( cmd );
-
-    // Store push constants binding
-    // @todo: turn push constants into DALi controller uniform buffers
-    item.mRenderCommand->PushConstants( std::move(pushConstantsBindings) );
-
     cmd.BindRenderTarget(renderTargetBinding);
 
     float width = instruction.mViewport.width;
@@ -345,25 +280,24 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    WriteUniform( item, "uModelMatrix", item.mModelMatrix);
-    WriteUniform( item, "uMvpMatrix", mvp2);
-    WriteUniform( item, "uViewMatrix", *viewMatrix);
-    WriteUniform( item, "uModelView", item.mModelViewMatrix);
+    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform("uMvpMatrix", mvp2);
+    renderer->WriteUniform("uViewMatrix", *viewMatrix);
+    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    WriteUniform( item, "uNormalMatrix", uNormalMatrix);
-    WriteUniform( item, "uProjection", vulkanProjectionMatrix);
-    WriteUniform( item, "uSize", item.mSize);
-    WriteUniform( item, "uColor", color );
+    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform("uSize", item.mSize);
+    renderer->WriteUniform("uColor", color );
 
-    // replace push constants binding pointer
-    commandList.push_back( &cmd );
+    commandList.push_back(&cmd);
   }
 
-  controller.SubmitCommands( std::move(commandList) );
+  graphics.SubmitCommands( std::move(commandList) );
 }
 
 void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
