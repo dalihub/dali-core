@@ -126,7 +126,7 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
-  mGraphicsRenderCommand(),
+  mGfxRenderCommand(),
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
@@ -206,12 +206,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
   auto &controller = mGraphics->GetController();
 
-  if( !mGraphicsRenderCommand )
+  if (!mGfxRenderCommand)
   {
-    mGraphicsRenderCommand = controller.AllocateRenderCommand();
+    mGfxRenderCommand = controller.AllocateRenderCommand();
   }
 
-  if( !mShader->GetGfxObject() )
+  if (!mShader->GetGfxObject())
   {
     return;
   }
@@ -226,11 +226,139 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
   }
 
+  auto& shader = *mShader->GetGfxObject();
+  auto uboCount = shader.GetUniformBlockCount();
+
+  auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
+
+  // allocate new command ( may be not necessary at all )
+  // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
+
+  // see if we need to reallocate memory for each UBO
+  // todo: do it only when shader has changed
+  if (mUboMemory.size() != uboCount)
+  {
+    mUboMemory.resize(uboCount);
+  }
+
+  for (auto i = 0u; i < uboCount; ++i)
+  {
+    Graphics::API::ShaderDetails::UniformBlockInfo ubInfo;
+
+    DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose, sizeof(ubInfo) );
+
+    shader.GetUniformBlock(i, ubInfo);
+
+    if (mUboMemory[i].size() != ubInfo.size)
+    {
+      mUboMemory[i].resize(ubInfo.size);
+    }
+
+    // Set push constant bindings
+    auto &pushBinding = pushConstantsBindings[i];
+    pushBinding.data    = mUboMemory[i].data();
+    pushBinding.size    = uint32_t(mUboMemory[i].size());
+    pushBinding.binding = ubInfo.binding;
+  }
+
+  // write to memory
+  for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
+  {
+    // test for array ( special case )
+    std::string uniformName(uniformMap->uniformName);
+    auto hashValue = uniformMap->uniformNameHash;
+    int         arrayIndex       = 0;
+    auto        arrayLeftBracket = uniformMap->uniformName .find('[');
+    if (arrayLeftBracket != std::string::npos)
+    {
+      arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
+      DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
+      uniformName = uniformName.substr(0, arrayLeftBracket);
+      hashValue = CalculateHash( uniformName );
+    }
+
+    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+    if( mShader->GetUniform( uniformName, hashValue, uniformInfo ) )
+    {
+      // write into correct uniform buffer
+      auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
+
+      switch (uniformMap->propertyPtr->GetType())
+      {
+
+        case Property::Type::FLOAT:
+        case Property::Type::INTEGER:
+        case Property::Type::BOOLEAN:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(float) );
+
+          dst += sizeof(float) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetFloat(updateBufferIndex), sizeof(float));
+          break;
+        }
+        case Property::Type::VECTOR2:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
+          dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
+          memcpy(dst, &uniformMap->propertyPtr->GetVector2(updateBufferIndex), sizeof(Vector2));
+          break;
+        }
+        case Property::Type::VECTOR3:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
+                  << uniformInfo.offset << ", size: " << sizeof(Vector3) );
+          dst += sizeof(Vector3) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
+          break;
+        }
+        case Property::Type::VECTOR4:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Vector4) );
+
+          dst += sizeof(float) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
+          break;
+        }
+        case Property::Type::MATRIX:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat4 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Matrix)  );
+          dst += sizeof(Matrix) * arrayIndex;
+          memcpy(dst, &uniformMap->propertyPtr->GetMatrix(updateBufferIndex), sizeof(Matrix));
+          break;
+        }
+        case Property::Type::MATRIX3:
+        {
+          DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing mat3 offset: "
+                           << uniformInfo.offset << ", size: " << sizeof(Matrix3) );
+          dst += sizeof(Matrix3) * arrayIndex;
+
+          auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
+
+          float* values = reinterpret_cast<float*>(dst);
+          std::fill( values, values+12, 10.0f );
+          std::memcpy( &values[0], matrix.AsFloat(), sizeof(float)*3 );
+          std::memcpy( &values[4], &matrix.AsFloat()[3], sizeof(float)*3 );
+          std::memcpy( &values[8], &matrix.AsFloat()[6], sizeof(float)*3 );
+
+          memcpy(dst, values, sizeof(float)*12);
+          break;
+        }
+        default:
+        {
+        }
+      }
+    }
+  }
+
   /**
    * Prepare textures
    */
   auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
-  auto samplers        = mShader->GetGfxObject()->GetSamplers();
+  auto samplers        = shader.GetSamplers();
   if(mTextureSet)
   {
     if (!samplers.empty())
@@ -272,7 +400,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       }
     }
   }
-  mGraphicsRenderCommand->BindTextures( std::move(textureBindings) );
+  mGfxRenderCommand->BindTextures( std::move(textureBindings) );
 
   // Build render command
   // todo: this may be deferred until all render items are sorted, otherwise
@@ -284,18 +412,19 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   bool usesIndexBuffer{false};
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
-    mGraphicsRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
+    mGfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
                                          .SetBuffer(mGeometry->GetIndexBuffer())
                                          .SetOffset(0)
     );
   }
 
-  mGraphicsRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
+  mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
+  mGfxRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
 
 
   if(usesIndexBuffer)
   {
-    mGraphicsRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
                                         .SetDrawType( Graphics::API::RenderCommand::DrawType::INDEXED_DRAW )
                                         .SetFirstInstance( 0u )
@@ -307,7 +436,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
   else
   {
-    mGraphicsRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstVertex(0u)
                                         .SetDrawType(Graphics::API::RenderCommand::DrawType::VERTEX_DRAW)
                                         .SetFirstInstance(0u)
@@ -316,6 +445,23 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
+
+void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t size )
+{
+  if( !mShader->GetGfxObject() )
+  {
+    // Invalid pipeline
+    return;
+  }
+  auto& gfxShader = *mShader->GetGfxObject();
+  auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+  if( gfxShader.GetNamedUniform( name, uniformInfo ) )
+  {
+    auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+    memcpy( dst, data, size );
+  }
+}
+
 
 void Renderer::SetTextures( TextureSet* textureSet )
 {
@@ -627,134 +773,6 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
   if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
   {
     mShader = NULL;
-  }
-}
-
-void Renderer::BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline )
-{
-  mGraphicsPipeline = std::move(pipeline);
-  mGraphicsRenderCommand->BindPipeline( *mGraphicsPipeline.get() );
-}
-
-void Renderer::UpdateUniformBuffers( BufferIndex updateBufferIndex,
-                                     std::vector<std::vector<char>>& uniformBufferOutput,
-                                     std::vector<Graphics::API::RenderCommand::PushConstantsBinding>& outBindings )
-{
-  if( !GetShader().GetGfxObject() )
-  {
-    return;
-  }
-
-  auto uboCount = GetShader().GetGfxObject()->GetUniformBlockCount();
-
-  outBindings.clear();
-  outBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
-
-  if( uniformBufferOutput.size() != uboCount)
-  {
-    uniformBufferOutput.resize(uboCount);
-  }
-
-  outBindings.clear();
-  outBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
-
-  for (auto i = 0u; i < uboCount; ++i)
-  {
-    Graphics::API::ShaderDetails::UniformBlockInfo ubInfo;
-
-    GetShader().GetGfxObject()->GetUniformBlock(i, ubInfo);
-
-    if( uniformBufferOutput[i].size() != ubInfo.size)
-    {
-      uniformBufferOutput[i].resize(ubInfo.size);
-    }
-
-    // Set push constant bindings
-    auto &pushBinding = outBindings[i];
-    pushBinding.data    = uniformBufferOutput[i].data();
-    pushBinding.size    = uint32_t(uniformBufferOutput[i].size());
-    pushBinding.binding = ubInfo.binding;
-  }
-
-  // write to memory
-  auto count = mCollectedUniformMap->Count();
-  for(auto index = 0u; index < count; ++index )
-  {
-    const auto& uniformMap = (*mCollectedUniformMap)[index];
-
-    // test for array ( special case )
-    std::string uniformName(uniformMap->uniformName);
-
-    auto hashValue = uniformMap->uniformNameHash;
-    int         arrayIndex       = 0;
-    auto        arrayLeftBracket = uniformMap->uniformName .find('[');
-    if (arrayLeftBracket != std::string::npos)
-    {
-      arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
-      uniformName = uniformName.substr(0, arrayLeftBracket);
-      hashValue = CalculateHash( uniformName );
-    }
-
-    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-    if( GetShader().GetUniform( uniformName, hashValue, uniformInfo ) )
-    {
-      // write into correct uniform buffer
-      auto dst = (uniformBufferOutput[uniformInfo.bufferIndex].data() + uniformInfo.offset);
-
-      switch (uniformMap->propertyPtr->GetType())
-      {
-        case Property::Type::FLOAT:
-        case Property::Type::INTEGER:
-        case Property::Type::BOOLEAN:
-        {
-          dst += sizeof(float) * arrayIndex;
-          memcpy(dst, &uniformMap->propertyPtr->GetFloat(updateBufferIndex), sizeof(float));
-          break;
-        }
-        case Property::Type::VECTOR2:
-        {
-          dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
-          memcpy(dst, &uniformMap->propertyPtr->GetVector2(updateBufferIndex), sizeof(Vector2));
-          break;
-        }
-        case Property::Type::VECTOR3:
-        {
-          dst += sizeof(Vector3) * arrayIndex;
-          memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
-          break;
-        }
-        case Property::Type::VECTOR4:
-        {
-          dst += sizeof(float) * arrayIndex;
-          memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
-          break;
-        }
-        case Property::Type::MATRIX:
-        {
-          dst += sizeof(Matrix) * arrayIndex;
-          memcpy(dst, &uniformMap->propertyPtr->GetMatrix(updateBufferIndex), sizeof(Matrix));
-          break;
-        }
-        case Property::Type::MATRIX3:
-        {
-          dst += sizeof(Matrix3) * arrayIndex;
-
-          auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
-
-          float* values = reinterpret_cast<float*>(dst);
-          std::fill( values, values+12, 10.0f );
-          std::memcpy( &values[0], matrix.AsFloat(), sizeof(float)*3 );
-          std::memcpy( &values[4], &matrix.AsFloat()[3], sizeof(float)*3 );
-          std::memcpy( &values[8], &matrix.AsFloat()[6], sizeof(float)*3 );
-
-          memcpy(dst, values, sizeof(float)*12);
-          break;
-        }
-        default:
-        {
-        }
-      }
-    }
   }
 }
 
