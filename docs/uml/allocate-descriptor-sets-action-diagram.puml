@@ -1,0 +1,35 @@
+@startuml
+
+start
+
+if (Do descriptor pool data\n exist for the calling thread?) then (Yes)
+else (No)
+  : Create and store\n( DescriptorSetLayoutSignature,\n vector of DescriptorPools)\n pairs for each provided signature\n and map it with the current thread id.;
+endif
+
+  while (For each provided signature...)
+    if (Signature match found?) then (Yes)
+    else (No)
+        : Create a new ( Signature, vector of DescriptorPools ) entry.;
+    endif
+
+    while( While there are still allocation left... )
+                while (For each descriptor pool of this signature...)
+                        if ( Does the pool have the capacity to allocate?) then (Yes)
+                            : Allocate descriptor sets.;
+                        else (No)
+                        endif
+                endwhile
+
+                if ( Are all allocations completed? ) then ( Yes )
+                else (No)
+                    : Determine the number of additional descriptor pools\n needed to complete the remaining allocations;
+                    : Create additional descriptor pools;
+                endif
+     endwhile
+  endwhile
+
+: Return allocated descriptor sets.;
+stop
+
+@enduml
