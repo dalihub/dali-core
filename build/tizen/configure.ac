@@ -126,7 +126,7 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
-DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
+DALI_CFLAGS="$DALI_CFLAGS -I${includedir} -DDali=DaliVk"
 DALI_LDFLAGS="-L${libdir}"
 
 # forward VULKAN_SDK path to the graphics library if set correctly
