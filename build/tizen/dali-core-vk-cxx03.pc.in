@@ -9,4 +9,5 @@ Description: Cross platform 3D Engine
 Version: ${apiversion}
 Requires:
 Libs: -L${libdir} -ldali-core-vk-cxx03
-Cflags: -I${includedir} -std=c++14
+Cflags: -I${includedir} -std=c++14 -DDali=DaliVk
+
