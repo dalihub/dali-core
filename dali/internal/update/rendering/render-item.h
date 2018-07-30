@@ -24,17 +24,9 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/update/nodes/node.h>
 
-#include <memory>
-
 namespace Dali
 {
-namespace Graphics
-{
-namespace API
-{
-class RenderCommand;
-}
-}
+
 namespace Internal
 {
 
@@ -87,14 +79,6 @@ struct RenderItem
   const void*       mTextureSet;        //< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque:1;
-
-  std::unique_ptr<Graphics::API::RenderCommand> mRenderCommand;   ///< Per-draw render command
-
-  /**
-   * Uniform Buffer memory is allocated inside the Graphics implementation.
-   * The pointers may have to be updated per-draw
-   */
-  std::vector<std::vector<char>>                mUboMemory; ///< Transient memory allocated for each UBO
 
 private:
 

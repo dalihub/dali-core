@@ -356,10 +356,39 @@ public:
    */
   void PrepareRender( BufferIndex updateBufferIndex );
 
+  /**
+   * AB: preparing the command data
+   * @param controller
+   * @param updateBufferIndex
+   */
+  void PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
+
   Graphics::API::RenderCommand& GetGfxRenderCommand()
   {
-    return *mGraphicsRenderCommand.get();
+    return *mGfxRenderCommand.get();
   }
+
+  template<class T>
+  void WriteUniform( const std::string& name, const T& data )
+  {
+    WriteUniform( name, &data, sizeof(T) );
+  }
+
+  void WriteUniform( const std::string& name, const Matrix3& data )
+  {
+    // Matrix3 has to take stride in account ( 16 )
+    float values[12];
+    std::fill( values, values+12, 10.0f );
+
+    std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
+    std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
+    std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
+
+    WriteUniform( name, &values, sizeof(float)*12 );
+  }
+
+  void WriteUniform( const std::string& name, const void* data, uint32_t size );
+
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -378,21 +407,11 @@ public:
    */
   void TextureSetDeleted();
 
-  /**
-   * Binds graphics pipeline to the renderer
-   * @param[in] pipeline Pointer to pipeline
-   */
-  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline );
-
-  /**
-   * Updates given uniform buffer memory with data
-   * @param[in] updateBufferIndex Current update index
-   * @param[out] uniformBufferOutput Array of memory blocks to write into
-   * @param[out] outBindings Generated push constants bindings for the render command
-   */
-  void UpdateUniformBuffers( BufferIndex updateBufferIndex,
-                             std::vector<std::vector<char>>& uniformBufferOutput,
-                             std::vector<Graphics::API::RenderCommand::PushConstantsBinding>& outBindings );
+  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline )
+  {
+    mGfxPipeline = std::move(pipeline);
+    mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
+  }
 
 public: // Implementation of ConnectionChangePropagator
   /**
@@ -441,6 +460,7 @@ private:
    */
   Renderer();
 
+
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
 
@@ -470,9 +490,9 @@ private:
 
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-  std::unique_ptr<Graphics::API::RenderCommand> mGraphicsRenderCommand;
-  std::unique_ptr<Graphics::API::Pipeline>      mGraphicsPipeline;
-
+  std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
+  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
+  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
