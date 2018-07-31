@@ -250,7 +250,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    2, // double buffered
+                                    3, // minImageCount + 1
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -271,7 +271,7 @@ RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surf
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    2, // double buffered
+                                    3, // minImageCount + 1
                                     std::move(oldSwapchain) );
 
 
@@ -1572,7 +1572,7 @@ RefCountedCommandPool Graphics::GetCommandPool( std::thread::id threadId )
 
   if( !commandPool )
   {
-    auto&& createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
+    auto createInfo = vk::CommandPoolCreateInfo{}.setFlags( vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
     commandPool = CommandPool::New( *this, createInfo );
   }
 
