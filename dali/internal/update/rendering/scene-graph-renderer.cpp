@@ -719,13 +719,13 @@ void Renderer::UpdateUniformBuffers( BufferIndex updateBufferIndex,
         }
         case Property::Type::VECTOR3:
         {
-          dst += sizeof(Vector3) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
           break;
         }
         case Property::Type::VECTOR4:
         {
-          dst += sizeof(float) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
           break;
         }
@@ -742,12 +742,11 @@ void Renderer::UpdateUniformBuffers( BufferIndex updateBufferIndex,
           auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
 
           float* values = reinterpret_cast<float*>(dst);
-          std::fill( values, values+12, 10.0f );
+
           std::memcpy( &values[0], matrix.AsFloat(), sizeof(float)*3 );
           std::memcpy( &values[4], &matrix.AsFloat()[3], sizeof(float)*3 );
           std::memcpy( &values[8], &matrix.AsFloat()[6], sizeof(float)*3 );
 
-          memcpy(dst, values, sizeof(float)*12);
           break;
         }
         default:
