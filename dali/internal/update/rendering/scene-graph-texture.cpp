@@ -192,7 +192,8 @@ constexpr Graphics::API::Format ConvertPixelFormat( Pixel::Format format )
       return Graphics::API::Format::UNDEFINED; // doesn't seem to map onto any format
 
     case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::API::Format::UNDEFINED; // doesn't seem to be supported at all
+      //return Graphics::API::Format::UNDEFINED; // doesn't seem to be supported at all
+      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK;
 
     case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
       return Graphics::API::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
