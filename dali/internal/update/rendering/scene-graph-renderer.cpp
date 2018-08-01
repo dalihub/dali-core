@@ -301,7 +301,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         {
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
                            << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
-          dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector2(updateBufferIndex), sizeof(Vector2));
           break;
         }
@@ -309,7 +309,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         {
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
                   << uniformInfo.offset << ", size: " << sizeof(Vector3) );
-          dst += sizeof(Vector3) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
           break;
         }
@@ -318,7 +318,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
                            << uniformInfo.offset << ", size: " << sizeof(Vector4) );
 
-          dst += sizeof(float) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
           break;
         }
