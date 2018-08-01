@@ -293,7 +293,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing 32bit offset: "
                            << uniformInfo.offset << ", size: " << sizeof(float) );
 
-          dst += sizeof(float) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetFloat(updateBufferIndex), sizeof(float));
           break;
         }
@@ -301,7 +301,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         {
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec2 offset: "
                            << uniformInfo.offset << ", size: " << sizeof(Vector2) ) ;
-          dst += /* sizeof(Vector2) * */arrayIndex * 16; // todo: use array stride from spirv
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector2(updateBufferIndex), sizeof(Vector2));
           break;
         }
@@ -309,7 +309,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
         {
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec3 offset: "
                   << uniformInfo.offset << ", size: " << sizeof(Vector3) );
-          dst += sizeof(Vector3) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector3(updateBufferIndex), sizeof(Vector3));
           break;
         }
@@ -318,7 +318,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  uniformInfo.name << ":[" << uniformInfo.bufferIndex << "]: " << "Writing vec4 offset: "
                            << uniformInfo.offset << ", size: " << sizeof(Vector4) );
 
-          dst += sizeof(float) * arrayIndex;
+          dst += sizeof(Vector4) * arrayIndex;
           memcpy(dst, &uniformMap->propertyPtr->GetVector4(updateBufferIndex), sizeof(Vector4));
           break;
         }
@@ -339,12 +339,10 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
 
           float* values = reinterpret_cast<float*>(dst);
-          std::fill( values, values+12, 10.0f );
           std::memcpy( &values[0], matrix.AsFloat(), sizeof(float)*3 );
           std::memcpy( &values[4], &matrix.AsFloat()[3], sizeof(float)*3 );
           std::memcpy( &values[8], &matrix.AsFloat()[6], sizeof(float)*3 );
 
-          memcpy(dst, values, sizeof(float)*12);
           break;
         }
         default:
