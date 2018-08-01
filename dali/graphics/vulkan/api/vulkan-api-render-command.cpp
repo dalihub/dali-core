@@ -184,14 +184,22 @@ void RenderCommand::BindTexturesAndSamplers()
   // only if textures/samplers changed, rewrite
   for( auto&& texture : mTextureBindings )
   {
-    auto& image = static_cast<const VulkanAPI::Texture&>(*texture.texture);
+    auto image = static_cast<const VulkanAPI::Texture*>(texture.texture);
+
+    // test if image is valid, skip invalid image
+    // @todo: possibly use builtin 'broken' image
+    if( !image || !image->GetImageRef() )
+    {
+      continue;
+    }
+
     DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                      "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
     mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding,
                                                    !texture.sampler ?
-                                                   image.GetSamplerRef() :
+                                                   image->GetSamplerRef() :
                                                    static_cast<const VulkanAPI::Sampler*>( texture.sampler )->GetSampler(),
-                                                   image.GetImageViewRef() );
+                                                   image->GetImageViewRef() );
   }
 }
 
