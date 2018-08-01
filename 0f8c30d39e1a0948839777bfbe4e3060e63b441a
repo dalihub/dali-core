@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64112375_dd460282",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-01T15:39:43Z",
+      "side": 1,
+      "message": "Can you replace this with std::numeric_limits\u003cuint64_t\u003e::max() instead please!",
+      "range": {
+        "startLine": 86,
+        "startChar": 44,
+        "endLine": 86,
+        "endChar": 62
+      },
+      "revId": "0f8c30d39e1a0948839777bfbe4e3060e63b441a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
