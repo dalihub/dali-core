@@ -180,19 +180,19 @@ constexpr Graphics::API::Format ConvertPixelFormat( Pixel::Format format )
       return Graphics::API::Format::ETC2_R8G8B8_SRGB_BLOCK;
 
     case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::UNDEFINED; // no 'punchthrough' format, unknown
+      return Graphics::API::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
 
     case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::UNDEFINED; // no 'punchthrough' format, unknown
+      return Graphics::API::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
 
     case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::API::Format::UNDEFINED; // doesn't seem to map onto any format
+      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
 
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::API::Format::UNDEFINED; // doesn't seem to map onto any format
+      return Graphics::API::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
 
     case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::API::Format::UNDEFINED; // doesn't seem to be supported at all
+      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
 
     case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
       return Graphics::API::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?

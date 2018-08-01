@@ -946,20 +946,26 @@ bool Texture::Initialise()
     }
   }
 
-  InitialiseTexture();
-
-  // copy data to the image
-  if( data )
+  if( InitialiseTexture() )
   {
-    CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+    // copy data to the image
+    if( data )
+    {
+      CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+    }
+    return true;
   }
-  return true;
+
+  return false;
 }
 
 void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
   // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
-  uint32_t allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
+  // check memory requirements
+  auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
+
+  auto allocationSize = requirements.size;
 
   // allocate transient buffer
   auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
@@ -1054,6 +1060,15 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
 // uploaded at this point
 bool Texture::InitialiseTexture()
 {
+  // Check whether format is supported  by the platform
+  auto properties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
+
+  if( !properties.optimalTilingFeatures )
+  {
+    // terminate if not supported
+    return false;
+  }
+
   // create image
   auto imageCreateInfo = vk::ImageCreateInfo{}
     .setFormat( mFormat )
