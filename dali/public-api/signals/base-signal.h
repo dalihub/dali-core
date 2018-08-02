@@ -113,7 +113,7 @@ public:
    * @brief Used to guard against nested Emit() calls.
    * @SINCE_1_0.0
    */
-  struct EmitGuard
+  struct DALI_CORE_API EmitGuard
   {
     /**
      * @brief Creates the guard.
