@@ -248,16 +248,19 @@ struct VisibilityChangedVoidFunctor
 
 struct ChildOrderChangedFunctor
 {
-  ChildOrderChangedFunctor(bool& signalCalled)
-  : mSignalCalled( signalCalled )
+  ChildOrderChangedFunctor(bool& signalCalled, Actor& actor)
+  : mSignalCalled( signalCalled ),
+    mActor( actor )
   { }
 
-  void operator()()
+  void operator()( Actor actor )
   {
     mSignalCalled  = true;
+    mActor = actor;
   }
 
   bool& mSignalCalled;
+  Actor& mActor;
 };
 
 } // anonymous namespace
@@ -4806,6 +4809,12 @@ int UtcDaliActorRaiseLower(void)
   actorB.TouchSignal().Connect( TestTouchCallback2 );
   actorC.TouchSignal().Connect( TestTouchCallback3 );
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
@@ -4829,7 +4838,11 @@ int UtcDaliActorRaiseLower(void)
   Property::Value value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.Raise();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
+
   // Ensure sort order is calculated before next touch event
   application.SendNotification();
 
@@ -4851,7 +4864,13 @@ int UtcDaliActorRaiseLower(void)
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
   value.Get( preActorOrder );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.Lower();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
+
   application.SendNotification(); // ensure sort order calculated before next touch event
 
   value  = actorB.GetProperty(Dali::DevelActor::Property::SIBLING_ORDER );
@@ -4929,6 +4948,12 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   // Set up gl abstraction trace so can query the set uniform order
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableSetUniformCallTrace(true);
@@ -4978,7 +5003,11 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorA\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseToTop();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
+
   application.SendNotification(); // ensure sorting order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -5009,7 +5038,13 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "RaiseToTop ActorB\n" );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.RaiseToTop();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
+
   application.SendNotification(); // Ensure sort order is calculated before next touch event
 
   application.ProcessEvent( touchEvent );
@@ -5040,11 +5075,23 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   tet_printf( "LowerToBottom ActorA then ActorB leaving Actor C at Top\n" );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.LowerToBottom();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.LowerToBottom();
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -5126,8 +5173,9 @@ int UtcDaliActorRaiseAbove(void)
   actorB.TouchSignal().Connect( TestTouchCallback2 );
   actorC.TouchSignal().Connect( TestTouchCallback3 );
 
-  bool orderChangedSignal(false);
-  ChildOrderChangedFunctor f(orderChangedSignal);
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
   DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
 
   Dali::Integration::Point point;
@@ -5150,6 +5198,7 @@ int UtcDaliActorRaiseAbove(void)
   DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.RaiseAbove( actorC );
   DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -5163,7 +5212,12 @@ int UtcDaliActorRaiseAbove(void)
 
   tet_printf( "Raise actor A Above Actor B\n" );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorB );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -5243,6 +5297,12 @@ int UtcDaliActorLowerBelow(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( container ).Connect( &application, f ) ;
+
   // Set up gl abstraction trace so can query the set uniform order
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableSetUniformCallTrace(true);
@@ -5297,7 +5357,11 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor C below Actor B ( actor B and A on same level due to insertion order) so C is below both \n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorC.LowerBelow( actorB );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorC, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5329,7 +5393,13 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor C below Actor A leaving B on top\n" );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorC.LowerBelow( actorA );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorC, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5358,7 +5428,13 @@ int UtcDaliActorLowerBelow(void)
 
   tet_printf( "Lower actor B below Actor C leaving A on top\n" );
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.LowerBelow( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorB, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5437,6 +5513,12 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   application.SendNotification();
   application.Render();
 
@@ -5467,7 +5549,10 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   tet_printf( "Raise actor A Above Actor C which have different parents\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5514,6 +5599,12 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   application.SendNotification();
   application.Render();
 
@@ -5536,7 +5627,10 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   tet_printf( "Raise actor A Above Actor C which have no parents\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5550,9 +5644,14 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   stage.Add ( actorB );
   tet_printf( "Lower actor A below Actor C when only A is not on stage \n" );
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.LowerBelow( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
 
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
@@ -5567,6 +5666,8 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   tet_printf( "Adding Actor A to stage, will be on top\n" );
 
   stage.Add ( actorA );
@@ -5574,7 +5675,11 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   application.Render();
 
   tet_printf( "Raise actor B Above Actor C when only B has a parent\n" );
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5587,8 +5692,14 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   tet_printf( "Lower actor A below Actor C when only A has a parent\n" );
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.LowerBelow( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
 
@@ -5601,8 +5712,15 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   stage.Add ( actorC );
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
+
   // Ensure sorting happens at end of Core::ProcessEvents() before next touch
   application.SendNotification();
   application.Render();
@@ -5649,6 +5767,12 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
   actorA.TouchSignal().Connect( TestTouchCallback );
@@ -5664,7 +5788,10 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   stage.Add ( actorA );
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.Raise();
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -5680,7 +5807,12 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   tet_printf( "Raise actor B Above Actor C but B not parented\n" );
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorC.Lower();
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5694,9 +5826,14 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   tet_printf( "Lower actor C below B but C not parented\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.Lower();
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5710,9 +5847,14 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   tet_printf( "Raise actor B to top\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorB.RaiseToTop();
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   // Sort actor tree before next touch event
   application.SendNotification();
   application.Render();
@@ -5726,13 +5868,18 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
   tet_printf( "Add ActorB to stage so only Actor C not parented\n" );
 
   stage.Add ( actorB );
 
   tet_printf( "Lower actor C to Bottom, B stays at top\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorC.LowerToBottom();
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -5791,6 +5938,12 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   ResetTouchCallbacks();
 
+  // Connect ChildOrderChangedSignal
+  bool orderChangedSignal( false );
+  Actor orderChangedActor;
+  ChildOrderChangedFunctor f( orderChangedSignal, orderChangedActor );
+  DevelActor::ChildOrderChangedSignal( stage.GetRootLayer() ).Connect( &application, f ) ;
+
   application.SendNotification();
   application.Render();
 
@@ -5811,7 +5964,11 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   tet_infoline( "Raise actor A Above Actor A which is the same actor!!\n" );
 
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorA );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -5825,7 +5982,13 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   ResetTouchCallbacks();
 
+  orderChangedSignal = false;
+
+  DALI_TEST_EQUALS( orderChangedSignal, false, TEST_LOCATION );
   actorA.RaiseAbove( actorC );
+  DALI_TEST_EQUALS( orderChangedSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( orderChangedActor, actorA, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
