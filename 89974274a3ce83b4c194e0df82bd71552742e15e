@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ffc87dd_b7073fb5",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-08-06T18:16:32Z",
+      "side": 1,
+      "message": "remove std::fill",
+      "revId": "89974274a3ce83b4c194e0df82bd71552742e15e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
