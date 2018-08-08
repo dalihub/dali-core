@@ -58,7 +58,9 @@ public:
 
 private:
 
-  bool SetupScissorClipping( const RenderItem& item, Graphics::API::ViewportState& viewportState );
+  bool SetupScissorClipping( const RenderItem& item );
+
+  bool SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState );
 
   void SubmitRenderItemList( Graphics::API::Controller&           graphics,
                              BufferIndex                          bufferIndex,

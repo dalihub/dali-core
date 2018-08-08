@@ -126,7 +126,7 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
   return intersectionBox;
 }
 
-bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics::API::ViewportState& viewportState )
+bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t childStackDepth = mScissorStack.size() - 1u;
@@ -164,9 +164,10 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
     if( clippingNode )
     {
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
-
+      // If the viewport hasn't been set, and we're rendering to a framebuffer, then
+      // set the size of the viewport to that of the framebuffer.
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox( item.CalculateViewportSpaceAABB( int(viewportState.viewport.width), int(viewportState.viewport.height)) );
+      const ClippingBox scissorBox( item.CalculateViewportSpaceAABB( mScissorStack[0].width, mScissorStack[0].height ) );
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox( mScissorStack.back() );
@@ -175,38 +176,33 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item, Graphics:
       // We add the new scissor box to the stack so we can return to it if needed.
       mScissorStack.emplace_back( IntersectAABB( parentBox, scissorBox ) );
     }
-
-    // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
-    // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
-    const bool scissorEnabled = ( mScissorStack.size() > 0u );// || mHasLayerScissor;
-
-    // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
-    if( scissorEnabled )
-    {
-      ClippingBox useScissorBox( mScissorStack.back() );
-      viewportState.SetScissorTestEnable( true  );
-      viewportState.SetScissor( { useScissorBox.x,
-                                  int32_t(viewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
-                                  uint32_t(useScissorBox.width),
-                                  uint32_t(useScissorBox.height) } );
-    }
-    else
-    {
-      viewportState.SetScissorTestEnable( false );
-      viewportState.SetScissor({});
-    }
   }
-  else if( mScissorStack.size() > 1 )
+
+  return ( mScissorStack.size() > 0u );
+}
+
+bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState )
+{
+  // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
+  // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
+
+  auto scissorEnabled = ( mScissorStack.size() > 0u );// || mHasLayerScissor;
+  // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
+  if( scissorEnabled )
   {
     ClippingBox useScissorBox( mScissorStack.back() );
-    viewportState.SetScissorTestEnable( true  );
-    viewportState.SetScissor( { useScissorBox.x,
-                                int32_t(viewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
+    outViewportState.SetScissorTestEnable( true  );
+    outViewportState.SetScissor( { useScissorBox.x,
+                                int32_t(outViewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
                                 uint32_t(useScissorBox.width),
                                 uint32_t(useScissorBox.height) } );
   }
-
-  return viewportState.scissorTestEnable;
+  else
+  {
+    outViewportState.SetScissorTestEnable( false );
+    outViewportState.SetScissor({});
+  }
+  return scissorEnabled;
 }
 
 void GraphicsAlgorithms::SubmitRenderItemList(
@@ -504,7 +500,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    * any time.
    */
   Graphics::API::PipelineDynamicStateMask dynamicStateMask{ 0u };
-  if( SetupScissorClipping( item, viewportState ) )
+
+  if( SetupPipelineViewportState( viewportState) )
   {
     renderer->GetGfxRenderCommand().mDrawCommand.SetScissor( viewportState.scissor );
     renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( true );
@@ -610,6 +607,10 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
       for (auto renderItemIndex = 0u; renderItemIndex < renderList->Count(); ++renderItemIndex)
       {
         auto &item = renderList->GetItem(renderItemIndex);
+
+        // setup clipping for item
+        SetupScissorClipping( item );
+
         if( item.mRenderer )
         {
           PrepareGraphicsPipeline( controller, ri, renderList, item, bufferIndex );
