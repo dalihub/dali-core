@@ -162,13 +162,21 @@ void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
 void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
   mFrameBuffer = frameBuffer;
-  SceneGraph::FrameBuffer* renderFrameBufferPtr( NULL );
+  SceneGraph::FrameBuffer* renderFrameBufferPtr( nullptr );
   if( frameBuffer )
   {
     renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
   }
 
   SetFrameBufferMessage( GetEventThreadServices(), *mSceneObject, renderFrameBufferPtr );
+
+  if( frameBuffer != nullptr &&
+      EqualsZero( mViewportSize.x ) &&
+      EqualsZero( mViewportSize.y ) )
+  {
+    // No viewport size has been set. Change it to the size of the framebuffer
+    SetViewportSize( Vector2( frameBuffer->GetWidth(), frameBuffer->GetHeight() ));
+  }
 }
 
 FrameBuffer* RenderTask::GetFrameBuffer() const

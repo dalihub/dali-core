@@ -69,6 +69,16 @@ public:
    */
   Texture* GetColorTexture();
 
+  unsigned int GetWidth()
+  {
+    return mWidth;
+  }
+
+  unsigned int GetHeight()
+  {
+    return mHeight;
+  }
+
 private: // implementation
 
   /**
