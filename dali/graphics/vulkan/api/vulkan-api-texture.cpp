@@ -944,6 +944,7 @@ bool Texture::Initialise()
       }
 
       data = outData;
+      sizeInBytes = mWidth * mHeight * 4;
       mFormat = vk::Format::eR8G8B8A8Unorm;
     }
   }
@@ -953,7 +954,7 @@ bool Texture::Initialise()
     // copy data to the image
     if( data )
     {
-      CopyMemory(data, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
+      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
     }
     return true;
   }
@@ -961,22 +962,13 @@ bool Texture::Initialise()
   return false;
 }
 
-void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
   // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
-  const auto formatInfo = Vulkan::GetFormatInfo( mFormat );
   uint32_t allocationSize = 0u;
 
-  if( formatInfo.compressed )
-  {
-    // check memory requirements
-    auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
-    allocationSize = uint32_t( requirements.size );
-  }
-  else
-  {
-    allocationSize = srcExtent.width * srcExtent.height * (Vulkan::GetFormatInfo(mFormat).blockSizeInBits / 8 );
-  }
+  auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
+  allocationSize = uint32_t( requirements.size );
 
   // allocate transient buffer
   auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
@@ -991,7 +983,7 @@ void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Of
 
   // write into the buffer
   auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
-  std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+allocationSize, ptr );
+  std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+srcMemorySize, ptr );
   buffer->GetMemoryHandle()->Unmap();
 
   ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
@@ -1006,7 +998,7 @@ void Texture::CopyMemory(const void *srcMemory, API::Extent2D srcExtent, API::Of
           .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
           .setBufferRowLength({ 0u })
           .setBufferOffset({ 0u })
-          .setBufferImageHeight({ srcExtent.height });
+          .setBufferImageHeight( 0u );
 
   transferRequest.bufferToImageInfo.dstImage = mImage;
   transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);

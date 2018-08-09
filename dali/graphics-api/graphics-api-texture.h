@@ -47,12 +47,13 @@ public:
    * must match the texture format.
    *
    * @param srcMemory Valid pointer to the memory containing image data
+   * @param srcMemorySize Size of source buffer in bytes
    * @param srcExtent Image dimensions
    * @param dstOffset Destination offset
    * @param layer Layer
    * @param level Mipmap level
    */
-  virtual void CopyMemory( const void *srcMemory, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level, TextureDetails::UpdateMode updateMode ) = 0;
+  virtual void CopyMemory( const void *srcMemory, uint32_t srcMemorySize, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level, TextureDetails::UpdateMode updateMode ) = 0;
 
   /**
    * Copies region of source texture at the offset.
