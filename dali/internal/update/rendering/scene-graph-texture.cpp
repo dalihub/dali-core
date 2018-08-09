@@ -287,8 +287,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mNativeImage( nativeImageInterface ),
   mSampler(),
   mFormat( Pixel::RGBA8888 ),
-  mWidth( nativeImageInterface->GetWidth() ),
-  mHeight( nativeImageInterface->GetHeight() ),
+  mWidth( uint32_t(nativeImageInterface->GetWidth()) ),
+  mHeight( uint32_t(nativeImageInterface->GetHeight()) ),
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
@@ -324,6 +324,7 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   {
     // schedule upload
     mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
+                                  pixelData->GetBufferSize(),
                                   { params.width, params.height },
                                   { params.xOffset, params.yOffset },
                                   params.layer,
