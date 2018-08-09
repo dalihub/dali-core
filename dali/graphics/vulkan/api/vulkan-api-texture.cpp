@@ -926,26 +926,30 @@ bool Texture::Initialise()
 
   if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
   {
-    if( data && sizeInBytes > 0 )
+    auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
+    if( !formatProperties.optimalTilingFeatures )
     {
-      assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
-
-      auto inData = reinterpret_cast<const uint8_t*>(data);
-      auto outData = new uint8_t[mWidth * mHeight * 4];
-
-      auto outIdx = 0u;
-      for( auto i = 0u; i < sizeInBytes; i += 3 )
+      if( data && sizeInBytes > 0 )
       {
-        outData[outIdx] = inData[i];
-        outData[outIdx + 1] = inData[i + 1];
-        outData[outIdx + 2] = inData[i + 2];
-        outData[outIdx + 3] = 0xff;
-        outIdx += 4;
-      }
+        assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
 
-      data = outData;
-      sizeInBytes = mWidth * mHeight * 4;
-      mFormat = vk::Format::eR8G8B8A8Unorm;
+        auto inData = reinterpret_cast<const uint8_t*>(data);
+        auto outData = new uint8_t[mWidth * mHeight * 4];
+
+        auto outIdx = 0u;
+        for( auto i = 0u; i < sizeInBytes; i += 3 )
+        {
+          outData[outIdx] = inData[i];
+          outData[outIdx + 1] = inData[i + 1];
+          outData[outIdx + 2] = inData[i + 2];
+          outData[outIdx + 3] = 0xff;
+          outIdx += 4;
+        }
+
+        data = outData;
+        sizeInBytes = mWidth * mHeight * 4;
+        mFormat = vk::Format::eR8G8B8A8Unorm;
+      }
     }
   }
 
