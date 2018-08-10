@@ -253,11 +253,14 @@ FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
+
+  auto surfaceCapabilities = surface->GetCapabilities();
+
   //TODO: propagate the format and presentation mode to higher layers to allow for more control?
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    3, // minImageCount + 1
+                                    surfaceCapabilities.minImageCount,
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -275,10 +278,12 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
 
 RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
 {
+  auto surfaceCapabilities = surface->GetCapabilities();
+
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    3, // minImageCount + 1
+                                    surfaceCapabilities.minImageCount,
                                     std::move(oldSwapchain) );
 
 
@@ -785,10 +790,10 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   }
 
   // Determine the number of images
-  if( surfaceCapabilities.maxImageCount > 0 &&
-      bufferCount > surfaceCapabilities.maxImageCount )
+  if (surfaceCapabilities.minImageCount > 0 &&
+      bufferCount > surfaceCapabilities.minImageCount )
   {
-    bufferCount = surfaceCapabilities.maxImageCount;
+      bufferCount = surfaceCapabilities.minImageCount;
   }
 
   // Find the transformation of the surface
@@ -868,7 +873,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   auto images = VkAssert( mDevice.getSwapchainImagesKHR( swapChainVkHandle ) );
 
   // number of images must match requested buffering mode
-  if( images.size() != bufferCount )
+  if( images.size() < surfaceCapabilities.minImageCount )
   {
     DALI_LOG_STREAM( gVulkanFilter,
                      Debug::General,
