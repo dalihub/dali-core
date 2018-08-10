@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "233c2703_35f09a4f",
+        "filename": "dali/graphics/vulkan/internal/vulkan-descriptor-set.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-08-10T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c526cfc_a23fb7db",
+      "range": {
+        "startLine": 214,
+        "startChar": 60,
+        "endLine": 214,
+        "endChar": 66
+      },
+      "revId": "892ef4be5644f3d96e690ddfa11a592cd51bec26",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d17b218b_807494a4",
         "filename": "dali/graphics/vulkan/internal/vulkan-descriptor-set.cpp",
         "patchSetId": 3
@@ -45,6 +69,30 @@
       "revId": "892ef4be5644f3d96e690ddfa11a592cd51bec26",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46cbfd7d_a41e8c69",
+        "filename": "dali/graphics/vulkan/internal/vulkan-descriptor-set.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-08-10T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d17b218b_807494a4",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 5
+      },
+      "revId": "892ef4be5644f3d96e690ddfa11a592cd51bec26",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
