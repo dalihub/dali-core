@@ -40,7 +40,7 @@ class Buffer : public Graphics::API::Buffer
 public:
 
   explicit Buffer( Controller& controller,
-                   vk::BufferUsageFlagBits usage,
+                   vk::BufferUsageFlags usage,
                    API::Buffer::UsageHint usageHints,
                    uint32_t size );
 
@@ -71,7 +71,7 @@ private:
 
   Controller& mController;
   Vulkan::Graphics& mGraphics;
-  vk::BufferUsageFlagBits mUsage{ vk::BufferUsageFlagBits::eVertexBuffer };
+  vk::BufferUsageFlags mUsage{ vk::BufferUsageFlagBits::eVertexBuffer };
   API::Buffer::UsageHint mUsageHints;
   uint32_t mSize;
 

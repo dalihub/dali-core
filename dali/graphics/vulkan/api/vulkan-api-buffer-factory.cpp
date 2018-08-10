@@ -28,12 +28,13 @@ namespace Graphics
 namespace VulkanAPI
 {
 BufferFactory::BufferFactory( Controller& controller )
-        : mController( controller ), mGraphics( controller.GetGraphics() )
+        : mController( controller ), mGraphics( controller.GetGraphics() ),
+          mUsage{}, mUsageHints{}, mSize{0u}
 {
 
 }
 
-BufferFactory& BufferFactory::SetUsage( API::Buffer::UsageHint usage )
+API::BufferFactory& BufferFactory::SetUsage( API::Buffer::UsageHint usage )
 {
   mUsageHints = usage;
   switch( usage )
@@ -67,7 +68,29 @@ BufferFactory& BufferFactory::SetUsage( API::Buffer::UsageHint usage )
   return *this;
 }
 
-BufferFactory& BufferFactory::SetSize( uint32_t size )
+API::BufferFactory& BufferFactory::SetUsageFlags( API::BufferUsageFlags usageFlags )
+{
+  mUsage = {};
+  if( usageFlags & uint32_t(API::BufferUsageFlagBits::UNIFORM_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eUniformBuffer;
+  }
+  if( usageFlags & uint32_t(API::BufferUsageFlagBits::SHADER_STORAGE_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eStorageBuffer;
+  }
+  if( usageFlags & uint32_t(API::BufferUsageFlagBits::INDEX_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eIndexBuffer;
+  }
+  if( usageFlags & uint32_t(API::BufferUsageFlagBits::VERTEX_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eVertexBuffer;
+  }
+  return *this;
+}
+
+API::BufferFactory& BufferFactory::SetSize( uint32_t size )
 {
   mSize = size;
   return *this;
@@ -83,6 +106,13 @@ std::unique_ptr< API::Buffer > BufferFactory::Create() const
   return nullptr;
 }
 
+API::BufferFactory& BufferFactory::Reset()
+{
+  mUsageHints = {};
+  mUsage = {};
+  mSize = { 0u };
+  return *this;
+}
 
 } // namespace VulkanAPI
 } // namespace Graphics

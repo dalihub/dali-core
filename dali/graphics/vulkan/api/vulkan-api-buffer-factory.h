@@ -18,10 +18,10 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
-
 
 namespace Dali
 {
@@ -41,17 +41,21 @@ public:
 
   explicit BufferFactory( Controller& controller );
 
-  VulkanAPI::BufferFactory& SetUsage( API::Buffer::UsageHint usage ) override;
+  API::BufferFactory& SetUsage( API::Buffer::UsageHint usage ) override;
 
-  VulkanAPI::BufferFactory& SetSize( uint32_t size ) override;
+  API::BufferFactory& SetUsageFlags( API::BufferUsageFlags usageFlags ) override;
+
+  API::BufferFactory& SetSize( uint32_t size ) override;
 
   PointerType Create() const override;
+
+  API::BufferFactory& Reset();
 
 private:
 
   Controller& mController;
   Vulkan::Graphics& mGraphics;
-  vk::BufferUsageFlagBits mUsage;
+  vk::BufferUsageFlags mUsage;
   API::Buffer::UsageHint mUsageHints;
   uint32_t mSize;
 };

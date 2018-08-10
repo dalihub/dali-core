@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-api-types.h>
 
 namespace Dali
 {
@@ -44,6 +45,13 @@ public:
    * @return
    */
   virtual BufferFactory& SetUsage( Buffer::UsageHint usage ) = 0;
+
+  /**
+   *
+   * @param usageFlags
+   * @return
+   */
+  virtual BufferFactory& SetUsageFlags( API::BufferUsageFlags usageFlags ) = 0;
 
   /**
    * Sets size of the buffer

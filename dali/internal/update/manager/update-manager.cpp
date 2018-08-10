@@ -59,6 +59,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/shader-cache.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
 
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
@@ -204,9 +205,11 @@ struct UpdateManager::Impl
     renderTaskWaiting( false ),
     renderersAdded( false ),
     surfaceRectChanged( false ),
-    shaderCache( graphics.GetController() )
+    shaderCache( graphics.GetController() ),
+    uniformBufferManager()
   {
     sceneController = new SceneControllerImpl( discardQueue );
+    uniformBufferManager.reset( new UniformBufferManager( graphics.GetController() ) );
 
     // create first 'dummy' node
     nodes.PushBack(0u);
@@ -314,7 +317,7 @@ struct UpdateManager::Impl
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
   ShaderCache                          shaderCache;
-
+  std::unique_ptr< UniformBufferManager > uniformBufferManager;          ///< Uniform buffer manager
 private:
 
   Impl( const Impl& ); ///< Undefined
