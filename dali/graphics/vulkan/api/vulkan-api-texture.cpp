@@ -924,6 +924,7 @@ bool Texture::Initialise()
   mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
   mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
 
+  std::vector<uint8_t> rgbaBuffer{};
   if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
   {
     auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
@@ -934,7 +935,9 @@ bool Texture::Initialise()
         assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
 
         auto inData = reinterpret_cast<const uint8_t*>(data);
-        auto outData = new uint8_t[mWidth * mHeight * 4];
+
+        rgbaBuffer.reserve( mWidth * mHeight * 4 );
+        auto outData = rgbaBuffer.data();
 
         auto outIdx = 0u;
         for( auto i = 0u; i < sizeInBytes; i += 3 )
