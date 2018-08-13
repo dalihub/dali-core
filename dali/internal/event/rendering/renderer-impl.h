@@ -322,14 +322,12 @@ private: // data
 
   Render::Renderer::StencilParameters mStencilParameters;            ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask
-
   float                               mOpacity;                      ///< Local copy of the opacity
-
-  DepthFunction::Type                 mDepthFunction:3;              ///< Local copy of the depth function
-  FaceCullingMode::Type               mFaceCullingMode:2;            ///< Local copy of the mode of face culling
-  BlendMode::Type                     mBlendMode:2;                  ///< Local copy of the mode of blending
-  DepthWriteMode::Type                mDepthWriteMode:2;             ///< Local copy of the depth write mode
-  DepthTestMode::Type                 mDepthTestMode:2;              ///< Local copy of the depth test mode
+  DepthFunction::Type                 mDepthFunction:4;              ///< Local copy of the depth function
+  FaceCullingMode::Type               mFaceCullingMode:3;            ///< Local copy of the mode of face culling
+  BlendMode::Type                     mBlendMode:3;                  ///< Local copy of the mode of blending
+  DepthWriteMode::Type                mDepthWriteMode:3;             ///< Local copy of the depth write mode
+  DepthTestMode::Type                 mDepthTestMode:3;              ///< Local copy of the depth test mode
   bool                                mPremultipledAlphaEnabled:1;   ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
