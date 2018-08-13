@@ -93,7 +93,6 @@ DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateIn
   if( !retval.empty() )
   {
     mAvailableAllocations -= allocateInfo.descriptorSetCount;
-    std::cout << "Available allocations: " << mAvailableAllocations << std::endl;
   }
 
   return retval;
