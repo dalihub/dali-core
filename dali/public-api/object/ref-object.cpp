@@ -101,7 +101,8 @@ void RefObject::Reference()
 
 #else
 
-  std::atomic_fetch_add<int>(&mCount, 1);
+  // gcc > 4.1 builtin atomic add and fetch:
+  __sync_add_and_fetch( &mCount, 1 );
 
 #endif
 }
@@ -149,7 +150,8 @@ void RefObject::Unreference()
 
 #else
 
-  newValue = ( mCount -= 1 );
+  // gcc > 4.1 builtin atomic subtract and fetch (--mCount; return mCount)
+  newValue = __sync_sub_and_fetch( &mCount, 1 );
 
 #endif
 
