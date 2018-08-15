@@ -126,7 +126,7 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
-  mGfxRenderCommand(),
+  mGfxData(),
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
@@ -206,9 +206,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 {
   auto &controller = mGraphics->GetController();
 
-  if (!mGfxRenderCommand)
+  auto& gfxRenderCommand = mGfxData[updateBufferIndex].gfxRenderCommand;
+  auto& uboMemory = mGfxData[updateBufferIndex].uboMemory;
+
+  if (!gfxRenderCommand)
   {
-    mGfxRenderCommand = controller.AllocateRenderCommand();
+    gfxRenderCommand = controller.AllocateRenderCommand();
   }
 
   if (!mShader->GetGfxObject())
@@ -236,9 +239,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   // see if we need to reallocate memory for each UBO
   // todo: do it only when shader has changed
-  if (mUboMemory.size() != uboCount)
+  if (uboMemory.size() != uboCount)
   {
-    mUboMemory.resize(uboCount);
+    uboMemory.resize(uboCount);
   }
 
   for (auto i = 0u; i < uboCount; ++i)
@@ -249,15 +252,15 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     shader.GetUniformBlock(i, ubInfo);
 
-    if (mUboMemory[i].size() != ubInfo.size)
+    if (uboMemory[i].size() != ubInfo.size)
     {
-      mUboMemory[i].resize(ubInfo.size);
+      uboMemory[i].resize(ubInfo.size);
     }
 
     // Set push constant bindings
     auto &pushBinding = pushConstantsBindings[i];
-    pushBinding.data    = mUboMemory[i].data();
-    pushBinding.size    = uint32_t(mUboMemory[i].size());
+    pushBinding.data    = uboMemory[i].data();
+    pushBinding.size    = uint32_t(uboMemory[i].size());
     pushBinding.binding = ubInfo.binding;
   }
 
@@ -281,7 +284,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
     if( mShader->GetUniform( uniformName, hashValue, uniformInfo ) )
     {
       // write into correct uniform buffer
-      auto dst = (mUboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
+      auto dst = (uboMemory[uniformInfo.bufferIndex].data() + uniformInfo.offset);
 
       switch (uniformMap->propertyPtr->GetType())
       {
@@ -398,7 +401,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       }
     }
   }
-  mGfxRenderCommand->BindTextures( std::move(textureBindings) );
+  gfxRenderCommand->BindTextures( std::move(textureBindings) );
 
   // Build render command
   // todo: this may be deferred until all render items are sorted, otherwise
@@ -410,19 +413,19 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   bool usesIndexBuffer{false};
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
-    mGfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
+    gfxRenderCommand->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
                                          .SetBuffer(mGeometry->GetIndexBuffer())
                                          .SetOffset(0)
     );
   }
 
-  mGfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
-  mGfxRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
+  gfxRenderCommand->PushConstants( std::move(pushConstantsBindings) );
+  gfxRenderCommand->BindVertexBuffers(std::move(vertexBuffers) );
 
 
   if(usesIndexBuffer)
   {
-    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    gfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
                                         .SetDrawType( Graphics::API::RenderCommand::DrawType::INDEXED_DRAW )
                                         .SetFirstInstance( 0u )
@@ -434,7 +437,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
   else
   {
-    mGfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    gfxRenderCommand->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstVertex(0u)
                                         .SetDrawType(Graphics::API::RenderCommand::DrawType::VERTEX_DRAW)
                                         .SetFirstInstance(0u)
@@ -444,7 +447,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
-void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t size )
+void Renderer::WriteUniform( BufferIndex updateBufferIndex, const std::string& name, const void* data, uint32_t size )
 {
   if( !mShader->GetGfxObject() )
   {
@@ -455,7 +458,7 @@ void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t
   auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
   if( gfxShader.GetNamedUniform( name, uniformInfo ) )
   {
-    auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+    auto dst = (mGfxData[updateBufferIndex].uboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
     memcpy( dst, data, size );
   }
 }

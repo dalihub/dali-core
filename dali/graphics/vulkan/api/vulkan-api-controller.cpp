@@ -55,6 +55,10 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+namespace
+{
+constexpr uint32_t MAX_SEC_BUFFER_ARRAYS = 3u;
+}
 
 struct Controller::Impl
 {
@@ -83,7 +87,8 @@ struct Controller::Impl
 
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
           : mGraphics( graphics ),
-            mOwner( owner )
+            mOwner( owner ),
+            mBufferRefsIndex(0u)
   {
   }
 
@@ -110,6 +115,8 @@ struct Controller::Impl
 
   void BeginFrame()
   {
+    mSecondaryCommandBufferRefs[mBufferRefsIndex].clear();
+
     // for all swapchains acquire new framebuffer
     auto surface = mGraphics.GetSurface( 0u );
 
@@ -150,11 +157,11 @@ struct Controller::Impl
       uint32_t offset = rp.offset;
       auto count = uint32_t(
               ( i == mRenderPasses.size() - 1 ) ?
-              mSecondaryCommandBufferRefs.size() - rp.offset :
+              mSecondaryCommandBufferRefs[mBufferRefsIndex].size() - rp.offset :
               mRenderPasses[i + 1].offset - rp.offset );
 
       primaryCommandBuffer->BeginRenderPass( rp.beginInfo, vk::SubpassContents::eSecondaryCommandBuffers );
-      primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs, offset, count );
+      primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs[mBufferRefsIndex], offset, count );
     }
 
     if( !mRenderPasses.empty() )
@@ -163,7 +170,6 @@ struct Controller::Impl
     }
 
     swapchain->Present();
-    mSecondaryCommandBufferRefs.clear();
     mRenderPasses.clear();
 
     if( !swapchain->IsValid() )
@@ -177,6 +183,10 @@ struct Controller::Impl
       // replace swapchain
       mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
     }
+
+    ++mBufferRefsIndex;
+
+    mBufferRefsIndex %= MAX_SEC_BUFFER_ARRAYS;
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -309,7 +319,7 @@ struct Controller::Impl
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
     auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
-    UpdateRenderPass( firstCommand->GetRenderTargetBinding(), Vulkan::U32(mSecondaryCommandBufferRefs.size()) );
+    UpdateRenderPass( firstCommand->GetRenderTargetBinding(), Vulkan::U32(mSecondaryCommandBufferRefs[mBufferRefsIndex].size()) );
 
     // set up writes
     for( auto&& command : commands )
@@ -334,9 +344,7 @@ struct Controller::Impl
 
       // start new command buffer
       auto cmdbuf = mGraphics.CreateCommandBuffer( false );
-      cmdbuf->Reset();
       cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
-
       cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
       //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
 
@@ -400,7 +408,7 @@ struct Controller::Impl
                       drawCommand.firstInstance );
       }
       cmdbuf->End();
-      mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
+      mSecondaryCommandBufferRefs[mBufferRefsIndex].emplace_back( cmdbuf );
     }
   }
 
@@ -530,6 +538,7 @@ struct Controller::Impl
 
   Vulkan::Graphics& mGraphics;
   Controller& mOwner;
+  uint32_t mBufferRefsIndex;
 
   std::unique_ptr< VulkanAPI::TextureFactory > mTextureFactory;
   std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;
@@ -549,7 +558,7 @@ struct Controller::Impl
   // Accumulate all the secondary command buffers of the frame here to avoid them being overwritten
   // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
   // and ready to be used for the next frame.
-  std::vector< Vulkan::RefCountedCommandBuffer > mSecondaryCommandBufferRefs;
+  std::vector< Vulkan::RefCountedCommandBuffer > mSecondaryCommandBufferRefs[MAX_SEC_BUFFER_ARRAYS];
 
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
   std::vector< RenderPassChange > mRenderPasses;

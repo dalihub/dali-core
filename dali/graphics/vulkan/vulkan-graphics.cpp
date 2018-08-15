@@ -71,12 +71,12 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         "VK_LAYER_LUNARG_parameter_validation", // parameter
         //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
-        "VK_LAYER_LUNARG_swapchain",           // swapchain
-        "VK_LAYER_GOOGLE_threading",           // threading
-        "VK_LAYER_LUNARG_api_dump",            // api
-        "VK_LAYER_LUNARG_object_tracker",      // objects
-        "VK_LAYER_LUNARG_core_validation",     // core
-        "VK_LAYER_GOOGLE_unique_objects",      // unique objects
+        //"VK_LAYER_LUNARG_swapchain",           // swapchain
+        //"VK_LAYER_GOOGLE_threading",           // threading
+        //"VK_LAYER_LUNARG_api_dump",            // api
+        //"VK_LAYER_LUNARG_object_tracker",      // objects
+        //"VK_LAYER_LUNARG_core_validation",     // core
+        //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
         "VK_LAYER_LUNARG_standard_validation", // standard
 };
 
@@ -1035,32 +1035,43 @@ RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedImage image, vk::Me
 
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
+
+
   auto submitInfos = std::vector< vk::SubmitInfo >{};
+  submitInfos.reserve( submissionData.size() );
   auto commandBufferHandles = std::vector< vk::CommandBuffer >{};
 
+  // prepare memory
+  auto bufferSize = 0u;
+  for( auto& data : submissionData )
+  {
+    bufferSize += uint32_t( data.commandBuffers.size() );
+  }
+  commandBufferHandles.reserve( bufferSize );
+
   // Transform SubmissionData to vk::SubmitInfo
-  std::transform( submissionData.begin(),
-                  submissionData.end(),
-                  std::back_inserter( submitInfos ),
-                  [ & ]( SubmissionData subData ) {
+  for( const auto& subData : submissionData )
+  {
+    auto currentBufferIndex = commandBufferHandles.size();
 
+    //Extract the command buffer handles
+    std::transform( subData.commandBuffers.cbegin(),
+                    subData.commandBuffers.cend(),
+                    std::back_inserter( commandBufferHandles ),
+                    [ & ]( const RefCountedCommandBuffer& entry ) {
+                      return entry->GetVkHandle();
+                    } );
 
-                    //Extract the command buffer handles
-                    std::transform( subData.commandBuffers.begin(),
-                                    subData.commandBuffers.end(),
-                                    std::back_inserter( commandBufferHandles ),
-                                    [ & ]( RefCountedCommandBuffer& entry ) {
-                                      return entry->GetVkHandle();
-                                    } );
+    auto retval = vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
+                                  .setPWaitSemaphores( subData.waitSemaphores.data() )
+                                  .setPWaitDstStageMask( &subData.waitDestinationStageMask )
+                                  .setCommandBufferCount( U32( subData.commandBuffers.size() ) )
+                                  .setPCommandBuffers( &commandBufferHandles[currentBufferIndex] )
+                                  .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
+                                  .setPSignalSemaphores( subData.signalSemaphores.data() );
 
-                    return vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
-                                           .setPWaitSemaphores( subData.waitSemaphores.data() )
-                                           .setPWaitDstStageMask( &subData.waitDestinationStageMask )
-                                           .setCommandBufferCount( U32( subData.commandBuffers.size() ) )
-                                           .setPCommandBuffers( commandBufferHandles.data() )
-                                           .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
-                                           .setPSignalSemaphores( subData.signalSemaphores.data() );
-                  } );
+    submitInfos.push_back( retval );
+  }
 
   return VkAssert( queue.mQueue.submit( submitInfos, fence ? fence->GetVkHandle() : vk::Fence{} ) );
 }
