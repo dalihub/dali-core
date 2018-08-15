@@ -363,18 +363,18 @@ public:
    */
   void PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
 
-  Graphics::API::RenderCommand& GetGfxRenderCommand()
+  Graphics::API::RenderCommand& GetGfxRenderCommand( BufferIndex updateBufferIndex )
   {
-    return *mGfxRenderCommand.get();
+    return *mGfxData[updateBufferIndex].gfxRenderCommand.get();
   }
 
   template<class T>
-  void WriteUniform( const std::string& name, const T& data )
+  void WriteUniform( BufferIndex updateBufferIndex, const std::string& name, const T& data )
   {
-    WriteUniform( name, &data, sizeof(T) );
+    WriteUniform( updateBufferIndex, name, &data, sizeof(T) );
   }
 
-  void WriteUniform( const std::string& name, const Matrix3& data )
+  void WriteUniform( BufferIndex updateBufferIndex, const std::string& name, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
@@ -384,10 +384,10 @@ public:
     std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
     std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
 
-    WriteUniform( name, &values, sizeof(float)*12 );
+    WriteUniform( updateBufferIndex, name, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( const std::string& name, const void* data, uint32_t size );
+  void WriteUniform( BufferIndex updateBufferIndex, const std::string& name, const void* data, uint32_t size );
 
 
   /**
@@ -407,10 +407,10 @@ public:
    */
   void TextureSetDeleted();
 
-  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline )
+  void BindPipeline( BufferIndex updateBufferIndex, std::unique_ptr<Graphics::API::Pipeline> pipeline )
   {
     mGfxPipeline = std::move(pipeline);
-    mGfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
+    mGfxData[updateBufferIndex].gfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
   }
 
 public: // Implementation of ConnectionChangePropagator
@@ -490,9 +490,14 @@ private:
 
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-  std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
-  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
-  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
+  struct GfxData
+  {
+    std::vector<std::vector<char>>                uboMemory;       ///< Transient memory allocated for each UBO
+    std::unique_ptr<Graphics::API::RenderCommand> gfxRenderCommand;
+  } mGfxData[2];                                                   ///< Buffered graphics data
+
+  std::unique_ptr<Graphics::API::Pipeline>      mGfxPipeline;      ///< PIpeline
+
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions

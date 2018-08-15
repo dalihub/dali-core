@@ -50,6 +50,7 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
           mSwapchainKHR( vkHandle ),
           mSwapchainCreateInfoKHR( std::move( createInfo ) ),
           mSwapchainBuffer( std::move( framebuffers ) ),
+          mFrameIndex( 0u ),
           mIsValid( true )
 {
 }
@@ -68,6 +69,15 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
+  if( mAcquireSemaphore.empty() )
+  {
+    mAcquireSemaphore.resize( mSwapchainBuffer.size() );
+    for( auto& sem : mAcquireSemaphore )
+    {
+      sem = mGraphics->GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics->GetAllocator() ).value;
+    }
+  }
+
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
@@ -77,15 +87,11 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   const auto& device = mGraphics->GetDevice();
 
-  if( !mFrameFence )
-  {
-    mFrameFence = mGraphics->CreateFence( {} );
-  }
 
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
-                                            nullptr,
-                                            mFrameFence->GetVkHandle(), &mCurrentBufferIndex );
+                                            mAcquireSemaphore[mFrameIndex%(mAcquireSemaphore.size())],
+                                            nullptr, &mCurrentBufferIndex );
 
 
   // swapchain either not optimal or expired, returning nullptr and
@@ -96,8 +102,8 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
     return RefCountedFramebuffer();
   }
 
-  mGraphics->WaitForFence( mFrameFence );
-  mGraphics->ResetFence( mFrameFence );
+  //mGraphics->WaitForFence( mFrameFence );
+ // mGraphics->ResetFence( mFrameFence );
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
@@ -106,6 +112,11 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
           .setFramebuffer( swapBuffer.framebuffer->GetVkHandle() )
           .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
           .setSubpass( 0 );
+
+  if( mFrameIndex > mSwapchainBuffer.size() )
+  {
+    mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
+  }
 
   swapBuffer.masterCmdBuffer->Reset();
   swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
@@ -130,11 +141,19 @@ void Swapchain::Present()
   // submit
   mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
-  auto submissionData = SubmissionData{}.SetCommandBuffers( { swapBuffer.masterCmdBuffer } );
+  // create present semaphore
+  if( !swapBuffer.presentSignalSemaphore )
+  {
+    swapBuffer.presentSignalSemaphore = mGraphics->GetDevice().createSemaphore( {}, mGraphics->GetAllocator() ).value;
+  }
+
+  auto submissionData = SubmissionData{}
+    .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
+    .SetWaitSemaphores( { mAcquireSemaphore[mFrameIndex%(mAcquireSemaphore.size())] } )
+    .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eTopOfPipe )
+    .SetSignalSemaphores( { swapBuffer.presentSignalSemaphore } );
 
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
-
-  mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
 
   // fixme: use semaphores to synchronize all previously submitted command buffers!
   vk::PresentInfoKHR presentInfo{};
@@ -143,8 +162,8 @@ void Swapchain::Present()
              .setPResults( &result )
              .setPSwapchains( &mSwapchainKHR )
              .setSwapchainCount( 1 )
-             .setPWaitSemaphores( nullptr )
-             .setWaitSemaphoreCount( 0 );
+             .setPWaitSemaphores( &swapBuffer.presentSignalSemaphore )
+             .setWaitSemaphoreCount( 1 );
 
   mGraphics->Present( *mQueue, presentInfo );
 
@@ -157,6 +176,8 @@ void Swapchain::Present()
     // invalidate swapchain
     mIsValid = false;
   }
+
+  ++mFrameIndex;
 
 }
 

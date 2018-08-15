@@ -52,6 +52,11 @@ struct SwapchainBuffer
    */
   RefCountedFence endOfFrameFence;
 
+  /**
+   * Semaphore
+   */
+  vk::Semaphore presentSignalSemaphore;
+
   /*
    * Buffer index
    */
@@ -145,7 +150,10 @@ private:
 
   std::vector< SwapchainBuffer > mSwapchainBuffer;
 
+  uint32_t mFrameIndex;
+
   bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
+  std::vector< vk::Semaphore > mAcquireSemaphore;
 };
 
 } // namespace Vulkan

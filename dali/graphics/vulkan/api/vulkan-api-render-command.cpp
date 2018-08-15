@@ -82,7 +82,6 @@ void RenderCommand::PrepareResources()
       }
 
       AllocateUniformBufferMemory();
-
     }
 
     BindUniformBuffers();
