@@ -59,6 +59,8 @@ RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphic
 {
 }
 
+std::mutex mutex;
+
 ///@todo: needs pipeline factory rather than pipeline creation in place!!!
 void RenderCommand::PrepareResources()
 {
@@ -81,7 +83,10 @@ void RenderCommand::PrepareResources()
         mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
       }
 
-      AllocateUniformBufferMemory();
+      {
+        std::lock_guard< std::mutex > lock( mutex );
+        AllocateUniformBufferMemory();
+      }
 
     }
 

@@ -73,7 +73,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_monitor",             // monitor
         "VK_LAYER_LUNARG_swapchain",           // swapchain
         "VK_LAYER_GOOGLE_threading",           // threading
-        "VK_LAYER_LUNARG_api_dump",            // api
+        //"VK_LAYER_LUNARG_api_dump",            // api
         "VK_LAYER_LUNARG_object_tracker",      // objects
         "VK_LAYER_LUNARG_core_validation",     // core
         "VK_LAYER_GOOGLE_unique_objects",      // unique objects
