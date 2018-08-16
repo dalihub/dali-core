@@ -43,4 +43,5 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache-debug.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-ubo-pool.cpp \
-    $(graphics_src_dir)/vulkan/api/internal/vulkan-api-pipeline-impl.cpp
+    $(graphics_src_dir)/vulkan/api/internal/vulkan-api-pipeline-impl.cpp \
+    $(graphics_src_dir)/thread-pool.cpp
