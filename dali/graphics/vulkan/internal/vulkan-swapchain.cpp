@@ -232,6 +232,11 @@ bool Swapchain::IsValid() const
   return mIsValid;
 }
 
+uint32_t Swapchain::GetFramebufferCount() const
+{
+  return uint32_t( mSwapchainBuffer.size() );
+}
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali

@@ -96,6 +96,12 @@ public:
     return static_cast<T&>(*mGraphicsImpl.get());
   }
 
+  /**
+   * Returns number of main swapchain buffers
+   * @return
+   */
+  uint32_t GetSwapchainBufferCount( Dali::Graphics::FBID framebufferId ) const;
+
 private:
 
   std::unique_ptr<Dali::Graphics::GraphicsImpl> mGraphicsImpl;

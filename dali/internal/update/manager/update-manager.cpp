@@ -204,7 +204,8 @@ struct UpdateManager::Impl
     renderTaskWaiting( false ),
     renderersAdded( false ),
     surfaceRectChanged( false ),
-    shaderCache( graphics.GetController() )
+    shaderCache( graphics.GetController() ),
+    renderBufferIndex( 0u )
   {
     sceneController = new SceneControllerImpl( discardQueue );
 
@@ -314,7 +315,7 @@ struct UpdateManager::Impl
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
   ShaderCache                          shaderCache;
-
+  uint32_t                             renderBufferIndex;
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -727,7 +728,7 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   auto rendererCount = mImpl->renderers.Count();
   for( auto i = 0u; i < rendererCount; ++i )
   {
-    mImpl->renderers[i]->PrepareRender( bufferIndex );
+    mImpl->renderers[i]->PrepareRender( mImpl->renderBufferIndex, bufferIndex );
   }
 }
 
@@ -863,7 +864,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
       // generate graphics objects
       PrepareRenderers( bufferIndex );
-      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
+      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex, mImpl->renderBufferIndex );
+      mImpl->renderBufferIndex++;
+      mImpl->renderBufferIndex %= mImpl->graphics.GetSwapchainBufferCount( 0u ); // todo@ max buffers
     }
   }
 
