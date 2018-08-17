@@ -100,6 +100,11 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
   mGraphicsImpl->CollectGarbage();
 }
 
+uint32_t Graphics::GetSwapchainBufferCount( Dali::Graphics::FBID framebufferId ) const
+{
+  return mGraphicsImpl->GetSwapchainForFBID( framebufferId )->GetFramebufferCount();
+}
+
 void IncludeThisLibrary()
 {
   // dummy function to create linker dependency
