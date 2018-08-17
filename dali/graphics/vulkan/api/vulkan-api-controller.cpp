@@ -453,12 +453,9 @@ struct Controller::Impl
           {
             // add barrier
             auto image = req.bufferToImageInfo.dstImage;
-            preLayoutBarriers.push_back( layout.setImage( image->GetVkHandle() )
-                                               .setOldLayout( image->GetImageLayout() )
-                                               .setNewLayout( vk::ImageLayout::eTransferDstOptimal ));
-            postLayoutBarriers.push_back( layout.setImage( image->GetVkHandle() )
-                                               .setNewLayout( image->GetImageLayout() )
-                                               .setOldLayout( vk::ImageLayout::eTransferDstOptimal ));
+            preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+            postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+            image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
           }
           else if( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
           {
@@ -485,7 +482,7 @@ struct Controller::Impl
       commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
       // issue memory barrier
-      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, preLayoutBarriers );
+      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers );
 
       // issue blit or copy commands
       for(const auto& req : mResourceTransferRequests)
@@ -509,7 +506,7 @@ struct Controller::Impl
         }
       }
 
-      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTopOfPipe, {}, {}, {}, postLayoutBarriers );
+      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, postLayoutBarriers );
       commandBuffer->End();
 
       // submit to the queue

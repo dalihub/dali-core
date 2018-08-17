@@ -898,25 +898,22 @@ bool Texture::Initialise()
   mHeight = uint32_t( size.height );
   auto sizeInBytes = mTextureFactory.GetDataSize();
   auto data = mTextureFactory.GetData();
-
+  mLayout = vk::ImageLayout::eUndefined;
   switch( mTextureFactory.GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
     {
       mUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
-      mLayout = vk::ImageLayout::eUndefined;
       break;
     }
     case API::TextureDetails::Usage::DEPTH_ATTACHMENT:
     {
       mUsage = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled;
-      mLayout = vk::ImageLayout::eUndefined;
       break;
     }
     case API::TextureDetails::Usage::SAMPLE:
     {
       mUsage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
-      mLayout = vk::ImageLayout::ePreinitialized;
       break;
     }
   }
