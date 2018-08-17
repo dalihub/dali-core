@@ -312,6 +312,8 @@ struct Controller::Impl
       return;
     }
 
+
+
     mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
     {
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
@@ -418,8 +420,6 @@ struct Controller::Impl
       cmdbuf->End();
       mSecondaryCommandBufferRefs[mBufferRefsIndex].emplace_back( cmdbuf );
     }
-
-//    std::cout << "FRAME END------------------------------------------------------------" << std::endl;
   }
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )

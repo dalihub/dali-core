@@ -97,6 +97,11 @@ struct Ubo::Impl
     return mAllocationInfo.allocationSize;
   }
 
+  void Map()
+  {
+    mPool.Map( mUbo );
+  }
+
   Ubo& mUbo;
   UboPool& mPool;
   UboAllocationInfo mAllocationInfo;
@@ -336,6 +341,11 @@ uint32_t Ubo::Write( const void* data, uint32_t offset, uint32_t size )
 uint32_t Ubo::WriteKeepMapped( const void* data, uint32_t offset, uint32_t size )
 {
   return mImpl->WriteKeepMapped( data, offset, size );
+}
+
+void Ubo::Map()
+{
+  mImpl->Map();
 }
 
 Vulkan::RefCountedBuffer Ubo::GetBuffer() const
