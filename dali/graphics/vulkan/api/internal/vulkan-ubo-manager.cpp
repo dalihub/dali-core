@@ -40,8 +40,8 @@ struct UboManager::Impl
   void Initialise()
   {
     // populate pools
-    mPools.emplace( 64, std::make_unique< UboPool >( mController, 64, 64 ) );
-    mPools.emplace( 128, std::make_unique< UboPool >( mController, 128, 64 ) );
+    //mPools.emplace( 64, std::make_unique< UboPool >( mController, 64, 64 ) );
+    //mPools.emplace( 128, std::make_unique< UboPool >( mController, 128, 64 ) );
     mPools.emplace( 256, std::make_unique< UboPool >( mController, 256, 64 ) );
     mPools.emplace( 512, std::make_unique< UboPool >( mController, 512, 64 ) );
     mPools.emplace( 1024, std::make_unique< UboPool >( mController, 1024, 64 ) );

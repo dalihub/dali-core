@@ -54,7 +54,8 @@ public:
    */
   void SubmitRenderInstructions(Graphics::API::Controller &graphics,
                                 SceneGraph::RenderInstructionContainer &renderInstructions,
-                                BufferIndex bufferIndex);
+                                BufferIndex updateBufferIndex,
+                                BufferIndex renderBufferIndex );
 
 private:
 
@@ -63,25 +64,29 @@ private:
   bool SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState );
 
   void SubmitRenderItemList( Graphics::API::Controller&           graphics,
-                             BufferIndex                          bufferIndex,
+                             BufferIndex                          updateBufferIndex,
+                             BufferIndex                          renderBufferIndex,
                              Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
                              Matrix                               viewProjection,
                              RenderInstruction&                   instruction,
                              const RenderList&                    renderItemList );
 
   void SubmitInstruction( Graphics::API::Controller& graphics,
-                          BufferIndex                bufferIndex,
+                          BufferIndex                updateBufferIndex,
+                          BufferIndex                renderBufferIndex,
                           RenderInstruction&         instruction );
 
   bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
                                 RenderInstruction& instruction,
                                 const RenderList* renderList,
                                 RenderItem& item,
-                                BufferIndex bufferIndex );
+                                BufferIndex updateBufferIndex,
+                                BufferIndex renderBufferIndex );
 
   void PrepareRendererPipelines( Graphics::API::Controller& controller,
                                  RenderInstructionContainer& renderInstructions,
-                                 BufferIndex bufferIndex );
+                                 BufferIndex updateBufferIndex,
+                                 BufferIndex renderBufferIndex );
 
   using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
 

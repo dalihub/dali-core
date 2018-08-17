@@ -110,9 +110,12 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
           .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
           .setSubpass( 0 );
 
-  if( mFrameIndex > mSwapchainBuffer.size() )
+  if( mFrameIndex >= mSwapchainBuffer.size() )
   {
     mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
+
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
 
   swapBuffer.masterCmdBuffer->Reset();
@@ -152,6 +155,7 @@ void Swapchain::Present()
 
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
 
+
   // fixme: use semaphores to synchronize all previously submitted command buffers!
   vk::PresentInfoKHR presentInfo{};
   vk::Result result;
@@ -163,9 +167,6 @@ void Swapchain::Present()
              .setWaitSemaphoreCount( 1 );
 
   mGraphics->Present( *mQueue, presentInfo );
-
-  mGraphics->ExecuteActions();
-  mGraphics->CollectGarbage();
 
   // handle error
   if( presentInfo.pResults[0] != vk::Result::eSuccess )
@@ -230,6 +231,11 @@ vk::SwapchainKHR Swapchain::GetVkHandle()
 bool Swapchain::IsValid() const
 {
   return mIsValid;
+}
+
+uint32_t Swapchain::GetFramebufferCount() const
+{
+  return uint32_t( mSwapchainBuffer.size() );
 }
 
 } // namespace Vulkan

@@ -157,6 +157,9 @@ void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
 
+  // initialize data buffering
+  mGfxData.resize( mGraphics->GetSwapchainBufferCount( 0u ) );
+
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
@@ -202,12 +205,11 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
   }
 }
 
-void Renderer::PrepareRender( BufferIndex updateBufferIndex )
+void Renderer::PrepareRender( BufferIndex renderBufferIndex, BufferIndex updateBufferIndex )
 {
   auto &controller = mGraphics->GetController();
-
-  auto& gfxRenderCommand = mGfxData[updateBufferIndex].gfxRenderCommand;
-  auto& uboMemory = mGfxData[updateBufferIndex].uboMemory;
+  auto& gfxRenderCommand = mGfxData[renderBufferIndex].gfxRenderCommand;
+  auto& uboMemory = mGfxData[renderBufferIndex].uboMemory;
 
   if (!gfxRenderCommand)
   {
@@ -233,9 +235,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   auto uboCount = shader.GetUniformBlockCount();
 
   auto pushConstantsBindings = Graphics::API::RenderCommand::NewPushConstantsBindings(uboCount);
-
-  // allocate new command ( may be not necessary at all )
-  // mGfxRenderCommand = Graphics::API::RenderCommandBuilder().Build();
 
   // see if we need to reallocate memory for each UBO
   // todo: do it only when shader has changed
@@ -447,7 +446,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
-void Renderer::WriteUniform( BufferIndex updateBufferIndex, const std::string& name, const void* data, uint32_t size )
+void Renderer::WriteUniform( BufferIndex renderBufferIndex, const std::string& name, const void* data, uint32_t size )
 {
   if( !mShader->GetGfxObject() )
   {
@@ -458,7 +457,7 @@ void Renderer::WriteUniform( BufferIndex updateBufferIndex, const std::string& n
   auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
   if( gfxShader.GetNamedUniform( name, uniformInfo ) )
   {
-    auto dst = (mGfxData[updateBufferIndex].uboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
+    auto dst = (mGfxData[renderBufferIndex].uboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
     memcpy( dst, data, size );
   }
 }

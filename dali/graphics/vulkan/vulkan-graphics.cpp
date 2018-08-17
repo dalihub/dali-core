@@ -64,6 +64,12 @@ namespace Graphics
 namespace Vulkan
 {
 
+namespace
+{
+constexpr uint32_t BUFFER_COUNT_OPTIMAL = 0u;
+}
+
+
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
@@ -803,11 +809,19 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
   }
 
-  // Determine the number of images
-  if (surfaceCapabilities.minImageCount > 0 &&
-      bufferCount > surfaceCapabilities.minImageCount )
+  // Determine the number of images.
+  // If buffer count is 'optimal' the is set to min images
+  if( bufferCount == BUFFER_COUNT_OPTIMAL )
   {
-      bufferCount = surfaceCapabilities.minImageCount;
+    bufferCount = surfaceCapabilities.minImageCount;
+  }
+  else if( bufferCount > surfaceCapabilities.maxImageCount )
+  {
+    bufferCount = surfaceCapabilities.maxImageCount;
+  }
+  else if( surfaceCapabilities.minImageCount && bufferCount < surfaceCapabilities.minImageCount )
+  {
+    bufferCount = surfaceCapabilities.minImageCount;
   }
 
   // Find the transformation of the surface
@@ -821,7 +835,6 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   {
     preTransform = surfaceCapabilities.currentTransform;
   }
-
 
   // Check if the requested present mode is supported
   auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
@@ -1394,7 +1407,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-
+#if 0
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1402,6 +1415,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
   }
 #else
   info.setEnabledLayerCount(0);
+#endif
 #endif
 
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );

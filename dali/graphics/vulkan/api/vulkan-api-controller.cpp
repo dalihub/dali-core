@@ -55,10 +55,6 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
-namespace
-{
-constexpr uint32_t MAX_SEC_BUFFER_ARRAYS = 3u;
-}
 
 struct Controller::Impl
 {
@@ -109,6 +105,8 @@ struct Controller::Impl
     mUboManager = MakeUnique< VulkanAPI::UboManager >( mOwner );
 
     mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
+
+    mSecondaryCommandBufferRefs.resize( (mBufferRefsMaxCount = mGraphics.GetSwapchainForFBID(0u)->GetFramebufferCount()) );
 
     return true;
   }
@@ -196,7 +194,7 @@ struct Controller::Impl
 
     ++mBufferRefsIndex;
 
-    mBufferRefsIndex %= MAX_SEC_BUFFER_ARRAYS;
+    mBufferRefsIndex %= mBufferRefsMaxCount;
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -546,6 +544,7 @@ struct Controller::Impl
   Vulkan::Graphics& mGraphics;
   Controller& mOwner;
   uint32_t mBufferRefsIndex;
+  uint32_t mBufferRefsMaxCount;
 
   std::unique_ptr< VulkanAPI::TextureFactory > mTextureFactory;
   std::unique_ptr< VulkanAPI::ShaderFactory > mShaderFactory;
@@ -565,7 +564,7 @@ struct Controller::Impl
   // Accumulate all the secondary command buffers of the frame here to avoid them being overwritten
   // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
   // and ready to be used for the next frame.
-  std::vector< Vulkan::RefCountedCommandBuffer > mSecondaryCommandBufferRefs[MAX_SEC_BUFFER_ARRAYS];
+  std::vector<std::vector< Vulkan::RefCountedCommandBuffer >> mSecondaryCommandBufferRefs;
 
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
   std::vector< RenderPassChange > mRenderPasses;
