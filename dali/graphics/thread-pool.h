@@ -105,15 +105,15 @@ public:
 class WorkerThread
 {
 private:
-  std::thread m_Worker;
+  std::thread mWorker;
 
-  TaskQueue m_TaskQueue;
+  TaskQueue mTaskQueue;
 
-  std::mutex m_TaskQueueMutex;
+  std::mutex mTaskQueueMutex;
 
-  std::condition_variable m_ConditionVariable;
+  std::condition_variable mConditionVariable;
 
-  bool m_Terminating{ false };
+  bool mTerminating{ false };
 
   void WaitAndExecute();
 
@@ -134,7 +134,7 @@ public:
 class ThreadPool
 {
 private:
-  std::vector< std::unique_ptr< WorkerThread>> m_Workers;
+  std::vector< std::unique_ptr< WorkerThread>> mWorkers;
 
   static uint32_t sWorkerIndex;
 
@@ -147,7 +147,7 @@ public:
   std::shared_ptr< Future< ReturnT > > SubmitTask( uint32_t workerIndex, std::function< ReturnT() > task )
   {
     auto future = std::shared_ptr< Future< ReturnT > >( new Future< ReturnT > );
-    m_Workers[workerIndex]->AddTask( [ task, future ]() {
+    mWorkers[workerIndex]->AddTask( [ task, future ]() {
       auto res = task();
       future->mPromise.set_value( res );
     } );
@@ -161,7 +161,7 @@ public:
   template< typename ReturnT >
   std::shared_ptr< Future< void > > SubmitTask( std::function< ReturnT() > task )
   {
-    return SubmitTask( sWorkerIndex++ % static_cast< uint32_t >( m_Workers.size() ), std::move( task ) );
+    return SubmitTask( sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() ), std::move( task ) );
   }
 
   std::shared_ptr< Future< void > > SubmitTasks( const std::vector< Task >& tasks );
@@ -170,7 +170,7 @@ public:
   std::shared_ptr< FutureGroup< void > >
   ParallelProcess( std::vector< T >& data, Predicate predicate )
   {
-      auto workerCount = m_Workers.size();
+      auto workerCount = mWorkers.size();
       auto tasksPerThread = data.size() / workerCount;
 
       if (tasksPerThread == 0 ) tasksPerThread = data.size();
@@ -208,7 +208,7 @@ public:
           futureGroup->mFutures[i]->mPromise.set_value();
         } );
 
-        m_Workers[sWorkerIndex++ % static_cast< uint32_t >( m_Workers.size() )]->AddTask( task );
+        mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
 
         start = end;
       }
