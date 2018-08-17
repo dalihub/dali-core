@@ -75,7 +75,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_GOOGLE_threading",           // threading
         //"VK_LAYER_LUNARG_api_dump",            // api
         //"VK_LAYER_LUNARG_object_tracker",      // objects
-        //"VK_LAYER_LUNARG_core_validation",     // core
+        "VK_LAYER_LUNARG_core_validation",     // core
         //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
         "VK_LAYER_LUNARG_standard_validation", // standard
 };
@@ -84,6 +84,8 @@ Graphics::Graphics() = default;
 
 Graphics::~Graphics()
 {
+  mGfxController.reset( nullptr );
+
   // Wait for everything to finish on the GPU
   DeviceWaitIdle();
 
@@ -1118,7 +1120,9 @@ vk::Result Graphics::QueueWaitIdle( Queue& queue )
 
 vk::Result Graphics::DeviceWaitIdle()
 {
-  return mDevice.waitIdle();
+  auto result  = vkDeviceWaitIdle( static_cast<VkDevice>(mDevice) );
+  assert( result == VK_SUCCESS );
+  return vk::Result( result );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -1401,14 +1405,14 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
 
-#if defined(DEBUG_ENABLED)
-  if( !getenv( "LOG_VULKAN" ) )
-  {
-    info.setEnabledLayerCount( 0 );
-  }
-#else
-  info.setEnabledLayerCount(0);
-#endif
+//#if defined(DEBUG_ENABLED)
+//  if( !getenv( "LOG_VULKAN" ) )
+//  {
+//    info.setEnabledLayerCount( 0 );
+//  }
+//#else
+//  info.setEnabledLayerCount(0);
+//#endif
 
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
