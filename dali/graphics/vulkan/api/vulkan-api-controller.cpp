@@ -48,6 +48,7 @@
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
+#include <dali/graphics/thread-pool.h>
 
 namespace Dali
 {
@@ -110,7 +111,7 @@ struct Controller::Impl
 
     mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
 
-    return true;
+    return mThreadPool.Initialize();
   }
 
   void BeginFrame()
@@ -290,20 +291,22 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
-    // if there are any scheduled writes
-    if( !mBufferTransferRequests.empty() )
-    {
-      for( auto&& req : mBufferTransferRequests )
+    auto transferRequestsFuture = mThreadPool.SubmitTask(Task([this](){
+      // if there are any scheduled writes
+      if( !mBufferTransferRequests.empty() )
       {
-        void* dst = req->dstBuffer->GetMemoryHandle()->Map();
-        memcpy( dst, &*req->srcPtr, req->srcSize );
-        req->dstBuffer->GetMemoryHandle()->Unmap();
+        for( auto&& req : mBufferTransferRequests )
+        {
+          void* dst = req->dstBuffer->GetMemoryHandle()->Map();
+          memcpy( dst, &*req->srcPtr, req->srcSize );
+          req->dstBuffer->GetMemoryHandle()->Unmap();
+        }
+        mBufferTransferRequests.clear();
       }
-      mBufferTransferRequests.clear();
-    }
 
-    // execute all scheduled resource transfers
-    ProcessResourceTransferRequests();
+      // execute all scheduled resource transfers
+      ProcessResourceTransferRequests();
+    }));
 
     // the list of commands may be empty, but still we may have scheduled memory
     // transfers
@@ -312,20 +315,15 @@ struct Controller::Impl
       return;
     }
 
-    // bind resources
-    for( auto&& command : commands )
+
+
+    mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
     {
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
       apiCommand->PrepareResources();
-    }
-
-    // Update uniform buffers
-    for( auto&& command : commands )
-    {
-      // prepare pipelines
-      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
       apiCommand->UpdateUniformBuffers();
-    }
+    })->Wait();
+
 
     mUboManager->UnmapAllBuffers();
 
@@ -333,6 +331,8 @@ struct Controller::Impl
     // clear color obtained from very first command in the batch
     auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
     UpdateRenderPass( firstCommand->GetRenderTargetBinding(), Vulkan::U32(mSecondaryCommandBufferRefs[mBufferRefsIndex].size()) );
+
+    transferRequestsFuture->Wait();
 
     // set up writes
     for( auto&& command : commands )
@@ -572,6 +572,8 @@ struct Controller::Impl
 
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
   std::vector< RenderPassChange > mRenderPasses;
+
+  ThreadPool mThreadPool;
 
 };
 
