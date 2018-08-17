@@ -207,7 +207,8 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportStat
 
 void GraphicsAlgorithms::SubmitRenderItemList(
   Graphics::API::Controller&           graphics,
-  BufferIndex                          bufferIndex,
+  BufferIndex                          updateBufferIndex,
+  BufferIndex                          renderBufferIndex,
   Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
   Matrix                               viewProjection,
   RenderInstruction&                   instruction,
@@ -215,8 +216,8 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 {
   auto numberOfRenderItems = renderItemList.Count();
 
-  const auto viewMatrix = instruction.GetViewMatrix( bufferIndex );
-  const auto projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
+  const auto viewMatrix = instruction.GetViewMatrix( updateBufferIndex );
+  const auto projectionMatrix = instruction.GetProjectionMatrix( updateBufferIndex );
 
   Matrix vulkanProjectionMatrix;
   Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
@@ -232,9 +233,9 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
-    auto color = item.mNode->GetWorldColor( bufferIndex );
+    auto color = item.mNode->GetWorldColor( updateBufferIndex );
 
-    auto &cmd = renderer->GetGfxRenderCommand( bufferIndex );
+    auto &cmd = renderer->GetGfxRenderCommand( renderBufferIndex );
     if (cmd.GetVertexBufferBindings()
            .empty())
     {
@@ -261,7 +262,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     // Could set to false if we know that we can use the Pipeline viewport rather than the
     // dynamic viewport.
 
-    auto opacity = renderer->GetOpacity( bufferIndex );
+    auto opacity = renderer->GetOpacity( updateBufferIndex );
 
     if( renderer->IsPreMultipliedAlphaEnabled() )
     {
@@ -276,19 +277,19 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform( bufferIndex, "uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform( bufferIndex, "uMvpMatrix", mvp2);
-    renderer->WriteUniform( bufferIndex, "uViewMatrix", *viewMatrix);
-    renderer->WriteUniform( bufferIndex, "uModelView", item.mModelViewMatrix);
+    renderer->WriteUniform( renderBufferIndex, "uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform( renderBufferIndex, "uMvpMatrix", mvp2);
+    renderer->WriteUniform( renderBufferIndex, "uViewMatrix", *viewMatrix);
+    renderer->WriteUniform( renderBufferIndex, "uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform( bufferIndex, "uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform( bufferIndex, "uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform( bufferIndex, "uSize", item.mSize);
-    renderer->WriteUniform( bufferIndex, "uColor", color );
+    renderer->WriteUniform( renderBufferIndex, "uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform( renderBufferIndex, "uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform( renderBufferIndex, "uSize", item.mSize);
+    renderer->WriteUniform( renderBufferIndex, "uColor", color );
 
     commandList.push_back(&cmd);
   }
@@ -297,14 +298,15 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 }
 
 void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
-                        BufferIndex                bufferIndex,
+                        BufferIndex                updateBufferIndex,
+                        BufferIndex                renderBufferIndex,
                         RenderInstruction&         instruction )
 {
   using namespace Graphics::API;
 
   // Create constant buffer with static uniforms: view matrix, projection matrix
-  const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
-  const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
+  const Matrix* viewMatrix       = instruction.GetViewMatrix( updateBufferIndex );
+  const Matrix* projectionMatrix = instruction.GetProjectionMatrix( updateBufferIndex );
   Matrix        viewProjection;
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
@@ -329,7 +331,7 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
   auto numberOfRenderLists = instruction.RenderListCount();
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
-    SubmitRenderItemList( graphics, bufferIndex, renderTargetBinding,
+    SubmitRenderItemList( graphics, updateBufferIndex, renderBufferIndex, renderTargetBinding,
                           viewProjection, instruction, *instruction.GetRenderList( i ) );
   }
 }
@@ -338,7 +340,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
                               RenderInstruction& instruction,
                               const RenderList* renderList,
                               RenderItem& item,
-                              BufferIndex bufferIndex )
+                              BufferIndex updateBufferIndex,
+                              BufferIndex renderBufferIndex )
 {
   using namespace Dali::Graphics::API;
 
@@ -475,8 +478,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    */
   ViewportState viewportState{};
 
-  // Set viewport only when not using dynamic viewport state
-  if( !renderer->GetGfxRenderCommand( bufferIndex ).GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
+  // Set viewport only when not using viewport state
+  if( !renderer->GetGfxRenderCommand( renderBufferIndex ).GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
   {
     // scissor test only when we have viewport
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
@@ -503,13 +506,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   if( SetupPipelineViewportState( viewportState) )
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissor( viewportState.scissor );
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( true );
+    renderer->GetGfxRenderCommand( renderBufferIndex ).mDrawCommand.SetScissor( viewportState.scissor );
+    renderer->GetGfxRenderCommand( renderBufferIndex ).mDrawCommand.SetScissorTestEnable( true );
     dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
   }
   else
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( false );
+    renderer->GetGfxRenderCommand( renderBufferIndex ).mDrawCommand.SetScissorTestEnable( false );
   }
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
@@ -587,17 +590,18 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
 
   // bind pipeline to the render command
-  renderer->BindPipeline( bufferIndex, std::move(pipeline) );
+  renderer->BindPipeline( renderBufferIndex, std::move(pipeline) );
   return true;
 }
 
 void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
                                RenderInstructionContainer& renderInstructions,
-                               BufferIndex bufferIndex )
+                               BufferIndex updateBufferIndex,
+                               BufferIndex renderBufferIndex )
 {
-  for( auto i = 0u; i < renderInstructions.Count( bufferIndex ); ++i )
+  for( auto i = 0u; i < renderInstructions.Count( updateBufferIndex ); ++i )
   {
-    RenderInstruction &ri = renderInstructions.At(bufferIndex, i);
+    RenderInstruction &ri = renderInstructions.At(updateBufferIndex, i);
 
     for (auto renderListIndex = 0u; renderListIndex < ri.RenderListCount(); ++renderListIndex)
     {
@@ -613,7 +617,7 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
 
         if( item.mRenderer )
         {
-          PrepareGraphicsPipeline( controller, ri, renderList, item, bufferIndex );
+          PrepareGraphicsPipeline( controller, ri, renderList, item, updateBufferIndex, renderBufferIndex );
         }
       }
     }
@@ -622,19 +626,20 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
 
 void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  controller,
                                RenderInstructionContainer& renderInstructions,
-                               BufferIndex                 bufferIndex )
+                               BufferIndex                 updateBufferIndex,
+                               BufferIndex                 renderBufferIndex )
 {
-  PrepareRendererPipelines( controller, renderInstructions, bufferIndex );
+  PrepareRendererPipelines( controller, renderInstructions, updateBufferIndex, renderBufferIndex );
 
-  auto numberOfInstructions = renderInstructions.Count( bufferIndex );
+  auto numberOfInstructions = renderInstructions.Count( updateBufferIndex );
 
   controller.BeginFrame();
 
   for( size_t i = 0; i < numberOfInstructions; ++i )
   {
-    RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
+    RenderInstruction& instruction = renderInstructions.At( updateBufferIndex, i );
 
-    SubmitInstruction( controller, bufferIndex, instruction );
+    SubmitInstruction( controller, updateBufferIndex, renderBufferIndex, instruction );
   }
 
   controller.EndFrame();
