@@ -47,6 +47,7 @@ namespace Integration
 namespace Graphics
 {
 class SurfaceFactory;
+class GraphicsCreateInfo;
 class EXPORT_API Graphics final
 {
 public:
@@ -70,9 +71,7 @@ public:
    * @param window's height
    * @return
    */
-  Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory,
-                                                                                        unsigned int width,
-                                                                                        unsigned int height );
+  Dali::Graphics::FBID Create( const GraphicsCreateInfo& createInfo );
 
   /**
    * Prerender
@@ -102,7 +101,56 @@ private:
   std::unique_ptr<Dali::Graphics::GraphicsImpl> mGraphicsImpl;
 };
 
+enum class DepthStencilMode
+{
+  /**
+   * No depth/stencil at all
+   */
+  NONE,
 
+  /**
+   * Optimal depth ( chosen by the implementation )
+   */
+  DEPTH_OPTIMAL,
+
+  /**
+   * Optimal depth and stencil ( chosen by the implementation )
+   */
+  DEPTH_STENCIL_OPTIMAL,
+
+  /**
+   * Depth and stencil with explicit format set in depthStencilFormat
+   */
+  DEPTH_STENCIL_EXPLICIT,
+};
+
+enum class SwapchainBufferingMode
+{
+  OPTIMAL = 0,
+
+  DOUBLE_BUFFERING = 2,
+
+  TRIPLE_BUFFERING = 3,
+};
+
+struct GraphicsCreateInfo
+{
+  mutable std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory;
+  uint32_t                    surfaceWidth;
+  uint32_t                    surfaceHeight;
+  DepthStencilMode            depthStencilMode;
+  SwapchainBufferingMode      swapchainBufferingMode;
+};
+
+namespace GraphicsFactory
+{
+/**
+ * Creates new instance of Graphics integration object
+ * @param info
+ * @return
+ */
+std::unique_ptr<Dali::Integration::Graphics::Graphics> Create( const GraphicsCreateInfo& info );
+}
 
 /**
  * fixme: dummy function to make sure the static library won't be discarded entirely during linking

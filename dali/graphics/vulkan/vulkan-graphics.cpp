@@ -126,7 +126,6 @@ Graphics::~Graphics()
 // Create methods -----------------------------------------------------------------------------------------------
 void Graphics::Create()
 {
-
   auto extensions = PrepareDefaultInstanceExtensions();
 
   auto layers = vk::enumerateInstanceLayerProperties();
@@ -210,11 +209,10 @@ void Graphics::CreateDevice()
   mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
-FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
-                                       unsigned int width, unsigned int height )
+FBID Graphics::CreateSurface( const Integration::Graphics::GraphicsCreateInfo& createInfo )
 {
   // create surface from the factory
-  auto surface = new Surface( *this, std::move( surfaceFactory ) );
+  auto surface = new Surface( *this, std::move( createInfo.surfaceFactory ) );
 
   if( !surface->mVulkanSurfaceFactory )
   {
@@ -236,10 +234,10 @@ FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
   if( surface->mCapabilities.currentExtent.width == std::numeric_limits< uint32_t >::max() )
   {
     surface->mCapabilities.currentExtent.width = std::max( surface->mCapabilities.minImageExtent.width,
-                                   std::min( surface->mCapabilities.maxImageExtent.width, width ) );
+                                   std::min( surface->mCapabilities.maxImageExtent.width, createInfo.surfaceWidth ) );
 
     surface->mCapabilities.currentExtent.height = std::max( surface->mCapabilities.minImageExtent.height,
-                                    std::min( surface->mCapabilities.maxImageExtent.height, height ) );
+                                    std::min( surface->mCapabilities.maxImageExtent.height, createInfo.surfaceHeight ) );
 
   }
 
@@ -247,6 +245,22 @@ FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
   auto fbid = ++mBaseFBID;
 
   mSurfaceFBIDMap[ fbid ] = SwapchainSurfacePair{ RefCountedSwapchain{}, RefCountedSurface( surface ) };
+
+
+  if( createInfo.depthStencilMode == Integration::Graphics::DepthStencilMode::DEPTH_OPTIMAL ||
+      createInfo.depthStencilMode == Integration::Graphics::DepthStencilMode::DEPTH_STENCIL_OPTIMAL )
+  {
+    mHasDepth = true;
+  }
+  else
+  {
+    mHasDepth = false;
+  }
+
+  if( createInfo.depthStencilMode == Integration::Graphics::DepthStencilMode::DEPTH_STENCIL_OPTIMAL )
+  {
+    mHasStencil = true;
+  }
 
   return fbid;
 }
@@ -882,40 +896,43 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     return RefCountedSwapchain();
   }
 
-  // Create a Depth/Stencil
+  // Create a Depth/Stencil ( optional )
+  auto depthAttachment = RefCountedFramebufferAttachment{};
 
-  auto imageCreateInfo = vk::ImageCreateInfo{}
-          .setFormat( vk::Format::eD24UnormS8Uint )
-          .setMipLevels( 1 )
-          .setTiling( vk::ImageTiling::eOptimal )
-          .setImageType( vk::ImageType::e2D )
-          .setArrayLayers( 1 )
-          .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
-          .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
-          .setSharingMode( vk::SharingMode::eExclusive )
-          .setInitialLayout( vk::ImageLayout::eUndefined )
-          .setSamples( vk::SampleCountFlagBits::e1 );
+  if( mHasDepth ) //@ todo fix for stencil
+  {
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+            .setFormat( vk::Format::eD24UnormS8Uint )
+            .setMipLevels( 1 )
+            .setTiling( vk::ImageTiling::eOptimal )
+            .setImageType( vk::ImageType::e2D )
+            .setArrayLayers( 1 )
+            .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
+            .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
+            .setSharingMode( vk::SharingMode::eExclusive )
+            .setInitialLayout( vk::ImageLayout::eUndefined )
+            .setSamples( vk::SampleCountFlagBits::e1 );
 
-  auto dsRefCountedImage = CreateImage( imageCreateInfo );
+    auto dsRefCountedImage = CreateImage( imageCreateInfo );
 
-  auto memory = mDeviceMemoryManager->GetDefaultAllocator().Allocate( dsRefCountedImage,
-                                                                      vk::MemoryPropertyFlagBits::eDeviceLocal );
+    auto memory = mDeviceMemoryManager->GetDefaultAllocator().Allocate( dsRefCountedImage,
+                                                                        vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-  BindImageMemory( dsRefCountedImage, memory, 0 );
+    BindImageMemory( dsRefCountedImage, memory, 0 );
 
-  // create the depth stencil ImageView to be used within framebuffer
-  auto depthStencilImageView = CreateImageView( dsRefCountedImage );
+    // create the depth stencil ImageView to be used within framebuffer
+    auto depthStencilImageView = CreateImageView( dsRefCountedImage );
+    auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
+                                                       .setStencil( 1 );
 
+    // A single depth attachment for the swapchain.
+    depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
+  }
 
   auto framebuffers = std::vector< RefCountedFramebuffer >{};
   framebuffers.reserve( images.size() );
 
   auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
-  auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
-                                                     .setStencil( 1 );
-
-  // A single depth attachment for the swapchain.
-  auto depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
 
   /*
    * CREATE FRAMEBUFFERS
@@ -1398,7 +1415,6 @@ void Graphics::DestroyInstance()
     mInstance = nullptr;
   }
 }
-
 
 void Graphics::PreparePhysicalDevice()
 {

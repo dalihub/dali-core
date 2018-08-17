@@ -28,6 +28,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
 #include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-allocator.h>
+#include <dali/integration-api/graphics/graphics.h>
 
 #include <thread>
 #include <mutex>
@@ -102,7 +103,7 @@ public: // Create methods
 
   void CreateDevice();
 
-  FBID CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory, unsigned int width, unsigned int height );
+  FBID CreateSurface( const Integration::Graphics::GraphicsCreateInfo& createInfo );
 
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
@@ -338,6 +339,9 @@ private: // Members
 
   std::vector< std::function< void() > > mActionQueue;
   std::vector< std::function< void() > > mDiscardQueue;
+
+  bool mHasDepth;
+  bool mHasStencil;
 };
 
 } // namespace Vulkan

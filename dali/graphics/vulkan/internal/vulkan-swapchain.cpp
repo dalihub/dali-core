@@ -102,9 +102,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
     return RefCountedFramebuffer();
   }
 
-  //mGraphics->WaitForFence( mFrameFence );
- // mGraphics->ResetFence( mFrameFence );
-
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
   // start recording
