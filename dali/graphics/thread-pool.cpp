@@ -30,28 +30,28 @@ void WorkerThread::WaitAndExecute()
     Task task;
 
     {
-      std::unique_lock< std::mutex > lock{ m_TaskQueueMutex };
+      std::unique_lock< std::mutex > lock{ mTaskQueueMutex };
 
-      m_ConditionVariable.wait( lock, [ this ]() -> bool {
-        return !m_TaskQueue.empty() || m_Terminating;
+      mConditionVariable.wait( lock, [ this ]() -> bool {
+        return !mTaskQueue.empty() || mTerminating;
       } );
 
-      if( m_Terminating )
+      if( mTerminating )
       {
         break;
       }
 
-      task = m_TaskQueue.front();
+      task = mTaskQueue.front();
     }
 
     task();
 
     {
-      std::lock_guard< std::mutex > lock{ m_TaskQueueMutex };
+      std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
 
-      m_TaskQueue.pop();
+      mTaskQueue.pop();
 
-      m_ConditionVariable.notify_one();
+      mConditionVariable.notify_one();
     }
   }
 }
@@ -59,37 +59,37 @@ void WorkerThread::WaitAndExecute()
 WorkerThread::WorkerThread()
 {
   // Have to pass "this" as an argument because WaitAndExecute is a member function.
-  m_Worker = std::thread{ &WorkerThread::WaitAndExecute, this };
+  mWorker = std::thread{ &WorkerThread::WaitAndExecute, this };
 }
 
 WorkerThread::~WorkerThread()
 {
-  if( m_Worker.joinable() )
+  if( mWorker.joinable() )
   {
     Wait();
 
     {
-      std::lock_guard< std::mutex > lock{ m_TaskQueueMutex };
-      m_Terminating = true;
-      m_ConditionVariable.notify_one();
+      std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+      mTerminating = true;
+      mConditionVariable.notify_one();
     }
 
-    m_Worker.join();
+    mWorker.join();
   }
 }
 
 void WorkerThread::AddTask( Task task )
 {
-  std::lock_guard< std::mutex > lock{ m_TaskQueueMutex };
-  m_TaskQueue.push( std::move( task ) );
-  m_ConditionVariable.notify_one();
+  std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+  mTaskQueue.push( std::move( task ) );
+  mConditionVariable.notify_one();
 }
 
 void WorkerThread::Wait()
 {
-  std::unique_lock< std::mutex > lock{ m_TaskQueueMutex };
-  m_ConditionVariable.wait( lock, [ this ]() -> bool {
-    return m_TaskQueue.empty();
+  std::unique_lock< std::mutex > lock{ mTaskQueueMutex };
+  mConditionVariable.wait( lock, [ this ]() -> bool {
+    return mTaskQueue.empty();
   } );
 }
 
@@ -121,7 +121,7 @@ bool ThreadPool::Initialize()
     * and will wait for a job to enter the job queue. Once a job is in the the queue
     * the threads will wake up to acquire and execute it.
     */
-    m_Workers.push_back( std::unique_ptr< WorkerThread >( new WorkerThread ) );
+    mWorkers.push_back( std::unique_ptr< WorkerThread >( new WorkerThread ) );
   }
 
   return true;
@@ -130,7 +130,7 @@ bool ThreadPool::Initialize()
 
 void ThreadPool::Wait()
 {
-  for( auto& worker : m_Workers )
+  for( auto& worker : mWorkers )
   {
     worker->Wait();
   }
@@ -139,7 +139,7 @@ void ThreadPool::Wait()
 std::shared_ptr< Future< void > > ThreadPool::SubmitTask( uint32_t workerIndex, const Task& task )
 {
   auto future = std::shared_ptr< Future< void > >( new Future< void > );
-  m_Workers[workerIndex]->AddTask( [task, future]()
+  mWorkers[workerIndex]->AddTask( [task, future]()
                                    {
                                      task();
 
@@ -152,7 +152,7 @@ std::shared_ptr< Future< void > > ThreadPool::SubmitTask( uint32_t workerIndex, 
 std::shared_ptr< Future< void > > ThreadPool::SubmitTasks( const std::vector< Task >& tasks )
 {
     auto future = std::shared_ptr< Future< void > >( new Future< void > );
-    m_Workers[ sWorkerIndex++ % static_cast< uint32_t >( m_Workers.size() )]->AddTask(
+    mWorkers[ sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask(
     [ future, tasks ]() {
       for( auto& task : tasks )
       {
@@ -168,7 +168,7 @@ std::shared_ptr< Future< void > > ThreadPool::SubmitTasks( const std::vector< Ta
 
 size_t ThreadPool::GetWorkerCount() const
 {
-  return m_Workers.size();
+  return mWorkers.size();
 }
 
 
