@@ -86,11 +86,6 @@ public:
   void BindTexturesAndSamplers();
 
   /**
-   * Binds vertex buffers
-   */
-  void BindVertexBuffers();
-
-  /**
    * Returns an array of updated descriptor sets
    * @return
    */
@@ -122,7 +117,6 @@ private:
   Vulkan::Graphics& mGraphics;
   Vulkan::RefCountedCommandBuffer mCommandBuffer;
   Vulkan::RefCountedPipeline mVulkanPipeline;
-  Vulkan::RefCountedDescriptorPool mDescriptorPool;
 
   std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 

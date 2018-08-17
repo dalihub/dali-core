@@ -127,6 +127,12 @@ public:
    */
   bool IsValid() const;
 
+  /**
+   * Returns number of framebuffers per swapchain
+   * @return
+   */
+  uint32_t GetFramebufferCount() const;
+
 private:
 
   Swapchain( Graphics& graphics,

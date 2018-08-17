@@ -64,6 +64,12 @@ namespace Graphics
 namespace Vulkan
 {
 
+namespace
+{
+constexpr uint32_t BUFFER_COUNT_OPTIMAL = 0u;
+}
+
+
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
@@ -267,14 +273,11 @@ FBID Graphics::CreateSurface( const Integration::Graphics::GraphicsCreateInfo& c
 
 RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surface )
 {
-
-  auto surfaceCapabilities = surface->GetCapabilities();
-
   //TODO: propagate the format and presentation mode to higher layers to allow for more control?
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount,
+                                    BUFFER_COUNT_OPTIMAL,
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -292,12 +295,10 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
 
 RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
 {
-  auto surfaceCapabilities = surface->GetCapabilities();
-
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount,
+                                    BUFFER_COUNT_OPTIMAL,
                                     std::move(oldSwapchain) );
 
 
@@ -803,11 +804,19 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
   }
 
-  // Determine the number of images
-  if (surfaceCapabilities.minImageCount > 0 &&
-      bufferCount > surfaceCapabilities.minImageCount )
+  // Determine the number of images.
+  // If buffer count is 'optimal' the is set to min images
+  if( bufferCount == BUFFER_COUNT_OPTIMAL )
   {
-      bufferCount = surfaceCapabilities.minImageCount;
+    bufferCount = surfaceCapabilities.minImageCount;
+  }
+  else if( bufferCount > surfaceCapabilities.maxImageCount )
+  {
+    bufferCount = surfaceCapabilities.maxImageCount;
+  }
+  else if( surfaceCapabilities.minImageCount && bufferCount < surfaceCapabilities.minImageCount )
+  {
+    bufferCount = surfaceCapabilities.minImageCount;
   }
 
   // Find the transformation of the surface
@@ -821,7 +830,6 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   {
     preTransform = surfaceCapabilities.currentTransform;
   }
-
 
   // Check if the requested present mode is supported
   auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
@@ -1395,7 +1403,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
 
-#if defined(DEBUG_ENABLED)
+  #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
     info.setEnabledLayerCount( 0 );
