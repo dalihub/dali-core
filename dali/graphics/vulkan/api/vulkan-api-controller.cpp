@@ -268,27 +268,6 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
-
-//
-//    if( !mBufferTransferRequests.empty() )
-//    {
-//      mThreadPool.ParallelProcess( mBufferTransferRequests,
-//                                              [](
-//                                              std::unique_ptr< Dali::Graphics::VulkanAPI::BufferMemoryTransfer >& transfer )
-//                                              {
-//                                                void* dst = transfer->dstBuffer->GetMemoryHandle()->Map();
-//                                                memcpy( dst, &*transfer->srcPtr, transfer->srcSize );
-//                                                transfer->dstBuffer->GetMemoryHandle()->Unmap();
-//                                              } )->Wait();
-//      mBufferTransferRequests.clear();
-//    }
-//
-//    auto transferRequestsFuture = mThreadPool.SubmitTask( Task([this]()
-//                                                          {
-//                                                            ProcessResourceTransferRequests();
-//                                                          }));
-
-    //todo: Use parallel proccess here
     auto transferRequestsFuture = mThreadPool.SubmitTask(Task([this](){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
@@ -312,13 +291,22 @@ struct Controller::Impl
     {
       return;
     }
-
-    mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
+//
+//    mThreadPool.SubmitTask( Task([&](){
+//      for( auto& command : commands) {
+//        auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+//        apiCommand->PrepareResources();
+//        apiCommand->UpdateUniformBuffers();
+//      }
+//    }) )->Wait();
+    auto f = mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
     {
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
       apiCommand->PrepareResources();
       apiCommand->UpdateUniformBuffers();
-    })->Wait();
+    });
+
+    f->Wait();
 
     mUboManager->UnmapAllBuffers();
 
@@ -420,6 +408,8 @@ struct Controller::Impl
       cmdbuf->End();
       mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
     }
+
+//    std::cout << "FRAME END------------------------------------------------------------" << std::endl;
   }
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
