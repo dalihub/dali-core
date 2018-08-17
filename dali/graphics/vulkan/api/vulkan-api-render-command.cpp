@@ -127,6 +127,7 @@ void RenderCommand::AllocateUniformBufferMemory()
   for( auto&& pc : mPushConstantsBindings )
   {
     mUboBuffers.emplace_back( mController.GetUboManager().Allocate( pc.size ) );
+    mUboBuffers.back()->Map(); //TODO: This is not the place to map the buffer
   }
 
 }
