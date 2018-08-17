@@ -25,6 +25,7 @@
 #include <condition_variable>
 #include <future>
 #include <algorithm>
+#include <iostream>
 
 namespace Dali
 {
@@ -41,16 +42,19 @@ class Future final
   friend class ThreadPool;
 
 private:
-  std::promise< T > mPromise;
-  std::future< T > mFuture;
-
-  std::vector< Future< T > > mChildren;
+  std::promise< T > mPromise{};
+  std::future< T > mFuture{};
 
 public:
 
   Future()
   {
     mFuture = mPromise.get_future();
+  }
+
+  ~Future()
+  {
+    Wait();
   }
 
   T Get() const
@@ -60,22 +64,14 @@ public:
 
   void Wait() const
   {
-    if( !mChildren.empty() )
+    if( IsValid() )
     {
-      for( const auto& child : mChildren )
-      {
-        child.Wait();
-      }
-    }
-    else
-    {
-      mFuture.wait();
+        mFuture.wait();
     }
   }
 
   bool IsValid() const
   {
-    //TODO: check children
     return mFuture.valid();
   }
 
@@ -83,8 +79,27 @@ public:
   {
     mPromise = std::promise< T >();
     mFuture = mPromise.get_future();
-    mChildren.clear();
   }
+};
+
+template< typename T >
+class FutureGroup final
+{
+  friend class ThreadPool;
+
+private:
+  std::vector< std::unique_ptr< Future< T > > > mFutures;
+
+public:
+
+  void Wait()
+  {
+    for( auto& future : mFutures )
+    {
+      future->Wait();
+    }
+  }
+
 };
 
 class WorkerThread
@@ -152,35 +167,45 @@ public:
   std::shared_ptr< Future< void > > SubmitTasks( const std::vector< Task >& tasks );
 
   template< typename T, typename Predicate >
-  std::shared_ptr< Future< void > >
+  std::shared_ptr< FutureGroup< void > >
   ParallelProcess( std::vector< T >& data, Predicate predicate )
   {
       auto workerCount = m_Workers.size();
       auto tasksPerThread = data.size() / workerCount;
 
+      if (tasksPerThread == 0 ) tasksPerThread = data.size();
+
+      auto batches = data.size() / tasksPerThread;
+
       auto start = 0ul;
       auto end = 0ul;
 
-      auto masterFuture = std::shared_ptr< Future< void > >( new Future< void > );
+      auto futureGroup = std::shared_ptr< FutureGroup< void > >( new FutureGroup< void > );
 
-      for( auto i = 0u; i < workerCount; ++i )
+      for( auto i = 0u; i < batches; ++i )
       {
-        masterFuture->mChildren.emplace_back( Future< void >() );
-        end = ( i == workerCount - 1 ) ? start + tasksPerThread + ( data.size() - workerCount * tasksPerThread ) :
+        futureGroup->mFutures.emplace_back( new Future< void >() );
+      }
+
+      for( auto i = 0u; i < batches; ++i )
+      {
+        if ( end == data.size() )
+        {
+          break;
+        }
+
+        end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
               start + tasksPerThread;
 
         auto task = Task(
-        [ masterFuture, i, start, end, predicate, &data ]()
+        [ futureGroup, i, start, end, predicate, &data ]()
         {
+          //auto fg = futureGroup;
           auto sIt = data.begin() + static_cast<int>(start);
           auto eIt = data.begin() + static_cast<int>(end);
           std::for_each( sIt, eIt, predicate );
-//          for( auto j = start; j < end; ++j )
-//          {
-//            predicate( data.at(j)  );
-//          }
 
-          masterFuture->mChildren[i].mPromise.set_value();
+          futureGroup->mFutures[i]->mPromise.set_value();
         } );
 
         m_Workers[sWorkerIndex++ % static_cast< uint32_t >( m_Workers.size() )]->AddTask( task );
@@ -188,7 +213,7 @@ public:
         start = end;
       }
 
-      return masterFuture;
+      return futureGroup;
   }
 
 
