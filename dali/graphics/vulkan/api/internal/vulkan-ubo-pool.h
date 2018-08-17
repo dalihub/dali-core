@@ -140,6 +140,8 @@ struct Ubo
    */
   uint32_t WriteKeepMapped( const void* data, uint32_t offset, uint32_t size );
 
+  void Map();
+
   /**
    * Returns buffer associated with the UBO
    * @return

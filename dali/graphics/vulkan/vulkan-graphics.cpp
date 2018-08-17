@@ -75,7 +75,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_GOOGLE_threading",           // threading
         //"VK_LAYER_LUNARG_api_dump",            // api
         //"VK_LAYER_LUNARG_object_tracker",      // objects
-        //"VK_LAYER_LUNARG_core_validation",     // core
+        "VK_LAYER_LUNARG_core_validation",     // core
         //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
         "VK_LAYER_LUNARG_standard_validation", // standard
 };
@@ -84,6 +84,8 @@ Graphics::Graphics() = default;
 
 Graphics::~Graphics()
 {
+  mGfxController.reset( nullptr );
+
   // Wait for everything to finish on the GPU
   DeviceWaitIdle();
 
@@ -1058,6 +1060,8 @@ RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedImage image, vk::Me
 
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
+
+
   auto submitInfos = std::vector< vk::SubmitInfo >{};
   submitInfos.reserve( submissionData.size() );
   auto commandBufferHandles = std::vector< vk::CommandBuffer >{};
@@ -1075,21 +1079,21 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
   {
     auto currentBufferIndex = commandBufferHandles.size();
 
-                    //Extract the command buffer handles
+    //Extract the command buffer handles
     std::transform( subData.commandBuffers.cbegin(),
                     subData.commandBuffers.cend(),
-                                    std::back_inserter( commandBufferHandles ),
+                    std::back_inserter( commandBufferHandles ),
                     [ & ]( const RefCountedCommandBuffer& entry ) {
-                                      return entry->GetVkHandle();
-                                    } );
+                      return entry->GetVkHandle();
+                    } );
 
     auto retval = vk::SubmitInfo().setWaitSemaphoreCount( U32( subData.waitSemaphores.size() ) )
-                                           .setPWaitSemaphores( subData.waitSemaphores.data() )
-                                           .setPWaitDstStageMask( &subData.waitDestinationStageMask )
-                                           .setCommandBufferCount( U32( subData.commandBuffers.size() ) )
+                                  .setPWaitSemaphores( subData.waitSemaphores.data() )
+                                  .setPWaitDstStageMask( &subData.waitDestinationStageMask )
+                                  .setCommandBufferCount( U32( subData.commandBuffers.size() ) )
                                   .setPCommandBuffers( &commandBufferHandles[currentBufferIndex] )
-                                           .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
-                                           .setPSignalSemaphores( subData.signalSemaphores.data() );
+                                  .setSignalSemaphoreCount( U32( subData.signalSemaphores.size() ) )
+                                  .setPSignalSemaphores( subData.signalSemaphores.data() );
 
     submitInfos.push_back( retval );
   }
@@ -1398,7 +1402,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-#if 0
+
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1407,7 +1411,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
 #else
   info.setEnabledLayerCount(0);
 #endif
-#endif
+
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
 
@@ -1431,7 +1435,7 @@ void Graphics::PreparePhysicalDevice()
   {
     mPhysicalDevice = devices[0];
   }
-  else // otherwise look for one which is a graphics devicem
+  else // otherwise look for one which is a graphics device
   {
     for( auto& device : devices )
     {
