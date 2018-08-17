@@ -110,7 +110,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
           .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
           .setSubpass( 0 );
 
-  if( mFrameIndex > mSwapchainBuffer.size() )
+  if( mFrameIndex >= mSwapchainBuffer.size() )
   {
     mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
   }
@@ -230,6 +230,11 @@ vk::SwapchainKHR Swapchain::GetVkHandle()
 bool Swapchain::IsValid() const
 {
   return mIsValid;
+}
+
+uint32_t Swapchain::GetFramebufferCount() const
+{
+  return uint32_t( mSwapchainBuffer.size() );
 }
 
 } // namespace Vulkan
