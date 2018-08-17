@@ -291,22 +291,14 @@ struct Controller::Impl
     {
       return;
     }
-//
-//    mThreadPool.SubmitTask( Task([&](){
-//      for( auto& command : commands) {
-//        auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-//        apiCommand->PrepareResources();
-//        apiCommand->UpdateUniformBuffers();
-//      }
-//    }) )->Wait();
-    auto f = mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
+
+    mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
     {
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
       apiCommand->PrepareResources();
       apiCommand->UpdateUniformBuffers();
-    });
+    })->Wait();
 
-    f->Wait();
 
     mUboManager->UnmapAllBuffers();
 
