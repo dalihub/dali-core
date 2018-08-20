@@ -991,7 +991,8 @@ int UtcDaliRendererPreMultipledAlpha(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Vector4(1.0f, 0.0f, 1.0f, 0.5f), TEST_LOCATION );
 
-  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
+  // Enable pre-multiplied alpha
+  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
 
   application.SendNotification();
   application.Render();
@@ -1016,6 +1017,33 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Vector4(0.5f, 0.0f, 0.5f, 0.5f), TEST_LOCATION );
+
+  // Disable pre-multiplied alpha again
+  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, false );
+
+  application.SendNotification();
+  application.Render();
+
+  value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( preMultipliedAlpha ) );
+  DALI_TEST_CHECK( !preMultipliedAlpha );
+
+  value = renderer.GetCurrentProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( preMultipliedAlpha ) );
+  DALI_TEST_CHECK( !preMultipliedAlpha );
+
+  srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+
+  DALI_TEST_EQUALS( (int)BlendFactor::SRC_ALPHA,           srcFactorRgb,    TEST_LOCATION );
+  DALI_TEST_EQUALS( (int)BlendFactor::ONE_MINUS_SRC_ALPHA, destFactorRgb,   TEST_LOCATION );
+  DALI_TEST_EQUALS( (int)BlendFactor::ONE,                 srcFactorAlpha,  TEST_LOCATION );
+  DALI_TEST_EQUALS( (int)BlendFactor::ONE_MINUS_SRC_ALPHA, destFactorAlpha, TEST_LOCATION );
+
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Vector4( 1.0f, 0.0f, 1.0f, 0.5f ), TEST_LOCATION );
 
   END_TEST;
 }
