@@ -887,9 +887,9 @@ protected:
   // flags, compressed to bitfield
   unsigned int                       mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
   int                                mDirtyFlags:8;           ///< A composite set of flags for each of the Node properties
-  DrawMode::Type                     mDrawMode:2;             ///< How the Node and its children should be drawn
-  ColorMode                          mColorMode:2;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
-  ClippingMode::Type                 mClippingMode:2;         ///< The clipping mode of this node
+  DrawMode::Type                     mDrawMode:3;             ///< How the Node and its children should be drawn
+  ColorMode                          mColorMode:3;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
+  ClippingMode::Type                 mClippingMode:3;         ///< The clipping mode of this node
   bool                               mIsRoot:1;               ///< True if the node cannot have a parent
   bool                               mIsLayer:1;              ///< True if the node is a layer
   bool                               mPositionUsesAnchorPoint:1; ///< True if the node should use the anchor-point when calculating the position
@@ -1035,14 +1035,22 @@ inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadS
 
 // Template specialisation for OwnerPointer<Node>, because delete is protected
 template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset();
-
+inline void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
+{
+  if (mObject != NULL)
+  {
+    Dali::Internal::SceneGraph::Node::Delete(mObject);
+    mObject = NULL;
+  }
+}
 } // namespace Internal
 
 // Template specialisations for OwnerContainer<Node*>, because delete is protected
 template <>
-void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete( Dali::Internal::SceneGraph::Node* pointer );
-
+inline void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete( Dali::Internal::SceneGraph::Node* pointer )
+{
+  Dali::Internal::SceneGraph::Node::Delete(pointer);
+}
 } // namespace Dali
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_NODE_H
