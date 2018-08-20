@@ -312,23 +312,24 @@ struct Controller::Impl
       return;
     }
 
-    std::vector< std::vector< vk::WriteDescriptorSet > > writesPerThread;
-    writesPerThread.resize( mThreadPool.GetWorkerCount() );
-
-
-    mThreadPool.IndexedParallelProcess( commands, [&writesPerThread]( Dali::Graphics::API::RenderCommand* command,
-                                                                      uint32_t workerIndex )
     {
-      auto apiCommand = static_cast< VulkanAPI::RenderCommand* >(command);
-      apiCommand->PrepareResources( writesPerThread[ workerIndex ] );
-      apiCommand->UpdateUniformBuffers();
-    })->Wait();
+      std::vector< std::vector< vk::WriteDescriptorSet > > writesPerThread;
+      writesPerThread.resize( mThreadPool.GetWorkerCount() + 1/* plus one for the the main thread*/ );
 
-    for( auto& vector : writesPerThread )
-    {
-      mGraphics.GetDevice().updateDescriptorSets( static_cast<uint32_t>(vector.size()), vector.data(), 0, nullptr);
+
+      mThreadPool.IndexedParallelProcess( commands, [&writesPerThread]( Dali::Graphics::API::RenderCommand* command,
+                                                                        uint32_t workerIndex )
+      {
+        auto apiCommand = static_cast< VulkanAPI::RenderCommand* >(command);
+        apiCommand->PrepareResources( writesPerThread[ workerIndex ] );
+        apiCommand->UpdateUniformBuffers();
+      }, true)->Wait();
+
+      for( auto& vector : writesPerThread )
+      {
+        mGraphics.GetDevice().updateDescriptorSets( static_cast<uint32_t>(vector.size()), vector.data(), 0, nullptr);
+      }
     }
-
 
     mUboManager->UnmapAllBuffers();
 
