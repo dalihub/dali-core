@@ -171,7 +171,6 @@ size_t ThreadPool::GetWorkerCount() const
   return mWorkers.size();
 }
 
-
 } //namespace Graphics
 
 } //namespace Dali
