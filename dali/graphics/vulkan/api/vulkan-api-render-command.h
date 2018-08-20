@@ -68,7 +68,7 @@ public:
    * updates cache
    * @return
    */
-  void PrepareResources();
+  void PrepareResources( std::vector< vk::WriteDescriptorSet >& descriptorWrites );
 
   /**
    * Updates uniform buffers
@@ -128,7 +128,12 @@ private:
 
   std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
 
-  std::vector< std::unique_ptr< Ubo>> mUboBuffers;
+  // Added to keep the pointers to DescriptorBufferInfos
+  // and DescriptorImageInfos valid until the update of descriptorSets
+  std::vector< vk::DescriptorBufferInfo > mBufferInfos;
+  std::vector< vk::DescriptorImageInfo > mImageInfos;
+
+  std::vector< std::unique_ptr< Ubo >> mUboBuffers;
 };
 
 }
