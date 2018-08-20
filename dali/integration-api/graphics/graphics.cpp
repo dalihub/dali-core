@@ -40,7 +40,8 @@ namespace Graphics
 
 using Dali::Integration::Graphics::SurfaceFactory;
 
-Graphics::Graphics()
+Graphics::Graphics( const GraphicsCreateInfo& info )
+: mCreateInfo( info )
 {
   // create device
   auto impl = Dali::Graphics::MakeUnique<Dali::Graphics::GraphicsImpl>();
@@ -53,12 +54,10 @@ Graphics::Graphics()
 Graphics::~Graphics() = default;
 
 
-Dali::Graphics::FBID Graphics::Create( const GraphicsCreateInfo& createInfo )
+Dali::Graphics::FBID Graphics::Create( std::unique_ptr< SurfaceFactory > surfaceFactory )
 {
-  //@todo do we really need to have a surface that early???
-
-  // create surface
-  auto retval = mGraphicsImpl->CreateSurface( createInfo );
+  // create surface ( also takes surface factory ownership )
+  auto retval = mGraphicsImpl->CreateSurface( std::move(surfaceFactory), mCreateInfo );
 
   // create device
   mGraphicsImpl->CreateDevice();

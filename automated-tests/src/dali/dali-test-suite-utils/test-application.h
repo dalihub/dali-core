@@ -90,7 +90,7 @@ private:
 
 protected:
   TestPlatformAbstraction             mPlatformAbstraction;
-  Integration::Graphics::Graphics     mGraphics;
+  std::unique_ptr<Integration::Graphics::Graphics> mGraphics;
   TestRenderController                mRenderController;
   TestGestureManager                  mGestureManager;
 

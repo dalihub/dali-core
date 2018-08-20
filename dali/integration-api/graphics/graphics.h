@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GRAPHICS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ namespace Graphics
 namespace API
 {
 class Controller;
-}
+} // API
+
 // frame buffer id
 using FBID = int32_t;
 
@@ -47,59 +48,6 @@ namespace Integration
 namespace Graphics
 {
 class SurfaceFactory;
-class GraphicsCreateInfo;
-class EXPORT_API Graphics final
-{
-public:
-
-
-  Graphics();
-  ~Graphics();
-
-  /**
-   *
-   * @param surfaceFactory
-   * @return
-   */
-  Dali::Graphics::FBID CreateSurface( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory );
-
-
-  /**
-   * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )
-   * @param surfaceFactory
-   * @param window's width
-   * @param window's height
-   * @return
-   */
-  Dali::Graphics::FBID Create( const GraphicsCreateInfo& createInfo );
-
-  /**
-   * Prerender
-   */
-  void PreRender( Dali::Graphics::FBID framebufferId = 0u );
-
-  /*
-   * Postrender
-   */
-  void PostRender( Dali::Graphics::FBID framebufferId = 0u );
-
-  /**
-   * Returns controller object
-   * @return
-   */
-  Dali::Graphics::API::Controller& GetController();
-
-  // this function is used only by the standalone test
-  template <class T>
-  T& GetImplementation() const
-  {
-    return static_cast<T&>(*mGraphicsImpl.get());
-  }
-
-private:
-
-  std::unique_ptr<Dali::Graphics::GraphicsImpl> mGraphicsImpl;
-};
 
 enum class DepthStencilMode
 {
@@ -135,11 +83,70 @@ enum class SwapchainBufferingMode
 
 struct GraphicsCreateInfo
 {
-  mutable std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory;
   uint32_t                    surfaceWidth;
   uint32_t                    surfaceHeight;
   DepthStencilMode            depthStencilMode;
   SwapchainBufferingMode      swapchainBufferingMode;
+};
+
+/**
+ *
+ * Graphics class
+ *
+ */
+class EXPORT_API Graphics final
+{
+public:
+
+  Graphics( const GraphicsCreateInfo& info );
+  ~Graphics();
+
+  /**
+   *
+   * @param surfaceFactory
+   * @return
+   */
+  Dali::Graphics::FBID CreateSurface( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory );
+
+  /**
+   * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )
+   * @param surfaceFactory the surface factory.
+   *
+   * @note This should be called from the render thread
+   */
+  Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory);
+
+  /**
+   * Prerender
+   */
+  void PreRender( Dali::Graphics::FBID framebufferId = 0u );
+
+  /*
+   * Postrender
+   */
+  void PostRender( Dali::Graphics::FBID framebufferId = 0u );
+
+  /**
+   * Returns controller object
+   * @return
+   */
+  Dali::Graphics::API::Controller& GetController();
+
+  // this function is used only by the standalone test
+  template <class T>
+  T& GetImplementation() const
+  {
+    return static_cast<T&>(*mGraphicsImpl.get());
+  }
+
+  GraphicsCreateInfo& GetCreateInfo()
+  {
+    return mCreateInfo;
+  }
+
+private:
+  GraphicsCreateInfo mCreateInfo;
+  std::unique_ptr<Dali::Graphics::GraphicsImpl> mGraphicsImpl;
 };
 
 namespace GraphicsFactory

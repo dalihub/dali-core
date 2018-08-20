@@ -20,6 +20,21 @@
 namespace Dali
 {
 
+namespace Integration
+{
+namespace Graphics
+{
+class SurfaceFactory
+{
+public:
+  SurfaceFactory()
+  {
+  }
+};
+
+}
+}
+
 
 TestApplication::TestApplication( size_t surfaceWidth,
                                   size_t surfaceHeight,
@@ -34,6 +49,12 @@ TestApplication::TestApplication( size_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
+  Integration::Graphics::GraphicsCreateInfo info;
+  info.surfaceWidth = 480;
+  info.surfaceHeight = 800;
+  info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
+  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
+
   Initialize();
 }
 
@@ -51,6 +72,11 @@ TestApplication::TestApplication( bool   initialize,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
+  Integration::Graphics::GraphicsCreateInfo info;
+  info.surfaceWidth = 480;
+  info.surfaceHeight = 800;
+  info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
+  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
   if ( initialize )
   {
     Initialize();
@@ -64,7 +90,7 @@ void TestApplication::Initialize()
 
   mCore = Dali::Integration::Core::New( mRenderController,
                                         mPlatformAbstraction,
-                                        mGraphics,
+                                        *mGraphics,
                                         mGestureManager,
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,

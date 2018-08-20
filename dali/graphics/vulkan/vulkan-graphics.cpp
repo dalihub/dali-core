@@ -209,10 +209,11 @@ void Graphics::CreateDevice()
   mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
-FBID Graphics::CreateSurface( const Integration::Graphics::GraphicsCreateInfo& createInfo )
+FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
+                              const Integration::Graphics::GraphicsCreateInfo& createInfo )
 {
   // create surface from the factory
-  auto surface = new Surface( *this, std::move( createInfo.surfaceFactory ) );
+  auto surface = new Surface( *this, std::move( surfaceFactory ) );
 
   if( !surface->mVulkanSurfaceFactory )
   {
