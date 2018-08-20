@@ -62,7 +62,7 @@ RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphic
 std::mutex mutex;
 
 ///@todo: needs pipeline factory rather than pipeline creation in place!!!
-void RenderCommand::PrepareResources()
+void RenderCommand::PrepareResources( std::vector< vk::WriteDescriptorSet >& descriptorWrites )
 {
   if( mUpdateFlags )
   {
@@ -90,11 +90,83 @@ void RenderCommand::PrepareResources()
 
     }
 
-    BindUniformBuffers();
+    mBufferInfos.clear();
+    mBufferInfos.resize( mPushConstantsBindings.size() );
+
+    // if uniform buffers for some reason changed, then rewrite
+    // bind PCs
+    for( uint32_t i = 0; i < mPushConstantsBindings.size(); ++i )
+    {
+      auto& ubo = mUboBuffers[i];
+      auto& pc = mPushConstantsBindings[i];
+
+#ifdef DEBUG_ENABLED
+      auto offset = ubo->GetBindingOffset();
+    auto size = ubo->GetBindingSize();
+
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
+    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
+#endif
+
+      auto bufferInfo = vk::DescriptorBufferInfo{}
+      .setOffset( static_cast<uint32_t>( ubo->GetBindingOffset() ) )
+      .setRange( static_cast<uint32_t>( ubo->GetBindingSize() ) )
+      .setBuffer( ubo->GetBuffer()->GetVkHandle() );
+
+      assert( (ubo->GetBindingOffset() % 256 ) == 0 );
+
+      mBufferInfos[i] = bufferInfo;
+
+      auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &mBufferInfos[i] )
+                                           .setDescriptorType( vk::DescriptorType::eUniformBuffer )
+                                           .setDescriptorCount( 1 )
+                                           .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
+                                           .setDstBinding( pc.binding )
+                                           .setDstArrayElement( 0 );
+
+      descriptorWrites.emplace_back( write );
+    }
 
     if( mUpdateFlags & ( API::RENDER_COMMAND_UPDATE_TEXTURE_BIT|API::RENDER_COMMAND_UPDATE_SAMPLER_BIT) )
     {
-      BindTexturesAndSamplers();
+
+      mImageInfos.clear();
+      mImageInfos.resize( mTextureBindings.size() );
+
+      // only if textures/samplers changed, rewrite
+      for( auto i = 0u; i < mTextureBindings.size(); ++i)
+      {
+        auto& texture = mTextureBindings[i];
+        auto image = static_cast<const VulkanAPI::Texture*>(texture.texture);
+
+        // test if image is valid, skip invalid image
+        // @todo: possibly use builtin 'broken' image
+        if( !image || !image->GetImageRef() )
+        {
+          continue;
+        }
+
+        DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+                         "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
+
+        auto imageViewInfo = vk::DescriptorImageInfo{}
+        .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
+        .setImageView( image->GetImageViewRef()->GetVkHandle() )
+        .setSampler( !texture.sampler ?
+                     image->GetSamplerRef()->GetVkHandle() :
+                     static_cast<const VulkanAPI::Sampler*>( texture.sampler )->GetSampler()->GetVkHandle() );
+
+        mImageInfos[i] = imageViewInfo;
+
+        auto write = vk::WriteDescriptorSet{}.setPImageInfo( &mImageInfos[i] )
+                                             .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
+                                             .setDescriptorCount( 1 )
+                                             .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
+                                             .setDstBinding( texture.binding )
+                                             .setDstArrayElement( 0 );
+
+        descriptorWrites.emplace_back( write );
+      }
     }
     mUpdateFlags = 0u;
   }
@@ -148,8 +220,10 @@ void RenderCommand::BindUniformBuffers()
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
 #endif
-    mDescriptorSets[0]
-            ->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
+    mDescriptorSets[0]->WriteUniformBuffer( pc.binding,
+                                            ubo->GetBuffer(),
+                                            ubo->GetBindingOffset(),
+                                            ubo->GetBindingSize() );
   }
 }
 
