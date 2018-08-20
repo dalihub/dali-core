@@ -44,7 +44,7 @@ void WorkerThread::WaitAndExecute()
       task = mTaskQueue.front();
     }
 
-    task();
+    task( mIndex );
 
     {
       std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
@@ -56,7 +56,7 @@ void WorkerThread::WaitAndExecute()
   }
 }
 
-WorkerThread::WorkerThread()
+WorkerThread::WorkerThread(uint32_t index) : mIndex( index )
 {
   // Have to pass "this" as an argument because WaitAndExecute is a member function.
   mWorker = std::thread{ &WorkerThread::WaitAndExecute, this };
@@ -121,7 +121,7 @@ bool ThreadPool::Initialize()
     * and will wait for a job to enter the job queue. Once a job is in the the queue
     * the threads will wake up to acquire and execute it.
     */
-    mWorkers.push_back( std::unique_ptr< WorkerThread >( new WorkerThread ) );
+    mWorkers.push_back( std::unique_ptr< WorkerThread >( new WorkerThread( i ) ) );
   }
 
   return true;
@@ -139,9 +139,9 @@ void ThreadPool::Wait()
 std::shared_ptr< Future< void > > ThreadPool::SubmitTask( uint32_t workerIndex, const Task& task )
 {
   auto future = std::shared_ptr< Future< void > >( new Future< void > );
-  mWorkers[workerIndex]->AddTask( [task, future]()
+  mWorkers[workerIndex]->AddTask( [task, future]( uint32_t index )
                                    {
-                                     task();
+                                     task( index );
 
                                      future->mPromise.set_value();
                                    });
@@ -153,10 +153,10 @@ std::shared_ptr< Future< void > > ThreadPool::SubmitTasks( const std::vector< Ta
 {
     auto future = std::shared_ptr< Future< void > >( new Future< void > );
     mWorkers[ sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask(
-    [ future, tasks ]() {
+    [ future, tasks ]( uint32_t index ) {
       for( auto& task : tasks )
       {
-        task();
+        task( index );
       }
 
       future->mPromise.set_value();
