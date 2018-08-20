@@ -32,7 +32,7 @@ namespace Dali
 namespace Graphics
 {
 
-using Task = std::function< void() >;
+using Task = std::function< void(uint32_t) >;
 
 using TaskQueue = std::queue< Task >;
 
@@ -107,6 +107,8 @@ class WorkerThread
 private:
   std::thread mWorker;
 
+  uint32_t mIndex;
+
   TaskQueue mTaskQueue;
 
   std::mutex mTaskQueueMutex;
@@ -118,7 +120,7 @@ private:
   void WaitAndExecute();
 
 public:
-  WorkerThread();
+  WorkerThread(uint32_t index);
 
   WorkerThread( const WorkerThread& other ) = delete;
 
@@ -144,11 +146,11 @@ public:
   void Wait();
 
   template< typename ReturnT >
-  std::shared_ptr< Future< ReturnT > > SubmitTask( uint32_t workerIndex, std::function< ReturnT() > task )
+  std::shared_ptr< Future< ReturnT > > SubmitTask( uint32_t workerIndex, std::function< ReturnT(uint32_t) > task )
   {
     auto future = std::shared_ptr< Future< ReturnT > >( new Future< ReturnT > );
-    mWorkers[workerIndex]->AddTask( [ task, future ]() {
-      auto res = task();
+    mWorkers[workerIndex]->AddTask( [ task, future ](uint32_t index) {
+      auto res = task( index );
       future->mPromise.set_value( res );
     } );
 
@@ -159,7 +161,7 @@ public:
   std::shared_ptr< Future< void > > SubmitTask( uint32_t workerIndex, const Task& task );
 
   template< typename ReturnT >
-  std::shared_ptr< Future< void > > SubmitTask( std::function< ReturnT() > task )
+  std::shared_ptr< Future< void > > SubmitTask( std::function< ReturnT(uint32_t) > task )
   {
     return SubmitTask( sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() ), std::move( task ) );
   }
@@ -198,7 +200,7 @@ public:
               start + tasksPerThread;
 
         auto task = Task(
-        [ futureGroup, i, start, end, predicate, &data ]()
+        [ futureGroup, i, start, end, predicate, &data ](uint32_t index)
         {
           //auto fg = futureGroup;
           auto sIt = data.begin() + static_cast<int>(start);
@@ -216,6 +218,55 @@ public:
       return futureGroup;
   }
 
+  template< typename T, typename Predicate >
+  std::shared_ptr< FutureGroup< void > >
+  IndexedParallelProcess( std::vector< T >& data, Predicate predicate )
+  {
+    auto workerCount = mWorkers.size();
+    auto tasksPerThread = data.size() / workerCount;
+
+    if (tasksPerThread == 0 ) tasksPerThread = data.size();
+
+    auto batches = data.size() / tasksPerThread;
+
+    auto start = 0ul;
+    auto end = 0ul;
+
+    auto futureGroup = std::shared_ptr< FutureGroup< void > >( new FutureGroup< void > );
+
+    for( auto i = 0u; i < batches; ++i )
+    {
+      futureGroup->mFutures.emplace_back( new Future< void >() );
+    }
+
+    for( auto i = 0u; i < batches; ++i )
+    {
+      if ( end == data.size() )
+      {
+        break;
+      }
+
+      end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
+            start + tasksPerThread;
+
+      auto task = Task(
+      [ futureGroup, i, start, end, predicate, &data ](uint32_t index)
+      {
+        //auto fg = futureGroup;
+        auto sIt = data.begin() + static_cast<int>(start);
+        auto eIt = data.begin() + static_cast<int>(end);
+        std::for_each( sIt, eIt, std::bind( predicate, std::placeholders::_1, index ) );
+
+        futureGroup->mFutures[i]->mPromise.set_value();
+      } );
+
+      mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
+
+      start = end;
+    }
+
+    return futureGroup;
+  }
 
     size_t GetWorkerCount() const;
   };
