@@ -291,7 +291,7 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
-    auto transferRequestsFuture = mThreadPool.SubmitTask(Task([this](){
+    auto transferRequestsFuture = mThreadPool.SubmitTask(Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
       {
@@ -315,14 +315,22 @@ struct Controller::Impl
       return;
     }
 
+    std::vector< std::vector< vk::WriteDescriptorSet > > writesPerThread;
+    writesPerThread.resize( mThreadPool.GetWorkerCount() );
 
 
-    mThreadPool.ParallelProcess( commands, []( Dali::Graphics::API::RenderCommand* command )
+    mThreadPool.IndexedParallelProcess( commands, [&writesPerThread]( Dali::Graphics::API::RenderCommand* command,
+                                                                      uint32_t workerIndex )
     {
-      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-      apiCommand->PrepareResources();
+      auto apiCommand = static_cast< VulkanAPI::RenderCommand* >(command);
+      apiCommand->PrepareResources( writesPerThread[ workerIndex ] );
       apiCommand->UpdateUniformBuffers();
     })->Wait();
+
+    for( auto& vector : writesPerThread )
+    {
+      mGraphics.GetDevice().updateDescriptorSets( static_cast<uint32_t>(vector.size()), vector.data(), 0, nullptr);
+    }
 
 
     mUboManager->UnmapAllBuffers();
