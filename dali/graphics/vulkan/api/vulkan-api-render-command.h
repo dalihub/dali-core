@@ -129,6 +129,7 @@ private:
   std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
 
   std::vector< std::unique_ptr< Ubo>> mUboBuffers;
+  bool mUBONeedsBinding { false };
 };
 
 }
