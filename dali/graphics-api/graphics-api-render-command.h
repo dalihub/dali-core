@@ -141,6 +141,11 @@ public:
       return *this;
     }
 
+    bool operator==( const TextureBinding& rhs)
+    {
+      return (texture == rhs.texture) && (sampler == rhs.sampler);
+    }
+
     friend std::ostream& operator<<(std::ostream& ss, const TextureBinding& object);
 
   };
@@ -396,8 +401,28 @@ public:
 
   RenderCommand& BindTextures( std::vector<TextureBinding>&& bindings )
   {
-    mTextureBindings = std::move( bindings );
-    mUpdateFlags |= RENDER_COMMAND_UPDATE_TEXTURE_BIT;
+    // compare bindings
+    bool notEqual = false;
+    if( bindings.size() == mTextureBindings.size() )
+    {
+      for( auto i = 0u; i < bindings.size(); ++i )
+      {
+        if( !(bindings[i] == mTextureBindings[i]) )
+        {
+          notEqual = true;
+          break;
+        }
+      }
+    }
+    else
+    {
+      notEqual = true;
+    }
+    if( notEqual )
+    {
+      mTextureBindings = std::move( bindings );
+      mUpdateFlags |= RENDER_COMMAND_UPDATE_TEXTURE_BIT;
+    }
     return *this;
   }
 
