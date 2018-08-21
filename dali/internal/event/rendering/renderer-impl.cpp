@@ -22,6 +22,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
@@ -37,6 +38,10 @@ namespace Internal
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDERER" );
+#endif
+
 
 /**
  * Properties: |name                              |type     |writable|animatable|constraint-input|enum for index-checking|
@@ -235,6 +240,8 @@ void Renderer::SetBlendMode( BlendMode::Type mode )
   if( mBlendMode != mode )
   {
     mBlendMode = mode;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Renderer::SetBlendMode( %s )\n", Scripting::GetEnumerationName<BlendMode::Type>( mBlendMode, BLEND_MODE_TABLE, BLEND_MODE_TABLE_COUNT ) );
 
     SetBlendModeMessage( GetEventThreadServices(), *mSceneObject, mBlendMode );
   }

@@ -169,6 +169,9 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
   if( inside )
   {
     Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
+
+    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "AddRendererToRenderList(%p) = %s\n", renderable.mRenderer, (opacityType== Renderer::TRANSPARENT ? "Transparent" : opacityType== Renderer::TRANSLUCENT ? "Translucent" : "Opaque"));
+
     if( opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN )
     {
       // Get the next free RenderItem.
