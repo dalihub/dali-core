@@ -172,7 +172,7 @@ public:
   std::shared_ptr< FutureGroup< void > >
   ParallelProcess( std::vector< T >& data, Predicate predicate, bool useMainThread )
   {
-    auto workerCount = mWorkers.size();
+    auto workerCount = useMainThread ? mWorkers.size() + 1 : mWorkers.size();
     auto tasksPerThread = data.size() / workerCount;
 
     if (tasksPerThread == 0 ) tasksPerThread = data.size();
@@ -237,10 +237,13 @@ public:
   std::shared_ptr< FutureGroup< void > >
   IndexedParallelProcess( std::vector< T >& data, Predicate predicate, bool useMainThread )
   {
-    auto workerCount = mWorkers.size();
+    auto workerCount = useMainThread ? mWorkers.size() + 1 : mWorkers.size();
     auto tasksPerThread = data.size() / workerCount;
 
-    if (tasksPerThread == 0 ) tasksPerThread = data.size();
+    if (tasksPerThread == 0 )
+    {
+      tasksPerThread = data.size();
+    }
 
     auto batches = useMainThread ? (data.size() / tasksPerThread) - 1 : data.size() / tasksPerThread;
 
