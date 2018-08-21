@@ -17,6 +17,7 @@
 
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
@@ -158,14 +159,25 @@ API::PipelineFactory& PipelineFactory::SetDynamicStateMask( const API::PipelineD
   return *this;
 }
 
-std::unique_ptr< API::Pipeline > PipelineFactory::Create() const
+API::PipelineFactory& PipelineFactory::SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline )
 {
-  // todo: validate pipeline
+  mOldPipeline = std::move( oldPipeline );
+  mHashCode = 0;
+  return *this;
+}
 
+std::unique_ptr< API::Pipeline > PipelineFactory::Create()
+{
   // check cache
   if( mPipelineCache )
   {
     auto ptr = mPipelineCache->GetPipeline( *this );
+
+    if( mOldPipeline && static_cast<VulkanAPI::Pipeline*>(mOldPipeline.get())->GetImplementation() == ptr )
+    {
+      return std::move( mOldPipeline );
+    }
+
     // if pipeline is already in cache, attach implementation and return unique ptr
     if( ptr )
     {
@@ -189,6 +201,7 @@ void PipelineFactory::Reset()
   mInfo.dynamicStateMask = 0u;
   mPipelineCache = nullptr;
   mBasePipeline = nullptr;
+  mOldPipeline.reset();
 }
 
 uint32_t PipelineFactory::GetHashCode() const

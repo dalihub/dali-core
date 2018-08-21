@@ -80,7 +80,7 @@ public:
   /**
    * Creates new pipeline
    */
-  virtual std::unique_ptr<Pipeline> CreatePipeline( const BaseFactory<Pipeline>& factory ) = 0;
+  virtual std::unique_ptr<Pipeline> CreatePipeline( const PipelineFactory& factory ) = 0;
 
   /**
    * @brief Returns texture factory

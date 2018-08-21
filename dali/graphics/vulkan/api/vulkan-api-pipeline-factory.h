@@ -67,12 +67,14 @@ public:
 
   API::PipelineFactory& SetInputAssemblyState( const API::InputAssemblyState& state ) override;
 
-  API::PipelineFactory& SetDynamicStateMask( const API::PipelineDynamicStateMask mask );
+  API::PipelineFactory& SetDynamicStateMask( const API::PipelineDynamicStateMask mask ) override;
+
+  API::PipelineFactory& SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline ) override;
 
   // To be called when getting new factory
   void Reset();
 
-  std::unique_ptr< API::Pipeline > Create() const override;
+  std::unique_ptr< API::Pipeline > Create() override;
 
   uint32_t GetHashCode() const;
 
@@ -102,6 +104,7 @@ public:
   VulkanAPI::PipelineCache* mPipelineCache;
   VulkanAPI::Pipeline* mBasePipeline;
   mutable uint32_t mHashCode;
+  std::unique_ptr<API::Pipeline> mOldPipeline { nullptr };
 };
 
 } // namespace API
