@@ -28,6 +28,7 @@
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 #include <dali/graphics-api/graphics-api-types.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
 
 namespace Dali
 {
@@ -435,11 +436,11 @@ public:
     return *this;
   }
 
-  RenderCommand& BindPipeline( const Pipeline& pipeline )
+  RenderCommand& BindPipeline( const Pipeline* pipeline )
   {
-    if( mPipeline != &pipeline)
+    if( !mPipeline || mPipeline != pipeline )
     {
-      mPipeline = &pipeline;
+      mPipeline = pipeline;
       mUpdateFlags |= RENDER_COMMAND_UPDATE_PIPELINE_BIT;
     }
     return *this;

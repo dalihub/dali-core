@@ -410,7 +410,12 @@ public:
   void BindPipeline( BufferIndex updateBufferIndex, std::unique_ptr<Graphics::API::Pipeline> pipeline )
   {
     mGfxPipeline = std::move(pipeline);
-    mGfxData[updateBufferIndex].gfxRenderCommand->BindPipeline( *mGfxPipeline.get() );
+    mGfxData[updateBufferIndex].gfxRenderCommand->BindPipeline( mGfxPipeline.get() );
+  }
+
+  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline()
+  {
+    return std::move(mGfxPipeline);
   }
 
 public: // Implementation of ConnectionChangePropagator
