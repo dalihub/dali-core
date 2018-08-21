@@ -110,6 +110,13 @@ DALI_CORE_API DaliException::DaliException( const char* location, const char* co
 
   DALI_LOG_ERROR_NOFN("Backtrace:\n");
 
+  std::string tmpString("\n=== DALi Native Excetion Info ===");
+  //appending condition
+  tmpString.append("\nCONDITION: ");
+  tmpString.append(condition);
+  //appending back-trace
+  tmpString.append("\nBACKTRACE: \n");
+
   void* frameArray[MAX_NUM_STACK_FRAMES];
   int nSize = backtrace(frameArray, MAX_NUM_STACK_FRAMES);
   char** symbols = backtrace_symbols(frameArray, nSize);
@@ -117,10 +124,20 @@ DALI_CORE_API DaliException::DaliException( const char* location, const char* co
   {
     std::string demangled_symbol = Demangle(symbols[i]);
     DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.c_str() );
+
+    tmpString.append("[");
+    tmpString.append(std::to_string(i));
+    tmpString.append("]  ");
+    tmpString.append(demangled_symbol);
+    tmpString.append("\n");
   }
   free(symbols);
-}
 
+  tmpString.append("=================================\n\0");
+
+  info = static_cast<char*>(malloc( tmpString.size() * sizeof(char)) );
+  strncpy(info, tmpString.c_str(), tmpString.size());
+}
 
 #else // BACKTRACE_ENABLED
 

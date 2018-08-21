@@ -116,6 +116,8 @@ public:
 
   const char* location;
   const char* condition;
+
+  char* info;
 };
 
 /**
