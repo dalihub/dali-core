@@ -42,6 +42,9 @@ namespace SceneGraph
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDERER" );
+#endif
 
 static constexpr float CLIP_MATRIX_DATA[] = {
   1.0f, 0.0f, 0.0f, 0.0f,
@@ -245,8 +248,8 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     float width = instruction.mViewport.width;
     float height = instruction.mViewport.height;
 
-	// If the viewport hasn't been set, and we're rendering to a framebuffer, then
-	// set the size of the viewport to that of the framebuffer.
+  // If the viewport hasn't been set, and we're rendering to a framebuffer, then
+  // set the size of the viewport to that of the framebuffer.
     if( !instruction.mIsViewportSet && renderTargetBinding.framebuffer != nullptr )
     {
       width = renderTargetBinding.framebufferWidth;
@@ -320,7 +323,7 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
     if( instruction.mFrameBuffer != 0 )
     {
       renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
-	  // Store the size of the framebuffer in case the viewport isn't set.
+    // Store the size of the framebuffer in case the viewport isn't set.
       renderTargetBinding.framebufferWidth = instruction.mFrameBuffer->GetWidth();
       renderTargetBinding.framebufferHeight = instruction.mFrameBuffer->GetHeight();
     }
@@ -457,7 +460,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    */
   ColorBlendState colorBlendState{};
   colorBlendState.SetBlendEnable(false);
-  if( renderer->GetBlendMode() != BlendMode::OFF)
+
+  if( !item.mIsOpaque )
   {
     colorBlendState.SetBlendEnable(true);
     const auto& options = renderer->GetBlendingOptions();
@@ -470,6 +474,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
       .SetAlphaBlendOp(ConvertBlendEquation(options.GetBlendEquationAlpha()));
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "PrepareGraphicsPipeline(renderer=%p), opaque:%s, blendMode:%d  => Blending:%s\n", item.mRenderer, item.mIsOpaque?"T":"F", renderer->GetBlendMode(), colorBlendState.blendEnable?"T":"F" );
   /**
    * 3. VIEWPORT
    */
