@@ -550,6 +550,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   // create pipeline
   auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
 
+            .SetOldPipeline( renderer->ReleaseGraphicsPipeline() ) // set old pipeline
+
             // vertex input
             .SetVertexInputState(vi)
 

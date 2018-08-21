@@ -36,13 +36,14 @@ public:
 
   virtual ~Pipeline() = default;
 
+  virtual bool Equals(const Pipeline&) const { return false; }
+
 protected:
 
   Pipeline(Pipeline&&) = default;
   Pipeline& operator=(Pipeline&&) = default;
 
   Pipeline() = default;
-
 };
 }
 }
