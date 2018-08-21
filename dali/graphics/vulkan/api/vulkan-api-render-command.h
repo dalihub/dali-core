@@ -76,21 +76,6 @@ public:
   void UpdateUniformBuffers();
 
   /**
-   * Writes uniform buffers into descriptor set
-   */
-  void BindUniformBuffers();
-
-  /**
-   * Writes texture/sample combo into descriptor set
-   */
-  void BindTexturesAndSamplers();
-
-  /**
-   * Binds vertex buffers
-   */
-  void BindVertexBuffers();
-
-  /**
    * Returns an array of updated descriptor sets
    * @return
    */
@@ -134,6 +119,7 @@ private:
   std::vector< vk::DescriptorImageInfo > mImageInfos;
 
   std::vector< std::unique_ptr< Ubo >> mUboBuffers;
+  bool mUBONeedsBinding { false };
 };
 
 }

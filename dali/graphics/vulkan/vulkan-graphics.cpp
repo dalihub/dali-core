@@ -277,7 +277,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount+1,
+                                    surfaceCapabilities.minImageCount,
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -305,7 +305,7 @@ RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surf
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount+1,
+                                    surfaceCapabilities.minImageCount,
                                     std::move(oldSwapchain) );
 
 

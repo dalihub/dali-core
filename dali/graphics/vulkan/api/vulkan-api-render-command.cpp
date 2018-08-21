@@ -87,44 +87,47 @@ void RenderCommand::PrepareResources( std::vector< vk::WriteDescriptorSet >& des
         std::lock_guard< std::mutex > lock( mutex );
         AllocateUniformBufferMemory();
       }
-
     }
 
-    mBufferInfos.clear();
-    mBufferInfos.resize( mPushConstantsBindings.size() );
-
-    // if uniform buffers for some reason changed, then rewrite
-    // bind PCs
-    for( uint32_t i = 0; i < mPushConstantsBindings.size(); ++i )
+    if( mUBONeedsBinding )
     {
-      auto& ubo = mUboBuffers[i];
-      auto& pc = mPushConstantsBindings[i];
+      mBufferInfos.clear();
+      mBufferInfos.resize( mPushConstantsBindings.size() );
 
-#ifdef DEBUG_ENABLED
-      auto offset = ubo->GetBindingOffset();
-    auto size = ubo->GetBindingSize();
+      // if uniform buffers for some reason changed, then rewrite
+      // bind PCs
+      for( uint32_t i = 0; i < mPushConstantsBindings.size(); ++i )
+      {
+        auto& ubo = mUboBuffers[i];
+        auto& pc = mPushConstantsBindings[i];
 
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
-#endif
+  #ifdef DEBUG_ENABLED
+        auto offset = ubo->GetBindingOffset();
+      auto size = ubo->GetBindingSize();
 
-      auto bufferInfo = vk::DescriptorBufferInfo{}
-      .setOffset( static_cast<uint32_t>( ubo->GetBindingOffset() ) )
-      .setRange( static_cast<uint32_t>( ubo->GetBindingSize() ) )
-      .setBuffer( ubo->GetBuffer()->GetVkHandle() );
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
+      DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
+  #endif
 
-      assert( (ubo->GetBindingOffset() % 256 ) == 0 );
+        auto bufferInfo = vk::DescriptorBufferInfo{}
+        .setOffset( static_cast<uint32_t>( ubo->GetBindingOffset() ) )
+        .setRange( static_cast<uint32_t>( ubo->GetBindingSize() ) )
+        .setBuffer( ubo->GetBuffer()->GetVkHandle() );
 
-      mBufferInfos[i] = bufferInfo;
+        assert( (ubo->GetBindingOffset() % 256 ) == 0 );
 
-      auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &mBufferInfos[i] )
-                                           .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                           .setDescriptorCount( 1 )
-                                           .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
-                                           .setDstBinding( pc.binding )
-                                           .setDstArrayElement( 0 );
+        mBufferInfos[i] = bufferInfo;
 
-      descriptorWrites.emplace_back( write );
+        auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &mBufferInfos[i] )
+                                             .setDescriptorType( vk::DescriptorType::eUniformBuffer )
+                                             .setDescriptorCount( 1 )
+                                             .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
+                                             .setDstBinding( pc.binding )
+                                             .setDstArrayElement( 0 );
+
+        descriptorWrites.emplace_back( write );
+      }
+      mUBONeedsBinding = false;
     }
 
     if( mUpdateFlags & ( API::RENDER_COMMAND_UPDATE_TEXTURE_BIT|API::RENDER_COMMAND_UPDATE_SAMPLER_BIT) )
@@ -193,61 +196,13 @@ void RenderCommand::AllocateUniformBufferMemory()
 {
   // release any existing buffers
   mUboBuffers.clear();
-
+  mUBONeedsBinding = true;
   // based on pipeline allocate memory for each push constant and uniform buffer
   // using given UBOManager
   for( auto&& pc : mPushConstantsBindings )
   {
     mUboBuffers.emplace_back( mController.GetUboManager().Allocate( pc.size ) );
     mUboBuffers.back()->Map(); //TODO: This is not the place to map the buffer
-  }
-
-}
-
-void RenderCommand::BindUniformBuffers()
-{
-  // if uniform buffers for some reason changed, then rewrite
-  // bind PCs
-  for( uint32_t i = 0; i < mPushConstantsBindings.size(); ++i )
-  {
-    auto& ubo = mUboBuffers[i];
-    auto& pc = mPushConstantsBindings[i];
-
-#ifdef DEBUG_ENABLED
-    auto offset = ubo->GetBindingOffset();
-    auto size = ubo->GetBindingSize();
-
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
-#endif
-    mDescriptorSets[0]->WriteUniformBuffer( pc.binding,
-                                            ubo->GetBuffer(),
-                                            ubo->GetBindingOffset(),
-                                            ubo->GetBindingSize() );
-  }
-}
-
-void RenderCommand::BindTexturesAndSamplers()
-{
-  // only if textures/samplers changed, rewrite
-  for( auto&& texture : mTextureBindings )
-  {
-    auto image = static_cast<const VulkanAPI::Texture*>(texture.texture);
-
-    // test if image is valid, skip invalid image
-    // @todo: possibly use builtin 'broken' image
-    if( !image || !image->GetImageRef() )
-    {
-      continue;
-    }
-
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                     "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
-    mDescriptorSets[0]->WriteCombinedImageSampler( texture.binding,
-                                                   !texture.sampler ?
-                                                   image->GetSamplerRef() :
-                                                   static_cast<const VulkanAPI::Sampler*>( texture.sampler )->GetSampler(),
-                                                   image->GetImageViewRef() );
   }
 }
 

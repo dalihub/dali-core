@@ -334,7 +334,8 @@ struct Controller::Impl
       }
     }
 
-    mUboManager->UnmapAllBuffers();
+    // For now we try to use persistently mapped buffers
+    // mUboManager->UnmapAllBuffers();
 
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
