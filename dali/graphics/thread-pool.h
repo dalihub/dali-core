@@ -170,64 +170,14 @@ public:
 
   template< typename T, typename Predicate >
   std::shared_ptr< FutureGroup< void > >
-  ParallelProcess( std::vector< T >& data, Predicate predicate )
+  ParallelProcess( std::vector< T >& data, Predicate predicate, bool useMainThread )
   {
-      auto workerCount = mWorkers.size();
-      auto tasksPerThread = data.size() / workerCount;
-
-      if (tasksPerThread == 0 ) tasksPerThread = data.size();
-
-      auto batches = data.size() / tasksPerThread;
-
-      auto start = 0ul;
-      auto end = 0ul;
-
-      auto futureGroup = std::shared_ptr< FutureGroup< void > >( new FutureGroup< void > );
-
-      for( auto i = 0u; i < batches; ++i )
-      {
-        futureGroup->mFutures.emplace_back( new Future< void >() );
-      }
-
-      for( auto i = 0u; i < batches; ++i )
-      {
-        if ( end == data.size() )
-        {
-          break;
-        }
-
-        end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
-              start + tasksPerThread;
-
-        auto task = Task(
-        [ futureGroup, i, start, end, predicate, &data ](uint32_t index)
-        {
-          //auto fg = futureGroup;
-          auto sIt = data.begin() + static_cast<int>(start);
-          auto eIt = data.begin() + static_cast<int>(end);
-          std::for_each( sIt, eIt, predicate );
-
-          futureGroup->mFutures[i]->mPromise.set_value();
-        } );
-
-        mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
-
-        start = end;
-      }
-
-      return futureGroup;
-  }
-
-  template< typename T, typename Predicate >
-  std::shared_ptr< FutureGroup< void > >
-  IndexedParallelProcess( std::vector< T >& data, Predicate predicate )
-  {
-    auto workerCount = mWorkers.size();
+    auto workerCount = useMainThread ? mWorkers.size() + 1 : mWorkers.size();
     auto tasksPerThread = data.size() / workerCount;
 
     if (tasksPerThread == 0 ) tasksPerThread = data.size();
 
-    auto batches = data.size() / tasksPerThread;
+    auto batches = useMainThread ? (data.size() / tasksPerThread) - 1 : data.size() / tasksPerThread;
 
     auto start = 0ul;
     auto end = 0ul;
@@ -246,13 +196,87 @@ public:
         break;
       }
 
-      end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
-            start + tasksPerThread;
+      if( !useMainThread )
+      {
+        end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
+              start + tasksPerThread;
+      }
+      else
+      {
+        end = start + tasksPerThread;
+      }
 
       auto task = Task(
       [ futureGroup, i, start, end, predicate, &data ](uint32_t index)
       {
-        //auto fg = futureGroup;
+        auto sIt = data.begin() + static_cast<int>(start);
+        auto eIt = data.begin() + static_cast<int>(end);
+        std::for_each( sIt, eIt, predicate );
+
+        futureGroup->mFutures[i]->mPromise.set_value();
+      } );
+
+      mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
+
+      start = end;
+    }
+
+    if( useMainThread )
+    {
+      end = start + tasksPerThread + ( data.size() - (++batches) * tasksPerThread );
+
+      auto sIt = data.begin() + static_cast<int>(start);
+      auto eIt = data.begin() + static_cast<int>(end);
+      std::for_each( sIt, eIt, predicate );
+    }
+
+    return futureGroup;
+  }
+
+  template< typename T, typename Predicate >
+  std::shared_ptr< FutureGroup< void > >
+  IndexedParallelProcess( std::vector< T >& data, Predicate predicate, bool useMainThread )
+  {
+    auto workerCount = useMainThread ? mWorkers.size() + 1 : mWorkers.size();
+    auto tasksPerThread = data.size() / workerCount;
+
+    if (tasksPerThread == 0 )
+    {
+      tasksPerThread = data.size();
+    }
+
+    auto batches = useMainThread ? (data.size() / tasksPerThread) - 1 : data.size() / tasksPerThread;
+
+    auto start = 0ul;
+    auto end = 0ul;
+
+    auto futureGroup = std::shared_ptr< FutureGroup< void > >( new FutureGroup< void > );
+
+    for( auto i = 0u; i < batches; ++i )
+    {
+      futureGroup->mFutures.emplace_back( new Future< void >() );
+    }
+
+    for( auto i = 0u; i < batches; ++i )
+    {
+      if ( end == data.size() )
+      {
+        break;
+      }
+
+      if( !useMainThread )
+      {
+        end = ( i == batches - 1 ) ? start + tasksPerThread + ( data.size() - batches * tasksPerThread ) :
+              start + tasksPerThread;
+      }
+      else
+      {
+        end = start + tasksPerThread;
+      }
+
+      auto task = Task(
+      [ futureGroup, i, start, end, predicate, &data ](uint32_t index)
+      {
         auto sIt = data.begin() + static_cast<int>(start);
         auto eIt = data.begin() + static_cast<int>(end);
         std::for_each( sIt, eIt, std::bind( predicate, std::placeholders::_1, index ) );
@@ -263,6 +287,17 @@ public:
       mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
 
       start = end;
+    }
+
+    if( useMainThread )
+    {
+      end = start + tasksPerThread + ( data.size() - (++batches) * tasksPerThread );
+
+      auto sIt = data.begin() + static_cast<int>(start);
+      auto eIt = data.begin() + static_cast<int>(end);
+      std::for_each( sIt, eIt, std::bind( predicate,
+                                          std::placeholders::_1,
+                                          mWorkers.size() /* the main thread will be the last index */ ) );
     }
 
     return futureGroup;
