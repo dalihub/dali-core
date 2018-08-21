@@ -165,7 +165,7 @@ public:
   /**
    * @brief Create a new object
    */
-  std::unique_ptr< API::Pipeline > CreatePipeline( const API::BaseFactory< API::Pipeline >& factory ) override;
+  std::unique_ptr< API::Pipeline > CreatePipeline( const API::PipelineFactory& factory ) override;
 
   /**
    * @brief Create a new object

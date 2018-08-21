@@ -193,6 +193,9 @@ struct Controller::Impl
 
       // replace swapchain
       mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
+
+      mGraphics.ExecuteActions();
+      mGraphics.CollectGarbage();
     }
 
     ++mBufferRefsIndex;
@@ -605,7 +608,7 @@ std::unique_ptr< API::Sampler > Controller::CreateSampler( const API::BaseFactor
   return factory.Create();
 }
 
-std::unique_ptr< API::Pipeline > Controller::CreatePipeline( const API::BaseFactory< API::Pipeline >& factory )
+std::unique_ptr< API::Pipeline > Controller::CreatePipeline( const API::PipelineFactory& factory )
 {
   auto& pipelineFactory = const_cast<PipelineFactory&>(dynamic_cast<const PipelineFactory&>( factory ));
 
