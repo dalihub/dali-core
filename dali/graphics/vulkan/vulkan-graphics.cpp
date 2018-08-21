@@ -291,6 +291,11 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   return swapchain;
 }
 
+void Graphics::InitialiseController()
+{
+  mGfxController->Initialise();
+}
+
 RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
 {
   auto surfaceCapabilities = surface->GetCapabilities();

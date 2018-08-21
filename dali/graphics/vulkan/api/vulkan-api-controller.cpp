@@ -619,6 +619,10 @@ std::unique_ptr< Controller > Controller::New( Vulkan::Graphics& vulkanGraphics 
 
 Controller::Controller( Vulkan::Graphics& vulkanGraphics ) : mImpl( std::make_unique< Impl >( *this, vulkanGraphics ) )
 {
+}
+
+void Controller::Initialise()
+{
   mImpl->Initialise();
 }
 

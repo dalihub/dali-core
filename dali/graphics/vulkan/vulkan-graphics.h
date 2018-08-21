@@ -103,6 +103,8 @@ public: // Create methods
 
   void CreateDevice();
 
+  void InitialiseController();
+
   FBID CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory,
                       const Integration::Graphics::GraphicsCreateInfo& createInfo );
 
@@ -293,6 +295,8 @@ private: // Methods
   std::vector< const char* > PrepareDefaultInstanceExtensions();
 
   RefCountedCommandPool GetCommandPool( std::thread::id threadId );
+
+
 
 private: // Members
 

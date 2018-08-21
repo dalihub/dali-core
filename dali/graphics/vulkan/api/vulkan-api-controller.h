@@ -133,6 +133,8 @@ public:
 
   explicit Controller( Vulkan::Graphics& vulkanGraphics );
 
+  void Initialise();
+
   /**
    * Must be created from VulkanGraphics
    * @param vulkanGraphics

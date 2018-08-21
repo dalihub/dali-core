@@ -68,6 +68,8 @@ Dali::Graphics::FBID Graphics::Create( std::unique_ptr< SurfaceFactory > surface
   // create swapchain
   mGraphicsImpl->CreateSwapchainForSurface( surface );
 
+  mGraphicsImpl->InitialiseController();
+
   return retval;
 }
 
