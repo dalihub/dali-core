@@ -90,6 +90,7 @@ void RenderCommand::PrepareResources()
     {
       BindTexturesAndSamplers();
     }
+
     mUpdateFlags = 0u;
   }
 }
@@ -115,7 +116,7 @@ void RenderCommand::AllocateUniformBufferMemory()
 {
   // release any existing buffers
   mUboBuffers.clear();
-
+  mUBONeedsBinding = true;
   // based on pipeline allocate memory for each push constant and uniform buffer
   // using given UBOManager
   for( auto&& pc : mPushConstantsBindings )
@@ -141,9 +142,13 @@ void RenderCommand::BindUniformBuffers()
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "offset: " << offset << ", size: " << size );
     DALI_LOG_STREAM( gVulkanFilter, Debug::General, "[RenderCommand] BindingUBO: binding = " << pc.binding );
 #endif
-    mDescriptorSets[0]
+    if( mUBONeedsBinding )
+    {
+      mDescriptorSets[0]
             ->WriteUniformBuffer( pc.binding, ubo->GetBuffer(), ubo->GetBindingOffset(), ubo->GetBindingSize() );
+    }
   }
+  mUBONeedsBinding = false;
 }
 
 void RenderCommand::BindTexturesAndSamplers()
