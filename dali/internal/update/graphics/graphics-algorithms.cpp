@@ -560,7 +560,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
             // input assembly
             .SetInputAssemblyState(InputAssemblyState()
                                      .SetTopology(topology)
-                                     .SetPrimitiveRestartEnable(true))
+                                     .SetPrimitiveRestartEnable(false))
 
             // viewport ( if zeroes then framebuffer size used )
             .SetViewportState(viewportState)
