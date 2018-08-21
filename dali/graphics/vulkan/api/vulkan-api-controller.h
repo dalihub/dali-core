@@ -165,7 +165,7 @@ public:
   /**
    * @brief Create a new object
    */
-  std::unique_ptr< API::Pipeline > CreatePipeline( const API::BaseFactory< API::Pipeline >& factory ) override;
+  std::unique_ptr< API::Pipeline > CreatePipeline( const API::PipelineFactory& factory ) override;
 
   /**
    * @brief Create a new object
@@ -203,7 +203,7 @@ public:
   API::PipelineFactory& GetPipelineFactory() override;
 
   API::FramebufferFactory& GetFramebufferFactory() const override;
-  
+
   API::SamplerFactory& GetSamplerFactory() override;
 
 public:

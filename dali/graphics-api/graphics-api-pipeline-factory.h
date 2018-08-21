@@ -32,7 +32,7 @@ class PipelineCache;
 /**
  * @brief Interface class for ShaderFactory types in the graphics API.
  */
-class PipelineFactory : public BaseFactory<Pipeline>
+class PipelineFactory
 {
 public:
 
@@ -61,6 +61,10 @@ public:
   virtual PipelineFactory& SetInputAssemblyState( const InputAssemblyState& state ) = 0;
 
   virtual PipelineFactory& SetDynamicStateMask( const PipelineDynamicStateMask mask ) = 0;
+
+  virtual PipelineFactory& SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline ) = 0;
+
+  virtual std::unique_ptr<Pipeline> Create() = 0;
 
 protected:
   /// @brief default constructor
