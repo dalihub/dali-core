@@ -65,6 +65,7 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
           mSwapchainKHR( vkHandle ),
           mSwapchainCreateInfoKHR( std::move( createInfo ) ),
           mSwapchainBuffer( std::move( framebuffers ) ),
+          mFrameIndex( 0u ),
           mIsValid( true )
 {
 }
@@ -83,6 +84,15 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
+  if( mAcquireSemaphore.empty() )
+  {
+    mAcquireSemaphore.resize( mSwapchainBuffer.size() );
+    for( auto& sem : mAcquireSemaphore )
+    {
+      sem = mGraphics->GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics->GetAllocator() ).value;
+    }
+  }
+
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
@@ -157,7 +167,7 @@ void Swapchain::Present()
   swapBuffer.masterCmdBuffer->End();
 
   // submit
-  mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+  //mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
   auto submissionData = SubmissionData{}
     .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
