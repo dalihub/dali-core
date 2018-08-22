@@ -117,6 +117,16 @@ public:
   Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory);
 
   /**
+   * Lifecycle event for pausing application
+   */
+  void Pause();
+
+  /**
+   * Lifecycle event for resuming application
+   */
+  void Resume();
+
+  /**
    * Prerender
    */
   void PreRender( Dali::Graphics::FBID framebufferId = 0u );

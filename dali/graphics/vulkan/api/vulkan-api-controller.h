@@ -180,6 +180,10 @@ public:
 
   void EndFrame() override;
 
+  void Pause() override;
+
+  void Resume() override;
+
   // VULKAN only
 
 public:
