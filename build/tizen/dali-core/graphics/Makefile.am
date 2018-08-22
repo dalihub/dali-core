@@ -59,7 +59,8 @@ cxx_warnings_to_remove = \
                          -Wno-switch \
                          -Wno-switch-enum \
                          -Wno-error=switch \
-                         -Wno-error=switch-enum
+                         -Wno-error=switch-enum \
+                         -Wno-variadic-macros
 
 #the following warnings should be added back when possible
 cxx_warnings_to_preserve = \

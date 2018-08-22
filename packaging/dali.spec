@@ -10,6 +10,7 @@ Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(dlog)
 BuildRequires:  gawk
 BuildRequires:  Vulkan-LoaderAndValidationLayers
 BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
@@ -107,7 +108,7 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 %build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -std=gnu++14 "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions "
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions -ldlog"
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"

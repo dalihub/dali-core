@@ -45,8 +45,20 @@ std::string FormatToString( const char* format, ... );
   }
 
 #else
+
 #define DALI_LOG_STREAM( filter, level, stream )
 #define DALI_LOG_INFO( filter, level, format, ... )
 #endif
+
+// always log
+#if defined(_ARCH_ARM_)
+#undef LOG_TAG
+#define LOG_TAG "DALI"
+#include <dlog/dlog.h>
+#define DALIEXT_ERRLOG(fmt, ...) LOGE("[%s:%d] " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
+#else
+#define DALIEXT_ERRLOG(fmt, ...) DALI_LOG_INFO( gVulkanFilter, "[%s:%d] " fmt "\n", __func__, __LINE__, __VA_ARGS__ )
+#endif // target platform tizen
+
 
 #endif // DALI_GRAPHICS_VULKAN_DEBUG_H
