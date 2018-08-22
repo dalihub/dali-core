@@ -49,6 +49,8 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/thread-pool.h>
+#include <utility>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
 {
@@ -59,27 +61,27 @@ namespace VulkanAPI
 
 struct Controller::Impl
 {
-  struct RenderPassChange
+  struct RenderPassData
   {
     // only move semantics
-    RenderPassChange( vk::RenderPassBeginInfo _beginInfo,
+    RenderPassData( vk::RenderPassBeginInfo _beginInfo,
                       std::vector< vk::ClearValue >&& _clearColorValues,
-                      const Vulkan::RefCountedFramebuffer& _framebuffer,
-                      uint32_t _offset )
-            : beginInfo( std::move( _beginInfo ) ),
+                      Vulkan::RefCountedFramebuffer _framebuffer,
+                      std::vector< Dali::Graphics::API::RenderCommand* > _renderCommands )
+            : beginInfo( _beginInfo ),
               colorValues( std::move( _clearColorValues ) ),
-              framebuffer( _framebuffer ),
-              offset( _offset )
+              framebuffer( std::move( _framebuffer ) ),
+              renderCommands( std::move( _renderCommands ) )
     {
     }
 
     // no default constructor!
-    RenderPassChange() = delete;
+    RenderPassData() = delete;
 
     vk::RenderPassBeginInfo beginInfo{};
     std::vector< vk::ClearValue > colorValues{};
     Vulkan::RefCountedFramebuffer framebuffer{};
-    uint32_t offset{ 0 };
+    std::vector< Dali::Graphics::API::RenderCommand* > renderCommands;
   };
 
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
@@ -140,26 +142,21 @@ struct Controller::Impl
 
     auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
 
-    for( auto i = 0u; i < mRenderPasses.size(); ++i )
-    {
-      if( i != 0u )
-      {
-        primaryCommandBuffer->EndRenderPass();
-      }
-
-      const auto& rp = mRenderPasses[i];
-      uint32_t offset = rp.offset;
-      auto count = uint32_t(
-              ( i == mRenderPasses.size() - 1 ) ?
-              mSecondaryCommandBufferRefs.size() - rp.offset :
-              mRenderPasses[i + 1].offset - rp.offset );
-
-      primaryCommandBuffer->BeginRenderPass( rp.beginInfo, vk::SubpassContents::eSecondaryCommandBuffers );
-      primaryCommandBuffer->ExecuteCommands( mSecondaryCommandBufferRefs, offset, count );
-    }
-
     if( !mRenderPasses.empty() )
     {
+      for( auto& renderPassData : mRenderPasses )
+      {
+        ProcessRenderPassData( primaryCommandBuffer, renderPassData );
+      }
+    }
+    else
+    {
+      primaryCommandBuffer->BeginRenderPass( vk::RenderPassBeginInfo{}
+        .setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() )
+        .setRenderPass(swapchain->GetCurrentFramebuffer()->GetRenderPass() )
+        .setRenderArea( { {0, 0}, { swapchain->GetCurrentFramebuffer()->GetWidth(), swapchain->GetCurrentFramebuffer()->GetHeight() } } )
+        .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
+        .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
       primaryCommandBuffer->EndRenderPass();
     }
 
@@ -172,7 +169,7 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
-    mSecondaryCommandBufferRefs.clear();
+
     mRenderPasses.clear();
 
     if( !swapchain->IsValid() )
@@ -218,8 +215,11 @@ struct Controller::Impl
     return std::make_unique< VulkanAPI::RenderCommand >( mOwner, mGraphics );
   }
 
-  bool UpdateRenderPass( const API::RenderCommand::RenderTargetBinding& renderTargetBinding, uint32_t offset )
+  void UpdateRenderPass( std::vector< Dali::Graphics::API::RenderCommand*  >&& commands )
   {
+    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
+    auto renderTargetBinding = firstCommand->GetRenderTargetBinding();
+
     Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
     if( renderTargetBinding.framebuffer )
     {
@@ -265,12 +265,11 @@ struct Controller::Impl
                       .setPClearValues( newColors.data() ),
               std::move( newColors ),
               framebuffer,
-              offset );
-      return true;
+              commands );
     }
 
-    // same render pass
-    return false;
+    auto& vector = mRenderPasses.back().renderCommands;
+    vector.insert( vector.begin(), commands.begin(), commands.end() );
   }
 
   /**
@@ -279,7 +278,7 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
-    mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(Task([this](uint32_t workerIndex){
+    mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(0, Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
       {
@@ -305,105 +304,7 @@ struct Controller::Impl
 
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
-    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
-    UpdateRenderPass( firstCommand->GetRenderTargetBinding(), Vulkan::U32(mSecondaryCommandBufferRefs.size()) );
-
-    // set up writes
-    for( auto&& command : commands )
-    {
-#if defined(DEBUG_ENABLED)
-      if( getenv( "LOG_VULKAN_API" ) )
-      {
-        DALI_LOG_STREAM( gVulkanFilter, Debug::General, *command );
-      }
-#endif
-
-      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-
-      apiCommand->PrepareResources();
-      apiCommand->UpdateUniformBuffers();
-
-      // skip if there's no valid pipeline
-      if( !apiCommand->GetVulkanPipeline() )
-      {
-        continue;
-      }
-      auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
-         .setRenderPass( mCurrentFramebuffer->GetRenderPass() )
-         .setFramebuffer( mCurrentFramebuffer->GetVkHandle() );
-
-      // start new command buffer
-      auto cmdbuf = mGraphics.CreateCommandBuffer( false );
-      cmdbuf->Reset();
-      cmdbuf->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
-
-      cmdbuf->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
-      //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
-
-      // set dynamic state
-      if( apiCommand->mDrawCommand.scissorTestEnable )
-      {
-        vk::Rect2D scissorRect( { apiCommand->mDrawCommand.scissor.x,
-                                  apiCommand->mDrawCommand.scissor.y },
-                                { apiCommand->mDrawCommand.scissor.width,
-                                  apiCommand->mDrawCommand.scissor.height } );
-
-        cmdbuf->SetScissor( 0, 1, &scissorRect );
-      }
-
-      // dynamic state: viewport
-      auto vulkanApiPipeline = static_cast<const VulkanAPI::Pipeline*>(apiCommand->GetPipeline());
-      auto dynamicStateMask = vulkanApiPipeline->GetDynamicStateMask();
-      if( (dynamicStateMask & API::PipelineDynamicStateBits::VIEWPORT_BIT) && apiCommand->mDrawCommand.viewportEnable )
-      {
-        auto viewportRect = apiCommand->mDrawCommand.viewport;
-
-        vk::Viewport viewport( viewportRect.x,
-                               viewportRect.y,
-                               viewportRect.width,
-                               viewportRect.height,
-                               viewportRect.minDepth,
-                               viewportRect.maxDepth );
-
-        cmdbuf->SetViewport( 0, 1, &viewport );
-      }
-
-      // bind vertex buffers
-      auto binding = 0u;
-      for( auto&& vb : apiCommand->GetVertexBufferBindings() )
-      {
-        cmdbuf->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
-      }
-
-      // note: starting set = 0
-      cmdbuf->BindDescriptorSets( apiCommand->GetDescriptorSets(), 0 );
-
-      // draw
-      const auto& drawCommand = apiCommand->GetDrawCommand();
-
-      const auto& indexBinding = apiCommand->GetIndexBufferBinding();
-      if( indexBinding.buffer )
-      {
-        cmdbuf->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
-                                 0, vk::IndexType::eUint16 );
-        cmdbuf->DrawIndexed( drawCommand.indicesCount,
-                             drawCommand.instanceCount,
-                             drawCommand.firstIndex,
-                             0,
-                             drawCommand.firstInstance );
-      }
-      else
-      {
-        cmdbuf->Draw( drawCommand.vertexCount,
-                      drawCommand.instanceCount,
-                      drawCommand.firstVertex,
-                      drawCommand.firstInstance );
-      }
-      cmdbuf->End();
-      mSecondaryCommandBufferRefs.emplace_back( cmdbuf );
-    }
-
-    mUboManager->UnmapAllBuffers();
+    UpdateRenderPass( std::move( commands ) );
   }
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
@@ -525,6 +426,100 @@ struct Controller::Impl
 
   }
 
+  void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer primaryCommandBuffer, const RenderPassData& renderPassData )
+  {
+
+    primaryCommandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
+
+    for( auto&& command : renderPassData.renderCommands )
+    {
+#if defined(DEBUG_ENABLED)
+      if( getenv( "LOG_VULKAN_API" ) )
+      {
+        DALI_LOG_STREAM( gVulkanFilter, Debug::General, *command );
+      }
+#endif
+
+      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+
+      apiCommand->PrepareResources();
+      apiCommand->UpdateUniformBuffers();
+
+      // skip if there's no valid pipeline
+      if( !apiCommand->GetVulkanPipeline() )
+      {
+        continue;
+      }
+
+      primaryCommandBuffer->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
+      //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
+
+      // set dynamic state
+      if( apiCommand->mDrawCommand.scissorTestEnable )
+      {
+        vk::Rect2D scissorRect( { apiCommand->mDrawCommand.scissor.x,
+                                  apiCommand->mDrawCommand.scissor.y },
+                                { apiCommand->mDrawCommand.scissor.width,
+                                  apiCommand->mDrawCommand.scissor.height } );
+
+        primaryCommandBuffer->SetScissor( 0, 1, &scissorRect );
+      }
+
+      // dynamic state: viewport
+      auto vulkanApiPipeline = static_cast<const VulkanAPI::Pipeline*>(apiCommand->GetPipeline());
+      auto dynamicStateMask = vulkanApiPipeline->GetDynamicStateMask();
+      if( (dynamicStateMask & API::PipelineDynamicStateBits::VIEWPORT_BIT) && apiCommand->mDrawCommand.viewportEnable )
+      {
+        auto viewportRect = apiCommand->mDrawCommand.viewport;
+
+        vk::Viewport viewport( viewportRect.x,
+                               viewportRect.y,
+                               viewportRect.width,
+                               viewportRect.height,
+                               viewportRect.minDepth,
+                               viewportRect.maxDepth );
+
+        primaryCommandBuffer->SetViewport( 0, 1, &viewport );
+      }
+
+      // bind vertex buffers
+      auto binding = 0u;
+      for( auto&& vb : apiCommand->GetVertexBufferBindings() )
+      {
+        primaryCommandBuffer->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
+      }
+
+      // note: starting set = 0
+      primaryCommandBuffer->BindDescriptorSets( apiCommand->GetDescriptorSets(), 0 );
+
+      // draw
+      const auto& drawCommand = apiCommand->GetDrawCommand();
+
+      const auto& indexBinding = apiCommand->GetIndexBufferBinding();
+      if( indexBinding.buffer )
+      {
+        primaryCommandBuffer->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
+                                 0, vk::IndexType::eUint16 );
+        primaryCommandBuffer->DrawIndexed( drawCommand.indicesCount,
+                             drawCommand.instanceCount,
+                             drawCommand.firstIndex,
+                             0,
+                             drawCommand.firstInstance );
+      }
+      else
+      {
+        primaryCommandBuffer->Draw( drawCommand.vertexCount,
+                      drawCommand.instanceCount,
+                      drawCommand.firstVertex,
+                      drawCommand.firstInstance );
+      }
+    }
+
+    primaryCommandBuffer->EndRenderPass();
+
+    mUboManager->UnmapAllBuffers();
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
   Vulkan::Graphics& mGraphics;
@@ -545,13 +540,8 @@ struct Controller::Impl
 
   std::unique_ptr< VulkanAPI::UboManager > mUboManager;
 
-  // Accumulate all the secondary command buffers of the frame here to avoid them being overwritten
-  // This accumulator vector gets cleared at the end of the frame. The command buffers are returned to the pool
-  // and ready to be used for the next frame.
-  std::vector< Vulkan::RefCountedCommandBuffer > mSecondaryCommandBufferRefs;
-
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
-  std::vector< RenderPassChange > mRenderPasses;
+  std::vector< RenderPassData > mRenderPasses;
 
   ThreadPool mThreadPool;
 

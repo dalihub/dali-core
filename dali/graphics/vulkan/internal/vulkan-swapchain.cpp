@@ -58,15 +58,14 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
                       std::vector< SwapchainBuffer > framebuffers,
                       vk::SwapchainCreateInfoKHR createInfo,
                       vk::SwapchainKHR vkHandle )
-        : mGraphics( &graphics ),
-          mQueue( &presentationQueue ),
-          mSurface( std::move( surface ) ),
-          mCurrentBufferIndex( 0u ),
-          mSwapchainKHR( vkHandle ),
-          mSwapchainCreateInfoKHR( std::move( createInfo ) ),
-          mSwapchainBuffer( std::move( framebuffers ) ),
-          mFrameIndex( 0u ),
-          mIsValid( true )
+: mGraphics( &graphics ),
+  mQueue( &presentationQueue ),
+  mSurface( std::move( surface ) ),
+  mCurrentBufferIndex( 0u ),
+  mSwapchainKHR( vkHandle ),
+  mSwapchainCreateInfoKHR( std::move( createInfo ) ),
+  mSwapchainBuffer( std::move( framebuffers ) ),
+  mIsValid( true )
 {
 }
 
@@ -84,15 +83,6 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
-  if( mAcquireSemaphore.empty() )
-  {
-    mAcquireSemaphore.resize( mSwapchainBuffer.size() );
-    for( auto& sem : mAcquireSemaphore )
-    {
-      sem = mGraphics->GetDevice().createSemaphore( vk::SemaphoreCreateInfo{}, mGraphics->GetAllocator() ).value;
-    }
-  }
-
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
@@ -132,12 +122,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-  // start recording
-  auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
-          .setFramebuffer( swapBuffer.framebuffer->GetVkHandle() )
-          .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
-          .setSubpass( 0 );
-
   if( prevBufferIndex >= 0 )
   {
     mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
@@ -147,7 +131,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   mGraphics->CollectGarbage();
 
   swapBuffer.masterCmdBuffer->Reset();
-  swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
+  swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
   return swapBuffer.framebuffer;
 }
@@ -167,13 +151,13 @@ void Swapchain::Present()
   swapBuffer.masterCmdBuffer->End();
 
   // submit
-  //mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+  mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
   auto submissionData = SubmissionData{}
-    .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
-    .SetSignalSemaphores( { mSyncPrimitives[mFrameCounter]->submitSemaphore } )
-    .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
-    .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
+  .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
+  .SetSignalSemaphores( { mSyncPrimitives[mFrameCounter]->submitSemaphore } )
+  .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
+  .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
 
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
 
