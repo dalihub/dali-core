@@ -41,6 +41,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -901,6 +902,8 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     mDevice.destroySwapchainKHR( swapChainVkHandle );
     return RefCountedSwapchain();
   }
+
+  DALIEXT_ERRLOG( "CreateSwapchain: images = %d\n", int(images.size()) );
 
   // Create a Depth/Stencil ( optional )
   auto depthAttachment = RefCountedFramebufferAttachment{};
