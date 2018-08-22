@@ -34,6 +34,7 @@
 #include <dali/internal/update/rendering/scene-graph-shader.h>
 #include "../../../graphics-api/graphics-api-types.h"
 
+
 namespace Dali
 {
 namespace Internal
