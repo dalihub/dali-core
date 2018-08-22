@@ -63,6 +63,8 @@
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
+#include <dali/integration-api/trace.h>
+
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -86,6 +88,8 @@ mImpl->frameCounter++;
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gRenderTaskLogFilter;
 #endif
+
+//DALI_INIT_TRACE_FILTER( gFilter, "TRACE_DALIVK", true );
 
 
 using namespace Dali::Integration;
@@ -762,7 +766,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   mImpl->discardQueue.Clear( bufferIndex );
 
   //Process Touches & Gestures
+  DALI_ANNOTATE_BEGIN( 4, 0x00AA00CC, "ProcessGestures" );
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+  DALI_ANNOTATE_END( 4 );
 
   bool updateScene = // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
@@ -771,6 +777,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       gestureUpdated;                                       // ..a gesture property was updated
 
 
+  DALI_ANNOTATE_BEGIN( 4, 0x009500b3, "Reset" );
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
@@ -779,17 +786,21 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     ResetProperties( bufferIndex );
     mImpl->transformManager.ResetToBaseValue();
   }
+  DALI_ANNOTATE_END( 4 );
 
+  DALI_ANNOTATE_BEGIN( 4, 0x007f099, "ProcessMessages" );
   // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
+  DALI_ANNOTATE_END( 4 );
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if( updateScene || mImpl->previousUpdateScene )
   {
+    DALI_ANNOTATE_BEGIN( 4, 0x006a0080, "AnimUpdate" );
     //Animate
     Animate( bufferIndex, elapsedSeconds );
 
@@ -829,6 +840,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     {
       cameraIterator->Update( bufferIndex );
     }
+    DALI_ANNOTATE_END( 4 );
 
     //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
     //reset the update buffer index and make sure there is enough room in the instruction container
@@ -862,8 +874,12 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       }
 
       // generate graphics objects
+      DALI_ANNOTATE_BEGIN( 4, 0x0055066, "PrepareRenderers" );
       PrepareRenderers( bufferIndex );
+      DALI_ANNOTATE_END( 4 );
+      DALI_ANNOTATE_BEGIN( 4, 0x0040004D, "SubmitRenderInstructions" );
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
+      DALI_ANNOTATE_END( 4 );
     }
   }
 

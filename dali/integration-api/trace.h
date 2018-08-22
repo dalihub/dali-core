@@ -24,12 +24,13 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
+#define ANNOTATE_USING_TTRACE 1
+//#define ANNOTATE_USING_DS5 1
+
 namespace Dali
 {
-
 namespace Integration
 {
-
 namespace Trace
 {
 
@@ -206,6 +207,22 @@ namespace                                                                       
 #define DALI_TRACE_SCOPE( filter, tag ) \
   Dali::Integration::Trace::Tracer logTracerScope( filter, tag );
 
+#if defined(ANNOTATE_USING_DS5)
+__attribute__((weak)) void AnnotateChannelColor(unsigned int channel, unsigned int annotateColor, const char *tag);
+__attribute__((weak)) void AnnotateChannelEnd(unsigned int channel);
+__attribute__((weak)) void AnnotateMarkerStr(char *tag);
+
+#define DALI_ANNOTATE_BEGIN( channel, color, tag )  \
+  Dali::Integration::Trace::AnnotateChannelColor( channel, color, tag )
+
+#define DALI_ANNOTATE_END( channel )            \
+  Dali::Integration::Trace::AnnotateChannelEnd( channel )
+
+#define DALI_ANNOTATE_STR( tag )                \
+  Dali::Integration::Trace::AnnotateMarkerStr( tag )
+
+#endif // ANNOTATE_USING_DS5
+
 #else // TRACE_ENABLED
 
 #define DALI_INIT_TRACE_FILTER( name, tag, enable )
@@ -217,9 +234,34 @@ namespace                                                                       
 #endif
 
 } // Trace
-
 } // Integration
-
 } // Dali
+
+#if defined(ANNOTATE_USING_TTRACE)
+#if defined(TRACE_ENABLED)
+
+#define TTRACE_TAG_ALWAYS              (1<<0)  // This tag is always enabled.
+#define TTRACE_TAG_GRAPHICS            (1<<1)
+
+__attribute__((weak)) void traceBegin(uint64_t tag, const char *name, ...);
+__attribute__((weak)) void traceEnd(uint64_t tag);
+__attribute__((weak)) void traceMark(uint64_t tag, const char *name, ...);
+
+#define DALI_ANNOTATE_BEGIN( channel, color, tag )  \
+  traceBegin( TTRACE_TAG_ALWAYS, tag )
+
+#define DALI_ANNOTATE_END( channel )            \
+  traceEnd( TTRACE_TAG_ALWAYS )
+
+#define DALI_ANNOTATE_STR( tag )                \
+  traceMark( TTRACE_TAG_ALWAYS, tag )
+
+#else // TRACE_ENABLED
+#define DALI_ANNOTATE_BEGIN( channel, color, tag )
+#define DALI_ANNOTATE_END( channel )
+#define DALI_ANNOTATE_STR( tag )
+
+#endif // TRACE_ENABLED
+#endif // ANNOTATE_USING_TTRACE
 
 #endif // DALI_INTEGRATION_TRACE_H
