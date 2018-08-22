@@ -52,6 +52,9 @@
 #include <utility>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 
+#include <dali/integration-api/trace.h>
+
+
 namespace Dali
 {
 namespace Graphics
@@ -113,6 +116,7 @@ struct Controller::Impl
 
   void BeginFrame()
   {
+    DALI_ANNOTATE_BEGIN( 1u, 0x00000080, "VC::BeginFrame()" );
     // for all swapchains acquire new framebuffer
     auto surface = mGraphics.GetSurface( 0u );
 
@@ -133,10 +137,12 @@ struct Controller::Impl
     }
 
     mCurrentFramebuffer.Reset();
+    DALI_ANNOTATE_END( 1 );
   }
 
   void EndFrame()
   {
+    DALI_ANNOTATE_BEGIN( 1, 0x000000B3, "VC::EndFrame()" );
     // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
@@ -167,8 +173,10 @@ struct Controller::Impl
     }
 
     mMemoryTransferFutures.clear();
-
+	
+    DALI_ANNOTATE_BEGIN( 2, 0x0000cccc, "Present" );
     swapchain->Present();
+    DALI_ANNOTATE_END( 2 );
 
     mRenderPasses.clear();
 
@@ -186,6 +194,7 @@ struct Controller::Impl
       mGraphics.ExecuteActions();
       mGraphics.CollectGarbage();
     }
+    DALI_ANNOTATE_END( 1 );
   }
 
   API::TextureFactory& GetTextureFactory() const
