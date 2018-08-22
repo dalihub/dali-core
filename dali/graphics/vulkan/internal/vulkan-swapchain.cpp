@@ -113,6 +113,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   if( mFrameIndex > mSwapchainBuffer.size() )
   {
     mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
+    mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
     mGraphics->ExecuteActions();
     mGraphics->CollectGarbage();
@@ -139,7 +140,7 @@ void Swapchain::Present()
   swapBuffer.masterCmdBuffer->End();
 
   // submit
-  mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+  //mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
   // create present semaphore
   if( !swapBuffer.presentSignalSemaphore )
