@@ -40,6 +40,7 @@
 
 #include <cstring>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 namespace // unnamed namespace
 {
@@ -48,6 +49,7 @@ Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_
 Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
 #endif
 
+DALI_INIT_TRACE_FILTER( gFilter, "TRACE_DALI_REND", false );
 
 const unsigned int UNIFORM_MAP_READY      = 0;
 const unsigned int COPY_UNIFORM_MAP       = 1;
