@@ -180,6 +180,14 @@ struct Controller::Impl
       primaryCommandBuffer->EndRenderPass();
     }
 
+    for( auto& future : mMemoryTransferFutures )
+    {
+      future->Wait();
+      future.reset();
+    }
+
+    mMemoryTransferFutures.clear();
+
     swapchain->Present();
     mRenderPasses.clear();
 
@@ -291,7 +299,7 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
-    auto transferRequestsFuture = mThreadPool.SubmitTask(Task([this](uint32_t workerIndex){
+    mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
       {
@@ -306,7 +314,7 @@ struct Controller::Impl
 
       // execute all scheduled resource transfers
       ProcessResourceTransferRequests();
-    }));
+    })) );
 
     // the list of commands may be empty, but still we may have scheduled memory
     // transfers
@@ -315,33 +323,10 @@ struct Controller::Impl
       return;
     }
 
-    {
-      std::vector< std::vector< vk::WriteDescriptorSet > > writesPerThread;
-      writesPerThread.resize( mThreadPool.GetWorkerCount() + 1/* plus one for the the main thread*/ );
-
-
-      mThreadPool.IndexedParallelProcess( commands, [&writesPerThread]( Dali::Graphics::API::RenderCommand* command,
-                                                                        uint32_t workerIndex )
-      {
-        auto apiCommand = static_cast< VulkanAPI::RenderCommand* >(command);
-        apiCommand->PrepareResources( writesPerThread[ workerIndex ] );
-        apiCommand->UpdateUniformBuffers();
-      }, true)->Wait();
-
-      for( auto& vector : writesPerThread )
-      {
-        mGraphics.GetDevice().updateDescriptorSets( static_cast<uint32_t>(vector.size()), vector.data(), 0, nullptr);
-      }
-    }
-
-    mUboManager->UnmapAllBuffers();
-
     // Begin render pass for render target
     // clear color obtained from very first command in the batch
     auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
     UpdateRenderPass( firstCommand->GetRenderTargetBinding(), Vulkan::U32(mSecondaryCommandBufferRefs[mBufferRefsIndex].size()) );
-
-    transferRequestsFuture->Wait();
 
     // set up writes
     for( auto&& command : commands )
@@ -354,6 +339,9 @@ struct Controller::Impl
 #endif
 
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+
+      apiCommand->PrepareResources();
+      apiCommand->UpdateUniformBuffers();
 
       // skip if there's no valid pipeline
       if( !apiCommand->GetVulkanPipeline() )
@@ -432,6 +420,8 @@ struct Controller::Impl
       cmdbuf->End();
       mSecondaryCommandBufferRefs[mBufferRefsIndex].emplace_back( cmdbuf );
     }
+
+    mUboManager->UnmapAllBuffers();
   }
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
@@ -584,6 +574,7 @@ struct Controller::Impl
 
   ThreadPool mThreadPool;
 
+  std::vector< std::shared_ptr< Future<void> > > mMemoryTransferFutures;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
