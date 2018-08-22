@@ -237,7 +237,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     }
     auto color = item.mNode->GetWorldColor( bufferIndex );
 
-    auto &cmd = renderer->GetGfxRenderCommand( bufferIndex );
+    auto &cmd = renderer->GetGfxRenderCommand();
     if (cmd.GetVertexBufferBindings()
            .empty())
     {
@@ -279,19 +279,19 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform( bufferIndex, "uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform( bufferIndex, "uMvpMatrix", mvp2);
-    renderer->WriteUniform( bufferIndex, "uViewMatrix", *viewMatrix);
-    renderer->WriteUniform( bufferIndex, "uModelView", item.mModelViewMatrix);
+    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform("uMvpMatrix", mvp2);
+    renderer->WriteUniform("uViewMatrix", *viewMatrix);
+    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform( bufferIndex, "uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform( bufferIndex, "uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform( bufferIndex, "uSize", item.mSize);
-    renderer->WriteUniform( bufferIndex, "uColor", color );
+    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform("uSize", item.mSize);
+    renderer->WriteUniform("uColor", color );
 
     commandList.push_back(&cmd);
   }
@@ -481,7 +481,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   ViewportState viewportState{};
 
   // Set viewport only when not using dynamic viewport state
-  if( !renderer->GetGfxRenderCommand( bufferIndex ).GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
+  if( !renderer->GetGfxRenderCommand().GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
   {
     // scissor test only when we have viewport
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
@@ -508,13 +508,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   if( SetupPipelineViewportState( viewportState) )
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissor( viewportState.scissor );
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( true );
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissor( viewportState.scissor );
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( true );
     dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
   }
   else
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( false );
+    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( false );
   }
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
@@ -594,7 +594,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
 
   // bind pipeline to the render command
-  renderer->BindPipeline( bufferIndex, std::move(pipeline) );
+  renderer->BindPipeline( std::move(pipeline) );
   return true;
 }
 
