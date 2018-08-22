@@ -206,6 +206,20 @@ namespace                                                                       
 #define DALI_TRACE_SCOPE( filter, tag ) \
   Dali::Integration::Trace::Tracer logTracerScope( filter, tag );
 
+
+__attribute__((weak)) void AnnotateChannelColor(unsigned int channel, unsigned int annotateColor, const char *tag);
+__attribute__((weak)) void AnnotateChannelEnd(unsigned int channel);
+__attribute__((weak)) void AnnotateMarkerStr(char *tag);
+
+#define DALI_ANNOTATE_BEGIN( channel, color, tag )  \
+  Dali::Integration::Trace::AnnotateChannelColor( channel, color, tag )
+
+#define DALI_ANNOTATE_END( channel )            \
+  Dali::Integration::Trace::AnnotateChannelEnd( channel )
+
+#define DALI_ANNOTATE_STR( tag )                \
+  Dali::Integration::Trace::AnnotateMarkerStr( tag )
+
 #else // TRACE_ENABLED
 
 #define DALI_INIT_TRACE_FILTER( name, tag, enable )
@@ -213,6 +227,10 @@ namespace                                                                       
 #define DALI_TRACE_END( filter, tag )
 #define DALI_TRACE_FUNCTION( filter )
 #define DALI_TRACE_SCOPE( filter, tag )
+
+#define DALI_ANNOTATE_BEGIN( channel, color, tag )
+#define DALI_ANNOTATE_END( channel )
+#define DALI_ANNOTATE_STR( tag )
 
 #endif
 
