@@ -32,6 +32,13 @@
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
+#include <dali/integration-api/trace.h>
+
+namespace
+{
+DALI_INIT_TRACE_FILTER( gFilter, "TRACE_DALI_VKSW", true )
+}
+
 namespace Dali
 {
 namespace Graphics
@@ -106,10 +113,14 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   {
     prevBufferIndex = int(mCurrentBufferIndex);
   }
+
+  DALI_TRACE_BEGIN( gFilter, "Swapchain::AcquireNextImage()" );
+
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
                                             mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore,
                                             nullptr, &mCurrentBufferIndex );
+  DALI_TRACE_END( gFilter, "Swapchain::AcquireNextImage()" );
 
 
   // swapchain either not optimal or expired, returning nullptr and
@@ -124,11 +135,18 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   if( prevBufferIndex >= 0 )
   {
+    DALI_TRACE_BEGIN( gFilter, "Swapchain::WaitForFence()" );
     mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
+    DALI_TRACE_END( gFilter, "Swapchain::WaitForFence()" );
   }
 
+  DALI_TRACE_BEGIN( gFilter, "Swapchain::ExecuteActions()" );
   mGraphics->ExecuteActions();
+  DALI_TRACE_END( gFilter, "Swapchain::ExecuteActions()" );
+
+  DALI_TRACE_BEGIN( gFilter, "Swapchain::CollectGarbage()" );
   mGraphics->CollectGarbage();
+  DALI_TRACE_END( gFilter, "Swapchain::CollectGarbage()" );
 
   swapBuffer.masterCmdBuffer->Reset();
   swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
@@ -159,7 +177,9 @@ void Swapchain::Present()
   .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
   .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
 
+  DALI_TRACE_BEGIN( gFilter, "Swapchain::Submit()" );
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
+  DALI_TRACE_END( gFilter, "Swapchain::Submit()" );
 
   vk::PresentInfoKHR presentInfo{};
   vk::Result result;
@@ -170,7 +190,9 @@ void Swapchain::Present()
              .setPWaitSemaphores( &mSyncPrimitives[mFrameCounter]->submitSemaphore )
              .setWaitSemaphoreCount( 1 );
 
+  DALI_TRACE_BEGIN( gFilter, "Swapchain::Present()" );
   mGraphics->Present( *mQueue, presentInfo );
+  DALI_TRACE_END( gFilter, "Swapchain::Present()" );
 
   // handle error
   if( presentInfo.pResults[0] != vk::Result::eSuccess )
