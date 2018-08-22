@@ -122,6 +122,8 @@ public:
    */
   bool IsValid() const;
 
+  void Invalidate();
+
 private:
 
   Swapchain( Graphics& graphics,

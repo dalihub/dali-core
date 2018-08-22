@@ -78,6 +78,16 @@ Dali::Graphics::FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > 
   return 0u;
 }
 
+void Graphics::Pause()
+{
+  mGraphicsImpl->GetController().Pause();
+}
+
+void Graphics::Resume()
+{
+  mGraphicsImpl->GetController().Resume();
+}
+
 void Graphics::PreRender(Dali::Graphics::FBID framebufferId)
 {
   assert(framebufferId != 0 && "Invalid FBID!");

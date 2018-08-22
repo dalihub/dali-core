@@ -140,6 +140,16 @@ public:
    */
   virtual void EndFrame() = 0;
 
+  /**
+   * @brief Respond to pause lifecycle event
+   */
+  virtual void Pause() = 0;
+
+  /**
+   * @brief Respond to resume lifecycle event
+   */
+  virtual void Resume() = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

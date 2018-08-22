@@ -216,6 +216,12 @@ bool Swapchain::IsValid() const
   return mIsValid;
 }
 
+void Swapchain::Invalidate()
+{
+  mIsValid = false;
+}
+
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali

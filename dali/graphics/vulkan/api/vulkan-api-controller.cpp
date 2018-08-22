@@ -532,7 +532,12 @@ struct Controller::Impl
         mResourceTransferRequests = std::move(tmp);
       }
     }
+  }
 
+  void InvalidateSwapchain()
+  {
+    auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
+    swapchain->Invalidate();
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
@@ -633,6 +638,15 @@ void Controller::BeginFrame()
 void Controller::EndFrame()
 {
   mImpl->EndFrame();
+}
+
+void Controller::Pause()
+{
+  mImpl->InvalidateSwapchain();
+}
+
+void Controller::Resume()
+{
 }
 
 API::TextureFactory& Controller::GetTextureFactory() const
