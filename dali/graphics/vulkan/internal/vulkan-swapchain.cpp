@@ -104,12 +104,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-  // start recording
-  auto inheritanceInfo = vk::CommandBufferInheritanceInfo{}
-          .setFramebuffer( swapBuffer.framebuffer->GetVkHandle() )
-          .setRenderPass( swapBuffer.framebuffer->GetRenderPass() )
-          .setSubpass( 0 );
-
   if( mFrameIndex > mSwapchainBuffer.size() )
   {
     mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
@@ -120,7 +114,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   }
 
   swapBuffer.masterCmdBuffer->Reset();
-  swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eRenderPassContinue, &inheritanceInfo );
+  swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
   return swapBuffer.framebuffer;
 }
@@ -138,9 +132,6 @@ void Swapchain::Present()
 
   // end command buffer
   swapBuffer.masterCmdBuffer->End();
-
-  // submit
-  //mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
   // create present semaphore
   if( !swapBuffer.presentSignalSemaphore )
