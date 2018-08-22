@@ -145,7 +145,28 @@ private:
 
   std::vector< SwapchainBuffer > mSwapchainBuffer;
 
+  struct SyncPrimitives
+  {
+    SyncPrimitives( Graphics& _graphics );
+
+    ~SyncPrimitives();
+
+    Graphics& graphics;
+    /**
+     * Semaphore signalled on acquire next image
+     */
+    vk::Semaphore acquireNextImageSemaphore;
+
+    /**
+     * Semaphore signalled on complete commands submission
+     */
+    vk::Semaphore submitSemaphore;
+  };
+
+  std::vector<std::unique_ptr<SyncPrimitives>> mSyncPrimitives;
+
   bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
+  uint32_t mFrameCounter { 0u };
 };
 
 } // namespace Vulkan
