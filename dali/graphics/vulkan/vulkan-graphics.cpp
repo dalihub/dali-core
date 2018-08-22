@@ -99,9 +99,6 @@ Graphics::~Graphics()
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" )
   mResourceRegister->PrintReferenceCountReport();
-  PrintAllocationReport( *mDescriptorAllocator );
-
-  mDescriptorAllocator.reset( nullptr );
 
   // Clear the last references of resources in the cache.
   // This should ensure that all resources have been queued for garbage collection
@@ -112,6 +109,10 @@ Graphics::~Graphics()
 
   // Execute any outstanding actions...
   ExecuteActions();
+
+  PrintAllocationReport( *mDescriptorAllocator );
+
+  mDescriptorAllocator.reset( nullptr );
 
   // Collect the garbage! And shut down gracefully...
   CollectGarbage();

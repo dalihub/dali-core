@@ -113,6 +113,10 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   if( mFrameIndex > mSwapchainBuffer.size() )
   {
     mGraphics->WaitForFence( swapBuffer.endOfFrameFence );
+    mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
 
   swapBuffer.masterCmdBuffer->Reset();
@@ -136,7 +140,7 @@ void Swapchain::Present()
   swapBuffer.masterCmdBuffer->End();
 
   // submit
-  mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+  //mGraphics->ResetFence( swapBuffer.endOfFrameFence );
 
   // create present semaphore
   if( !swapBuffer.presentSignalSemaphore )
@@ -163,9 +167,6 @@ void Swapchain::Present()
              .setWaitSemaphoreCount( 1 );
 
   mGraphics->Present( *mQueue, presentInfo );
-
-  mGraphics->ExecuteActions();
-  mGraphics->CollectGarbage();
 
   // handle error
   if( presentInfo.pResults[0] != vk::Result::eSuccess )
