@@ -267,9 +267,11 @@ struct Controller::Impl
               framebuffer,
               commands );
     }
-
-    auto& vector = mRenderPasses.back().renderCommands;
-    vector.insert( vector.end(), commands.begin(), commands.end() );
+    else
+    {
+      auto& vector = mRenderPasses.back().renderCommands;
+      vector.insert( vector.end(), commands.begin(), commands.end() );
+    }
   }
 
   /**
