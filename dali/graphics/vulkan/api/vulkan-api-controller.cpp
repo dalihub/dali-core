@@ -173,7 +173,7 @@ struct Controller::Impl
     }
 
     mMemoryTransferFutures.clear();
-	
+
     DALI_ANNOTATE_BEGIN( 2, 0x0000cccc, "Present" );
     swapchain->Present();
     DALI_ANNOTATE_END( 2 );
@@ -276,9 +276,11 @@ struct Controller::Impl
               framebuffer,
               commands );
     }
-
-    auto& vector = mRenderPasses.back().renderCommands;
-    vector.insert( vector.end(), commands.begin(), commands.end() );
+    else
+    {
+      auto& vector = mRenderPasses.back().renderCommands;
+      vector.insert( vector.end(), commands.begin(), commands.end() );
+    }
   }
 
   /**
