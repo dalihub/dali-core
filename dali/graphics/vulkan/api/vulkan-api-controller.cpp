@@ -269,7 +269,7 @@ struct Controller::Impl
     }
 
     auto& vector = mRenderPasses.back().renderCommands;
-    vector.insert( vector.begin(), commands.begin(), commands.end() );
+    vector.insert( vector.end(), commands.begin(), commands.end() );
   }
 
   /**
