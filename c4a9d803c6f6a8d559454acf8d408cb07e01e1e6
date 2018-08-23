@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb114ea2_bf237b42",
+        "filename": "dali/graphics/thread-pool.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:19:18Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 223,
+        "startChar": 2,
+        "endLine": 223,
+        "endChar": 24
+      },
+      "revId": "c4a9d803c6f6a8d559454acf8d408cb07e01e1e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
