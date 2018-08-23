@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7fabc221_903763f1",
+        "filename": "dali/graphics/thread-pool.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:17:51Z",
+      "side": 1,
+      "message": "formatting.",
+      "range": {
+        "startLine": 171,
+        "startChar": 2,
+        "endLine": 171,
+        "endChar": 64
+      },
+      "revId": "d1693ecb66560df59fe1aeef90ce954ba76feaaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ec0a4d20_abb2258f",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:17:51Z",
+      "side": 1,
+      "message": "should be static member of RenderCommand.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 17
+      },
+      "revId": "d1693ecb66560df59fe1aeef90ce954ba76feaaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c1354e9_05476c72",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:17:51Z",
+      "side": 1,
+      "message": "Fix this todo",
+      "range": {
+        "startLine": 131,
+        "startChar": 31,
+        "endLine": 131,
+        "endChar": 78
+      },
+      "revId": "d1693ecb66560df59fe1aeef90ce954ba76feaaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "52e9ad4e_f3ac5759",
+        "filename": "dali/graphics/vulkan/internal/vulkan-debug.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:17:51Z",
+      "side": 1,
+      "message": "Need to remove this eventually.",
+      "range": {
+        "startLine": 19,
+        "startChar": 7,
+        "endLine": 19,
+        "endChar": 20
+      },
+      "revId": "d1693ecb66560df59fe1aeef90ce954ba76feaaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
