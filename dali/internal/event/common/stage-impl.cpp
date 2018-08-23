@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -624,6 +624,22 @@ void Stage::KeepRendering( float durationSeconds )
   KeepRenderingMessage( mUpdateManager, durationSeconds );
 }
 
+void Stage::SetRenderingBehavior( DevelStage::Rendering renderingBehavior )
+{
+  if( mRenderingBehavior != renderingBehavior )
+  {
+    // Send message to change the rendering behavior
+    SetRenderingBehaviorMessage( mUpdateManager, renderingBehavior );
+
+    mRenderingBehavior = renderingBehavior;
+  }
+}
+
+DevelStage::Rendering Stage::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
+}
+
 bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
@@ -804,6 +820,7 @@ Stage::Stage( AnimationPlaylist& playlist,
   mStereoBase( DEFAULT_STEREO_BASE ),
   mTopMargin( 0 ),
   mSystemOverlay( NULL ),
+  mRenderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
   mDepthTreeDirty( false ),
   mForceNextUpdate( false ),
   mRenderToFbo( false )

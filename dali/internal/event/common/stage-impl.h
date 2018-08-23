@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_STAGE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,6 +314,16 @@ public:
   void KeepRendering( float durationSeconds );
 
   /**
+   * @copydoc Dali::DevelStage::SetRenderingBehavior()
+   */
+  void SetRenderingBehavior( DevelStage::Rendering renderingBehavior );
+
+  /**
+   * @copydoc Dali::DevelStage::GetRenderingBehavior()
+   */
+  DevelStage::Rendering GetRenderingBehavior() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -552,6 +562,8 @@ private:
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 
   Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
+
+  DevelStage::Rendering mRenderingBehavior; ///< The rendering behavior
 
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
   bool mForceNextUpdate:1; ///< True if the next rendering is really required.
