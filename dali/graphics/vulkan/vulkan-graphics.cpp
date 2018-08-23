@@ -169,6 +169,8 @@ void Graphics::CreateDevice()
 
     std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
+    mPhysicalDeviceFeatures->robustBufferAccess = vk::Bool32( false );
+
     auto info = vk::DeviceCreateInfo{};
     info.setEnabledExtensionCount( U32( extensions.size() ) )
         .setPpEnabledExtensionNames( extensions.data() )
