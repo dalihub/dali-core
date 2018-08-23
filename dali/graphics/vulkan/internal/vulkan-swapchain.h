@@ -167,6 +167,7 @@ private:
 
   bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
   uint32_t mFrameCounter { 0u };
+  bool mFrameSyncEnabled;
 };
 
 } // namespace Vulkan

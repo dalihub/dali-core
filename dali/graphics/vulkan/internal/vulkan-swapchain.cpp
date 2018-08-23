@@ -65,7 +65,9 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
   mSwapchainKHR( vkHandle ),
   mSwapchainCreateInfoKHR( std::move( createInfo ) ),
   mSwapchainBuffer( std::move( framebuffers ) ),
-  mIsValid( true )
+  mIsValid( true ),
+  mFrameCounter( 0u ),
+  mFrameSyncEnabled( false )
 {
 }
 
@@ -93,7 +95,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   const auto& device = mGraphics->GetDevice();
 
   // on swapchain first create sync primitives if not created yet
-  int prevBufferIndex = -1;
   if( mSyncPrimitives.empty() )
   {
     mSyncPrimitives.resize( mSwapchainBuffer.size() );
@@ -102,10 +103,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
       prim.reset( new SyncPrimitives( *mGraphics ) );
     }
   }
-  else
-  {
-    prevBufferIndex = int(mCurrentBufferIndex);
-  }
+
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
                                             mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore,
@@ -122,13 +120,12 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-  if( prevBufferIndex >= 0 )
+  if( mFrameSyncEnabled )
   {
-    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
+    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(mCurrentBufferIndex)].endOfFrameFence );
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
-
-  mGraphics->ExecuteActions();
-  mGraphics->CollectGarbage();
 
   swapBuffer.masterCmdBuffer->Reset();
   swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
@@ -180,6 +177,10 @@ void Swapchain::Present()
   }
 
   mFrameCounter = uint32_t( (mFrameCounter+1) % mSwapchainBuffer.size() );
+  if( !mFrameSyncEnabled && mFrameCounter == 0 )
+  {
+    mFrameSyncEnabled = true;
+  }
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
