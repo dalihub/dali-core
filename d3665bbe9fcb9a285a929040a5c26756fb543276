@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e64e691_983d735b",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:42:55Z",
+      "side": 1,
+      "message": "Why base interface rather than derived implementation?",
+      "range": {
+        "startLine": 84,
+        "startChar": 33,
+        "endLine": 84,
+        "endChar": 36
+      },
+      "revId": "d3665bbe9fcb9a285a929040a5c26756fb543276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
