@@ -32,6 +32,8 @@
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
+#undef DALIEXT_ERRLOG
+#define DALIEXT_ERRLOG(...)
 namespace Dali
 {
 namespace Graphics
@@ -65,7 +67,9 @@ Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
   mSwapchainKHR( vkHandle ),
   mSwapchainCreateInfoKHR( std::move( createInfo ) ),
   mSwapchainBuffer( std::move( framebuffers ) ),
-  mIsValid( true )
+  mIsValid( true ),
+  mFrameCounter( 0u ),
+  mFrameSyncEnabled( false )
 {
 }
 
@@ -83,6 +87,7 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 {
+  DALIEXT_ERRLOG( "AcquireNextFramebuffer()", "");
   // prevent from using invalid swapchain
   if( !mIsValid )
   {
@@ -93,7 +98,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   const auto& device = mGraphics->GetDevice();
 
   // on swapchain first create sync primitives if not created yet
-  int prevBufferIndex = -1;
   if( mSyncPrimitives.empty() )
   {
     mSyncPrimitives.resize( mSwapchainBuffer.size() );
@@ -102,10 +106,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
       prim.reset( new SyncPrimitives( *mGraphics ) );
     }
   }
-  else
-  {
-    prevBufferIndex = int(mCurrentBufferIndex);
-  }
+
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
                                             mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore,
@@ -116,19 +117,19 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   // setting validity to false
   if( result != vk::Result::eSuccess )
   {
+    DALIEXT_ERRLOG( "AcquireNextFramebuffer(): result = %d", int(result));
     mIsValid = false;
     return RefCountedFramebuffer();
   }
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-  if( prevBufferIndex >= 0 )
+  if( mFrameSyncEnabled )
   {
-    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
+    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(mCurrentBufferIndex)].endOfFrameFence );
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
-
-  mGraphics->ExecuteActions();
-  mGraphics->CollectGarbage();
 
   swapBuffer.masterCmdBuffer->Reset();
   swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
@@ -159,6 +160,7 @@ void Swapchain::Present()
   .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
   .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
 
+  DALIEXT_ERRLOG( "Present(): Submit()", "");
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
 
   vk::PresentInfoKHR presentInfo{};
@@ -175,11 +177,16 @@ void Swapchain::Present()
   // handle error
   if( presentInfo.pResults[0] != vk::Result::eSuccess )
   {
+    DALIEXT_ERRLOG( "Present(): result: %d", uint32_t(presentInfo.pResults[0]));
     // invalidate swapchain
     mIsValid = false;
   }
 
   mFrameCounter = uint32_t( (mFrameCounter+1) % mSwapchainBuffer.size() );
+  if( !mFrameSyncEnabled && mFrameCounter == 0 )
+  {
+    mFrameSyncEnabled = true;
+  }
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
