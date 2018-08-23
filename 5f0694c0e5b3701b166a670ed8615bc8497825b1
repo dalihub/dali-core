@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2e8d8db7_6334fc30",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-23T10:30:28Z",
+      "side": 1,
+      "message": "Clean up removal properly.",
+      "range": {
+        "startLine": 62,
+        "startChar": 1,
+        "endLine": 62,
+        "endChar": 19
+      },
+      "revId": "5f0694c0e5b3701b166a670ed8615bc8497825b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
