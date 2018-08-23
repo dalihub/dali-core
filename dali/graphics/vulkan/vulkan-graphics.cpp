@@ -169,6 +169,14 @@ void Graphics::CreateDevice()
 
     std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
+    mPhysicalDeviceFeatures->robustBufferAccess = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->geometryShader = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->tessellationShader = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->inheritedQueries = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->sparseBinding = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->sparseResidency2Samples = vk::Bool32( false );
+//    mPhysicalDeviceFeatures->sparseResidency4Samples = vk::Bool32( false );
+
     auto info = vk::DeviceCreateInfo{};
     info.setEnabledExtensionCount( U32( extensions.size() ) )
         .setPpEnabledExtensionNames( extensions.data() )
