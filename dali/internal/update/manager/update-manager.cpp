@@ -198,6 +198,7 @@ struct UpdateManager::Impl
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
+    renderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
     animationFinishedDuringUpdate( false ),
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
@@ -302,6 +303,8 @@ struct UpdateManager::Impl
   float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
   int                                  frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+
+  DevelStage::Rendering                renderingBehavior;             ///< Set via DevelStage::SetRenderingBehavior
 
   bool                                 animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
   bool                                 previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
@@ -970,13 +973,15 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
   unsigned int keepUpdatingRequest = KeepUpdating::NOT_REQUESTED;
 
+  // If the rendering behavior is set to continuously render, then continue to render.
   // If Stage::KeepRendering() has been called, then continue until the duration has elapsed.
   // Keep updating until no messages are received and no animations are running.
   // If an animation has just finished, update at least once more for Discard end-actions.
   // No need to check for renderQueue as there is always a render after update and if that
   // render needs another update it will tell the adaptor to call update again
 
-  if ( mImpl->keepRenderingSeconds > 0.0f )
+  if ( ( mImpl->renderingBehavior == DevelStage::Rendering::CONTINUOUSLY ) ||
+       ( mImpl->keepRenderingSeconds > 0.0f ) )
   {
     keepUpdatingRequest |= KeepUpdating::STAGE_KEEP_RENDERING;
   }
@@ -1022,6 +1027,11 @@ void UpdateManager::SetDefaultSurfaceRect( const Rect<int>& rect )
 void UpdateManager::KeepRendering( float durationSeconds )
 {
   mImpl->keepRenderingSeconds = std::max( mImpl->keepRenderingSeconds, durationSeconds );
+}
+
+void UpdateManager::SetRenderingBehavior( DevelStage::Rendering renderingBehavior )
+{
+  mImpl->renderingBehavior = renderingBehavior;
 }
 
 void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool systemLevel )
