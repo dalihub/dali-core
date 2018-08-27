@@ -57,7 +57,7 @@ public:
    * Note! this class *does not* prevent a deadlock in the case when same thread is
    * locking the same mutex twice.
    */
-  class ScopedLock
+  class DALI_CORE_API ScopedLock
   {
   public:
 

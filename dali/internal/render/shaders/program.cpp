@@ -248,7 +248,7 @@ void Program::GetActiveSamplerUniforms()
   mGlAbstraction.GetProgramiv( mProgramId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformMaxNameLength );
 
   std::vector<std::string> samplerNames;
-  char name[uniformMaxNameLength+1]; // Allow for null terminator
+  std::vector<char> name(uniformMaxNameLength + 1); // Allow for null terminator
   std::vector< LocationPosition >  samplerUniformLocations;
 
   {
@@ -259,12 +259,12 @@ void Program::GetActiveSamplerUniforms()
     for( int i=0; i<numberOfActiveUniforms; ++i )
     {
       mGlAbstraction.GetActiveUniform( mProgramId, static_cast< GLuint >( i ), uniformMaxNameLength,
-                                       &nameLength, &number, &type, name );
+                                       &nameLength, &number, &type, name.data() );
 
       if( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_EXTERNAL_OES )
       {
-        GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name );
-        samplerNames.push_back(name);
+        GLuint location = mGlAbstraction.GetUniformLocation( mProgramId, name.data() );
+        samplerNames.push_back( name.data() );
         samplerUniformLocations.push_back(LocationPosition(location, -1));
       }
     }
