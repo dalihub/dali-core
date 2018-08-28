@@ -169,12 +169,27 @@ void Graphics::CreateDevice()
 
     std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
-    mPhysicalDeviceFeatures->robustBufferAccess = vk::Bool32( false );
+    vk::PhysicalDeviceFeatures featuresToEnable{};
+
+    if( mPhysicalDeviceFeatures.fillModeNonSolid )
+    {
+      featuresToEnable.fillModeNonSolid = VK_TRUE;
+    }
+
+    if( mPhysicalDeviceFeatures.textureCompressionASTC_LDR )
+    {
+      featuresToEnable.textureCompressionASTC_LDR = VK_TRUE;
+    }
+
+    if( mPhysicalDeviceFeatures.textureCompressionETC2 )
+    {
+      featuresToEnable.textureCompressionETC2 = VK_TRUE;
+    }
 
     auto info = vk::DeviceCreateInfo{};
     info.setEnabledExtensionCount( U32( extensions.size() ) )
         .setPpEnabledExtensionNames( extensions.data() )
-        .setPEnabledFeatures( &( *mPhysicalDeviceFeatures ) )
+        .setPEnabledFeatures( &featuresToEnable  )
         .setPQueueCreateInfos( queueInfos.data() )
         .setQueueCreateInfoCount( U32( queueInfos.size() ) );
 
@@ -1188,7 +1203,7 @@ const vk::AllocationCallbacks& Graphics::GetAllocator() const
 
 const vk::PhysicalDeviceMemoryProperties& Graphics::GetMemoryProperties() const
 {
-  return *mPhysicalDeviceMemoryProperties;
+  return mPhysicalDeviceMemoryProperties;
 }
 
 Queue& Graphics::GetGraphicsQueue( uint32_t index ) const
@@ -1464,12 +1479,9 @@ void Graphics::PreparePhysicalDevice()
 void Graphics::GetPhysicalDeviceProperties()
 {
   // store data on heap to keep object smaller
-  mPhysicalDeviceProperties =
-          MakeUnique< vk::PhysicalDeviceProperties >( mPhysicalDevice.getProperties() );
-  mPhysicalDeviceMemoryProperties =
-          MakeUnique< vk::PhysicalDeviceMemoryProperties >( mPhysicalDevice.getMemoryProperties() );
-  mPhysicalDeviceFeatures =
-          MakeUnique< vk::PhysicalDeviceFeatures >( mPhysicalDevice.getFeatures() );
+  mPhysicalDeviceProperties =  mPhysicalDevice.getProperties();
+  mPhysicalDeviceMemoryProperties = mPhysicalDevice.getMemoryProperties();
+  mPhysicalDeviceFeatures = mPhysicalDevice.getFeatures();
 }
 
 void Graphics::GetQueueFamilyProperties()
