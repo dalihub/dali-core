@@ -296,8 +296,6 @@ private: // Methods
 
   RefCountedCommandPool GetCommandPool( std::thread::id threadId );
 
-
-
 private: // Members
 
   // physical device
@@ -309,9 +307,9 @@ private: // Members
   vk::Instance mInstance;
 
   // physical device properties
-  std::unique_ptr< vk::PhysicalDeviceProperties > mPhysicalDeviceProperties;
-  std::unique_ptr< vk::PhysicalDeviceMemoryProperties > mPhysicalDeviceMemoryProperties;
-  std::unique_ptr< vk::PhysicalDeviceFeatures > mPhysicalDeviceFeatures;
+  vk::PhysicalDeviceProperties mPhysicalDeviceProperties;
+  vk::PhysicalDeviceMemoryProperties mPhysicalDeviceMemoryProperties;
+  vk::PhysicalDeviceFeatures mPhysicalDeviceFeatures;
 
   std::unique_ptr< vk::AllocationCallbacks > mAllocator{ nullptr };
 
