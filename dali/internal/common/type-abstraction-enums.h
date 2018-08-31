@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_ABSTRACTION_ENUMS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/common/stage-devel.h>
 #include <dali/internal/common/type-abstraction.h>
 
 namespace Dali
@@ -36,6 +37,7 @@ template <> struct ParameterType< Dali::DepthFunction::Type >    : public BasicT
 template <> struct ParameterType< Dali::RenderMode::Type >       : public BasicType< Dali::RenderMode::Type > {};
 template <> struct ParameterType< Dali::StencilFunction::Type >  : public BasicType< Dali::StencilFunction::Type > {};
 template <> struct ParameterType< Dali::StencilOperation::Type > : public BasicType< Dali::StencilOperation::Type > {};
+template <> struct ParameterType< Dali::DevelStage::Rendering >  : public BasicType< Dali::DevelStage::Rendering > {};
 
 } //namespace Internal
 
