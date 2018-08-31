@@ -105,16 +105,12 @@ public: // Create methods
 
   void InitialiseController();
 
-  FBID CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory,
+  FBID CreateSurface( SurfaceFactory& surfaceFactory,
                       const Integration::Graphics::GraphicsCreateInfo& createInfo );
 
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
 
   RefCountedSwapchain ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain);
-
-  RefCountedShader CreateShader(); //will see if this will work
-
-  RefCountedPipeline CreatePipeline();
 
   RefCountedFence CreateFence( const vk::FenceCreateInfo& fenceCreateInfo );
 
@@ -142,12 +138,6 @@ public: // Create methods
                                        vk::ImageSubresourceRange subresourceRange );
 
   RefCountedImageView CreateImageView( RefCountedImage image );
-
-  RefCountedDescriptorPool CreateDescriptorPool();
-
-  RefCountedGpuMemoryBlock CreateGpuMemoryBlock();
-
-  RefCountedDescriptorSet CreateDescriptorSet();
 
   RefCountedSampler CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo );
 

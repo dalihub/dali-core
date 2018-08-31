@@ -48,6 +48,13 @@ namespace Integration
 namespace Graphics
 {
 class SurfaceFactory;
+struct EXPORT_API Surface
+{
+  Surface( Dali::Graphics::GraphicsImpl* graphicsImpl, Dali::Graphics::FBID fbid );
+  ~Surface();
+  Dali::Graphics::GraphicsImpl* mGraphicsImpl;
+  Dali::Graphics::FBID frambufferId;
+};
 
 enum class DepthStencilMode
 {
@@ -106,7 +113,7 @@ public:
    * @param surfaceFactory
    * @return
    */
-  Dali::Graphics::FBID CreateSurface( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory );
+  std::unique_ptr<Surface> CreateSurface( SurfaceFactory& surfaceFactory );
 
   /**
    * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )
@@ -114,7 +121,7 @@ public:
    *
    * @note This should be called from the render thread
    */
-  Dali::Graphics::FBID Create( std::unique_ptr<Dali::Integration::Graphics::SurfaceFactory> surfaceFactory);
+  void Create();
 
   /**
    * Lifecycle event for pausing application

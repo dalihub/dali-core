@@ -38,6 +38,25 @@ namespace Integration
 namespace Graphics
 {
 
+Surface::Surface( Dali::Graphics::GraphicsImpl* graphicsImpl, Dali::Graphics::FBID fbid )
+    : mGraphicsImpl( graphicsImpl ),
+      frambufferId( fbid )
+{
+}
+
+Surface::~Surface()
+{
+  if( auto surface = mGraphicsImpl->GetSurface( frambufferId ) )
+  {
+    mGraphicsImpl->DeviceWaitIdle();
+    auto swapchain = mGraphicsImpl->GetSwapchainForFBID( frambufferId );
+    swapchain->Destroy();
+    surface->Destroy();
+    mGraphicsImpl->CollectGarbage();
+  }
+}
+
+
 using Dali::Integration::Graphics::SurfaceFactory;
 
 Graphics::Graphics( const GraphicsCreateInfo& info )
@@ -54,13 +73,19 @@ Graphics::Graphics( const GraphicsCreateInfo& info )
 Graphics::~Graphics() = default;
 
 
-Dali::Graphics::FBID Graphics::Create( std::unique_ptr< SurfaceFactory > surfaceFactory )
+void Graphics::Create()
 {
-  // create surface ( also takes surface factory ownership )
-  auto retval = mGraphicsImpl->CreateSurface( std::move(surfaceFactory), mCreateInfo );
-
   // create device
   mGraphicsImpl->CreateDevice();
+
+  // initialise controller
+  mGraphicsImpl->InitialiseController();
+}
+
+std::unique_ptr<Surface> Graphics::CreateSurface( SurfaceFactory& surfaceFactory)
+{
+  // create surface ( also takes surface factory ownership )
+  auto retval = mGraphicsImpl->CreateSurface( surfaceFactory, mCreateInfo );
 
   // create swapchain from surface
   auto surface = mGraphicsImpl->GetSurface( retval );
@@ -68,14 +93,7 @@ Dali::Graphics::FBID Graphics::Create( std::unique_ptr< SurfaceFactory > surface
   // create swapchain
   mGraphicsImpl->CreateSwapchainForSurface( surface );
 
-  mGraphicsImpl->InitialiseController();
-
-  return retval;
-}
-
-Dali::Graphics::FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory)
-{
-  return 0u;
+  return std::unique_ptr<Surface>( new Surface( mGraphicsImpl.get(), retval ) );
 }
 
 void Graphics::Pause()

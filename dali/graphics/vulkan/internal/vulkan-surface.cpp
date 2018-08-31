@@ -19,7 +19,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
 
 namespace Dali
 {
@@ -28,12 +27,8 @@ namespace Graphics
 namespace Vulkan
 {
 
-using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
-
-Surface::Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory )
-: mGraphics( &graphics ),
-  mSurfaceFactory( std::move( surfaceFactory ) ),
-  mVulkanSurfaceFactory( dynamic_cast<VkSurfaceFactory*>( mSurfaceFactory.get() ) )
+Surface::Surface( Graphics& graphics )
+: mGraphics( &graphics )
 {
 }
 
@@ -51,16 +46,20 @@ const vk::SurfaceCapabilitiesKHR& Surface::GetCapabilities() const
 
 bool Surface::OnDestroy()
 {
-  auto instance = mGraphics->GetInstance();
-  auto surface = mSurface;
-  auto allocator = &mGraphics->GetAllocator();
+  if( mSurface )
+  {
+    auto instance = mGraphics->GetInstance();
+    auto surface = mSurface;
+    auto allocator = &mGraphics->GetAllocator();
 
-  mGraphics->DiscardResource( [ instance, surface, allocator ]() {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: surface->%p\n",
-                   static_cast< VkSurfaceKHR >( surface ) )
-    instance.destroySurfaceKHR( surface, allocator );
-  } );
+    mGraphics->DiscardResource( [ instance, surface, allocator ]() {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: surface->%p\n",
+                     static_cast< VkSurfaceKHR >( surface ) )
+      instance.destroySurfaceKHR( surface, allocator );
+    } );
 
+    mSurface = nullptr;
+  }
   return false;
 }
 

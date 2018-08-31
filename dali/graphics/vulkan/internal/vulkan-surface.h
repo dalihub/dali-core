@@ -46,9 +46,6 @@ namespace Graphics
 {
 namespace Vulkan
 {
-using Dali::Integration::Graphics::SurfaceFactory;
-using Dali::Integration::Graphics::Vulkan::VkSurfaceFactory;
-
 class Graphics;
 
 class Surface : public VkManaged
@@ -74,12 +71,10 @@ public:
   bool OnDestroy() override;
 
 private:
-  Surface( Graphics& graphics, std::unique_ptr< SurfaceFactory > surfaceFactory );
+  Surface( Graphics& graphic );
 
 private:
   Graphics* mGraphics;
-  std::unique_ptr< SurfaceFactory > mSurfaceFactory;
-  VkSurfaceFactory* mVulkanSurfaceFactory;
   vk::SurfaceKHR mSurface;
   vk::SurfaceCapabilitiesKHR mCapabilities;
 };

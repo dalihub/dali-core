@@ -214,20 +214,22 @@ void Graphics::CreateDevice()
   mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
-FBID Graphics::CreateSurface( std::unique_ptr< SurfaceFactory > surfaceFactory,
+FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
                               const Integration::Graphics::GraphicsCreateInfo& createInfo )
 {
-  // create surface from the factory
-  auto surface = new Surface( *this, std::move( surfaceFactory ) );
+  auto vulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>( &surfaceFactory );
 
-  if( !surface->mVulkanSurfaceFactory )
+  if( !vulkanSurfaceFactory )
   {
-    return -1;
+    return -1; // fail
   }
 
-  surface->mSurface = surface->mVulkanSurfaceFactory->Create( mInstance,
-                                                              mAllocator.get(),
-                                                              mPhysicalDevice );
+  // create surface from the factory
+  auto surface = new Surface( *this );
+
+  surface->mSurface = vulkanSurfaceFactory->Create( mInstance,
+                                                    mAllocator.get(),
+                                                    mPhysicalDevice );
 
   if( !surface->mSurface )
   {
@@ -1479,11 +1481,6 @@ void Graphics::GetQueueFamilyProperties()
 
 std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
 {
-  // surface is needed in order to find a family that supports presentation to this surface
-  // fixme: assuming all surfaces will be compatible with the queue family
-  assert( !mSurfaceFBIDMap.empty() &&
-          "At least one surface has to be created before creating VkDevice!" );
-
   std::vector< vk::DeviceQueueCreateInfo > queueInfos{};
 
   constexpr uint8_t MAX_QUEUE_TYPES = 3;
@@ -1499,7 +1496,7 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
   // Transfer
   auto& transferFamily = familyIndexTypes[1];
 
-  // Transfer
+  // Present
   auto& presentFamily = familyIndexTypes[2];
 
   auto queueFamilyIndex = 0u;
@@ -1508,15 +1505,15 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
     if( ( prop.queueFlags & vk::QueueFlagBits::eGraphics ) && graphicsFamily == -1u )
     {
       graphicsFamily = queueFamilyIndex;
+
+      //@todo: in case the graphics family cannot support presentation
+      // we should find the right queue family with very first surface.
+      // At this point all supported platforms have general purpose queues.
+      presentFamily = queueFamilyIndex;
     }
     if( ( prop.queueFlags & vk::QueueFlagBits::eTransfer ) && transferFamily == -1u )
     {
       transferFamily = queueFamilyIndex;
-    }
-    if( mPhysicalDevice.getSurfaceSupportKHR( queueFamilyIndex, mSurfaceFBIDMap.begin()->second.
-    surface->GetVkHandle() ).value && presentFamily == -1u )
-    {
-      presentFamily = queueFamilyIndex;
     }
     ++queueFamilyIndex;
   }
@@ -1525,10 +1522,8 @@ std::vector< vk::DeviceQueueCreateInfo > Graphics::GetQueueCreateInfos()
           && "No queue family that supports graphics operations!" );
   assert( transferFamily != std::numeric_limits< uint32_t >::max()
           && "No queue family that supports transfer operations!" );
-  assert( presentFamily != std::numeric_limits< uint32_t >::max()
-          && "No queue family that supports present operations!" );
 
-  // todo: we may require that the family must be same for all types of operations, it makes
+  // todo: we may require that the family must be same for all type of operations, it makes
   // easier to handle synchronisation related issues.
 
   // sort queues

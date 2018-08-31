@@ -222,6 +222,8 @@ bool Swapchain::OnDestroy()
                      static_cast< VkSwapchainKHR >(swapchain) )
       device.destroySwapchainKHR( swapchain, allocator );
     } );
+
+    mSwapchainKHR = nullptr;
   }
   return false;
 }
