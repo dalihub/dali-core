@@ -22,6 +22,8 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
+#include <dali/devel-api/common/stage-devel.h>
+
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/common/shader-saver.h>
@@ -585,6 +587,11 @@ public:
   void KeepRendering( float durationSeconds );
 
   /**
+   * @copydoc Dali::DevelStage::SetRenderingBehavior()
+   */
+  void SetRenderingBehavior( DevelStage::Rendering renderingBehavior );
+
+  /**
    * Sets the depths of all layers.
    * @param layers The layers in depth order.
    * @param[in] systemLevel True if using the system-level overlay.
@@ -956,6 +963,17 @@ inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds 
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::KeepRendering, durationSeconds );
+}
+
+inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Rendering renderingBehavior )
+{
+  typedef MessageValue1< UpdateManager, DevelStage::Rendering > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetRenderingBehavior, renderingBehavior );
 }
 
 /**
