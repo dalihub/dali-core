@@ -120,6 +120,8 @@ struct Controller::Impl
 
     swapchain->AcquireNextFramebuffer();
 
+    mRenderPasses.clear();
+
     if( !swapchain->IsValid() )
     {
       // make sure device doesn't do any work before replacing swapchain
@@ -169,23 +171,6 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
-
-    mRenderPasses.clear();
-
-    if( !swapchain->IsValid() )
-    {
-      // get surface associated with 'main' framebuffer
-      auto surface = mGraphics.GetSurface( 0u );
-
-      // wait till device is idle, no more GPU work done
-      mGraphics.DeviceWaitIdle();
-
-      // replace swapchain
-      mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
-
-      mGraphics.ExecuteActions();
-      mGraphics.CollectGarbage();
-    }
   }
 
   API::TextureFactory& GetTextureFactory() const
