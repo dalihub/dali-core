@@ -70,6 +70,8 @@ public:
 
   bool OnDestroy() override;
 
+  void Replace();
+
 private:
   Surface( Graphics& graphic );
 
@@ -77,6 +79,7 @@ private:
   Graphics* mGraphics;
   vk::SurfaceKHR mSurface;
   vk::SurfaceCapabilitiesKHR mCapabilities;
+  std::unique_ptr<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory> mFactory;
 };
 
 } // namespace Vulkan

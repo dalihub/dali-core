@@ -82,10 +82,10 @@ void Graphics::Create()
   mGraphicsImpl->InitialiseController();
 }
 
-std::unique_ptr<Surface> Graphics::CreateSurface( SurfaceFactory& surfaceFactory)
+std::unique_ptr<Surface> Graphics::CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory)
 {
   // create surface ( also takes surface factory ownership )
-  auto retval = mGraphicsImpl->CreateSurface( surfaceFactory, mCreateInfo );
+  auto retval = mGraphicsImpl->CreateSurface( std::move( surfaceFactory ), mCreateInfo );
 
   // create swapchain from surface
   auto surface = mGraphicsImpl->GetSurface( retval );

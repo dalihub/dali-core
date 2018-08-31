@@ -113,7 +113,7 @@ public:
    * @param surfaceFactory
    * @return
    */
-  std::unique_ptr<Surface> CreateSurface( SurfaceFactory& surfaceFactory );
+  std::unique_ptr<Surface> CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory );
 
   /**
    * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )

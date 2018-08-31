@@ -19,7 +19,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-
+#include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
 namespace Dali
 {
 namespace Graphics
@@ -28,7 +28,8 @@ namespace Vulkan
 {
 
 Surface::Surface( Graphics& graphics )
-: mGraphics( &graphics )
+: mGraphics( &graphics ),
+  mFactory( nullptr )
 {
 }
 
@@ -42,6 +43,17 @@ vk::SurfaceKHR Surface::GetVkHandle() const
 const vk::SurfaceCapabilitiesKHR& Surface::GetCapabilities() const
 {
   return mCapabilities;
+}
+
+void Surface::Replace()
+{
+  if( mSurface )
+  {
+    OnDestroy();
+  }
+
+  // create new surface
+  mSurface = mFactory->Create( mGraphics->GetInstance(), &mGraphics->GetAllocator(), mGraphics->GetPhysicalDevice() );
 }
 
 bool Surface::OnDestroy()

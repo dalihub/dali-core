@@ -31,8 +31,8 @@ public:
   SurfaceFactory()          = default;
   virtual ~SurfaceFactory() = default;
 
-  SurfaceFactory( const SurfaceFactory& ) = delete;
-  SurfaceFactory& operator=( const SurfaceFactory& ) = delete;
+  SurfaceFactory( const SurfaceFactory& ) = default;
+  SurfaceFactory& operator=( const SurfaceFactory& ) = default;
 };
 
 } // Namespace Graphics

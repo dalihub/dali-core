@@ -214,10 +214,10 @@ void Graphics::CreateDevice()
   mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
-FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
+FBID Graphics::CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory,
                               const Integration::Graphics::GraphicsCreateInfo& createInfo )
 {
-  auto vulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>( &surfaceFactory );
+  auto vulkanSurfaceFactory = dynamic_cast<Dali::Integration::Graphics::Vulkan::VkSurfaceFactory*>( surfaceFactory.get() );
 
   if( !vulkanSurfaceFactory )
   {
@@ -231,6 +231,8 @@ FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
                                                     mAllocator.get(),
                                                     mPhysicalDevice );
 
+  surfaceFactory.release();
+  surface->mFactory.reset( vulkanSurfaceFactory );
   if( !surface->mSurface )
   {
     return -1;
@@ -749,7 +751,29 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                RefCountedSwapchain&& oldSwapchain )
 {
   // obtain supported image format
-  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
+  uint32_t count = 0u;
+  auto result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &count, nullptr );
+  if( result != vk::Result::eSuccess )
+  {
+    surface->Replace();
+    RefCountedSwapchain nullSwapchain;
+    return CreateSwapchain( surface, requestedFormat, presentMode, bufferCount, std::move(nullSwapchain) );
+  }
+  std::vector<vk::SurfaceFormatKHR> formats;
+  formats.resize( count );
+
+  while( (result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &count, formats.data()) ) == vk::Result::eIncomplete )
+  {
+    // loop while it's incomplete
+  }
+
+  if( result != vk::Result::eSuccess )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "CreateSwapchain() failed, bad surface, error: %d\n", int(result));
+    return RefCountedSwapchain();
+  }
+
+  auto supportedFormats = formats;
 
   vk::Format swapchainImageFormat{};
   vk::ColorSpaceKHR swapchainColorSpace{};

@@ -105,7 +105,7 @@ public: // Create methods
 
   void InitialiseController();
 
-  FBID CreateSurface( SurfaceFactory& surfaceFactory,
+  FBID CreateSurface( std::unique_ptr<SurfaceFactory> surfaceFactory,
                       const Integration::Graphics::GraphicsCreateInfo& createInfo );
 
   RefCountedSwapchain CreateSwapchainForSurface( RefCountedSurface surface );
