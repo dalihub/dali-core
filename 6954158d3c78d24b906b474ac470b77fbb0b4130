@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6c0a587_65a05197",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1481,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-31T15:05:46Z",
+      "side": 1,
+      "message": "Comment is incorrect now :D",
+      "range": {
+        "startLine": 1481,
+        "startChar": 2,
+        "endLine": 1481,
+        "endChar": 46
+      },
+      "revId": "6954158d3c78d24b906b474ac470b77fbb0b4130",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae0769aa_414316de",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-08-31T15:05:46Z",
+      "side": 1,
+      "message": "Whitespace!",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 2
+      },
+      "revId": "6954158d3c78d24b906b474ac470b77fbb0b4130",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
