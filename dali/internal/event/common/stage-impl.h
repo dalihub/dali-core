@@ -399,6 +399,16 @@ public:
   Dali::DevelStage::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
 
   /**
+   * @copydoc Dali::DevelStage::AddFrameCallback()
+   */
+  void AddFrameCallback( FrameCallbackInterface& frameCallback, Actor& rootActor );
+
+  /**
+   * @copydoc Dali::DevelStage::RemoveFrameCallback()
+   */
+  void RemoveFrameCallback( FrameCallbackInterface& frameCallback );
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.

@@ -102,8 +102,9 @@ public:
 
   /**
    * Construct a new Node.
+   * @param[in] id The unique ID of the node
    */
-  static Node* New();
+  static Node* New( unsigned int id );
 
   /**
    * Deletes a Node.
@@ -785,8 +786,9 @@ protected:
 
   /**
    * Protected constructor; See also Node::New()
+   * @param[in] id The Unique ID of the actor creating the node
    */
-  Node();
+  Node( unsigned int id );
 
   /**
    * Protected virtual destructor; See also Node::Delete( Node* )
@@ -867,6 +869,7 @@ public: // Default properties
   InheritedColor                     mWorldColor;             ///< Full inherited color
 
   uint32_t                           mClippingSortModifier;   ///< Contains bit-packed clipping information for quick access when sorting
+  const unsigned int                 mId;                     ///< The Unique ID of the node.
 
 protected:
 

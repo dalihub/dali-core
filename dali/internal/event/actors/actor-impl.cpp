@@ -3893,7 +3893,7 @@ void Actor::SetParent( Actor* parent )
 
 SceneGraph::Node* Actor::CreateNode() const
 {
-  return Node::New();
+  return Node::New( mId );
 }
 
 bool Actor::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& /* attributes */ )

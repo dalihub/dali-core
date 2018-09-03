@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,7 +314,7 @@ bool Layer::IsHoverConsumed() const
 
 SceneGraph::Node* Layer::CreateNode() const
 {
-  return SceneGraph::Layer::New();
+  return SceneGraph::Layer::New( mId );
 }
 
 void Layer::OnStageConnectionInternal()
