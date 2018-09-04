@@ -216,6 +216,12 @@ public:
                   vk::ImageLayout dstLayout,
                   const std::vector<vk::ImageCopy>& regions );
 
+  void BlitImage( RefCountedImage srcImage,
+                  vk::ImageLayout srcLayout,
+                  RefCountedImage dstImage,
+                  vk::ImageLayout dstLayout,
+                  const std::vector< vk::ImageBlit >& blitRegions, vk::Filter filter );
+
   /**
    * Sets scissors when VK_DYNAMIC_STATE_SCISSOR used
    * @param firstScissor

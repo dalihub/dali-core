@@ -56,6 +56,8 @@
 
 #include <iostream>
 #include <utility>
+#include "vulkan-graphics.h"
+
 
 namespace Dali
 {
@@ -67,7 +69,7 @@ namespace Vulkan
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
-        //"VK_LAYER_RENDERDOC_Capture",
+        "VK_LAYER_RENDERDOC_Capture",
         "VK_LAYER_LUNARG_parameter_validation", // parameter
         //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
@@ -648,14 +650,21 @@ RefCountedImageView Graphics::CreateImageView( RefCountedImage image )
           .setLevelCount( image->GetMipLevelCount() )
           .setLayerCount( image->GetLayerCount() );
 
-  auto refCountedImageView = CreateImageView( {},
-                                              image,
-                                              vk::ImageViewType::e2D,
-                                              image->GetFormat(),
-                                              componentsMapping,
-                                              subresourceRange );
+  return CreateImageView( image,
+                          subresourceRange,
+                          componentsMapping );
+}
 
-  return refCountedImageView;
+RefCountedImageView Graphics::CreateImageView( RefCountedImage image,
+                                               const vk::ImageSubresourceRange& subresourceRange,
+                                               const vk::ComponentMapping& componentMapping )
+{
+  return CreateImageView( {},
+                          image,
+                          vk::ImageViewType::e2D,
+                          image->GetFormat(),
+                          componentMapping,
+                          subresourceRange );
 }
 
 RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo )
@@ -679,21 +688,32 @@ RefCountedCommandBuffer Graphics::CreateCommandBuffer( bool primary )
   return commandPool->NewCommandBuffer( primary );
 }
 
+// This function assumes that all images have 1 mip level and 1 layer
 vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image,
                                                            vk::ImageLayout oldLayout,
                                                            vk::ImageLayout newLayout )
 {
-  // This function assumes that all images have 1 mip level and 1 layer
+  return CreateImageMemoryBarrier( std::move( image ),
+                                   vk::ImageSubresourceRange{}.setBaseMipLevel( 0 )
+                                                              .setLevelCount( 1 )
+                                                              .setBaseArrayLayer( 0 )
+                                                              .setLayerCount( 1 ),
+                                   oldLayout,
+                                   newLayout );
+}
+
+vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image,
+                                                           const vk::ImageSubresourceRange& subresourceRange,
+                                                           vk::ImageLayout oldLayout,
+                                                           vk::ImageLayout newLayout )
+{
   auto barrier = vk::ImageMemoryBarrier{}
-          .setOldLayout( oldLayout )
-          .setNewLayout( newLayout )
-          .setSrcQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
-          .setDstQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
-          .setImage( image->GetVkHandle() )
-          .setSubresourceRange( vk::ImageSubresourceRange{}.setBaseMipLevel( 0 )
-                                                           .setLevelCount( 1 )
-                                                           .setBaseArrayLayer( 0 )
-                                                           .setLayerCount( 1 ) );
+  .setOldLayout( oldLayout )
+  .setNewLayout( newLayout )
+  .setSrcQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
+  .setDstQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
+  .setImage( image->GetVkHandle() )
+  .setSubresourceRange( subresourceRange );
 
   barrier.subresourceRange.aspectMask = image->GetAspectFlags();
 
@@ -1264,6 +1284,21 @@ Dali::Graphics::API::Controller& Graphics::GetController()
   return *mGfxController;
 }
 
+vk::FormatProperties Graphics::GetFormatProperties( vk::Format format )
+{
+  return mPhysicalDevice.getFormatProperties( format );
+}
+
+const vk::PhysicalDeviceProperties& Graphics::GetPhysicalDeviceProperties()
+{
+  return mPhysicalDeviceProperties;
+}
+
+const vk::PhysicalDeviceFeatures& Graphics::GetPhysicalDeviceFeatures()
+{
+  return mPhysicalDeviceFeatures;
+}
+
 // --------------------------------------------------------------------------------------------------------------
 
 // Cache manipulation methods -----------------------------------------------------------------------------------
@@ -1471,14 +1506,14 @@ void Graphics::PreparePhysicalDevice()
 
   assert( mPhysicalDevice && "No suitable Physical Device found!" );
 
-  GetPhysicalDeviceProperties();
+  AcquirePhysicalDeviceProperties();
 
   GetQueueFamilyProperties();
 
   mDeviceMemoryManager = GpuMemoryManager::New( *this );
 }
 
-void Graphics::GetPhysicalDeviceProperties()
+void Graphics::AcquirePhysicalDeviceProperties()
 {
   mPhysicalDeviceProperties =  mPhysicalDevice.getProperties();
   mPhysicalDeviceMemoryProperties = mPhysicalDevice.getMemoryProperties();

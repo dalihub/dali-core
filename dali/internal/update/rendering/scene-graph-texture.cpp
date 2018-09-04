@@ -396,9 +396,7 @@ bool Texture::HasAlphaChannel()
 
 void Texture::GenerateMipmaps()
 {
-  mMaxMipMapLevel = 0;
-  DALI_LOG_ERROR( "FIXME: GRAPHICS\n");
-  //@todo Implement with GraphicsAPI
+  mGraphicsTexture->GenerateMipmaps();
 }
 
 

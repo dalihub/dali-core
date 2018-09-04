@@ -62,11 +62,15 @@ public:
 
   void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
 
+  void GenerateMipmaps() override;
+
 private:
 
   void CreateSampler();
   void CreateImageView();
   bool InitialiseTexture();
+
+  void CopyToImage( Vulkan::RefCountedImage dstImage, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode );
 
 private:
 
