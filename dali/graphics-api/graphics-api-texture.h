@@ -77,6 +77,8 @@ public:
    */
   virtual void CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level,  TextureDetails::UpdateMode updateMode ) = 0;
 
+  virtual void GenerateMipmaps() = 0;
+
 protected:
   // derived types should not be moved directly to prevent slicing
   Texture(Texture&&) = default;

@@ -37,14 +37,20 @@ using Extension = void*;
  */
 struct Offset2D
 {
-  int32_t x = 0;
-  int32_t y = 0;
+  int32_t x{ 0 };
+  int32_t y{ 0 };
+
+  Offset2D() = default;
+
+  Offset2D( int32_t x_, int32_t y_ ) : x( x_ ), y( y_ ) {}
 };
 
 struct Extent2D
 {
   uint32_t width;
   uint32_t height;
+
+  Extent2D( uint32_t width_, uint32_t height_ ) : width( width_ ), height( height_ ) {}
 };
 
 /**
@@ -56,6 +62,15 @@ struct Rect2D
   int32_t y = 0;
   uint32_t width = 0;
   uint32_t height = 0;
+
+  Rect2D() = default;
+
+  Rect2D( int32_t x_, int32_t y_, uint32_t width_, uint32_t height_ )
+  : x( x_ ),
+    y( y_ ),
+    width( width_ ),
+    height( height_ )
+  {}
 };
 
 /**
@@ -69,6 +84,17 @@ struct Viewport
   float height = 0.0f;
   float minDepth = 0.0f;
   float maxDepth = 0.0f;
+
+  Viewport() = default;
+
+  Viewport( float x_, float y_, float width_, float height_, float minDepth_, float maxDepth_ )
+  : x( x_ ),
+    y( y_ ),
+    width( width_ ),
+    height( height_ ),
+    minDepth( minDepth_ ),
+    maxDepth( maxDepth_ )
+  {}
 };
 
 /**
@@ -368,8 +394,8 @@ struct FramebufferState
  */
 struct ViewportState
 {
-  Viewport    viewport           { 0.0, 0.0, 0.0, 0.0 };
-  Rect2D      scissor            { 0, 0, 0, 0 };
+  Viewport    viewport;
+  Rect2D      scissor;
   bool        scissorTestEnable  { false };
 
   Extension   extension          { nullptr };

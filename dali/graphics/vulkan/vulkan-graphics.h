@@ -139,11 +139,20 @@ public: // Create methods
 
   RefCountedImageView CreateImageView( RefCountedImage image );
 
+  RefCountedImageView CreateImageView( RefCountedImage image,
+                                       const vk::ImageSubresourceRange& subresourceRange,
+                                       const vk::ComponentMapping& componentMapping );
+
   RefCountedSampler CreateSampler( const vk::SamplerCreateInfo& samplerCreateInfo );
 
   RefCountedCommandBuffer CreateCommandBuffer( bool primary );
 
   vk::ImageMemoryBarrier CreateImageMemoryBarrier( RefCountedImage image,
+                                                   vk::ImageLayout oldLayout,
+                                                   vk::ImageLayout newLayout );
+
+  vk::ImageMemoryBarrier CreateImageMemoryBarrier( RefCountedImage image,
+                                                   const vk::ImageSubresourceRange& subresourceRange,
                                                    vk::ImageLayout oldLayout,
                                                    vk::ImageLayout newLayout );
 
@@ -223,6 +232,12 @@ public: // Getters
 
   Dali::Graphics::API::Controller& GetController();
 
+  vk::FormatProperties GetFormatProperties( vk::Format format );
+
+  const vk::PhysicalDeviceProperties& GetPhysicalDeviceProperties();
+
+  const vk::PhysicalDeviceFeatures& GetPhysicalDeviceFeatures();
+
 public: //Cache management methods
 
   void AddBuffer( Buffer& buffer );
@@ -276,7 +291,7 @@ private: // Methods
 
   void PreparePhysicalDevice();
 
-  void GetPhysicalDeviceProperties();
+  void AcquirePhysicalDeviceProperties();
 
   void GetQueueFamilyProperties();
 
