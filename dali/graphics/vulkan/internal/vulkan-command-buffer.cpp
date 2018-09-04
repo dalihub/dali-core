@@ -29,6 +29,8 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include "vulkan-command-buffer.h"
+
 
 namespace Dali
 {
@@ -46,11 +48,11 @@ CommandBuffer::CommandBuffer( CommandPool& commandPool,
                               uint32_t poolIndex,
                               const vk::CommandBufferAllocateInfo& allocateInfo,
                               vk::CommandBuffer vulkanHandle )
-        : mOwnerCommandPool( &commandPool ),
-          mGraphics( &mOwnerCommandPool->GetGraphics() ),
-          mPoolAllocationIndex( poolIndex ),
-          mAllocateInfo( allocateInfo ),
-          mCommandBuffer( vulkanHandle )
+: mOwnerCommandPool( &commandPool ),
+  mGraphics( &mOwnerCommandPool->GetGraphics() ),
+  mPoolAllocationIndex( poolIndex ),
+  mAllocateInfo( allocateInfo ),
+  mCommandBuffer( vulkanHandle )
 {
 }
 
@@ -167,8 +169,7 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
 void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
                                         uint32_t firstSet )
 {
-  BindDescriptorSets(
-          descriptorSets, mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
+  BindDescriptorSets( descriptorSets, mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
 }
 
 void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
@@ -282,9 +283,24 @@ void CommandBuffer::CopyImage( RefCountedImage srcImage,
                                vk::ImageLayout srcLayout,
                                RefCountedImage dstImage,
                                vk::ImageLayout dstLayout,
-                               const std::vector<vk::ImageCopy>& regions )
+                               const std::vector< vk::ImageCopy >& regions )
 {
   mCommandBuffer.copyImage( srcImage->GetVkHandle(), srcLayout, dstImage->GetVkHandle(), dstLayout, regions );
+}
+
+void CommandBuffer::BlitImage( RefCountedImage srcImage,
+                               vk::ImageLayout srcLayout,
+                               RefCountedImage dstImage,
+                               vk::ImageLayout dstLayout,
+                               const std::vector< vk::ImageBlit >& blitRegions,
+                               vk::Filter filter )
+{
+  mCommandBuffer.blitImage( srcImage->GetVkHandle(),
+                            srcLayout,
+                            dstImage->GetVkHandle(),
+                            dstLayout,
+                            blitRegions,
+                            filter );
 }
 
 void CommandBuffer::SetScissor( uint32_t firstScissor, uint32_t scissorCount, const vk::Rect2D* pScissors )
