@@ -16,6 +16,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
@@ -748,42 +750,70 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                uint32_t bufferCount,
                                                RefCountedSwapchain&& oldSwapchain )
 {
-  // obtain supported image format
-  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
+    // obtain supported image format
+    //auto supportedFormats = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() );
 
-  vk::Format swapchainImageFormat{};
-  vk::ColorSpaceKHR swapchainColorSpace{};
+    uint32_t SurfaceFormatCount = 0;
 
-  // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
-  // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
-  if( supportedFormats.size() == 1 && supportedFormats[0].format == vk::Format::eUndefined )
-  {
-    swapchainColorSpace = supportedFormats[0].colorSpace;
-    swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
-  }
-  else // Try to find the requested format in the list
-  {
-    auto found = std::find_if( supportedFormats.begin(),
-                               supportedFormats.end(),
-                               [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
-                                 return requestedFormat == supportedFormat.format;
-                               } );
-
-    // If found assign it.
-    if( found != supportedFormats.end() )
+    auto result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, NULL );
+    if (result != vk::Result::eSuccess )
     {
-      auto surfaceFormat = *found;
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR with surface %p, result 0x%x\n", &*surface, result );
+        //assert( "Fail to getSurfaceFormatsKHR" );
     }
-    else // Requested format not found...attempt to use the first one on the list
+    else
     {
-      auto surfaceFormat = supportedFormats[0];
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
+        DALI_LOG_ERROR(" Wonsik #### Success to getSurfaceFormatsKHR with surface %p, format count %d\n", &*surface, SurfaceFormatCount );
     }
 
-  }
+    std::unique_ptr<vk::SurfaceFormatKHR[]> supportedFormats(new vk::SurfaceFormatKHR[SurfaceFormatCount]);
+
+    result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, supportedFormats.get() );
+    if (result != vk::Result::eSuccess )
+    {
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR with surface %p, result 0x%x\n", &*surface, result );
+        //assert( "Fail to getSurfaceFormatsKHR" );
+    }
+
+
+    vk::Format swapchainImageFormat{};
+    vk::ColorSpaceKHR swapchainColorSpace{};
+
+    // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
+    // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
+    if( SurfaceFormatCount == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+    {
+      swapchainColorSpace = supportedFormats[0].colorSpace;
+      swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+    }
+    else // Try to find the requested format in the list
+    {
+  #if 1
+      swapchainColorSpace = supportedFormats[0].colorSpace;
+      swapchainImageFormat = supportedFormats[0].format;
+  #else
+
+      auto found = std::find_if( supportedFormats.begin(),
+                                 supportedFormats.end(),
+                                 [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
+                                   return requestedFormat == supportedFormat.format;
+                                 } );
+
+      // If found assign it.
+      if( found != supportedFormats.end() )
+      {
+        auto surfaceFormat = *found;
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
+      else // Requested format not found...attempt to use the first one on the list
+      {
+        auto surfaceFormat = supportedFormats[0];
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
+  #endif
+    }
 
   assert( swapchainImageFormat != vk::Format::eUndefined && "Could not find a supported swap chain image format." );
 
