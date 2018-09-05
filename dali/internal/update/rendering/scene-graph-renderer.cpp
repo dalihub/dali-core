@@ -451,15 +451,13 @@ void Renderer::WriteUniform( const std::string& name, const void* data, uint32_t
     // Invalid pipeline
     return;
   }
-  auto& gfxShader = *mShader->GetGfxObject();
   auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-  if( gfxShader.GetNamedUniform( name, uniformInfo ) )
+  if( mShader->GetUniform( name, 0u, uniformInfo ) )
   {
     auto dst = (mUboMemory[uniformInfo.bufferIndex].data()+uniformInfo.offset);
     memcpy( dst, data, size );
   }
 }
-
 
 void Renderer::SetTextures( TextureSet* textureSet )
 {
