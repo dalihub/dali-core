@@ -16,6 +16,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
@@ -41,6 +43,8 @@
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
+
+#include <vulkan/vulkan.hpp>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -748,43 +752,124 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                uint32_t bufferCount,
                                                RefCountedSwapchain&& oldSwapchain )
 {
-  // obtain supported image format
-  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
+    // obtain supported image format
+    //auto supportedFormats = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() );
 
-  vk::Format swapchainImageFormat{};
-  vk::ColorSpaceKHR swapchainColorSpace{};
+    uint32_t SurfaceFormatCount = 0;
+    vk::Format swapchainImageFormat{};
+    vk::ColorSpaceKHR swapchainColorSpace{};
 
-  // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
-  // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
-  if( supportedFormats.size() == 1 && supportedFormats[0].format == vk::Format::eUndefined )
-  {
-    swapchainColorSpace = supportedFormats[0].colorSpace;
-    swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
-  }
-  else // Try to find the requested format in the list
-  {
-    auto found = std::find_if( supportedFormats.begin(),
-                               supportedFormats.end(),
-                               [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
-                                 return requestedFormat == supportedFormat.format;
-                               } );
-
-    // If found assign it.
-    if( found != supportedFormats.end() )
+    vk::Result result = vk::Result::eSuccess;
+    do
     {
-      auto surfaceFormat = *found;
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
-    }
-    else // Requested format not found...attempt to use the first one on the list
+      result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, NULL );
+      if ( ( result == vk::Result::eSuccess ) && SurfaceFormatCount )
+      {
+        DALI_LOG_ERROR(" Wonsik #### Success to getSurfaceFormatsKHR to get format's count with surface %p, count %d, result 0x%x\n", &*surface, SurfaceFormatCount, result );
+        std::unique_ptr<vk::SurfaceFormatKHR[]> supportedFormats(new vk::SurfaceFormatKHR[SurfaceFormatCount]);
+
+        result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, supportedFormats.get() );
+        if (result == vk::Result::eSuccess)
+        {
+            DALI_LOG_ERROR(" Wonsik #### Success to getSurfaceFormatsKHR to get surface's format with surface %p, count %d, result 0x%x\n", &*surface, SurfaceFormatCount, result );
+            if( SurfaceFormatCount == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+            {
+              swapchainColorSpace = supportedFormats[0].colorSpace;
+              swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+            }
+            else // Try to find the requested format in the list
+            {
+              swapchainColorSpace = supportedFormats[0].colorSpace;
+              swapchainImageFormat = supportedFormats[0].format;
+            }
+        }
+        else
+        {
+            DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR to get surface's format with surface %p, count %d, result 0x%x\n", &*surface, SurfaceFormatCount, result );
+            swapchainColorSpace = vk::ColorSpaceKHR::eSrgbNonlinear;
+            swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+        }
+      }
+      else
+      {
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR to get format's count with surface %p, count %d, result 0x%x\n", &*surface, SurfaceFormatCount, result );
+        swapchainColorSpace = vk::ColorSpaceKHR::eSrgbNonlinear;
+        swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+      }
+    } while ( result == vk::Result::eIncomplete );
+
+
+
+
+
+#if 0
+
+    uint32_t SurfaceFormatCount = 0;
+
+    auto result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, NULL );
+    if (result != vk::Result::eSuccess )
     {
-      auto surfaceFormat = supportedFormats[0];
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR with surface %p, result 0x%x\n", &*surface, result );
+        //assert( "Fail to getSurfaceFormatsKHR" );
+    }
+    else
+    {
+        DALI_LOG_ERROR(" Wonsik #### Success to getSurfaceFormatsKHR with surface %p, format count %d\n", &*surface, SurfaceFormatCount );
     }
 
-  }
+    std::unique_ptr<vk::SurfaceFormatKHR[]> supportedFormats(new vk::SurfaceFormatKHR[SurfaceFormatCount]);
 
+    result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &SurfaceFormatCount, supportedFormats.get() );
+    if (result != vk::Result::eSuccess )
+    {
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfaceFormatsKHR with surface %p, result 0x%x\n", &*surface, result );
+        //assert( "Fail to getSurfaceFormatsKHR" );
+    }
+    else
+    {
+        DALI_LOG_ERROR(" Wonsik #### Success to getSurfaceFormatsKHR with surface %p, result 0x%x\n", &*surface, result );
+    }
+
+
+    vk::Format swapchainImageFormat{};
+    vk::ColorSpaceKHR swapchainColorSpace{};
+
+    // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
+    // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
+    if( SurfaceFormatCount == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+    {
+      swapchainColorSpace = supportedFormats[0].colorSpace;
+      swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+    }
+    else // Try to find the requested format in the list
+    {
+  #if 1
+      swapchainColorSpace = supportedFormats[0].colorSpace;
+      swapchainImageFormat = supportedFormats[0].format;
+  #else
+
+      auto found = std::find_if( supportedFormats.begin(),
+                                 supportedFormats.end(),
+                                 [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
+                                   return requestedFormat == supportedFormat.format;
+                                 } );
+
+      // If found assign it.
+      if( found != supportedFormats.end() )
+      {
+        auto surfaceFormat = *found;
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
+      else // Requested format not found...attempt to use the first one on the list
+      {
+        auto surfaceFormat = supportedFormats[0];
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
+  #endif
+    }
+#endif
   assert( swapchainImageFormat != vk::Format::eUndefined && "Could not find a supported swap chain image format." );
 
   // Get the surface capabilities to determine some settings of the swap chain
@@ -837,8 +922,8 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Check if the requested present mode is supported
+#if 0
   auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
-
   auto found = std::find_if( presentModes.begin(),
                              presentModes.end(),
                              [ & ]( vk::PresentModeKHR mode ) {
@@ -850,6 +935,38 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     // Requested present mode not supported. Default to FIFO. FIFO is always supported as per spec.
     presentMode = vk::PresentModeKHR::eFifo;
   }
+#endif
+
+  uint32_t presentModeCount = 0;
+  vk::Result result1 = vk::Result::eSuccess;
+  do
+  {
+    result1 = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &presentModeCount, NULL );
+    if ( ( result1 == vk::Result::eSuccess ) && presentModeCount )
+    {
+      DALI_LOG_ERROR(" Wonsik #### Success to getSurfacePresentModesKHR to get PresentMode's count with surface %p, count %d, result 0x%x\n", &*surface, presentModeCount, result1 );
+
+      std::unique_ptr<vk::PresentModeKHR[]> presentModes(new vk::PresentModeKHR[presentModeCount]);
+      result1 = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &presentModeCount, presentModes.get() );
+      if (result1 == vk::Result::eSuccess)
+      {
+          DALI_LOG_ERROR(" Wonsik #### Success to getSurfacePresentModesKHR to get surface's PresentMode with surface %p, count %d, result 0x%x\n", &*surface, presentModeCount, result1 );
+          presentMode = vk::PresentModeKHR::eFifo;
+      }
+      else
+      {
+          DALI_LOG_ERROR(" Wonsik #### Fail to getSurfacePresentModesKHR to get surface's PresentMode with surface %p, count %d, result 0x%x\n", &*surface, presentModeCount, result1 );
+          presentMode = vk::PresentModeKHR::eFifo;
+      }
+    }
+    else
+    {
+        DALI_LOG_ERROR(" Wonsik #### Fail to getSurfacePresentModesKHR to get PresentMode's count with surface %p, count %d, result 0x%x\n", &*surface, presentModeCount, result1 );
+        presentMode = vk::PresentModeKHR::eFifo;
+    }
+  } while ( result1 == vk::Result::eIncomplete );
+
+
 
   // Creation settings have been determined. Fill in the create info struct.
   auto swapChainCreateInfo = vk::SwapchainCreateInfoKHR{}.setSurface( surface->GetVkHandle() )
