@@ -191,8 +191,15 @@ struct GpuMemoryDefaultAllocator : public GpuMemoryAllocator
     mGraphics.GetDevice().unmapMemory( block.GetData< MemoryBlock >()->memory );
   }
 
-  void Flush( GpuMemoryBlock& allocationId ) override
+  void Flush( GpuMemoryBlock& block ) override
   {
+    auto data = block.GetData< MemoryBlock >();
+
+    mGraphics.GetDevice().flushMappedMemoryRanges( { vk::MappedMemoryRange{}
+    .setSize( data->size )
+    .setMemory( data->memory )
+    .setOffset( 0u )
+     } );
   }
 
   GpuMemoryManager& mGpuManager;

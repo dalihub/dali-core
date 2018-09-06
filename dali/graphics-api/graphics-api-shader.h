@@ -84,6 +84,16 @@ public:
     return 0u;
   }
 
+  virtual uint32_t GetUniformBlockBinding( uint32_t index ) const
+  {
+    return 0u;
+  }
+
+  virtual uint32_t GetUniformBlockSize( uint32_t index ) const
+  {
+    return 0u;
+  }
+
   virtual bool GetUniformBlock( uint32_t index, ShaderDetails::UniformBlockInfo& out ) const
   {
     return false;
