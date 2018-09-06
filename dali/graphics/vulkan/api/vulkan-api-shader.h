@@ -88,6 +88,10 @@ public:
 
   uint32_t GetUniformBlockCount() const override;
 
+  uint32_t GetUniformBlockSize( uint32_t index ) const override;
+
+  uint32_t GetUniformBlockBinding( uint32_t index ) const override;
+
   bool GetUniformBlock( uint32_t index, API::ShaderDetails::UniformBlockInfo& out ) const override;
 
 protected:

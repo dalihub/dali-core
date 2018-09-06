@@ -194,7 +194,7 @@ public:
 
   void ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& transferRequest );
 
-  VulkanAPI::UboManager& GetUboManager();
+  void PushDescriptorWrite( const vk::WriteDescriptorSet& write );
 
 public:
 
@@ -232,6 +232,18 @@ protected:
 private:
   struct Impl;
   std::unique_ptr< Impl > mImpl;
+
+public:
+  struct Stats
+  {
+    uint32_t frame { 0u };
+    uint32_t uniformBufferBindings { 0u };
+    uint32_t samplerTextureBindings { 0u };
+  };
+
+  void PrintStats();
+
+  Stats mStats;
 };
 
 } // namespace VulkanAPI
