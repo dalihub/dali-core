@@ -747,6 +747,27 @@ enum class Format
   PVRTC2_4BPP_SRGB_BLOCK_IMG,
 };
 
+enum class BufferUsage
+{
+  TRANSFER_SRC = 1 << 0,
+  TRANSFER_DST = 1 << 1,
+  UNIFORM_TEXEL_BUFFER = 1 << 2,
+  STORAGE_TEXEL_BUFFER = 1 << 3,
+  UNIFORM_BUFFER = 1 << 4,
+  STORAGE_BUFFER = 1 << 5,
+  INDEX_BUFFER = 1 << 6,
+  VERTEX_BUFFER = 1 << 7,
+  INDIRECT_BUFFER = 1 << 8
+};
+
+using BufferUsageFlags = uint32_t;
+
+inline BufferUsageFlags operator|( BufferUsageFlags flags, BufferUsage usage )
+{
+  flags |= static_cast<uint32_t>( usage );
+  return flags;
+}
+
 } // API
 } // Graphics
 } // Dali

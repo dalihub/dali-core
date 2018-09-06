@@ -321,6 +321,16 @@ uint32_t Shader::GetUniformBlockCount() const
   return U32( mUniformBlocks.size() );
 }
 
+uint32_t Shader::GetUniformBlockSize( uint32_t index ) const
+{
+  return U32( mUniformBlocks[index].size );
+}
+
+uint32_t Shader::GetUniformBlockBinding( uint32_t index ) const
+{
+  return U32( mUniformBlocks[index].binding );
+}
+
 bool Shader::GetUniformBlock( uint32_t index, API::ShaderDetails::UniformBlockInfo& out ) const
 {
   if( index >= mUniformBlocks.size() )

@@ -30,7 +30,7 @@ namespace VulkanAPI
 {
 
 Buffer::Buffer( Controller& controller,
-                vk::BufferUsageFlagBits usage,
+                vk::BufferUsageFlags usage,
                 API::Buffer::UsageHint usageHints,
                 uint32_t size )
         : mController( controller ),
@@ -45,15 +45,15 @@ Buffer::Buffer( Controller& controller,
 bool Buffer::Initialise()
 {
   Vulkan::BufferType type;
-  if( mUsage == vk::BufferUsageFlagBits::eUniformBuffer )
+  if( mUsage & vk::BufferUsageFlagBits::eUniformBuffer )
   {
     type = Vulkan::BufferType::UNIFORM;
   }
-  else if( mUsage == vk::BufferUsageFlagBits::eIndexBuffer )
+  else if( mUsage & vk::BufferUsageFlagBits::eIndexBuffer )
   {
     type = Vulkan::BufferType::INDEX;
   }
-  else if( mUsage == vk::BufferUsageFlagBits::eVertexBuffer )
+  else if( mUsage & vk::BufferUsageFlagBits::eVertexBuffer )
   {
     type = Vulkan::BufferType::VERTEX;
   }
@@ -82,6 +82,11 @@ void* Buffer::Map()
 void Buffer::Unmap()
 {
   mBufferRef->GetMemoryHandle()->Unmap();
+}
+
+void Buffer::Flush()
+{
+  mBufferRef->GetMemoryHandle()->Flush();
 }
 
 void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
