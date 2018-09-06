@@ -67,6 +67,47 @@ BufferFactory& BufferFactory::SetUsage( API::Buffer::UsageHint usage )
   return *this;
 }
 
+BufferFactory& BufferFactory::SetUsageFlags( Dali::Graphics::API::BufferUsageFlags usage )
+{
+  if( usage & uint32_t( API::BufferUsage::TRANSFER_DST ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eTransferDst;
+  }
+  if( usage & uint32_t( API::BufferUsage::TRANSFER_SRC ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eTransferSrc;
+  }
+  if( usage & uint32_t( API::BufferUsage::UNIFORM_TEXEL_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eUniformTexelBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::STORAGE_TEXEL_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eStorageTexelBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::UNIFORM_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eUniformBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::STORAGE_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eStorageBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::INDEX_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eIndexBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::VERTEX_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eVertexBuffer;
+  }
+  if( usage & uint32_t( API::BufferUsage::INDIRECT_BUFFER ) )
+  {
+    mUsage |= vk::BufferUsageFlagBits::eIndexBuffer;
+  }
+  return *this;
+}
+
 BufferFactory& BufferFactory::SetSize( uint32_t size )
 {
   mSize = size;
