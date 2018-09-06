@@ -226,6 +226,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   std::vector<Graphics::API::RenderCommand*> commandList;
 
+  auto uboIndex = mCurrentFrameIndex % MAX_BUFFERS;
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
@@ -235,16 +236,21 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
+
+    // update the uniform buffer
+    // pass shared UBO and offset, return new offset for next item to be used
+    auto bindings = renderer->UpdateUniformBuffers( *mUniformBuffer[uboIndex].get(), mUboOffset, bufferIndex );
+
     auto color = item.mNode->GetWorldColor( bufferIndex );
 
-    auto &cmd = renderer->GetGfxRenderCommand();
+    auto &cmd = renderer->GetGfxRenderCommand( bufferIndex );
     if (cmd.GetVertexBufferBindings()
            .empty())
     {
       continue;
     }
     cmd.BindRenderTarget(renderTargetBinding);
-
+    cmd.BindUniformBuffers( &bindings );
     float width = instruction.mViewport.width;
     float height = instruction.mViewport.height;
 
@@ -261,9 +267,9 @@ void GraphicsAlgorithms::SubmitRenderItemList(
                                     height,
                                     0.0f , 1.0f } )
                     .SetViewportEnable( true );
+
     // Could set to false if we know that we can use the Pipeline viewport rather than the
     // dynamic viewport.
-
     auto opacity = renderer->GetOpacity( bufferIndex );
 
     if( renderer->IsPreMultipliedAlphaEnabled() )
@@ -276,22 +282,24 @@ void GraphicsAlgorithms::SubmitRenderItemList(
       color.a *= opacity;
     }
 
+    // we know bindings for this render item, so we can use 'offset' and write additional
+    // uniforms
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform("uMvpMatrix", mvp2);
-    renderer->WriteUniform("uViewMatrix", *viewMatrix);
-    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uMvpMatrix", mvp2);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uViewMatrix", *viewMatrix);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform("uSize", item.mSize);
-    renderer->WriteUniform("uColor", color );
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uSize", item.mSize);
+    renderer->WriteUniform( *mUniformBuffer[uboIndex].get(), bindings, "uColor", color );
 
     commandList.push_back(&cmd);
   }
@@ -345,6 +353,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 {
   using namespace Dali::Graphics::API;
 
+  const uint32_t UBO_ALIGNMENT = 256u;
+
   // vertex input state
   VertexInputState vi{};
 
@@ -355,6 +365,19 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   if( !gfxShader )
   {
     return false;
+  }
+
+  // Update allocation requirements
+  mUniformBlockAllocationCount += gfxShader->GetUniformBlockCount();
+  for( auto i = 0u; i < gfxShader->GetUniformBlockCount(); ++i )
+  {
+    auto size = gfxShader->GetUniformBlockSize( i );
+    auto blockSize = (( size / UBO_ALIGNMENT ) + ( ( size % UBO_ALIGNMENT ) ? 1 : 0 )) * UBO_ALIGNMENT;
+    if( mUniformBlockMaxSize < blockSize )
+    {
+      mUniformBlockMaxSize = blockSize;
+    }
+    mUniformBlockAllocationBytes += blockSize;
   }
 
   /**
@@ -481,7 +504,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   ViewportState viewportState{};
 
   // Set viewport only when not using dynamic viewport state
-  if( !renderer->GetGfxRenderCommand().GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
+  if( !renderer->GetGfxRenderCommand( bufferIndex ).GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
   {
     // scissor test only when we have viewport
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
@@ -508,13 +531,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
   if( SetupPipelineViewportState( viewportState) )
   {
-    renderer->GetGfxRenderCommand().mDrawCommand.SetScissor( viewportState.scissor );
-    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( true );
+    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissor( viewportState.scissor );
+    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( true );
     dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
   }
   else
   {
-    renderer->GetGfxRenderCommand().mDrawCommand.SetScissorTestEnable( false );
+    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( false );
   }
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
@@ -594,14 +617,20 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
 
   // bind pipeline to the render command
-  renderer->BindPipeline( std::move(pipeline) );
+  renderer->BindPipeline( std::move(pipeline), bufferIndex );
   return true;
 }
+
 
 void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex bufferIndex )
 {
+
+  mUniformBlockAllocationCount = 0u;
+  mUniformBlockAllocationBytes = 0u;
+  mUniformBlockMaxSize = 0u;
+
   for( auto i = 0u; i < renderInstructions.Count( bufferIndex ); ++i )
   {
     RenderInstruction &ri = renderInstructions.At(bufferIndex, i);
@@ -625,6 +654,9 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
       }
     }
   }
+
+  //printf("Alloc: %d, Bytes: %d, Max: %d\n", int(mUniformBlockAllocationCount),
+  //int(mUniformBlockAllocationBytes), int(mUniformBlockMaxSize));
 }
 
 void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  controller,
@@ -635,6 +667,27 @@ void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  c
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
+  auto uboIndex = mCurrentFrameIndex % MAX_BUFFERS;
+
+  // Prepare uniform buffers
+  if( !mGraphicsBufferManager )
+  {
+    mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
+  }
+
+  if( !mUniformBuffer[uboIndex] )
+  {
+    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( mUniformBlockAllocationBytes ) );
+  }
+
+  // allocate always * 2 than needed for now if size less than required
+  if( mUniformBuffer[uboIndex]->GetSize() <= mUniformBlockAllocationBytes )
+  {
+    mUniformBuffer[uboIndex]->Reserve( mUniformBlockAllocationBytes*2 );
+  }
+
+  mUboOffset = 0u;
+
   controller.BeginFrame();
 
   for( size_t i = 0; i < numberOfInstructions; ++i )
@@ -644,7 +697,14 @@ void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  c
     SubmitInstruction( controller, bufferIndex, instruction );
   }
 
+  if( mUniformBlockAllocationBytes && mUniformBuffer[mCurrentFrameIndex%MAX_BUFFERS] )
+  {
+    mUniformBuffer[mCurrentFrameIndex%MAX_BUFFERS]->Flush();
+  }
+
   controller.EndFrame();
+
+  mCurrentFrameIndex++;
 }
 
 } // namespace SceneGraph
