@@ -30,6 +30,7 @@
 #include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 
+#include <cstring>
 namespace Dali
 {
 namespace Graphics
@@ -392,10 +393,27 @@ public:
     return *this;
   }
 
-  RenderCommand& BindUniformBuffers( std::vector<UniformBufferBinding>&& bindings )
+  RenderCommand& BindUniformBuffers( std::vector<UniformBufferBinding>* bindings )
   {
-    mUniformBufferBindings = std::move( bindings );
-    mUpdateFlags |= RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
+    bool changed = (bindings->size() != mUniformBufferBindings.size());
+
+    if(!changed)
+    {
+      for( auto i = 0u; i < bindings->size(); ++i )
+      {
+        if( std::memcmp( &(*bindings)[0], &mUniformBufferBindings[0], sizeof(UniformBufferBinding) ) )
+        {
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    if( changed )
+    {
+      mUpdateFlags |= RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
+      mUniformBufferBindings = *bindings;
+    }
     return *this;
   }
 
@@ -486,6 +504,13 @@ public:
   static std::vector<PushConstantsBinding> NewPushConstantsBindings( uint32_t count )
   {
     auto retval = std::vector<PushConstantsBinding>{};
+    retval.resize( count );
+    return retval;
+  }
+
+  static std::vector<UniformBufferBinding> NewUniformBufferBindings( uint32_t count )
+  {
+    auto retval = std::vector<UniformBufferBinding>{};
     retval.resize( count );
     return retval;
   }

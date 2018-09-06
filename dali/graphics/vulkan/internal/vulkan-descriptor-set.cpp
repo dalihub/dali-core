@@ -159,20 +159,30 @@ DescriptorSet::~DescriptorSet() = default;
 
 void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size )
 {
+#if 0
   auto bufferInfo = vk::DescriptorBufferInfo{}
           .setOffset( U32( offset ) )
           .setRange( U32( size ) )
           .setBuffer( buffer->GetVkHandle() );
 
-  auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
+  mDescriptorWrites.emplace_back(
+            vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
                                        .setDescriptorType( vk::DescriptorType::eUniformBuffer )
                                        .setDescriptorCount( 1 )
                                        .setDstSet( mDescriptorSet )
                                        .setDstBinding( binding )
-                                       .setDstArrayElement( 0 );
+                                       .setDstArrayElement( 0 ) );
 
+
+#endif
   // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
+  //mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
+}
+
+void DescriptorSet::Flush()
+{
+
+  mDescriptorWrites.clear();
 }
 
 vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
@@ -184,20 +194,23 @@ void DescriptorSet::WriteCombinedImageSampler( uint32_t binding,
                                                RefCountedSampler sampler,
                                                RefCountedImageView imageView )
 {
+#if 0
   auto imageViewInfo = vk::DescriptorImageInfo{}
           .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
           .setImageView( imageView->GetVkHandle() )
           .setSampler( sampler->GetVkHandle() );
 
-  auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
+  mDescriptorWrites.emplace_back(
+  vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
                                        .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
                                        .setDescriptorCount( 1 )
                                        .setDstSet( mDescriptorSet )
                                        .setDstBinding( binding )
-                                       .setDstArrayElement( 0 );
-
+                                       .setDstArrayElement( 0 )
+  );
+#endif
   // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
+  //mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
 }
 
 bool DescriptorSet::OnDestroy()

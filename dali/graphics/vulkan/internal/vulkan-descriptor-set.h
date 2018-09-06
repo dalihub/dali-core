@@ -83,6 +83,8 @@ public:
    */
   vk::DescriptorSet GetVkDescriptorSet() const;
 
+  void Flush();
+
   bool OnDestroy() override;
 
 private:
@@ -94,6 +96,7 @@ private:
   DescriptorPool* mPool;
   vk::DescriptorSetAllocateInfo mAllocateInfo;
   vk::DescriptorSet mDescriptorSet;
+  std::vector< vk::WriteDescriptorSet > mDescriptorWrites;
 };
 
 class DescriptorPool : public VkManaged
@@ -113,6 +116,8 @@ public:
   void FreeDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets );
 
   uint32_t GetAvailableAllocations() const;
+
+
 
   /**
    * Resets descriptor pool
