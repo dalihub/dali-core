@@ -38,7 +38,7 @@ PropertyBuffer::PropertyBuffer()
   mSize(0),
   mDataChanged(true),
   mGraphicsBuffer{ nullptr },
-  mGraphicsBufferUsage{ Graphics::API::Buffer::UsageHint::ATTRIBUTES }
+  mGraphicsBufferUsage{ 0u | Graphics::API::BufferUsage::VERTEX_BUFFER }
 {
 }
 
@@ -49,11 +49,6 @@ PropertyBuffer::~PropertyBuffer()
 void PropertyBuffer::Initialize( Integration::Graphics::Graphics& graphics )
 {
   mGraphics = &graphics;
-}
-
-void PropertyBuffer::SetUsage( Graphics::API::Buffer::UsageHint usage )
-{
-  mGraphicsBufferUsage = usage;
 }
 
 void PropertyBuffer::SetFormat( OwnerPointer< PropertyBuffer::Format >& format )
@@ -73,8 +68,7 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<char> >& data, size_t s
     auto& controller = mGraphics->GetController();
     mGraphicsBuffer = controller.CreateBuffer( controller.GetBufferFactory()
                                            .SetSize( uint32_t( mFormat->size * size) )
-                                           .SetUsage(Graphics::API::Buffer::UsageHint::ATTRIBUTES ));
-
+                                           .SetUsageFlags( 0u | Graphics::API::BufferUsage::VERTEX_BUFFER ));
   }
 }
 
@@ -90,7 +84,7 @@ bool PropertyBuffer::Update( Dali::Graphics::API::Controller& controller )
     if( !mGraphicsBuffer )
     {
       mGraphicsBuffer = controller.CreateBuffer( controller.GetBufferFactory()
-                                                      .SetUsage( mGraphicsBufferUsage )
+                                                      .SetUsageFlags( mGraphicsBufferUsage )
                                                       .SetSize( mSize ) );
     }
 

@@ -63,7 +63,7 @@ void GpuMemoryBlock::Unmap()
 
 void GpuMemoryBlock::Flush()
 {
-
+  mAllocator.Flush( *this );
 }
 
 }

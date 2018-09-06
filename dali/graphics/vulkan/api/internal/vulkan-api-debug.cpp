@@ -206,12 +206,15 @@ std::ostream& operator<<(std::ostream& ss, const RenderCommand& object)
   }
   ss << "  }\n" << std::endl;
 
-  ss << "  mUniformBufferBindings = {" << std::endl;
-  for( auto i = 0u; i < object.mUniformBufferBindings.size(); ++i )
+  if(object.mUniformBufferBindings)
   {
-    ss << object.mUniformBufferBindings[i] << std::endl;
+    ss << "  mUniformBufferBindings = {" << std::endl;
+    for( auto i = 0u; i < object.mUniformBufferBindings->size(); ++i )
+    {
+      ss << (*object.mUniformBufferBindings)[i] << std::endl;
+    }
+    ss << "  }\n" << std::endl;
   }
-  ss << "  }\n" << std::endl;
 
   ss << "  mTextureBindings {" << std::endl;
   for( auto i = 0u; i < object.mTextureBindings.size(); ++i )

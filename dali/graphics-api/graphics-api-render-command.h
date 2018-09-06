@@ -30,6 +30,7 @@
 #include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 
+#include <cstring>
 namespace Dali
 {
 namespace Graphics
@@ -392,9 +393,9 @@ public:
     return *this;
   }
 
-  RenderCommand& BindUniformBuffers( std::vector<UniformBufferBinding>&& bindings )
+  RenderCommand& BindUniformBuffers( const std::vector<UniformBufferBinding>* bindings )
   {
-    mUniformBufferBindings = std::move( bindings );
+    mUniformBufferBindings = bindings;
     mUpdateFlags |= RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
     return *this;
   }
@@ -490,6 +491,13 @@ public:
     return retval;
   }
 
+  static std::vector<UniformBufferBinding> NewUniformBufferBindings( uint32_t count )
+  {
+    auto retval = std::vector<UniformBufferBinding>{};
+    retval.resize( count );
+    return retval;
+  }
+
   // Getters
   const std::vector<const Buffer*>& GetVertexBufferBindings() const
   {
@@ -537,7 +545,7 @@ public:
 
   // list of resources
   std::vector<const Buffer*>                mVertexBufferBindings;
-  std::vector<UniformBufferBinding>         mUniformBufferBindings;
+  const std::vector<UniformBufferBinding>*  mUniformBufferBindings;
   std::vector<TextureBinding>               mTextureBindings;
   std::vector<SamplerBinding>               mSamplerBindings;
 

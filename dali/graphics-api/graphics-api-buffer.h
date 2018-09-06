@@ -58,6 +58,8 @@ public:
 
   virtual void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) = 0;
 
+  virtual void Flush() = 0;
+
 protected:
   // derived types should not be moved directly to prevent slicing
   Buffer(Buffer&&) = default;

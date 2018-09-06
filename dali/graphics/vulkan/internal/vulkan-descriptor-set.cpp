@@ -157,47 +157,15 @@ DescriptorSet::DescriptorSet( Graphics& graphics,
 
 DescriptorSet::~DescriptorSet() = default;
 
-void DescriptorSet::WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size )
+void DescriptorSet::Flush()
 {
-  auto bufferInfo = vk::DescriptorBufferInfo{}
-          .setOffset( U32( offset ) )
-          .setRange( U32( size ) )
-          .setBuffer( buffer->GetVkHandle() );
 
-  auto write = vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
-                                       .setDescriptorType( vk::DescriptorType::eUniformBuffer )
-                                       .setDescriptorCount( 1 )
-                                       .setDstSet( mDescriptorSet )
-                                       .setDstBinding( binding )
-                                       .setDstArrayElement( 0 );
-
-  // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
+  mDescriptorWrites.clear();
 }
 
 vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
 {
   return mDescriptorSet;
-}
-
-void DescriptorSet::WriteCombinedImageSampler( uint32_t binding,
-                                               RefCountedSampler sampler,
-                                               RefCountedImageView imageView )
-{
-  auto imageViewInfo = vk::DescriptorImageInfo{}
-          .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
-          .setImageView( imageView->GetVkHandle() )
-          .setSampler( sampler->GetVkHandle() );
-
-  auto write = vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
-                                       .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
-                                       .setDescriptorCount( 1 )
-                                       .setDstSet( mDescriptorSet )
-                                       .setDstBinding( binding )
-                                       .setDstArrayElement( 0 );
-
-  // write descriptor set
-  mGraphics->GetDevice().updateDescriptorSets( 1, &write, 0, nullptr );
 }
 
 bool DescriptorSet::OnDestroy()
@@ -218,58 +186,6 @@ bool DescriptorSet::OnDestroy()
   return false;
 }
 
-
-#if 0
-struct DescriptorSetLayout::Impl
-{
-  Impl( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo ) :
-    mGraphics( graphics ),
-    mCreateInfo( createInfo )
-  {
-  }
-
-  ~Impl()
-  {
-    if(mLayout)
-    {
-      mGraphics.GetDevice().destroyDescriptorSetLayout( mLayout, mGraphics.GetAllocator() );
-    }
-  }
-
-  bool Initialise()
-  {
-    mLayout = VkAssert( mGraphics.GetDevice().createDescriptorSetLayout( mCreateInfo, mGraphics.GetAllocator() ));
-    if(mLayout)
-    {
-      return true;
-    }
-    return false;
-  }
-
-  Graphics&                         mGraphics;
-  vk::DescriptorSetLayout           mLayout;
-  vk::DescriptorSetLayoutCreateInfo mCreateInfo;
-};
-
-/**
- * Class: DescriptorSetLayout
- */
-
-std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::New( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo )
-{
-  auto retval = std::unique_ptr<DescriptorSetLayout>( new DescriptorSetLayout(graphics, createInfo ) );
-  if( retval->mImpl->Initialise() )
-  {
-    return retval;
-  }
-  return nullptr;
-}
-
-DescriptorSetLayout::DescriptorSetLayout( Graphics& graphics, const vk::DescriptorSetLayoutCreateInfo& createInfo )
-{
-  mImpl = MakeUnique<DescriptorSetLayout::Impl>( graphics, createInfo );
-}
-#endif
 } // Namespace Vulkan
 
 } // Namespace Graphics

@@ -43,45 +43,12 @@ public:
   ~DescriptorSet() override;
 
   /**
-   *
-   * @param buffer
-   * @param offset
-   * @param size
-   */
-  void WriteUniformBuffer( uint32_t binding, Handle< Buffer > buffer, uint32_t offset, uint32_t size );
-
-  /**
-   *
-   * @param binding
-   * @param sampler
-   * @param imageView
-   */
-  void WriteCombinedImageSampler( uint32_t binding, RefCountedSampler sampler, RefCountedImageView imageView );
-
-  /**
-   *
-   * @param buffer
-   * @param offset
-   * @param size
-   */
-  void WriteStorageBuffer( RefCountedBuffer buffer, uint32_t offset, uint32_t size );
-
-  /**
-   *
-   */
-  void WriteImage( Handle< Image > );
-
-  /**
-   *
-   * @param writeDescriptorSet
-   */
-  void Write( vk::WriteDescriptorSet writeDescriptorSet );
-
-  /**
    * Returns VkDescriptorSet associated with this object
    * @return Descriptor set
    */
   vk::DescriptorSet GetVkDescriptorSet() const;
+
+  void Flush();
 
   bool OnDestroy() override;
 
@@ -94,6 +61,7 @@ private:
   DescriptorPool* mPool;
   vk::DescriptorSetAllocateInfo mAllocateInfo;
   vk::DescriptorSet mDescriptorSet;
+  std::vector< vk::WriteDescriptorSet > mDescriptorWrites;
 };
 
 class DescriptorPool : public VkManaged
@@ -113,6 +81,8 @@ public:
   void FreeDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets );
 
   uint32_t GetAvailableAllocations() const;
+
+
 
   /**
    * Resets descriptor pool

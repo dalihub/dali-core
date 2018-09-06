@@ -68,16 +68,16 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
 
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
-        "VK_LAYER_LUNARG_parameter_validation", // parameter
+        //"VK_LAYER_LUNARG_parameter_validation", // parameter
         //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
         //"VK_LAYER_LUNARG_swapchain",           // swapchain
         //"VK_LAYER_GOOGLE_threading",           // threading
         //"VK_LAYER_LUNARG_api_dump",            // api
         //"VK_LAYER_LUNARG_object_tracker",      // objects
-        "VK_LAYER_LUNARG_core_validation",     // core
+        //"VK_LAYER_LUNARG_core_validation",     // core
         //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
-        "VK_LAYER_LUNARG_standard_validation", // standard
+        //"VK_LAYER_LUNARG_standard_validation", // standard
 };
 
 Graphics::Graphics() = default;
@@ -297,7 +297,7 @@ RefCountedSwapchain Graphics::CreateSwapchainForSurface( RefCountedSurface surfa
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount+1, // Temp Fix to cope with incorrect image count returned by device
+                                    surfaceCapabilities.minImageCount,
                                     Dali::Graphics::Vulkan::RefCountedSwapchain() );
 
   // store swapchain in the correct pair
@@ -325,7 +325,7 @@ RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surf
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
                                     vk::PresentModeKHR::eFifo,
-                                    surfaceCapabilities.minImageCount+1, // Temp Fix to cope with incorrect image count returned by device
+                                    surfaceCapabilities.minImageCount,
                                     std::move(oldSwapchain) );
 
 

@@ -170,8 +170,6 @@ public:
     return mGraphicsBuffer.get();
   }
 
-  void SetUsage( Graphics::API::Buffer::UsageHint usage );
-
 private:
   Integration::Graphics::Graphics*        mGraphics;  ///< Graphics interface object
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
@@ -182,7 +180,7 @@ private:
 
   // GRAPHICS
   std::unique_ptr<Graphics::API::Buffer> mGraphicsBuffer;
-  Graphics::API::Buffer::UsageHint mGraphicsBufferUsage;
+  Graphics::API::BufferUsageFlags mGraphicsBufferUsage;
 };
 
 

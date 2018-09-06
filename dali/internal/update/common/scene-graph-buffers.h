@@ -30,6 +30,16 @@ namespace Internal
 namespace SceneGraph
 {
 
+namespace
+{
+
+/**
+ * Maximum number of graphics data buffers ( render commands,
+ * uniform buffers )
+ */
+const auto MAX_GRAPHICS_DATA_BUFFER_COUNT = 2u;
+}
+
 /**
  * Node values (position etc.) are double-buffered.  A SceneGraphBuffers object
  * can be used to keep track of which buffers are being written or read.
