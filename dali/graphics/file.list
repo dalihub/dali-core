@@ -38,10 +38,8 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/api/vulkan-api-render-command.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-pipeline.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-pipeline-factory.cpp \
-    $(graphics_src_dir)/vulkan/api/internal/vulkan-ubo-manager.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-api-debug.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache-debug.cpp \
-    $(graphics_src_dir)/vulkan/api/internal/vulkan-ubo-pool.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-api-pipeline-impl.cpp \
     $(graphics_src_dir)/thread-pool.cpp

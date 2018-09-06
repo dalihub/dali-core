@@ -47,7 +47,6 @@
 #include <dali/graphics/vulkan/api/vulkan-api-sampler-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
-#include <dali/graphics/vulkan/api/internal/vulkan-ubo-manager.h>
 #include <dali/graphics/thread-pool.h>
 #include <utility>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
@@ -104,8 +103,6 @@ struct Controller::Impl
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
     mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
 
-    mUboManager = MakeUnique< VulkanAPI::UboManager >( mOwner );
-
     mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
 
     return mThreadPool.Initialize();
@@ -139,6 +136,7 @@ struct Controller::Impl
 
   void EndFrame()
   {
+    // Update descriptor sets if there are any updates
     // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
@@ -420,8 +418,21 @@ struct Controller::Impl
 
   void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer primaryCommandBuffer, const RenderPassData& renderPassData )
   {
-
     primaryCommandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
+
+    // update descriptor sets
+    for( auto&& command : renderPassData.renderCommands )
+    {
+      auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
+      apiCommand->PrepareResources();
+    }
+
+    if( mDescriptorWrites.size() )
+    {
+      mGraphics.GetDevice().updateDescriptorSets( uint32_t( mDescriptorWrites.size() ), mDescriptorWrites.data(), 0, nullptr );
+      mDescriptorWrites.clear();
+      mDescriptorInfoStack.clear();
+    }
 
     for( auto&& command : renderPassData.renderCommands )
     {
@@ -433,9 +444,6 @@ struct Controller::Impl
 #endif
 
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
-
-      apiCommand->PrepareResources();
-      apiCommand->UpdateUniformBuffers();
 
       // skip if there's no valid pipeline
       if( !apiCommand->GetVulkanPipeline() )
@@ -508,8 +516,6 @@ struct Controller::Impl
     }
 
     primaryCommandBuffer->EndRenderPass();
-
-    mUboManager->UnmapAllBuffers();
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
@@ -530,14 +536,24 @@ struct Controller::Impl
   // used for texture<->buffer<->memory transfers
   std::vector< ResourceTransferRequest >                            mResourceTransferRequests;
 
-  std::unique_ptr< VulkanAPI::UboManager > mUboManager;
-
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
   std::vector< RenderPassData > mRenderPasses;
 
   ThreadPool mThreadPool;
 
   std::vector< std::shared_ptr< Future<void> > > mMemoryTransferFutures;
+
+  std::vector<vk::WriteDescriptorSet> mDescriptorWrites;
+
+  struct DescriptorInfo
+  {
+    vk::DescriptorImageInfo imageInfo;
+    vk::DescriptorBufferInfo bufferInfo;
+  };
+
+  std::deque<DescriptorInfo> mDescriptorInfoStack;
+
+  std::mutex mDescriptorWriteMutex{};
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -602,12 +618,50 @@ Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::BeginFrame()
 {
+  mStats.samplerTextureBindings = 0;
+  mStats.uniformBufferBindings = 0;
+
+  //@ todo, not multithreaded yet
+  mImpl->mDescriptorWrites.clear();
+
   mImpl->BeginFrame();
+}
+
+void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
+{
+  vk::DescriptorImageInfo* pImageInfo { nullptr };
+  vk::DescriptorBufferInfo* pBufferInfo { nullptr };
+  std::lock_guard<std::mutex> lock( mImpl->mDescriptorWriteMutex );
+  if( write.pImageInfo )
+  {
+    mImpl->mDescriptorInfoStack.emplace_back();
+    mImpl->mDescriptorInfoStack.back().imageInfo = *write.pImageInfo;
+    pImageInfo = &mImpl->mDescriptorInfoStack.back().imageInfo;
+  }
+  else if( write.pBufferInfo )
+  {
+    mImpl->mDescriptorInfoStack.emplace_back();
+    mImpl->mDescriptorInfoStack.back().bufferInfo = *write.pBufferInfo;
+    pBufferInfo = &mImpl->mDescriptorInfoStack.back().bufferInfo;
+  }
+  mImpl->mDescriptorWrites.emplace_back( write );
+  mImpl->mDescriptorWrites.back().pBufferInfo = pBufferInfo;
+  mImpl->mDescriptorWrites.back().pImageInfo = pImageInfo;
 }
 
 void Controller::EndFrame()
 {
   mImpl->EndFrame();
+
+  // print stats
+  //PrintStats();
+}
+
+void Controller::PrintStats()
+{
+  printf("Frame: %d\n", int(mStats.frame));
+  printf("  UBO bindings: %d\n", int(mStats.uniformBufferBindings));
+  printf("  Tex bindings: %d\n", int(mStats.samplerTextureBindings));
 }
 
 void Controller::Pause()
@@ -670,11 +724,6 @@ void Controller::ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& 
   {
     mImpl->ProcessResourceTransferRequests( true );
   }
-}
-
-VulkanAPI::UboManager& Controller::GetUboManager()
-{
-  return *mImpl->mUboManager;
 }
 
 void Controller::SubmitCommands( std::vector< API::RenderCommand* > commands )
