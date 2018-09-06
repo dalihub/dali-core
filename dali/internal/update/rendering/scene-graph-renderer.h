@@ -46,6 +46,7 @@ class Geometry;
 class SceneController;
 class TextureSet;
 class Shader;
+class GraphicsBuffer;
 
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
@@ -356,39 +357,31 @@ public:
    */
   void PrepareRender( BufferIndex updateBufferIndex );
 
-  /**
-   * AB: preparing the command data
-   * @param controller
-   * @param updateBufferIndex
-   */
-  void PrepareRender( Graphics::API::Controller& controller, BufferIndex updateBufferIndex );
-
   Graphics::API::RenderCommand& GetGfxRenderCommand()
   {
     return *mGfxRenderCommand.get();
   }
 
   template<class T>
-  void WriteUniform( const std::string& name, const T& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const T& data )
   {
-    WriteUniform( name, &data, sizeof(T) );
+    WriteUniform( ubo, bindings, name, &data, sizeof(T) );
   }
 
-  void WriteUniform( const std::string& name, const Matrix3& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
-    std::fill( values, values+12, 10.0f );
 
+    // todo: optimise this case, ideally by stopping using Matrix3
     std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
     std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
     std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
 
-    WriteUniform( name, &values, sizeof(float)*12 );
+    WriteUniform( ubo, bindings, name, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( const std::string& name, const void* data, uint32_t size );
-
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const void* data, uint32_t size );
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -396,6 +389,16 @@ public:
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
   OpacityType GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const;
+
+  /**
+   * Updates uniform buffer at index. Writes uniforms into given memory address
+   * @param dstMemory
+   * @param offset
+   * @param size
+   */
+  std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& UpdateUniformBuffers( GraphicsBuffer& ubo,
+                                 uint32_t& offset,
+                                 BufferIndex updateBufferIndex );
 
   /**
    * Called by the TextureSet to notify to the renderer that it has changed
@@ -498,6 +501,8 @@ private:
   std::vector<std::vector<char>> mUboMemory;                      ///< Transient memory allocated for each UBO
   std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
   std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
+  std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings; /// shouldn't be here but we need to store it!
+
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions

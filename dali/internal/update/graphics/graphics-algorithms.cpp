@@ -226,6 +226,25 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   std::vector<Graphics::API::RenderCommand*> commandList;
 
+  // rollback before writes occur
+
+  if( !mGraphicsBufferManager )
+  {
+    mGraphicsBufferManager.reset( new GraphicsBufferManager( &graphics ) );
+  }
+
+  if( !mUniformBuffer )
+  {
+    mUniformBuffer = std::move( mGraphicsBufferManager->AllocateUniformBuffer( mUniformBlockAllocationBytes ) );
+  }
+
+  // allocate always * 2 than needed for now if size less than required
+  if( mUniformBuffer->GetSize() <= mUniformBlockAllocationBytes )
+  {
+    mUniformBuffer->Reserve( mUniformBlockAllocationBytes*2 );
+  }
+
+  uint32_t uboOffset = 0u;
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
@@ -235,6 +254,11 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
+
+    // update the uniform buffer
+    // pass shared UBO and offset, return new offset for next item to be used
+    auto bindings = renderer->UpdateUniformBuffers( *mUniformBuffer.get(), uboOffset, bufferIndex );
+
     auto color = item.mNode->GetWorldColor( bufferIndex );
 
     auto &cmd = renderer->GetGfxRenderCommand();
@@ -244,7 +268,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
       continue;
     }
     cmd.BindRenderTarget(renderTargetBinding);
-
+    cmd.BindUniformBuffers( &bindings );
     float width = instruction.mViewport.width;
     float height = instruction.mViewport.height;
 
@@ -261,9 +285,9 @@ void GraphicsAlgorithms::SubmitRenderItemList(
                                     height,
                                     0.0f , 1.0f } )
                     .SetViewportEnable( true );
+
     // Could set to false if we know that we can use the Pipeline viewport rather than the
     // dynamic viewport.
-
     auto opacity = renderer->GetOpacity( bufferIndex );
 
     if( renderer->IsPreMultipliedAlphaEnabled() )
@@ -276,22 +300,24 @@ void GraphicsAlgorithms::SubmitRenderItemList(
       color.a *= opacity;
     }
 
+    // we know bindings for this render item, so we can use 'offset' and write additional
+    // uniforms
     Matrix mvp, mvp2;
     Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
     Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-    renderer->WriteUniform("uModelMatrix", item.mModelMatrix);
-    renderer->WriteUniform("uMvpMatrix", mvp2);
-    renderer->WriteUniform("uViewMatrix", *viewMatrix);
-    renderer->WriteUniform("uModelView", item.mModelViewMatrix);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uModelMatrix", item.mModelMatrix);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uMvpMatrix", mvp2);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uViewMatrix", *viewMatrix);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uModelView", item.mModelViewMatrix);
 
     Matrix3 uNormalMatrix( item.mModelViewMatrix );
     uNormalMatrix.Invert();
     uNormalMatrix.Transpose();
 
-    renderer->WriteUniform("uNormalMatrix", uNormalMatrix);
-    renderer->WriteUniform("uProjection", vulkanProjectionMatrix);
-    renderer->WriteUniform("uSize", item.mSize);
-    renderer->WriteUniform("uColor", color );
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uNormalMatrix", uNormalMatrix);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uProjection", vulkanProjectionMatrix);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uSize", item.mSize);
+    renderer->WriteUniform( *mUniformBuffer.get(), bindings, "uColor", color );
 
     commandList.push_back(&cmd);
   }
@@ -345,6 +371,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 {
   using namespace Dali::Graphics::API;
 
+  const uint32_t UBO_ALIGNMENT = 256u;
+
   // vertex input state
   VertexInputState vi{};
 
@@ -355,6 +383,19 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   if( !gfxShader )
   {
     return false;
+  }
+
+  // Update allocation requirements
+  mUniformBlockAllocationCount += gfxShader->GetUniformBlockCount();
+  for( auto i = 0u; i < gfxShader->GetUniformBlockCount(); ++i )
+  {
+    auto size = gfxShader->GetUniformBlockSize( i );
+    auto blockSize = (( size / UBO_ALIGNMENT ) + ( ( size % UBO_ALIGNMENT ) ? 1 : 0 )) * UBO_ALIGNMENT;
+    if( mUniformBlockMaxSize < blockSize )
+    {
+      mUniformBlockMaxSize = blockSize;
+    }
+    mUniformBlockAllocationBytes += blockSize;
   }
 
   /**
@@ -598,10 +639,16 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   return true;
 }
 
+
 void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
                                RenderInstructionContainer& renderInstructions,
                                BufferIndex bufferIndex )
 {
+
+  mUniformBlockAllocationCount = 0u;
+  mUniformBlockAllocationBytes = 0u;
+  mUniformBlockMaxSize = 0u;
+
   for( auto i = 0u; i < renderInstructions.Count( bufferIndex ); ++i )
   {
     RenderInstruction &ri = renderInstructions.At(bufferIndex, i);
@@ -625,6 +672,9 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
       }
     }
   }
+
+  //printf("Alloc: %d, Bytes: %d, Max: %d\n", int(mUniformBlockAllocationCount),
+  //int(mUniformBlockAllocationBytes), int(mUniformBlockMaxSize));
 }
 
 void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  controller,

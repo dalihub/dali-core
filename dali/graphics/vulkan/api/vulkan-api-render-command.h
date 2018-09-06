@@ -71,11 +71,6 @@ public:
   void PrepareResources();
 
   /**
-   * Updates uniform buffers
-   */
-  void UpdateUniformBuffers();
-
-  /**
    * Writes uniform buffers into descriptor set
    */
   void BindUniformBuffers();
@@ -86,21 +81,10 @@ public:
   void BindTexturesAndSamplers();
 
   /**
-   * Binds vertex buffers
-   */
-  void BindVertexBuffers();
-
-  /**
    * Returns an array of updated descriptor sets
    * @return
    */
   const std::vector< Vulkan::RefCountedDescriptorSet >& GetDescriptorSets() const;
-
-  /**
-   * Returns associated Vulkan command buffer
-   * @return
-   */
-  const Vulkan::RefCountedCommandBuffer& GetCommandBuffer() const;
 
   /**
    * Returns Vulkan backed pipeline
@@ -110,25 +94,14 @@ public:
 
 private:
 
-  /**
-   * Allocates UBO memory based on the pipeline. Executed only
-   * once per pipeline
-   */
-  void AllocateUniformBufferMemory();
-
-private:
-
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
   Vulkan::RefCountedCommandBuffer mCommandBuffer;
   Vulkan::RefCountedPipeline mVulkanPipeline;
-  Vulkan::RefCountedDescriptorPool mDescriptorPool;
 
   std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 
   std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
-
-  std::vector< std::unique_ptr< Ubo>> mUboBuffers;
   bool mUBONeedsBinding { false };
 };
 

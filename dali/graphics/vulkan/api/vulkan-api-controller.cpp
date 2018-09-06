@@ -435,7 +435,6 @@ struct Controller::Impl
       auto apiCommand = static_cast<VulkanAPI::RenderCommand*>(command);
 
       apiCommand->PrepareResources();
-      apiCommand->UpdateUniformBuffers();
 
       // skip if there's no valid pipeline
       if( !apiCommand->GetVulkanPipeline() )

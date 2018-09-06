@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
@@ -43,7 +44,10 @@ public:
    * @param usage
    * @return
    */
-  virtual BufferFactory& SetUsage( Buffer::UsageHint usage ) = 0;
+  virtual BufferFactory& SetUsageFlags( API::BufferUsageFlags usage ) = 0;
+
+  // deprecated!
+  virtual BufferFactory& SetUsage( API::Buffer::UsageHint usage ) = 0;
 
   /**
    * Sets size of the buffer
