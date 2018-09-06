@@ -1670,3 +1670,46 @@ int UtcDaliStageOperatorAssign(void)
 
   END_TEST;
 }
+
+int UtcDaliStageRenderingBehavior(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  tet_infoline( "Check default rendering behavior is only if required" );
+  DALI_TEST_CHECK( DevelStage::GetRenderingBehavior( stage ) == DevelStage::Rendering::IF_REQUIRED );
+
+  tet_infoline( "No update required with an empty application" );
+  application.SendNotification();
+  DALI_TEST_CHECK( application.UpdateOnly() == false );
+  application.RenderOnly();
+
+  tet_infoline( "Change to continuous rendering, further updates should be required" );
+  DevelStage::SetRenderingBehavior( stage, DevelStage::Rendering::CONTINUOUSLY );
+
+  DALI_TEST_CHECK( DevelStage::GetRenderingBehavior( stage ) == DevelStage::Rendering::CONTINUOUSLY );
+
+  application.SendNotification();
+  DALI_TEST_CHECK( application.UpdateOnly() == true );
+  application.RenderOnly();
+
+  application.SendNotification();
+  DALI_TEST_CHECK( application.UpdateOnly() == true );
+  application.RenderOnly();
+
+  tet_infoline( "Change to rendering only if required, further updates should NOT be required" );
+  DevelStage::SetRenderingBehavior( stage, DevelStage::Rendering::IF_REQUIRED );
+
+  DALI_TEST_CHECK( DevelStage::GetRenderingBehavior( stage ) == DevelStage::Rendering::IF_REQUIRED );
+
+  application.SendNotification();
+  DALI_TEST_CHECK( application.UpdateOnly() == false );
+  application.RenderOnly();
+
+  tet_infoline( "The next update is not required so TestApplication should print a warning" );
+  application.SendNotification();
+  DALI_TEST_CHECK( application.UpdateOnly() == false );
+  application.RenderOnly();
+
+  END_TEST;
+}

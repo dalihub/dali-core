@@ -326,6 +326,10 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
     {
       SetBlendFunc( BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA );
     }
+    else
+    {
+      SetBlendFunc( BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA );
+    }
     mPremultipledAlphaEnabled = preMultipled;
     SetEnablePreMultipliedAlphaMessage( GetEventThreadServices(), *mSceneObject, mPremultipledAlphaEnabled );
   }

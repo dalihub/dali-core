@@ -305,6 +305,16 @@ public:
   void KeepRendering( float durationSeconds );
 
   /**
+   * @copydoc Dali::DevelStage::SetRenderingBehavior()
+   */
+  void SetRenderingBehavior( DevelStage::Rendering renderingBehavior );
+
+  /**
+   * @copydoc Dali::DevelStage::GetRenderingBehavior()
+   */
+  DevelStage::Rendering GetRenderingBehavior() const;
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -531,6 +541,8 @@ private:
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 
   Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
+
+  DevelStage::Rendering mRenderingBehavior; ///< The rendering behavior
 
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
   bool mForceNextUpdate:1; ///< True if the next rendering is really required.

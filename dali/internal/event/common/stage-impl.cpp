@@ -543,6 +543,22 @@ void Stage::KeepRendering( float durationSeconds )
   KeepRenderingMessage( mUpdateManager, durationSeconds );
 }
 
+void Stage::SetRenderingBehavior( DevelStage::Rendering renderingBehavior )
+{
+  if( mRenderingBehavior != renderingBehavior )
+  {
+    // Send message to change the rendering behavior
+    SetRenderingBehaviorMessage( mUpdateManager, renderingBehavior );
+
+    mRenderingBehavior = renderingBehavior;
+  }
+}
+
+DevelStage::Rendering Stage::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
+}
+
 bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
@@ -725,6 +741,7 @@ Stage::Stage( AnimationPlaylist& playlist,
   mContextLostSignal(),
   mContextRegainedSignal(),
   mSceneCreatedSignal(),
+  mRenderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
   mDepthTreeDirty( false ),
   mForceNextUpdate( false ),
   mRenderToFbo( false )
