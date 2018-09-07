@@ -1719,6 +1719,15 @@ public:
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 
   /**
+   * Retrieve the actor's node.
+   * @return The node used by this actor
+   */
+  const SceneGraph::Node& GetNode() const
+  {
+    return *mNode;
+  }
+
+  /**
    * @copydoc Dali::DevelActor::Raise()
    */
   void Raise();

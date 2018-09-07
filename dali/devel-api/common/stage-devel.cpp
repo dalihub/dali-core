@@ -40,6 +40,16 @@ Rendering GetRenderingBehavior( Dali::Stage stage )
   return GetImplementation( stage ).GetRenderingBehavior();
 }
 
+void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor )
+{
+  GetImplementation( stage ).AddFrameCallback( frameCallback, GetImplementation( rootActor ) );
+}
+
+void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback )
+{
+  GetImplementation( stage ).RemoveFrameCallback( frameCallback );
+}
+
 } // namespace DevelStage
 
 } // namespace Dali

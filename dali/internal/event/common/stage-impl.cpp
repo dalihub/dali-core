@@ -656,6 +656,16 @@ Dali::DevelStage::KeyEventGeneratedSignalType& Stage::KeyEventGeneratedSignal()
   return mKeyEventGeneratedSignal;
 }
 
+void Stage::AddFrameCallback( FrameCallbackInterface& frameCallback, Actor& rootActor )
+{
+  AddFrameCallbackMessage( mUpdateManager, frameCallback, rootActor.GetNode() );
+}
+
+void Stage::RemoveFrameCallback( FrameCallbackInterface& frameCallback )
+{
+  RemoveFrameCallbackMessage( mUpdateManager, frameCallback );
+}
+
 Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
 {
   return mEventProcessingFinishedSignal;

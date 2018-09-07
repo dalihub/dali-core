@@ -18,7 +18,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/signals/signal-delegate.cpp \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
   $(devel_api_src_dir)/threading/mutex.cpp \
-  $(devel_api_src_dir)/threading/thread.cpp
+  $(devel_api_src_dir)/threading/thread.cpp \
+  $(devel_api_src_dir)/update/update-proxy.cpp
 
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
 
@@ -71,3 +72,7 @@ devel_api_core_threading_header_files = \
   $(devel_api_src_dir)/threading/conditional-wait.h \
   $(devel_api_src_dir)/threading/mutex.h \
   $(devel_api_src_dir)/threading/thread.h
+
+devel_api_core_update_header_files = \
+  $(devel_api_src_dir)/update/frame-callback-interface.h \
+  $(devel_api_src_dir)/update/update-proxy.h

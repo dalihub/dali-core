@@ -55,9 +55,9 @@ const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_P
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 
-Node* Node::New()
+Node* Node::New( unsigned int id )
 {
-  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node();
+  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node( id );
 }
 
 void Node::Delete( Node* node )
@@ -78,7 +78,7 @@ void Node::Delete( Node* node )
   }
 }
 
-Node::Node()
+Node::Node( unsigned int id )
 : mTransformManager( NULL ),
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
@@ -95,6 +95,7 @@ Node::Node()
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
   mClippingSortModifier( 0u ),
+  mId( id ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),

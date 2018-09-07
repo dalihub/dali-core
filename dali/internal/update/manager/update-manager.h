@@ -45,6 +45,8 @@
 namespace Dali
 {
 
+class FrameCallbackInterface;
+
 namespace Integration
 {
 class GlSyncAbstraction;
@@ -609,6 +611,19 @@ public:
    * @return true if the default surface rect is changed.
    */
   bool IsDefaultSurfaceRectChanged();
+
+  /**
+   * Adds an implementation of the FrameCallbackInterface.
+   * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface
+   * @param[in] rootNode A pointer to the root node to apply the FrameCallback to
+   */
+  void AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode );
+
+  /**
+   * Removes the specified implementation of FrameCallbackInterface.
+   * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface to remove.
+   */
+  void RemoveFrameCallback( FrameCallbackInterface* frameCallback );
 
 private:
 
@@ -1337,6 +1352,27 @@ inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyRes
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
 }
 
+inline void AddFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback, const Node& rootNode )
+{
+  typedef MessageValue2< UpdateManager, FrameCallbackInterface*, const Node* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameCallback, &frameCallback, &rootNode );
+}
+
+inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback )
+{
+  typedef MessageValue1< UpdateManager, FrameCallbackInterface* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveFrameCallback, &frameCallback );
+}
 
 } // namespace SceneGraph
 
