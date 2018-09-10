@@ -612,7 +612,6 @@ void Controller::EndFrame()
 
 void Controller::Pause()
 {
-  mImpl->InvalidateSwapchain();
 }
 
 void Controller::Resume()

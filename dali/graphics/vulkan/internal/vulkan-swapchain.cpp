@@ -117,7 +117,14 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   if( result != vk::Result::eSuccess )
   {
     mIsValid = false;
-    return RefCountedFramebuffer();
+    if ( result == vk::Result::eErrorOutOfDateKHR )
+    {
+      return RefCountedFramebuffer();
+    }
+    else
+    {
+      assert( mIsValid );
+    }
   }
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
@@ -176,7 +183,15 @@ void Swapchain::Present()
   if( presentInfo.pResults[0] != vk::Result::eSuccess )
   {
     // invalidate swapchain
-    mIsValid = false;
+    if ( result == vk::Result::eErrorOutOfDateKHR )
+    {
+      mIsValid = false;
+    }
+    else
+    {
+      mIsValid = false;
+      assert( mIsValid );
+    }
   }
 
   mFrameCounter = uint32_t( (mFrameCounter+1) % mSwapchainBuffer.size() );
