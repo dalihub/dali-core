@@ -93,7 +93,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   const auto& device = mGraphics->GetDevice();
 
   // on swapchain first create sync primitives if not created yet
-  int prevBufferIndex = -1;
   if( mSyncPrimitives.empty() )
   {
     mSyncPrimitives.resize( mSwapchainBuffer.size() );
@@ -102,15 +101,11 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
       prim.reset( new SyncPrimitives( *mGraphics ) );
     }
   }
-  else
-  {
-    prevBufferIndex = int(mCurrentBufferIndex);
-  }
+
   auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
-                                            mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore,
+                                            mSyncPrimitives[mBufferIndex]->acquireNextImageSemaphore,
                                             nullptr, &mCurrentBufferIndex );
-
 
   // swapchain either not optimal or expired, returning nullptr and
   // setting validity to false
@@ -122,9 +117,9 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
 
-  if( prevBufferIndex >= 0 )
+  if( mFrameCounter >= mSwapchainBuffer.size() )
   {
-    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
+    mGraphics->WaitForFence( mSwapchainBuffer[mCurrentBufferIndex].endOfFrameFence );
   }
 
   mGraphics->ExecuteActions();
@@ -155,8 +150,8 @@ void Swapchain::Present()
 
   auto submissionData = SubmissionData{}
   .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
-  .SetSignalSemaphores( { mSyncPrimitives[mFrameCounter]->submitSemaphore } )
-  .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
+  .SetSignalSemaphores( { mSyncPrimitives[mBufferIndex]->submitSemaphore } )
+  .SetWaitSemaphores( { mSyncPrimitives[mBufferIndex]->acquireNextImageSemaphore } )
   .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
 
   mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
@@ -167,7 +162,7 @@ void Swapchain::Present()
              .setPResults( &result )
              .setPSwapchains( &mSwapchainKHR )
              .setSwapchainCount( 1 )
-             .setPWaitSemaphores( &mSyncPrimitives[mFrameCounter]->submitSemaphore )
+             .setPWaitSemaphores( &mSyncPrimitives[mBufferIndex]->submitSemaphore )
              .setWaitSemaphoreCount( 1 );
 
   mGraphics->Present( *mQueue, presentInfo );
@@ -179,7 +174,8 @@ void Swapchain::Present()
     mIsValid = false;
   }
 
-  mFrameCounter = uint32_t( (mFrameCounter+1) % mSwapchainBuffer.size() );
+  mFrameCounter++;
+  mBufferIndex = uint32_t( (mBufferIndex+1) % mSwapchainBuffer.size() );
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
