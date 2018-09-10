@@ -668,7 +668,6 @@ void Controller::PrintStats()
 
 void Controller::Pause()
 {
-  mImpl->InvalidateSwapchain();
 }
 
 void Controller::Resume()
