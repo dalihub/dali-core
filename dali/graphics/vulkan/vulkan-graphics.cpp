@@ -965,25 +965,10 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                swapchainExtent.height ) );
   }
 
-  auto swapChainBuffers = std::vector< SwapchainBuffer >{};
-  swapChainBuffers.reserve( swapChainBuffers.size() );
-
-  for( const auto& framebuffer : framebuffers )
-  {
-    auto masterCmd = CreateCommandBuffer( true );
-
-    auto swapBuffer = SwapchainBuffer{};
-    swapBuffer.framebuffer = framebuffer;
-    swapBuffer.index = 0;
-    swapBuffer.masterCmdBuffer = masterCmd;
-    swapBuffer.endOfFrameFence = CreateFence( {} );
-    swapChainBuffers.push_back( swapBuffer );
-  }
-
   return RefCountedSwapchain( new Swapchain( *this,
                                              GetPresentQueue(),
                                              surface,
-                                             swapChainBuffers,
+                                             std::move(framebuffers),
                                              swapChainCreateInfo,
                                              swapChainVkHandle ) );
 }

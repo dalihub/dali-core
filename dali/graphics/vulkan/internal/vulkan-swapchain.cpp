@@ -39,13 +39,46 @@ namespace Graphics
 namespace Vulkan
 {
 
-Swapchain::SyncPrimitives::SyncPrimitives( Graphics& _graphics ) : graphics( _graphics )
+/**
+ * SwapchainBuffer stores all per-buffer data
+ */
+struct SwapchainBuffer
+{
+  SwapchainBuffer( Graphics& _graphics );
+
+  ~SwapchainBuffer();
+
+  /*
+   * Each buffer has own master command buffer which executes
+   * secondary buffers
+   */
+  RefCountedCommandBuffer masterCmdBuffer;
+
+  /**
+   * Semaphore signalled on acquire next image
+   */
+  vk::Semaphore acquireNextImageSemaphore;
+
+  /**
+   * Semaphore signalled on complete commands submission
+   */
+  vk::Semaphore submitSemaphore;
+
+  RefCountedFence endOfFrameFence;
+
+  Graphics& graphics;
+};
+
+SwapchainBuffer::SwapchainBuffer(Graphics& _graphics)
+: graphics( _graphics )
 {
   acquireNextImageSemaphore = graphics.GetDevice().createSemaphore( {}, graphics.GetAllocator() ).value;
   submitSemaphore = graphics.GetDevice().createSemaphore( {}, graphics.GetAllocator() ).value;
+  masterCmdBuffer = graphics.CreateCommandBuffer( true );
+  endOfFrameFence = graphics.CreateFence({});
 }
 
-Swapchain::SyncPrimitives::~SyncPrimitives()
+SwapchainBuffer::~SwapchainBuffer()
 {
   // swapchain dies so make sure semaphore are not in use anymore
   graphics.GetDevice().waitIdle();
@@ -55,16 +88,16 @@ Swapchain::SyncPrimitives::~SyncPrimitives()
 
 Swapchain::Swapchain( Graphics& graphics, Queue& presentationQueue,
                       RefCountedSurface surface,
-                      std::vector< SwapchainBuffer > framebuffers,
+                      std::vector< RefCountedFramebuffer >&& framebuffers,
                       vk::SwapchainCreateInfoKHR createInfo,
                       vk::SwapchainKHR vkHandle )
 : mGraphics( &graphics ),
   mQueue( &presentationQueue ),
   mSurface( std::move( surface ) ),
-  mCurrentBufferIndex( 0u ),
+  mSwapchainImageIndex( 0u ),
   mSwapchainKHR( vkHandle ),
   mSwapchainCreateInfoKHR( std::move( createInfo ) ),
-  mSwapchainBuffer( std::move( framebuffers ) ),
+  mFramebuffers( std::move( framebuffers ) ),
   mIsValid( true )
 {
 }
@@ -73,12 +106,12 @@ Swapchain::~Swapchain() = default;
 
 RefCountedFramebuffer Swapchain::GetCurrentFramebuffer() const
 {
-  return GetFramebuffer( mCurrentBufferIndex );
+  return GetFramebuffer( mSwapchainImageIndex );
 }
 
 RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
 {
-  return mSwapchainBuffer[index].framebuffer;
+  return mFramebuffers[index];
 }
 
 RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
@@ -92,25 +125,26 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
 
   const auto& device = mGraphics->GetDevice();
 
-  // on swapchain first create sync primitives if not created yet
-  int prevBufferIndex = -1;
-  if( mSyncPrimitives.empty() )
+  // on swapchain first create sync primitives and master command buffer
+  // if not created yet
+  if( mSwapchainBuffers.empty() )
   {
-    mSyncPrimitives.resize( mSwapchainBuffer.size() );
-    for( auto& prim : mSyncPrimitives )
+    const auto MAX_SWAPCHAIN_BUFFERS { mFramebuffers.size() };
+
+    mSwapchainBuffers.resize( MAX_SWAPCHAIN_BUFFERS );
+    for( auto& buffer : mSwapchainBuffers )
     {
-      prim.reset( new SyncPrimitives( *mGraphics ) );
+      buffer.reset( new SwapchainBuffer( *mGraphics ) );
     }
   }
-  else
-  {
-    prevBufferIndex = int(mCurrentBufferIndex);
-  }
-  auto result = device.acquireNextImageKHR( mSwapchainKHR,
-                                            std::numeric_limits<uint64_t>::max(),
-                                            mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore,
-                                            nullptr, &mCurrentBufferIndex );
 
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Swapchain Image Index ( BEFORE Acquire ) = %d", int(mSwapchainImageIndex) );
+                 auto result = device.acquireNextImageKHR( mSwapchainKHR,
+                                            std::numeric_limits<uint64_t>::max(),
+                                            mSwapchainBuffers[mBufferIndex]->acquireNextImageSemaphore,
+                                            nullptr, &mSwapchainImageIndex );
+
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Swapchain Image Index ( AFTER Acquire ) = %d", int(mSwapchainImageIndex) );
 
   // swapchain either not optimal or expired, returning nullptr and
   // setting validity to false
@@ -120,20 +154,20 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
     return RefCountedFramebuffer();
   }
 
-  auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
+  auto& swapBuffer = mSwapchainBuffers[mBufferIndex];
 
-  if( prevBufferIndex >= 0 )
+  if( mFrameCounter >= mSwapchainBuffers.size() )
   {
-    mGraphics->WaitForFence( mSwapchainBuffer[uint32_t(prevBufferIndex)].endOfFrameFence );
+    mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
   }
 
   mGraphics->ExecuteActions();
   mGraphics->CollectGarbage();
 
-  swapBuffer.masterCmdBuffer->Reset();
-  swapBuffer.masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+  swapBuffer->masterCmdBuffer->Reset();
+  swapBuffer->masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
-  return swapBuffer.framebuffer;
+  return mFramebuffers[mSwapchainImageIndex];
 }
 
 void Swapchain::Present()
@@ -145,29 +179,29 @@ void Swapchain::Present()
     return;
   }
 
-  auto& swapBuffer = mSwapchainBuffer[mCurrentBufferIndex];
+  auto& swapBuffer = mSwapchainBuffers[mBufferIndex];
 
   // end command buffer
-  swapBuffer.masterCmdBuffer->End();
+  swapBuffer->masterCmdBuffer->End();
 
   // submit
-  mGraphics->ResetFence( swapBuffer.endOfFrameFence );
+  mGraphics->ResetFence( swapBuffer->endOfFrameFence );
 
   auto submissionData = SubmissionData{}
-  .SetCommandBuffers( { swapBuffer.masterCmdBuffer } )
-  .SetSignalSemaphores( { mSyncPrimitives[mFrameCounter]->submitSemaphore } )
-  .SetWaitSemaphores( { mSyncPrimitives[mFrameCounter]->acquireNextImageSemaphore } )
+  .SetCommandBuffers( { swapBuffer->masterCmdBuffer } )
+  .SetSignalSemaphores( { swapBuffer->submitSemaphore } )
+  .SetWaitSemaphores( { swapBuffer->acquireNextImageSemaphore } )
   .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
 
-  mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer.endOfFrameFence );
+  mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer->endOfFrameFence );
 
   vk::PresentInfoKHR presentInfo{};
   vk::Result result;
-  presentInfo.setPImageIndices( &mCurrentBufferIndex )
+  presentInfo.setPImageIndices( &mSwapchainImageIndex )
              .setPResults( &result )
              .setPSwapchains( &mSwapchainKHR )
              .setSwapchainCount( 1 )
-             .setPWaitSemaphores( &mSyncPrimitives[mFrameCounter]->submitSemaphore )
+             .setPWaitSemaphores( &swapBuffer->submitSemaphore )
              .setWaitSemaphoreCount( 1 );
 
   mGraphics->Present( *mQueue, presentInfo );
@@ -179,7 +213,8 @@ void Swapchain::Present()
     mIsValid = false;
   }
 
-  mFrameCounter = uint32_t( (mFrameCounter+1) % mSwapchainBuffer.size() );
+  mFrameCounter++;
+  mBufferIndex = uint32_t( (mBufferIndex+1) % mSwapchainBuffers.size() );
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
@@ -193,7 +228,7 @@ void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
 
   vk::PresentInfoKHR presentInfo{};
   vk::Result result{};
-  presentInfo.setPImageIndices( &mCurrentBufferIndex )
+  presentInfo.setPImageIndices( &mSwapchainImageIndex )
              .setPResults( &result )
              .setPSwapchains( &mSwapchainKHR )
              .setSwapchainCount( 1 )
@@ -205,7 +240,7 @@ void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
 
 RefCountedCommandBuffer Swapchain::GetCurrentCommandBuffer() const
 {
-  return mSwapchainBuffer[mCurrentBufferIndex].masterCmdBuffer;
+  return mSwapchainBuffers[mBufferIndex]->masterCmdBuffer;
 }
 
 bool Swapchain::OnDestroy()

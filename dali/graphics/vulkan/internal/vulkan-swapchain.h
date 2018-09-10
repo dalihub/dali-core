@@ -27,36 +27,10 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
 class Surface;
-
 class Queue;
-
-/**
-   * SwapchainBuffer stores all per-buffer data
-   */
-struct SwapchainBuffer
-{
-  /*
-   * Each buffer has own master command buffer which executes
-   * secondary buffers
-   */
-  RefCountedCommandBuffer masterCmdBuffer;
-
-  /*
-   * Framebuffer object associated with the buffer
-   */
-  RefCountedFramebuffer framebuffer;
-
-  /*
-   * Sync primitives
-   */
-  RefCountedFence endOfFrameFence;
-
-  /*
-   * Buffer index
-   */
-  uint32_t index;
-};
+class SwapchainBuffer;
 
 /**
  * Creates swapchain for given surface and queue
@@ -129,7 +103,7 @@ private:
   Swapchain( Graphics& graphics,
              Queue& presentationQueue,
              RefCountedSurface surface,
-             std::vector< SwapchainBuffer > framebuffers,
+             std::vector< RefCountedFramebuffer >&& framebuffers,
              vk::SwapchainCreateInfoKHR createInfo,
              vk::SwapchainKHR vkHandle );
 
@@ -138,37 +112,25 @@ private:
   Queue* mQueue;
   RefCountedSurface mSurface;
 
-  uint32_t mCurrentBufferIndex;
-
-  RefCountedFence mFrameFence;
+  uint32_t mSwapchainImageIndex;
 
   vk::SwapchainKHR mSwapchainKHR;
   vk::SwapchainCreateInfoKHR mSwapchainCreateInfoKHR;
 
-  std::vector< SwapchainBuffer > mSwapchainBuffer;
+  /*
+   * Framebuffer object associated with the buffer
+   */
+  std::vector<RefCountedFramebuffer> mFramebuffers;
 
-  struct SyncPrimitives
-  {
-    SyncPrimitives( Graphics& _graphics );
-
-    ~SyncPrimitives();
-
-    Graphics& graphics;
-    /**
-     * Semaphore signalled on acquire next image
-     */
-    vk::Semaphore acquireNextImageSemaphore;
-
-    /**
-     * Semaphore signalled on complete commands submission
-     */
-    vk::Semaphore submitSemaphore;
-  };
-
-  std::vector<std::unique_ptr<SyncPrimitives>> mSyncPrimitives;
+  /**
+   * Array of swapchain buffers
+   */
+  std::vector<std::unique_ptr<SwapchainBuffer>> mSwapchainBuffers;
 
   bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
-  uint32_t mFrameCounter { 0u };
+
+  uint32_t mFrameCounter { 0u }; ///< Current frame number
+  uint32_t mBufferIndex { 0u }; ///< Current buffer index number
 };
 
 } // namespace Vulkan
