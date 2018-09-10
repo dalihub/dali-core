@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd82020a_f26f8144",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-10T15:14:39Z",
+      "side": 1,
+      "message": "Can we log mCurrentBufferIndex before and after? (Just to see it changing!)",
+      "revId": "94d504079ff415c9f838c1f717c92db5780f2ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f2a0916_5d4ee682",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-10T15:14:39Z",
+      "side": 1,
+      "message": "Add comment to state why we don\u0027t wait for first few frames",
+      "range": {
+        "startLine": 120,
+        "startChar": 47,
+        "endLine": 120,
+        "endChar": 48
+      },
+      "revId": "94d504079ff415c9f838c1f717c92db5780f2ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ceab278_4b13cb2b",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-10T15:14:39Z",
+      "side": 1,
+      "message": "Comment please! Rename to mSwapchainImageIndex",
+      "range": {
+        "startLine": 141,
+        "startChar": 11,
+        "endLine": 141,
+        "endChar": 30
+      },
+      "revId": "94d504079ff415c9f838c1f717c92db5780f2ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3e2c44b_adb2b0fc",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-10T15:14:39Z",
+      "side": 1,
+      "message": "Comments please!",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 31
+      },
+      "revId": "94d504079ff415c9f838c1f717c92db5780f2ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
