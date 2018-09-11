@@ -752,40 +752,45 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                RefCountedSwapchain&& oldSwapchain )
 {
   // obtain supported image format
-  auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
-
+  uint32_t surfaceFormatCounts;
   vk::Format swapchainImageFormat{};
   vk::ColorSpaceKHR swapchainColorSpace{};
 
-  // If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
-  // there is no preferred format, so we assume vk::Format::eB8G8R8A8Unorm
-  if( supportedFormats.size() == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+  auto supportedFormats = std::vector<vk::SurfaceFormatKHR>{};
+
+  auto result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &surfaceFormatCounts, NULL );
+  assert( result == vk::Result::eSuccess );
+
+  supportedFormats.reserve( surfaceFormatCounts );
+  result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &surfaceFormatCounts, supportedFormats.data() );
+  assert( result == vk::Result::eSuccess );
+
+  if ( surfaceFormatCounts == 1 && supportedFormats[0].format == vk::Format::eUndefined )
   {
-    swapchainColorSpace = supportedFormats[0].colorSpace;
-    swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+      swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+      swapchainColorSpace = supportedFormats[0].colorSpace;
   }
-  else // Try to find the requested format in the list
+  else
   {
-    auto found = std::find_if( supportedFormats.begin(),
-                               supportedFormats.end(),
-                               [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
-                                 return requestedFormat == supportedFormat.format;
-                               } );
+      auto found = std::find_if( supportedFormats.begin(),
+                                 supportedFormats.end(),
+                                 [ & ]( vk::SurfaceFormatKHR supportedFormat ) {
+                                   return requestedFormat == supportedFormat.format;
+                                 } );
 
-    // If found assign it.
-    if( found != supportedFormats.end() )
-    {
-      auto surfaceFormat = *found;
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
-    }
-    else // Requested format not found...attempt to use the first one on the list
-    {
-      auto surfaceFormat = supportedFormats[0];
-      swapchainColorSpace = surfaceFormat.colorSpace;
-      swapchainImageFormat = surfaceFormat.format;
-    }
-
+      // If found assign it.
+      if( found != supportedFormats.end() )
+      {
+        auto surfaceFormat = *found;
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
+      else // Requested format not found...attempt to use the first one on the list
+      {
+        auto surfaceFormat = supportedFormats[0];
+        swapchainColorSpace = surfaceFormat.colorSpace;
+        swapchainImageFormat = surfaceFormat.format;
+      }
   }
 
   assert( swapchainImageFormat != vk::Format::eUndefined && "Could not find a supported swap chain image format." );
@@ -840,15 +845,22 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Check if the requested present mode is supported
-  auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
+  uint32_t surfacePresentModeCount;
+  auto supportPresentModes = std::vector<vk::PresentModeKHR>{};
+  result = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &surfacePresentModeCount, NULL );
+  assert( result == vk::Result::eSuccess );
 
-  auto found = std::find_if( presentModes.begin(),
-                             presentModes.end(),
+  supportPresentModes.reserve( surfacePresentModeCount );
+  result = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &surfacePresentModeCount, supportPresentModes.data());
+  assert( result == vk::Result::eSuccess );
+
+  auto found = std::find_if( supportPresentModes.begin(),
+                             supportPresentModes.end(),
                              [ & ]( vk::PresentModeKHR mode ) {
                                return presentMode == mode;
                              } );
 
-  if( found == presentModes.end() )
+  if( found == supportPresentModes.end() )
   {
     // Requested present mode not supported. Default to FIFO. FIFO is always supported as per spec.
     presentMode = vk::PresentModeKHR::eFifo;
@@ -874,7 +886,9 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Create the swap chain
-  auto swapChainVkHandle = VkAssert( mDevice.createSwapchainKHR( swapChainCreateInfo, mAllocator.get() ) );
+  vk::SwapchainKHR swapChainVkHandle;
+  result = mDevice.createSwapchainKHR( &swapChainCreateInfo, mAllocator.get(), &swapChainVkHandle );
+  assert( result == vk::Result::eSuccess );
 
   if( oldSwapchain )
   {
