@@ -742,6 +742,8 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
   return barrier;
 }
 
+#define SUPPORT_CTYPE 1
+
 RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                vk::Format requestedFormat,
                                                vk::PresentModeKHR presentMode,
@@ -749,6 +751,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                RefCountedSwapchain&& oldSwapchain )
 {
   // obtain supported image format
+#ifndef SUPPORT_CTYPE
   auto supportedFormats = VkAssert( mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle() ) );
 
   vk::Format swapchainImageFormat{};
@@ -784,7 +787,46 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     }
 
   }
+#else
+  uint32_t surfaceFormatCounts;
+  auto found = 0;
+  uint32_t index = 0;
 
+  vk::Format swapchainImageFormat{};
+  vk::ColorSpaceKHR swapchainColorSpace{};
+
+  auto result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &surfaceFormatCounts, NULL );
+  assert( result == vk::Result::eSuccess );
+
+  std::unique_ptr<vk::SurfaceFormatKHR[]> supportedFormats(new vk::SurfaceFormatKHR[surfaceFormatCounts]);
+  result = mPhysicalDevice.getSurfaceFormatsKHR( surface->GetVkHandle(), &surfaceFormatCounts, supportedFormats.get() );
+  assert( result == vk::Result::eSuccess );
+
+  if ( surfaceFormatCounts == 1 && supportedFormats[0].format == vk::Format::eUndefined )
+  {
+      swapchainImageFormat = vk::Format::eB8G8R8A8Unorm;
+      swapchainColorSpace = supportedFormats[0].colorSpace;
+  }
+  else
+  {
+      for(index=0; index<surfaceFormatCounts; index++)
+      {
+          if (supportedFormats[index].format == requestedFormat)
+          {
+              swapchainImageFormat = supportedFormats[index].format;
+              swapchainColorSpace = supportedFormats[index].colorSpace;
+              found = 1;
+              break;
+          }
+      }
+
+      if ( !found )
+      {
+          swapchainImageFormat = supportedFormats[0].format;
+          swapchainColorSpace = supportedFormats[0].colorSpace;
+      }
+  }
+#endif
   assert( swapchainImageFormat != vk::Format::eUndefined && "Could not find a supported swap chain image format." );
 
   // Get the surface capabilities to determine some settings of the swap chain
@@ -837,6 +879,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Check if the requested present mode is supported
+#ifndef SUPPORT_CTYPE
   auto presentModes = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle() ).value;
 
   auto found = std::find_if( presentModes.begin(),
@@ -850,6 +893,31 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     // Requested present mode not supported. Default to FIFO. FIFO is always supported as per spec.
     presentMode = vk::PresentModeKHR::eFifo;
   }
+#else
+  uint32_t surfacePresentModeCount;
+  result = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &surfacePresentModeCount, NULL );
+  assert( result == vk::Result::eSuccess );
+
+  std::unique_ptr<vk::PresentModeKHR[]> supportPresentModes(new vk::PresentModeKHR[surfacePresentModeCount]);
+  result = mPhysicalDevice.getSurfacePresentModesKHR( surface->GetVkHandle(), &surfacePresentModeCount, supportPresentModes.get());
+  assert( result == vk::Result::eSuccess );
+
+  found = 0;
+  for (index=0; index<surfacePresentModeCount; index++)
+  {
+      if ( supportPresentModes[index] == presentMode )
+      {
+          found = 1;
+          break;
+      }
+  }
+
+  if ( !found )
+  {
+      presentMode = vk::PresentModeKHR::eFifo;
+  }
+#endif
+
 
   // Creation settings have been determined. Fill in the create info struct.
   auto swapChainCreateInfo = vk::SwapchainCreateInfoKHR{}.setSurface( surface->GetVkHandle() )
@@ -871,8 +939,14 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
 
   // Create the swap chain
+#ifndef SUPPORT_CTYPE
   auto swapChainVkHandle = VkAssert( mDevice.createSwapchainKHR( swapChainCreateInfo, mAllocator.get() ) );
+#else
+  vk::SwapchainKHR swapChainVkHandle;
+  result = mDevice.createSwapchainKHR( &swapChainCreateInfo, NULL, &swapChainVkHandle );
 
+  assert( result == vk::Result::eSuccess );
+#endif
   if( oldSwapchain )
   {
     for( auto&& i : mSurfaceFBIDMap )
