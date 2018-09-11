@@ -22,6 +22,30 @@
       "revId": "b1fbe65489786c7bbcfd8fb2270353b185335761",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "80d1f6d0_986f32fb",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-09-11T11:07:03Z",
+      "side": 1,
+      "message": "I don\u0027t have any reason. I just avoid the build error.\nBecase of different Allocator\u0027s input param type.\nI will add allocator.",
+      "parentUuid": "09e07af1_5ee59992",
+      "range": {
+        "startLine": 946,
+        "startChar": 61,
+        "endLine": 946,
+        "endChar": 65
+      },
+      "revId": "b1fbe65489786c7bbcfd8fb2270353b185335761",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     }
   ]
 }
