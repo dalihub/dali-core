@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09e07af1_5ee59992",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-11T10:54:24Z",
+      "side": 1,
+      "message": "Is there a reason you aren\u0027t using the allocator here?",
+      "range": {
+        "startLine": 946,
+        "startChar": 61,
+        "endLine": 946,
+        "endChar": 65
+      },
+      "revId": "b1fbe65489786c7bbcfd8fb2270353b185335761",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
