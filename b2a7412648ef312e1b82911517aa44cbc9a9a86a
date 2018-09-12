@@ -1,0 +1,366 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "590ab1e8_e3ab573d",
+        "filename": "dali/graphics-api/graphics-api-buffer-factory.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "You can remove this method - we haven\u0027t released it yet! :D",
+      "range": {
+        "startLine": 49,
+        "startChar": 5,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59aca09c_f19f47df",
+        "filename": "dali/graphics-api/graphics-api-render-command.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Shouldn\u0027t all methods defined in this header be marked inline? This method\u0027s larger than many... Also, why is it defined in our interface header, when it\u0027s only called internally from Vulkan?",
+      "range": {
+        "startLine": 397,
+        "startChar": 2,
+        "endLine": 397,
+        "endChar": 3
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aacb10b5_82907d34",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Remove, or use debug macros again...",
+      "range": {
+        "startLine": 660,
+        "startChar": 0,
+        "endLine": 665,
+        "endChar": 1
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bafef6ee_fca6f24e",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Remove commented out code.",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 169
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e012a15b_f70682b6",
+        "filename": "dali/graphics/vulkan/internal/vulkan-descriptor-set.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Remove method",
+      "range": {
+        "startLine": 51,
+        "startChar": 7,
+        "endLine": 51,
+        "endChar": 25
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "04f4b339_080b8569",
+        "filename": "dali/graphics/vulkan/internal/vulkan-descriptor-set.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Remove method",
+      "range": {
+        "startLine": 59,
+        "startChar": 7,
+        "endLine": 59,
+        "endChar": 32
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c052ba7_53170648",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "If this is now returning the correct value, remove the comment.",
+      "range": {
+        "startLine": 285,
+        "startChar": 56,
+        "endLine": 285,
+        "endChar": 69
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a54eed9e_1f1d39fc",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "If this is now returning correct value, remove the comment.",
+      "range": {
+        "startLine": 313,
+        "startChar": 36,
+        "endLine": 313,
+        "endChar": 136
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "407fafa2_c540a89b",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Why is this different to the passed in bufferIndex?",
+      "range": {
+        "startLine": 229,
+        "startChar": 7,
+        "endLine": 229,
+        "endChar": 17
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f05e096d_645515f1",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "This constant belongs in SceneGraphBuffers.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 22
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f0fd1bf0_a76fe9f3",
+        "filename": "dali/internal/update/graphics/graphics-buffer-manager.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Fix alignment. Comments!",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 46
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59d265c6_c6880444",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Isn\u0027t this value either 0 or 1? We don\u0027t currently support triple buffering in Event/Update...",
+      "range": {
+        "startLine": 206,
+        "startChar": 42,
+        "endLine": 206,
+        "endChar": 59
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "747a847d_25a5c472",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Formatting",
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1827f56c_a3447809",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Remove commented out code",
+      "range": {
+        "startLine": 355,
+        "startChar": 2,
+        "endLine": 355,
+        "endChar": 3
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bbb99c2_44807631",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Add an inline method for this calc.",
+      "range": {
+        "startLine": 365,
+        "startChar": 31,
+        "endLine": 365,
+        "endChar": 122
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53bc8df3_3673b76a",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-12T18:49:17Z",
+      "side": 1,
+      "message": "Magic number... Also, we only support double buffering in Update. If you want to support swapchain image count here, we need a clear way of doing it.",
+      "range": {
+        "startLine": 502,
+        "startChar": 66,
+        "endLine": 502,
+        "endChar": 68
+      },
+      "revId": "b2a7412648ef312e1b82911517aa44cbc9a9a86a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
