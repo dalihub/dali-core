@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39f92bca_9104f32a",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-13T15:24:20Z",
+      "side": 1,
+      "message": "MAGIC_NUMBER :D",
+      "range": {
+        "startLine": 93,
+        "startChar": 56,
+        "endLine": 93,
+        "endChar": 58
+      },
+      "revId": "89321bda24c8b0ef4076105fb79b28f3ced416c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
