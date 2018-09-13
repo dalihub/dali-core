@@ -88,6 +88,7 @@ Node::Node( unsigned int id )
   mOrientation(),                                                                 // Initialized to identity by default
   mScale( TRANSFORM_PROPERTY_SCALE ),
   mVisible( true ),
+  mCulled( false ),
   mColor( Color::WHITE ),
   mWorldPosition( TRANSFORM_PROPERTY_WORLD_POSITION, Vector3( 0.0f,0.0f,0.0f ) ), // Zero initialized by default
   mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3( 1.0f,1.0f,1.0f ) ),

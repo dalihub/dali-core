@@ -743,6 +743,26 @@ public:
     }
   }
 
+  /**
+   * @brief Sets whether the node is culled or not.
+   * @param[in] bufferIndex The buffer to read from.
+   * @param[in] culled True if the node is culled.
+   */
+  void SetCulled( BufferIndex bufferIndex, bool culled )
+  {
+    mCulled[bufferIndex] = culled;
+  }
+
+  /**
+   * @brief Retrieves whether the node is culled or not.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return True if the node is culled.
+   */
+  bool IsCulled( BufferIndex bufferIndex ) const
+  {
+    return mCulled[bufferIndex];
+  }
+
 public:
   /**
    * @copydoc UniformMap::Add
@@ -858,6 +878,7 @@ public: // Default properties
   TransformManagerPropertyVector3    mScale;                  ///< Local transform; scale relative to parent node
 
   AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
+  AnimatableProperty<bool>           mCulled;                 ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4>        mColor;                  ///< Color can be inherited from the Node hierarchy
 
   // Inherited properties; read-only from public API
