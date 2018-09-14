@@ -201,7 +201,10 @@ void PipelineFactory::Reset()
   mInfo.dynamicStateMask = 0u;
   mPipelineCache = nullptr;
   mBasePipeline = nullptr;
-  mOldPipeline.reset();
+  if( mOldPipeline )
+  {
+    mOldPipeline.reset();
+  }
 }
 
 uint32_t PipelineFactory::GetHashCode() const

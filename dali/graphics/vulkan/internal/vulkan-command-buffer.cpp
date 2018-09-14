@@ -135,14 +135,14 @@ void CommandBuffer::BindVertexBuffer( uint32_t binding,
   BindVertexBuffers( binding, 1, std::vector< Handle< Buffer>>( { buffer } ), &offset );
 }
 
-void CommandBuffer::BindGraphicsPipeline( Handle< Pipeline > pipeline )
+void CommandBuffer::BindGraphicsPipeline( const RefCountedPipeline& pipeline )
 {
-  mCurrentPipeline = pipeline;
-  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkHandle() );
+  mCurrentPipeline = &pipeline;
+  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, (*mCurrentPipeline)->GetVkHandle() );
 }
 
 void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
-                                        RefCountedPipeline pipeline,
+                                        const RefCountedPipeline& pipeline,
                                         uint32_t firstSet,
                                         uint32_t descriptorSetCount )
 {
@@ -168,7 +168,7 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
                                         uint32_t firstSet )
 {
   BindDescriptorSets(
-          descriptorSets, mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
+          descriptorSets, *mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
 }
 
 void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )

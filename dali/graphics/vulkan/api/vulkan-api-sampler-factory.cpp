@@ -112,7 +112,7 @@ SamplerFactory& SamplerFactory::Reset()
   mMagFilter = API::SamplerFilter{};
   mMipmapMode = API::SamplerMipmapMode{};
   mCompareOp = API::CompareOp{};
-  mMaxAnisotropy = 0.0f;
+  mMaxAnisotropy = 1.0f; // value must be 1.0f as default if anisotropy feature isn't enabled
   mMinLod = 0.0f;
   mMaxLod = 0.0f;
   mCompareEnable = false;

@@ -1135,7 +1135,8 @@ void Texture::CreateSampler()
     .setCompareOp( vk::CompareOp::eNever )
     .setMinFilter( vk::Filter::eLinear )
     .setMagFilter( vk::Filter::eLinear )
-    .setMipmapMode( vk::SamplerMipmapMode::eLinear );
+    .setMipmapMode( vk::SamplerMipmapMode::eLinear )
+    .setMaxAnisotropy( 1.0f );
 
   mSampler = mGraphics.CreateSampler( samplerCreateInfo );
 }

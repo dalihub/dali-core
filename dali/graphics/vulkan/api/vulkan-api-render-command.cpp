@@ -75,12 +75,14 @@ void RenderCommand::PrepareResources()
       mVkDescriptorSetLayouts.clear();
       mVkDescriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
       auto dsLayoutSignatures = pipeline->GetDescriptorSetLayoutSignatures();
-      mVulkanPipeline         = pipeline->GetVkPipeline();
+      mVulkanPipeline         = &pipeline->GetVkPipeline();
 
-      if( mDescriptorSets.empty() )
-      {
-        mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
-      }
+      mDescriptorSets.clear();
+      mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
+
+      // rebind data in case descriptor sets changed
+      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
+      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_TEXTURE_BIT;
     }
 
     if( mUpdateFlags & (API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT ))
@@ -115,7 +117,6 @@ void RenderCommand::BindUniformBuffers()
       .setOffset( uint32_t( binding.offset ) )
       .setRange( uint32_t( binding.dataSize ) )
       .setBuffer( static_cast<const VulkanAPI::Buffer*>(binding.buffer)->GetBufferRef()->GetVkHandle() );
-
 
     mController.PushDescriptorWrite(
       vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
@@ -169,9 +170,9 @@ const std::vector< Vulkan::RefCountedDescriptorSet >& RenderCommand::GetDescript
   return mDescriptorSets;
 }
 
-Vulkan::RefCountedPipeline RenderCommand::GetVulkanPipeline() const
+const Vulkan::RefCountedPipeline& RenderCommand::GetVulkanPipeline() const
 {
-  return mVulkanPipeline;
+  return *mVulkanPipeline;
 }
 
 } // namespace VulkanAPI

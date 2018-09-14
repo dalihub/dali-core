@@ -319,16 +319,16 @@ public:
 
   virtual void OnRetain( uint32_t refcount )
   {
-  };
+  }
 
   virtual void OnRelease( uint32_t refcount )
   {
-  };
+  }
 
   virtual bool OnDestroy()
   {
     return false;
-  };
+  }
 
 private:
 
@@ -490,6 +490,15 @@ std::ostream& operator<<( std::ostream& os,
 
 using DescriptorSetLayoutSignature =
 TypeValueEncoder< 4, DescriptorType, static_cast< size_t >( DescriptorType::DESCRIPTOR_TYPE_COUNT ) >;
+
+/**
+ * Helper function converting Vulkan C++ types into void* ( for logging )
+ */
+template<class T, class K>
+const void* VkVoidCast( const K& o )
+{
+  return static_cast<T>(o);
+}
 
 /*
  * Forward declarations of reference types

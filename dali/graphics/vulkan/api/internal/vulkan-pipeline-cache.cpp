@@ -28,8 +28,9 @@ namespace VulkanAPI
 {
 
 PipelineCache::PipelineCache( Vulkan::Graphics& graphics, Controller& controller )
+: mGraphics( graphics ),
+  mController( controller )
 {
-
 }
 
 PipelineCache::~PipelineCache() = default;

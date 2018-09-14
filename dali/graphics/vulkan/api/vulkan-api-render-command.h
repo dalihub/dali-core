@@ -90,14 +90,14 @@ public:
    * Returns Vulkan backed pipeline
    * @return
    */
-  Vulkan::RefCountedPipeline GetVulkanPipeline() const;
+  const Vulkan::RefCountedPipeline& GetVulkanPipeline() const;
 
 private:
 
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
   Vulkan::RefCountedCommandBuffer mCommandBuffer;
-  Vulkan::RefCountedPipeline mVulkanPipeline;
+  const Vulkan::RefCountedPipeline* mVulkanPipeline;
 
   std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 

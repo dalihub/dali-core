@@ -66,7 +66,7 @@ public:
 
   Pipeline( Internal::Pipeline* impl );
 
-  Vulkan::RefCountedPipeline GetVkPipeline() const;
+  const Vulkan::RefCountedPipeline& GetVkPipeline() const;
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 

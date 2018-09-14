@@ -35,9 +35,11 @@ class Graphics;
 
 namespace VulkanAPI
 {
+class Controller;
 namespace Internal
 {
 class Pipeline;
+
 } // Internal
 
 class Controller;
@@ -81,6 +83,9 @@ private:
     std::unique_ptr< Internal::Pipeline > pipelineImpl;
     std::unique_ptr< PipelineFactory::Info > info{}; // to compare if hash collision occurs
   };
+
+  Vulkan::Graphics& mGraphics;
+  VulkanAPI::Controller& mController;
 
   std::map< uint32_t, std::vector< CacheEntry>> mCacheMap;
 };

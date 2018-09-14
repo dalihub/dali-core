@@ -205,7 +205,11 @@ struct Pipeline::VulkanPipelineState
 {
   VulkanPipelineState() = default;
 
-  ~VulkanPipelineState() = default;
+  ~VulkanPipelineState()
+  {
+    pipeline.Reset();
+  }
+
 
   vk::PipelineColorBlendStateCreateInfo colorBlend;
   std::vector< vk::PipelineColorBlendAttachmentState > colorBlendAttachmentState;
@@ -255,7 +259,24 @@ Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const Pi
 
 Pipeline::~Pipeline()
 {
-  // deleting pipeline
+  if( mVulkanPipelineState )
+  {
+    mVulkanPipelineState = nullptr;
+
+    auto device = mGraphics.GetDevice();
+    auto descriptorSetLayouts = mVkDescriptorSetLayouts;
+    auto allocator = &mGraphics.GetAllocator();
+
+    // Discard unused descriptor set layouts
+    mGraphics.DiscardResource( [ device, descriptorSetLayouts, allocator ]() {
+
+      for( const auto& descriptorSetLayout : descriptorSetLayouts )
+      {
+        device.destroyDescriptorSetLayout( descriptorSetLayout, allocator );
+      }
+
+    } );
+  }
 }
 
 uint32_t GetLocationIndex( const std::vector< Vulkan::SpirV::SPIRVVertexInputAttribute >& attribs, uint32_t location )
@@ -369,7 +390,7 @@ bool Pipeline::Initialise()
 
   pipeline->Compile();
 
-  mVulkanPipelineState->pipeline = pipeline;
+  mVulkanPipelineState->pipeline = std::move( pipeline );
   return true;
 }
 
@@ -714,7 +735,7 @@ uint32_t Pipeline::GetHashCode() const
   return mHashCode;
 }
 
-Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
+const Vulkan::RefCountedPipeline& Pipeline::GetVkPipeline() const
 {
   return mVulkanPipelineState->pipeline;
 }

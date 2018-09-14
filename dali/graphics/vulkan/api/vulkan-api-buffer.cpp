@@ -44,27 +44,8 @@ Buffer::Buffer( Controller& controller,
 
 bool Buffer::Initialise()
 {
-  Vulkan::BufferType type;
-  if( mUsage & vk::BufferUsageFlagBits::eUniformBuffer )
-  {
-    type = Vulkan::BufferType::UNIFORM;
-  }
-  else if( mUsage & vk::BufferUsageFlagBits::eIndexBuffer )
-  {
-    type = Vulkan::BufferType::INDEX;
-  }
-  else if( mUsage & vk::BufferUsageFlagBits::eVertexBuffer )
-  {
-    type = Vulkan::BufferType::VERTEX;
-  }
-  else
-  {
-    // unsupported usage
-    return false;
-  }
-
   // create buffer
-  mBufferRef = mGraphics.CreateBuffer( mSize, type );
+  mBufferRef = mGraphics.CreateBuffer( mSize, mUsage );
 
   // allocate memory
   // todo: host visible should be only for dynamic buffers

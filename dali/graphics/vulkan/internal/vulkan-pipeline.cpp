@@ -113,7 +113,7 @@ struct Pipeline::Impl
     mInfo.setFlags( vk::PipelineCreateFlagBits::eAllowDerivatives );
 
     // create pipeline
-    mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( nullptr, mInfo, mGraphics.GetAllocator() ) );
+    mPipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics.GetVulkanPipelineCache(), mInfo, mGraphics.GetAllocator() ) );
     if( mPipeline )
     {
       return vk::Result::eSuccess;

@@ -103,7 +103,7 @@ public:
    * Binds graphics pipeline
    * @param pipeline
    */
-  void BindGraphicsPipeline( Handle <Pipeline> pipeline );
+  void BindGraphicsPipeline( const RefCountedPipeline& pipeline );
 
   /**
    *
@@ -113,7 +113,7 @@ public:
    * @param descriptorSetCount
    */
   void BindDescriptorSets( std::vector< Dali::Graphics::Vulkan::Handle< DescriptorSet>> descriptorSets,
-                           Handle <Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount );
+                           const RefCountedPipeline& pipeline, uint32_t firstSet, uint32_t descriptorSetCount );
 
   /**
    * Binds descriptor sets to the most recently bound Pipeline
@@ -263,7 +263,7 @@ private:
 
   vk::CommandBuffer mCommandBuffer{};
 
-  RefCountedPipeline mCurrentPipeline;
+  const RefCountedPipeline* mCurrentPipeline{nullptr}; // we don't want to increase ref count!
 
   vk::RenderPass mCurrentRenderPass;
 

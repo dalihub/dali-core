@@ -48,7 +48,7 @@ Pipeline::Pipeline( Internal::Pipeline* impl ) :
   mPipelineImpl->Reference();
 }
 
-Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
+const Vulkan::RefCountedPipeline& Pipeline::GetVkPipeline() const
 {
   return mPipelineImpl->GetVkPipeline();
 }

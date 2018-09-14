@@ -59,7 +59,7 @@ public:
 
   void Destroy();
 
-  Vulkan::RefCountedPipeline GetVkPipeline() const;
+  const Vulkan::RefCountedPipeline& GetVkPipeline() const;
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
