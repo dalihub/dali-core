@@ -41,7 +41,334 @@ function toggleVisibility( button, obj )
 </HEAD>
 <BODY>
 
-<H1>General</H1>
+<H1>General coding conventions</H1>
+  <H2>Type casting <input type="button" value="Hide" onclick="toggleVisibility( this, 'ccasts_details' );"/></H2>
+    <ARTICLE class="detail" id="ccasts_details">
+      <SUMMARY>
+        <B>Never use C-Style Casts</B><BR>
+        The C-style cast - "(type) expr" used to convert one fundamental type to another is subject to implementation-defined effects.
+        For scalar types it can result in silent truncation of the value. For pointers and references, it does not check the
+        compatibility of the value with the target type.<BR>
+        <B>Don't cast away const, use mutable keyword instead</B><BR>
+        <B>Don't reinterpret_cast, fix the design instead</B><BR>
+        <B>Remember that reference cast will throw an error if cast fails</B><BR>
+        <B>Avoid using pointer or reference casts. They have been referred to as the goto of OO programming, fix the design instead</B><BR>
+      </SUMMARY>
+      <CODE class="good">
+  X* ptr = static_cast&#x3C;X*&#x3E;( y_ptr ); // ok, compiler checks whether types are compatible
+      </CODE>
+      <CODE class="bad">
+  (Foo*) ptr; // bad! C-cast is not guaranteed to check and never complains
+      </CODE>
+    </ARTICLE>
+
+<H1>Classes</H1>
+  <SUMMARY>
+    A class interface should be complete and minimal. Class should encapsulate one thing and one thing only.
+    A complete interface allows clients to do anything they may reasonably want to do.
+    On the other hand, a minimal interface will contain as few functions as possible.
+    Class methods must be defined in the same order as they are declared. This helps navigating through code.
+  </SUMMARY>
+  <H2>Compulsory member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'implicit_method_details' );"/></H2>
+    <ARTICLE class="detail" id="implicit_method_details">
+      <SUMMARY>
+        Every class must define default constructor, copy constructor, assignment operator and destructor.
+        If you dont declare them, compiler will and the compiler generated versions are usually not good or safe enough.
+        If your class does not support copying, then declare copy constructor and assignment operator as private and don't define them.
+      </SUMMARY>
+      <P>
+        If for example the assignment operator is not needed for a particular class, then it
+        must be declared private and not defined. Any attempt to invoke the operator will result
+        in a compile-time error. On the contrary, if the assignment operator is not declared, then
+        when it is invoked, a compiler-generated form will be created and subsequently executed.
+        This could lead to unexpected results. The same goes with default constructor and copy constructor.
+      </P>
+      <CODE class="good">
+  class X
+  {
+    X();                      // default constructor
+    X( const X& );            // copy constructor
+    X& operator=( const X& ); // copy assignment operator
+    ~X();                     // destructor
+  };
+
+  class X
+  {
+    X();                                // default constructor
+    ~X();                               // destructor
+    X( const X& ) = delete;             // copy constructor not allowed
+    X& operator=( const X& ); = delete; // copy assignment operator not allowed
+  };
+      </CODE>
+    </ARTICLE>
+  <H2>Class types <input type="button" value="Hide" onclick="toggleVisibility( this, 'class_types_details' );"/></H2>
+    <ARTICLE class="detail" id="class_types_details">
+      <SUMMARY>
+        Classes can have either <B>Value</B> semantics or <B>Pointer</B> semantics. Not both.
+        It must be clearly documented whether a class follows value or pointer semantics and this also
+        sets requirements on the class interface.
+      </SUMMARY>
+      <P>
+        Classes with <B>Value</B> semantics are passed as value types. These classes provide a copy constructor,
+        a default constructor and assignment operator so that they can be copied and also stored on STL containers.
+      </P>
+      <P>
+        Classes with <B>Pointer</B> semantics are always passed through pointers, references or smart pointers.
+        These classes are ususally compound types that cannot be easily copied and thus prevent copy constructor,
+        and assignment operator. They can be only stored on STL containers through smart pointers.
+      </P>
+    </ARTICLE>
+  <H2>Access Rights <input type="button" value="Hide" onclick="toggleVisibility( this, 'access_details' );"/></H2>
+    <ARTICLE class="detail" id="access_details">
+      <P>
+        Public and protected data should only be used in structs, not classes.
+        Roughly two types of classes exist: those that essentially aggregate data and those that provide
+        an abstraction while maintaining a well-defined state or invariant.
+      </P>
+      <P>
+        A structure should be used to model an entity that does not require an invariant (Plain Old Data)
+        A class should be used to model an entity that maintains an invariant.
+        <B>Rationale:</B> A class is able to maintain its invariant by controlling access to its data. However,
+        a class cannot control access to its members if those members non-private.
+        Hence all data in a class should be private.
+      </P>
+    </ARTICLE>
+  <H2>Constructors <input type="button" value="Hide" onclick="toggleVisibility( this, 'constructor_details' );"/></H2>
+    <ARTICLE class="detail" id="constructor_details">
+      <P>
+        Virtual function calls are not allowed from constructor
+        Rationale: Virtual functions are resolved statically (not dynamically) in constructor
+      </P>
+      <P>
+        Member initialization order must be the same in which they are declared in the class.
+        Note: Since base class members are initialized before derived class members, base class
+              initializers should appear at the beginning of the member initialization list.
+        <B>Rationale:</B> Members of a class are initialized in the order in which they are declared—not
+        the order in which they appear in the initialization list.
+      </P>
+      <P>
+        Constructor body should not throw an exception, keep constructor simple and trivial.
+        If constructor fails, objects lifecycle never started, destructor will not be called.
+      </P>
+      <P>
+        Declare all single argument constructors as explicit thus preventing their use as implicit type convertors.
+        <CODE class="good">
+  class C
+  {
+  public:
+    explicit C( int );         // good, explicit
+    C( int, int );             // ok more than one non-default argument
+  };
+        </CODE>
+        <CODE class="bad">
+  class C
+  {
+  public:
+    C( double );               // bad, can be used in implicit conversion
+    C( float f, int i=0 );     // bad, implicit conversion constructor
+    C( int i=0, float f=0.0 ); // bad, default constructor, but also a conversion constructor
+  };
+        </CODE>
+      </P>
+    </ARTICLE>
+  <H2>Destructor <input type="button" value="Hide" onclick="toggleVisibility( this, 'destructor_details' );"/></H2>
+    <ARTICLE class="detail" id="destructor_details">
+      <P>
+        All classes should define a destructor, either:
+        <UL>
+          <LI>public for value types
+          <LI>public and virtual for base classes with virtual methods
+          <LI>protected and virtual for base classes to prevent deletion (and ownership) through base class
+        </UL>
+        This prevents undefined behavior. If an application attempts to delete a derived class object
+        through a base class pointer, the result is undefined if the base class destructor is non-virtual.
+      </P>
+      <P>
+        Virtual function calls are not allowed from inside the destructor.
+        Rationale: A class's virtual functions are resolved statically (not dynamically) in its destructor
+      </P>
+      <P>
+        All resources acquired by a class shall be released by the class's destructor.
+      </P>
+      <P>
+        Destructor is not allowed to throw an exception, avoid doing complicated things in destructor.
+      </P>
+    </ARTICLE>
+  <H2>Methods <input type="button" value="Hide" onclick="toggleVisibility( this, 'method_details' );"/></H2>
+    <ARTICLE class="detail" id="method_details">
+      <P>
+        Don't shortcut, like use the returned reference of getter to assign a new value. If a Setter is missing, add it!
+        <CODE class="bad">
+  initial.GetPosition() = Position(10, 10); // bad!, If GetPosition is one day changed to return copy
+                                            // of Position this code silently changes to a no-op.
+        </CODE>
+        <CODE class="good">
+  initial.SetPosition( Position( 10, 10 ) );
+        </CODE>
+      </P>
+      <P>
+        Code that is not used (commented out) should be deleted.
+        Rationale: No dead code should be left to confuse other people.
+        Exception: Code that is simply part of an explanation may appear in comments.
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <H2>Inline member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'inline_details' );"/></H2>
+    <ARTICLE class="detail" id="inline_details">
+      <P>
+
+        GCC automatically inlines member functions defined within the class body of C++ programs even if they are not explicitly declared inline.
+        <CODE class="bad">
+  class Color
+  {
+    inline float& GetRed()  { return mRed;   } // inline keyword not needed
+    inline float& GetGreen(){ return mGreen; }
+  };
+        </CODE>
+        <CODE class="good">
+  class Color
+  {
+    float& GetRed()   { return mRed;   }
+    float& GetGreen(){ return mGreen; }
+  };
+        </CODE>
+      </P>
+      <P>
+        If there are a lot of inlines, they should be in a .inl file.
+        Remember the inline keyword is just a hint to the compiler. Whether
+        a function will be inlined or not is down to the compiler and its flags.
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <H2>Conversion operators <input type="button" value="Hide" onclick="toggleVisibility( this, 'conversion_details' );"/></H2>
+    <ARTICLE class="detail" id="conversion_details">
+      <P>
+
+        Don't declare implicit conversion operators in classes. They allow the compiler to trip you up and go from one type to another via the conversion operator unintentionally.
+        Conversion operators are particularly dangerous in conjunction with auto keyword. If conversion is required, make it explicit or better yet, add a getter with a more meaningfull name.
+        <CODE class="bad">
+
+  // Bad:
+  class SmallInt
+  {
+  public:
+    // implicit conversion to float
+    operator float() const { return float( val ); }
+  private:
+    int val;
+  };
+  //... and in the program:
+
+  int main( void )
+  {
+    int value;
+    SmallValue foo;
+    value = foo; // oops, didn't really want to allow conversion to int but the compiler can do that as float can be assigned to int.
+
+    return 0;
+  }
+        </CODE>
+        <CODE class="good">
+
+  // Good:
+  class SmallInt
+  {
+  public:
+    // explicit getter for float
+    float AsFloat const { return static_cast&#x3C;float&#x3E;( val ); }
+  private:
+    int val;
+  };
+  //... and in the program:
+
+  int main( void )
+  {
+    int value;
+    SmallValue foo;
+    si.AsFloat() + 3; // ok: explicitly request the conversion
+
+    return 0;
+  }
+
+  // Good:
+  class SmallInt
+  {
+  public:
+    // explicit conversion to int
+    explicit operator int() const { return val; }
+  private:
+    int val;
+  };
+  //... and in the program:
+
+  int main()
+  {
+    SmallInt si = 3; // ok: the SmallInt constructor is not explicit
+    si + 3; // error: implicit is conversion required, but operator int is explicit
+    static_cast&#x3C;int&#x3E;(si) + 3; // ok: explicitly request the conversion
+
+    return 0;
+  }
+
+        </CODE>
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <H2>Auto keyword <input type="button" value="Hide" onclick="toggleVisibility( this, 'auto_details' );"/></H2>
+    <ARTICLE class="detail" id="auto_details">
+      <P>
+
+        auto keyword should only be used where it improves the readability of the code and does not lead to ambiguities.
+        never use auto in a line where multiple different types occur as part of expressions like additions, subtracts, multiplies as whe conversion ordering rules are not always obvious.
+
+        <CODE class="good">
+
+  // Good:
+  auto actor = Actor::DownCast(GetOwner()); // it is obvious that actor is of type Actor so no need to retype the type
+  auto widthMode = widthMeasureSpec.GetMode(); // it is relatively obvious that Mode is an enumeration with potentially long name so no need to repeat the type, no ambiguity
+  auto childLayout = GetChildAt( i ); // name of the variable is clear enough indication of the type, no ambiguity
+  auto childPosition = childOwner.GetProperty&#x3C; Dali::Vector3 &#x3E;( Actor::Property::POSITION ); // getter already contains the type, no need to repeat it
+
+  for ( auto&& renderTask : mImpl->taskList.GetTasks() ) // iterator type not relevant for the algorithm, code much cleaner with auto
+  {
+    renderTask->UpdateState();
+  }
+
+        </CODE>
+        <CODE class="bad">
+
+  // Bad:
+  auto width = layout->GetWidth() - padding.end - padding.start; // not obvious what the final type ends up as multiple type conversions may occur
+
+  auto size = std::max( LayoutLength(0), specSize - padding ); // not obvious which of the types is preferred by compiler; or what the type of specSize - padding actually is
+
+  auto minPosition = Vector3( Vector3::ZERO ); // auto does not add any value here
+        </CODE>
+        <CODE class="good">
+  // Good:
+  Vector3 minPosition; // vector initializes to 0,0,0
+        </CODE>
+        <CODE class="bad">
+  // Bad:
+  auto specification = MeasureSpec( GetMeasuredHeight(), MeasureSpec::Mode::EXACTLY ); // no value in typing auto in assignment, much cleaner and less ambiguous to write:
+        </CODE>
+        <CODE class="good">
+  // Good:
+  MeasureSpec specification( GetMeasuredHeight(), MeasureSpec::Mode::EXACTLY ); // obvious construction of a type with parameters
+        </CODE>
+
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+<H1>General design priciples</H1>
   <P>
     Here's a few pragmatic programmer guidelines to follow (<A HREF="http://www.codinghorror.com/blog/files/Pragmatic%20Quick%20Reference.htm">Web version</A>)
     <H3>Details <input type="button" value="Hide" onclick="toggleVisibility( this, 'general_details' );"/></H3>
@@ -130,201 +457,6 @@ function toggleVisibility( button, obj )
       High-level modules should not depend on low-level modules. Both should depend on abstractions.
       Abstractions should not depend upon details. Details should depend upon abstractions.
     </P>
-
-<H1>General conventions</H1>
-  <H2>Type casting <input type="button" value="Hide" onclick="toggleVisibility( this, 'ccasts_details' );"/></H2>
-    <ARTICLE class="detail" id="ccasts_details">
-      <SUMMARY>
-        <B>Never use C-Style Casts</B><BR>
-        The C-style cast - "(type) expr" used to convert one fundamental type to another is subject to implementation-defined effects.
-        For scalar types it can result in silent truncation of the value. For pointers and references, it does not check the
-        compatibility of the value with the target type.<BR>
-        <B>Don't cast away const, use mutable keyword instead</B><BR>
-        <B>Don't reinterpret_cast, fix the design instead</B><BR>
-        <B>Remember that reference cast will throw an error if cast fails</B><BR>
-        <B>Avoid using pointer or reference casts. They have been referred to as the goto of OO programming, fix the design instead</B><BR>
-      </SUMMARY>
-      <CODE class="good">
-        X* ptr = static_cast<X*>( y_ptr ); // ok, compiler checks whether types are compatible
-      </CODE>
-      <CODE class="bad">
-        (Foo*) ptr; // bad! C-cast is not guaranteed to check and never complains
-      </CODE>
-    </ARTICLE>
-
-<H1>Classes</H1>
-  <SUMMARY>
-    A class interface should be complete and minimal. Class should encapsulate one thing and one thing only.
-    A complete interface allows clients to do anything they may reasonably want to do.
-    On the other hand, a minimal interface will contain as few functions as possible.
-    Class methods must be defined in the same order as they are declared. This helps navigating through code.
-  </SUMMARY>
-  <H2>Compulsory member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'implicit_method_details' );"/></H2>
-    <ARTICLE class="detail" id="implicit_method_details">
-      <SUMMARY>
-        Every class must define default constructor, copy constructor, assignment operator and destructor.
-        If you dont declare them, compiler will and the compiler generated versions are usually not good or safe enough.
-        If your class does not support copying, then declare copy constructor and assignment operator as private and don't define them.
-      </SUMMARY>
-      <P>
-        If for example the assignment operator is not needed for a particular class, then it
-        must be declared private and not defined. Any attempt to invoke the operator will result
-        in a compile-time error. On the contrary, if the assignment operator is not declared, then
-        when it is invoked, a compiler-generated form will be created and subsequently executed.
-        This could lead to unexpected results. The same goes with default constructor and copy constructor.
-      </P>
-      <CODE class="good">
-        class X
-        {
-          X();                      // default constructor
-          X( const X& );            // copy constructor
-          X& operator=( const X& ); // copy assignment operator
-          ~X();                     // destructor
-        };
-      </CODE>
-    </ARTICLE>
-  <H2>Class types <input type="button" value="Hide" onclick="toggleVisibility( this, 'class_types_details' );"/></H2>
-    <ARTICLE class="detail" id="class_types_details">
-      <SUMMARY>
-        Classes can have either <B>Value</B> semantics or <B>Pointer</B> semantics. Not both.
-        It must be clearly documented whether a class follows value or pointer semantics and this also
-        sets requirements on the class interface.
-      </SUMMARY>
-      <P>
-        Classes with <B>Value</B> semantics are passed as value types. These classes provide a copy constructor,
-        a default constructor and assignment operator so that they can be copied and also stored on STL containers.
-      </P>
-      <P>
-        Classes with <B>Pointer</B> semantics are always passed through pointers, references or smart pointers.
-        These classes are ususally compound types that cannot be easily copied and thus prevent copy constructor,
-        and assignment operator. That can be only stored on STL containers through smart pointers.
-      </P>
-    </ARTICLE>
-  <H2>Access Rights <input type="button" value="Hide" onclick="toggleVisibility( this, 'access_details' );"/></H2>
-    <ARTICLE class="detail" id="access_details">
-      <P>
-        Public and protected data should only be used in structs, not classes.
-        Roughly two types of classes exist: those that essentially aggregate data and those that provide
-        an abstraction while maintaining a well-defined state or invariant.
-      </P>
-      <P>
-        A structure should be used to model an entity that does not require an invariant (Plain Old Data)
-        A class should be used to model an entity that maintains an invariant.
-        <B>Rationale:</B> A class is able to maintain its invariant by controlling access to its data. However,
-        a class cannot control access to its members if those members non-private.
-        Hence all data in a class should be private.
-      </P>
-    </ARTICLE>
-  <H2>Constructors <input type="button" value="Hide" onclick="toggleVisibility( this, 'constructor_details' );"/></H2>
-    <ARTICLE class="detail" id="constructor_details">
-      <P>
-        Virtual function calls are not allowed from constructor
-        Rationale: Virtual functions are resolved statically (not dynamically) in constructor
-      </P>
-      <P>
-        Member initialization order must be the same in which they are declared in the class.
-        Note: Since base class members are initialized before derived class members, base class
-              initializers should appear at the beginning of the member initialization list.
-        <B>Rationale:</B> Members of a class are initialized in the order in which they are declared—not
-        the order in which they appear in the initialization list.
-      </P>
-      <P>
-        Constructor body should not throw an exception, keep constructor simple and trivial.
-        If constructor fails, objects lifecycle never started, destructor will not be called.
-      </P>
-      <P>
-        Declare all single argument constructors as explicit thus preventing their use as implicit type convertors.
-        <CODE class="good">
-          class C
-          {
-          public:
-            explicit C( int );         // good, explicit
-            C( int, int );             // ok more than one non-default argument
-          };
-        </CODE>
-        <CODE class="bad">
-          class C
-          {
-          public:
-            C( double );               // bad, can be used in implicit conversion
-            C( float f, int i=0 );     // bad, implicit conversion constructor
-            C( int i=0, float f=0.0 ); // bad, default constructor, but also a conversion constructor
-          };
-        </CODE>
-      </P>
-    </ARTICLE>
-  <H2>Destructor <input type="button" value="Hide" onclick="toggleVisibility( this, 'destructor_details' );"/></H2>
-    <ARTICLE class="detail" id="destructor_details">
-      <P>
-        All classes should define a destructor, either:
-        <UL>
-          <LI>public for value types
-          <LI>public and virtual for base classes with virtual methods
-          <LI>protected and virtual for base classes to prevent deletion (and ownership) through base class
-        </UL>
-        This prevents undefined behavior. If an application attempts to delete a derived class object
-        through a base class pointer, the result is undefined if the base class destructor is non-virtual.
-      </P>
-      <P>
-        Virtual function calls are not allowed from inside the destructor.
-        Rationale: A class's virtual functions are resolved statically (not dynamically) in its destructor
-      </P>
-      <P>
-        All resources acquired by a class shall be released by the class's destructor.
-      </P>
-      <P>
-        Destructor is not allowed to throw an exception, avoid doing complicated things in destructor.
-      </P>
-    </ARTICLE>
-  <H2>Methods <input type="button" value="Hide" onclick="toggleVisibility( this, 'method_details' );"/></H2>
-    <ARTICLE class="detail" id="method_details">
-      <P>
-        Don't shortcut, like use the returned reference of getter to assign a new value. If a Setter is missing, add it!
-        <CODE class="bad">
-            initial.GetPosition() = Position(10, 10); // bad!, If GetPosition is one day changed to return copy
-                                                      // of Position this code silently changes to a no-op.
-        </CODE>
-        <CODE class="good">
-            initial.SetPosition( Position( 10, 10 ) );
-        </CODE>
-      </P>
-      <P>
-        Code that is not used (commented out) should be deleted.
-        Rationale: No dead code should be left to confuse other people.
-        Exception: Code that is simply part of an explanation may appear in comments.
-      </P>
-      <P>
-      </P>
-    </ARTICLE>
-
-  <H2>Inline member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'inline_details' );"/></H2>
-    <ARTICLE class="detail" id="inline_details">
-      <P>
-
-        GCC automatically inlines member functions defined within the class body of C++ programs even if they are not explicitly declared inline.
-        <CODE class="bad">
-		class Color
-		{
- 			inline float& GetRed()  { return mRed;   }		// inline keyword not needed
-			inline float& GetGreen(){ return mGreen; }
-		};
-        </CODE>
-        <CODE class="good">
-		class Color
-		{
- 			float& GetRed()   { return mRed;   }
-			float& GetGreen(){ return mGreen; }
-		};
-        </CODE>
-      </P>
-      <P>
-      	If there are a lot of inlines, they should be in a .inl file.
-      	Remember the inline keyword is just a hint to the compiler. Whether
-      	a function will be inlined or not is down to the compiler and its flags.
-      </P>
-      <P>
-      </P>
-    </ARTICLE>
 
   <P>Thats all folks, if you read this far you are now all equipped to write good code :) !! </P>
 
