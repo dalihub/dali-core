@@ -252,7 +252,6 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libdali-core.so.*
 %{_libdir}/libdali-core-cxx03.so
-%defattr(-,app,app,-)
 %license LICENSE
 %endif
 
@@ -265,7 +264,6 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libdali-core-cxx11.so.*
 %{_libdir}/libdali-core.so
-%defattr(-,app,app,-)
 %license LICENSE
 
 %if !0%{?disable_cxx03_build}
