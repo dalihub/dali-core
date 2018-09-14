@@ -412,7 +412,7 @@ public:
    * @brief Output to stream.
    * @SINCE_1_0.0
    */
-  friend std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
+  friend DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Property::Value& value );
 
 private:
 
