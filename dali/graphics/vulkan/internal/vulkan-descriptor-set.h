@@ -101,9 +101,6 @@ private:
   vk::DescriptorPool mDescriptorPool;
 
   uint32_t mAvailableAllocations{ 0u };
-
-  // cache
-  std::vector< RefCountedDescriptorSet > mDescriptorSetCache;
 };
 
 #if 0

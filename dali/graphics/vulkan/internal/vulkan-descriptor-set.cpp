@@ -48,7 +48,8 @@ DescriptorPool::~DescriptorPool() = default;
 
 bool DescriptorPool::Initialise()
 {
-  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator() ) );
+  auto allocator = mGraphics->GetAllocatorWithTag("DescriptorPool");
+  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, &allocator) );
   return true;
 }
 
@@ -87,7 +88,6 @@ DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateIn
   {
     RefCountedDescriptorSet handle( new DescriptorSet( *mGraphics, *this, item, allocateInfo ) );
     retval.emplace_back( handle );
-    mDescriptorSetCache.emplace_back( handle );
   }
 
   if( !retval.empty() )
@@ -119,7 +119,6 @@ uint32_t DescriptorPool::GetAvailableAllocations() const
 void DescriptorPool::Reset()
 {
   mGraphics->GetDevice().resetDescriptorPool( mDescriptorPool );
-  mDescriptorSetCache.clear();
 }
 
 bool DescriptorPool::OnDestroy()
