@@ -336,14 +336,8 @@ inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadService
 
 // Template specialisation for OwnerPointer<Layer>, because delete is protected
 template <>
-inline void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
-{
-  if (mObject != NULL)
-  {
-    Dali::Internal::SceneGraph::Node::Delete(mObject);
-    mObject = NULL;
-  }
-}
+void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset();
+
 } // namespace Internal
 
 } // namespace Dali
