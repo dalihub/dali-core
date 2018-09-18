@@ -108,10 +108,11 @@ ShaderPtr Shader::New( const std::string& vertexShader,
 ShaderPtr Shader::New( std::vector<char>& vertexShader,
                        std::vector<char>& fragmentShader,
                        DevelShader::ShaderLanguage language,
-                       const Property::Map& specializationConstants )
+                       const Property::Map& specializationConstants,
+                       Dali::Shader::Hint::Value hints )
 {
   ShaderPtr shader( new Shader() );
-  shader->Initialize(vertexShader, fragmentShader, language, specializationConstants );
+  shader->Initialize(vertexShader, fragmentShader, language, specializationConstants, hints );
   return shader;
 }
 
@@ -331,9 +332,9 @@ void Shader::Initialize(
 void Shader::Initialize( std::vector<char>& vertexShader,
                          std::vector<char>& fragmentShader,
                          DevelShader::ShaderLanguage language,
-                         const Property::Map& specializationConstants )
+                         const Property::Map& specializationConstants,
+                         Dali::Shader::Hint::Value hints )
 {
-  auto hints = Dali::Shader::Hint::Value::NONE;
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
   mSceneObject = new SceneGraph::Shader( hints );
@@ -344,7 +345,8 @@ void Shader::Initialize( std::vector<char>& vertexShader,
   mShaderData = new ShaderData( vertexShader, fragmentShader, hints );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, false );
+  bool shaderModifiesGeometry = (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x00;
+  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, shaderModifiesGeometry );
 
   eventThreadServices.RegisterObject( this );
 }

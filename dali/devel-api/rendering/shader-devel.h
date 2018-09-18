@@ -2,7 +2,7 @@
 #define DALI_SHADER_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,32 +38,118 @@ enum class ShaderLanguage
 
 /**
  * Creates shader with binary or text source
- * @param vertexShader
- * @param fragmentShader
- * @param language
- * @param specializationConstants
+ * @param[in] vertexShader
+ * @param[in] fragmentShader
+ * @param[in] language
+ * @param[in] specializationConstants
+ * @param[in] hints Hints to define the geometry of the rendered object
  * @return
  */
-DALI_IMPORT_API Dali::Shader New( std::vector<char>& vertexShader, std::vector<char>& fragmentShader, ShaderLanguage language, const Property::Map& specializationConstants );
+DALI_IMPORT_API Dali::Shader New(
+  std::vector<char>& vertexShader,
+  std::vector<char>& fragmentShader,
+  ShaderLanguage language,
+  const Property::Map& specializationConstants,
+  Shader::Hint::Value hints );
 
+/**
+ * Template method to utilize any vector type to generate shader data.
+ * Treats the vector as a block of memory.
+ *
+ * @tparam T The type of vector used to define vertexShader and fragmentShader
+ * @param[in] vertexShader The pre-compiled vertex shader as a block of memory
+ * @param[in] fragmentShader The pre-compiled vertex shader as a block of memory
+ * @param[in] language The language used to create the shader.
+ * @param[in] specializationConstants Any specialization constants that the shaders use (e.g. for conditional compiliation, or for uniform array sizes, etc.)
+ */
 template<class T>
-DALI_IMPORT_API Dali::Shader New( std::vector<T>& vertexShader, std::vector<T>& fragmentShader, ShaderLanguage language, const Property::Map& specializationConstants )
+DALI_IMPORT_API Dali::Shader New(
+  std::vector<T>& vertexShader,
+  std::vector<T>& fragmentShader,
+  ShaderLanguage language,
+  const Property::Map& specializationConstants )
 {
   auto vsh = std::vector<char>();
   auto fsh = std::vector<char>();
   vsh.insert( vsh.begin(), reinterpret_cast<char*>(&vertexShader[0]), reinterpret_cast<char*>(&vertexShader[0])+vertexShader.size()*sizeof(T) );
   fsh.insert( fsh.begin(), reinterpret_cast<char*>(&fragmentShader[0]), reinterpret_cast<char*>(&fragmentShader[0])+fragmentShader.size()*sizeof(T) );
-  return New( vsh, fsh, language, specializationConstants );
+  return New( vsh, fsh, language, specializationConstants, Shader::Hint::NONE );
 }
 
+/**
+ * Template method to utilize any vector type to generate shader data.
+ * Treats the vector as a block of memory.
+ *
+ * @tparam T The type of vector used to define vertexShader and fragmentShader
+ * @param[in] vertexShader The pre-compiled vertex shader as a block of memory
+ * @param[in] fragmentShader The pre-compiled vertex shader as a block of memory
+ * @param[in] language The language used to create the shader.
+ * @param[in] specializationConstants Any specialization constants that the shaders use (e.g. for conditional compiliation, or for uniform array sizes, etc.)
+ * @param[in] hints Hints to define the geometry of the rendered object
+ */
 template<class T>
-DALI_IMPORT_API Dali::Shader New( std::vector<T>&& vertexShader, std::vector<T>&& fragmentShader, ShaderLanguage language, const Property::Map& specializationConstants )
+DALI_IMPORT_API Dali::Shader New(
+  std::vector<T>& vertexShader,
+  std::vector<T>& fragmentShader,
+  ShaderLanguage language,
+  const Property::Map& specializationConstants,
+  Shader::Hint::Value hints )
 {
   auto vsh = std::vector<char>();
   auto fsh = std::vector<char>();
   vsh.insert( vsh.begin(), reinterpret_cast<char*>(&vertexShader[0]), reinterpret_cast<char*>(&vertexShader[0])+vertexShader.size()*sizeof(T) );
   fsh.insert( fsh.begin(), reinterpret_cast<char*>(&fragmentShader[0]), reinterpret_cast<char*>(&fragmentShader[0])+fragmentShader.size()*sizeof(T) );
-  return New( vsh, fsh, language, specializationConstants );
+  return New( vsh, fsh, language, specializationConstants, hints );
+}
+
+/**
+ * Template method to utilize any vector type to generate shader data.
+ * Treats the vector as a block of memory.
+ *
+ * @tparam T The type of vector used to define vertexShader and fragmentShader
+ * @param[in] vertexShader The pre-compiled vertex shader as a block of memory, as an RValue
+ * @param[in] fragmentShader The pre-compiled vertex shader as a block of memory, as an RValu
+ * @param[in] language The language used to create the shader.
+ * @param[in] specializationConstants Any specialization constants that the shaders use (e.g. for conditional compiliation, or for uniform array sizes, etc.)
+ */
+template<class T>
+DALI_IMPORT_API Dali::Shader New(
+  std::vector<T>&& vertexShader,
+  std::vector<T>&& fragmentShader,
+  ShaderLanguage language,
+  const Property::Map& specializationConstants )
+{
+  auto vsh = std::vector<char>();
+  auto fsh = std::vector<char>();
+  vsh.insert( vsh.begin(), reinterpret_cast<char*>(&vertexShader[0]), reinterpret_cast<char*>(&vertexShader[0])+vertexShader.size()*sizeof(T) );
+  fsh.insert( fsh.begin(), reinterpret_cast<char*>(&fragmentShader[0]), reinterpret_cast<char*>(&fragmentShader[0])+fragmentShader.size()*sizeof(T) );
+  return New( vsh, fsh, language, specializationConstants, Shader::Hint::NONE );
+}
+
+/**
+ * Template method to utilize any vector type to generate shader data.
+ * Treats the vector as a block of memory.
+ *
+ * @tparam T The type of vector used to define vertexShader and fragmentShader
+ * @param[in] vertexShader The pre-compiled vertex shader as a block of memory, as an RValue
+ * @param[in] fragmentShader The pre-compiled vertex shader as a block of memory, as an RValu
+ * @param[in] language The language used to create the shader.
+ * @param[in] specializationConstants Any specialization constants that the shaders use (e.g. for conditional compiliation, or for uniform array sizes, etc.)
+ * @param[in] hints Hints to define the geometry of the rendered object
+ */
+template<class T>
+DALI_IMPORT_API Dali::Shader New(
+  std::vector<T>&& vertexShader,
+  std::vector<T>&& fragmentShader,
+  ShaderLanguage language,
+  const Property::Map& specializationConstants,
+  Shader::Hint::Value hints )
+{
+  auto vsh = std::vector<char>();
+  auto fsh = std::vector<char>();
+  vsh.insert( vsh.begin(), reinterpret_cast<char*>(&vertexShader[0]), reinterpret_cast<char*>(&vertexShader[0])+vertexShader.size()*sizeof(T) );
+  fsh.insert( fsh.begin(), reinterpret_cast<char*>(&fragmentShader[0]), reinterpret_cast<char*>(&fragmentShader[0])+fragmentShader.size()*sizeof(T) );
+  return New( vsh, fsh, language, specializationConstants, hints );
 }
 
 

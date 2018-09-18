@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,12 @@ namespace DevelShader
 Dali::Shader New( std::vector<char>& vertexShader,
                   std::vector<char>& fragmentShader,
                   ShaderLanguage language,
-                  const Property::Map& specializationConstants )
+                  const Property::Map& specializationConstants,
+                  Shader::Hint::Value hints )
 {
-  auto impl = Dali::Internal::Shader::New( vertexShader, fragmentShader, language, specializationConstants );
+  auto impl = Dali::Internal::Shader::New( vertexShader, fragmentShader, language, specializationConstants, hints );
   return Shader( impl.Get() );
 }
 
-
 }
 }
-

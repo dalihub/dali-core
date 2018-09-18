@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,17 +55,20 @@ public:
                         Dali::Shader::Hint::Value hints );
 
   /**
+   * Create a new shader object
    *
-   * @param vertexShader
-   * @param fragmentShader
-   * @param language
-   * @param specializationConstants
+   * @param[in] vertexShader
+   * @param[in] fragmentShader
+   * @param[in] language
+   * @param[in] specializationConstants
+   * @param[in] hints Hints to define the geometry of the rendered object
    * @return
    */
   static ShaderPtr New( std::vector<char>& vertexShader,
                         std::vector<char>& fragmentShader,
                         DevelShader::ShaderLanguage language,
-                        const Property::Map& specializationConstants );
+                        const Property::Map& specializationConstants,
+                        Dali::Shader::Hint::Value hints );
 
   /**
    * @brief Get the shader scene object
@@ -184,11 +187,13 @@ private: // implementation
    * @param fragmentShader
    * @param language
    * @param specializationConstants
+   * @param[in] hints Hints to define the geometry of the rendered object
    */
-  void Initialize(  std::vector<char>& vertexShader,
-                    std::vector<char>& fragmentShader,
-                    DevelShader::ShaderLanguage language,
-                    const Property::Map& specializationConstants );
+  void Initialize( std::vector<char>& vertexShader,
+                   std::vector<char>& fragmentShader,
+                   DevelShader::ShaderLanguage language,
+                   const Property::Map& specializationConstants,
+                   Dali::Shader::Hint::Value hints );
 
 protected:
   /**
