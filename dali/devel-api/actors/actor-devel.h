@@ -119,6 +119,13 @@ enum Type
    * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
    */
   POSITION_USES_ANCHOR_POINT = INHERIT_LAYOUT_DIRECTION + 4,
+
+  /**
+   * @brief Returns whether the actor is culled or not.
+   * @details Name "culled", type Property::BOOLEAN. Read-only
+   * @note True means that the actor is out of the view frustum.
+   */
+  CULLED = INHERIT_LAYOUT_DIRECTION + 5,
 };
 
 } // namespace Property

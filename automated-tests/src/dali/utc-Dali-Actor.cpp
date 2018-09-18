@@ -263,6 +263,23 @@ struct ChildOrderChangedFunctor
   Actor& mActor;
 };
 
+struct CulledPropertyNotificationFunctor
+{
+  CulledPropertyNotificationFunctor( bool& signalCalled, PropertyNotification& propertyNotification )
+  : mSignalCalled( signalCalled ),
+    mPropertyNotification( propertyNotification )
+  { }
+
+  void operator()( PropertyNotification& source )
+  {
+    mSignalCalled  = true;
+    mPropertyNotification = source;
+  }
+
+  bool& mSignalCalled;
+  PropertyNotification& mPropertyNotification;
+};
+
 } // anonymous namespace
 
 
@@ -7172,6 +7189,53 @@ int UtcDaliChildMovedSignalP(void)
   DALI_TEST_EQUALS( addedBSignalReceived, false, TEST_LOCATION );
   DALI_TEST_EQUALS( removedBSignalReceived, true, TEST_LOCATION );
 
+
+  END_TEST;
+}
+
+int utcDaliActorCulled(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  tet_infoline( "Check that the actor is culled if the actor is out of the screen" );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 10.0f, 10.0f );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  actor.AddRenderer( renderer );
+
+  stage.Add( actor );
+
+  application.SendNotification();
+  application.Render( 0 );
+
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( DevelActor::Property::CULLED ), false, TEST_LOCATION );
+
+  PropertyNotification notification = actor.AddPropertyNotification( DevelActor::Property::CULLED, LessThanCondition( 0.5f ) );
+  notification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+  // Connect NotifySignal
+  bool propertyNotificationSignal( false );
+  PropertyNotification source;
+  CulledPropertyNotificationFunctor f( propertyNotificationSignal, source );
+  notification.NotifySignal().Connect( &application, f ) ;
+
+  actor.SetPosition( 1000.0f, 1000.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( DevelActor::Property::CULLED ), true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( propertyNotificationSignal, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( source.GetTargetProperty(), static_cast< int >( DevelActor::Property::CULLED ), TEST_LOCATION );
+  DALI_TEST_EQUALS( source.GetTarget().GetProperty< bool >( source.GetTargetProperty() ), true, TEST_LOCATION );
 
   END_TEST;
 }
