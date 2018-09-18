@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1c67751_871d3d72",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-api-pipeline-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "If we\u0027re not even going to ref count out of here, we should stop using a handle entirely, and switch to a weak ptr or raw ptr.",
+      "range": {
+        "startLine": 62,
+        "startChar": 2,
+        "endLine": 62,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "08fbb92c_a8ae8daa",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "You\u0027re not actually using these - could remove them from the change.",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 27
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "61d0d840_70f1223c",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-pipeline.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "Shouldn\u0027t use a ref to a handle type - could use const ref to object, or use a raw ptr.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a804907_97b956be",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "Const ptr to a ref-counting handle?! Do you actually need to store this, anyway?",
+      "range": {
+        "startLine": 100,
+        "startChar": 2,
+        "endLine": 100,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3ff3c3b_5ff234a7",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "What was the effect of having this set to zero previously?",
+      "range": {
+        "startLine": 1139,
+        "startChar": 2,
+        "endLine": 1139,
+        "endChar": 30
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f36ed7dd_c91bb8ec",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "Should state why we don\u0027t want to increase ref count..",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 20
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1366e719_038a78e6",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "Should state why we don\u0027t want to ref-count",
+      "range": {
+        "startLine": 111,
+        "startChar": 12,
+        "endLine": 111,
+        "endChar": 20
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee1b7a3b_6894268e",
+        "filename": "dali/graphics/vulkan/internal/vulkan-types.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "Should be in vulkan-debug.h",
+      "range": {
+        "startLine": 494,
+        "startChar": 0,
+        "endLine": 501,
+        "endChar": 1
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc2de100_d00994f2",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:40:16Z",
+      "side": 1,
+      "message": "\"for each buffer index\"",
+      "range": {
+        "startLine": 117,
+        "startChar": 27,
+        "endLine": 117,
+        "endChar": 32
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
