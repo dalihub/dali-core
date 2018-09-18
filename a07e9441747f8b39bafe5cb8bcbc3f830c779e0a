@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dd18d56f_d90c2849",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:53:32Z",
+      "side": 1,
+      "message": "I think we should remove the conditional code throughout - it\u0027s a maintenance nightmare.",
+      "range": {
+        "startLine": 754,
+        "startChar": 0,
+        "endLine": 790,
+        "endChar": 5
+      },
+      "revId": "a07e9441747f8b39bafe5cb8bcbc3f830c779e0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "86d28216_10069e0d",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:53:32Z",
+      "side": 1,
+      "message": "Why not just use a vector?",
+      "range": {
+        "startLine": 801,
+        "startChar": 2,
+        "endLine": 801,
+        "endChar": 41
+      },
+      "revId": "a07e9441747f8b39bafe5cb8bcbc3f830c779e0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46e9a4b8_89d5f496",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:53:32Z",
+      "side": 1,
+      "message": "Again, just use a vector, it\u0027s simpler code.",
+      "range": {
+        "startLine": 901,
+        "startChar": 2,
+        "endLine": 901,
+        "endChar": 40
+      },
+      "revId": "a07e9441747f8b39bafe5cb8bcbc3f830c779e0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}

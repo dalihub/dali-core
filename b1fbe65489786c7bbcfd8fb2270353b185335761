@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "f6e8da05_195055b0",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-09-18T14:53:32Z",
+      "side": 1,
+      "message": "We shouldn\u0027t really have conditional code like this - I think we should start writing our own version of the vulkan.hpp so this is abstracted better.",
+      "range": {
+        "startLine": 754,
+        "startChar": 1,
+        "endLine": 754,
+        "endChar": 7
+      },
+      "revId": "b1fbe65489786c7bbcfd8fb2270353b185335761",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "09e07af1_5ee59992",
         "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
         "patchSetId": 1
