@@ -35,9 +35,11 @@ class Graphics;
 
 namespace VulkanAPI
 {
+class Controller;
 namespace Internal
 {
 class Pipeline;
+
 } // Internal
 
 class Controller;
@@ -48,7 +50,7 @@ class PipelineCache
 {
 public:
 
-  PipelineCache( Vulkan::Graphics& graphics, Controller& controller );
+  PipelineCache();
 
   ~PipelineCache();
 

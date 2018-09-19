@@ -161,6 +161,12 @@ DescriptorSetAllocator::AllocateDescriptorSets( const std::vector< DescriptorSet
 
             // Advance allocation the iterator
             std::advance( allocationIterator, allocationCount );
+
+            // No more sets left to allocate
+            if( !totalSetsToAllocate )
+            {
+              break;
+            }
           }
         }
       }

@@ -319,16 +319,16 @@ public:
 
   virtual void OnRetain( uint32_t refcount )
   {
-  };
+  }
 
   virtual void OnRelease( uint32_t refcount )
   {
-  };
+  }
 
   virtual bool OnDestroy()
   {
     return false;
-  };
+  }
 
 private:
 

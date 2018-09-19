@@ -20,7 +20,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-shader.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>

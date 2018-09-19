@@ -20,9 +20,9 @@
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
-#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
+#include <dali/graphics/vulkan/internal/vulkan-shader.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
@@ -205,7 +205,10 @@ struct Pipeline::VulkanPipelineState
 {
   VulkanPipelineState() = default;
 
-  ~VulkanPipelineState() = default;
+  ~VulkanPipelineState()
+  {
+  }
+
 
   vk::PipelineColorBlendStateCreateInfo colorBlend;
   std::vector< vk::PipelineColorBlendAttachmentState > colorBlendAttachmentState;
@@ -236,7 +239,8 @@ struct Pipeline::VulkanPipelineState
     std::vector< vk::Rect2D > scissors;
   } viewport;
 
-  Vulkan::RefCountedPipeline pipeline{};
+  vk::Pipeline pipeline;
+  vk::PipelineLayout pipelineLayout;
 };
 
 Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory )
@@ -255,7 +259,33 @@ Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const Pi
 
 Pipeline::~Pipeline()
 {
-  // deleting pipeline
+  if( mVulkanPipelineState )
+  {
+    auto device = mGraphics.GetDevice();
+    auto descriptorSetLayouts = mVkDescriptorSetLayouts;
+    auto allocator = &mGraphics.GetAllocator();
+    auto pipelineLayout = mVulkanPipelineState->pipelineLayout;
+    auto pipeline = mVulkanPipelineState->pipeline;
+
+    mVulkanPipelineState = nullptr;
+
+    // Discard unused descriptor set layouts
+    mGraphics.DiscardResource( [ device, descriptorSetLayouts, pipeline, pipelineLayout, allocator ]() {
+
+      // Destroy pipeline
+      device.destroyPipeline( pipeline, allocator );
+
+      // Destroy pipeline layout
+      device.destroyPipelineLayout( pipelineLayout, allocator );
+
+      // Destry descriptor set layouts
+      for( const auto& descriptorSetLayout : descriptorSetLayouts )
+      {
+        device.destroyDescriptorSetLayout( descriptorSetLayout, allocator );
+      }
+
+    } );
+  }
 }
 
 uint32_t GetLocationIndex( const std::vector< Vulkan::SpirV::SPIRVVertexInputAttribute >& attribs, uint32_t location )
@@ -346,13 +376,15 @@ bool Pipeline::Initialise()
   auto swapchain = mGraphics.GetSwapchainForFBID( 0 );
   auto framebufferObject = framebuffer ? framebuffer->GetFramebufferRef() : swapchain->GetCurrentFramebuffer();
 
+  mVulkanPipelineState->pipelineLayout = PreparePipelineLayout();
+
   vk::GraphicsPipelineCreateInfo pipelineInfo;
   pipelineInfo
           .setSubpass( 0 )
           .setRenderPass( framebufferObject->GetRenderPass() )
           .setBasePipelineHandle( nullptr )
           .setBasePipelineIndex( 0 )
-          .setLayout( PreparePipelineLayout() )
+          .setLayout( mVulkanPipelineState->pipelineLayout )
           .setPColorBlendState( PrepareColorBlendStateCreateInfo() )
           .setPDepthStencilState( PrepareDepthStencilStateCreateInfo() )
           .setPDynamicState( PrepareDynamicStateCreatInfo() )
@@ -365,11 +397,7 @@ bool Pipeline::Initialise()
           .setPStages( shaderStages.data() )
           .setStageCount( Vulkan::U32( shaderStages.size() ) );
 
-  auto pipeline = Vulkan::Pipeline::New( mGraphics, pipelineInfo );
-
-  pipeline->Compile();
-
-  mVulkanPipelineState->pipeline = pipeline;
+  mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo ) );
   return true;
 }
 
@@ -714,9 +742,14 @@ uint32_t Pipeline::GetHashCode() const
   return mHashCode;
 }
 
-Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
+const vk::Pipeline& Pipeline::GetVkPipeline() const
 {
   return mVulkanPipelineState->pipeline;
+}
+
+const vk::PipelineLayout& Pipeline::GetVkPipelineLayout() const
+{
+  return mVulkanPipelineState->pipelineLayout;
 }
 
 const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
@@ -732,6 +765,11 @@ const std::vector< Vulkan::DescriptorSetLayoutSignature >& Pipeline::GetDescript
 API::PipelineDynamicStateMask Pipeline::GetDynamicStateMask() const
 {
   return mCreateInfo->info.dynamicStateMask;
+}
+
+void Pipeline::Bind( Vulkan::RefCountedCommandBuffer& commandBuffer )
+{
+  commandBuffer->GetVkHandle().bindPipeline( vk::PipelineBindPoint::eGraphics, mVulkanPipelineState->pipeline );
 }
 
 } // Internal

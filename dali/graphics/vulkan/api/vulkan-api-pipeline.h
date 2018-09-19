@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
+#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 
 namespace Dali
@@ -66,13 +66,17 @@ public:
 
   Pipeline( Internal::Pipeline* impl );
 
-  Vulkan::RefCountedPipeline GetVkPipeline() const;
+  const vk::Pipeline& GetVkPipeline() const;
+
+  const vk::PipelineLayout& GetVkPipelineLayout() const;
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
   const std::vector< Vulkan::DescriptorSetLayoutSignature>& GetDescriptorSetLayoutSignatures() const;
 
   API::PipelineDynamicStateMask GetDynamicStateMask() const;
+
+  void Bind( Vulkan::RefCountedCommandBuffer& commandBuffer ) const;
 
 public:
 

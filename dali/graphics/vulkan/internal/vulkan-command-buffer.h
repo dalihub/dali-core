@@ -101,27 +101,22 @@ public:
 
   /**
    * Binds graphics pipeline
-   * @param pipeline
+   * @param pipeline Vulkan pipeline object
    */
-  void BindGraphicsPipeline( Handle <Pipeline> pipeline );
-
-  /**
-   *
-   * @param descriptorSets
-   * @param pipeline
-   * @param firstSet
-   * @param descriptorSetCount
-   */
-  void BindDescriptorSets( std::vector< Dali::Graphics::Vulkan::Handle< DescriptorSet>> descriptorSets,
-                           Handle <Pipeline> pipeline, uint32_t firstSet, uint32_t descriptorSetCount );
+  void BindGraphicsPipeline( const vk::Pipeline& pipeline );
 
   /**
    * Binds descriptor sets to the most recently bound Pipeline
-   * @param descriptorSets
-   * @param firstSet
+   * @param descriptorSets array of descriptor sets
+   * @param pipelineLayout pipeline layout
+   * @param firstSet index of the first descriptor set
+   * @param descriptorSetCount number of descriptor sets to bind
    */
-  void
-  BindDescriptorSets( std::vector< Dali::Graphics::Vulkan::Handle< DescriptorSet>> descriptorSets, uint32_t firstSet );
+
+  void BindDescriptorSets( std::vector< RefCountedDescriptorSet> descriptorSets,
+                           const vk::PipelineLayout& pipelineLayout,
+                           uint32_t firstSet,
+                           uint32_t descriptorSetCount );
 
   /**
    * Issues draw command
@@ -262,10 +257,6 @@ private:
   vk::CommandBufferAllocateInfo mAllocateInfo{};
 
   vk::CommandBuffer mCommandBuffer{};
-
-  RefCountedPipeline mCurrentPipeline;
-
-  vk::RenderPass mCurrentRenderPass;
 
   bool mRecording{ false };
 };

@@ -24,7 +24,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
@@ -103,7 +102,7 @@ struct Controller::Impl
     mPipelineFactory = MakeUnique< VulkanAPI::PipelineFactory >( mOwner );
     mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
 
-    mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >( mGraphics, mOwner );
+    mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >();
 
     return mThreadPool.Initialize();
   }
@@ -451,7 +450,7 @@ struct Controller::Impl
         continue;
       }
 
-      primaryCommandBuffer->BindGraphicsPipeline( apiCommand->GetVulkanPipeline() );
+      apiCommand->BindPipeline( primaryCommandBuffer );
       //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
 
       // set dynamic state
@@ -490,7 +489,8 @@ struct Controller::Impl
       }
 
       // note: starting set = 0
-      primaryCommandBuffer->BindDescriptorSets( apiCommand->GetDescriptorSets(), 0 );
+      const auto& descriptorSets = apiCommand->GetDescriptorSets();
+      primaryCommandBuffer->BindDescriptorSets( descriptorSets, vulkanApiPipeline->GetVkPipelineLayout(), 0, uint32_t( descriptorSets.size() ) );
 
       // draw
       const auto& drawCommand = apiCommand->GetDrawCommand();

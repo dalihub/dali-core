@@ -114,7 +114,7 @@ public: // Create methods
 
   RefCountedFence CreateFence( const vk::FenceCreateInfo& fenceCreateInfo );
 
-  RefCountedBuffer CreateBuffer( size_t size, BufferType type );
+  RefCountedBuffer CreateBuffer( size_t size, vk::BufferUsageFlags usageFlags );
 
   RefCountedBuffer CreateBuffer( const vk::BufferCreateInfo& bufferCreateInfo );
 
@@ -222,6 +222,8 @@ public: // Getters
   Platform GetDefaultPlatform() const;
 
   Dali::Graphics::API::Controller& GetController();
+
+  const vk::PipelineCache& GetVulkanPipelineCache();
 
 public: //Cache management methods
 
@@ -331,10 +333,14 @@ private: // Members
   std::unique_ptr< DescriptorSetAllocator > mDescriptorAllocator;
 
   std::vector< std::function< void() > > mActionQueue;
-  std::vector< std::function< void() > > mDiscardQueue;
+  std::vector< std::function< void() > > mDiscardQueue[2u];
+
+  uint32_t mCurrentGarbageBufferIndex { 0u };
 
   bool mHasDepth;
   bool mHasStencil;
+
+  vk::PipelineCache mVulkanPipelineCache;
 };
 
 } // namespace Vulkan

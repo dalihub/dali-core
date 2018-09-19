@@ -29,7 +29,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
@@ -67,7 +66,7 @@ void RenderCommand::PrepareResources()
   {
     if( mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT )
     {
-      auto pipeline = dynamic_cast<const VulkanAPI::Pipeline *>( mPipeline );
+      auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
       if( !pipeline )
       {
         return;
@@ -77,10 +76,13 @@ void RenderCommand::PrepareResources()
       auto dsLayoutSignatures = pipeline->GetDescriptorSetLayoutSignatures();
       mVulkanPipeline         = pipeline->GetVkPipeline();
 
-      if( mDescriptorSets.empty() )
-      {
-        mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
-      }
+
+      mDescriptorSets.clear();
+      mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
+
+      // rebind data in case descriptor sets changed
+      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
+      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_TEXTURE_BIT;
     }
 
     if( mUpdateFlags & (API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT ))
@@ -116,7 +118,6 @@ void RenderCommand::BindUniformBuffers()
       .setRange( uint32_t( binding.dataSize ) )
       .setBuffer( static_cast<const VulkanAPI::Buffer*>(binding.buffer)->GetBufferRef()->GetVkHandle() );
 
-
     mController.PushDescriptorWrite(
       vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
                               .setDescriptorType( vk::DescriptorType::eUniformBuffer )
@@ -127,6 +128,16 @@ void RenderCommand::BindUniformBuffers()
   }
 
   mUBONeedsBinding = false;
+}
+
+
+void RenderCommand::BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer ) const
+{
+  if( mPipeline )
+  {
+    auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
+    pipeline->Bind( commandBuffer );
+  }
 }
 
 void RenderCommand::BindTexturesAndSamplers()
@@ -169,7 +180,7 @@ const std::vector< Vulkan::RefCountedDescriptorSet >& RenderCommand::GetDescript
   return mDescriptorSets;
 }
 
-Vulkan::RefCountedPipeline RenderCommand::GetVulkanPipeline() const
+const vk::Pipeline& RenderCommand::GetVulkanPipeline() const
 {
   return mVulkanPipeline;
 }

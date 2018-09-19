@@ -49,4 +49,27 @@ std::string FormatToString( const char* format, ... );
 #define DALI_LOG_INFO( filter, level, format, ... )
 #endif
 
+namespace Dali
+{
+namespace Graphics
+{
+namespace Vulkan
+{
+
+/**
+ * Helper function converting Vulkan C++ types into void* ( for logging )
+ */
+template<class T, class K>
+const void* VkVoidCast( const K& o )
+{
+  return static_cast<T>(o);
+}
+
+} // Namespace Vulkan
+
+} // Namespace Graphics
+
+} // Namespace Dali
+
+
 #endif // DALI_GRAPHICS_VULKAN_DEBUG_H

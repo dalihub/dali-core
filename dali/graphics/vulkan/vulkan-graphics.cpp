@@ -27,7 +27,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-shader.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
@@ -114,8 +113,12 @@ Graphics::~Graphics()
 
   mDescriptorAllocator.reset( nullptr );
 
-  // Collect the garbage! And shut down gracefully...
+  // Collect the garbage ( for each buffer index ) and shut down gracefully...
   CollectGarbage();
+  CollectGarbage();
+
+  // Kill pipeline cache
+  mDevice.destroyPipelineCache( mVulkanPipelineCache, mAllocator.get() );
 
   // We are done with all resources (technically... . If not we will get a ton of validation layer errors)
   // Kill the Vulkan logical device
@@ -123,7 +126,6 @@ Graphics::~Graphics()
 
   // Kill the Vulkan instance
   DestroyInstance();
-
 }
 
 // Create methods -----------------------------------------------------------------------------------------------
@@ -251,6 +253,18 @@ FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
     return -1;
   }
 
+  VkBool32 supported( VK_FALSE );
+  for( auto i = 0u; i < mQueueFamilyProperties.size(); ++i )
+  {
+    mPhysicalDevice.getSurfaceSupportKHR( i, surface->mSurface, &supported );
+    if( supported )
+    {
+      break;
+    }
+  }
+
+  assert( supported && "There is no queue family supporting presentation!");
+
   surface->mCapabilities = VkAssert( mPhysicalDevice.getSurfaceCapabilitiesKHR( surface->mSurface ) );
 
    // If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
@@ -354,34 +368,8 @@ RefCountedFence Graphics::CreateFence( const vk::FenceCreateInfo& fenceCreateInf
   return refCountedFence;
 }
 
-RefCountedBuffer Graphics::CreateBuffer( size_t size, BufferType type )
+RefCountedBuffer Graphics::CreateBuffer( size_t size, vk::BufferUsageFlags usageFlags )
 {
-  auto usageFlags = vk::BufferUsageFlags{};
-
-  switch( type )
-  {
-    case BufferType::VERTEX:
-    {
-      usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer;
-      break;
-    };
-    case BufferType::INDEX:
-    {
-      usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer;
-      break;
-    };
-    case BufferType::UNIFORM:
-    {
-      usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer;
-      break;
-    };
-    case BufferType::SHADER_STORAGE:
-    {
-      usageFlags |= vk::BufferUsageFlagBits::eStorageBuffer;
-      break;
-    };
-  }
-
   auto info = vk::BufferCreateInfo{};
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
@@ -1250,6 +1238,16 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 }
 
 // --------------------------------------------------------------------------------------------------------------
+// Vulkan pipeline cache
+const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
+{
+  if( !mVulkanPipelineCache )
+  {
+    mVulkanPipelineCache = mDevice.createPipelineCache( vk::PipelineCacheCreateInfo{}, GetAllocator() ).value;
+  }
+
+  return mVulkanPipelineCache;
+}
 
 // Cache manipulation methods -----------------------------------------------------------------------------------
 void Graphics::AddBuffer( Buffer& buffer )
@@ -1359,12 +1357,20 @@ void Graphics::CollectGarbage()
   std::lock_guard< std::mutex > lock{ mMutex };
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                    "Beginning graphics garbage collection---------------------------------------" )
-  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue.size() )
-  for( const auto& deleter : mDiscardQueue )
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[mCurrentGarbageBufferIndex].size() )
+
+
+  // swap buffer
+  mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
+
+  mDevice.waitIdle();
+  for( const auto& deleter : mDiscardQueue[mCurrentGarbageBufferIndex] )
   {
     deleter();
   }
-  mDiscardQueue.clear();
+  // collect what's in the queue
+  mDiscardQueue[mCurrentGarbageBufferIndex].clear();
+
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                    "Graphics garbage collection complete---------------------------------------" )
 }
@@ -1387,7 +1393,7 @@ void Graphics::ExecuteActions()
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
-  mDiscardQueue.push_back( std::move( deleter ) );
+  mDiscardQueue[mCurrentGarbageBufferIndex].push_back( std::move( deleter ) );
 }
 
 void Graphics::EnqueueAction( std::function< void() > action )
