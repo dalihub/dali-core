@@ -415,13 +415,13 @@ public:
 
   void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex )
   {
-    mGfxPipeline = std::move(pipeline);
-    mGfxRenderCommand[updateBufferIndex]->BindPipeline( mGfxPipeline.get() );
+    mGfxPipeline[updateBufferIndex] = std::move(pipeline);
+    mGfxRenderCommand[updateBufferIndex]->BindPipeline( mGfxPipeline[updateBufferIndex].get() );
   }
 
-  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline()
+  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
   {
-    return std::move(mGfxPipeline);
+    return std::move(mGfxPipeline[updateBufferIndex]);
   }
 
 public: // Implementation of ConnectionChangePropagator
@@ -504,7 +504,7 @@ private:
 
   std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
 
-  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
+  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
   std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings[ MAX_GRAPHICS_DATA_BUFFER_COUNT ]; /// shouldn't be here but we need to store it!
 
 public:

@@ -59,13 +59,17 @@ public:
 
   void Destroy();
 
-  Vulkan::RefCountedPipeline GetVkPipeline() const;
+  const vk::Pipeline& GetVkPipeline() const;
+
+  const vk::PipelineLayout& GetVkPipelineLayout() const;
 
   const std::vector< vk::DescriptorSetLayout >& GetVkDescriptorSetLayouts() const;
 
   const std::vector< Vulkan::DescriptorSetLayoutSignature >& GetDescriptorSetLayoutSignatures() const;
 
   API::PipelineDynamicStateMask GetDynamicStateMask() const;
+
+  void Bind( Vulkan::RefCountedCommandBuffer& commandBuffer );
 
 private:
 

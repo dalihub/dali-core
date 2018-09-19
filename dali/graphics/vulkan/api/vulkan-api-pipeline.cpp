@@ -48,9 +48,14 @@ Pipeline::Pipeline( Internal::Pipeline* impl ) :
   mPipelineImpl->Reference();
 }
 
-Vulkan::RefCountedPipeline Pipeline::GetVkPipeline() const
+const vk::Pipeline& Pipeline::GetVkPipeline() const
 {
   return mPipelineImpl->GetVkPipeline();
+}
+
+const vk::PipelineLayout& Pipeline::GetVkPipelineLayout() const
+{
+  return mPipelineImpl->GetVkPipelineLayout();
 }
 
 const std::vector< vk::DescriptorSetLayout >& Pipeline::GetVkDescriptorSetLayouts() const
@@ -68,6 +73,10 @@ API::PipelineDynamicStateMask Pipeline::GetDynamicStateMask() const
   return mPipelineImpl->GetDynamicStateMask();
 }
 
+void Pipeline::Bind( Vulkan::RefCountedCommandBuffer& commandBuffer ) const
+{
+  mPipelineImpl->Bind( commandBuffer );
+}
 
 }
 }

@@ -56,8 +56,6 @@ class RenderCommand : public Graphics::API::RenderCommand
 {
 public:
 
-  constexpr static uint32_t UPDATE_ALL = 0xffffffff;
-
   RenderCommand( VulkanAPI::Controller& controller,
                  Vulkan::Graphics& graphics );
 
@@ -90,14 +88,20 @@ public:
    * Returns Vulkan backed pipeline
    * @return
    */
-  Vulkan::RefCountedPipeline GetVulkanPipeline() const;
+  const vk::Pipeline& GetVulkanPipeline() const;
+
+  /**
+   * Binds pipeline in the given command buffer
+   * @param commandBuffer
+   */
+  void BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer ) const;
 
 private:
 
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
   Vulkan::RefCountedCommandBuffer mCommandBuffer;
-  Vulkan::RefCountedPipeline mVulkanPipeline;
+  vk::Pipeline mVulkanPipeline;
 
   std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
 

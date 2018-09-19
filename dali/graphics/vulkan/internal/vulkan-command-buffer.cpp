@@ -25,10 +25,8 @@
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
-#include <dali/graphics/vulkan/internal/vulkan-pipeline.h>
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 namespace Dali
 {
@@ -135,14 +133,13 @@ void CommandBuffer::BindVertexBuffer( uint32_t binding,
   BindVertexBuffers( binding, 1, std::vector< Handle< Buffer>>( { buffer } ), &offset );
 }
 
-void CommandBuffer::BindGraphicsPipeline( Handle< Pipeline > pipeline )
+void CommandBuffer::BindGraphicsPipeline( const vk::Pipeline& pipeline )
 {
-  mCurrentPipeline = pipeline;
-  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline->GetVkHandle() );
+  mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline );
 }
 
 void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
-                                        RefCountedPipeline pipeline,
+                                        const vk::PipelineLayout& pipelineLayut,
                                         uint32_t firstSet,
                                         uint32_t descriptorSetCount )
 {
@@ -156,19 +153,12 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
 
   // TODO: support dynamic offsets
   mCommandBuffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics,
-                                     pipeline->GetVkPipelineLayout(),
+                                     pipelineLayut,
                                      firstSet,
                                      descriptorSetCount,
                                      vkSets.data(),
                                      0,
                                      nullptr );
-}
-
-void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
-                                        uint32_t firstSet )
-{
-  BindDescriptorSets(
-          descriptorSets, mCurrentPipeline, firstSet, static_cast<uint32_t>( descriptorSets.size()) );
 }
 
 void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
@@ -204,19 +194,16 @@ void CommandBuffer::BeginRenderPass( FBID framebufferId, uint32_t bufferIndex )
   info.setPClearValues( clearValues.data() );
   info.setRenderArea( vk::Rect2D( { 0, 0 }, surface->GetCapabilities().currentExtent ) );
 
-  mCurrentRenderPass = renderPass;
   mCommandBuffer.beginRenderPass( info, vk::SubpassContents::eInline );
 }
 
 void CommandBuffer::BeginRenderPass( vk::RenderPassBeginInfo renderPassBeginInfo, vk::SubpassContents subpassContents )
 {
-  mCurrentRenderPass = renderPassBeginInfo.renderPass;
   mCommandBuffer.beginRenderPass( renderPassBeginInfo, subpassContents );
 }
 
 void CommandBuffer::EndRenderPass()
 {
-  mCurrentRenderPass = nullptr;
   mCommandBuffer.endRenderPass();
 }
 
