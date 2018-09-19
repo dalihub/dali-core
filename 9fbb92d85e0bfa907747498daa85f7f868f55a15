@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "962b2df7_26e105d6",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-api-pipeline-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "now api pipeline owns vk::Pipeline object directly",
+      "parentUuid": "a1c67751_871d3d72",
+      "range": {
+        "startLine": 62,
+        "startChar": 2,
+        "endLine": 62,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "08fbb92c_a8ae8daa",
         "filename": "dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.cpp",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "2849eff0_b52c61f2",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08fbb92c_a8ae8daa",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 32,
+        "endChar": 27
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "61d0d840_70f1223c",
         "filename": "dali/graphics/vulkan/api/vulkan-api-pipeline.h",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2018-09-18T14:40:16Z",
       "side": 1,
       "message": "Shouldn\u0027t use a ref to a handle type - could use const ref to object, or use a raw ptr.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "84b9896b_44f52961",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-pipeline.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "using vk::Pipeline directly",
+      "parentUuid": "61d0d840_70f1223c",
       "range": {
         "startLine": 69,
         "startChar": 0,
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "479e6dda_b7323376",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-render-command.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "using vk::Pipeline directly",
+      "parentUuid": "1a804907_97b956be",
+      "range": {
+        "startLine": 100,
+        "startChar": 2,
+        "endLine": 100,
+        "endChar": 35
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d3ff3c3b_5ff234a7",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
         "patchSetId": 1
@@ -105,6 +201,30 @@
       "writtenOn": "2018-09-18T14:40:16Z",
       "side": 1,
       "message": "What was the effect of having this set to zero previously?",
+      "range": {
+        "startLine": 1139,
+        "startChar": 2,
+        "endLine": 1139,
+        "endChar": 30
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfd2c2a7_2ce53edb",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "this will come as separate change",
+      "parentUuid": "d3ff3c3b_5ff234a7",
       "range": {
         "startLine": 1139,
         "startChar": 2,
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "44b007a9_3bc42074",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "using vk::Pipeline now",
+      "parentUuid": "f36ed7dd_c91bb8ec",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 20
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1366e719_038a78e6",
         "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
         "patchSetId": 1
@@ -151,6 +295,30 @@
       "writtenOn": "2018-09-18T14:40:16Z",
       "side": 1,
       "message": "Should state why we don\u0027t want to ref-count",
+      "range": {
+        "startLine": 111,
+        "startChar": 12,
+        "endLine": 111,
+        "endChar": 20
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d1dc854_5fcf4969",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "Pipeline isn\u0027t passed to the function anymore, instead pipeline layout is passed.",
+      "parentUuid": "1366e719_038a78e6",
       "range": {
         "startLine": 111,
         "startChar": 12,
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "f4501f5f_9199406b",
+        "filename": "dali/graphics/vulkan/internal/vulkan-types.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee1b7a3b_6894268e",
+      "range": {
+        "startLine": 494,
+        "startChar": 0,
+        "endLine": 501,
+        "endChar": 1
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fc2de100_d00994f2",
         "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
         "patchSetId": 1
@@ -206,6 +398,30 @@
       "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1975e8d9_0e981a63",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-09-19T13:36:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc2de100_d00994f2",
+      "range": {
+        "startLine": 117,
+        "startChar": 27,
+        "endLine": 117,
+        "endChar": 32
+      },
+      "revId": "9fbb92d85e0bfa907747498daa85f7f868f55a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
