@@ -329,17 +329,17 @@ struct SPIRVShader::Impl
     auto opMemberNames = std::unordered_map< uint32_t, MemberNameArray >{};
     for( auto&& op : opCodes )
     {
-      auto id = op.GetParameterU32( 0 );
       if( op == SpvOpVariable )
       {
         vars.push_back( &op );
       }
       else if( op == SpvOpName )
       {
-        opNames.emplace( id, &op );
+        opNames.emplace( op.GetParameterU32( 0 ), &op );
       }
       else if( op == SpvOpMemberName )
       {
+        auto id = op.GetParameterU32( 0 );
         GetResult< MemberNameArray > result{};
         MemberNameArray* memberNames{ nullptr };
         if( !( result = GetMapItem( opMemberNames, id ) ).success )
