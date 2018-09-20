@@ -329,7 +329,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const void* data, uint32_t size )
+void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
 {
   if( !mShader->GetGfxObject() )
   {
@@ -337,7 +337,7 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::AP
     return;
   }
   auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-  if( mShader->GetUniform( name, 0u, uniformInfo ) )
+  if( mShader->GetUniform( name, hash, uniformInfo ) )
   {
     ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
   }
