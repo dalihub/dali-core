@@ -25,6 +25,7 @@
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/hash.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
@@ -54,8 +55,6 @@ static constexpr float CLIP_MATRIX_DATA[] = {
 };
 
 static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
-
-
 
 constexpr Graphics::API::BlendFactor ConvertBlendFactor( BlendFactor::Type blendFactor )
 {
@@ -108,6 +107,22 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   }
   return Graphics::API::BlendOp{};
 }
+
+
+struct HashedName
+{
+  std::string name;
+  size_t hash;
+};
+
+const HashedName UNIFORM_MODEL_MATRIX{      "uModelMatrix",      CalculateHash( std::string("uModelMatrix") ) };
+const HashedName UNIFORM_MVP_MATRIX{        "uMvpMatrix",        CalculateHash( std::string("uMvpMatrix") ) };
+const HashedName UNIFORM_VIEW_MATRIX{       "uViewMatrix",       CalculateHash( std::string("uViewMatrix") ) };
+const HashedName UNIFORM_MODEL_VIEW_MATRIX{ "uModelView",        CalculateHash( std::string("uModelView") ) };
+const HashedName UNIFORM_NORMAL_MATRIX{     "uNormalMatrix",     CalculateHash( std::string("uNormalMatrix") ) };
+const HashedName UNIFORM_PROJECTION_MATRIX{ "uProjection",       CalculateHash( std::string("uProjection") ) };
+const HashedName UNIFORM_SIZE{              "uSize",             CalculateHash( std::string("uSize") ) };
+const HashedName UNIFORM_COLOR{             "uColor",            CalculateHash( std::string("uColor") ) };
 
 constexpr Graphics::API::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
 {
@@ -470,7 +485,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     {
       continue;
     }
-    cmd.BindRenderTarget(renderTargetBinding);
+    cmd.BindRenderTarget( renderTargetBinding );
 
     float width = instruction.mViewport.width;
     float height = instruction.mViewport.height;
@@ -491,7 +506,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
     // update the uniform buffer
     // pass shared UBO and offset, return new offset for next item to be used
-    // don't process bindings if there are no uniform buffers allocates
+    // don't process bindings if there are no uniform buffers allocated
     auto shader = renderer->GetShader().GetGfxObject();
     auto ubo = mUniformBuffer[bufferIndex].get();
     if( ubo && shader )
@@ -519,19 +534,19 @@ void GraphicsAlgorithms::SubmitRenderItemList(
       Matrix mvp, mvp2;
       Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
       Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-      renderer->WriteUniform( *ubo, *bindings, "uModelMatrix", item.mModelMatrix);
-      renderer->WriteUniform( *ubo, *bindings, "uMvpMatrix", mvp2);
-      renderer->WriteUniform( *ubo, *bindings, "uViewMatrix", *viewMatrix);
-      renderer->WriteUniform( *ubo, *bindings, "uModelView", item.mModelViewMatrix);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MODEL_MATRIX.name, UNIFORM_MODEL_MATRIX.hash, item.mModelMatrix);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MVP_MATRIX.name, UNIFORM_MVP_MATRIX.hash, mvp2);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_VIEW_MATRIX.name, UNIFORM_VIEW_MATRIX.hash, *viewMatrix);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MODEL_VIEW_MATRIX.name, UNIFORM_MODEL_VIEW_MATRIX.hash, item.mModelViewMatrix);
 
       Matrix3 uNormalMatrix( item.mModelViewMatrix );
       uNormalMatrix.Invert();
       uNormalMatrix.Transpose();
 
-      renderer->WriteUniform( *ubo, *bindings, "uNormalMatrix", uNormalMatrix);
-      renderer->WriteUniform( *ubo, *bindings, "uProjection", vulkanProjectionMatrix);
-      renderer->WriteUniform( *ubo, *bindings, "uSize", item.mSize);
-      renderer->WriteUniform( *ubo, *bindings, "uColor", color );
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_NORMAL_MATRIX.name, UNIFORM_NORMAL_MATRIX.hash, uNormalMatrix);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_PROJECTION_MATRIX.name, UNIFORM_PROJECTION_MATRIX.hash, vulkanProjectionMatrix);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_SIZE.name, UNIFORM_SIZE.hash, item.mSize);
+      renderer->WriteUniform( *ubo, *bindings, UNIFORM_COLOR.name, UNIFORM_COLOR.hash, color );
     }
 
     commandList.push_back(&cmd);
@@ -540,9 +555,10 @@ void GraphicsAlgorithms::SubmitRenderItemList(
   graphics.SubmitCommands( std::move(commandList) );
 }
 
-void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
-                        BufferIndex                bufferIndex,
-                        RenderInstruction&         instruction )
+void GraphicsAlgorithms::SubmitInstruction(
+  Graphics::API::Controller& graphics,
+  BufferIndex                bufferIndex,
+  RenderInstruction&         instruction )
 {
   using namespace Graphics::API;
 
@@ -564,7 +580,7 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
     if( instruction.mFrameBuffer != 0 )
     {
       renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
-    // Store the size of the framebuffer in case the viewport isn't set.
+      // Store the size of the framebuffer in case the viewport isn't set.
       renderTargetBinding.framebufferWidth = instruction.mFrameBuffer->GetWidth();
       renderTargetBinding.framebufferHeight = instruction.mFrameBuffer->GetHeight();
     }
@@ -578,11 +594,12 @@ void GraphicsAlgorithms::SubmitInstruction( Graphics::API::Controller& graphics,
   }
 }
 
-bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& controller,
-                              RenderInstruction& instruction,
-                              const RenderList* renderList,
-                              RenderItem& item,
-                              BufferIndex bufferIndex )
+bool GraphicsAlgorithms::PrepareGraphicsPipeline(
+  Graphics::API::Controller& controller,
+  RenderInstruction& instruction,
+  const RenderList* renderList,
+  RenderItem& item,
+  BufferIndex bufferIndex )
 {
   using namespace Dali::Graphics::API;
 
@@ -828,29 +845,29 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
             .SetVertexInputState(vi)
 
             // shaders
-            .SetShaderState(ShaderState()
+            .SetShaderState( ShaderState()
                               .SetShaderProgram(*gfxShader))
 
             // input assembly
-            .SetInputAssemblyState(InputAssemblyState()
+            .SetInputAssemblyState( InputAssemblyState()
                                      .SetTopology(topology)
                                      .SetPrimitiveRestartEnable(false))
 
             // viewport ( if zeroes then framebuffer size used )
-            .SetViewportState(viewportState)
+            .SetViewportState( viewportState )
 
             .SetFramebufferState( framebufferState )
 
             // depth stencil
-            .SetDepthStencilState(depthStencilState)
+            .SetDepthStencilState( depthStencilState )
 
             // color blend
-            .SetColorBlendState(colorBlendState
+            .SetColorBlendState( colorBlendState
                                   .SetColorComponentsWriteBits(0xff)
                                   .SetLogicOpEnable(false))
 
             // rasterization
-            .SetRasterizationState(RasterizationState()
+            .SetRasterizationState( RasterizationState()
                                      .SetCullMode(cullMode)
                                      .SetPolygonMode(PolygonMode::FILL)
                                      .SetFrontFace(FrontFace::COUNTER_CLOCKWISE))
@@ -866,9 +883,10 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 }
 
 
-void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
-                               RenderInstructionContainer& renderInstructions,
-                               BufferIndex bufferIndex )
+void GraphicsAlgorithms::PrepareRendererPipelines(
+  Graphics::API::Controller& controller,
+  RenderInstructionContainer& renderInstructions,
+  BufferIndex bufferIndex )
 {
 
   mUniformBlockAllocationCount = 0u;
@@ -910,9 +928,10 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
   }
 }
 
-void GraphicsAlgorithms::SubmitRenderInstructions( Graphics::API::Controller&  controller,
-                               RenderInstructionContainer& renderInstructions,
-                               BufferIndex                 bufferIndex )
+void GraphicsAlgorithms::SubmitRenderInstructions(
+  Graphics::API::Controller&  controller,
+  RenderInstructionContainer& renderInstructions,
+  BufferIndex                 bufferIndex )
 {
   PrepareRendererPipelines( controller, renderInstructions, bufferIndex );
 

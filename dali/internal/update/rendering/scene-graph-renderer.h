@@ -363,12 +363,12 @@ public:
   }
 
   template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const T& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
   {
-    WriteUniform( ubo, bindings, name, &data, sizeof(T) );
+    WriteUniform( ubo, bindings, name, hash, &data, sizeof(T) );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const Matrix3& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
@@ -378,10 +378,10 @@ public:
     std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
     std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
 
-    WriteUniform( ubo, bindings, name, &values, sizeof(float)*12 );
+    WriteUniform( ubo, bindings, name, hash, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, const void* data, uint32_t size );
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
