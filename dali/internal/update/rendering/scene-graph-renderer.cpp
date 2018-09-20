@@ -354,9 +354,9 @@ bool Renderer::UpdateUniformBuffers( GraphicsBuffer& ubo,
                                      BufferIndex updateBufferIndex )
 {
   int updates( 0u );
-  auto uboCount = GetShader().GetGfxObject()->GetUniformBlockCount();
 
-  auto gfxShader = GetShader().GetGfxObject();
+  auto uboCount = mShader->GetGfxObject()->GetUniformBlockCount();
+  auto gfxShader = mShader->GetGfxObject();
 
   auto& currentUboBindings = mUboBindings[updateBufferIndex];
 
@@ -391,21 +391,27 @@ bool Renderer::UpdateUniformBuffers( GraphicsBuffer& ubo,
   // write to memory
   for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
   {
+    // Convert uniform name into hash value
+    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+    bool uniformFound = false;
+
     // test for array ( special case )
-    std::string uniformName(uniformMap->uniformName);
-    auto hashValue = uniformMap->uniformNameHash;
-    int         arrayIndex       = 0;
-    auto        arrayLeftBracket = uniformMap->uniformName .find('[');
+    // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
+    int arrayIndex = 0;
+    auto arrayLeftBracket = uniformMap->uniformName.find('[');
     if (arrayLeftBracket != std::string::npos)
     {
-      arrayIndex = std::atoi(&uniformName.c_str()[arrayLeftBracket + 1]);
+      arrayIndex = std::atoi(&(uniformMap->uniformName.c_str()[arrayLeftBracket + 1]));
       DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
-      uniformName = uniformName.substr(0, arrayLeftBracket);
-      hashValue = CalculateHash( uniformName );
+      std::string uniformName = uniformMap->uniformName.substr(0, arrayLeftBracket);
+      uniformFound = mShader->GetUniform( uniformName, CalculateHash( uniformName ), uniformInfo );
+    }
+    else
+    {
+      uniformFound = mShader->GetUniform( uniformMap->uniformName, uniformMap->uniformNameHash, uniformInfo );
     }
 
-    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
-    if( mShader->GetUniform( uniformName, hashValue, uniformInfo ) )
+    if( uniformFound )
     {
       auto dst = currentUboBindings[uniformInfo.bufferIndex].offset + uniformInfo.offset;
 
