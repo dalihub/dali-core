@@ -100,12 +100,9 @@ private:
 
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
-  Vulkan::RefCountedCommandBuffer mCommandBuffer;
   vk::Pipeline mVulkanPipeline;
 
-  std::vector< vk::DescriptorSetLayout > mVkDescriptorSetLayouts;
-
-  std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
+    std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
   bool mUBONeedsBinding { false };
 };
 

@@ -53,11 +53,10 @@ namespace VulkanAPI
 RenderCommand::~RenderCommand() = default;
 
 RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
-        : mController( controller ), mGraphics( graphics ), mCommandBuffer()
+        : mController( controller ), mGraphics( graphics )
 {
 }
 
-//std::mutex mutex;
 
 ///@todo: needs pipeline factory rather than pipeline creation in place!!!
 void RenderCommand::PrepareResources()
@@ -71,14 +70,9 @@ void RenderCommand::PrepareResources()
       {
         return;
       }
-      mVkDescriptorSetLayouts.clear();
-      mVkDescriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
-      auto dsLayoutSignatures = pipeline->GetDescriptorSetLayoutSignatures();
-      mVulkanPipeline         = pipeline->GetVkPipeline();
-
-
+      mVulkanPipeline = pipeline->GetVkPipeline();
       mDescriptorSets.clear();
-      mDescriptorSets = mGraphics.AllocateDescriptorSets( dsLayoutSignatures, mVkDescriptorSetLayouts );
+      mDescriptorSets = mGraphics.AllocateDescriptorSets( pipeline->GetDescriptorSetLayoutSignatures(), pipeline->GetVkDescriptorSetLayouts() );
 
       // rebind data in case descriptor sets changed
       mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
