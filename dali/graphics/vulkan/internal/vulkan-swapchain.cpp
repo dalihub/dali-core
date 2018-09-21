@@ -169,8 +169,11 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
     mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
-    mGraphics->ExecuteActions();
-    mGraphics->CollectGarbage();
+    if( mFrameCounter > mSwapchainBuffers.size() )
+    {
+      mGraphics->ExecuteActions();
+      mGraphics->CollectGarbage();
+    }
   }
 
   swapBuffer->masterCmdBuffer->Reset();
