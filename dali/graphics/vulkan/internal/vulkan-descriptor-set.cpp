@@ -17,7 +17,6 @@
 
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
@@ -64,8 +63,7 @@ vk::DescriptorPool DescriptorPool::GetVkHandle() const
   return mDescriptorPool;
 }
 
-std::vector< RefCountedDescriptorSet >
-DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
+std::vector< RefCountedDescriptorSet > DescriptorPool::AllocateDescriptorSets( vk::DescriptorSetAllocateInfo allocateInfo )
 {
   assert( allocateInfo.descriptorSetCount <= mAvailableAllocations );
 
@@ -154,12 +152,6 @@ DescriptorSet::DescriptorSet( Graphics& graphics,
 }
 
 DescriptorSet::~DescriptorSet() = default;
-
-void DescriptorSet::Flush()
-{
-
-  mDescriptorWrites.clear();
-}
 
 vk::DescriptorSet DescriptorSet::GetVkDescriptorSet() const
 {
