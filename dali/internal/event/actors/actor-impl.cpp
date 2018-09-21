@@ -213,6 +213,7 @@ DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali:
 DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
 DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
+DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true, Dali::DevelActor::Property::CULLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -3771,6 +3772,10 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
         property = &mNode->mWorldMatrix;
         break;
 
+      case Dali::DevelActor::Property::CULLED:
+        property = &mNode->mCulled;
+        break;
+
       default:
         break;
     }
@@ -4410,6 +4415,12 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
     case Dali::Actor::Property::VISIBLE:
     {
       value = IsVisible();
+      break;
+    }
+
+    case DevelActor::Property::CULLED:
+    {
+      value = mNode->IsCulled( GetEventThreadServices().GetEventBufferIndex() );
       break;
     }
 
