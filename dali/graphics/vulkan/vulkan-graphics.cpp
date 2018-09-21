@@ -1363,7 +1363,6 @@ void Graphics::CollectGarbage()
   // swap buffer
   mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
 
-  mDevice.waitIdle();
   for( const auto& deleter : mDiscardQueue[mCurrentGarbageBufferIndex] )
   {
     deleter();
