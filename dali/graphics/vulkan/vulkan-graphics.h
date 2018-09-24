@@ -225,6 +225,10 @@ public: // Getters
 
   const vk::PipelineCache& GetVulkanPipelineCache();
 
+  bool HasDepthEnabled() const;
+
+  bool HasStencilEnabled() const;
+
 public: //Cache management methods
 
   void AddBuffer( Buffer& buffer );

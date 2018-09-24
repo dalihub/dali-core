@@ -78,6 +78,10 @@ public:
 
   void Bind( Vulkan::RefCountedCommandBuffer& commandBuffer ) const;
 
+  bool HasDepthEnabled() const;
+
+  bool HasStencilEnabled() const;
+
 public:
 
   Internal::Pipeline* GetImplementation() const

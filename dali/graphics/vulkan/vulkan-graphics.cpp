@@ -1238,6 +1238,17 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 }
 
 // --------------------------------------------------------------------------------------------------------------
+// Depth/stencil
+bool Graphics::HasDepthEnabled() const
+{
+  return mHasDepth;
+}
+
+bool Graphics::HasStencilEnabled() const
+{
+  return mHasStencil;
+}
+
 // Vulkan pipeline cache
 const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
 {

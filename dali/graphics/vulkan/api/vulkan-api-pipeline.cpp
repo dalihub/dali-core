@@ -78,6 +78,17 @@ void Pipeline::Bind( Vulkan::RefCountedCommandBuffer& commandBuffer ) const
   mPipelineImpl->Bind( commandBuffer );
 }
 
+bool Pipeline::HasDepthEnabled() const
+{
+  return mPipelineImpl->HasDepthEnabled();
+}
+
+bool Pipeline::HasStencilEnabled() const
+{
+  return mPipelineImpl->HasStencilEnabled();
+}
+
+
 }
 }
 }

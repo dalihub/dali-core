@@ -769,6 +769,17 @@ void Pipeline::Bind( Vulkan::RefCountedCommandBuffer& commandBuffer )
   commandBuffer->GetVkHandle().bindPipeline( vk::PipelineBindPoint::eGraphics, mVulkanPipelineState->pipeline );
 }
 
+bool Pipeline::HasDepthEnabled() const
+{
+  return mCreateInfo->info.depthStencilState.depthTestEnable || mCreateInfo->info.depthStencilState.depthWriteEnable;
+}
+
+bool Pipeline::HasStencilEnabled() const
+{
+  // @todo: work out proper condition
+  return mCreateInfo->info.depthStencilState.stencilTestEnable;
+}
+
 } // Internal
 } // VulkanAPI
 } // Graphics
