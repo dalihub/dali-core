@@ -83,8 +83,9 @@ struct Controller::Impl
   };
 
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
-          : mGraphics( graphics ),
-            mOwner( owner )
+  : mGraphics( graphics ),
+    mOwner( owner ),
+    mHasDepthEnabled( mGraphics.HasDepthEnabled() )
   {
   }
 
@@ -451,6 +452,7 @@ struct Controller::Impl
       }
 
       apiCommand->BindPipeline( primaryCommandBuffer );
+
       //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
 
       // set dynamic state
@@ -466,6 +468,15 @@ struct Controller::Impl
 
       // dynamic state: viewport
       auto vulkanApiPipeline = static_cast<const VulkanAPI::Pipeline*>(apiCommand->GetPipeline());
+
+      // enable depth-stencil
+      if( !mHasDepthEnabled && vulkanApiPipeline->HasDepthEnabled() )
+      {
+        // add depth stencil to main framebuffer
+        mGraphics.GetSwapchainForFBID( 0u )->EnableDepthStencil( vk::Format::eD16UnormS8Uint );
+        mHasDepthEnabled = true;
+      }
+
       auto dynamicStateMask = vulkanApiPipeline->GetDynamicStateMask();
       if( (dynamicStateMask & API::PipelineDynamicStateBits::VIEWPORT_BIT) && apiCommand->mDrawCommand.viewportEnable )
       {
@@ -554,6 +565,8 @@ struct Controller::Impl
   std::deque<DescriptorInfo> mDescriptorInfoStack;
 
   std::mutex mDescriptorWriteMutex{};
+
+  bool mHasDepthEnabled;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later

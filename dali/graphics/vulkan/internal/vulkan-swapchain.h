@@ -98,6 +98,20 @@ public:
 
   void Invalidate();
 
+  /**
+   * Enables depth/stencil buffer for swapchain ( off by default )
+   *
+   * @param[in] depthStencilFormat valid depth/stencil pixel format
+   */
+  void EnableDepthStencil( vk::Format depthStencilFormat );
+
+  /**
+   * Returns current depth stencil format
+   *
+   * @return format or vk::Format::eUndefined if depth/stencil is disabled
+   */
+  vk::Format GetDepthStencilFormat() const;
+
 private:
 
   Swapchain( Graphics& graphics,

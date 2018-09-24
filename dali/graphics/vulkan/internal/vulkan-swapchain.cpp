@@ -298,6 +298,78 @@ void Swapchain::Invalidate()
   mIsValid = false;
 }
 
+void Swapchain::EnableDepthStencil( vk::Format depthStencilFormat )
+{
+  RefCountedFramebufferAttachment depthAttachment;
+  auto swapchainExtent = mSwapchainCreateInfoKHR.imageExtent;
+
+  if( depthStencilFormat != vk::Format::eUndefined )
+  {
+    // Create depth/stencil image
+    auto imageCreateInfo = vk::ImageCreateInfo{}
+      .setFormat( vk::Format::eD24UnormS8Uint )
+      .setMipLevels( 1 )
+      .setTiling( vk::ImageTiling::eOptimal )
+      .setImageType( vk::ImageType::e2D )
+      .setArrayLayers( 1 )
+      .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
+      .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
+      .setSharingMode( vk::SharingMode::eExclusive )
+      .setInitialLayout( vk::ImageLayout::eUndefined )
+      .setSamples( vk::SampleCountFlagBits::e1 );
+
+    auto dsRefCountedImage = mGraphics->CreateImage( imageCreateInfo );
+
+    auto memory = mGraphics->AllocateMemory( dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
+    mGraphics->BindImageMemory( dsRefCountedImage, memory, 0 );
+
+    // create the depth stencil ImageView to be used within framebuffer
+    auto depthStencilImageView = mGraphics->CreateImageView( dsRefCountedImage );
+    auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
+                                                       .setStencil( 1 );
+
+    // A single depth attachment for the swapchain.
+    depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
+
+  }
+  // Get images
+  auto images = VkAssert( mGraphics->GetDevice().getSwapchainImagesKHR( mSwapchainKHR ) );
+
+  // allocate framebuffers
+  auto framebuffers = std::vector< RefCountedFramebuffer >{};
+  framebuffers.reserve( images.size() );
+
+  auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+
+  for( auto&& image : images )
+  {
+
+    auto colorImageView = mGraphics->CreateImageView( mGraphics->CreateImageFromExternal( image, mSwapchainCreateInfoKHR.imageFormat, swapchainExtent ) );
+
+    // A new color attachment for each framebuffer
+    auto colorAttachment = FramebufferAttachment::NewColorAttachment( colorImageView,
+                                                                      clearColor,
+                                                                      true /* presentable */ );
+
+    framebuffers.push_back( mGraphics->CreateFramebuffer( { colorAttachment },
+                                               depthAttachment,
+                                               swapchainExtent.width,
+                                               swapchainExtent.height ) );
+  }
+
+  // Before replacing framebuffers in the swapchain, wait until all is done
+  mGraphics->DeviceWaitIdle();
+
+  mFramebuffers = framebuffers;
+}
+
+vk::Format Swapchain::GetDepthStencilFormat() const
+{
+  return vk::Format::eUndefined;
+}
+
+
 
 } // namespace Vulkan
 } // namespace Graphics

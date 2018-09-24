@@ -71,6 +71,10 @@ public:
 
   void Bind( Vulkan::RefCountedCommandBuffer& commandBuffer );
 
+  bool HasDepthEnabled() const;
+
+  bool HasStencilEnabled() const;
+
 private:
 
   const vk::PipelineColorBlendStateCreateInfo* PrepareColorBlendStateCreateInfo();
