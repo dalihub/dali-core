@@ -392,10 +392,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
                                           bool hasClippingNodes,
                                           RenderInstructionContainer& instructions )
 {
-  // Retrieve the RenderInstruction buffer from the RenderInstructionContainer
-  // then populate with instructions.
-  RenderInstruction& instruction = instructions.GetNextInstruction( updateBufferIndex );
-  renderTask.PrepareRenderInstruction( instruction, updateBufferIndex );
+  RenderInstruction& instruction = renderTask.PrepareRenderInstruction( updateBufferIndex );
   bool viewMatrixHasNotChanged = !renderTask.ViewMatrixUpdated();
   bool isRenderListAdded = false;
 
@@ -458,9 +455,9 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
   // Inform the render instruction that all renderers have been added and this frame is complete.
   instruction.UpdateCompleted();
 
-  if( !isRenderListAdded && !instruction.mIsClearColorSet )
+  if( isRenderListAdded || instruction.mIsClearColorSet )
   {
-    instructions.DiscardCurrentInstruction( updateBufferIndex );
+    instructions.PushBack( updateBufferIndex, &instruction );
   }
 }
 

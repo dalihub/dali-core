@@ -27,6 +27,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
+#include <dali/internal/update/rendering/render-instruction.h>
 
 namespace Dali
 {
@@ -299,13 +300,13 @@ public:
    * Prepares the render-instruction buffer to be populated with instructions.
    *
    * If the render task is a render-once framebuffer backed by a native image,
-   * then this method will ensure that a GL sync object is created to track
+   * then this method will ensure that a Graphics Sync object is created to track
    * when the rendering has finished.
    *
-   * @param[out] instruction to prepare
    * @param[in] updateBufferIndex The current update buffer index.
+   * @return instruction to prepare
    */
-  void PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex );
+  RenderInstruction& PrepareRenderInstruction( BufferIndex updateBufferIndex );
 
   /**
    * @return true if the view matrix has been updated during this or last frame
@@ -313,10 +314,15 @@ public:
   bool ViewMatrixUpdated();
 
   /**
-   * Indicate whether GL sync is required for native render target.
-   * @param[in] requiresSync whether GL sync is required for native render target
+   * Indicate whether a Graphics Sync is required for native render target.
+   * @param[in] requiresSync whether Graphics sync is required for native render target
    */
   void SetSyncRequired( bool requiresSync );
+
+  RenderInstruction& GetRenderInstruction( BufferIndex updateBufferIndex )
+  {
+    return mRenderInstruction[updateBufferIndex];
+  }
 
 private:
 
@@ -342,6 +348,8 @@ private:
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;
   SceneGraph::FrameBuffer* mFrameBuffer;
+
+  RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
 
   bool mWaitingToRender:1; ///< True when an render once to FBO is waiting
   bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering

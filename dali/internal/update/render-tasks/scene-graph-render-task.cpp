@@ -358,7 +358,7 @@ const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
   return mCamera->GetProjectionMatrix( bufferIndex );
 }
 
-void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
+RenderInstruction& RenderTask::PrepareRenderInstruction( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( NULL != mCamera );
 
@@ -367,16 +367,18 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
   Viewport viewport;
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
-  instruction.Reset( mCamera,
-                     GetFrameBuffer(),
-                     viewportSet ? &viewport : NULL,
-                     mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
+  mRenderInstruction[updateBufferIndex].Reset( mCamera,
+                                               GetFrameBuffer(),
+                                               viewportSet ? &viewport : NULL,
+                                               mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
 
   if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
   {
     // Perform a hard synchronization after render instruction has executed.
   }
+
+  return mRenderInstruction[updateBufferIndex];
 }
 
 bool RenderTask::ViewMatrixUpdated()

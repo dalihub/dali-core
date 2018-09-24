@@ -282,7 +282,7 @@ struct UpdateManager::Impl
   RenderController&                    renderController;              ///< render controller
   SceneControllerImpl*                 sceneController;               ///< scene controller
   GraphicsAlgorithms                   graphicsAlgorithms;            ///< Graphics algorithms
-  RenderInstructionContainer           renderInstructions;            ///< Used to prepare the render instructions @todo GRAPHICS Remove
+  RenderInstructionContainer           renderInstructions;            ///< List of current instructions per frame
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
   Integration::Graphics::Graphics&     graphics;                      ///< Graphics
