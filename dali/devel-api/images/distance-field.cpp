@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,9 @@ const float MAX_DISTANCE( 1e20 );
  */
 void DistanceTransform( float *source, float* dest, unsigned int length )
 {
-  int parabolas[length];    // Locations of parabolas in lower envelope
-  float edge[length + 1];   // Locations of boundaries between parabolas
+  std::vector<int> parabolas(length);    // Locations of parabolas in lower envelope
+  std::vector<float> edge(length + 1);   // Locations of boundaries between parabolas
+
   int rightmost(0);         // Index of rightmost parabola in lower envelope
 
   parabolas[0] = 0;

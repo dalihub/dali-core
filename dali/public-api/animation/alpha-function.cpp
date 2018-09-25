@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,14 @@
 
 namespace Dali
 {
+
+namespace
+{
+constexpr unsigned int BitMaskOfN( unsigned int bits )
+{
+  return ( 1 << bits ) - 1;
+}
+} // unnamed namespace
 
 AlphaFunction::AlphaFunction()
 :mBezierControlPoints(Vector4::ZERO),
@@ -65,12 +73,12 @@ AlphaFunctionPrototype AlphaFunction::GetCustomFunction() const
 
 AlphaFunction::BuiltinFunction AlphaFunction::GetBuiltinFunction() const
 {
-  return mBuiltin;
+  return static_cast<AlphaFunction::BuiltinFunction>( mBuiltin & BitMaskOfN( Log<COUNT>::value + 1 ) );
 }
 
 AlphaFunction::Mode AlphaFunction::GetMode() const
 {
-  return mMode;
+  return static_cast<AlphaFunction::Mode>( mMode & BitMaskOfN( 2 ) );
 }
 
 } // namespace Dali

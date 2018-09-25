@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,10 @@ public:
 
   /**
    * Construct a new Layer.
+   * @param[in] id The Unique ID of the actor creating the node
    * @return A smart-pointer to a newly allocated Node
    */
-  static SceneGraph::Layer* New();
+  static SceneGraph::Layer* New( unsigned int id );
 
   /**
    * From Node, to convert a node to a layer.
@@ -205,9 +206,10 @@ private:
 
   /**
    * Private constructor.
+   * @param[in] id The Unique ID of the actor creating the node
    * See also Layer::New()
    */
-  Layer();
+  Layer( unsigned int id );
 
   // Undefined
   Layer(const Layer&);
@@ -334,8 +336,14 @@ inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadService
 
 // Template specialisation for OwnerPointer<Layer>, because delete is protected
 template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset();
-
+inline void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
+{
+  if (mObject != NULL)
+  {
+    Dali::Internal::SceneGraph::Node::Delete(mObject);
+    mObject = NULL;
+  }
+}
 } // namespace Internal
 
 } // namespace Dali

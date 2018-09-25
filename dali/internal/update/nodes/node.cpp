@@ -55,9 +55,9 @@ const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_P
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 
-Node* Node::New()
+Node* Node::New( unsigned int id )
 {
-  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node();
+  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node( id );
 }
 
 void Node::Delete( Node* node )
@@ -78,7 +78,7 @@ void Node::Delete( Node* node )
   }
 }
 
-Node::Node()
+Node::Node( unsigned int id )
 : mTransformManager( NULL ),
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
@@ -88,6 +88,7 @@ Node::Node()
   mOrientation(),                                                                 // Initialized to identity by default
   mScale( TRANSFORM_PROPERTY_SCALE ),
   mVisible( true ),
+  mCulled( false ),
   mColor( Color::WHITE ),
   mWorldPosition( TRANSFORM_PROPERTY_WORLD_POSITION, Vector3( 0.0f,0.0f,0.0f ) ), // Zero initialized by default
   mWorldScale( TRANSFORM_PROPERTY_WORLD_SCALE, Vector3( 1.0f,1.0f,1.0f ) ),
@@ -95,6 +96,7 @@ Node::Node()
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
   mClippingSortModifier( 0u ),
+  mId( id ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),
@@ -340,22 +342,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
 
 } // namespace SceneGraph
 
-template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
-{
-  if( mObject != NULL )
-  {
-    Dali::Internal::SceneGraph::Node::Delete( mObject );
-    mObject = NULL;
-  }
-}
-
 } // namespace Internal
-
-template <>
-void OwnerContainer<Dali::Internal::SceneGraph::Node*>::Delete(Dali::Internal::SceneGraph::Node* pointer)
-{
-  Dali::Internal::SceneGraph::Node::Delete( pointer );
-}
 
 } // namespace Dali

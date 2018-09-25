@@ -1,6 +1,6 @@
 Name:       dali-vk
 Summary:    DALi 3D Engine
-Version:    1.3.39
+Version:    1.3.42
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -256,7 +256,6 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libdali-core-vk.so.*
 %{_libdir}/libdali-core-vk-cxx03.so
-%defattr(-,app,app,-)
 %license LICENSE
 %endif
 
@@ -269,7 +268,6 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/libdali-core-vk-cxx11.so.*
 %{_libdir}/libdali-core-vk.so
-%defattr(-,app,app,-)
 %license LICENSE
 
 %if !0%{?disable_cxx03_build}

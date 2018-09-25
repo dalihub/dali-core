@@ -46,6 +46,7 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/graphics/graphics-algorithms.h>
+#include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/manager/transform-manager.h>
@@ -196,6 +197,7 @@ struct UpdateManager::Impl
     shaders(),
     panGestureProcessor( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
+    frameCallbackProcessor( NULL ),
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
@@ -258,6 +260,18 @@ struct UpdateManager::Impl
     delete sceneController;
   }
 
+  /**
+   * Lazy init for FrameCallbackProcessor.
+   */
+  FrameCallbackProcessor& GetFrameCallbackProcessor()
+  {
+    if( ! frameCallbackProcessor )
+    {
+      frameCallbackProcessor = new FrameCallbackProcessor( transformManager, *root );
+    }
+    return *frameCallbackProcessor;
+  }
+
   SceneGraphBuffers                    sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
   NotificationManager&                 notificationManager;           ///< Queues notification messages for the event-thread.
   TransformManager                     transformManager;              ///< Used to update the transformation matrices of the nodes
@@ -304,6 +318,8 @@ struct UpdateManager::Impl
   OwnerPointer< PanGesture >           panGestureProcessor;           ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
   MessageQueue                         messageQueue;                  ///< The messages queued from the event-thread
+
+  OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor;        ///< Owned FrameCallbackProcessor, only created if required.
 
   float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
@@ -824,6 +840,12 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update the transformations of all the nodes
     mImpl->transformManager.Update();
 
+    // Call the frame-callback-processor if set
+    if( mImpl->frameCallbackProcessor )
+    {
+      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
+    }
+
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
@@ -1008,6 +1030,16 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
   mImpl->surfaceRectChanged = false;
 
   return surfaceRectChanged;
+}
+
+void UpdateManager::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+{
+  mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
+}
+
+void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
+{
+  mImpl->GetFrameCallbackProcessor().RemoveFrameCallback( frameCallback );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )

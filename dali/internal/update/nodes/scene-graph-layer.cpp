@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,15 +31,16 @@ namespace Internal
 namespace SceneGraph
 {
 
-SceneGraph::Layer* Layer::New()
+SceneGraph::Layer* Layer::New( unsigned int id )
 {
   // Layers are currently heap allocated, unlike Nodes which are in a memory pool
   // However Node::Delete( layer ) will correctly delete a layer / node depending on type
-  return new Layer();
+  return new Layer( id );
 }
 
-Layer::Layer()
-: mSortFunction( Internal::Layer::ZValue ),
+Layer::Layer( unsigned int id )
+: Node( id ),
+  mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
   mLastCamera( NULL ),
   mBehavior( Dali::Layer::LAYER_2D ),
@@ -113,15 +114,6 @@ void Layer::ClearRenderables()
 
 } // namespace SceneGraph
 
-template <>
-void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
-{
-  if( mObject != NULL )
-  {
-    Dali::Internal::SceneGraph::Node::Delete( mObject );
-    mObject = NULL;
-  }
-}
 } // namespace Internal
 
 } // namespace Dali
