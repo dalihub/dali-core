@@ -26,7 +26,6 @@
 #include <dali/integration-api/graphics/surface-factory.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/internal/vulkan-descriptor-allocator.h>
 #include <dali/integration-api/graphics/graphics.h>
 
@@ -75,6 +74,54 @@ class ResourceRegister;
 class FramebufferAttachment;
 
 class DescriptorSetAllocator;
+
+class Memory
+{
+  friend class Graphics;
+
+private:
+
+  Memory( Graphics* graphics, vk::DeviceMemory deviceMemory, size_t memSize, size_t memAlign, bool hostVisible );
+
+public:
+
+  ~Memory();
+
+  template<class T>
+  T* MapTyped()
+  {
+    return reinterpret_cast<T*>(Map());
+  }
+
+  Memory(Memory&) = delete;
+  Memory& operator=(Memory&) = delete;
+
+  void* Map();
+
+  void* Map( uint32_t offset, uint32_t size );
+
+  void Unmap();
+
+  void Flush();
+
+  /**
+   * Releases vk::DeviceMemory object so it can be deleted
+   * externally
+   * @return
+   */
+  vk::DeviceMemory ReleaseVkObject();
+
+  vk::DeviceMemory GetVkHandle() const;
+
+private:
+  Graphics* graphics;
+  vk::DeviceMemory memory;
+  size_t size;
+  size_t alignment;
+  void* mappedPtr;
+  size_t mappedSize;
+  bool hostVisible;
+};
 
 using Dali::Integration::Graphics::SurfaceFactory;
 using CommandPoolMap = std::unordered_map< std::thread::id, RefCountedCommandPool >;
@@ -162,25 +209,25 @@ public: // Actions
 
   vk::Result ResetFences( const std::vector< RefCountedFence >& fences );
 
-  vk::Result BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset );
+  vk::Result BindImageMemory( RefCountedImage image,std::unique_ptr<Memory> memory, uint32_t offset );
 
-  vk::Result BindBufferMemory( RefCountedBuffer buffer, RefCountedGpuMemoryBlock memory, uint32_t offset );
+  vk::Result BindBufferMemory( RefCountedBuffer buffer, std::unique_ptr<Memory> memory, uint32_t offset );
 
-  void* MapMemory( RefCountedGpuMemoryBlock memory ) const;
+  void* MapMemory( Memory* memory ) const;
 
-  void* MapMemory( RefCountedGpuMemoryBlock memory, uint32_t size, uint32_t offset ) const;
+  void* MapMemory( Memory* memory, uint32_t size, uint32_t offset ) const;
 
-  void UnmapMemory( RefCountedGpuMemoryBlock memory ) const;
+  void UnmapMemory( Memory* memory ) const;
 
   template< typename T >
-  T* MapMemoryTyped( RefCountedGpuMemoryBlock memory ) const
+  T* MapMemoryTyped( Memory* memory ) const
   {
     return memory->MapTyped<T>();
   }
 
-  RefCountedGpuMemoryBlock AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties );
+  std::unique_ptr<Memory> AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties );
 
-  RefCountedGpuMemoryBlock AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties );
+  std::unique_ptr<Memory> AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties );
 
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 
@@ -323,8 +370,6 @@ private: // Members
   std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
   FBID mBaseFBID{ 0u };
 
-  std::unique_ptr< GpuMemoryManager > mDeviceMemoryManager;
-
   Platform mPlatform{ Platform::UNDEFINED };
 
   std::mutex mMutex;
@@ -336,10 +381,11 @@ private: // Members
 
   std::unique_ptr< DescriptorSetAllocator > mDescriptorAllocator;
 
-  std::vector< std::function< void() > > mActionQueue;
+  std::vector< std::function< void() > > mActionQueue[2u];
   std::vector< std::function< void() > > mDiscardQueue[2u];
 
   uint32_t mCurrentGarbageBufferIndex { 0u };
+  uint32_t mCurrentActionBufferIndex { 0u };
 
   bool mHasDepth;
   bool mHasStencil;

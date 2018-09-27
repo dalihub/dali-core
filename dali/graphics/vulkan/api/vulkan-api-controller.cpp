@@ -18,8 +18,6 @@
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
@@ -115,7 +113,8 @@ struct Controller::Impl
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    swapchain->AcquireNextFramebuffer();
+    // We won't run garbage collection in case there are pending resource transfers.
+    swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
 
     mRenderPasses.clear();
 
@@ -128,7 +127,7 @@ struct Controller::Impl
       swapchain = mGraphics.ReplaceSwapchainForSurface( surface, std::move(swapchain) );
 
       // get new valid framebuffer
-      swapchain->AcquireNextFramebuffer();
+      swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
     }
 
     mCurrentFramebuffer.Reset();
@@ -141,6 +140,12 @@ struct Controller::Impl
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
     auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
+
+    for( auto& future : mMemoryTransferFutures )
+    {
+      future->Wait();
+      future.reset();
+    }
 
     if( !mRenderPasses.empty() )
     {
@@ -158,12 +163,6 @@ struct Controller::Impl
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
         .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
       primaryCommandBuffer->EndRenderPass();
-    }
-
-    for( auto& future : mMemoryTransferFutures )
-    {
-      future->Wait();
-      future.reset();
     }
 
     mMemoryTransferFutures.clear();
@@ -269,9 +268,10 @@ struct Controller::Impl
       {
         for( auto&& req : mBufferTransferRequests )
         {
-          void* dst = req->dstBuffer->GetMemoryHandle()->Map();
+          void* dst = req->dstBuffer->GetMemory()->Map();
           memcpy( dst, &*req->srcPtr, req->srcSize );
-          req->dstBuffer->GetMemoryHandle()->Unmap();
+          req->dstBuffer->GetMemory()->Flush();
+          req->dstBuffer->GetMemory()->Unmap();
         }
         mBufferTransferRequests.clear();
       }
@@ -294,6 +294,7 @@ struct Controller::Impl
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
   {
+    std::lock_guard<std::mutex> lock(mResourceTransferMutex);
     if(!mResourceTransferRequests.empty())
     {
       // for images we need to generate all the barriers to make sure the layouts
@@ -473,7 +474,7 @@ struct Controller::Impl
       if( !mHasDepthEnabled && vulkanApiPipeline->HasDepthEnabled() )
       {
         // add depth stencil to main framebuffer
-        mGraphics.GetSwapchainForFBID( 0u )->EnableDepthStencil( vk::Format::eD16UnormS8Uint );
+        mGraphics.GetSwapchainForFBID(0u)->SetDepthStencil(vk::Format::eD24UnormS8Uint);
         mHasDepthEnabled = true;
       }
 
@@ -545,7 +546,7 @@ struct Controller::Impl
   std::vector< std::unique_ptr< VulkanAPI::BufferMemoryTransfer > > mBufferTransferRequests;
 
   // used for texture<->buffer<->memory transfers
-  std::vector< ResourceTransferRequest >                            mResourceTransferRequests;
+  std::vector< ResourceTransferRequest > mResourceTransferRequests;
 
   Vulkan::RefCountedFramebuffer mCurrentFramebuffer;
   std::vector< RenderPassData > mRenderPasses;
@@ -565,7 +566,7 @@ struct Controller::Impl
   std::deque<DescriptorInfo> mDescriptorInfoStack;
 
   std::mutex mDescriptorWriteMutex{};
-
+  std::mutex mResourceTransferMutex{};
   bool mHasDepthEnabled;
 };
 
@@ -730,6 +731,7 @@ void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::Buffe
 
 void Controller::ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& transferRequest )
 {
+  std::lock_guard<std::mutex> lock(mImpl->mResourceTransferMutex);
   mImpl->mResourceTransferRequests.emplace_back( std::move(transferRequest) );
 
   // if we requested immediate upload then request will be processed instantly with skipping
@@ -738,6 +740,11 @@ void Controller::ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& 
   {
     mImpl->ProcessResourceTransferRequests( true );
   }
+}
+
+bool Controller::HasPendingResourceTransfers() const
+{
+  return !mImpl->mResourceTransferRequests.empty();
 }
 
 void Controller::SubmitCommands( std::vector< API::RenderCommand* > commands )

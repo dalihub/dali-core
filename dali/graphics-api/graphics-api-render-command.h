@@ -400,30 +400,11 @@ public:
     return *this;
   }
 
-  RenderCommand& BindTextures( std::vector<TextureBinding>&& bindings )
+  RenderCommand& BindTextures( const std::vector<TextureBinding>* bindings )
   {
     // compare bindings
-    bool notEqual = false;
-    if( bindings.size() == mTextureBindings.size() )
-    {
-      for( auto i = 0u; i < bindings.size(); ++i )
-      {
-        if( !(bindings[i] == mTextureBindings[i]) )
-        {
-          notEqual = true;
-          break;
-        }
-      }
-    }
-    else
-    {
-      notEqual = true;
-    }
-    if( notEqual )
-    {
-      mTextureBindings = std::move( bindings );
-      mUpdateFlags |= RENDER_COMMAND_UPDATE_TEXTURE_BIT;
-    }
+    mTextureBindings = bindings;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_TEXTURE_BIT;
     return *this;
   }
 
@@ -509,7 +490,7 @@ public:
     return mUniformBufferBindings;
   }
 
-  const std::vector<TextureBinding>& GetTextureBindings() const
+  const std::vector<TextureBinding>* GetTextureBindings() const
   {
     return mTextureBindings;
   }
@@ -546,7 +527,7 @@ public:
   // list of resources
   std::vector<const Buffer*>                mVertexBufferBindings;
   const std::vector<UniformBufferBinding>*  mUniformBufferBindings;
-  std::vector<TextureBinding>               mTextureBindings;
+  const std::vector<TextureBinding>*        mTextureBindings;
   std::vector<SamplerBinding>               mSamplerBindings;
 
 

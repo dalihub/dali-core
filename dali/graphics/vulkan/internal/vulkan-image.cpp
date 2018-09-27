@@ -18,7 +18,6 @@
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 
 namespace Dali
 {
@@ -147,11 +146,14 @@ bool Image::OnDestroy()
     auto device = mGraphics->GetDevice();
     auto image = mImage;
     auto allocator = &mGraphics->GetAllocator();
+    auto memory = mDeviceMemory->ReleaseVkObject();
 
-    mGraphics->DiscardResource( [ device, image, allocator ]() {
+    mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
       DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
                      static_cast< VkImage >(image) )
       device.destroyImage( image, allocator );
+
+      device.freeMemory( memory, allocator );
     } );
   }
 

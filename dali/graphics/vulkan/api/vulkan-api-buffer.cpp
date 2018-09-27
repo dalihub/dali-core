@@ -18,8 +18,6 @@
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 namespace Dali
@@ -50,24 +48,24 @@ bool Buffer::Initialise()
   // allocate memory
   // todo: host visible should be only for dynamic buffers
   auto memory = mGraphics.AllocateMemory( mBufferRef, vk::MemoryPropertyFlagBits::eHostVisible );
-  mGraphics.BindBufferMemory( mBufferRef, memory, 0 );
+  mGraphics.BindBufferMemory( mBufferRef, std::move(memory), 0 );
 
   return true;
 }
 
 void* Buffer::Map()
 {
-  return mBufferRef->GetMemoryHandle()->Map();
+  return mBufferRef->GetMemory()->Map();
 }
 
 void Buffer::Unmap()
 {
-  mBufferRef->GetMemoryHandle()->Unmap();
+  mBufferRef->GetMemory()->Unmap();
 }
 
 void Buffer::Flush()
 {
-  mBufferRef->GetMemoryHandle()->Flush();
+  mBufferRef->GetMemory()->Flush();
 }
 
 void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )

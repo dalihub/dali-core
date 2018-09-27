@@ -114,7 +114,7 @@ struct ResourceTransferRequest
       bufferToImageInfo.dstImage = std::move( obj.bufferToImageInfo.dstImage );
       bufferToImageInfo.copyInfo = std::move (obj.bufferToImageInfo.copyInfo );
     }
-    else if( requestType == TransferRequestType::BUFFER_TO_IMAGE )
+    else if( requestType == TransferRequestType::IMAGE_TO_IMAGE )
     {
       imageToImageInfo.srcImage = std::move( obj.imageToImageInfo.srcImage );
       imageToImageInfo.dstImage = std::move( obj.imageToImageInfo.dstImage );
@@ -196,6 +196,7 @@ public:
 
   void PushDescriptorWrite( const vk::WriteDescriptorSet& write );
 
+  bool HasPendingResourceTransfers() const;
 public:
 
   API::TextureFactory& GetTextureFactory() const override;

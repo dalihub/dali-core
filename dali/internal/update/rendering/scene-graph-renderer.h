@@ -506,6 +506,7 @@ private:
 
   std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
   std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings[ MAX_GRAPHICS_DATA_BUFFER_COUNT ]; /// shouldn't be here but we need to store it!
+  std::vector<Graphics::API::RenderCommand::TextureBinding> mTextureBindings{};
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value

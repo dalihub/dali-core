@@ -275,7 +275,7 @@ Pipeline::~Pipeline()
       // Destroy pipeline layout
       device.destroyPipelineLayout( pipelineLayout, allocator );
 
-      // Destry descriptor set layouts
+      // Destroy descriptor set layouts
       for( const auto& descriptorSetLayout : descriptorSetLayouts )
       {
         device.destroyDescriptorSetLayout( descriptorSetLayout, allocator );

@@ -17,9 +17,6 @@
 
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
-#include <utility>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 namespace Dali
@@ -52,9 +49,9 @@ vk::BufferUsageFlags Buffer::GetUsage() const
   return mInfo.usage;
 }
 
-const RefCountedGpuMemoryBlock& Buffer::GetMemoryHandle() const
+Memory* Buffer::GetMemory() const
 {
-  return mDeviceMemory;
+  return mDeviceMemory.get();
 }
 
 uint32_t Buffer::GetSize() const
@@ -74,11 +71,14 @@ bool Buffer::OnDestroy()
   auto device = mGraphics->GetDevice();
   auto buffer = mBuffer;
   auto allocator = &mGraphics->GetAllocator();
+  auto memory = mDeviceMemory->ReleaseVkObject();
 
-  mGraphics->DiscardResource( [ device, buffer, allocator ]() {
+  mGraphics->DiscardResource( [ device, buffer, memory, allocator ]() {
     DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: buffer->%p\n",
                    static_cast< VkBuffer >(buffer) )
     device.destroyBuffer( buffer, allocator );
+
+    device.freeMemory( memory, allocator );
   } );
 
   return false;

@@ -138,7 +138,11 @@ void RenderCommand::BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer
 void RenderCommand::BindTexturesAndSamplers()
 {
   // only if textures/samplers changed, rewrite
-  for( auto&& texture : mTextureBindings )
+  if( !mTextureBindings )
+  {
+    return;
+  }
+  for( const auto& texture : *mTextureBindings )
   {
     auto image = static_cast<const VulkanAPI::Texture*>(texture.texture);
 

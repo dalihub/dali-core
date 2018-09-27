@@ -27,7 +27,7 @@ namespace Graphics
 namespace Vulkan
 {
 
-class GpuMemoryBlock;
+class Memory;
 
 class Buffer : public VkManaged
 {
@@ -61,7 +61,7 @@ public:
    * Returns handle to the allocated memory
    * @return
    */
-  const RefCountedGpuMemoryBlock& GetMemoryHandle() const;
+  Memory* GetMemory() const;
 
   /**
    *
@@ -85,7 +85,7 @@ private:
 
 private:
   Graphics* mGraphics;
-  RefCountedGpuMemoryBlock mDeviceMemory;
+  std::unique_ptr<Memory> mDeviceMemory;
   vk::BufferCreateInfo mInfo;
   vk::Buffer mBuffer;
 };

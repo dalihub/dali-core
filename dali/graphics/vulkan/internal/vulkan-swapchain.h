@@ -66,7 +66,7 @@ public:
    * @todo we should rather use round robin method
    * @return
    */
-  RefCountedFramebuffer AcquireNextFramebuffer();
+  RefCountedFramebuffer AcquireNextFramebuffer( bool shouldCollectGarbageNow = true );
 
   /**
    * Returns primary command buffer associated with currently
@@ -103,7 +103,7 @@ public:
    *
    * @param[in] depthStencilFormat valid depth/stencil pixel format
    */
-  void EnableDepthStencil( vk::Format depthStencilFormat );
+  void SetDepthStencil(vk::Format depthStencilFormat);
 
   /**
    * Returns current depth stencil format
