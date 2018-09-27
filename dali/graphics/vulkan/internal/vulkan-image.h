@@ -28,6 +28,7 @@ namespace Vulkan
 {
 
 class Graphics;
+class Memory;
 
 class Image : public VkManaged
 {
@@ -106,6 +107,11 @@ public:
 
   bool OnDestroy() override;
 
+  Memory* GetMemory() const
+  {
+    return mDeviceMemory.get();
+  }
+
 private:
 
   /**
@@ -123,7 +129,7 @@ private:
   vk::ImageLayout mImageLayout;
   vk::ImageAspectFlags mAspectFlags;
 
-  RefCountedGpuMemoryBlock mDeviceMemory;
+  std::unique_ptr<Memory> mDeviceMemory;
   bool mIsExternal;
 };
 

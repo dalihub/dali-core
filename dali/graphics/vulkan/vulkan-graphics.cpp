@@ -22,7 +22,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/integration-api/graphics/vulkan/vk-surface-factory.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
@@ -35,8 +34,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-resource-register.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
@@ -62,6 +59,113 @@ namespace Graphics
 {
 namespace Vulkan
 {
+
+const uint32_t INVALID_MEMORY_INDEX = -1u;
+
+/**
+ * Helper function which returns GPU heap index that can be used to allocate
+ * particular type of resource
+ */
+uint32_t GetMemoryIndex( const vk::PhysicalDeviceMemoryProperties& memoryProperties,
+                         uint32_t memoryTypeBits, vk::MemoryPropertyFlags properties )
+{
+  for( uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i )
+  {
+    if( ( memoryTypeBits & ( 1u << i ) ) &&
+        ( ( memoryProperties.memoryTypes[i].propertyFlags & properties ) == properties ) )
+    {
+      return i;
+    }
+  }
+  return INVALID_MEMORY_INDEX;
+}
+
+
+/********************************************************
+ * Memory
+ */
+
+Memory::Memory( Graphics* _graphics, vk::DeviceMemory deviceMemory, size_t memSize, size_t memAlign, bool isHostVisible )
+: graphics( _graphics ),
+  memory( deviceMemory ),
+  size( memSize ),
+  alignment( memAlign ),
+  mappedPtr( nullptr ),
+  mappedSize( 0u ),
+  hostVisible( isHostVisible )
+{
+}
+
+Memory::~Memory()
+{
+  // free memory
+  if( memory )
+  {
+    auto device = graphics->GetDevice();
+    auto allocator = &graphics->GetAllocator();
+    auto deviceMemory = memory;
+
+    // Discard unused descriptor set layouts
+    graphics->DiscardResource( [ device, deviceMemory, allocator ]() {
+      // free memory
+      device.freeMemory( deviceMemory, allocator );
+    } );
+  }
+}
+
+void* Memory::Map( uint32_t offset, uint32_t requestedMappedSize )
+{
+  if( !memory )
+  {
+    return nullptr;
+  }
+
+  if( mappedPtr )
+  {
+    return mappedPtr;
+  }
+  mappedPtr = graphics->GetDevice().mapMemory( memory, offset, requestedMappedSize ? requestedMappedSize : VK_WHOLE_SIZE ).value;
+  mappedSize = requestedMappedSize;
+  return mappedPtr;
+}
+
+void* Memory::Map()
+{
+  return Map( 0u, 0u );
+}
+
+void Memory::Unmap()
+{
+  if( memory && mappedPtr )
+  {
+    graphics->GetDevice().unmapMemory( memory );
+    mappedPtr = nullptr;
+  }
+}
+
+vk::DeviceMemory Memory::ReleaseVkObject()
+{
+  auto retval = memory;
+  memory = nullptr;
+  return retval;
+}
+
+void Memory::Flush()
+{
+  graphics->GetDevice().flushMappedMemoryRanges( { vk::MappedMemoryRange{}
+    .setSize( mappedSize )
+    .setMemory( memory )
+    .setOffset( 0u )
+  } );
+}
+
+vk::DeviceMemory Memory::GetVkHandle() const
+{
+  return memory;
+}
+
+
+/********************************************************/
 
 const auto VALIDATION_LAYERS = std::vector< const char* >{
 
@@ -104,9 +208,8 @@ Graphics::~Graphics()
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
   mResourceRegister->Clear();
 
-  mDeviceMemoryManager.reset( nullptr );
-
   // Execute any outstanding actions...
+  ExecuteActions();
   ExecuteActions();
 
   PrintAllocationReport( *mDescriptorAllocator );
@@ -931,10 +1034,9 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
 
     auto dsRefCountedImage = CreateImage( imageCreateInfo );
 
-    auto memory = mDeviceMemoryManager->GetDefaultAllocator().Allocate( dsRefCountedImage,
-                                                                        vk::MemoryPropertyFlagBits::eDeviceLocal );
+    auto memory = AllocateMemory( dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-    BindImageMemory( dsRefCountedImage, memory, 0 );
+    BindImageMemory( dsRefCountedImage, std::move(memory), 0 );
 
     // create the depth stencil ImageView to be used within framebuffer
     auto depthStencilImageView = CreateImageView( dsRefCountedImage );
@@ -1011,44 +1113,94 @@ vk::Result Graphics::ResetFences( const std::vector< RefCountedFence >& fences )
   return mDevice.resetFences( vkFenceHandles );
 }
 
-vk::Result Graphics::BindImageMemory( RefCountedImage image, RefCountedGpuMemoryBlock memory, uint32_t offset )
+vk::Result Graphics::BindImageMemory( RefCountedImage image, std::unique_ptr<Memory> memory, uint32_t offset )
 {
-  auto result = VkAssert( mDevice.bindImageMemory( image->mImage, *memory, offset ) );
-  image->mDeviceMemory = memory;
+  auto result = VkAssert( mDevice.bindImageMemory( image->mImage, memory->memory, offset ) );
+  image->mDeviceMemory = std::move(memory);
   return result;
 }
 
-vk::Result Graphics::BindBufferMemory( RefCountedBuffer buffer, RefCountedGpuMemoryBlock memory, uint32_t offset )
+vk::Result Graphics::BindBufferMemory( RefCountedBuffer buffer, std::unique_ptr<Memory> memory, uint32_t offset )
 {
   assert( buffer->mBuffer && "Buffer not initialised!" );
-  auto result = VkAssert( mDevice.bindBufferMemory( buffer->mBuffer, *memory, offset ) );
-  buffer->mDeviceMemory = memory;
+  auto result = VkAssert( mDevice.bindBufferMemory( buffer->mBuffer, memory->memory, offset ) );
+  buffer->mDeviceMemory = std::move(memory);
   return result;
 }
 
-void* Graphics::MapMemory( RefCountedGpuMemoryBlock memory ) const
+void* Graphics::MapMemory( Memory* memory ) const
 {
   return memory->Map();
 }
 
-void* Graphics::MapMemory( RefCountedGpuMemoryBlock memory, uint32_t size, uint32_t offset ) const
+void* Graphics::MapMemory( Memory* memory, uint32_t size, uint32_t offset ) const
 {
   return memory->Map( offset, size );
 }
 
-void Graphics::UnmapMemory( RefCountedGpuMemoryBlock memory ) const
+void Graphics::UnmapMemory( Memory* memory ) const
 {
   memory->Unmap();
 }
 
-RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties )
+std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedBuffer buffer, vk::MemoryPropertyFlags memoryProperties )
 {
-  return mDeviceMemoryManager->GetDefaultAllocator().Allocate( std::move( buffer ) , memoryProperties );
+  auto requirements = mDevice.getBufferMemoryRequirements( buffer->GetVkHandle() );
+  auto memoryTypeIndex = GetMemoryIndex( GetMemoryProperties(),
+                                         requirements.memoryTypeBits,
+                                         memoryProperties );
+
+  vk::DeviceMemory memory{};
+
+  auto allocateInfo = vk::MemoryAllocateInfo{}
+    .setMemoryTypeIndex( memoryTypeIndex )
+    .setAllocationSize( requirements.size );
+
+  auto result = GetDevice().allocateMemory( &allocateInfo, &GetAllocator(), &memory );
+
+  if( result != vk::Result::eSuccess )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Unable to allocate memory for the buffer of size %d!", int(requirements.size) );
+    return nullptr;
+  }
+
+  return std::unique_ptr<Memory>(
+    new Memory( this,
+                memory,
+                uint32_t(requirements.size),
+                uint32_t(requirements.alignment),
+                ((memoryProperties & vk::MemoryPropertyFlagBits::eHostVisible) == vk::MemoryPropertyFlagBits::eHostVisible) )
+  );
 }
 
-RefCountedGpuMemoryBlock Graphics::AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties )
+std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::MemoryPropertyFlags memoryProperties )
 {
-  return mDeviceMemoryManager->GetDefaultAllocator().Allocate( std::move( image ), memoryProperties );
+  auto requirements = mDevice.getImageMemoryRequirements( image->GetVkHandle() );
+  auto memoryTypeIndex = GetMemoryIndex( GetMemoryProperties(),
+                                         requirements.memoryTypeBits,
+                                         memoryProperties );
+
+  vk::DeviceMemory memory{};
+
+  auto allocateInfo = vk::MemoryAllocateInfo{}
+    .setMemoryTypeIndex( memoryTypeIndex )
+    .setAllocationSize( requirements.size );
+
+  auto result = GetDevice().allocateMemory( &allocateInfo, &GetAllocator(), &memory );
+
+  if( result != vk::Result::eSuccess )
+  {
+    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Unable to allocate memory for the image of size %d!", int(requirements.size) );
+    return nullptr;
+  }
+
+  return std::unique_ptr<Memory>(
+    new Memory( this,
+                memory,
+                uint32_t(requirements.size),
+                uint32_t(requirements.alignment),
+                ((memoryProperties & vk::MemoryPropertyFlagBits::eHostVisible) == vk::MemoryPropertyFlagBits::eHostVisible) )
+  );
 }
 
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
@@ -1370,6 +1522,10 @@ void Graphics::CollectGarbage()
                    "Beginning graphics garbage collection---------------------------------------" )
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[mCurrentGarbageBufferIndex].size() )
 
+  if( mDiscardQueue[mCurrentGarbageBufferIndex].empty() )
+  {
+    return;
+  }
 
   // swap buffer
   mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
@@ -1391,25 +1547,35 @@ void Graphics::ExecuteActions()
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                    "Beginning graphics action execution---------------------------------------" )
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Action queue size: %ld\n", mActionQueue.size() )
-  for( const auto& action : mActionQueue )
+
+  if( mActionQueue[mCurrentActionBufferIndex].empty() )
+  {
+    return;
+  }
+
+  // swap buffer
+  mCurrentActionBufferIndex = ((mCurrentActionBufferIndex+1)&1);
+
+  for( const auto& action : mActionQueue[mCurrentActionBufferIndex] )
   {
     action();
   }
-  mActionQueue.clear();
+
+  mActionQueue[mCurrentActionBufferIndex].clear();
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                    "Graphics action execution complete---------------------------------------" )
 }
 
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
-  std::lock_guard< std::mutex > lock{ mMutex };
+  std::lock_guard< std::mutex > lock( mMutex );
   mDiscardQueue[mCurrentGarbageBufferIndex].push_back( std::move( deleter ) );
 }
 
 void Graphics::EnqueueAction( std::function< void() > action )
 {
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mActionQueue.push_back( std::move( action ) );
+  std::lock_guard< std::mutex > lock( mMutex );
+  mActionQueue[mCurrentActionBufferIndex].push_back( std::move( action ) );
 }
 // --------------------------------------------------------------------------------------------------------------
 
@@ -1423,7 +1589,6 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1475,8 +1640,6 @@ void Graphics::PreparePhysicalDevice()
   GetPhysicalDeviceProperties();
 
   GetQueueFamilyProperties();
-
-  mDeviceMemoryManager = GpuMemoryManager::New( *this );
 }
 
 void Graphics::GetPhysicalDeviceProperties()

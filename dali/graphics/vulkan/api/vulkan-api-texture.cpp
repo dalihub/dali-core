@@ -20,8 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
@@ -889,7 +887,10 @@ Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
 {
 }
 
-Texture::~Texture() = default;
+Texture::~Texture()
+{
+
+}
 
 bool Texture::Initialise()
 {
@@ -991,9 +992,9 @@ void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Ext
                               0u );
 
   // write into the buffer
-  auto ptr = buffer->GetMemoryHandle()->MapTyped<char>();
+  auto ptr = buffer->GetMemory()->MapTyped<char>();
   std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+srcMemorySize, ptr );
-  buffer->GetMemoryHandle()->Unmap();
+  buffer->GetMemory()->Unmap();
 
   ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
 
@@ -1101,7 +1102,7 @@ bool Texture::InitialiseTexture()
   auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
   // bind the allocated memory to the image
-  mGraphics.BindImageMemory( mImage, memory, 0 );
+  mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
 
   // create default image view
   CreateImageView();

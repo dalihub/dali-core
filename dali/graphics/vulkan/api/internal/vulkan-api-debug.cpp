@@ -25,9 +25,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
 
 // EXTERNAL INCLUDES
 #include <sstream>
@@ -216,12 +213,15 @@ std::ostream& operator<<(std::ostream& ss, const RenderCommand& object)
     ss << "  }\n" << std::endl;
   }
 
-  ss << "  mTextureBindings {" << std::endl;
-  for( auto i = 0u; i < object.mTextureBindings.size(); ++i )
+  if( object.mTextureBindings )
   {
-    ss << object.mTextureBindings[i] << std::endl;
+    ss << "  mTextureBindings {" << std::endl;
+    for( auto i = 0u; i < object.mTextureBindings->size(); ++i )
+    {
+      ss << (*object.mTextureBindings)[i] << std::endl;
+    }
+    ss << "  }\n" << std::endl;
   }
-  ss << "  }\n" << std::endl;
 
   ss << "  mSamplerBindings {" << std::endl;
   for( auto i = 0u; i < object.mSamplerBindings.size(); ++i )

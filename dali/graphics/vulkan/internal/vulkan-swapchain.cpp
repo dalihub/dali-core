@@ -17,9 +17,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-allocator.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-handle.h>
-#include <dali/graphics/vulkan/internal/vulkan-gpu-memory-manager.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
@@ -114,7 +111,7 @@ RefCountedFramebuffer Swapchain::GetFramebuffer( uint32_t index ) const
   return mFramebuffers[index];
 }
 
-RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
+RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarbageNow  )
 {
   // prevent from using invalid swapchain
   if( !mIsValid )
@@ -169,7 +166,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer()
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
     mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
-    if( mFrameCounter > mSwapchainBuffers.size() )
+    if( mFrameCounter > mSwapchainBuffers.size() && shouldCollectGarbageNow )
     {
       mGraphics->ExecuteActions();
       mGraphics->CollectGarbage();
@@ -298,7 +295,7 @@ void Swapchain::Invalidate()
   mIsValid = false;
 }
 
-void Swapchain::EnableDepthStencil( vk::Format depthStencilFormat )
+void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
 {
   RefCountedFramebufferAttachment depthAttachment;
   auto swapchainExtent = mSwapchainCreateInfoKHR.imageExtent;
@@ -307,7 +304,7 @@ void Swapchain::EnableDepthStencil( vk::Format depthStencilFormat )
   {
     // Create depth/stencil image
     auto imageCreateInfo = vk::ImageCreateInfo{}
-      .setFormat( vk::Format::eD24UnormS8Uint )
+      .setFormat( depthStencilFormat )
       .setMipLevels( 1 )
       .setTiling( vk::ImageTiling::eOptimal )
       .setImageType( vk::ImageType::e2D )
@@ -322,7 +319,7 @@ void Swapchain::EnableDepthStencil( vk::Format depthStencilFormat )
 
     auto memory = mGraphics->AllocateMemory( dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-    mGraphics->BindImageMemory( dsRefCountedImage, memory, 0 );
+    mGraphics->BindImageMemory( dsRefCountedImage, std::move(memory), 0 );
 
     // create the depth stencil ImageView to be used within framebuffer
     auto depthStencilImageView = mGraphics->CreateImageView( dsRefCountedImage );
@@ -331,8 +328,8 @@ void Swapchain::EnableDepthStencil( vk::Format depthStencilFormat )
 
     // A single depth attachment for the swapchain.
     depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
-
   }
+
   // Get images
   auto images = VkAssert( mGraphics->GetDevice().getSwapchainImagesKHR( mSwapchainKHR ) );
 

@@ -242,12 +242,12 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   /**
    * Prepare textures
    */
-  auto textureBindings = Graphics::API::RenderCommand::NewTextureBindings();
   auto samplers        = shader.GetSamplers();
   if(mTextureSet)
   {
     if (!samplers.empty())
     {
+      mTextureBindings.clear();
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
         auto texture = mTextureSet->GetTexture(i);
@@ -280,12 +280,17 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
             .SetTexture(texture->GetGfxObject())
             .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
 
-          textureBindings.emplace_back(binding);
+          mTextureBindings.emplace_back(binding);
         }
+      }
+      if( !mGfxRenderCommand[updateBufferIndex]->GetTextureBindings() )
+      {
+        mGfxRenderCommand[updateBufferIndex]->BindTextures( &mTextureBindings );
       }
     }
   }
-  mGfxRenderCommand[updateBufferIndex]->BindTextures( std::move(textureBindings) );
+
+
 
   // Build render command
   // todo: this may be deferred until all render items are sorted, otherwise
@@ -489,6 +494,15 @@ void Renderer::SetTextures( TextureSet* textureSet )
 
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
+
+  // Rebind textures to make sure old data won't be used
+  for( auto& cmd : mGfxRenderCommand )
+  {
+    if( cmd )
+    {
+      cmd->BindTextures( &mTextureBindings );
+    }
+  }
 
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
                  "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
