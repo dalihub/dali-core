@@ -261,8 +261,15 @@ public:
     bool        scissorTestEnable { false };
     Rect2D      scissor {};
 
+    // dynamic viewport state
     bool        viewportEnable { false };
     Viewport    viewport {};
+
+    // dynamic stencil clear before draw is issued
+    // may have a performance hit
+    // todo: solve it neater
+    bool        clearStencilEnable { false };
+    uint32_t    clearStencilValue  { 0xff };
 
     void*    pNext{ nullptr };
     DrawCommand& SetDrawType( DrawType value )

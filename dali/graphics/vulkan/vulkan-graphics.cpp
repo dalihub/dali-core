@@ -172,7 +172,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
         //"VK_LAYER_LUNARG_parameter_validation", // parameter
-        //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+        // "VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
         //"VK_LAYER_LUNARG_swapchain",           // swapchain
         //"VK_LAYER_GOOGLE_threading",           // threading
@@ -180,7 +180,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_object_tracker",      // objects
         //"VK_LAYER_LUNARG_core_validation",     // core
         //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
-        //"VK_LAYER_LUNARG_standard_validation", // standard
+        "VK_LAYER_LUNARG_standard_validation", // standard
 };
 
 Graphics::Graphics() = default;
@@ -588,10 +588,10 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
 
       if( imageLayout == vk::ImageLayout::eUndefined )
       {
-        imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        imageLayout = vk::ImageLayout::eGeneral;// DSA vk::ImageLayout::eDepthStencilAttachmentOptimal;
       }
 
-      assert( imageLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal );
+      //assert( imageLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal );
 
       depthAttachmentReference.setLayout( imageLayout );
       depthAttachmentReference.setAttachment( U32( colorAttachmentReferences.size() ) );
@@ -802,6 +802,7 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
     case vk::ImageLayout::eColorAttachmentOptimal:
       barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
       break;
+    case vk::ImageLayout::eGeneral:
     case vk::ImageLayout::eDepthStencilAttachmentOptimal:
       barrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
       break;
@@ -830,6 +831,7 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
     case vk::ImageLayout::eColorAttachmentOptimal:
       barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
       break;
+    case vk::ImageLayout::eGeneral:
     case vk::ImageLayout::eDepthStencilAttachmentOptimal:
       barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
       break;
@@ -1027,7 +1029,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
             .setImageType( vk::ImageType::e2D )
             .setArrayLayers( 1 )
             .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
-            .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
+            .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment|vk::ImageUsageFlagBits::eTransferDst )
             .setSharingMode( vk::SharingMode::eExclusive )
             .setInitialLayout( vk::ImageLayout::eUndefined )
             .setSamples( vk::SampleCountFlagBits::e1 );
@@ -1041,7 +1043,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     // create the depth stencil ImageView to be used within framebuffer
     auto depthStencilImageView = CreateImageView( dsRefCountedImage );
     auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
-                                                       .setStencil( 1 );
+                                                       .setStencil( 255u );
 
     // A single depth attachment for the swapchain.
     depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
@@ -1589,6 +1591,8 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
+
+#if 0
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1597,7 +1601,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
 #else
   info.setEnabledLayerCount(0);
 #endif
-
+#endif
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
 

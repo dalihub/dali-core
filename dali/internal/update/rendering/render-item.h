@@ -80,6 +80,9 @@ struct RenderItem
   int               mDepthIndex;
   bool              mIsOpaque:1;
 
+  mutable uint32_t  mClearStencilValue; //< Used to dynamically clear stencil in the middle of command buffer
+  mutable bool      mClearStencilEnabled:1;
+
 private:
 
   /**

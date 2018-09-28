@@ -49,7 +49,9 @@ RenderItem::RenderItem()
   mRenderer( NULL ),
   mTextureSet( NULL ),
   mDepthIndex( 0 ),
-  mIsOpaque( true )
+  mIsOpaque( true ),
+  mClearStencilValue( 0xff ),
+  mClearStencilEnabled( false )
 {
 }
 
