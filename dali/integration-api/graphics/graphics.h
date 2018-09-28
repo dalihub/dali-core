@@ -149,6 +149,11 @@ public:
    */
   Dali::Graphics::API::Controller& GetController();
 
+  /*
+   * Surface resized
+   */
+  void SurfaceResized( unsigned int width, unsigned int height );
+
   // this function is used only by the standalone test
   template <class T>
   T& GetImplementation() const
