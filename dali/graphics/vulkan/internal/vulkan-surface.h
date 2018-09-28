@@ -68,6 +68,11 @@ public:
    */
   const vk::SurfaceCapabilitiesKHR& GetCapabilities() const;
 
+  /**
+   * Update size of surface
+   */
+  void UpdateSize( unsigned int width, unsigned int height );
+
   bool OnDestroy() override;
 
 private:
