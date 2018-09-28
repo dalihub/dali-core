@@ -129,6 +129,14 @@ void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
   mGraphicsImpl->CollectGarbage();
 }
 
+void Graphics::SurfaceResized( unsigned int width, unsigned int height )
+{
+  mCreateInfo.surfaceWidth = width;
+  mCreateInfo.surfaceHeight = height;
+
+  mGraphicsImpl->SurfaceResized( width, height );
+}
+
 void IncludeThisLibrary()
 {
   // dummy function to create linker dependency

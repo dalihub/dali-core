@@ -113,6 +113,11 @@ struct Controller::Impl
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
+    if ( mGraphics.IsSurfaceResized() )
+    {
+      swapchain->Invalidate();
+    }
+
     // We won't run garbage collection in case there are pending resource transfers.
     swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
 

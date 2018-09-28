@@ -381,6 +381,8 @@ FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
 
   }
 
+  mSurfaceResized = false;
+
   // map surface to FBID
   auto fbid = ++mBaseFBID;
 
@@ -438,6 +440,8 @@ void Graphics::InitialiseController()
 RefCountedSwapchain Graphics::ReplaceSwapchainForSurface( RefCountedSurface surface, RefCountedSwapchain&& oldSwapchain )
 {
   auto surfaceCapabilities = surface->GetCapabilities();
+
+  mSurfaceResized = false;
 
   auto swapchain = CreateSwapchain( surface,
                                     vk::Format::eB8G8R8A8Unorm,
@@ -1267,6 +1271,27 @@ vk::Result Graphics::DeviceWaitIdle()
 {
   return mDevice.waitIdle();
 }
+
+void Graphics::SurfaceResized( unsigned int width, unsigned int height )
+{
+  // Get surface with FBID "0"
+  // At first, check to empty about mSurfaceFBIDMap
+  if ( !mSurfaceFBIDMap.empty() )
+  {
+    auto surface = mSurfaceFBIDMap.begin()->second.surface;
+    if (surface)
+    {
+      auto surfaceCapabilities = surface->GetCapabilities();
+      if ( surfaceCapabilities.currentExtent.width != width
+         || surfaceCapabilities.currentExtent.height != height )
+      {
+        surface->UpdateSize( width, height );
+        mSurfaceResized = true;
+      }
+    }
+  }
+}
+
 // --------------------------------------------------------------------------------------------------------------
 
 // Getters ------------------------------------------------------------------------------------------------------
@@ -1387,6 +1412,11 @@ Dali::Graphics::API::Controller& Graphics::GetController()
   }
 
   return *mGfxController;
+}
+
+bool Graphics::IsSurfaceResized() const
+{
+  return mSurfaceResized;
 }
 
 // --------------------------------------------------------------------------------------------------------------
