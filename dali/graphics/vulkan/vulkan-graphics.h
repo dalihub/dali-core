@@ -241,6 +241,8 @@ public: // Actions
 
   vk::Result DeviceWaitIdle();
 
+  void SurfaceResized( unsigned int width, unsigned int height );
+
 public: // Getters
   RefCountedSurface GetSurface( FBID surfaceId );
 
@@ -275,6 +277,8 @@ public: // Getters
   bool HasDepthEnabled() const;
 
   bool HasStencilEnabled() const;
+
+  bool IsSurfaceResized( RefCountedSurface surface );
 
 public: //Cache management methods
 
@@ -391,6 +395,10 @@ private: // Members
   bool mHasStencil;
 
   vk::PipelineCache mVulkanPipelineCache;
+
+  bool mSurfaceResized;
+  unsigned int mSurfaceWidth;
+  unsigned int mSurfaceHeight;
 };
 
 } // namespace Vulkan
