@@ -114,6 +114,11 @@ struct Controller::Impl
 
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
+    if ( mGraphics.IsSurfaceResized( surface ) )
+    {
+      swapchain->Invalidate();
+    }
+
     swapchain->AcquireNextFramebuffer();
 
     mRenderPasses.clear();

@@ -44,6 +44,12 @@ const vk::SurfaceCapabilitiesKHR& Surface::GetCapabilities() const
   return mCapabilities;
 }
 
+void Surface::UpdateSize( unsigned int width, unsigned int height )
+{
+  mCapabilities.currentExtent.width = width;
+  mCapabilities.currentExtent.height = height;
+}
+
 bool Surface::OnDestroy()
 {
   if( mSurface )
