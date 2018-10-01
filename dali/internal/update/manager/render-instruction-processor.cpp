@@ -160,7 +160,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      bool cull )
 {
   bool inside( true );
-  const Node* node = renderable.mNode;
+  Node* node = renderable.mNode;
 
   if( cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
   {
@@ -202,6 +202,12 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
       Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
     }
+
+     node->SetCulled( updateBufferIndex, false );
+  }
+  else
+  {
+     node->SetCulled( updateBufferIndex, true );
   }
 }
 
