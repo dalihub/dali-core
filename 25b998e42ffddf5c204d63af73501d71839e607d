@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff421978_605a8007",
+        "filename": "dali/graphics/vulkan/internal/vulkan-surface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-01T15:24:35Z",
+      "side": 1,
+      "message": "what do you mean by capabilities?",
+      "range": {
+        "startLine": 72,
+        "startChar": 20,
+        "endLine": 72,
+        "endChar": 32
+      },
+      "revId": "25b998e42ffddf5c204d63af73501d71839e607d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "22c17992_e63e296c",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-01T15:24:35Z",
+      "side": 1,
+      "message": "braces",
+      "revId": "25b998e42ffddf5c204d63af73501d71839e607d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "90ee39b5_ddd2018e",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-01T15:24:35Z",
+      "side": 1,
+      "message": "Actually, do you really even need to check?  Just set it to false.",
+      "revId": "25b998e42ffddf5c204d63af73501d71839e607d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b6c66e3_b4fd6e51",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1415,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-01T15:24:35Z",
+      "side": 1,
+      "message": "Why do we do this calculation every time?\n\nIf this is already set to true, is there any advantage in doing this entire calculation again?\n\nAlso seems a bit dangerous setting this when we\u0027re querying whether a surface has been resized. Ideally this should be a const method and this boolean should be set at the point when the surface resize request is actually made.",
+      "range": {
+        "startLine": 1415,
+        "startChar": 4,
+        "endLine": 1415,
+        "endChar": 19
+      },
+      "revId": "25b998e42ffddf5c204d63af73501d71839e607d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
