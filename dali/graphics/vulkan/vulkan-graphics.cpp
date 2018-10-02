@@ -172,7 +172,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
         //"VK_LAYER_LUNARG_parameter_validation", // parameter
-        //"VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
+        // "VK_LAYER_LUNARG_vktrace",              // vktrace ( requires vktrace connection )
         //"VK_LAYER_LUNARG_monitor",             // monitor
         //"VK_LAYER_LUNARG_swapchain",           // swapchain
         //"VK_LAYER_GOOGLE_threading",           // threading
@@ -1041,7 +1041,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     // create the depth stencil ImageView to be used within framebuffer
     auto depthStencilImageView = CreateImageView( dsRefCountedImage );
     auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
-                                                       .setStencil( 1 );
+                                                       .setStencil( 255u );
 
     // A single depth attachment for the swapchain.
     depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );

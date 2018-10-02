@@ -26,6 +26,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
@@ -141,12 +142,6 @@ struct Controller::Impl
 
     auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
 
-    for( auto& future : mMemoryTransferFutures )
-    {
-      future->Wait();
-      future.reset();
-    }
-
     if( !mRenderPasses.empty() )
     {
       for( auto& renderPassData : mRenderPasses )
@@ -163,6 +158,12 @@ struct Controller::Impl
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
         .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
       primaryCommandBuffer->EndRenderPass();
+    }
+
+    for( auto& future : mMemoryTransferFutures )
+    {
+      future->Wait();
+      future.reset();
     }
 
     mMemoryTransferFutures.clear();

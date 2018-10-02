@@ -228,6 +228,22 @@ public:
   void SetViewport( uint32_t firstViewport, uint32_t viewportCount, const vk::Viewport* pViewports );
 
   /**
+   * Clears depth/stencil values of image
+   * @param image
+   * @param layout
+   * @param depthStencilClearValue
+   * @param ranges
+   */
+  void ClearDepthStencilImage( const RefCountedImage& image,
+                               vk::ImageLayout layout,
+                               vk::ClearDepthStencilValue depthStencilClearValue,
+                               std::vector<vk::ImageSubresourceRange> ranges );
+
+  void ClearDepthStencilImage( const RefCountedImage& image,
+                               vk::ImageLayout layout,
+                               vk::ClearDepthStencilValue depthStencilClearValue,
+                               vk::ImageAspectFlags aspect);
+  /**
    * Implements VkManaged::OnDestroy
    * @return
    */

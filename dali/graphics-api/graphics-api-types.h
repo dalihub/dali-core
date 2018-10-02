@@ -395,6 +395,62 @@ struct ViewportState
 };
 
 /**
+ * Describes stencil operation state
+ */
+struct StencilOpState
+{
+  StencilOp failOp        {};
+  StencilOp passOp        {};
+  StencilOp depthFailOp   {};
+  CompareOp compareOp     {};
+  uint32_t  compareMask   { 0u };
+  uint32_t  writeMask     { 0u };
+  uint32_t  reference     { 0u };
+
+  StencilOpState& SetFailOp( StencilOp value )
+  {
+    failOp = value;
+    return *this;
+  }
+
+  StencilOpState& SetPassOp( StencilOp value )
+  {
+    failOp = value;
+    return *this;
+  }
+
+  StencilOpState& SetDepthFailOp( StencilOp value )
+  {
+    failOp = value;
+    return *this;
+  }
+
+  StencilOpState& SetCompareOp( CompareOp value )
+  {
+    compareOp = value;
+    return *this;
+  }
+
+  StencilOpState& SetCompareMask( uint32_t value )
+  {
+    compareMask = value;
+    return *this;
+  }
+
+  StencilOpState& SetWriteMask( uint32_t value )
+  {
+    writeMask = value;
+    return *this;
+  }
+
+  StencilOpState& SetReference( uint32_t value )
+  {
+    reference = value;
+    return *this;
+  }
+};
+
+/**
  * Describes pipeline's viewport and scissor state
  */
 struct DepthStencilState
@@ -402,10 +458,10 @@ struct DepthStencilState
   bool      depthTestEnable   { false };
   bool      depthWriteEnable  { false };
   CompareOp depthCompareOp    {};
+
   bool      stencilTestEnable { false };
-
-
-  Extension   extension       { nullptr };
+  StencilOpState front {};
+  StencilOpState back {};
 
   DepthStencilState& SetDepthTestEnable( bool value )
   {
@@ -425,6 +481,23 @@ struct DepthStencilState
     return *this;
   }
 
+  DepthStencilState& SetFront( StencilOpState value)
+  {
+    front = value;
+    return *this;
+  }
+
+  DepthStencilState& SetBack( StencilOpState value)
+  {
+    back = value;
+    return *this;
+  }
+
+  DepthStencilState& SetStencilTestEnable( bool value)
+  {
+    stencilTestEnable = value;
+    return *this;
+  }
 };
 
 /**

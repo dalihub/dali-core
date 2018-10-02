@@ -324,7 +324,7 @@ void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
     // create the depth stencil ImageView to be used within framebuffer
     auto depthStencilImageView = mGraphics->CreateImageView( dsRefCountedImage );
     auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
-                                                       .setStencil( 1 );
+                                                       .setStencil( 255u );
 
     // A single depth attachment for the swapchain.
     depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
