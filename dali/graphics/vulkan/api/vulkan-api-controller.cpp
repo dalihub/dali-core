@@ -26,6 +26,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
+#include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
@@ -141,12 +142,6 @@ struct Controller::Impl
 
     auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
 
-    for( auto& future : mMemoryTransferFutures )
-    {
-      future->Wait();
-      future.reset();
-    }
-
     if( !mRenderPasses.empty() )
     {
       for( auto& renderPassData : mRenderPasses )
@@ -163,6 +158,12 @@ struct Controller::Impl
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
         .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
       primaryCommandBuffer->EndRenderPass();
+    }
+
+    for( auto& future : mMemoryTransferFutures )
+    {
+      future->Wait();
+      future.reset();
     }
 
     mMemoryTransferFutures.clear();
@@ -294,7 +295,7 @@ struct Controller::Impl
 
   void ProcessResourceTransferRequests( bool immediateOnly = false )
   {
-    std::lock_guard<std::mutex> lock(mResourceTransferMutex);
+    std::lock_guard<std::recursive_mutex> lock(mResourceTransferMutex);
     if(!mResourceTransferRequests.empty())
     {
       // for images we need to generate all the barriers to make sure the layouts
@@ -566,7 +567,7 @@ struct Controller::Impl
   std::deque<DescriptorInfo> mDescriptorInfoStack;
 
   std::mutex mDescriptorWriteMutex{};
-  std::mutex mResourceTransferMutex{};
+  std::recursive_mutex mResourceTransferMutex{};
   bool mHasDepthEnabled;
 };
 
@@ -731,7 +732,7 @@ void Controller::ScheduleBufferMemoryTransfer( std::unique_ptr< VulkanAPI::Buffe
 
 void Controller::ScheduleResourceTransfer( VulkanAPI::ResourceTransferRequest&& transferRequest )
 {
-  std::lock_guard<std::mutex> lock(mImpl->mResourceTransferMutex);
+  std::lock_guard<std::recursive_mutex> lock(mImpl->mResourceTransferMutex);
   mImpl->mResourceTransferRequests.emplace_back( std::move(transferRequest) );
 
   // if we requested immediate upload then request will be processed instantly with skipping

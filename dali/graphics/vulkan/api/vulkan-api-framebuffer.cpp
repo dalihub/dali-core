@@ -76,7 +76,7 @@ bool Framebuffer::Initialise( const std::vector<FramebufferFactory::ColorAttachm
       auto imageView = texture->GetImageViewRef();
 
       // @todo Get a clear color from API.
-      auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 ).setStencil( 1 );
+      auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 ).setStencil( 255u );
       depthAttachmentObject = Vulkan::FramebufferAttachment::NewDepthAttachment( imageView, depthClearValue );
     }
   }

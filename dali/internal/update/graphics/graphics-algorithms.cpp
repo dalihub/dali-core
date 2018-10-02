@@ -109,6 +109,38 @@ constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blend
   return Graphics::API::BlendOp{};
 }
 
+constexpr Graphics::API::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
+{
+  switch( stencilOp )
+  {
+    case StencilOperation::ZERO: return Graphics::API::StencilOp::ZERO;
+    case StencilOperation::DECREMENT: return Graphics::API::StencilOp::DECREMENT_AND_CLAMP;
+    case StencilOperation::DECREMENT_WRAP: return Graphics::API::StencilOp::DECREMENT_AND_WRAP;
+    case StencilOperation::INCREMENT: return Graphics::API::StencilOp::INCREMENT_AND_CLAMP;
+    case StencilOperation::INCREMENT_WRAP: return Graphics::API::StencilOp::INCREMENT_AND_WRAP;
+    case StencilOperation::INVERT: return Graphics::API::StencilOp::INVERT;
+    case StencilOperation::KEEP: return Graphics::API::StencilOp::KEEP;
+    case StencilOperation::REPLACE: return Graphics::API::StencilOp::REPLACE;
+  }
+  return {};
+}
+
+constexpr Graphics::API::CompareOp ConvertStencilFunc( StencilFunction::Type stencilFunc )
+{
+  switch( stencilFunc )
+  {
+    case StencilFunction::NEVER: return Graphics::API::CompareOp::NEVER;
+    case StencilFunction::LESS: return Graphics::API::CompareOp::LESS;
+    case StencilFunction::EQUAL: return Graphics::API::CompareOp::EQUAL;
+    case StencilFunction::LESS_EQUAL: return Graphics::API::CompareOp::LESS_OR_EQUAL;
+    case StencilFunction::GREATER: return Graphics::API::CompareOp::GREATER;
+    case StencilFunction::NOT_EQUAL: return Graphics::API::CompareOp::NOT_EQUAL;
+    case StencilFunction::GREATER_EQUAL: return Graphics::API::CompareOp::GREATER_OR_EQUAL;
+    case StencilFunction::ALWAYS: return Graphics::API::CompareOp::ALWAYS;
+  }
+  return {};
+}
+
 }
 
 ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
@@ -183,6 +215,200 @@ bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item)
 
   return ( mScissorStack.size() > 0u );
 }
+
+bool GraphicsAlgorithms::SetupStencilClipping( const RenderItem& item, uint32_t& lastClippingDepth, uint32_t& lastClippingId )
+{
+  const Dali::Internal::SceneGraph::Node* node = item.mNode;
+  const uint32_t clippingId = node->GetClippingId();
+  // If there is no clipping Id, then either we haven't reached a clipping Node yet, or there aren't any.
+  // Either way we can skip clipping setup for this renderer.
+  if( clippingId == 0u )
+  {
+    mCurrentStencilState = {};
+    mCurrentStencilState.stencilTestEnable = false;
+    // Exit immediately if there are no clipping actions to perform (EG. we have not yet hit a clipping node).
+    return false;
+  }
+
+  mCurrentStencilState.stencilTestEnable = true;
+
+  const uint32_t clippingDepth = node->GetClippingDepth();
+
+  // Pre-calculate a mask which has all bits set up to and including the current clipping depth.
+  // EG. If depth is 3, the mask would be "111" in binary.
+  const uint32_t currentDepthMask = ( 1u << clippingDepth ) - 1u;
+
+  //@todo clear support between draw calls
+  //item.mClearStencilEnabled = false;
+
+  // Are we are writing to the stencil buffer?
+  if( item.mNode->GetClippingMode() == Dali::ClippingMode::CLIP_CHILDREN )
+  {
+    // We are writing to the stencil buffer.
+    // If clipping Id is 1, this is the first clipping renderer within this render-list.
+    if( clippingId == 1u )
+    {
+      // We are enabling the stencil-buffer for the first time within this render list.
+      // Clear the buffer at this point.
+      mCurrentStencilState.front.writeMask = 0xff;
+      mCurrentStencilState.back.writeMask = 0xff;
+
+      // tell render item to clear stencil with specified mask
+      // using clear command
+      //@todo clear support between draw calls
+      //item.mClearStencilValue = 0xff;
+      //item.mClearStencilEnabled = true;
+    }
+    else if( ( clippingDepth < lastClippingDepth ) ||
+             ( ( clippingDepth == lastClippingDepth ) && ( clippingId > lastClippingId ) ) )
+    {
+      // The above if() statement tests if we need to clear some (not all) stencil bit-planes.
+      // We need to do this if either of the following are true:
+      //   1) We traverse up the scene-graph to a previous stencil depth
+      //   2) We are at the same stencil depth but the clipping Id has increased.
+      //
+      // This calculation takes the new depth to move to, and creates an inverse-mask of that number of consecutive bits.
+      // This has the effect of clearing everything except the bit-planes up to (and including) our current depth.
+      const uint32_t stencilClearMask = ( currentDepthMask >> 1u ) ^ 0xff;
+
+      mCurrentStencilState.front.writeMask = stencilClearMask;
+      mCurrentStencilState.back.writeMask = stencilClearMask;
+
+      //@todo clear support between draw calls
+      //item.mClearStencilValue = stencilClearMask;
+      //item.mClearStencilEnabled = true;
+    }
+
+    // We keep track of the last clipping Id and depth so we can determine when we are
+    // moving back up the scene graph and require some of the stencil bit-planes to be deleted.
+    lastClippingDepth = clippingDepth;
+    lastClippingId = clippingId;
+
+    // We only ever write to bit-planes up to the current depth as we may need
+    // to erase individual bit-planes and revert to a previous clipping area.
+    // Our reference value for testing (in StencilFunc) is written to to the buffer, but we actually
+    // want to test a different value. IE. All the bit-planes up to but not including the current depth.
+    // So we use the Mask parameter of StencilFunc to mask off the top bit-plane when testing.
+    // Here we create our test mask to innore the top bit of the reference test value.
+    // As the mask is made up of contiguous "1" values, we can do this quickly with a bit-shift.
+    const uint32_t testMask = currentDepthMask >> 1u;
+
+    mCurrentStencilState.front.compareOp = Graphics::API::CompareOp::EQUAL;
+    mCurrentStencilState.front.reference = currentDepthMask;
+    mCurrentStencilState.front.compareMask = testMask;
+
+    mCurrentStencilState.front.failOp = Graphics::API::StencilOp::KEEP;
+    mCurrentStencilState.front.depthFailOp = Graphics::API::StencilOp::REPLACE;
+    mCurrentStencilState.front.passOp = Graphics::API::StencilOp::REPLACE;
+
+    mCurrentStencilState.back = mCurrentStencilState.front;
+  }
+  else
+  {
+    // We are reading from the stencil buffer. Set up the stencil accordingly
+    // This calculation sets all the bits up to the current depth bit.
+    // This has the effect of testing that the pixel being written to exists in every bit-plane up to the current depth.
+
+    mCurrentStencilState.front.compareOp = Graphics::API::CompareOp::EQUAL;
+    mCurrentStencilState.front.reference = currentDepthMask;
+    mCurrentStencilState.front.compareMask = 0xff;
+
+    mCurrentStencilState.front.failOp = Graphics::API::StencilOp::KEEP;
+    mCurrentStencilState.front.depthFailOp = Graphics::API::StencilOp::KEEP;
+    mCurrentStencilState.front.passOp = Graphics::API::StencilOp::KEEP;
+
+    mCurrentStencilState.back = mCurrentStencilState.front;
+  }
+
+  return true;
+}
+
+void GraphicsAlgorithms::SetupClipping( const RenderItem& item,
+                                        bool& usedStencilBuffer,
+                                        uint32_t& lastClippingDepth,
+                                        uint32_t& lastClippingId )
+{
+  RenderMode::Type renderMode = RenderMode::AUTO;
+  const Renderer *renderer = item.mRenderer;
+  if( renderer )
+  {
+    renderMode = renderer->GetStencilParameters().renderMode;
+  }
+
+  // Setup the stencil using either the automatic clipping feature, or, the manual per-renderer stencil API.
+  // Note: This switch is in order of most likely value first.
+  switch( renderMode )
+  {
+    case RenderMode::AUTO:
+    {
+      // Turn the color buffer on as we always want to render this renderer, regardless of clipping hierarchy.
+
+      // The automatic clipping feature will manage the scissor and stencil functions, only if stencil buffer is available for the latter.
+      // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
+      // We process both based on our current and old clipping depths for each mode.
+      // Both methods with return rapidly if there is nothing to be done for that type of clipping.
+      SetupScissorClipping( item );
+
+      //if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
+      {
+        SetupStencilClipping( item, lastClippingDepth, lastClippingId );
+      }
+      break;
+    }
+    case RenderMode::NONE:
+    case RenderMode::COLOR:
+    {
+#if 0
+      // No clipping is performed for these modes.
+      // Note: We do not turn off scissor clipping as it may be used for the whole layer.
+      // The stencil buffer will not be used at all, but we only need to disable it if it's available.
+      if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
+      {
+        context.EnableStencilBuffer( false );
+      }
+
+      // Setup the color buffer based on the RenderMode.
+      context.ColorMask( renderMode == RenderMode::COLOR );
+#endif
+      break;
+    }
+
+    case RenderMode::STENCIL:
+    case RenderMode::COLOR_STENCIL:
+    {
+#if 0
+      if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
+      {
+        // We are using the low-level Renderer Stencil API.
+        // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
+        // Note: As the command state is cached, it is only sent when needed.
+        context.EnableStencilBuffer( true );
+
+        // Setup the color buffer based on the RenderMode.
+        context.ColorMask( renderMode == RenderMode::COLOR_STENCIL );
+
+        // If this is the first use of the stencil buffer within this RenderList, clear it (this avoids unnecessary clears).
+        if( !usedStencilBuffer )
+        {
+          context.Clear( GL_STENCIL_BUFFER_BIT, Context::CHECK_CACHED_VALUES );
+          usedStencilBuffer = true;
+        }
+
+        // Setup the stencil buffer based on the renderers properties.
+        context.StencilFunc( DaliStencilFunctionToGL[ renderer->GetStencilFunction() ],
+                             renderer->GetStencilFunctionReference(),
+                             renderer->GetStencilFunctionMask() );
+        context.StencilOp( DaliStencilOperationToGL[ renderer->GetStencilOperationOnFail() ],
+                           DaliStencilOperationToGL[ renderer->GetStencilOperationOnZFail() ],
+                           DaliStencilOperationToGL[ renderer->GetStencilOperationOnZPass() ] );
+        context.StencilMask( renderer->GetStencilMask() );
+      }
+#endif
+      break;
+    }
+  }
+}
+
 
 bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState )
 {
@@ -485,6 +711,17 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   depthStencilState.SetDepthTestEnable( enableDepthTest );
   depthStencilState.SetDepthWriteEnable( enableDepthWrite );
 
+  // Stencil setup
+  bool stencilEnabled = mCurrentStencilState.stencilTestEnable;
+
+  if( stencilEnabled)
+  {
+    depthStencilState
+      .SetStencilTestEnable( mCurrentStencilState.stencilTestEnable )
+      .SetFront( mCurrentStencilState.front )
+      .SetBack( mCurrentStencilState.back );
+  }
+
   /**
    * 2. BLENDING
    */
@@ -645,14 +882,24 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
     for (auto renderListIndex = 0u; renderListIndex < ri.RenderListCount(); ++renderListIndex)
     {
       const auto *renderList = ri.GetRenderList(renderListIndex);
+
+      // Reset scissor stack
       mScissorStack.clear();
       mScissorStack.push_back( ri.mViewport );
+
+      // Reset stencil state
+      mCurrentStencilState = {};
+
+      uint32_t lastClippingDepth( 0u );
+      uint32_t lastClippingId( 0u );
+      bool usedStencilBuffer( false );
+
       for (auto renderItemIndex = 0u; renderItemIndex < renderList->Count(); ++renderItemIndex)
       {
         auto &item = renderList->GetItem(renderItemIndex);
 
         // setup clipping for item
-        SetupScissorClipping( item );
+        SetupClipping( item, usedStencilBuffer, lastClippingDepth, lastClippingId );
 
         if( item.mRenderer )
         {
