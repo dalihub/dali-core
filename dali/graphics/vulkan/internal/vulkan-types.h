@@ -31,6 +31,12 @@ namespace Dali
 namespace Graphics
 {
 
+namespace
+{
+// Default value use to clear the stencil buffer
+constexpr auto STENCIL_DEFAULT_CLEAR_VALUE = 255u;
+}
+
 template< typename T, typename... Args >
 std::unique_ptr< T > MakeUnique( Args&& ... args )
 {

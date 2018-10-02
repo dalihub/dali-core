@@ -62,6 +62,14 @@ private:
 
   bool SetupScissorClipping( const RenderItem& item );
 
+  bool SetupStencilClipping( const RenderItem& item, uint32_t& lastClippingDepth, uint32_t& lastClippingId );
+
+  void SetupClipping( const RenderItem& item,
+                            bool& usedStencilBuffer,
+                            uint32_t& lastClippingDepth,
+                            uint32_t& lastClippingId );
+
+
   bool SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState );
 
   void SubmitRenderItemList( Graphics::API::Controller&           graphics,
@@ -97,6 +105,8 @@ private:
   uint32_t mUniformBlockMaxSize;
   uint32_t mUboOffset { 0u };
   uint32_t mCurrentFrameIndex { 0u };
+
+  Dali::Graphics::API::DepthStencilState mCurrentStencilState{};
 };
 } // namespace SceneGraph
 } // namespace Internal
