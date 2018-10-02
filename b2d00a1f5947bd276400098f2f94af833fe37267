@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a055259_97cd4340",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1277,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-02T14:00:49Z",
+      "side": 1,
+      "message": "Is there a possibility that this is set to true and we call this API again and set it to false accidentally?\n\nMy point being, I don\u0027t think you should set it back to false here.",
+      "revId": "b2d00a1f5947bd276400098f2f94af833fe37267",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03e88e58_fa668351",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1285,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-02T14:00:49Z",
+      "side": 1,
+      "message": "I don\u0027t think you need to put this statement on 3 lines.",
+      "revId": "b2d00a1f5947bd276400098f2f94af833fe37267",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5e45d760_32bad941",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-02T14:00:49Z",
+      "side": 1,
+      "message": "You need to initialise this to false like on line 391.\n\nmHasDepth and mHasStencil should also be intialized in the same way but I think Adam is pushing a patch for that.",
+      "revId": "b2d00a1f5947bd276400098f2f94af833fe37267",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
