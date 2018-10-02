@@ -427,10 +427,11 @@ void GraphicsAlgorithms::SetupClipping( const RenderItem& item,
 
 bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState )
 {
-  // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
+  // The scissor test is enabled if we have more than one child (the first entry is always the viewport)
+  // on the stack, or the stack is empty and there is a layer clipping box.
   // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
 
-  auto scissorEnabled = ( mScissorStack.size() > 0u );// || mHasLayerScissor;
+  auto scissorEnabled = ( mScissorStack.size() > 1u );// || mHasLayerScissor;
   // If scissor is enabled, we use the calculated screen-space coordinates (now in the stack).
   if( scissorEnabled )
   {
@@ -476,7 +477,8 @@ void GraphicsAlgorithms::SubmitRenderItemList(
       continue;
     }
 
-    auto &cmd = renderer->GetGfxRenderCommand( bufferIndex );
+    auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
+    auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
 
     auto color = item.mNode->GetWorldColor( bufferIndex );
 
@@ -512,7 +514,7 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     if( ubo && shader )
     {
       std::vector<Graphics::API::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
-      if( renderer->UpdateUniformBuffers( *ubo, bindings, mUboOffset, bufferIndex ) )
+      if( renderer->UpdateUniformBuffers( instruction, *ubo, bindings, mUboOffset, bufferIndex ) )
       {
         cmd.BindUniformBuffers( bindings );
       }
@@ -609,6 +611,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   VertexInputState vi{};
 
   auto *renderer = item.mRenderer;
+  auto &renderCmd = renderer->GetRenderCommand( &instruction, bufferIndex );
+  auto &cmd = renderCmd.GetGfxRenderCommand( bufferIndex );
   auto *geometry = renderer->GetGeometry();
   auto gfxShader = renderer->GetShader().GetGfxObject();
 
@@ -765,7 +769,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   ViewportState viewportState{};
 
   // Set viewport only when not using dynamic viewport state
-  if( !renderer->GetGfxRenderCommand( bufferIndex ).GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
+  if( !cmd.GetDrawCommand().viewportEnable && instruction.mIsViewportSet )
   {
     // scissor test only when we have viewport
     viewportState.SetViewport({ float(instruction.mViewport.x), float(instruction.mViewport.y),
@@ -792,13 +796,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
 
   if( SetupPipelineViewportState( viewportState) )
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissor( viewportState.scissor );
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( true );
+    cmd.mDrawCommand.SetScissor( viewportState.scissor );
+    cmd.mDrawCommand.SetScissorTestEnable( true );
     dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
   }
   else
   {
-    renderer->GetGfxRenderCommand( bufferIndex ).mDrawCommand.SetScissorTestEnable( false );
+    cmd.mDrawCommand.SetScissorTestEnable( false );
   }
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
@@ -837,9 +841,8 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   }
 
   // create pipeline
-  auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
-
-            .SetOldPipeline( renderer->ReleaseGraphicsPipeline( bufferIndex ) ) // set old pipeline
+  auto pipeline = controller.CreatePipeline( controller.GetPipelineFactory()
+            .SetOldPipeline( renderer->ReleaseGraphicsPipeline( bufferIndex, &instruction) ) // set old pipeline
 
             // vertex input
             .SetVertexInputState(vi)
@@ -878,7 +881,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
 
 
   // bind pipeline to the render command
-  renderer->BindPipeline( std::move(pipeline), bufferIndex );
+  renderer->BindPipeline( std::move(pipeline), bufferIndex, &instruction );
   return true;
 }
 

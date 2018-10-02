@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h> // for Color::BLACK
 #include <dali/internal/update/rendering/render-tracker.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -46,7 +47,19 @@ RenderInstruction::RenderInstruction()
 }
 
 RenderInstruction::~RenderInstruction()
-{ // pointer container releases the renderlists
+{
+  // Ensure renderers remove this from the list of owned render commands
+  for( auto renderList : mRenderLists )
+  {
+    const auto renderItemCount = renderList->Count();
+    for( auto renderItemIndex=0u; renderItemIndex < renderItemCount; ++renderItemIndex )
+    {
+      auto& renderItem = renderList->GetItem( renderItemIndex );
+      renderItem.mRenderer->FreeRenderCommand( this );
+    }
+  }
+
+  // pointer container releases the renderlists
 }
 
 RenderList& RenderInstruction::GetNextFreeRenderList( size_t capacityRequired )

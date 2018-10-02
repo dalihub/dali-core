@@ -22,6 +22,7 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/rendering/data-providers/node-data-provider.h>
+#include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-shader.h>
@@ -137,7 +138,8 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mPremultipledAlphaEnabled( false ),
-  mGfxRenderCommand(),
+  mRenderCommands{},
+  mTextureBindings{},
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
@@ -213,14 +215,22 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
   }
 }
 
-void Renderer::PrepareRender( BufferIndex updateBufferIndex )
+void Renderer::FreeRenderCommand( RenderInstruction* renderInstruction )
+{
+  mRenderCommands.DestroyRenderCommand( renderInstruction );
+}
+
+RenderCommand& Renderer::GetRenderCommand( RenderInstruction* renderInstruction,
+                                           BufferIndex updateBufferIndex )
+{
+  return mRenderCommands.GetRenderCommand( renderInstruction, updateBufferIndex );
+}
+
+void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
 {
   auto &controller = mGraphics->GetController();
-
-  if (!mGfxRenderCommand[updateBufferIndex])
-  {
-    mGfxRenderCommand[updateBufferIndex] = controller.AllocateRenderCommand();
-  }
+  auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, controller, updateBufferIndex );
+  auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
 
   if (!mShader->GetGfxObject())
   {
@@ -283,13 +293,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
           mTextureBindings.emplace_back(binding);
         }
       }
-      if( !mGfxRenderCommand[updateBufferIndex]->GetTextureBindings() )
-      {
-        mGfxRenderCommand[updateBufferIndex]->BindTextures( &mTextureBindings );
-      }
+      renderCmd.BindTextures( mTextureBindings, updateBufferIndex );
     }
   }
-
 
 
   // Build render command
@@ -302,17 +308,17 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   bool usesIndexBuffer{false};
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
-    mGfxRenderCommand[updateBufferIndex]->BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
-                                         .SetBuffer(mGeometry->GetIndexBuffer())
-                                         .SetOffset(0)
+    cmd.BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
+                        .SetBuffer(mGeometry->GetIndexBuffer())
+                        .SetOffset(0)
     );
   }
 
-  mGfxRenderCommand[updateBufferIndex]->BindVertexBuffers(std::move(vertexBuffers) );
+  cmd.BindVertexBuffers(std::move(vertexBuffers) );
 
   if(usesIndexBuffer)
   {
-    mGfxRenderCommand[updateBufferIndex]->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    cmd.Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
                                         .SetDrawType( Graphics::API::RenderCommand::DrawType::INDEXED_DRAW )
                                         .SetFirstInstance( 0u )
@@ -324,7 +330,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
   else
   {
-    mGfxRenderCommand[updateBufferIndex]->Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    cmd.Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
                                         .SetFirstVertex(0u)
                                         .SetDrawType(Graphics::API::RenderCommand::DrawType::VERTEX_DRAW)
                                         .SetFirstInstance(0u)
@@ -348,7 +354,8 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::AP
   }
 }
 
-bool Renderer::UpdateUniformBuffers( GraphicsBuffer& ubo,
+bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
+                                     GraphicsBuffer& ubo,
                                      std::vector<Graphics::API::RenderCommand::UniformBufferBinding>*& outBindings,
                                      uint32_t& offset,
                                      BufferIndex updateBufferIndex )
@@ -358,7 +365,15 @@ bool Renderer::UpdateUniformBuffers( GraphicsBuffer& ubo,
   auto uboCount = mShader->GetGfxObject()->GetUniformBlockCount();
   auto gfxShader = mShader->GetGfxObject();
 
-  auto& currentUboBindings = mUboBindings[updateBufferIndex];
+  RenderCommand* renderCommand;
+  if( !mRenderCommands.Find( &instruction, renderCommand ) )
+  {
+    DALI_ASSERT_DEBUG( 0 && "Can't find render command for this instruction" );
+    return false;
+  }
+
+  auto& currentUboBindings = renderCommand->mUboBindings[updateBufferIndex];
+
 
   if(currentUboBindings.size() != uboCount )
   {
@@ -502,13 +517,7 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet->AddObserver( this );
 
   // Rebind textures to make sure old data won't be used
-  for( auto& cmd : mGfxRenderCommand )
-  {
-    if( cmd )
-    {
-      cmd->BindTextures( &mTextureBindings );
-    }
-  }
+  mRenderCommands.BindTextures( mTextureBindings );
 
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
                  "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
@@ -527,8 +536,7 @@ void Renderer::SetShader( Shader* shader )
 
   mShader = shader;
   mShader->AddConnectionObserver( *this );
-  mUboBindings[0].clear();
-  mUboBindings[1].clear();
+  mRenderCommands.ClearUniformBindings();
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 

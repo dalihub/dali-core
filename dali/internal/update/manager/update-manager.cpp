@@ -743,10 +743,29 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 
 void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
 {
-  auto rendererCount = mImpl->renderers.Count();
-  for( auto i = 0u; i < rendererCount; ++i )
+  // Prepare renderers. Each render item maps to a render
+  // command. There may be more than one render item per renderer if
+  // the actor containing the renderer is in more than one render
+  // task. The renderer owns the render commands.
+
+  const auto renderInstructionCount = mImpl->renderInstructions.Count( bufferIndex );
+  for( auto i=0u; i < renderInstructionCount; ++i )
   {
-    mImpl->renderers[i]->PrepareRender( bufferIndex );
+    auto& renderInstruction = mImpl->renderInstructions.At( bufferIndex, i);
+    const auto renderListCount = renderInstruction.RenderListCount();
+    for( auto j=0u; j < renderListCount; ++j )
+    {
+      auto renderList = renderInstruction.GetRenderList( j );
+      const auto renderItemCount = renderList->Count();
+      for( auto k=0u; k < renderItemCount; ++k )
+      {
+        auto& renderItem = renderList->GetItem( k );
+        if( renderItem.mRenderer )
+        {
+          renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
+        }
+      }
+    }
   }
 }
 

@@ -28,6 +28,7 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
+#include <dali/internal/update/rendering/render-command-container.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
@@ -47,12 +48,11 @@ class SceneController;
 class TextureSet;
 class Shader;
 class GraphicsBuffer;
-
+class RenderInstruction;
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
 typedef RendererContainer::Iterator RendererIter;
 typedef RendererContainer::ConstIterator RendererConstIter;
-
 
 class Renderer : public PropertyOwner,
                  public UniformMap::Observer,
@@ -354,13 +354,22 @@ public:
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] renderInstruction The render instruction for this render command
    */
-  void PrepareRender( BufferIndex updateBufferIndex );
+  void PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
 
-  Graphics::API::RenderCommand& GetGfxRenderCommand( BufferIndex updateBufferIndex )
-  {
-    return *mGfxRenderCommand[updateBufferIndex].get();
-  }
+  /**
+   * Frees all the render commands and associated data for the given render instruction
+   * @param[in] renderInstruction The render instruction for this render command
+   */
+  void FreeRenderCommand( RenderInstruction* renderInstruction );
+
+  /**
+   * Gets the render command associated with the render instruction
+   * @param[in] renderInstruction The render instruction for this render command
+   * @param[in] updateBufferIndex The current update buffer index.
+   */
+  RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
 
   template<class T>
   void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
@@ -398,7 +407,8 @@ public:
    * @param[in] updateBufferIndex update buffer index
    * @return true whether uniform buffer has been updated
    */
-  bool UpdateUniformBuffers( GraphicsBuffer& ubo,
+  bool UpdateUniformBuffers( RenderInstruction& instruction,
+                             GraphicsBuffer& ubo,
                              std::vector<Graphics::API::RenderCommand::UniformBufferBinding>*& outBindings,
                              uint32_t& offset,
                              BufferIndex updateBufferIndex );
@@ -413,15 +423,14 @@ public:
    */
   void TextureSetDeleted();
 
-  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex )
+  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
   {
-    mGfxPipeline[updateBufferIndex] = std::move(pipeline);
-    mGfxRenderCommand[updateBufferIndex]->BindPipeline( mGfxPipeline[updateBufferIndex].get() );
+    GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline), updateBufferIndex );
   }
 
-  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
+  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
   {
-    return std::move(mGfxPipeline[updateBufferIndex]);
+    return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
   }
 
 public: // Implementation of ConnectionChangePropagator
@@ -501,12 +510,8 @@ private:
 
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-
-  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
-
-  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
-  std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings[ MAX_GRAPHICS_DATA_BUFFER_COUNT ]; /// shouldn't be here but we need to store it!
-  std::vector<Graphics::API::RenderCommand::TextureBinding> mTextureBindings{};
+  RenderCommandContainer       mRenderCommands;
+  std::vector<Graphics::API::RenderCommand::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
