@@ -34,6 +34,11 @@ void UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
   mImpl.SetPosition( id, position );
 }
 
+void UpdateProxy::BakePosition( unsigned int id, const Vector3& position )
+{
+  mImpl.BakePosition( id, position );
+}
+
 const Vector3& UpdateProxy::GetSize( unsigned int id ) const
 {
   return mImpl.GetSize( id );
@@ -44,34 +49,44 @@ void UpdateProxy::SetSize( unsigned int id, const Vector3& size )
   mImpl.SetSize( id, size );
 }
 
+void UpdateProxy::BakeSize( unsigned int id, const Vector3& size )
+{
+  mImpl.BakeSize( id, size );
+}
+
 void UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
 {
   mImpl.GetPositionAndSize( id, position, size );
 }
 
-Vector4 UpdateProxy::GetWorldColor( unsigned int id ) const
+Vector3 UpdateProxy::GetScale( unsigned int id ) const
 {
-  return mImpl.GetWorldColor( id );
+  return mImpl.GetScale( id );
 }
 
-void UpdateProxy::SetWorldColor( unsigned int id, const Vector4& color ) const
+void UpdateProxy::SetScale( unsigned int id, const Vector3& scale )
 {
-  mImpl.SetWorldColor( id, color );
+  mImpl.SetScale( id, scale );
 }
 
-void UpdateProxy::GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const
+void UpdateProxy::BakeScale( unsigned int id, const Vector3& scale )
 {
-  mImpl.GetWorldMatrixAndSize( id, worldMatrix, size );
+  mImpl.BakeScale( id, scale );
 }
 
-const Matrix& UpdateProxy::GetWorldMatrix( unsigned int id ) const
+Vector4 UpdateProxy::GetColor( unsigned int id ) const
 {
-  return mImpl.GetWorldMatrix( id );
+  return mImpl.GetColor( id );
 }
 
-void UpdateProxy::SetWorldMatrix( unsigned int id, const Matrix& worldMatrix )
+void UpdateProxy::SetColor( unsigned int id, const Vector4& color ) const
 {
-  mImpl.SetWorldMatrix( id, worldMatrix );
+  mImpl.SetColor( id, color );
+}
+
+void UpdateProxy::BakeColor( unsigned int id, const Vector4& color ) const
+{
+  mImpl.BakeColor( id, color );
 }
 
 UpdateProxy::UpdateProxy( Internal::UpdateProxy& impl )
