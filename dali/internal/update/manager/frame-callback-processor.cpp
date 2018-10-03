@@ -60,7 +60,8 @@ private:
 FrameCallbackProcessor::FrameCallbackProcessor( TransformManager& transformManager, Node& rootNode )
 : mFrameCallbacks(),
   mTransformManager( transformManager ),
-  mRootNode( rootNode )
+  mRootNode( rootNode ),
+  mNodeHierarchyChanged( true )
 {
 }
 
@@ -105,9 +106,16 @@ void FrameCallbackProcessor::Update( BufferIndex bufferIndex, float elapsedSecon
   {
     UpdateProxy& updateProxyImpl = *iter.updateProxyImpl;
     updateProxyImpl.SetCurrentBufferIndex( bufferIndex );
+
+    if( mNodeHierarchyChanged )
+    {
+      updateProxyImpl.NodeHierarchyChanged();
+    }
+
     Dali::UpdateProxy updateProxy( updateProxyImpl );
     iter.frameCallback->Update( updateProxy, elapsedSeconds );
   }
+  mNodeHierarchyChanged = false;
 }
 
 void FrameCallbackProcessor::PropertyOwnerDestroyed( PropertyOwner& owner )

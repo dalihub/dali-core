@@ -83,6 +83,14 @@ public:
    */
   void Update( BufferIndex bufferIndex, float elapsedSeconds );
 
+  /**
+   * Called by the UpdateManager when the node hierarchy changes.
+   */
+  void NodeHierarchyChanged()
+  {
+    mNodeHierarchyChanged = true;
+  }
+
 private:
 
   // From PropertyOwner::Observer
@@ -116,6 +124,8 @@ private:
 
   TransformManager& mTransformManager;
   Node& mRootNode;
+
+  bool mNodeHierarchyChanged;
 };
 
 } // namespace SceneGraph

@@ -408,6 +408,12 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
 
   parent->ConnectChild( node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DisconnectNode( Node* node )
@@ -417,6 +423,12 @@ void UpdateManager::DisconnectNode( Node* node )
   parent->SetDirtyFlag( ChildDeletedFlag ); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild( mSceneGraphBuffers.GetUpdateBufferIndex(), *node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DestroyNode( Node* node )
@@ -892,14 +904,14 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
 
-    //Update the transformations of all the nodes
-    mImpl->transformManager.Update();
-
     // Call the frame-callback-processor if set
     if( mImpl->frameCallbackProcessor )
     {
       mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
     }
+
+    //Update the transformations of all the nodes
+    mImpl->transformManager.Update();
 
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
