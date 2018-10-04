@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ Layer& Layer::operator=(const Layer& rhs)
   return *this;
 }
 
-unsigned int Layer::GetDepth() const
+uint32_t Layer::GetDepth() const
 {
   return GetImplementation(*this).GetDepth();
 }
@@ -123,7 +123,7 @@ bool Layer::IsClipping() const
   return GetImplementation(*this).IsClipping();
 }
 
-void Layer::SetClippingBox(int x, int y, int width, int height)
+void Layer::SetClippingBox(int32_t x, int32_t y, int32_t width, int32_t height)
 {
   GetImplementation(*this).SetClippingBox(x, y, width, height);
 }

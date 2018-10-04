@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -112,7 +115,7 @@ struct DALI_CORE_API Gesture
   /**
    * @brief The time the gesture took place.
    */
-  unsigned int time;
+  uint32_t time;
 
 protected: // Creation
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,7 @@ void VectorBase::Release()
   {
     // adjust pointer to real beginning
     SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-    // TODO would be nice to memset to a bitpattern to catch illegal use of container after release
-    // but that would require knowledge of the itemsize
+
     delete [] ( metadata - 2u );
     mData = 0u;
   }
@@ -75,7 +74,7 @@ void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
   if( capacity > oldCapacity )
   {
     const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-    void* wholeData = reinterpret_cast< void* >( new unsigned char[ wholeAllocation ] );
+    void* wholeData = reinterpret_cast< void* >( new uint8_t[ wholeAllocation ] );
     DALI_ASSERT_ALWAYS( wholeData && "VectorBase::Reserve - Memory allocation failed" );
 
 #if defined( DEBUG_ENABLED )

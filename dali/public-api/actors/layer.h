@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
@@ -43,7 +46,7 @@ class Layer;
  * @SINCE_1_0.0
  * @see Dali::Layer::SetClippingBox()
  */
-typedef Rect<int> ClippingBox;
+typedef Rect<int32_t> ClippingBox;
 
 /**
  * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.
@@ -101,7 +104,7 @@ public:
     enum
     {
       CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clippingEnable",   type bool @SINCE_1_0.0
-      CLIPPING_BOX,                                                 ///< name "clippingBox",      type Rect<int> @SINCE_1_0.0
+      CLIPPING_BOX,                                                 ///< name "clippingBox",      type Rect<int32_t> @SINCE_1_0.0
       BEHAVIOR,                                                     ///< name "behavior",         type String @SINCE_1_0.0
     };
   };
@@ -263,7 +266,7 @@ public:
    * @pre Layer is on the stage.
    * If layer is not added to the stage, returns 0.
    */
-  unsigned int GetDepth() const;
+  uint32_t GetDepth() const;
 
   /**
    * @brief Increments the depth of the layer.
@@ -391,7 +394,7 @@ public:
    * @param[in] width The width of the box
    * @param[in] height The height of the box
    */
-  void SetClippingBox(int x, int y, int width, int height);
+  void SetClippingBox(int32_t x, int32_t y, int32_t width, int32_t height);
 
   /**
    * @brief Sets the clipping box of a layer in window coordinates.

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/touch-point.h>
@@ -82,7 +85,7 @@ struct DALI_CORE_API HoverEvent
    * @SINCE_1_0.0
    * @return Total number of Points
    */
-  unsigned int GetPointCount() const;
+  uint32_t GetPointCount() const;
 
   /**
    * @brief Returns a touch point at the index requested.
@@ -95,7 +98,7 @@ struct DALI_CORE_API HoverEvent
    * @note "point" should be less than the value returned by GetPointCount().
    *       If out of range, then program asserts.
    */
-  const TouchPoint& GetPoint(unsigned int point) const;
+  const TouchPoint& GetPoint( uint32_t point) const;
 };
 
 /**

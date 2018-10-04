@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 #include <algorithm>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -360,7 +361,7 @@ protected: // API for deriving classes
       std::size_t offset = at - reinterpret_cast<char*>( mData );
 
       // need more space
-      Reserve( NextPowerOfTwo( newCount ), elementSize ); // reserve enough space to store at least the next power of two elements of the new required size.
+      Reserve( NextPowerOfTwo( static_cast<uint32_t>( newCount ) ), elementSize ); // reserve enough space to store at least the next power of two elements of the new required size.
 
       // Set the new at pointer.
       at = reinterpret_cast<char*>( mData ) + offset;

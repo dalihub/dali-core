@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,12 @@ Image Image::DownCast( BaseHandle handle )
   return Image( dynamic_cast<Dali::Internal::Image*>(handle.GetObjectPtr()) );
 }
 
-unsigned int Image::GetWidth() const
+uint32_t Image::GetWidth() const
 {
   return GetImplementation(*this).GetWidth();
 }
 
-unsigned int Image::GetHeight() const
+uint32_t Image::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
 }

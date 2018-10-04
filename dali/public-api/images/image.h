@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
@@ -138,7 +139,7 @@ public:
    * @SINCE_1_0.0
    * @return Width of the image in pixels
    */
-  unsigned int GetWidth() const DALI_DEPRECATED_API;
+  uint32_t GetWidth() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_2.41
@@ -150,7 +151,7 @@ public:
    * @SINCE_1_0.0
    * @return Height of the image in pixels
    */
-  unsigned int GetHeight() const DALI_DEPRECATED_API;
+  uint32_t GetHeight() const DALI_DEPRECATED_API;
 
 public: // Signals
 

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // int32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -79,7 +80,7 @@ struct DALI_CORE_API KeyEvent
    * @param[in] timeStamp The time (in ms) that the key event occurred
    * @param[in] keyState The state of the key event
    */
-  KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState);
+  KeyEvent(const std::string& keyName, const std::string& keyString, int32_t keyCode, int32_t keyModifier, unsigned long timeStamp, const State& keyState);
 
   /**
    * @brief Copy constructor.
@@ -180,12 +181,12 @@ struct DALI_CORE_API KeyEvent
    * platform-specific key code. You need to use IsKey() to know what a key event means
    * instead of direct comparison of key code value.
    */
-  int  keyCode;
+  int32_t keyCode;
 
   /**
    * @brief special keys like shift, alt and control which modify the next key pressed.
    */
-  int  keyModifier;
+  int32_t keyModifier;
 
   /**
    * @brief The time (in ms) that the key event occurred.

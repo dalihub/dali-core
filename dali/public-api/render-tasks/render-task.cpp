@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@ static bool FullScreenFrameBufferFunction( Vector2& coordinates )
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION = DefaultScreenToFrameBufferFunction;
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION        = FullScreenFrameBufferFunction;
 
-const bool         RenderTask::DEFAULT_EXCLUSIVE     = false;
-const bool         RenderTask::DEFAULT_INPUT_ENABLED = true;
-const Vector4      RenderTask::DEFAULT_CLEAR_COLOR   = Vector4( 0.0f, 0.0f, 0.0f, 1.0f ); // cannot use Color::Black because it may or may not be initialized yet
-const bool         RenderTask::DEFAULT_CLEAR_ENABLED = false;
-const bool         RenderTask::DEFAULT_CULL_MODE     = true;
-const unsigned int RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
+const bool     RenderTask::DEFAULT_EXCLUSIVE     = false;
+const bool     RenderTask::DEFAULT_INPUT_ENABLED = true;
+const Vector4  RenderTask::DEFAULT_CLEAR_COLOR   = Vector4( 0.0f, 0.0f, 0.0f, 1.0f ); // cannot use Color::Black because it may or may not be initialized yet
+const bool     RenderTask::DEFAULT_CLEAR_ENABLED = false;
+const bool     RenderTask::DEFAULT_CULL_MODE     = true;
+const uint32_t RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
 
 RenderTask::RenderTask()
 {
@@ -241,12 +241,12 @@ bool RenderTask::GetCullMode() const
   return GetImplementation(*this).GetCullMode();
 }
 
-void RenderTask::SetRefreshRate( unsigned int refreshRate )
+void RenderTask::SetRefreshRate( uint32_t refreshRate )
 {
   GetImplementation(*this).SetRefreshRate( refreshRate );
 }
 
-unsigned int RenderTask::GetRefreshRate() const
+uint32_t RenderTask::GetRefreshRate() const
 {
   return GetImplementation(*this).GetRefreshRate();
 }

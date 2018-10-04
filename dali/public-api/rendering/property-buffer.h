@@ -56,7 +56,7 @@ class PropertyBuffer;
  *  texturedQuadVertices.SetData( texturedQuadVertexData, 4 );
  *
  *  // Create indices
- *  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
+ *  uint32_t indexData[6] = { 0, 3, 1, 0, 2, 3 };
  *
  *  // Create the geometry object
  *  Geometry texturedQuadGeometry = Geometry::New();
