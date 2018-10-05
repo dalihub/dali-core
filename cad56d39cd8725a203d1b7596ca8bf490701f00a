@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e18463e0_bd80fb29",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-framebuffer.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:17:14Z",
+      "side": 1,
+      "message": "Magic number?",
+      "revId": "cad56d39cd8725a203d1b7596ca8bf490701f00a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17d38fad_1ceca18e",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:17:14Z",
+      "side": 1,
+      "message": "Missing documentation",
+      "revId": "cad56d39cd8725a203d1b7596ca8bf490701f00a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7e60b9c_f2d4c500",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:17:14Z",
+      "side": 1,
+      "message": "Magic number... surely we could have a const somewhere if we\u0027re using it in more than one place?",
+      "revId": "cad56d39cd8725a203d1b7596ca8bf490701f00a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
