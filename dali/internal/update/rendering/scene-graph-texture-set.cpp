@@ -51,10 +51,9 @@ TextureSet::TextureSet()
 
 TextureSet::~TextureSet()
 {
-  size_t rendererCount = mRenderers.Size();
-  for( size_t i(0); i<rendererCount; ++i )
+  for( auto&& renderer : mRenderers )
   {
-    mRenderers[i]->TextureSetDeleted();
+    renderer->TextureSetDeleted();
   }
 }
 
@@ -63,13 +62,13 @@ void TextureSet::operator delete( void* ptr )
   gTextureSetMemoryPool.FreeThreadSafe( static_cast<TextureSet*>( ptr ) );
 }
 
-void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
+void TextureSet::SetSampler( uint32_t index, Render::Sampler* sampler )
 {
-  size_t samplerCount( mSamplers.Size() );
+  const uint32_t samplerCount = static_cast<uint32_t>( mSamplers.Size() );
   if( samplerCount < index + 1 )
   {
     mSamplers.Resize( index + 1 );
-    for( size_t i(samplerCount); i<=index; ++i )
+    for( uint32_t i(samplerCount); i<=index; ++i )
     {
       mSamplers[i] = NULL;
     }
@@ -79,9 +78,9 @@ void TextureSet::SetSampler( size_t index, Render::Sampler* sampler )
   NotifyChangeToRenderers();
 }
 
-void TextureSet::SetTexture( size_t index, Render::Texture* texture )
+void TextureSet::SetTexture( uint32_t index, Render::Texture* texture )
 {
-  const size_t textureCount( mTextures.Size() );
+  const uint32_t textureCount = static_cast<uint32_t>( mTextures.Size() );
   if( textureCount < index + 1 )
   {
     mTextures.Resize( index + 1 );
@@ -93,7 +92,7 @@ void TextureSet::SetTexture( size_t index, Render::Texture* texture )
       samplerExist = false;
     }
 
-    for( size_t i(textureCount); i<=index; ++i )
+    for( uint32_t i(textureCount); i<=index; ++i )
     {
       mTextures[i] = 0;
 
@@ -120,10 +119,9 @@ bool TextureSet::HasAlpha() const
 
 void TextureSet::AddObserver( Renderer* renderer )
 {
-  size_t rendererCount( mRenderers.Size() );
-  for( size_t i(0); i<rendererCount; ++i )
+  for( auto&& element : mRenderers )
   {
-    if( mRenderers[i] == renderer )
+    if( element == renderer )
     {
       //Renderer already in the list
       return;
@@ -135,12 +133,11 @@ void TextureSet::AddObserver( Renderer* renderer )
 
 void TextureSet::RemoveObserver( Renderer* renderer )
 {
-  size_t rendererCount( mRenderers.Size() );
-  for( size_t i(0); i<rendererCount; ++i )
+  for( auto&& iter = mRenderers.Begin(), end = mRenderers.End(); iter != end; ++iter )
   {
-    if( mRenderers[i] == renderer )
+    if( *iter == renderer )
     {
-      mRenderers.Remove( mRenderers.Begin() + i );
+      mRenderers.Remove( iter );
       return;
     }
   }
@@ -148,10 +145,9 @@ void TextureSet::RemoveObserver( Renderer* renderer )
 
 void TextureSet::NotifyChangeToRenderers()
 {
-  size_t rendererCount = mRenderers.Size();
-  for( size_t i(0); i<rendererCount; ++i )
+  for( auto&& element : mRenderers )
   {
-    mRenderers[i]->TextureSetChanged();
+    element->TextureSetChanged();
   }
 }
 

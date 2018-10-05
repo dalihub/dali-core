@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ namespace SceneGraph
 namespace
 {
 
-const int ARGINDEX_REF_VALUE = 0;
-const int ARGINDEX_STEP_SIZE = 1;
-const int ARGINDEX_CURRENT_STEP = 2;
+const int32_t ARGINDEX_REF_VALUE = 0;
+const int32_t ARGINDEX_STEP_SIZE = 1;
+const int32_t ARGINDEX_CURRENT_STEP = 2;
 
 } // namespace
 
@@ -85,10 +85,10 @@ bool Step::Evaluate( const float propertyValue, PropertyNotification::RawArgumen
 {
   const float refValue = arg[ARGINDEX_REF_VALUE];
   const float step = arg[ARGINDEX_STEP_SIZE];
-  const int currentStep = static_cast<int>(arg[ARGINDEX_CURRENT_STEP]);
+  const int32_t currentStep = static_cast<int32_t>(arg[ARGINDEX_CURRENT_STEP]);
   const float distance = (propertyValue - refValue);
   // step is actual 1.0f / step so can multiply instead of dividing
-  const int newStep = static_cast<int>(floorf(distance * step));
+  const int32_t newStep = static_cast<int32_t>(floorf(distance * step));
 
   if( newStep != currentStep )
   {

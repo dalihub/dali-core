@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ const StringEnum PIXEL_FORMAT_TABLE[] =
   { "COMPRESSED_RGB8_ETC1",                         Pixel::COMPRESSED_RGB8_ETC1                         },
   { "COMPRESSED_RGB_PVRTC_4BPPV1",                  Pixel::COMPRESSED_RGB_PVRTC_4BPPV1                  },
 };
-const unsigned int PIXEL_FORMAT_TABLE_COUNT = sizeof( PIXEL_FORMAT_TABLE ) / sizeof( PIXEL_FORMAT_TABLE[0] );
+const uint32_t PIXEL_FORMAT_TABLE_COUNT = static_cast<uint32_t>( sizeof( PIXEL_FORMAT_TABLE ) / sizeof( PIXEL_FORMAT_TABLE[0] ) );
 
 const StringEnum IMAGE_FITTING_MODE_TABLE[] =
 {
@@ -76,7 +76,7 @@ const StringEnum IMAGE_FITTING_MODE_TABLE[] =
   { "FIT_WIDTH",     FittingMode::FIT_WIDTH    },
   { "FIT_HEIGHT",    FittingMode::FIT_HEIGHT   },
 };
-const unsigned int IMAGE_FITTING_MODE_TABLE_COUNT = sizeof( IMAGE_FITTING_MODE_TABLE ) / sizeof( IMAGE_FITTING_MODE_TABLE[0] );
+const uint32_t IMAGE_FITTING_MODE_TABLE_COUNT = static_cast<uint32_t>( sizeof( IMAGE_FITTING_MODE_TABLE ) / sizeof( IMAGE_FITTING_MODE_TABLE[0] ) );
 
 const StringEnum IMAGE_SAMPLING_MODE_TABLE[] =
 {
@@ -88,15 +88,15 @@ const StringEnum IMAGE_SAMPLING_MODE_TABLE[] =
   { "NO_FILTER",        SamplingMode::NO_FILTER       },
   { "DONT_CARE",        SamplingMode::DONT_CARE       },
 };
-const unsigned int IMAGE_SAMPLING_MODE_TABLE_COUNT = sizeof( IMAGE_SAMPLING_MODE_TABLE ) / sizeof( IMAGE_SAMPLING_MODE_TABLE[0] );
+const uint32_t IMAGE_SAMPLING_MODE_TABLE_COUNT = static_cast<uint32_t>( sizeof( IMAGE_SAMPLING_MODE_TABLE ) / sizeof( IMAGE_SAMPLING_MODE_TABLE[0] ) );
 
 const char* ImageTypeName[] = { "ResourceImage", "FrameBufferImage", "BufferImage" };
 enum ImageType                { RESOURCE_IMAGE,  FRAME_BUFFER_IMAGE, BUFFER_IMAGE };
-const unsigned int imageTypeCount = sizeof( ImageTypeName ) / sizeof( const char* );
+const uint32_t imageTypeCount = static_cast<uint32_t>( sizeof( ImageTypeName ) / sizeof( const char* ) );
 
 } // unnamed namespace
 
-bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, unsigned int tableCount, int& integerEnum )
+bool EnumStringToInteger( const char * const value, const StringEnum* const enumTable, uint32_t tableCount, int& integerEnum )
 {
   int ret = 0;
 
@@ -109,11 +109,11 @@ bool EnumStringToInteger( const char * const value, const StringEnum* const enum
 
     while(!done)
     {
-      size_t size = 0;
+      uint32_t size = 0;
 
       const StringEnum* table = enumTable;
 
-      for ( unsigned int i = 0; i < tableCount; ++i )
+      for ( uint32_t i = 0; i < tableCount; ++i )
       {
         if( Internal::CompareTokens( pValue, table->string, size ) )
         {
@@ -148,13 +148,13 @@ bool EnumStringToInteger( const char * const value, const StringEnum* const enum
   return found;
 }
 
-unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount )
+uint32_t FindEnumIndex( const char* value, const StringEnum* table, uint32_t tableCount )
 {
-  unsigned int index = 0;
+  uint32_t index = 0;
   bool found = false;
-  for ( unsigned int i = 0; i < tableCount; ++i, ++index )
+  for ( uint32_t i = 0; i < tableCount; ++i, ++index )
   {
-    size_t sizeIgnored = 0;
+    uint32_t sizeIgnored = 0;
     if( Internal::CompareTokens( value, table->string, sizeIgnored ) )
     {
       found = true;
@@ -187,7 +187,7 @@ Image NewImage( const Property::Value& property )
     {
       std::string type;
       value->Get( type );
-      for( unsigned int i = 0; i < imageTypeCount; ++i )
+      for( uint32_t i = 0; i < imageTypeCount; ++i )
       {
         if( 0 == type.compare( ImageTypeName[ i ] ) )
         {
@@ -215,7 +215,7 @@ Image NewImage( const Property::Value& property )
 
     // Width and height can be set individually. Dali derives the unspecified
     // dimension from the aspect ratio of the raw image.
-    int width = 0, height = 0;
+    int32_t width = 0, height = 0;
 
     value = map->Find( "width" );
     if( value )
@@ -223,7 +223,7 @@ Image NewImage( const Property::Value& property )
       // handle floats and integer the same for json script
       if( value->GetType() == Property::FLOAT )
       {
-        width = static_cast<unsigned int>( value->Get<float>() );
+        width = static_cast<uint32_t>( value->Get<float>() );
       }
       else
       {
@@ -235,7 +235,7 @@ Image NewImage( const Property::Value& property )
     {
       if( value->GetType() == Property::FLOAT )
       {
-        height = static_cast<int>( value->Get<float>() );
+        height = static_cast<int32_t>( value->Get<float>() );
       }
       else
       {
@@ -288,7 +288,7 @@ Image NewImage( const Property::Value& property )
     {
       case RESOURCE_IMAGE :
       {
-        ret = ResourceImage::New( filename, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ),
+        ret = ResourceImage::New( filename, ImageDimensions( static_cast<uint32_t>( attributes.GetSize().x ), static_cast<uint32_t>( attributes.GetSize().y ) ),
                                   attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
         break;
       }
@@ -340,7 +340,7 @@ Actor NewActor( const Property::Map& map )
   if ( actor )
   {
     // Now set the properties, or create children
-    for ( unsigned int i = 0, mapCount = map.Count(); i < mapCount; ++i )
+    for ( Property::Map::SizeType i = 0, mapCount = map.Count(); i < mapCount; ++i )
     {
       const KeyValuePair pair( map.GetKeyValue( i ) );
       if( pair.first.type == Property::Key::INDEX )
@@ -398,11 +398,11 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
     }
 
     // Children
-    unsigned int childCount( actor.GetChildCount() );
+    std::size_t childCount( actor.GetChildCount() );
     if ( childCount )
     {
       Property::Array childArray;
-      for ( unsigned int child = 0; child < childCount; ++child )
+      for ( uint32_t child = 0; child < childCount; ++child )
       {
         Property::Map childMap;
         CreatePropertyMap( actor.GetChildAt( child ), childMap );
@@ -441,8 +441,8 @@ void CreatePropertyMap( Image image, Property::Map& map )
       map[ "filename" ] = resourceImage.GetUrl();
     }
 
-    int width( image.GetWidth() );
-    int height( image.GetHeight() );
+    int32_t width( image.GetWidth() );
+    int32_t height( image.GetHeight() );
 
     if ( width && height )
     {
@@ -461,7 +461,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
   element->timePeriodDuration = 1.0f;
 
   // Now set the properties, or create children
-  for( unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i )
+  for( Property::Map::SizeType i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i )
   {
     const KeyValuePair pair( map.GetKeyValue( i ) );
     if( pair.first.type == Property::Key::INDEX )
@@ -544,7 +544,7 @@ void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimatio
     else if( key == "timePeriod" )
     {
       Property::Map timeMap = value.Get< Property::Map >();
-      for( unsigned int i = 0; i < timeMap.Count(); ++i )
+      for( Property::Map::SizeType i = 0; i < timeMap.Count(); ++i )
       {
         const KeyValuePair timePair( timeMap.GetKeyValue( i ) );
         if( timePair.first.type == Property::Key::INDEX )

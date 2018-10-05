@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_MESSAGES_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <string>
 
+// INTERNAL INCLUDES
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
-#include <string>
 
 namespace Dali
 {
@@ -89,7 +90,7 @@ public:
                     typename ParameterType< P >::PassingType value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) AnimatablePropertyMessage( sceneObject, property, member, value );
@@ -168,7 +169,7 @@ public:
                     float value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyComponentMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) AnimatablePropertyComponentMessage( sceneObject, property, member, value );
@@ -227,7 +228,7 @@ inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServic
   typedef MessageValue1< PropertyOwner, OwnerPointer<PropertyBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, property );
@@ -238,7 +239,7 @@ inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, co
   typedef MessageValue1< PropertyOwner, OwnerPointer<ConstraintBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::ApplyConstraint, constraint );
@@ -252,7 +253,7 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
   typedef MessageValue1< PropertyOwner, ConstraintBase* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );
@@ -263,7 +264,7 @@ inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, cons
   typedef MessageValue1< PropertyOwner, OwnerPointer< UniformPropertyMapping > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &owner, &PropertyOwner::AddUniformMapping, map );
 }
@@ -273,7 +274,7 @@ inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, c
   typedef MessageValue1< PropertyOwner, std::string > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &owner, &PropertyOwner::RemoveUniformMapping, uniformName );
 }

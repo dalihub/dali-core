@@ -534,15 +534,15 @@ void TypeInfo::AddChildProperty( const std::string& name, Property::Index index,
   }
 }
 
-size_t TypeInfo::GetPropertyCount() const
+uint32_t TypeInfo::GetPropertyCount() const
 {
-  size_t count( mRegisteredProperties.size() );
+  uint32_t count = static_cast<uint32_t>( mRegisteredProperties.size() );
 
   Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
   while ( base )
   {
     const TypeInfo& baseImpl( GetImplementation(base) );
-    count += baseImpl.mRegisteredProperties.size();
+    count += static_cast<uint32_t>( baseImpl.mRegisteredProperties.size() );
     base = TypeRegistry::Get()->GetTypeInfo( baseImpl.mBaseTypeName );
   }
 

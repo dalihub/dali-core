@@ -190,7 +190,7 @@ void Node::PrepareRender( BufferIndex bufferIndex )
       CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
       localMap.Resize(0);
 
-      for( uint32_t i = 0, count=mUniformMaps.Count(); i<count; ++i )
+      for( UniformMap::SizeType i = 0, count=mUniformMaps.Count(); i<count; ++i )
       {
         localMap.PushBack( &mUniformMaps[i] );
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,12 +108,12 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
   }
 }
 
-unsigned int RenderTaskList::GetTaskCount() const
+uint32_t RenderTaskList::GetTaskCount() const
 {
-  return mTasks.size();
+  return static_cast<uint32_t>( mTasks.size() ); // only 4,294,967,295 render tasks supported
 }
 
-Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
+Dali::RenderTask RenderTaskList::GetTask( uint32_t index ) const
 {
   DALI_ASSERT_ALWAYS( ( index < mTasks.size() ) && "RenderTask index out-of-range" );
 

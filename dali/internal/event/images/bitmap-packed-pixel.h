@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_BITMAP_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,10 @@ public:
    * @return pixel buffer pointer
    */
   virtual Dali::Integration::PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
-                                     unsigned int width,
-                                     unsigned int height,
-                                     unsigned int bufferWidth = 0,
-                                     unsigned int bufferHeight = 0);
+                                     uint32_t width,
+                                     uint32_t height,
+                                     uint32_t bufferWidth = 0,
+                                     uint32_t bufferHeight = 0);
 
   /**
    * Assign a pixel buffer. Any previously allocated pixel buffer is deleted.
@@ -85,11 +85,11 @@ public:
    */
   virtual void AssignBuffer(Pixel::Format pixelFormat,
                             Dali::Integration::PixelBuffer* buffer,
-                            std::size_t bufferSize,
-                            unsigned int width,
-                            unsigned int height,
-                            unsigned int bufferWidth = 0,
-                            unsigned int bufferHeight = 0);
+                            uint32_t bufferSize,
+                            uint32_t width,
+                            uint32_t height,
+                            uint32_t bufferWidth = 0,
+                            uint32_t bufferHeight = 0);
 
   /**
    * Get the width of the buffer (stride)
@@ -113,10 +113,9 @@ public:
    * Get the pixel buffer size in bytes
    * @return The buffer size in bytes.
    */
-  // unsigned int GetBufferSize() const
-  virtual size_t GetBufferSize() const
+  virtual uint32_t GetBufferSize() const
   {
-    return static_cast< size_t >( mBufferWidth ) * mBytesPerPixel * mBufferHeight; // need to cast to size_t to avoid possibility of overflow
+    return mBufferWidth * mBytesPerPixel * mBufferHeight;
   }
 
   /**
@@ -128,7 +127,7 @@ public:
    * Get the pixel buffer stride.
    * @return The buffer stride (in bytes).
    */
-  virtual unsigned int GetBufferStride() const;
+  virtual uint32_t GetBufferStride() const;
 
   /**
    * Get the pixel format
@@ -154,9 +153,9 @@ protected:
 
 protected:
 
-  unsigned int  mBufferWidth;         ///< Buffer width (stride) in pixels
-  unsigned int  mBufferHeight;        ///< Buffer height in pixels
-  unsigned int  mBytesPerPixel;       ///< Bytes per pixel
+  uint32_t  mBufferWidth;         ///< Buffer width (stride) in pixels
+  uint32_t  mBufferHeight;        ///< Buffer height in pixels
+  uint32_t  mBytesPerPixel;       ///< Bytes per pixel
 
 private:
 
@@ -169,10 +168,10 @@ private:
    * @param[in] bufferHeight  Buffer height in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           unsigned int width,
-                           unsigned int height,
-                           unsigned int bufferWidth,
-                           unsigned int bufferHeight);
+                           uint32_t width,
+                           uint32_t height,
+                           uint32_t bufferWidth,
+                           uint32_t bufferHeight);
 
 
   BitmapPackedPixel(const BitmapPackedPixel& other);  ///< defined private to prevent use

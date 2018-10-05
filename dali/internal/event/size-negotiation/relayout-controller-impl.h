@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -69,7 +72,7 @@ public:
    * @param width of the stage
    * @param height of the stage
    */
-  void SetStageSize( unsigned int width, unsigned int height );
+  void SetStageSize( uint32_t width, uint32_t height );
 
   /**
    * @brief Request to relayout the given actor and all sub-actors of it.

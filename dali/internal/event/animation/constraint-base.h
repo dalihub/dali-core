@@ -127,12 +127,12 @@ public:
   /**
    * @copydoc Dali::Constraint::SetTag()
    */
-  void SetTag(const unsigned int tag);
+  void SetTag( uint32_t tag );
 
   /**
    * @copydoc Dali::Constraint::GetTag()
    */
-  unsigned int GetTag() const;
+  uint32_t GetTag() const;
 
 private: // Object::Observer methods
 
@@ -206,7 +206,7 @@ protected:
   ObjectContainer mObservedObjects; // We don't observe the same object twice
   Property::Index mTargetPropertyIndex;
   RemoveAction mRemoveAction;
-  unsigned int mTag;
+  uint32_t mTag;
   bool mApplied:1; ///< Whether the constraint has been applied
   bool mSourceDestroyed:1; ///< Is set to true if any of our input source objects are destroyed
 };

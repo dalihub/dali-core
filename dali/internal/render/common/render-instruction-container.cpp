@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ RenderInstructionContainer::~RenderInstructionContainer()
   // OwnerContainer deletes the instructions
 }
 
-void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, size_t capacityRequired )
+void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired )
 {
   mIndex[ bufferIndex ] = 0u;
-  size_t oldcapacity = mInstructions[ bufferIndex ].Capacity();
+  uint32_t oldcapacity = static_cast<uint32_t>( mInstructions[ bufferIndex ].Capacity() ); // uint32_t is large enough in practice
   if( oldcapacity < capacityRequired )
   {
     mInstructions[ bufferIndex ].Reserve( capacityRequired );
@@ -60,7 +60,7 @@ void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, size_
   // RenderInstruction holds a lot of data so we keep them and recycle instead of new & delete
 }
 
-size_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
+uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
 {
   // mIndex contains the number of instructions that have been really prepared and updated
   // (from UpdateManager through GetNextInstruction)
@@ -73,7 +73,7 @@ RenderInstruction& RenderInstructionContainer::GetNextInstruction( BufferIndex b
   return At( bufferIndex, mIndex[ bufferIndex ]++ );
 }
 
-RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, size_t index )
+RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index )
 {
   DALI_ASSERT_DEBUG( index < mInstructions[ bufferIndex ].Count() );
 

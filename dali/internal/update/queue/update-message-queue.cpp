@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ void MessageQueue::EventProcessingStarted()
 }
 
 // Called from event thread
-unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool updateScene )
+uint32_t* MessageQueue::ReserveMessageSlot( std::size_t requestedSize, bool updateScene )
 {
   DALI_ASSERT_DEBUG( 0 != requestedSize );
 

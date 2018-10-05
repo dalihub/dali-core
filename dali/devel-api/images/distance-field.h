@@ -18,6 +18,8 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint8_t, uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -39,11 +41,11 @@ struct Vector2;
  * @param[in]  maxSize         The image is scaled from this size to distanceMapSize
  * @param[in]  highQuality     Set true to generate high quality distance fields
  */
-DALI_CORE_API void GenerateDistanceFieldMap( const unsigned char* const imagePixels, const Vector2& imageSize,
-                                               unsigned char* const distanceMap, const Vector2& distanceMapSize,
-                                               const unsigned int fieldBorder,
-                                               const Vector2& maxSize,
-                                               bool highQuality = true);
+DALI_CORE_API void GenerateDistanceFieldMap( const uint8_t* const imagePixels, const Vector2& imageSize,
+                                             uint8_t* const distanceMap, const Vector2& distanceMapSize,
+                                             const uint32_t fieldBorder,
+                                             const Vector2& maxSize,
+                                             bool highQuality = true );
 
 } //namespace Dali
 

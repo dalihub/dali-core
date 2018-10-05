@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ ShaderFactory::ShaderFactory()
 ShaderFactory::~ShaderFactory()
 {
   // Let all the cached objects destroy themselves:
-  for( int i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
+  for( std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
   {
     if( mShaderBinaryCache[i] )
     {
@@ -86,7 +86,7 @@ ShaderDataPtr ShaderFactory::Load( const std::string& vertexSource, const std::s
   ShaderDataPtr shaderData;
 
   /// Check a cache of previously loaded shaders:
-  for( int i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
+  for( std::size_t i = 0, cacheSize = mShaderBinaryCache.Size(); i < cacheSize; ++i )
   {
     if( mShaderBinaryCache[i]->GetHashValue() == shaderHash )
     {
@@ -132,7 +132,7 @@ void ShaderFactory::SaveBinary( Internal::ShaderDataPtr shaderData )
 
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
-  const bool saved = platformAbstraction.SaveShaderBinaryFile( binaryShaderFilename, &shaderData->GetBuffer()[0], shaderData->GetBufferSize() );
+  const bool saved = platformAbstraction.SaveShaderBinaryFile( binaryShaderFilename, &shaderData->GetBuffer()[0], static_cast<unsigned int>( shaderData->GetBufferSize() ) ); // don't expect buffer larger than unsigned int
 
   // Save the binary into to memory cache:
   MemoryCacheInsert( *shaderData );

@@ -19,11 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/internal/event/animation/key-frames-impl.h>
-#include <dali/internal/event/animation/path-impl.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
@@ -31,6 +26,11 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/event/animation/key-frames-impl.h>
+#include <dali/internal/event/animation/path-impl.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/integration-api/debug.h>
 
@@ -153,7 +153,7 @@ public:
     mSpeedFactor = factor;
   }
 
-  void SetLoopCount(int loopCount)
+  void SetLoopCount(int32_t loopCount)
   {
     mLoopCount = loopCount;
   }
@@ -329,7 +329,7 @@ public:
         float upperBound(1.0f);
         float currentT(0.5f);
         float currentX = EvaluateCubicBezier( controlPoints.x, controlPoints.z, currentT);
-        while( fabs( progress - currentX ) > tolerance )
+        while( fabsf( progress - currentX ) > tolerance )
         {
           if( progress > currentX )
           {
@@ -442,7 +442,7 @@ protected:
   float mIntervalDelaySeconds;
   float mSpeedFactor;
 
-  int mLoopCount;
+  int32_t mLoopCount;
 
   AlphaFunction mAlphaFunction;
 
@@ -558,7 +558,8 @@ public:
 
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
-    const PropertyType result = (*mAnimatorFunction)( alpha, current );
+    // need to cast the return value in case property is integer
+    const PropertyType result = static_cast<PropertyType>( (*mAnimatorFunction)( alpha, current ) );
     if ( bake )
     {
       mPropertyAccessor.Bake( bufferIndex, result );
@@ -717,8 +718,8 @@ public:
 
     const T& current = mPropertyAccessor.Get( bufferIndex );
 
-    const T result = (*mAnimatorFunction)( alpha, current );
-
+    // need to cast the return value in case property is integer
+    T result = static_cast<T>( (*mAnimatorFunction)( alpha, current ) );
 
     if ( bake )
     {
@@ -796,14 +797,14 @@ struct AnimatorFunctionBase
     return property;
   }
 
-  virtual float operator()(float progress, const int& property)
+  virtual float operator()(float progress, const int32_t& property)
   {
-    return property;
+    return static_cast<float>( property );
   }
 
-  virtual float operator()(float progress, const unsigned int& property)
+  virtual float operator()(float progress, const uint32_t& property)
   {
-    return property;
+    return static_cast<float>( property );
   }
 
   virtual float operator()(float progress, const float& property)
@@ -842,12 +843,12 @@ struct AnimateByInteger : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int& property)
+  float operator()(float alpha, const int32_t& property)
   {
-    return int(property + mRelative * alpha + 0.5f );
+    return truncf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha + 0.5f );
   }
 
-  int mRelative;
+  int32_t mRelative;
 };
 
 struct AnimateToInteger : public AnimatorFunctionBase
@@ -858,12 +859,12 @@ struct AnimateToInteger : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float alpha, const int& property)
+  float operator()(float alpha, const int32_t& property)
   {
-    return int(property + ((mTarget - property) * alpha) + 0.5f);
+    return truncf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) + 0.5f);
   }
 
-  int mTarget;
+  int32_t mTarget;
 };
 
 struct AnimateByFloat : public AnimatorFunctionBase
@@ -1134,13 +1135,13 @@ struct KeyFrameIntegerFunctor : public AnimatorFunctionBase
   }
 
   using AnimatorFunctionBase::operator();
-  float operator()(float progress, const int& property)
+  float operator()(float progress, const int32_t& property)
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, mInterpolation);
+      return static_cast<float>( mKeyFrames->GetValue(progress, mInterpolation) );
     }
-    return property;
+    return static_cast<float>( property );
   }
 
   KeyFrameIntegerPtr mKeyFrames;

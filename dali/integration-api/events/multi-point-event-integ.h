@@ -87,19 +87,19 @@ public:
    * @brief Retrieves the Point at position point.
    * @return The Point at position point.
    */
-  Point& GetPoint( unsigned int point );
+  Point& GetPoint( uint32_t point );
 
   /**
    * @brief Retrieves a const ref of the Point at position point.
    * @return The const ref of the Point at position point.
    */
-  const Point& GetPoint( unsigned int point ) const;
+  const Point& GetPoint( uint32_t point ) const;
 
   /**
    * @brief The total number of Points in this TouchEvent.
    * @return The point count.
    */
-  unsigned int GetPointCount() const;
+  uint32_t GetPointCount() const;
 };
 
 } // namespace Integration

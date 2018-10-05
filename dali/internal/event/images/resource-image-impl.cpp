@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ void ResourceImage::Reload()
     mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
-    size_t bufferSize = bitmap->GetBufferSize();
+    uint32_t bufferSize = bitmap->GetBufferSize();
     PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
                                              static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
     mTexture->Upload( pixelData );
@@ -201,7 +201,7 @@ unsigned int ResourceImage::GetHeight() const
 
 Vector2 ResourceImage::GetNaturalSize() const
 {
-  return Vector2(mWidth, mHeight);
+  return Vector2( static_cast<float>( mWidth ), static_cast<float>( mHeight ) );
 }
 
 

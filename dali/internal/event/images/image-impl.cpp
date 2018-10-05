@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ unsigned int Image::GetHeight() const
 
 Vector2 Image::GetNaturalSize() const
 {
-  return Vector2( mWidth, mHeight );
+  return Vector2( static_cast<float>( mWidth ), static_cast<float>( mHeight ) );
 }
 
 Image::Image()

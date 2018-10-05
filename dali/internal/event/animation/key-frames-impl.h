@@ -119,14 +119,14 @@ public:
 
   KeyFrameSpec() {}
 
-  virtual unsigned int GetNumberOfKeyFrames() const = 0;
+  virtual std::size_t GetNumberOfKeyFrames() const = 0;
 
   /**
    * Get the key frame value as a Property::Value.
    * @param[in] index The index of the key frame to fetch
    * @param[out] value The value of the given key frame
    */
-  virtual void GetKeyFrameAsValue( unsigned int index, Property::Value& value ) = 0;
+  virtual void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) = 0;
 
 protected:
 
@@ -220,7 +220,7 @@ public:
    * Get the number of key frames
    * @return The size of the progress value vector
    */
-  virtual unsigned int GetNumberOfKeyFrames() const
+  virtual std::size_t GetNumberOfKeyFrames() const
   {
     return mPVs.size();
   }
@@ -241,7 +241,7 @@ public:
   /**
    * @copydoc KeyFrameSpec::GetKeyFrameAsValue()
    */
-  virtual void GetKeyFrameAsValue( unsigned int index, Property::Value& value )
+  virtual void GetKeyFrameAsValue( std::size_t index, Property::Value& value )
   {
     value = mPVs[index].mValue;
   }

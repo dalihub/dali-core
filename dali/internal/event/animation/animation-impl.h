@@ -497,7 +497,7 @@ private:
 
     Property::Value targetValue;
     TimePeriod timePeriod;
-    unsigned int connectorIndex;
+    std::size_t connectorIndex;
     Animation::Type animatorType;
   };
 

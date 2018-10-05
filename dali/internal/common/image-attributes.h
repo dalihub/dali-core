@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_IMAGE_ATTRIBUTES_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,15 +128,6 @@ public:
   static ImageAttributes New();
 
   /**
-   * @brief Create an initialised image attributes object.
-   *
-   * @param [in] width         desired width.
-   * @param [in] height        desired height
-   * @return A handle to a newly allocated object
-   */
-   static ImageAttributes New(unsigned int width, unsigned int height);
-
-  /**
    * @brief Set the size properties.
    *
    * By default width and height are set to zero which means the image loaded has the original size.
@@ -146,7 +137,7 @@ public:
    * @param [in] width  desired width.
    * @param [in] height desired height
    */
-  void SetSize(unsigned int width, unsigned int height);
+  void SetSize( uint32_t width, uint32_t height);
 
   /**
    * @brief Set the image dimension properties.

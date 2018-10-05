@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,11 @@ void RenderTaskList::RemoveTask( RenderTask* task )
       break; // we're finished
     }
   }
+}
+
+uint32_t RenderTaskList::GetTaskCount()
+{
+  return static_cast<uint32_t>( mRenderTasks.Count() );
 }
 
 RenderTaskList::RenderTaskContainer& RenderTaskList::GetTasks()

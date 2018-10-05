@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Integration
 {
-typedef unsigned int ResourceId;
+typedef uint32_t ResourceId;
 typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
 
 /**
@@ -116,7 +116,7 @@ public:
    * @param[out] buffer  A buffer to receive the file.
    * @result             true if the file is loaded.
    */
-  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const = 0;
+  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< uint8_t >& buffer ) const = 0;
 
   /**
    * Save a shader binary file to the resource file system.
@@ -125,7 +125,7 @@ public:
    * @param[in] numbytes Size of the buffer.
    * @result             true if the file is saved, else false.
    */
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const = 0;
+  virtual bool SaveShaderBinaryFile( const std::string& filename, const uint8_t * buffer, uint32_t numBytes ) const = 0;
 
 protected:
 

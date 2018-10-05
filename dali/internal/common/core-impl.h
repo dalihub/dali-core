@@ -113,29 +113,29 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int)
+   * @copydoc Dali::Integration::Core::SurfaceResized(uint32_t, uint32_t)
    */
-  void SurfaceResized(unsigned int width, unsigned int height);
+  void SurfaceResized(uint32_t width, uint32_t height);
 
   /**
-   * @copydoc Dali::Integration::Core::SetTopMargin( unsigned int margin )
+   * @copydoc Dali::Integration::Core::SetTopMargin( uint32_t margin )
    */
-  void SetTopMargin( unsigned int margin );
+  void SetTopMargin( uint32_t margin );
 
   /**
-   * @copydoc Dali::Integration::Core::SetDpi(unsigned int, unsigned int)
+   * @copydoc Dali::Integration::Core::SetDpi(uint32_t, uint32_t)
    */
-  void SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical);
+  void SetDpi(uint32_t dpiHorizontal, uint32_t dpiVertical);
 
   /**
-   * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(unsigned int)
+   * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)
    */
-  void SetMinimumFrameTimeInterval(unsigned int interval);
+  void SetMinimumFrameTimeInterval(uint32_t interval);
 
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
+  void Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
 
   /**
    * @copydoc Dali::Integration::Core::Render()
@@ -160,7 +160,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::GetMaximumUpdateCount()
    */
-  unsigned int GetMaximumUpdateCount() const;
+  uint32_t GetMaximumUpdateCount() const;
 
   /**
    * @copydoc Dali::Integration::Core::GetSystemOverlay()

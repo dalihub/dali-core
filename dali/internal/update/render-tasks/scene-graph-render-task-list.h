@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,12 @@ public:
   void RemoveTask( RenderTask* task );
 
   /**
+   * Retrieve the count of RenderTasks.
+   * @return The count.
+   */
+  uint32_t GetTaskCount();
+
+  /**
    * Retrieve the container of RenderTasks.
    * @return The container.
    */
@@ -115,7 +121,7 @@ inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTask
   typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
@@ -129,7 +135,7 @@ inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderT
   typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::RemoveTask, &task );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ bool LessThan::EvalBoolean( const Dali::PropertyInput& value, PropertyNotificati
 
 bool LessThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const int arg0 = arg[0];
+  const int32_t arg0 = static_cast<int32_t>( arg[0] );
   return (value.GetInteger() < arg0);
 }
 
@@ -176,7 +176,7 @@ bool GreaterThan::EvalBoolean( const Dali::PropertyInput& value, PropertyNotific
 
 bool GreaterThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const int arg0 = arg[0];
+  const int32_t arg0 = static_cast<int32_t>( arg[0] );
   return (value.GetInteger() > arg0);
 }
 
@@ -265,8 +265,8 @@ bool Inside::EvalBoolean( const Dali::PropertyInput& value, PropertyNotification
 
 bool Inside::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const int valueInteger = value.GetInteger();
-  return ( (valueInteger > arg[0]) && (valueInteger < arg[1]) );
+  const int32_t valueInteger = value.GetInteger();
+  return ( ( valueInteger > static_cast<int32_t>( arg[0] ) ) && ( valueInteger < static_cast<int32_t>( arg[1] ) ) );
 }
 
 bool Inside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -354,8 +354,8 @@ bool Outside::EvalBoolean( const Dali::PropertyInput& value, PropertyNotificatio
 
 bool Outside::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const int valueInteger = value.GetInteger();
-  return ( (valueInteger < arg[0]) || (valueInteger > arg[1]) );
+  const int32_t valueInteger = value.GetInteger();
+  return ( ( valueInteger < static_cast<int32_t>( arg[0] ) ) || ( valueInteger > static_cast<int32_t>( arg[0] ) ) );
 }
 
 bool Outside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )

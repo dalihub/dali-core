@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,16 @@
 // CLASS HEADER
 #include <dali/internal/event/images/pixel-data-impl.h>
 
-// EXTERNAL INCLUDES
-#include <stdlib.h>
-
 namespace Dali
 {
 
 namespace Internal
 {
 
-PixelData::PixelData( unsigned char* buffer,
-                      unsigned int bufferSize,
-                      unsigned int width,
-                      unsigned int height,
+PixelData::PixelData( uint8_t* buffer,
+                      uint32_t bufferSize,
+                      uint32_t width,
+                      uint32_t height,
                       Pixel::Format pixelFormat,
                       Dali::PixelData::ReleaseFunction releaseFunction )
 : mBuffer( buffer ),
@@ -46,7 +43,7 @@ PixelData::~PixelData()
 {
   if( mBuffer )
   {
-    if( mReleaseFunction == Dali::PixelData::FREE)
+    if( mReleaseFunction == Dali::PixelData::FREE )
     {
       free( mBuffer );
     }
@@ -57,22 +54,22 @@ PixelData::~PixelData()
   }
  }
 
-PixelDataPtr PixelData::New(unsigned char* buffer,
-                            unsigned int bufferSize,
-                            unsigned int width,
-                            unsigned int height,
-                            Pixel::Format pixelFormat,
-                            Dali::PixelData::ReleaseFunction releaseFunction)
+PixelDataPtr PixelData::New( uint8_t* buffer,
+                             uint32_t bufferSize,
+                             uint32_t width,
+                             uint32_t height,
+                             Pixel::Format pixelFormat,
+                             Dali::PixelData::ReleaseFunction releaseFunction )
 {
   return new PixelData( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
 }
 
-unsigned int PixelData::GetWidth() const
+uint32_t PixelData::GetWidth() const
 {
   return mWidth;
 }
 
-unsigned int PixelData::GetHeight() const
+uint32_t PixelData::GetHeight() const
 {
   return mHeight;
 }
@@ -82,12 +79,12 @@ Pixel::Format PixelData::GetPixelFormat() const
   return mPixelFormat;
 }
 
-unsigned char* PixelData::GetBuffer() const
+uint8_t* PixelData::GetBuffer() const
 {
   return mBuffer;
 }
 
-unsigned int PixelData::GetBufferSize() const
+uint32_t PixelData::GetBufferSize() const
 {
   return mBufferSize;
 }

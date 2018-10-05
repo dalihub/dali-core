@@ -31,14 +31,14 @@ namespace Internal
 namespace SceneGraph
 {
 
-SceneGraph::Layer* Layer::New( unsigned int id )
+SceneGraph::Layer* Layer::New( uint32_t id )
 {
   // Layers are currently heap allocated, unlike Nodes which are in a memory pool
   // However Node::Delete( layer ) will correctly delete a layer / node depending on type
   return new Layer( id );
 }
 
-Layer::Layer( unsigned int id )
+Layer::Layer( uint32_t id )
 : Node( id ),
   mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),

@@ -163,7 +163,7 @@ void Layer::RaiseAbove( const Internal::Layer& target )
   if( ( this != &target ) && OnStage() && target.OnStage() )
   {
     // get parameters depth
-    const unsigned int targetDepth = target.GetDepth();
+    const uint32_t targetDepth = target.GetDepth();
     if( GetDepth() < targetDepth )
     {
       MoveAbove( target );
@@ -177,7 +177,7 @@ void Layer::LowerBelow( const Internal::Layer& target )
   if( ( this != &target ) && OnStage() && target.OnStage() )
   {
     // get parameters depth
-    const unsigned int targetDepth = target.GetDepth();
+    const uint32_t targetDepth = target.GetDepth();
     if( GetDepth() > targetDepth )
     {
       MoveBelow( target );
@@ -256,7 +256,7 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
     StagePtr stage = Stage::GetCurrent();
     if( stage )
     {
-      clippingBox.y = stage->GetSize().height - clippingBox.y - clippingBox.height;
+      clippingBox.y = static_cast<int32_t>( stage->GetSize().height ) - clippingBox.y - clippingBox.height;
 
       // layerNode is being used in a separate thread; queue a message to set the value
       SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
@@ -363,8 +363,8 @@ void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
   Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
   indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
-  int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
+  int32_t index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
+  for ( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
     indices.PushBack( index );
   }
@@ -439,7 +439,7 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in current class' default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[i];
     if( 0 == name.compare( property->name ) ) // dont want to convert rhs to string
@@ -474,7 +474,7 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       }
       case Dali::Layer::Property::CLIPPING_BOX:
       {
-        Rect<int> clippingBox( propertyValue.Get<Rect<int> >() );
+        Rect<int32_t> clippingBox( propertyValue.Get<Rect<int32_t> >() );
         SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
         break;
       }

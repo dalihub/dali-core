@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,8 +112,10 @@ void BuildOrthoPickingRay( const Matrix& viewMatrix,
     DALI_ASSERT_DEBUG( false );
   }
 
-  Vector4 near( screenX - viewport.x, viewport.height - (screenY - viewport.y), 0.f, 1.f );
-  if( !Unproject( near, invViewProjection, viewport.width, viewport.height, rayOrigin ) )
+  Vector4 near( screenX - static_cast<float>( viewport.x ),
+                static_cast<float>( viewport.height ) - (screenY - static_cast<float>( viewport.y ) ),
+                0.f, 1.f );
+  if( !Unproject( near, invViewProjection, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), rayOrigin ) )
   {
     DALI_ASSERT_DEBUG( false );
   }
@@ -455,9 +457,11 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
-    Vector4 near( screenCoordinates.x - viewport.x, viewport.height - (screenCoordinates.y - viewport.y), 0.f, 1.f );
+    Vector4 near( screenCoordinates.x - static_cast<float>(viewport.x),
+                  static_cast<float>( viewport.height ) - (screenCoordinates.y - static_cast<float>( viewport.y ) ),
+                  0.f, 1.f );
     const Matrix& inverseViewProjection = mSceneObject->GetInverseViewProjectionMatrix( GetEventThreadServices().GetEventBufferIndex() );
-    success = Unproject( near, inverseViewProjection, viewport.width, viewport.height, near );
+    success = Unproject( near, inverseViewProjection, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), near );
 
     // Compute the ray's director vector.
     rayDirection.x = near.x - rayOrigin.x;

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SHADER_DATA_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ public: // API
    * Allocate a buffer for the compiled binary bytecode
    * @param[in] size  The size of the buffer in bytes
    */
-  void AllocateBuffer( size_t size )
+  void AllocateBuffer( std::size_t size )
   {
     mBuffer.Resize( size );
   }
@@ -132,7 +132,7 @@ public: // API
    * Get the program buffer
    * @return reference to the buffer
    */
-  size_t GetBufferSize() const
+  std::size_t GetBufferSize() const
   {
     return mBuffer.Size();
   }
@@ -141,7 +141,7 @@ public: // API
    * Get the data that the buffer points to
    * @return raw pointer to the buffer data
    */
-  unsigned char* GetBufferData()
+  uint8_t* GetBufferData()
   {
     DALI_ASSERT_DEBUG( mBuffer.Size() > 0 );
     return &mBuffer[0];
@@ -151,7 +151,7 @@ public: // API
    * Get the data that the buffer points to
    * @return raw pointer to the buffer data
    */
-  Dali::Vector<unsigned char>& GetBuffer()
+  Dali::Vector<uint8_t>& GetBuffer()
   {
     return mBuffer;
   }
@@ -163,11 +163,12 @@ private: // Not implemented
 
 private: // Data
 
-  size_t                      mShaderHash;     ///< hash key created with vertex and fragment shader code
-  std::string                 mVertexShader;   ///< source code for vertex program
-  std::string                 mFragmentShader; ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;          ///< take a hint
-  Dali::Vector<unsigned char> mBuffer;         ///< buffer containing compiled binary bytecode
+  std::size_t               mShaderHash;     ///< hash key created with vertex and fragment shader code
+  std::string               mVertexShader;   ///< source code for vertex program
+  std::string               mFragmentShader; ///< source code for fragment program
+  Dali::Shader::Hint::Value mHints;          ///< take a hint
+  Dali::Vector<uint8_t>     mBuffer;         ///< buffer containing compiled binary bytecode
+
 };
 
 } // namespace Integration

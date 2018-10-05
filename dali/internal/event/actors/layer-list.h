@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_LAYER_LIST_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -60,7 +63,7 @@ public:
    * Query the number of layers.
    * @return The number of layers.
    */
-  unsigned int GetLayerCount() const;
+  uint32_t GetLayerCount() const;
 
   /**
    * Retrieve the layer at a specified depth.
@@ -68,13 +71,13 @@ public:
    * @param[in] depth The depth.
    * @return The layer found at the given depth.
    */
-  Layer* GetLayer( unsigned int depth ) const;
+  Layer* GetLayer( uint32_t depth ) const;
 
   /**
    * Gets the depth of a given layer
    * @param layer which depth to check
    */
-  unsigned int GetDepth( const Layer* layer ) const;
+  uint32_t GetDepth( const Layer* layer ) const;
 
   /**
    * Register a layer with the stage.

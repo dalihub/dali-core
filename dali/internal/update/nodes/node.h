@@ -718,7 +718,7 @@ public:
    * @brief Get the depth index of the node
    * @return Current depth index
    */
-  uint32_t GetDepthIndex()
+  uint32_t GetDepthIndex() const
   {
     return mDepthIndex;
   }

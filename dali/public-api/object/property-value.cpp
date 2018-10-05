@@ -238,8 +238,10 @@ public: // Data
 
 private:
 
-  Impl( const Impl& ); ///< Undefined
-  Impl& operator=( const Impl& ); ///< Undefined
+  // non-copyable
+  Impl( const Impl& ) = delete;
+  Impl& operator=( const Impl& ) = delete;
+
 };
 
 Property::Value::Value()
@@ -287,7 +289,7 @@ Property::Value::Value( const Matrix& matrixValue )
 {
 }
 
-Property::Value::Value( const Rect<int>& rectValue )
+Property::Value::Value( const Rect<int32_t>& rectValue )
 : mImpl( new Impl( rectValue ) )
 {
 }
@@ -651,7 +653,7 @@ bool Property::Value::Get( float& floatValue ) const
   return converted;
 }
 
-bool Property::Value::Get( int& integerValue ) const
+bool Property::Value::Get( int32_t& integerValue ) const
 {
   bool converted = false;
   if( mImpl )
@@ -751,7 +753,7 @@ bool Property::Value::Get( Matrix& matrixValue ) const
   return converted;
 }
 
-bool Property::Value::Get( Rect<int>& rectValue ) const
+bool Property::Value::Get( Rect<int32_t>& rectValue ) const
 {
   bool converted = false;
   if( mImpl && (mImpl->type == RECTANGLE) ) // type cannot change in mImpl so rect is allocated

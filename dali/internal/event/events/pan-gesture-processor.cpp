@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -472,11 +472,11 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
     // Avoid dividing by 0
     if ( panEvent.timeDelta > 0 )
     {
-      pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
-      pan.velocity.y = pan.displacement.y / panEvent.timeDelta;
+      pan.velocity.x = pan.displacement.x / static_cast<float>( panEvent.timeDelta );
+      pan.velocity.y = pan.displacement.y / static_cast<float>( panEvent.timeDelta );
 
-      pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
-      pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
+      pan.screenVelocity.x = pan.screenDisplacement.x / static_cast<float>( panEvent.timeDelta );
+      pan.screenVelocity.y = pan.screenDisplacement.y / static_cast<float>( panEvent.timeDelta );
     }
 
     // When the gesture ends, we may incorrectly get a ZERO velocity (as we have lifted our finger without any movement)
@@ -537,7 +537,7 @@ bool PanGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor
       actor->ScreenToLocal( renderTaskImpl, currentPosition.x, currentPosition.y, mCurrentPanEvent->currentPosition.x, mCurrentPanEvent->currentPosition.y );
       Vector2 displacement( currentPosition - startPosition );
 
-      Radian angle( atan( displacement.y / displacement.x ) );
+      Radian angle( atanf( displacement.y / displacement.x ) );
 
       /////////////////////////////
       //            |            //

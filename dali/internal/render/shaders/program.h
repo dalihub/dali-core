@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROGRAM_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // int32_t, uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -43,13 +44,10 @@ namespace Internal
 
 class ProgramCache;
 
-/*
+/**
  * A program contains a vertex & fragment shader.
  *
- * A program will contain vertex attributes and uniform variables.
- *
- * uColor is set to the value specified by Actor::SetColor and is
- * animatable through the property Actor::COLOR
+ * Program caches some of vertex attribute locations and uniform variable values to reduce unnecessary state changes.
  */
 class Program
 {
@@ -60,12 +58,12 @@ public:
    * GLES specification states that minimum uniform count for fragment shader
    * is 16 and for vertex shader 128. We're caching the 16 common ones for now
    */
-  static const int MAX_UNIFORM_CACHE_SIZE = 16;
+  static const int32_t MAX_UNIFORM_CACHE_SIZE = 16;
 
   /**
    * Constant for uniform / attribute not found
    */
-  static const int NOT_FOUND = -1;
+  static const int32_t NOT_FOUND = -1;
 
   /**
    * Vertex attributes
@@ -132,21 +130,21 @@ public:
    * @param [in] name attribute name
    * @return the index of the attribute name in local cache
    */
-  unsigned int RegisterCustomAttribute( const std::string& name );
+  uint32_t RegisterCustomAttribute( const std::string& name );
 
   /**
    * Gets the location of a pre-registered attribute.
    * @param [in] attributeIndex of the attribute in local cache
    * @return the index of the attribute in the GL program
    */
-  GLint GetCustomAttributeLocation( unsigned int attributeIndex );
+  GLint GetCustomAttributeLocation( uint32_t attributeIndex );
 
   /**
    * Register a uniform name in our local cache
    * @param [in] name uniform name
    * @return the index of the uniform name in local cache
    */
-  unsigned int RegisterUniform( const std::string& name );
+  uint32_t RegisterUniform( const std::string& name );
 
   /**
    * Gets the location of a pre-registered uniform.
@@ -154,7 +152,7 @@ public:
    * @param [in] uniformIndex of the uniform in local cache
    * @return the index of the uniform in the GL program
    */
-  GLint GetUniformLocation( unsigned int uniformIndex );
+  GLint GetUniformLocation( uint32_t uniformIndex );
 
   /**
    * Introspect the newly loaded shader to get the active sampler locations
@@ -167,13 +165,13 @@ public:
    * @param [out] location The location of the requested sampler
    * @return true if the active sampler was found
    */
-  bool GetSamplerUniformLocation( unsigned int index, GLint& location );
+  bool GetSamplerUniformLocation( uint32_t index, GLint& location );
 
   /**
    * Get the number of active samplers present in the shader
    * @return The number of active samplers
    */
-  size_t GetActiveSamplerCount() const;
+  uint32_t GetActiveSamplerCount() const;
 
   /**
    * Sets the uniform value
