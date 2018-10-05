@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a0e18ba_43573747",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-framebuffer.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:15:42Z",
+      "side": 1,
+      "message": "Magic number?",
+      "revId": "b24aefff07273d90f002d37370433278b5b31547",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "afab17a8_70230845",
+        "filename": "dali/graphics/vulkan/internal/vulkan-command-buffer.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:15:42Z",
+      "side": 1,
+      "message": "MIssing documentation.",
+      "revId": "b24aefff07273d90f002d37370433278b5b31547",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb9058ed_03334b06",
+        "filename": "dali/graphics/vulkan/internal/vulkan-swapchain.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-10-05T10:15:42Z",
+      "side": 1,
+      "message": "magic number?",
+      "revId": "b24aefff07273d90f002d37370433278b5b31547",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
