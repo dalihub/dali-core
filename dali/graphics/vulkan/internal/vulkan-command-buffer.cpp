@@ -284,6 +284,39 @@ void CommandBuffer::SetViewport( uint32_t firstViewport, uint32_t viewportCount,
   mCommandBuffer.setViewport( firstViewport, viewportCount, pViewports );
 }
 
+void CommandBuffer::ClearDepthStencilImage( const RefCountedImage& image,
+                                            vk::ImageLayout layout,
+                                            vk::ClearDepthStencilValue depthStencilClearValue,
+                                            std::vector<vk::ImageSubresourceRange> ranges )
+{
+  mCommandBuffer.clearDepthStencilImage(
+    image->GetVkHandle(),
+    layout,
+    depthStencilClearValue,
+    ranges
+  );
+}
+
+void CommandBuffer::ClearDepthStencilImage( const RefCountedImage& image,
+                                            vk::ImageLayout layout,
+                                            vk::ClearDepthStencilValue depthStencilClearValue,
+                                            vk::ImageAspectFlags aspect)
+{
+  vk::ImageSubresourceRange range;
+  range.setLayerCount( 1 )
+    .setBaseArrayLayer( 0 )
+    .setAspectMask( aspect )
+    .setBaseMipLevel( 0 )
+    .setLevelCount( 1 );
+
+  mCommandBuffer.clearDepthStencilImage(
+    image->GetVkHandle(),
+    layout,
+    depthStencilClearValue,
+    { range }
+  );
+}
+
 uint32_t CommandBuffer::GetPoolAllocationIndex() const
 {
   return mPoolAllocationIndex;

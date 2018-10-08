@@ -261,6 +261,7 @@ public:
     bool        scissorTestEnable { false };
     Rect2D      scissor {};
 
+    // dynamic viewport state
     bool        viewportEnable { false };
     Viewport    viewport {};
 
