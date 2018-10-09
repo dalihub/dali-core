@@ -65,6 +65,11 @@ public:
   void Remove( Actor& actor );
 
   /**
+   * @copydoc Dali::Integration::SystemOverlay::SetOverlayRenderTasks()
+   */
+  void SetOverlayRenderTasks(RenderTaskList& taskList);
+
+  /**
    * @copydoc Dali::Integration::SystemOverlay::GetOverlayRenderTasks()
    */
   RenderTaskList& GetOverlayRenderTasks();

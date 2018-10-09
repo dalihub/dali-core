@@ -38,6 +38,7 @@
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>   // for OwnerPointer< Shader >
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -153,10 +154,9 @@ public:
    * @pre The layer is of derived Node type Layer.
    * @pre The layer does not have a parent.
    * @param[in] layer The new root node.
-   * @param[in] systemLevel True if using the system-level overlay.
    * @post The node is owned by UpdateManager.
    */
-  void InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel );
+  void InstallRoot( OwnerPointer<Layer>& layer );
 
   /**
    * Add a Node; UpdateManager takes ownership.
@@ -215,6 +215,19 @@ public:
    * @param[in] object The object to remove.
    */
   void RemoveObject( PropertyOwner* object );
+
+  /**
+   * Add a newly created render task list.
+   * @param[in] taskList The render task list to add.
+   * @post The render task list is owned by UpdateManager.
+   */
+  void AddRenderTaskList( OwnerPointer<RenderTaskList>& taskList );
+
+  /**
+   * Remove a render task list.
+   * @param[in] taskList The render task list to remove.
+   */
+  void RemoveRenderTaskList( RenderTaskList* taskList );
 
   // Animations
 
@@ -596,9 +609,9 @@ public:
   /**
    * Sets the depths of all layers.
    * @param layers The layers in depth order.
-   * @param[in] systemLevel True if using the system-level overlay.
+   * @param[in] rootLayer The root layer of the sorted layers.
    */
-  void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
+  void SetLayerDepths( const std::vector< Layer* >& layers, const Layer* rootLayer );
 
   /**
    * Set the depth indices of all nodes (in LayerUI's)
@@ -715,16 +728,16 @@ private:
 
 // Messages for UpdateManager
 
-inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root, bool systemLevel )
+inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root )
 {
   // Message has ownership of Layer while in transit from event -> update
-  typedef MessageValue2< UpdateManager, OwnerPointer<Layer>, bool > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer<Layer> > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root, systemLevel );
+  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root );
 }
 
 inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
@@ -867,6 +880,31 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
   new (slot) LocalType( &manager, &UpdateManager::RemoveAnimation, &animation );
 }
 
+inline void AddRenderTaskListMessage( UpdateManager& manager, OwnerPointer< SceneGraph::RenderTaskList >& taskList )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::RenderTaskList > > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddRenderTaskList, taskList );
+}
+
+inline void RemoveRenderTaskListMessage( UpdateManager& manager, const RenderTaskList& constTaskList )
+{
+  // The scene-graph thread owns this object so it can safely edit it.
+  RenderTaskList& taskList = const_cast< RenderTaskList& >( constTaskList );
+
+  typedef MessageValue1< UpdateManager, RenderTaskList* > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderTaskList, &taskList );
+}
+
 inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer< PropertyNotification >& propertyNotification )
 {
   // Message has ownership of PropertyNotification while in transit from event -> update
@@ -995,17 +1033,17 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
  * Create a message for setting the depth of a layer
  * @param[in] manager The update manager
  * @param[in] layers list of layers
- * @param[in] systemLevel True if the layers are added via the SystemOverlay API
+ * @param[in] rootLayer True if the layers are added via the SystemOverlay API
  */
-inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, bool systemLevel )
+inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, const Layer* rootLayer )
 {
-  typedef MessageValue2< UpdateManager, std::vector< Layer* >, bool > LocalType;
+  typedef MessageValue2< UpdateManager, std::vector< Layer* >, const Layer* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
+  new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, rootLayer );
 }
 
 inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >& object )

@@ -60,9 +60,9 @@ template<class InputIterator> InputIterator Find( InputIterator first, InputIter
 
 } // unnamed namespace
 
-LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager, bool systemLevel )
+LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager )
 {
-  return new LayerList( updateManager, systemLevel );
+  return new LayerList( updateManager );
 }
 
 LayerList::~LayerList()
@@ -234,9 +234,9 @@ void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
   }
 }
 
-LayerList::LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel )
+LayerList::LayerList( SceneGraph::UpdateManager& updateManager )
 : mUpdateManager( updateManager ),
-  mIsSystemLevel( systemLevel )
+  mRoot( NULL )
 {
 }
 
@@ -255,7 +255,14 @@ void LayerList::SetLayerDepths()
   }
 
   // Layers are being used in a separate thread; queue a message to set order
-  SetLayerDepthsMessage( mUpdateManager, layers, mIsSystemLevel );
+  SetLayerDepthsMessage( mUpdateManager, layers, &( mRoot->GetSceneLayerOnStage() ) );
+}
+
+void LayerList::SetRootLayer(Layer* rootLayer)
+{
+  mRoot = rootLayer;
+
+  SetLayerDepths();
 }
 
 } // namespace Internal

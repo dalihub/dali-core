@@ -19,7 +19,15 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
+#include <dali/internal/common/memory-pool-object-allocator.h>
+
+namespace //Unnamed namespace
+{
+
+//Memory pool used to allocate new RenderTaskLists. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> gRenderTaskListMemoryPool;
+
+} // unnamed namespace
 
 namespace Dali
 {
@@ -30,9 +38,14 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderTaskList::RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher )
+RenderTaskList* RenderTaskList::New()
+{
+  return new ( gRenderTaskListMemoryPool.AllocateRawThreadSafe() ) RenderTaskList();
+}
+
+RenderTaskList::RenderTaskList()
 : mNotificationObject( NULL ),
-  mRenderMessageDispatcher( renderMessageDispatcher )
+  mRenderMessageDispatcher( NULL )
 {
 }
 
@@ -40,11 +53,22 @@ RenderTaskList::~RenderTaskList()
 {
 }
 
+void RenderTaskList::operator delete( void* ptr )
+{
+  gRenderTaskListMemoryPool.FreeThreadSafe( static_cast<RenderTaskList*>( ptr ) );
+}
+
+void RenderTaskList::SetRenderMessageDispatcher( RenderMessageDispatcher* renderMessageDispatcher )
+{
+  mRenderMessageDispatcher = renderMessageDispatcher;
+}
+
 void RenderTaskList::AddTask( OwnerPointer< RenderTask >& newTask )
 {
   DALI_ASSERT_DEBUG( newTask != NULL && "SceneGraph RenderTask is null");
+  DALI_ASSERT_DEBUG( mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
 
-  newTask->Initialize( mRenderMessageDispatcher );
+  newTask->Initialize( *mRenderMessageDispatcher );
   // mRenderTasks container takes ownership
   mRenderTasks.PushBack( newTask.Release() );
 }
