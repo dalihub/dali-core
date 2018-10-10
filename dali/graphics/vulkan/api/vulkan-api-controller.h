@@ -112,13 +112,13 @@ struct ResourceTransferRequest
     {
       bufferToImageInfo.srcBuffer = std::move( obj.bufferToImageInfo.srcBuffer );
       bufferToImageInfo.dstImage = std::move( obj.bufferToImageInfo.dstImage );
-      bufferToImageInfo.copyInfo = std::move (obj.bufferToImageInfo.copyInfo );
+      bufferToImageInfo.copyInfo = std::move( obj.bufferToImageInfo.copyInfo );
     }
     else if( requestType == TransferRequestType::IMAGE_TO_IMAGE )
     {
       imageToImageInfo.srcImage = std::move( obj.imageToImageInfo.srcImage );
       imageToImageInfo.dstImage = std::move( obj.imageToImageInfo.dstImage );
-      imageToImageInfo.copyInfo = std::move (obj.imageToImageInfo.copyInfo );
+      imageToImageInfo.copyInfo = std::move( obj.imageToImageInfo.copyInfo );
     }
   }
 
