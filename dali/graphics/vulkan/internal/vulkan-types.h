@@ -166,6 +166,7 @@ public:
     return !(mObject == &*object);
   }
 
+  bool operator<( const Handle& rhs ) const;
 
   template< class K >
   Handle< K > DynamicCast();
@@ -227,6 +228,12 @@ template< class T >
 Handle< T >::operator bool() const
 {
   return mObject != nullptr;
+}
+
+template< class T >
+bool Handle< T >::operator<( const Handle<T>& rhs ) const
+{
+  return mObject < rhs.mObject;
 }
 
 template< class T >

@@ -64,23 +64,32 @@ vk::Buffer Buffer::GetVkHandle() const
   return mBuffer;
 }
 
+vk::Buffer Buffer::ReleaseVkHandle()
+{
+  auto retval = mBuffer;
+  mBuffer = nullptr;
+  return retval;
+}
+
 bool Buffer::OnDestroy()
 {
   mGraphics->RemoveBuffer( *this );
 
-  auto device = mGraphics->GetDevice();
-  auto buffer = mBuffer;
-  auto allocator = &mGraphics->GetAllocator();
-  auto memory = mDeviceMemory->ReleaseVkObject();
+  if( mBuffer )
+  {
+    auto device = mGraphics->GetDevice();
+    auto buffer = mBuffer;
+    auto allocator = &mGraphics->GetAllocator();
+    auto memory = mDeviceMemory->ReleaseVkObject();
 
-  mGraphics->DiscardResource( [ device, buffer, memory, allocator ]() {
-    DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: buffer->%p\n",
-                   static_cast< VkBuffer >(buffer) )
-    device.destroyBuffer( buffer, allocator );
+    mGraphics->DiscardResource( [ device, buffer, memory, allocator ]() {
+      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: buffer->%p\n",
+                     static_cast< VkBuffer >(buffer) )
+      device.destroyBuffer( buffer, allocator );
 
-    device.freeMemory( memory, allocator );
-  } );
-
+      device.freeMemory( memory, allocator );
+    } );
+  }
   return false;
 }
 

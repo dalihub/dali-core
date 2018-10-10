@@ -67,6 +67,13 @@ vk::Image Image::GetVkHandle() const
   return mImage;
 }
 
+vk::Image Image::ReleaseVkHandle()
+{
+  auto retval = mImage;
+  mImage = nullptr;
+  return retval;
+}
+
 vk::ImageLayout Image::GetImageLayout() const
 {
   return mImageLayout;
@@ -143,18 +150,22 @@ bool Image::OnDestroy()
   {
     mGraphics->RemoveImage( *this );
 
-    auto device = mGraphics->GetDevice();
-    auto image = mImage;
-    auto allocator = &mGraphics->GetAllocator();
-    auto memory = mDeviceMemory->ReleaseVkObject();
+    if( mImage )
+    {
+      auto device = mGraphics->GetDevice();
+      auto image = mImage;
+      auto allocator = &mGraphics->GetAllocator();
+      auto memory = mDeviceMemory->ReleaseVkObject();
 
-    mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
-      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
-                     static_cast< VkImage >(image) )
-      device.destroyImage( image, allocator );
+      mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
+        DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
+                       static_cast< VkImage >(image) )
+        device.destroyImage( image, allocator );
 
-      device.freeMemory( memory, allocator );
-    } );
+        device.freeMemory( memory, allocator );
+      }
+      );
+    }
   }
 
   return false;

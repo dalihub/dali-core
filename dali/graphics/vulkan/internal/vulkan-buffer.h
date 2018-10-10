@@ -58,6 +58,12 @@ public:
   vk::Buffer GetVkHandle() const;
 
   /**
+   * Releases VkBuffer object ownership, resets it to nullptr
+   * @return Stored vk::Buffer object
+   */
+  vk::Buffer ReleaseVkHandle();
+
+  /**
    * Returns handle to the allocated memory
    * @return
    */

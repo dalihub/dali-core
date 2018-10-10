@@ -42,6 +42,12 @@ public:
   vk::Image GetVkHandle() const;
 
   /**
+   * Releases vk::Image object. Internal image becomes nullptr
+   * @return vk::Image object
+   */
+  vk::Image ReleaseVkHandle();
+
+  /**
    * Returns VkImageLayout associated with the image
    * @return
    */
