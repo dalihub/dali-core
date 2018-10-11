@@ -505,6 +505,126 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
   return refCountedBuffer;
 }
 
+vk::RenderPass Graphics::CreateCompatibleRenderPass(
+  const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
+  RefCountedFramebufferAttachment depthAttachment,
+  std::vector<vk::ImageView>& attachments
+)
+{
+  auto hasDepth = false;
+  if( depthAttachment )
+  {
+    hasDepth = depthAttachment->IsValid();
+    assert( hasDepth && "Invalid depth attachment! The attachment has no ImageView" );
+  }
+
+  // The total number of attachments
+  auto totalAttachmentCount = hasDepth ? colorAttachments.size() + 1 : colorAttachments.size();
+
+  attachments.clear();
+  attachments.reserve( totalAttachmentCount );
+
+  // This vector stores the attachment references
+  auto colorAttachmentReferences = std::vector< vk::AttachmentReference >{};
+  colorAttachmentReferences.reserve( colorAttachments.size() );
+
+  // This vector stores the attachment descriptions
+  auto attachmentDescriptions = std::vector< vk::AttachmentDescription >{};
+  attachmentDescriptions.reserve( totalAttachmentCount );
+
+  // For each color attachment...
+  for( auto i = 0u; i < colorAttachments.size(); ++i )
+  {
+    // Get the image layout
+    auto imageLayout = colorAttachments[i]->GetImageView()->GetImage()->GetImageLayout();
+
+    // If the layout is undefined...
+    if( imageLayout == vk::ImageLayout::eUndefined )
+    {
+      // Set it to color attachment optimal
+      imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
+    }
+
+    // Any other case should be invalid
+    assert( imageLayout == vk::ImageLayout::eColorAttachmentOptimal );
+
+    // Add a reference and a descriptions and image views to their respective vectors
+    colorAttachmentReferences.push_back( vk::AttachmentReference{}.setLayout( imageLayout )
+                                                                  .setAttachment( U32( i ) ) );
+
+    attachmentDescriptions.push_back( colorAttachments[i]->GetDescription() );
+
+    attachments.push_back( colorAttachments[i]->GetImageView()->GetVkHandle() );
+  }
+
+
+  // Follow the exact same procedure as color attachments
+  auto depthAttachmentReference = vk::AttachmentReference{};
+  if( hasDepth )
+  {
+    auto imageLayout = depthAttachment->GetImageView()->GetImage()->GetImageLayout();
+
+    if( imageLayout == vk::ImageLayout::eUndefined )
+    {
+      imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+    }
+
+    assert( imageLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal );
+
+    depthAttachmentReference.setLayout( imageLayout );
+    depthAttachmentReference.setAttachment( U32( colorAttachmentReferences.size() ) );
+
+    attachmentDescriptions.push_back( depthAttachment->GetDescription() );
+
+    attachments.push_back( depthAttachment->GetImageView()->GetVkHandle() );
+  }
+
+  // Creating a single subpass per framebuffer
+  auto subpassDesc = vk::SubpassDescription{};
+  subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
+  subpassDesc.setColorAttachmentCount( U32( colorAttachments.size()));
+  if( hasDepth )
+  {
+    subpassDesc.setPDepthStencilAttachment( &depthAttachmentReference );
+  }
+  subpassDesc.setPColorAttachments( colorAttachmentReferences.data() );
+
+  // Creating 2 subpass dependencies using VK_SUBPASS_EXTERNAL to leverage the implicit image layout
+  // transitions provided by the driver
+  std::array< vk::SubpassDependency, 2 > subpassDependencies{
+
+    vk::SubpassDependency{}.setSrcSubpass( VK_SUBPASS_EXTERNAL )
+                           .setDstSubpass( 0 )
+                           .setSrcStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
+                           .setDstStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
+                           .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
+                           .setDstAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
+                                              vk::AccessFlagBits::eColorAttachmentWrite )
+                           .setDependencyFlags( vk::DependencyFlagBits::eByRegion ),
+
+    vk::SubpassDependency{}.setSrcSubpass( 0 )
+                           .setDstSubpass( VK_SUBPASS_EXTERNAL )
+                           .setSrcStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
+                           .setDstStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
+                           .setSrcAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
+                                              vk::AccessFlagBits::eColorAttachmentWrite )
+                           .setDstAccessMask( vk::AccessFlagBits::eMemoryRead )
+                           .setDependencyFlags( vk::DependencyFlagBits::eByRegion )
+
+  };
+
+
+  // Create the render pass
+  auto renderPassCreateInfo = vk::RenderPassCreateInfo{}.setAttachmentCount( U32( attachmentDescriptions.size() ) )
+                                                        .setPAttachments( attachmentDescriptions.data() )
+                                                        .setPSubpasses( &subpassDesc )
+                                                        .setSubpassCount( 1 )
+                                                        .setPDependencies( subpassDependencies.data() );
+
+
+  return VkAssert( mDevice.createRenderPass( renderPassCreateInfo, mAllocator.get() ) );
+}
+
 RefCountedFramebuffer Graphics::CreateFramebuffer(
         const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
         RefCountedFramebufferAttachment depthAttachment,
@@ -540,115 +660,13 @@ RefCountedFramebuffer Graphics::CreateFramebuffer(
   // Flag that indicates if the render pass is externally provided
   auto isRenderPassExternal = externalRenderPass != vk::RenderPass{};
 
-  // The total number of attachments
-  auto totalAttachmentCount = hasDepth ? colorAttachments.size() + 1 : colorAttachments.size();
-
   // This vector stores the attachments (vk::ImageViews)
   auto attachments = std::vector< vk::ImageView >{};
-  attachments.reserve( totalAttachmentCount );
 
   // If no external render pass was provided, create one internally
   if( !isRenderPassExternal )
   {
-    // This vector stores the attachment references
-    auto colorAttachmentReferences = std::vector< vk::AttachmentReference >{};
-    colorAttachmentReferences.reserve( colorAttachments.size() );
-
-    // This vector stores the attachment descriptions
-    auto attachmentDescriptions = std::vector< vk::AttachmentDescription >{};
-    attachmentDescriptions.reserve( totalAttachmentCount );
-
-    // For each color attachment...
-    for( auto i = 0u; i < colorAttachments.size(); ++i )
-    {
-      // Get the image layout
-      auto imageLayout = colorAttachments[i]->GetImageView()->GetImage()->GetImageLayout();
-
-      // If the layout is undefined...
-      if( imageLayout == vk::ImageLayout::eUndefined )
-      {
-        // Set it to color attachment optimal
-        imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
-      }
-
-      // Any other case should be invalid
-      assert( imageLayout == vk::ImageLayout::eColorAttachmentOptimal );
-
-      // Add a reference and a descriptions and image views to their respective vectors
-      colorAttachmentReferences.push_back( vk::AttachmentReference{}.setLayout( imageLayout )
-                                                                    .setAttachment( U32( i ) ) );
-
-      attachmentDescriptions.push_back( colorAttachments[i]->GetDescription() );
-
-      attachments.push_back( colorAttachments[i]->GetImageView()->GetVkHandle() );
-    }
-
-
-    // Follow the exact same procedure as color attachments
-    auto depthAttachmentReference = vk::AttachmentReference{};
-    if( hasDepth )
-    {
-      auto imageLayout = depthAttachment->GetImageView()->GetImage()->GetImageLayout();
-
-      if( imageLayout == vk::ImageLayout::eUndefined )
-      {
-        imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-      }
-
-      assert( imageLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal );
-
-      depthAttachmentReference.setLayout( imageLayout );
-      depthAttachmentReference.setAttachment( U32( colorAttachmentReferences.size() ) );
-
-      attachmentDescriptions.push_back( depthAttachment->GetDescription() );
-
-      attachments.push_back( depthAttachment->GetImageView()->GetVkHandle() );
-    }
-
-    // Creating a single subpass per framebuffer
-    auto subpassDesc = vk::SubpassDescription{};
-    subpassDesc.setPipelineBindPoint( vk::PipelineBindPoint::eGraphics );
-    subpassDesc.setColorAttachmentCount( U32( colorAttachments.size()));
-    if( hasDepth )
-    {
-      subpassDesc.setPDepthStencilAttachment( &depthAttachmentReference );
-    }
-    subpassDesc.setPColorAttachments( colorAttachmentReferences.data() );
-
-    // Creating 2 subpass dependencies using VK_SUBPASS_EXTERNAL to leverage the implicit image layout
-    // transitions provided by the driver
-    std::array< vk::SubpassDependency, 2 > subpassDependencies{
-
-            vk::SubpassDependency{}.setSrcSubpass( VK_SUBPASS_EXTERNAL )
-                                   .setDstSubpass( 0 )
-                                   .setSrcStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
-                                   .setDstStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
-                                   .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
-                                   .setDstAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
-                                                      vk::AccessFlagBits::eColorAttachmentWrite )
-                                   .setDependencyFlags( vk::DependencyFlagBits::eByRegion ),
-
-            vk::SubpassDependency{}.setSrcSubpass( 0 )
-                                   .setDstSubpass( VK_SUBPASS_EXTERNAL )
-                                   .setSrcStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput )
-                                   .setDstStageMask( vk::PipelineStageFlagBits::eBottomOfPipe )
-                                   .setSrcAccessMask( vk::AccessFlagBits::eColorAttachmentRead |
-                                                      vk::AccessFlagBits::eColorAttachmentWrite )
-                                   .setDstAccessMask( vk::AccessFlagBits::eMemoryRead )
-                                   .setDependencyFlags( vk::DependencyFlagBits::eByRegion )
-
-    };
-
-
-    // Create the render pass
-    auto renderPassCreateInfo = vk::RenderPassCreateInfo{}.setAttachmentCount( U32( attachmentDescriptions.size() ) )
-                                                          .setPAttachments( attachmentDescriptions.data() )
-                                                          .setPSubpasses( &subpassDesc )
-                                                          .setSubpassCount( 1 )
-                                                          .setPDependencies( subpassDependencies.data() );
-
-
-    renderPass = VkAssert( mDevice.createRenderPass( renderPassCreateInfo, mAllocator.get() ) );
+    renderPass = CreateCompatibleRenderPass( colorAttachments, depthAttachment, attachments );
   }
 
   // Finally create the framebuffer
@@ -1019,38 +1037,6 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
     return RefCountedSwapchain();
   }
 
-  // Create a Depth/Stencil ( optional )
-  auto depthAttachment = RefCountedFramebufferAttachment{};
-
-  if( mHasDepth ) //@ todo fix for stencil
-  {
-    auto imageCreateInfo = vk::ImageCreateInfo{}
-            .setFormat( vk::Format::eD24UnormS8Uint )
-            .setMipLevels( 1 )
-            .setTiling( vk::ImageTiling::eOptimal )
-            .setImageType( vk::ImageType::e2D )
-            .setArrayLayers( 1 )
-            .setExtent( { swapchainExtent.width, swapchainExtent.height, 1 } )
-            .setUsage( vk::ImageUsageFlagBits::eDepthStencilAttachment )
-            .setSharingMode( vk::SharingMode::eExclusive )
-            .setInitialLayout( vk::ImageLayout::eUndefined )
-            .setSamples( vk::SampleCountFlagBits::e1 );
-
-    auto dsRefCountedImage = CreateImage( imageCreateInfo );
-
-    auto memory = AllocateMemory( dsRefCountedImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-    BindImageMemory( dsRefCountedImage, std::move(memory), 0 );
-
-    // create the depth stencil ImageView to be used within framebuffer
-    auto depthStencilImageView = CreateImageView( dsRefCountedImage );
-    auto depthClearValue = vk::ClearDepthStencilValue{}.setDepth( 0.0 )
-                                                       .setStencil( STENCIL_DEFAULT_CLEAR_VALUE );
-
-    // A single depth attachment for the swapchain.
-    depthAttachment = FramebufferAttachment::NewDepthAttachment( depthStencilImageView, depthClearValue );
-  }
-
   auto framebuffers = std::vector< RefCountedFramebuffer >{};
   framebuffers.reserve( images.size() );
 
@@ -1069,7 +1055,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
                                                                       true /* presentable */ );
 
     framebuffers.push_back( CreateFramebuffer( { colorAttachment },
-                                               depthAttachment,
+                                               RefCountedFramebufferAttachment{},
                                                swapchainExtent.width,
                                                swapchainExtent.height ) );
   }
