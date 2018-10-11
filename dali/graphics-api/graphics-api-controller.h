@@ -150,6 +150,11 @@ public:
    */
   virtual void Resume() = 0;
 
+  /**
+   * @brief Enables depth/stencil buffer if supported
+   */
+  virtual void EnableDepthStencilBuffer() = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

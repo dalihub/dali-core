@@ -103,14 +103,7 @@ public:
    *
    * @param[in] depthStencilFormat valid depth/stencil pixel format
    */
-  void SetDepthStencil(vk::Format depthStencilFormat);
-
-  /**
-   * Returns current depth stencil format
-   *
-   * @return format or vk::Format::eUndefined if depth/stencil is disabled
-   */
-  vk::Format GetDepthStencilFormat() const;
+  void SetDepthStencil( vk::Format depthStencilFormat );
 
 private:
 

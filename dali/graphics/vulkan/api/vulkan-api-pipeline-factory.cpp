@@ -17,10 +17,12 @@
 
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/internal/vulkan-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/vulkan-graphics.h>
+#include <dali/graphics/vulkan/api/vulkan-api-framebuffer.h>
 
 namespace Dali
 {
@@ -48,8 +50,14 @@ uint32_t HashBinary( const void* dataObj, uint32_t size )
   return hash;
 }
 
-uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
+uint32_t HashPipeline( const VulkanAPI::PipelineFactory& factory )
 {
+  const VulkanAPI::PipelineFactory::Info& info = factory.mInfo;
+
+  // Obtain renderpass as it is a part of the hashed value
+  const auto renderPass = info.framebufferState.framebuffer ? static_cast<const VulkanAPI::Framebuffer*>(info.framebufferState.framebuffer)->GetFramebufferRef()->GetRenderPass() :
+                    factory.mGraphics.GetSwapchainForFBID( 0u )->GetCurrentFramebuffer()->GetRenderPass();
+
   uint32_t dsHash = HashBinary( &info.depthStencilState, sizeof( info.depthStencilState ) );
   uint32_t cbHash = HashBinary( &info.colorBlendState, sizeof( info.colorBlendState ) );
   uint32_t shHash = HashBinary( &info.shaderState, sizeof( info.shaderState ) );
@@ -65,8 +73,9 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory::Info& info )
           sizeof( API::VertexInputState::Attribute ) * info.vertexInputState.attributes.size() ) );
 
   // rehash all
-  std::array< uint32_t, 10 > allHashes = {
-          dsHash, cbHash, shHash, vpHash, fbHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask
+  std::array< uint32_t, 11 > allHashes = {
+          dsHash, cbHash, shHash, vpHash, fbHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask,
+          uint32_t( uintptr_t( static_cast<const VkRenderPass>(renderPass) ) )
   };
 
   return HashBinary( allHashes.data(), uint32_t( allHashes.size() * sizeof( uint32_t ) ) );
@@ -212,7 +221,7 @@ uint32_t PipelineFactory::GetHashCode() const
 {
   if( !mHashCode )
   {
-    mHashCode = HashPipeline( GetCreateInfo() );
+    mHashCode = HashPipeline( *this );
   }
   return mHashCode;
 }

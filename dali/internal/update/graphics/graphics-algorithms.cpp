@@ -596,12 +596,13 @@ void GraphicsAlgorithms::SubmitInstruction(
   }
 }
 
-bool GraphicsAlgorithms::PrepareGraphicsPipeline(
-  Graphics::API::Controller& controller,
-  RenderInstruction& instruction,
-  const RenderList* renderList,
-  RenderItem& item,
-  BufferIndex bufferIndex )
+bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+                              RenderInstruction& instruction,
+                              const RenderList* renderList,
+                              RenderItem& item,
+                              bool& usesDepth,
+                              bool& usesStencil,
+                              BufferIndex bufferIndex )
 {
   using namespace Dali::Graphics::API;
 
@@ -732,8 +733,18 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
   depthStencilState.SetDepthTestEnable( enableDepthTest );
   depthStencilState.SetDepthWriteEnable( enableDepthWrite );
 
+  if( !usesDepth && (enableDepthTest || enableDepthWrite) )
+  {
+    usesDepth = true; // set out-value to indicate at least 1 pipeline uses depth buffer
+  }
+
   // Stencil setup
   bool stencilEnabled = mCurrentStencilState.stencilTestEnable;
+
+  if( !usesStencil && stencilEnabled )
+  {
+    usesStencil = true; // set out-value to indicate at least 1 pipeline uses stencil buffer
+  }
 
   if( stencilEnabled)
   {
@@ -886,10 +897,11 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
 }
 
 
-void GraphicsAlgorithms::PrepareRendererPipelines(
-  Graphics::API::Controller& controller,
-  RenderInstructionContainer& renderInstructions,
-  BufferIndex bufferIndex )
+void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
+                                                   RenderInstructionContainer& renderInstructions,
+                                                   bool& usesDepth,
+                                                   bool& usesStencil,
+                                                   BufferIndex bufferIndex )
 {
 
   mUniformBlockAllocationCount = 0u;
@@ -924,7 +936,7 @@ void GraphicsAlgorithms::PrepareRendererPipelines(
 
         if( item.mRenderer )
         {
-          PrepareGraphicsPipeline( controller, ri, renderList, item, bufferIndex );
+          PrepareGraphicsPipeline( controller, ri, renderList, item, usesDepth, usesStencil, bufferIndex );
         }
       }
     }
@@ -936,7 +948,14 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   RenderInstructionContainer& renderInstructions,
   BufferIndex                 bufferIndex )
 {
-  PrepareRendererPipelines( controller, renderInstructions, bufferIndex );
+  bool usesDepth = false;
+  bool usesStencil = false;
+  PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
+
+  if(usesDepth || usesStencil)
+  {
+    controller.EnableDepthStencilBuffer();
+  }
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
