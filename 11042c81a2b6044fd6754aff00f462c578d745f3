@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f14c04b6_72d33c8b",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-11T13:31:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abe033f8_31ca6072",
+      "range": {
+        "startLine": 444,
+        "startChar": 34,
+        "endLine": 444,
+        "endChar": 49
+      },
+      "revId": "11042c81a2b6044fd6754aff00f462c578d745f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "40e0213f_174bea75",
         "filename": "dali/graphics/vulkan/internal/vulkan-image.cpp",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-10-11T10:38:47Z",
       "side": 1,
       "message": "This will lead to memory leaks... don\u0027t do it...",
+      "range": {
+        "startLine": 70,
+        "startChar": 17,
+        "endLine": 70,
+        "endChar": 32
+      },
+      "revId": "11042c81a2b6044fd6754aff00f462c578d745f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "259eb20b_d0ef9c19",
+        "filename": "dali/graphics/vulkan/internal/vulkan-image.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-11T13:31:51Z",
+      "side": 1,
+      "message": "Function removed. Added function to destroy all Vulkan resources instantly. change applied to vulkan-buffer, too.",
+      "parentUuid": "40e0213f_174bea75",
       "range": {
         "startLine": 70,
         "startChar": 17,
