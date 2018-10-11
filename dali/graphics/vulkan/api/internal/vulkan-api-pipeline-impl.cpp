@@ -255,6 +255,8 @@ struct Pipeline::VulkanPipelineState
 
   vk::Pipeline pipeline {};
   vk::PipelineLayout pipelineLayout {};
+
+  vk::RenderPass renderpass {};
 };
 
 Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory )
@@ -411,6 +413,7 @@ bool Pipeline::Initialise()
           .setPStages( shaderStages.data() )
           .setStageCount( Vulkan::U32( shaderStages.size() ) );
 
+  mVulkanPipelineState->renderpass = pipelineInfo.renderPass;
   mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo ) );
   return true;
 }

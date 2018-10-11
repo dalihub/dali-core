@@ -172,6 +172,19 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
+
+    // if we enable depth/stencil dynamically we need to block and invalidate pipeline cache
+    // enable depth-stencil
+    if( !mHasDepthEnabled && mShouldEnableDepthStencil )
+    {
+      // add depth stencil to main framebuffer
+      mGraphics.GetSwapchainForFBID(0u)->SetDepthStencil(vk::Format::eD24UnormS8Uint);
+      mHasDepthEnabled = true;
+      mShouldEnableDepthStencil = false;
+
+      // make sure GPU finishe any pending work
+      mGraphics.DeviceWaitIdle();
+    }
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -546,14 +559,6 @@ struct Controller::Impl
       // dynamic state: viewport
       auto vulkanApiPipeline = static_cast<const VulkanAPI::Pipeline*>(apiCommand->GetPipeline());
 
-      // enable depth-stencil
-      if( !mHasDepthEnabled && vulkanApiPipeline->HasDepthEnabled() )
-      {
-        // add depth stencil to main framebuffer
-        mGraphics.GetSwapchainForFBID(0u)->SetDepthStencil(vk::Format::eD24UnormS8Uint);
-        mHasDepthEnabled = true;
-      }
-
       auto dynamicStateMask = vulkanApiPipeline->GetDynamicStateMask();
       if( (dynamicStateMask & API::PipelineDynamicStateBits::VIEWPORT_BIT) && apiCommand->mDrawCommand.viewportEnable )
       {
@@ -606,6 +611,15 @@ struct Controller::Impl
     primaryCommandBuffer->EndRenderPass();
   }
 
+  void EnableDepthStencilBuffer()
+  {
+    // enable depth-stencil
+    if( !mHasDepthEnabled )
+    {
+      mShouldEnableDepthStencil = true;
+    }
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
   Vulkan::Graphics& mGraphics;
@@ -643,7 +657,8 @@ struct Controller::Impl
 
   std::mutex mDescriptorWriteMutex{};
   std::recursive_mutex mResourceTransferMutex{};
-  bool mHasDepthEnabled;
+  bool mHasDepthEnabled { false };
+  bool mShouldEnableDepthStencil { false };
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -831,6 +846,11 @@ void Controller::SubmitCommands( std::vector< API::RenderCommand* > commands )
 std::unique_ptr< API::RenderCommand > Controller::AllocateRenderCommand()
 {
   return mImpl->AllocateRenderCommand();
+}
+
+void Controller::EnableDepthStencilBuffer()
+{
+  mImpl->EnableDepthStencilBuffer();
 }
 
 } // namespace VulkanAPI

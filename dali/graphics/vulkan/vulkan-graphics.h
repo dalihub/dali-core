@@ -198,6 +198,10 @@ public: // Create methods
                                        vk::PresentModeKHR presentMode,
                                        uint32_t bufferCount, RefCountedSwapchain&& oldSwapchain );
 
+  vk::RenderPass CreateCompatibleRenderPass( const std::vector< RefCountedFramebufferAttachment >& colorAttachments,
+                                             RefCountedFramebufferAttachment depthAttachment,
+                                             std::vector<vk::ImageView>& attachments);
+
 public: // Actions
   vk::Result WaitForFence( RefCountedFence fence, uint32_t timeout = std::numeric_limits< uint32_t >::max() );
 
@@ -391,8 +395,8 @@ private: // Members
   uint32_t mCurrentGarbageBufferIndex { 0u };
   uint32_t mCurrentActionBufferIndex { 0u };
 
-  bool mHasDepth;
-  bool mHasStencil;
+  bool mHasDepth { false };
+  bool mHasStencil { false };
 
   vk::PipelineCache mVulkanPipelineCache;
 
