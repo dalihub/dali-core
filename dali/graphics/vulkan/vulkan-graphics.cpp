@@ -1054,7 +1054,7 @@ RefCountedSwapchain Graphics::CreateSwapchain( RefCountedSurface surface,
   auto framebuffers = std::vector< RefCountedFramebuffer >{};
   framebuffers.reserve( images.size() );
 
-  auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+  auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 0.0f } );
 
   /*
    * CREATE FRAMEBUFFERS
