@@ -361,13 +361,6 @@ void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
   mFramebuffers = framebuffers;
 }
 
-vk::Format Swapchain::GetDepthStencilFormat() const
-{
-  return vk::Format::eUndefined;
-}
-
-
-
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali

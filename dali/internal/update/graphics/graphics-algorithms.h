@@ -87,10 +87,14 @@ private:
                                 RenderInstruction& instruction,
                                 const RenderList* renderList,
                                 RenderItem& item,
+                                bool& usesDepth,
+                                bool& usesStencil,
                                 BufferIndex bufferIndex );
 
   void PrepareRendererPipelines( Graphics::API::Controller& controller,
                                  RenderInstructionContainer& renderInstructions,
+                                 bool& usesDepth,
+                                 bool& usesStencil,
                                  BufferIndex bufferIndex );
 
   using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
