@@ -51,7 +51,7 @@ public:
   /**
    * Construct a new FrameCallbackProcessor.
    */
-  FrameCallbackProcessor( TransformManager& transformManager, Node& rootNode );
+  FrameCallbackProcessor( TransformManager& transformManager );
 
   /**
    * Non-virtual Destructor.
@@ -146,7 +146,6 @@ private:
   std::vector< FrameCallbackInfo > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
 
   TransformManager& mTransformManager;
-  Node& mRootNode;
 
   bool mNodeHierarchyChanged; ///< Set to true if the node hierarchy changes
 };

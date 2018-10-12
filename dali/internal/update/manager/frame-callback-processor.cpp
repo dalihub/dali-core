@@ -62,10 +62,9 @@ private:
 
 } // unnamed namespace
 
-FrameCallbackProcessor::FrameCallbackProcessor( TransformManager& transformManager, Node& rootNode )
+FrameCallbackProcessor::FrameCallbackProcessor( TransformManager& transformManager )
 : mFrameCallbacks(),
   mTransformManager( transformManager ),
-  mRootNode( rootNode ),
   mNodeHierarchyChanged( true )
 {
 }

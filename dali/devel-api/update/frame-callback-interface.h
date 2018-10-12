@@ -64,7 +64,7 @@ protected:
   /**
    * @brief Protected virtual destructor.
    */
-  virtual ~FrameCallbackInterface() {}
+  virtual ~FrameCallbackInterface();
 };
 
 } // namespace Dali

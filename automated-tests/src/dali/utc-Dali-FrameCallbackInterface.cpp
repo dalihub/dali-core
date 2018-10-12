@@ -804,6 +804,8 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
 
 int UtcDaliFrameCallbackActorDestroyed(void)
 {
+  // Test to ensure that the frame-callback behaves gracefully if the connected root-actor is destroyed
+
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
@@ -844,6 +846,36 @@ int UtcDaliFrameCallbackActorDestroyed(void)
 
   DALI_TEST_EQUALS( frameCallback1.mCalled, false,  TEST_LOCATION );
   DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackDestroyedBeforeRemoving(void)
+{
+  // Ensure there's no segmentation fault if the callback is deleted without being removed
+
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  {
+    FrameCallbackBasic frameCallback;
+    DevelStage::AddFrameCallback( stage, frameCallback, actor );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( frameCallback.mCalled, true,  TEST_LOCATION );
+    frameCallback.Reset();
+  }
+
+  // frameCallback has now been destroyed but not removed
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( true ); // If it runs to here then there's no segmentation fault
 
   END_TEST;
 }
