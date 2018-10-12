@@ -27,7 +27,7 @@ namespace Internal
 namespace
 {
 
-SceneGraph::Node* FindNodeInSceneGraph( unsigned int id, SceneGraph::Node& node )
+SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
 {
   SceneGraph::Node* matchingNode = NULL;
 
@@ -65,7 +65,7 @@ UpdateProxy::~UpdateProxy()
 {
 }
 
-bool UpdateProxy::GetPosition( unsigned int id, Vector3& position ) const
+bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
 {
   bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
@@ -77,7 +77,7 @@ bool UpdateProxy::GetPosition( unsigned int id, Vector3& position ) const
   return success;
 }
 
-bool UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
+bool UpdateProxy::SetPosition( uint32_t id, const Vector3& position )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -89,7 +89,7 @@ bool UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
   return success;
 }
 
-bool UpdateProxy::BakePosition( unsigned int id, const Vector3& position )
+bool UpdateProxy::BakePosition( uint32_t id, const Vector3& position )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -101,7 +101,7 @@ bool UpdateProxy::BakePosition( unsigned int id, const Vector3& position )
   return success;
 }
 
-bool UpdateProxy::GetSize( unsigned int id, Vector3& size ) const
+bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
 {
   bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
@@ -113,7 +113,7 @@ bool UpdateProxy::GetSize( unsigned int id, Vector3& size ) const
   return success;
 }
 
-bool UpdateProxy::SetSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::SetSize( uint32_t id, const Vector3& size )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -125,7 +125,7 @@ bool UpdateProxy::SetSize( unsigned int id, const Vector3& size )
   return success;
 }
 
-bool UpdateProxy::BakeSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::BakeSize( uint32_t id, const Vector3& size )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -137,7 +137,7 @@ bool UpdateProxy::BakeSize( unsigned int id, const Vector3& size )
   return success;
 }
 
-bool UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
+bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const
 {
   bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
@@ -150,7 +150,7 @@ bool UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector
   return success;
 }
 
-bool UpdateProxy::GetScale( unsigned int id, Vector3& scale ) const
+bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
 {
   bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
@@ -163,7 +163,7 @@ bool UpdateProxy::GetScale( unsigned int id, Vector3& scale ) const
   return success;
 }
 
-bool UpdateProxy::SetScale( unsigned int id, const Vector3& scale )
+bool UpdateProxy::SetScale( uint32_t id, const Vector3& scale )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -175,7 +175,7 @@ bool UpdateProxy::SetScale( unsigned int id, const Vector3& scale )
   return success;
 }
 
-bool UpdateProxy::BakeScale( unsigned int id, const Vector3& scale )
+bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -187,7 +187,7 @@ bool UpdateProxy::BakeScale( unsigned int id, const Vector3& scale )
   return success;
 }
 
-bool UpdateProxy::GetColor( unsigned int id, Vector4& color ) const
+bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -200,7 +200,7 @@ bool UpdateProxy::GetColor( unsigned int id, Vector4& color ) const
   return success;
 }
 
-bool UpdateProxy::SetColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::SetColor( uint32_t id, const Vector4& color ) const
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -212,7 +212,7 @@ bool UpdateProxy::SetColor( unsigned int id, const Vector4& color ) const
   return success;
 }
 
-bool UpdateProxy::BakeColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color ) const
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -230,7 +230,7 @@ void UpdateProxy::NodeHierarchyChanged()
   mNodeContainer.clear();
 }
 
-SceneGraph::Node* UpdateProxy::GetNodeWithId( unsigned int id ) const
+SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
 {
   SceneGraph::Node* node = NULL;
 

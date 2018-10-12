@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <cstdint>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/common/buffer-index.h>
@@ -67,67 +68,67 @@ public:
   /**
    * @copydoc Dali::UpdateProxy::GetPosition()
    */
-  bool GetPosition( unsigned int id, Vector3& position) const;
+  bool GetPosition( uint32_t id, Vector3& position) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetPosition()
    */
-  bool SetPosition( unsigned int id, const Vector3& position );
+  bool SetPosition( uint32_t id, const Vector3& position );
 
   /**
    * @copydoc Dali::UpdateProxy::BakePosition()
    */
-  bool BakePosition( unsigned int id, const Vector3& position );
+  bool BakePosition( uint32_t id, const Vector3& position );
 
   /**
    * @copydoc Dali::UpdateProxy::GetSize()
    */
-  bool GetSize( unsigned int id, Vector3& size ) const;
+  bool GetSize( uint32_t id, Vector3& size ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetSize()
    */
-  bool SetSize( unsigned int id, const Vector3& size );
+  bool SetSize( uint32_t id, const Vector3& size );
 
   /**
    * @copydoc Dali::UpdateProxy::BakeSize()
    */
-  bool BakeSize( unsigned int id, const Vector3& size );
+  bool BakeSize( uint32_t id, const Vector3& size );
 
   /**
    * @copydoc Dali::UpdateProxy::GetPositionAndSize()
    */
-  bool GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::GetScale()
    */
-  bool GetScale( unsigned int id, Vector3& scale ) const;
+  bool GetScale( uint32_t id, Vector3& scale ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetScale()
    */
-  bool SetScale( unsigned int id, const Vector3& scale );
+  bool SetScale( uint32_t id, const Vector3& scale );
 
   /**
    * @copydoc Dali::UpdateProxy::BakeScale()
    */
-  bool BakeScale( unsigned int id, const Vector3& scale );
+  bool BakeScale( uint32_t id, const Vector3& scale );
 
   /**
    * @copydoc Dali::UpdateProxy::GetColor()
    */
-  bool GetColor( unsigned int id, Vector4& color ) const;
+  bool GetColor( uint32_t id, Vector4& color ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetColor()
    */
-  bool SetColor( unsigned int id, const Vector4& color ) const;
+  bool SetColor( uint32_t id, const Vector4& color ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::BakeColor()
    */
-  bool BakeColor( unsigned int id, const Vector4& color ) const;
+  bool BakeColor( uint32_t id, const Vector4& color ) const;
 
   /**
    * @brief Retrieves the root-node used by this class
@@ -160,7 +161,7 @@ private:
    * @return A pointer to the required node if found.
    * @note This caches the last accessed node.
    */
-  SceneGraph::Node* GetNodeWithId( unsigned int id ) const;
+  SceneGraph::Node* GetNodeWithId( uint32_t id ) const;
 
 private:
 
@@ -169,7 +170,7 @@ private:
    */
   struct IdNodePair
   {
-    unsigned int id; ///< The ID of the node
+    uint32_t id; ///< The ID of the node
     SceneGraph::Node* node; ///< The node itself
   };
 
