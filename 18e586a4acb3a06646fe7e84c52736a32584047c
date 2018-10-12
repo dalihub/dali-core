@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f35b6fe7_e132fdd8",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-12T13:47:15Z",
+      "side": 1,
+      "message": "Add comment to say that the request list will end up containing batches of non-intersecting requests per image.",
+      "range": {
+        "startLine": 322,
+        "startChar": 39,
+        "endLine": 322,
+        "endChar": 40
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "110e1513_fb0eb58c",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-12T13:47:15Z",
+      "side": 1,
+      "message": "Shouldn\u0027t use copyable handle as a key... (You are relying on the equality operator working on the content...)",
+      "range": {
+        "startLine": 331,
+        "startChar": 8,
+        "endLine": 331,
+        "endChar": 31
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a0575e5_c67ca085",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-12T13:47:15Z",
+      "side": 1,
+      "message": "sp",
+      "range": {
+        "startLine": 407,
+        "startChar": 15,
+        "endLine": 407,
+        "endChar": 22
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53e9a875_62dfd513",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-12T13:47:15Z",
+      "side": 1,
+      "message": "Should add comment about why we are looping over the requests in this way. (i.e. to ensure that we parallelize independent image transfers)",
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06802faf_3f802ea8",
+        "filename": "dali/graphics/vulkan/internal/vulkan-types.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-12T13:47:15Z",
+      "side": 1,
+      "message": "You don\u0027t need these operators without map...",
+      "range": {
+        "startLine": 234,
+        "startChar": 26,
+        "endLine": 234,
+        "endChar": 28
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
