@@ -75,11 +75,6 @@ public:
   void SetPosition( unsigned int id, const Vector3& position );
 
   /**
-   * @copydoc Dali::UpdateProxy::BakePosition()
-   */
-  void BakePosition( unsigned int id, const Vector3& position );
-
-  /**
    * @copydoc Dali::UpdateProxy::GetSize()
    */
   const Vector3& GetSize( unsigned int id ) const;
@@ -90,44 +85,34 @@ public:
   void SetSize( unsigned int id, const Vector3& size );
 
   /**
-   * @copydoc Dali::UpdateProxy::BakeSize()
-   */
-  void BakeSize( unsigned int id, const Vector3& size );
-
-  /**
    * @copydoc Dali::UpdateProxy::GetPositionAndSize()
    */
   void GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
 
   /**
-   * @copydoc Dali::UpdateProxy::GetScale()
-   */
-  Vector3 GetScale( unsigned int id ) const;
-
-  /**
-   * @copydoc Dali::UpdateProxy::SetScale()
-   */
-  void SetScale( unsigned int id, const Vector3& scale );
-
-  /**
-   * @copydoc Dali::UpdateProxy::BakeScale()
-   */
-  void BakeScale( unsigned int id, const Vector3& scale );
-
-  /**
    * @copydoc Dali::UpdateProxy::GetColor()
    */
-  Vector4 GetColor( unsigned int id ) const;
+  Vector4 GetWorldColor( unsigned int id ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetColor()
    */
-  void SetColor( unsigned int id, const Vector4& color ) const;
+  void SetWorldColor( unsigned int id, const Vector4& color ) const;
 
   /**
-   * @copydoc Dali::UpdateProxy::BakeColor()
+   * @copydoc Dali::UpdateProxy::GetWorldMatrixAndSize()
    */
-  void BakeColor( unsigned int id, const Vector4& color ) const;
+  void GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetWorldMatrix()
+   */
+  const Matrix& GetWorldMatrix( unsigned int id ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::SetWorldMatrix()
+   */
+  void SetWorldMatrix( unsigned int id, const Matrix& worldMatrix );
 
   /**
    * @brief Retrieves the root-node used by this class
@@ -166,7 +151,7 @@ private:
 
   mutable std::vector< IdNodePair > mNodeContainer; ///< Used to store cached pointers to already searched for Nodes.
   mutable IdNodePair mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
-  BufferIndex mCurrentBufferIndex;
+  unsigned int mCurrentBufferIndex;
 
   SceneGraph::TransformManager& mTransformManager; ///< Reference to the Transform Manager.
   SceneGraph::Node& mRootNode; ///< The root node of this update proxy.

@@ -892,14 +892,14 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
 
+    //Update the transformations of all the nodes
+    mImpl->transformManager.Update();
+
     // Call the frame-callback-processor if set
     if( mImpl->frameCallbackProcessor )
     {
       mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
     }
-
-    //Update the transformations of all the nodes
-    mImpl->transformManager.Update();
 
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
