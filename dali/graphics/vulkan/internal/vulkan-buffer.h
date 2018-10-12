@@ -64,6 +64,14 @@ public:
   Memory* GetMemory() const;
 
   /**
+   * Destroys underlying Vulkan resources on the caller thread.
+   *
+   * @note Calling this function is unsafe and makes any further use of
+   * buffer invalid.
+   */
+  void DestroyNow();
+
+  /**
    *
    * @return
    */
@@ -82,6 +90,15 @@ private:
    * @param createInfo
    */
   Buffer( Graphics& graphics, const vk::BufferCreateInfo& createInfo );
+
+  /**
+   * Destroys used Vulkan resource objects
+   * @param device Vulkan device
+   * @param buffer Vulkan buffer
+   * @param memory Vulkan device memory
+   * @param allocator Pointer to the Vulkan allocator callbacks
+   */
+  static void DestroyVulkanResources( vk::Device device, vk::Buffer buffer, vk::DeviceMemory memory, const vk::AllocationCallbacks* allocator );
 
 private:
   Graphics* mGraphics;

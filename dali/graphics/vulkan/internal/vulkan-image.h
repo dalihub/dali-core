@@ -35,6 +35,7 @@ class Image : public VkManaged
   friend class Graphics;
 
 public:
+
   /**
    * Returns underlying Vulkan object
    * @return
@@ -112,6 +113,14 @@ public:
     return mDeviceMemory.get();
   }
 
+  /**
+   * Destroys underlying Vulkan resources on the caller thread.
+   *
+   * @note Calling this function is unsafe and makes any further use of
+   * image invalid.
+   */
+  void DestroyNow();
+
 private:
 
   /**
@@ -121,6 +130,15 @@ private:
    * @param createInfo
    */
   Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Image externalImage = nullptr );
+
+  /**
+   * Destroys used Vulkan resource objects
+   * @param device Vulkan device
+   * @param image Vulkan image
+   * @param memory Vulkan device memory
+   * @param allocator Pointer to the Vulkan allocator callbacks
+   */
+  static void DestroyVulkanResources( vk::Device device, vk::Image image, vk::DeviceMemory memory, const vk::AllocationCallbacks* allocator );
 
 private:
   Graphics* mGraphics;
