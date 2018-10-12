@@ -137,28 +137,45 @@ vk::SampleCountFlagBits Image::GetSampleCount() const
   return mCreateInfo.samples;
 }
 
+void Image::DestroyNow()
+{
+  DestroyVulkanResources( mGraphics->GetDevice(), mImage, mDeviceMemory->ReleaseVkObject(), &mGraphics->GetAllocator() );
+  mImage = nullptr;
+  mDeviceMemory = nullptr;
+}
+
 bool Image::OnDestroy()
 {
   if( !mIsExternal )
   {
     mGraphics->RemoveImage( *this );
 
-    auto device = mGraphics->GetDevice();
-    auto image = mImage;
-    auto allocator = &mGraphics->GetAllocator();
-    auto memory = mDeviceMemory->ReleaseVkObject();
+    if( mImage )
+    {
+      auto device = mGraphics->GetDevice();
+      auto image = mImage;
+      auto allocator = &mGraphics->GetAllocator();
+      auto memory = mDeviceMemory->ReleaseVkObject();
 
-    mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
-      DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
-                     static_cast< VkImage >(image) )
-      device.destroyImage( image, allocator );
-
-      device.freeMemory( memory, allocator );
-    } );
+      mGraphics->DiscardResource( [ device, image, memory, allocator ]() {
+        DestroyVulkanResources( device, image, memory, allocator );
+      }
+      );
+    }
   }
 
   return false;
 }
+
+void Image::DestroyVulkanResources( vk::Device device, vk::Image image, vk::DeviceMemory memory, const vk::AllocationCallbacks* allocator )
+{
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Invoking deleter function: image->%p\n",
+                 static_cast< VkImage >(image) )
+  device.destroyImage( image, allocator );
+
+  device.freeMemory( memory, allocator );
+}
+
 
 } // namespace Vulkan
 

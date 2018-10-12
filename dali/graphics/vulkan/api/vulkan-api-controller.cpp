@@ -46,8 +46,6 @@
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/thread-pool.h>
-#include <utility>
-#include <dali/graphics/vulkan/internal/vulkan-types.h>
 
 namespace Dali
 {
@@ -292,122 +290,200 @@ struct Controller::Impl
     UpdateRenderPass( std::move( commands ) );
   }
 
+  // @todo: possibly optimise
+  bool TestCopyRectIntersection( const ResourceTransferRequest* srcRequest, const ResourceTransferRequest* currentRequest )
+  {
+    auto srcOffset = srcRequest->bufferToImageInfo.copyInfo.imageOffset;
+    auto srcExtent = srcRequest->bufferToImageInfo.copyInfo.imageExtent;
+
+    auto curOffset = currentRequest->bufferToImageInfo.copyInfo.imageOffset;
+    auto curExtent = currentRequest->bufferToImageInfo.copyInfo.imageExtent;
+
+    auto offsetX0 = std::min( srcOffset.x, curOffset.x );
+    auto offsetY0 = std::min( srcOffset.y, curOffset.y );
+    auto offsetX1 = std::max( srcOffset.x+int32_t(srcExtent.width), curOffset.x+int32_t(curExtent.width) );
+    auto offsetY1 = std::max( srcOffset.y+int32_t(srcExtent.height), curOffset.y+int32_t(curExtent.height) );
+
+    return ( (offsetX1 - offsetX0) < (int32_t(srcExtent.width) + int32_t(curExtent.width)) &&
+             (offsetY1 - offsetY0) < (int32_t(srcExtent.height) + int32_t(curExtent.height)) );
+
+  }
+
+
   void ProcessResourceTransferRequests( bool immediateOnly = false )
   {
     std::lock_guard<std::recursive_mutex> lock(mResourceTransferMutex);
     if(!mResourceTransferRequests.empty())
     {
-      // for images we need to generate all the barriers to make sure the layouts
-      // are correct.
+      using ResourceTransferRequestList = std::vector<const ResourceTransferRequest*>;
+
+      /**
+       * Structure associating unique images and lists of transfer requests for which
+       * the key image is a destination. It contains separate lists of requests per image.
+       * Each list of requests groups non-intersecting copy operations into smaller batches.
+       */
+      struct ResourceTransferRequestPair
+      {
+        ResourceTransferRequestPair( const Vulkan::RefCountedImage& key )
+        : image( key ), requestList{{}}
+        {
+        }
+
+        Vulkan::RefCountedImage                  image;
+        std::vector<ResourceTransferRequestList> requestList;
+      };
+
+      // Map of all the requests where 'image' is a key.
+      std::vector<ResourceTransferRequestPair> requestMap;
+
+      auto highestBatchIndex = 1u;
+
+      // Collect all unique destination images and all transfer requests associated with them
+      for( const auto& req : mResourceTransferRequests )
+      {
+        Vulkan::RefCountedImage image { nullptr };
+        if( req.requestType == TransferRequestType::BUFFER_TO_IMAGE )
+        {
+          image = req.bufferToImageInfo.dstImage;
+        }
+        else if ( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
+        {
+          image = req.imageToImageInfo.dstImage;
+        }
+
+        assert( image );
+
+        auto predicate = [&]( auto& item )->bool {
+          return image->GetVkHandle() == item.image->GetVkHandle();
+        };
+        auto it = std::find_if( requestMap.begin(), requestMap.end(), predicate );
+
+        if( it == requestMap.end() )
+        {
+          // initialise new array
+          requestMap.emplace_back( image );
+          it = requestMap.end()-1;
+        }
+
+        auto& transfers = it->requestList;
+
+        // Compare with current transfer list whether there are any intersections
+        // with current image copy area. If intersection occurs, start new list
+        auto& currentList = transfers.back();
+
+        bool intersects( false );
+        for( auto& item : currentList )
+        {
+          // if area intersects create new list
+          if( (intersects = TestCopyRectIntersection( item, &req )) )
+          {
+            transfers.push_back({});
+            highestBatchIndex = std::max( highestBatchIndex, uint32_t(transfers.size()) );
+            break;
+          }
+        }
+
+        // push request to the most recently created list
+        transfers.back().push_back( &req );
+      }
+
+      // For all unique images prepare layout transition barriers as all of them must be
+      // in eTransferDstOptimal layout
       std::vector<vk::ImageMemoryBarrier> preLayoutBarriers;
       std::vector<vk::ImageMemoryBarrier> postLayoutBarriers;
-
-      auto layout = vk::ImageMemoryBarrier{}
-        .setSubresourceRange( vk::ImageSubresourceRange{}
-                                .setLayerCount( 1 )
-                                .setBaseArrayLayer( 0 )
-                                .setAspectMask( vk::ImageAspectFlagBits::eColor )
-                                .setBaseMipLevel( 0 )
-                                .setLevelCount( 1 ))
-        .setImage( nullptr )
-        .setOldLayout( {} )
-        .setNewLayout( vk::ImageLayout::eTransferDstOptimal )
-        .setSrcAccessMask( vk::AccessFlagBits::eMemoryRead )
-        .setDstAccessMask( vk::AccessFlagBits::eMemoryWrite );
-
-      // Create barriers for unique images
-      for(const auto& req : mResourceTransferRequests)
+      for( auto& item : requestMap )
       {
-        if( !immediateOnly || !req.deferredTransferMode )
-        {
-          if( req.requestType == TransferRequestType::BUFFER_TO_IMAGE )
-          {
-            // add barrier
-            auto image = req.bufferToImageInfo.dstImage;
-            preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-            postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-            image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
-          }
-          else if( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
-          {
-            auto dstImage = req.imageToImageInfo.dstImage;
-            auto srcImage = req.imageToImageInfo.srcImage;
-            preLayoutBarriers.push_back( layout.setImage( dstImage->GetVkHandle() )
-                                               .setOldLayout( dstImage->GetImageLayout() )
-                                               .setNewLayout( vk::ImageLayout::eTransferDstOptimal ));
-            postLayoutBarriers.push_back( layout.setImage( dstImage->GetVkHandle() )
-                                               .setNewLayout( dstImage->GetImageLayout() )
-                                               .setOldLayout( vk::ImageLayout::eTransferDstOptimal ));
-
-            preLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
-                                               .setOldLayout( srcImage->GetImageLayout() )
-                                               .setNewLayout( vk::ImageLayout::eTransferSrcOptimal ));
-            postLayoutBarriers.push_back( layout.setImage( srcImage->GetVkHandle() )
-                                               .setNewLayout( srcImage->GetImageLayout() )
-                                               .setOldLayout( vk::ImageLayout::eTransferSrcOptimal ));
-          }
-        }
+        auto image = item.image;
+        // add barrier
+        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
+        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
+        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
       }
 
+      // Build command buffer for each image until reaching next sync point
       auto commandBuffer = mGraphics.CreateCommandBuffer( true );
-      commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
 
-      // issue memory barrier
-      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers );
-
-      // issue blit or copy commands
-      for(const auto& req : mResourceTransferRequests)
-      {
-        if( !immediateOnly || !req.deferredTransferMode )
-        {
-          if( req.requestType == TransferRequestType::BUFFER_TO_IMAGE )
-          {
-            commandBuffer->CopyBufferToImage( req.bufferToImageInfo.srcBuffer,
-                                              req.bufferToImageInfo.dstImage, vk::ImageLayout::eTransferDstOptimal,
-                                              { req.bufferToImageInfo.copyInfo } );
-          }
-          else if( req.requestType == TransferRequestType::IMAGE_TO_IMAGE )
-          {
-            commandBuffer->CopyImage( req.imageToImageInfo.srcImage,
-                                      vk::ImageLayout::eTransferSrcOptimal,
-                                      req.imageToImageInfo.dstImage,
-                                      vk::ImageLayout::eTransferDstOptimal,
-                                      { req.imageToImageInfo.copyInfo });
-          }
-        }
-      }
-
-      commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, postLayoutBarriers );
-      commandBuffer->End();
-
-      // submit to the queue
-      auto transferQueue = mGraphics.GetTransferQueue( 0u );
-
-      // no fence, just semaphore
+      // Fence between submissions
       auto fence = mGraphics.CreateFence( {} );
 
-      mGraphics.Submit( mGraphics.GetTransferQueue(0u), { Vulkan::SubmissionData{ {}, {}, { commandBuffer }, {} } }, fence );
-
-      // @todo use semaphores rather than fences
-      mGraphics.WaitForFence( fence );
-
-      // when transferring only immediate requests we can't clear all
-      if( !immediateOnly )
+      /**
+       * The loop iterates through requests for each unique image. It parallelizes
+       * transfers to images until end of data in the batch.
+       * After submitting copy commands the loop waits for the fence to be signalled
+       * and repeats recording for the next batch of transfer requests.
+       */
+      for( auto i = 0u; i < highestBatchIndex; ++i )
       {
-        mResourceTransferRequests.clear();
-      }
-      else
-      {
-        decltype(mResourceTransferRequests) tmp;
-        for(auto&& req : mResourceTransferRequests)
+        commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+
+        // change image layouts only once
+        if( i == 0 )
         {
-          if( req.deferredTransferMode )
+          commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers );
+        }
+
+        for( auto& item : requestMap )
+        {
+          auto& batchItem = item.requestList;
+          if( batchItem.size() <= i )
           {
-            tmp.emplace_back( std::move( req ) );
+            continue;
+          }
+
+          auto& requestList = batchItem[i];
+
+          // record all copy commands for this batch
+          for( auto& req : requestList )
+          {
+            if( req->requestType == TransferRequestType::BUFFER_TO_IMAGE )
+            {
+              commandBuffer->CopyBufferToImage( req->bufferToImageInfo.srcBuffer,
+                                                req->bufferToImageInfo.dstImage, vk::ImageLayout::eTransferDstOptimal,
+                                                { req->bufferToImageInfo.copyInfo } );
+
+            }
+            else if( req->requestType == TransferRequestType::IMAGE_TO_IMAGE )
+            {
+              commandBuffer->CopyImage( req->imageToImageInfo.srcImage, vk::ImageLayout::eTransferSrcOptimal,
+                                        req->imageToImageInfo.dstImage, vk::ImageLayout::eTransferDstOptimal,
+                                        { req->imageToImageInfo.copyInfo });
+            }
           }
         }
-        mResourceTransferRequests = std::move(tmp);
+
+        // if this is the last batch restore original layouts
+        if( i == highestBatchIndex - 1 )
+        {
+          commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, postLayoutBarriers );
+        }
+        commandBuffer->End();
+
+        // submit to the queue
+        auto transferQueue = mGraphics.GetTransferQueue( 0u );
+        mGraphics.Submit( mGraphics.GetTransferQueue(0u), { Vulkan::SubmissionData{ {}, {}, { commandBuffer }, {} } }, fence );
+        mGraphics.WaitForFence( fence );
+        mGraphics.ResetFence( fence );
       }
+
+      // Destroy staging resources immediately
+      for( auto& request : mResourceTransferRequests )
+      {
+        if( request.requestType == TransferRequestType::BUFFER_TO_IMAGE )
+        {
+          auto& buffer = request.bufferToImageInfo.srcBuffer;
+          assert( buffer.GetRefCount() == 1 );
+          buffer->DestroyNow();
+        }
+        else if( request.requestType == TransferRequestType::IMAGE_TO_IMAGE )
+        {
+          auto& image = request.imageToImageInfo.srcImage;
+          assert( image.GetRefCount() == 1 );
+          image->DestroyNow();
+        }
+      }
+
+      // Clear transfer queue
+      mResourceTransferRequests.clear();
     }
   }
 

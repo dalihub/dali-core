@@ -166,7 +166,6 @@ public:
     return !(mObject == &*object);
   }
 
-
   template< class K >
   Handle< K > DynamicCast();
 
