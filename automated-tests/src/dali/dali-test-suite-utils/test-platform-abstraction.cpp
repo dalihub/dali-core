@@ -43,7 +43,7 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( const std::string&
                                                               SamplingMode::Type samplingMode,
                                                               bool orientationCorrection )
 {
-  ImageDimensions closestSize = ImageDimensions( mClosestSize.x, mClosestSize.y );
+  ImageDimensions closestSize = ImageDimensions( mClosestSize );
   mTrace.PushCall("GetClosestImageSize", "");
   return closestSize;
 }
@@ -54,7 +54,7 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
                                                    SamplingMode::Type samplingMode,
                                                    bool orientationCorrection )
 {
-  ImageDimensions closestSize = ImageDimensions( mClosestSize.x, mClosestSize.y );
+  ImageDimensions closestSize = ImageDimensions( mClosestSize );
   mTrace.PushCall("GetClosestImageSize", "");
   return closestSize;
 }
@@ -115,9 +115,9 @@ void TestPlatformAbstraction::ClearReadyResources()
   mDecodedBitmap.Reset();
 }
 
-void TestPlatformAbstraction::SetClosestImageSize(const Vector2& size)
+void TestPlatformAbstraction::SetClosestImageSize( const Vector2& size )
 {
-  mClosestSize = size;
+  mClosestSize = ImageDimensions( static_cast<uint32_t>( size.x ), static_cast<uint32_t>( size.y ) );
 }
 
 void TestPlatformAbstraction::SetLoadFileResult( bool result, Dali::Vector< unsigned char >& buffer )

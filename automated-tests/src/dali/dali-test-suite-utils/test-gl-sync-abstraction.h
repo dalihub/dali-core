@@ -105,7 +105,7 @@ public: // TEST FUNCTIONS
    *
    * @return the number of sync objects
    */
-  int GetNumberOfSyncObjects();
+  int32_t GetNumberOfSyncObjects();
 
 private:
 

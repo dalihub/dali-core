@@ -27,7 +27,7 @@
 namespace TestHarness
 {
 
-typedef std::map<int, TestCase> RunningTestCases;
+typedef std::map<int32_t, TestCase> RunningTestCases;
 
 const char* basename(const char* path)
 {
@@ -41,9 +41,9 @@ const char* basename(const char* path)
   return slash;
 }
 
-int RunTestCase( struct ::testcase_s& testCase )
+int32_t RunTestCase( struct ::testcase_s& testCase )
 {
-  int result = EXIT_STATUS_TESTCASE_FAILED;
+  int32_t result = EXIT_STATUS_TESTCASE_FAILED;
 
 // dont want to catch exception as we want to be able to get
 // gdb stack trace from the first error
@@ -69,11 +69,11 @@ int RunTestCase( struct ::testcase_s& testCase )
 }
 
 
-int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutput )
+int32_t RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutput )
 {
-  int testResult = EXIT_STATUS_TESTCASE_FAILED;
+  int32_t testResult = EXIT_STATUS_TESTCASE_FAILED;
 
-  int pid = fork();
+  int32_t pid = fork();
   if( pid == 0 ) // Child process
   {
     if( suppressOutput )
@@ -84,12 +84,12 @@ int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutpu
     else
     {
       printf("\n");
-      for(int i=0; i<80; ++i) printf("#");
+      for(int32_t i=0; i<80; ++i) printf("#");
       printf("\nTC: %s\n", testCase.name);
       fflush(stdout);
     }
 
-    int status = RunTestCase( testCase );
+    int32_t status = RunTestCase( testCase );
 
     if( ! suppressOutput )
     {
@@ -107,8 +107,8 @@ int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutpu
   }
   else // Parent process
   {
-    int status = 0;
-    int childPid = waitpid(pid, &status, 0);
+    int32_t status = 0;
+    int32_t childPid = waitpid(pid, &status, 0);
     if( childPid == -1 )
     {
       perror("waitpid");
@@ -127,7 +127,7 @@ int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutpu
     }
     else if(WIFSIGNALED(status) )
     {
-      int signal = WTERMSIG(status);
+      int32_t signal = WTERMSIG(status);
       testResult = EXIT_STATUS_TESTCASE_ABORTED;
       if( signal == SIGABRT )
       {
@@ -148,7 +148,7 @@ int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutpu
   return testResult;
 }
 
-void OutputStatistics( const char* processName, int numPasses, int numFailures )
+void OutputStatistics( const char* processName, int32_t numPasses, int32_t numFailures )
 {
   FILE* fp=fopen("summary.xml", "a");
   if( fp != NULL )
@@ -175,15 +175,15 @@ void OutputStatistics( const char* processName, int numPasses, int numFailures )
   }
 }
 
-int RunAll( const char* processName, ::testcase tc_array[] )
+int32_t RunAll( const char* processName, ::testcase tc_array[] )
 {
-  int numFailures = 0;
-  int numPasses = 0;
+  int32_t numFailures = 0;
+  int32_t numPasses = 0;
 
   // Run test cases in child process( to kill output/handle signals ), but run serially.
-  for( unsigned int i=0; tc_array[i].name; i++)
+  for( uint32_t i=0; tc_array[i].name; i++)
   {
-    int result = RunTestCaseInChildProcess( tc_array[i], false );
+    int32_t result = RunTestCaseInChildProcess( tc_array[i], false );
     if( result == 0 )
     {
       numPasses++;
@@ -200,26 +200,26 @@ int RunAll( const char* processName, ::testcase tc_array[] )
 }
 
 // Constantly runs up to MAX_NUM_CHILDREN processes
-int RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRunFailed)
+int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRunFailed)
 {
-  int numFailures = 0;
-  int numPasses = 0;
+  int32_t numFailures = 0;
+  int32_t numPasses = 0;
 
   RunningTestCases children;
-  std::vector<int> failedTestCases;
+  std::vector<int32_t> failedTestCases;
 
   // Fork up to MAX_NUM_CHILDREN processes, then
   // wait. As soon as a proc completes, fork the next.
 
-  int nextTestCase = 0;
-  int numRunningChildren = 0;
+  int32_t nextTestCase = 0;
+  int32_t numRunningChildren = 0;
 
   while( tc_array[nextTestCase].name || numRunningChildren > 0)
   {
     // Create more children (up to the max number or til the end of the array)
     while( numRunningChildren < MAX_NUM_CHILDREN && tc_array[nextTestCase].name )
     {
-      int pid = fork();
+      int32_t pid = fork();
       if( pid == 0 ) // Child process
       {
         close(STDOUT_FILENO);
@@ -242,8 +242,8 @@ int RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRu
 
     // Wait for the next child to finish
 
-    int status=0;
-    int childPid = waitpid(-1, &status, 0);
+    int32_t status=0;
+    int32_t childPid = waitpid(-1, &status, 0);
     if( childPid == -1 )
     {
       perror("waitpid");
@@ -254,7 +254,7 @@ int RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRu
     {
       if( childPid > 0 )
       {
-        int testResult = WEXITSTATUS(status);
+        int32_t testResult = WEXITSTATUS(status);
         if( testResult )
         {
           printf("Test case %s failed: %d\n", children[childPid].testCaseName, testResult);
@@ -296,12 +296,12 @@ int RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRu
 
   if( reRunFailed )
   {
-    for( unsigned int i=0; i<failedTestCases.size(); i++)
+    for( uint32_t i=0; i<failedTestCases.size(); i++)
     {
       char* testCaseStrapline;
-      int numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name );
+      int32_t numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name );
       printf("\n%s\n", testCaseStrapline);
-      for(int j=0; j<numChars; j++)
+      for(int32_t j=0; j<numChars; j++)
       {
         printf("=");
       }
@@ -315,11 +315,11 @@ int RunAllInParallel(  const char* processName, ::testcase tc_array[], bool reRu
 
 
 
-int FindAndRunTestCase(::testcase tc_array[], const char* testCaseName)
+int32_t FindAndRunTestCase(::testcase tc_array[], const char* testCaseName)
 {
-  int result = EXIT_STATUS_TESTCASE_NOT_FOUND;
+  int32_t result = EXIT_STATUS_TESTCASE_NOT_FOUND;
 
-  for( int i = 0; tc_array[i].name; i++ )
+  for( int32_t i = 0; tc_array[i].name; i++ )
   {
     if( !strcmp(testCaseName, tc_array[i].name) )
     {

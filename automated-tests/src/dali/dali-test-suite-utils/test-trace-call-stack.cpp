@@ -164,14 +164,14 @@ bool TraceCallStack::FindMethodAndParamsFromStartIndex( std::string method, std:
  * @param[in] params A comma separated list of parameter values
  * @return index in the stack where the method was found or -1 otherwise
  */
-int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string params) const
+int32_t TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string params) const
 {
-  int index = -1;
+  int32_t index = -1;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
     if( 0 == mCallStack[i].method.compare(method) && 0 == mCallStack[i].paramList.compare(params) )
     {
-      index = i;
+      index = static_cast<int32_t>( i );
       break;
     }
   }
@@ -180,7 +180,7 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string
 
 int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const TraceCallStack::NamedParams& params) const
 {
-  int index = -1;
+  int32_t index = -1;
   for( size_t i=0; i < mCallStack.size(); i++ )
   {
     if( 0 == mCallStack[i].method.compare(method) )
@@ -198,7 +198,7 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
       }
       if( match == true )
       {
-        index = i;
+        index = static_cast<int32_t>( i );
         break;
       }
     }
