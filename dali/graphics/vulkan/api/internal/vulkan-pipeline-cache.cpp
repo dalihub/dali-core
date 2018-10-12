@@ -93,10 +93,10 @@ bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
   }
 
   // delete pipeline
-  // todo: for now use brute force, later - safe delete
   if( iter->second.size() == 1 )
   {
     iter->second.clear();
+    mCacheMap.erase( iter );
   }
   else
   {
@@ -105,7 +105,12 @@ bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
     {
       if( entry.pipelineImpl.get() == pipeline )
       {
+
         iter->second.erase( iter->second.begin() + i );
+        if( iter->second.empty() )
+        {
+          mCacheMap.erase( iter );
+        }
         break;
       }
       ++i;
