@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "12616a99_f978ba03",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f35b6fe7_e132fdd8",
+      "range": {
+        "startLine": 322,
+        "startChar": 39,
+        "endLine": 322,
+        "endChar": 40
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "110e1513_fb0eb58c",
         "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2018-10-12T13:47:15Z",
       "side": 1,
       "message": "Shouldn\u0027t use copyable handle as a key... (You are relying on the equality operator working on the content...)",
+      "range": {
+        "startLine": 331,
+        "startChar": 8,
+        "endLine": 331,
+        "endChar": 31
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ff4539f_ab8dafd9",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "it\u0027s not just a key. we need to store an image handle as it\u0027s the type expected by the PipelineBarrier() function. I added lambda predicate comparing vk::Image objects but the RefCountedImage must be stored somewhere too.",
+      "parentUuid": "110e1513_fb0eb58c",
       "range": {
         "startLine": 331,
         "startChar": 8,
@@ -71,6 +119,54 @@
     },
     {
       "key": {
+        "uuid": "378cf18e_2616d13f",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a0575e5_c67ca085",
+      "range": {
+        "startLine": 407,
+        "startChar": 15,
+        "endLine": 407,
+        "endChar": 22
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24b0438b_60fb7696",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a0575e5_c67ca085",
+      "range": {
+        "startLine": 407,
+        "startChar": 15,
+        "endLine": 407,
+        "endChar": 22
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53e9a875_62dfd513",
         "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
         "patchSetId": 3
@@ -85,6 +181,42 @@
       "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b675255b_ece9a3bd",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53e9a875_62dfd513",
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8889f19d_80e84b08",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53e9a875_62dfd513",
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
@@ -108,6 +240,30 @@
       "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e9b7ed2_26d85fb1",
+        "filename": "dali/graphics/vulkan/internal/vulkan-types.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-12T15:52:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06802faf_3f802ea8",
+      "range": {
+        "startLine": 234,
+        "startChar": 26,
+        "endLine": 234,
+        "endChar": 28
+      },
+      "revId": "18e586a4acb3a06646fe7e84c52736a32584047c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
