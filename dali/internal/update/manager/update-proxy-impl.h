@@ -67,52 +67,67 @@ public:
   /**
    * @copydoc Dali::UpdateProxy::GetPosition()
    */
-  Vector3 GetPosition( unsigned int id ) const;
+  bool GetPosition( unsigned int id, Vector3& position) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetPosition()
    */
-  void SetPosition( unsigned int id, const Vector3& position );
+  bool SetPosition( unsigned int id, const Vector3& position );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakePosition()
+   */
+  bool BakePosition( unsigned int id, const Vector3& position );
 
   /**
    * @copydoc Dali::UpdateProxy::GetSize()
    */
-  const Vector3& GetSize( unsigned int id ) const;
+  bool GetSize( unsigned int id, Vector3& size ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetSize()
    */
-  void SetSize( unsigned int id, const Vector3& size );
+  bool SetSize( unsigned int id, const Vector3& size );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeSize()
+   */
+  bool BakeSize( unsigned int id, const Vector3& size );
 
   /**
    * @copydoc Dali::UpdateProxy::GetPositionAndSize()
    */
-  void GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetScale()
+   */
+  bool GetScale( unsigned int id, Vector3& scale ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::SetScale()
+   */
+  bool SetScale( unsigned int id, const Vector3& scale );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeScale()
+   */
+  bool BakeScale( unsigned int id, const Vector3& scale );
 
   /**
    * @copydoc Dali::UpdateProxy::GetColor()
    */
-  Vector4 GetWorldColor( unsigned int id ) const;
+  bool GetColor( unsigned int id, Vector4& color ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetColor()
    */
-  void SetWorldColor( unsigned int id, const Vector4& color ) const;
+  bool SetColor( unsigned int id, const Vector4& color ) const;
 
   /**
-   * @copydoc Dali::UpdateProxy::GetWorldMatrixAndSize()
+   * @copydoc Dali::UpdateProxy::BakeColor()
    */
-  void GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const;
-
-  /**
-   * @copydoc Dali::UpdateProxy::GetWorldMatrix()
-   */
-  const Matrix& GetWorldMatrix( unsigned int id ) const;
-
-  /**
-   * @copydoc Dali::UpdateProxy::SetWorldMatrix()
-   */
-  void SetWorldMatrix( unsigned int id, const Matrix& worldMatrix );
+  bool BakeColor( unsigned int id, const Vector4& color ) const;
 
   /**
    * @brief Retrieves the root-node used by this class
@@ -123,10 +138,19 @@ public:
     return mRootNode;
   }
 
+  /**
+   * @brief Sets the buffer index to use when processing the next callback.
+   * @param[in]  bufferIndex  The current buffer index
+   */
   void SetCurrentBufferIndex( BufferIndex bufferIndex )
   {
     mCurrentBufferIndex = bufferIndex;
   }
+
+  /**
+   * @brief Informs the update-proxy that the node hierarchy has changed.
+   */
+  void NodeHierarchyChanged();
 
 private:
 
@@ -151,7 +175,7 @@ private:
 
   mutable std::vector< IdNodePair > mNodeContainer; ///< Used to store cached pointers to already searched for Nodes.
   mutable IdNodePair mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
-  unsigned int mCurrentBufferIndex;
+  BufferIndex mCurrentBufferIndex;
 
   SceneGraph::TransformManager& mTransformManager; ///< Reference to the Transform Manager.
   SceneGraph::Node& mRootNode; ///< The root node of this update proxy.

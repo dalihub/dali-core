@@ -65,98 +65,169 @@ UpdateProxy::~UpdateProxy()
 {
 }
 
-Vector3 UpdateProxy::GetPosition( unsigned int id ) const
+bool UpdateProxy::GetPosition( unsigned int id, Vector3& position ) const
 {
-  const Dali::Matrix& matrix = GetWorldMatrix( id );
-  return matrix.GetTranslation3();
-}
-
-void UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
-{
+  bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    Matrix& matrix = mTransformManager.GetWorldMatrix( node->mTransformId );
-    matrix.SetTranslation( position );
+    position = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    success = true;
   }
+  return success;
 }
 
-const Vector3& UpdateProxy::GetSize( unsigned int id ) const
+bool UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
 {
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::BakePosition( unsigned int id, const Vector3& position )
+{
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION, position );
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetSize( unsigned int id, Vector3& size ) const
+{
+  bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    return mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    size = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    success = true;
   }
-
-  return Vector3::ZERO;
+  return success;
 }
 
-void UpdateProxy::SetSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::SetSize( unsigned int id, const Vector3& size )
 {
+  bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
     mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
+    success = true;
   }
+  return success;
 }
 
-void UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
+bool UpdateProxy::BakeSize( unsigned int id, const Vector3& size )
 {
-  Matrix worldMatrix( false );
-  GetWorldMatrixAndSize( id, worldMatrix, size );
-  position = worldMatrix.GetTranslation3();
-}
-
-Vector4 UpdateProxy::GetWorldColor( unsigned int id ) const
-{
+  bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    return node->mWorldColor.Get( mCurrentBufferIndex );
+    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE, size );
+    success = true;
   }
-
-  return Vector4::ZERO;
+  return success;
 }
 
-void UpdateProxy::SetWorldColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
 {
-  SceneGraph::Node* node = GetNodeWithId( id );
-  if( node )
-  {
-    Vector4& currentColor = node->mWorldColor.Get( mCurrentBufferIndex );
-    currentColor = color;
-  }
-}
-
-void UpdateProxy::GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const
-{
+  bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    mTransformManager.GetWorldMatrixAndSize( node->mTransformId, worldMatrix, size );
+    position = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_POSITION );
+    size = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SIZE );
+    success = true;
   }
+  return success;
 }
 
-const Matrix& UpdateProxy::GetWorldMatrix( unsigned int id ) const
+bool UpdateProxy::GetScale( unsigned int id, Vector3& scale ) const
 {
+  bool success = false;
   const SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    return mTransformManager.GetWorldMatrix( node->mTransformId );
+    scale = mTransformManager.GetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE );
+    success = true;
   }
 
-  return Matrix::IDENTITY;
+  return success;
 }
 
-void UpdateProxy::SetWorldMatrix( unsigned int id, const Matrix& worldMatrix )
+bool UpdateProxy::SetScale( unsigned int id, const Vector3& scale )
 {
+  bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
-    Matrix& currentMatrix = mTransformManager.GetWorldMatrix( node->mTransformId );
-    currentMatrix = worldMatrix;
+    mTransformManager.SetVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
+    success = true;
   }
+  return success;
+}
+
+bool UpdateProxy::BakeScale( unsigned int id, const Vector3& scale )
+{
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    mTransformManager.BakeVector3PropertyValue( node->mTransformId, SceneGraph::TRANSFORM_PROPERTY_SCALE, scale );
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetColor( unsigned int id, Vector4& color ) const
+{
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    color = node->mColor.Get( mCurrentBufferIndex );
+    success = true;
+  }
+
+  return success;
+}
+
+bool UpdateProxy::SetColor( unsigned int id, const Vector4& color ) const
+{
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    node->mColor.Set( mCurrentBufferIndex, color );
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::BakeColor( unsigned int id, const Vector4& color ) const
+{
+  bool success = false;
+  SceneGraph::Node* node = GetNodeWithId( id );
+  if( node )
+  {
+    node->mColor.Bake( mCurrentBufferIndex, color );
+    success = true;
+  }
+  return success;
+}
+
+void UpdateProxy::NodeHierarchyChanged()
+{
+  mLastCachedIdNodePair = { 0u, NULL };
+  mNodeContainer.clear();
 }
 
 SceneGraph::Node* UpdateProxy::GetNodeWithId( unsigned int id ) const

@@ -45,83 +45,117 @@ class DALI_CORE_API UpdateProxy
 public:
 
   /**
-   * @brief Given the Actor ID, this retrieves that Actor's position.
-   * @param[in]  id  The Actor ID
-   * @return If valid Actor ID, then the Actor's position is returned.
+   * @brief Given the Actor ID, this retrieves that Actor's local position.
+   * @param[in]   id        The Actor ID
+   * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
+   * @return Whether the method call was successful or not.
    */
-  Vector3 GetPosition( unsigned int id ) const;
+  bool GetPosition( unsigned int id, Vector3& position ) const;
 
   /**
-   * @brief Allows setting an Actor's position from the Frame callback function.
+   * @brief Allows setting an Actor's local position from the Frame callback function for the current frame only.
    * @param[in]  id        The Actor ID
-   * @param[in]  position  The position to set.
-   * @note This will get reset to the internally calculated value in the next frame, so will have to be set again.
+   * @param[in]  position  The position to set
+   * @return Whether the method call was successful or not.
+   * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  void SetPosition( unsigned int id, const Vector3& position );
+  bool SetPosition( unsigned int id, const Vector3& position );
+
+  /**
+   * @brief Allows baking an Actor's local position from the Frame callback function.
+   * @param[in]  id        The Actor ID
+   * @param[in]  position  The position to bake
+   * @return Whether the method call was successful or not.
+   * @note The value is saved so will cause undesired effects if this property is being animated.
+   */
+  bool BakePosition( unsigned int id, const Vector3& position );
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's size.
-   * @param[in]  id  The Actor ID
-   * @return If valid Actor ID, then Actor's size is returned, otherwise Vector3::ZERO.
+   * @param[in]   id    The Actor ID
+   * @param[out]  size  Set to the Actor's current size, if Actor ID is valid
+   * @return Whether the method call was successful or not.
    */
-  const Vector3& GetSize( unsigned int id ) const;
+  bool GetSize( unsigned int id, Vector3& size ) const;
 
   /**
-   * @brief Allows setting an Actor's size from the Frame callback function.
+   * @brief Allows setting an Actor's size from the Frame callback function for the current frame only.
    * @param[in]  id    The Actor ID
-   * @param[in]  size  The size to set.
-   * @note This will get reset to the internally calculated value in the next frame, so will have to be set again.
+   * @param[in]  size  The size to set
+   * @return Whether the method call was successful or not.
+   * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  void SetSize( unsigned int id, const Vector3& size );
+  bool SetSize( unsigned int id, const Vector3& size );
 
   /**
-   * @brief Given the Actor ID, this retrieves that Actor's position and size.
+   * @brief Allows baking an Actor's size from the Frame callback function.
+   * @param[in]  id    The Actor ID
+   * @param[in]  size  The size to bake
+   * @return Whether the method call was successful or not.
+   * @note The value is saved so will cause undesired effects if this property is being animated.
+   */
+  bool BakeSize( unsigned int id, const Vector3& size );
+
+  /**
+   * @brief Given the Actor ID, this retrieves that Actor's local position and size.
    * @param[in]   id        The Actor ID
-   * @param[out]  position  If valid Actor ID, then Actor's position is set
-   * @param[out]  size      If valid Actor ID, then Actor's size is set
+   * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
+   * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
+   * @return Whether the method call was successful or not.
    */
-  void GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
 
   /**
-   * @brief Given the Actor ID, this retrieves that Actor's color.
-   * @param[in]   id        The Actor ID
-   * @return If valid Actor ID, then Actor's color is returned, otherwise Vector4::ZERO.
+   * @brief Given the Actor ID, this retrieves that Actor's local scale.
+   * @param[in]   id     The Actor ID
+   * @param[out]  scale  Set to the Actor's current scale, if Actor ID is valid
+   * @return Whether the method call was successful or not.
    */
-  Vector4 GetWorldColor( unsigned int id ) const;
+  bool GetScale( unsigned int id, Vector3& scale ) const;
 
   /**
-   * @brief Allows setting an Actor's color from the Frame callback function.
+   * @brief Allows setting an Actor's local scale from the Frame callback function for the current frame only.
+   * @param[in]  id     The Actor ID
+   * @param[in]  scale  The scale to set
+   * @return Whether the method call was successful or not.
+   * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   */
+  bool SetScale( unsigned int id, const Vector3& scale );
+
+  /**
+   * @brief Allows baking an Actor's local scale from the Frame callback function.
+   * @param[in]  id     The Actor ID
+   * @param[in]  scale  The scale to bake
+   * @return Whether the method call was successful or not.
+   * @note The value is saved so will cause undesired effects if this property is being animated.
+   */
+  bool BakeScale( unsigned int id, const Vector3& scale );
+
+  /**
+   * @brief Given the Actor ID, this retrieves that Actor's local color.
+   * @param[in]   id     The Actor ID
+   * @param[out]  color  Set to the Actor's current color, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetColor( unsigned int id, Vector4& color ) const;
+
+  /**
+   * @brief Allows setting an Actor's local color from the Frame callback function for the current frame only.
    * @param[in]  id     The Actor ID
    * @param[in]  color  The color to set
-   * @note This will get reset to the internally calculated value in the next frame, so will have to be set again.
+   * @return Whether the method call was successful or not.
+   * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  void SetWorldColor( unsigned int id, const Vector4& color ) const;
+  bool SetColor( unsigned int id, const Vector4& color ) const;
 
   /**
-   * @brief Given the Actor ID, this retrieves that Actor's world-matrix and size.
-   * @param[in]   id           The Actor ID
-   * @param[out]  worldMatrix  If valid Actor ID, then Actor's world matrix is set
-   * @param[out]  size         If valid Actor ID, then Actor's size is set
+   * @brief Allows baking an Actor's local color from the Frame callback function.
+   * @param[in]  id     The Actor ID
+   * @param[in]  color  The color to bake
+   * @return Whether the method call was successful or not.
+   * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  void GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const;
-
-  /**
-   * @brief Given the Actor ID, this retrieves that Actor's world-matrix.
-   * @param[in]  id  The Actor ID
-   * @return If valid Actor ID, then Actor's world matrix is returned, otherwise Matrix::IDENTITY.
-   */
-  const Matrix& GetWorldMatrix( unsigned int id ) const;
-
-  /**
-   * @brief Allows the setting an Actor's world-matrix from the Frame callback function.
-   * @param[in]  id           The Actor ID
-   * @param[in]  worldMatrix  The world matrix to set.
-   * @note This will get reset to the internally calculated value in the next frame, so will have to be set again.
-   * @note This will only set the world matrix for that particular actor.
-   *       The world matrices of the children will not change and will have to be manually changed in the callback
-   *       as well (if required).
-   */
-  void SetWorldMatrix( unsigned int id, const Matrix& worldMatrix );
+  bool BakeColor( unsigned int id, const Vector4& color ) const;
 
 public: // Not intended for application developers
 
