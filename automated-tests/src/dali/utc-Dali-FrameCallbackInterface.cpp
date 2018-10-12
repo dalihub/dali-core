@@ -730,3 +730,120 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
 
   END_TEST;
 }
+
+int UtcDaliFrameCallbackMultipleCallbacks(void)
+{
+  // Test to ensure multiple frame-callbacks work as expected
+
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  FrameCallbackBasic frameCallback1;
+  FrameCallbackBasic frameCallback2;
+  DevelStage::AddFrameCallback( stage, frameCallback1, stage.GetRootLayer() );
+  DevelStage::AddFrameCallback( stage, frameCallback2, stage.GetRootLayer() );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Remove the second frame-callback, only the first should be called
+
+  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Re-add the second frame-callback and remove the first, only the second should be called
+
+  DevelStage::AddFrameCallback( stage, frameCallback2, stage.GetRootLayer() );
+  DevelStage::RemoveFrameCallback( stage, frameCallback1 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Attempt removal of the first frame-callback again, should be a no-op and yield the exact same results as the last run
+  DevelStage::RemoveFrameCallback( stage, frameCallback1 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Remove the second frame-callback as well, neither should be called
+  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackActorDestroyed(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add( actor );
+
+  FrameCallbackBasic frameCallback1;
+  FrameCallbackBasic frameCallback2;
+  DevelStage::AddFrameCallback( stage, frameCallback1, actor );
+  DevelStage::AddFrameCallback( stage, frameCallback2, actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, true,  TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Remove the second frame-callback, only the first should be called
+
+  DevelStage::RemoveFrameCallback( stage, frameCallback2 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, true,  TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+  frameCallback1.Reset();
+  frameCallback2.Reset();
+
+  // Remove and destroy the actor, the first one should not be called either
+  stage.Remove( actor );
+  actor.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( frameCallback1.mCalled, false,  TEST_LOCATION );
+  DALI_TEST_EQUALS( frameCallback2.mCalled, false, TEST_LOCATION );
+
+  END_TEST;
+}
