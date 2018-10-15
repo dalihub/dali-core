@@ -19,8 +19,10 @@ use strict;
 use Git;
 use Getopt::Long;
 use Error qw(:try);
+use HTML::Element;
 use Pod::Usage;
 use File::Basename;
+#use Data::Dumper;
 use File::stat;
 use Scalar::Util qw /looks_like_number/;
 use Cwd qw /getcwd/;
@@ -488,21 +490,17 @@ sub patch_html_output
 {
     my $filesref = shift;
 
-    open( my $filehandle, ">", $opt_output ) || die "Can't open $opt_output for writing:$!\n";
+    my $html = HTML::Element->new('html');
+    my $head = HTML::Element->new('head');
+    my $title = HTML::Element->new('title');
+    $title->push_content("Patch Coverage");
+    $head->push_content($title, "\n");
+    $html->push_content($head, "\n");
 
-    my $OUTPUT_FH = select;
-    select $filehandle;
-    print <<EOH;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-"http://www.w3.org/TR/REC-html40/loose.dtd">
-<html>
-<head>
-<title>Patch Coverage</title>
-</head>
-<body bgcolor="white">
-EOH
+    my $body = HTML::Element->new('body');
+    $body->attr('bgcolor', "white");
 
-    foreach my $file (keys(%$filesref))
+    foreach my $file (sort(keys(%$filesref)))
     {
         my ($name, $path, $suffix) = fileparse($file, qr{\.[^.]*$});
         next if($path !~ /^dali/);
@@ -510,33 +508,47 @@ EOH
         my $patchref = $filesref->{$file}->{"patch"};
         my $b_lines_ref = $filesref->{$file}->{"b_lines"};
         my $coverage_ref = $filesref->{$file}->{"coverage"};
-        print "<h2>$file</h2>\n";
 
+        my $header = HTML::Element->new('h2');
+        $header->push_content($file);
+        $body->push_content($header);
+        $body->push_content("\n");
         if($coverage_ref)
         {
             if( $coverage_ref->{"covered_lines"} > 0
                 ||
                 $coverage_ref->{"uncovered_lines"} > 0 )
             {
-                print "<p style=\"color:green;\">Covered: " .
-                    $coverage_ref->{"covered_lines"} . "<p>" .
-                    "<p style=\"color:red;\">Uncovered: " .
-                    $coverage_ref->{"uncovered_lines"} . "</span></p>";
+                my $para = HTML::Element->new('p');
+                my $covered = HTML::Element->new('span');
+                $covered->attr('style', "color:green;");
+                $covered->push_content("Covered: " . $coverage_ref->{"covered_lines"} );
+                $para->push_content($covered);
+
+                my $para2 = HTML::Element->new('p');
+                my $uncovered = HTML::Element->new('span');
+                $uncovered->attr('style', "color:red;");
+                $uncovered->push_content("Uncovered: " . $coverage_ref->{"uncovered_lines"} );
+                $para2->push_content($uncovered);
+                $body->push_content($para, $para2);
+            }
+            else
+            {
+                #print "coverage ref exists for $file:\n" . Data::Dumper::Dumper($coverage_ref) . "\n";
             }
         }
         else
         {
-            print "<p>";
-            my $span=0;
+            my $para = HTML::Element->new('p');
+            my $span = HTML::Element->new('span');
             if($suffix eq ".cpp" || $suffix eq ".c" || $suffix eq ".h")
             {
-                print "<span style=\"color:red;\">";
-                $span=1;
+                $span->attr('style', "color:red;");
             }
-            print "No coverage found";
-            print "</span>" if $span;
+            $span->push_content("No coverage found");
+            $para->push_content($span);
+            $body->push_content($para);
         }
-        print "</p>";
 
         for my $patch (@$patchref)
         {
@@ -545,53 +557,71 @@ EOH
             {
                 $hunkstr .= " - " . ($patch->[0]+$patch->[1]-1);
             }
-            print "<p style=\"font-weight:bold;\">" . $hunkstr . "</p>";
 
-            print "<pre>";
+            my $para = HTML::Element->new('p');
+            my $span = HTML::Element->new('span');
+            $span->attr('style', "font-weight:bold;");
+            $span->push_content($hunkstr);
+            $para->push_content($span);
+            $body->push_content($para);
+
+            my $codeHunk = HTML::Element->new('pre');
             for(my $i = 0; $i < $patch->[1]; $i++ )
             {
                 my $line = $i + $patch->[0];
                 my $num_line_digits=log($line)/log(10);
                 for $i (0..(6-$num_line_digits-1))
                 {
-                    print " ";
+                    $codeHunk->push_content(" ");
                 }
-                print "$line  ";
 
+                $codeHunk->push_content("$line  ");
+
+                my $srcLine = HTML::Element->new('span');
                 if($coverage_ref)
                 {
                     my $color;
+
                     if($coverage_ref->{"covered"}->{$line})
                     {
-                        print("<span style=\"color:green;\">");
+                        $srcLine->attr('style', "color:green;");
                     }
                     elsif($coverage_ref->{"uncovered"}->{$line})
                     {
-                        print("<span style=\"color:red;font-weight:bold;\">");
+                        $srcLine->attr('style', "color:red;font-weight:bold;");
                     }
                     else
                     {
-                        #print("<span style=\"color:black;font-weight:normal;\">");
+                        $srcLine->attr('style', "color:black;font-weight:normal;");
                     }
                     my $src=$coverage_ref->{"src"}->{$line};
                     chomp($src);
-                    #print $color, "$src\n", RESET;
-                    print "$src</span>\n";
+                    $srcLine->push_content($src);
                 }
                 else
                 {
                     # We don't have coverage data, so print it from the patch instead.
                     my $src = $b_lines_ref->{$line};
-                    print "$src\n";
+                    $srcLine->attr('style', "color:black;font-weight:normal;");
+                    $srcLine->push_content($src);
                 }
+                $codeHunk->push_content($srcLine, "\n");
             }
-            print "<\pre>\n";
+            $body->push_content($codeHunk, "\n");
         }
     }
+    $body->push_content(HTML::Element->new('hr'));
+    $html->push_content($body, "\n");
 
-    print $filehandle "<hr>\n</body>\n</html>\n";
+    open( my $filehandle, ">", $opt_output ) || die "Can't open $opt_output for writing:$!\n";
+
+    print $filehandle <<EOH;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+EOH
+;
+    print $filehandle $html->as_HTML();
     close $filehandle;
-    select $OUTPUT_FH;
 }
 
 
