@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/matrix.h>
@@ -50,7 +53,7 @@ public:
    * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetPosition( unsigned int id, Vector3& position ) const;
+  bool GetPosition( uint32_t id, Vector3& position ) const;
 
   /**
    * @brief Allows setting an Actor's local position from the Frame callback function for the current frame only.
@@ -59,7 +62,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetPosition( unsigned int id, const Vector3& position );
+  bool SetPosition( uint32_t id, const Vector3& position );
 
   /**
    * @brief Allows baking an Actor's local position from the Frame callback function.
@@ -68,7 +71,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakePosition( unsigned int id, const Vector3& position );
+  bool BakePosition( uint32_t id, const Vector3& position );
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's size.
@@ -76,7 +79,7 @@ public:
    * @param[out]  size  Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetSize( unsigned int id, Vector3& size ) const;
+  bool GetSize( uint32_t id, Vector3& size ) const;
 
   /**
    * @brief Allows setting an Actor's size from the Frame callback function for the current frame only.
@@ -85,7 +88,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetSize( unsigned int id, const Vector3& size );
+  bool SetSize( uint32_t id, const Vector3& size );
 
   /**
    * @brief Allows baking an Actor's size from the Frame callback function.
@@ -94,7 +97,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeSize( unsigned int id, const Vector3& size );
+  bool BakeSize( uint32_t id, const Vector3& size );
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local position and size.
@@ -103,7 +106,7 @@ public:
    * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const;
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local scale.
@@ -111,7 +114,7 @@ public:
    * @param[out]  scale  Set to the Actor's current scale, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetScale( unsigned int id, Vector3& scale ) const;
+  bool GetScale( uint32_t id, Vector3& scale ) const;
 
   /**
    * @brief Allows setting an Actor's local scale from the Frame callback function for the current frame only.
@@ -120,7 +123,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetScale( unsigned int id, const Vector3& scale );
+  bool SetScale( uint32_t id, const Vector3& scale );
 
   /**
    * @brief Allows baking an Actor's local scale from the Frame callback function.
@@ -129,7 +132,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeScale( unsigned int id, const Vector3& scale );
+  bool BakeScale( uint32_t id, const Vector3& scale );
 
   /**
    * @brief Given the Actor ID, this retrieves that Actor's local color.
@@ -137,7 +140,7 @@ public:
    * @param[out]  color  Set to the Actor's current color, if Actor ID is valid
    * @return Whether the method call was successful or not.
    */
-  bool GetColor( unsigned int id, Vector4& color ) const;
+  bool GetColor( uint32_t id, Vector4& color ) const;
 
   /**
    * @brief Allows setting an Actor's local color from the Frame callback function for the current frame only.
@@ -146,7 +149,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetColor( unsigned int id, const Vector4& color ) const;
+  bool SetColor( uint32_t id, const Vector4& color ) const;
 
   /**
    * @brief Allows baking an Actor's local color from the Frame callback function.
@@ -155,7 +158,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeColor( unsigned int id, const Vector4& color ) const;
+  bool BakeColor( uint32_t id, const Vector4& color ) const;
 
 public: // Not intended for application developers
 

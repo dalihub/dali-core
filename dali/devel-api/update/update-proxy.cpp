@@ -24,67 +24,67 @@
 namespace Dali
 {
 
-bool UpdateProxy::GetPosition( unsigned int id, Vector3& position ) const
+bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
 {
   return mImpl.GetPosition( id, position );
 }
 
-bool UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
+bool UpdateProxy::SetPosition( uint32_t id, const Vector3& position )
 {
   return mImpl.SetPosition( id, position );
 }
 
-bool UpdateProxy::BakePosition( unsigned int id, const Vector3& position )
+bool UpdateProxy::BakePosition( uint32_t id, const Vector3& position )
 {
   return mImpl.BakePosition( id, position );
 }
 
-bool UpdateProxy::GetSize( unsigned int id, Vector3& size ) const
+bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
 {
   return mImpl.GetSize( id, size );
 }
 
-bool UpdateProxy::SetSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::SetSize( uint32_t id, const Vector3& size )
 {
   return mImpl.SetSize( id, size );
 }
 
-bool UpdateProxy::BakeSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::BakeSize( uint32_t id, const Vector3& size )
 {
   return mImpl.BakeSize( id, size );
 }
 
-bool UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
+bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const
 {
   return mImpl.GetPositionAndSize( id, position, size );
 }
 
-bool UpdateProxy::GetScale( unsigned int id, Vector3& scale ) const
+bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
 {
   return mImpl.GetScale( id, scale );
 }
 
-bool UpdateProxy::SetScale( unsigned int id, const Vector3& scale )
+bool UpdateProxy::SetScale( uint32_t id, const Vector3& scale )
 {
   return mImpl.SetScale( id, scale );
 }
 
-bool UpdateProxy::BakeScale( unsigned int id, const Vector3& scale )
+bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
 {
   return mImpl.BakeScale( id, scale );
 }
 
-bool UpdateProxy::GetColor( unsigned int id, Vector4& color ) const
+bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
 {
   return mImpl.GetColor( id, color );
 }
 
-bool UpdateProxy::SetColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::SetColor( uint32_t id, const Vector4& color ) const
 {
   return mImpl.SetColor( id, color );
 }
 
-bool UpdateProxy::BakeColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color ) const
 {
   return mImpl.BakeColor( id, color );
 }
