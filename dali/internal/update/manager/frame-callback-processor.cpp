@@ -18,10 +18,12 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/frame-callback-processor.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
-#include <dali/internal/update/manager/update-proxy-impl.h>
 
 namespace Dali
 {
@@ -35,6 +37,9 @@ namespace SceneGraph
 namespace
 {
 
+/**
+ * Given a node, it matches all update-proxies using that node as their root-node.
+ */
 template< typename FrameCallbackInfoT >
 class MatchRootNode
 {
@@ -52,7 +57,7 @@ public:
 
 private:
 
-  PropertyOwner& mRootNode;
+  const PropertyOwner& mRootNode;
 };
 
 } // unnamed namespace
@@ -73,10 +78,6 @@ void FrameCallbackProcessor::AddFrameCallback( FrameCallbackInterface* frameCall
 {
   Node& node = const_cast< Node& >( *rootNode ); // Was sent as const from event thread, we need to be able to use non-const version here.
 
-  FrameCallbackInfo info;
-  info.frameCallback = frameCallback;
-  info.updateProxyImpl = new UpdateProxy( mTransformManager, node );
-
   // We want to be notified when the node is destroyed (if we're not observing it already)
   auto iter = std::find_if( mFrameCallbacks.begin(), mFrameCallbacks.end(), MatchRootNode< FrameCallbackInfo >( node ) );
   if( iter == mFrameCallbacks.end() )
@@ -84,20 +85,37 @@ void FrameCallbackProcessor::AddFrameCallback( FrameCallbackInterface* frameCall
     node.AddObserver( *this );
   }
 
-  mFrameCallbacks.push_back( info );
+  mFrameCallbacks.emplace_back( FrameCallbackInfo( frameCallback , new UpdateProxy( mTransformManager, node ) ) );
 }
 
 void FrameCallbackProcessor::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 {
-  auto iter = std::remove_if( mFrameCallbacks.begin(), mFrameCallbacks.end(),
-                              [ this, frameCallback ]
-                                ( const FrameCallbackInfo& info )
-                                {
-                                  info.updateProxyImpl->GetRootNode().RemoveObserver( *this );
-                                  delete info.updateProxyImpl;
-                                  return info.frameCallback == frameCallback;
-                                } );
+  std::vector< SceneGraph::Node* > nodesToStopObserving;
+
+  // Find and remove all matching frame-callbacks
+  auto iter =
+    std::remove_if( mFrameCallbacks.begin(), mFrameCallbacks.end(),
+                    [ frameCallback, &nodesToStopObserving ] ( FrameCallbackInfo& info )
+                    {
+                      bool match = false;
+                      if( info.frameCallback == frameCallback )
+                      {
+                        nodesToStopObserving.push_back( &info.updateProxyImpl->GetRootNode() );
+                        match = true;
+                      }
+                      return match;
+                    } );
   mFrameCallbacks.erase( iter, mFrameCallbacks.end() );
+
+  // Only stop observing the removed frame-callback nodes if none of the other frame-callbacks use them as root nodes
+  for( auto&& node : nodesToStopObserving )
+  {
+    auto nodeMatchingIter = std::find_if( mFrameCallbacks.begin(), mFrameCallbacks.end(), MatchRootNode< FrameCallbackInfo >( *node ) );
+    if( nodeMatchingIter == mFrameCallbacks.end() )
+    {
+      node->RemoveObserver( *this );
+    }
+  }
 }
 
 void FrameCallbackProcessor::Update( BufferIndex bufferIndex, float elapsedSeconds )
