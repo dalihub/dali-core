@@ -22,6 +22,30 @@
       "revId": "6bd28c027789b375deb044b98a0616070e102fb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09cba20b_a0cd85ae",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-10-15T19:24:15Z",
+      "side": 1,
+      "message": "Agree, but shouldn\u0027t it be another patch? The depth/stencil pixel formats are already supported by the graphics API. We just need to update Dali side and framwbuffer API.",
+      "parentUuid": "ca97ec8f_225adccb",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 8
+      },
+      "revId": "6bd28c027789b375deb044b98a0616070e102fb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     }
   ]
 }
