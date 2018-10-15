@@ -153,7 +153,7 @@ public:
   /**
    * @brief Enables depth/stencil buffer if supported
    */
-  virtual void EnableDepthStencilBuffer() = 0;
+  virtual void EnableDepthStencilBuffer( bool enableDepth, bool enableStencil ) = 0;
 
 public:
   // not copyable

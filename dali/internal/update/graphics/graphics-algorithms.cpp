@@ -952,14 +952,11 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   bool usesStencil = false;
   PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
 
-  if(usesDepth || usesStencil)
-  {
-    controller.EnableDepthStencilBuffer();
-  }
+  controller.EnableDepthStencilBuffer( usesDepth, usesStencil );
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
-  auto uboIndex = bufferIndex;//mCurrentFrameIndex % MAX_BUFFERS;
+  auto uboIndex = bufferIndex;
 
   // Prepare uniform buffers
   if( !mGraphicsBufferManager )
