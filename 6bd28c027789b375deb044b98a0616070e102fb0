@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca97ec8f_225adccb",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-15T19:05:48Z",
+      "side": 1,
+      "message": "We should also specify these pixel formats in vulkan-api-framebuffer-factory.h, in \nSetDepthStencilAttachment().\n\nWe don\u0027t (yet) have a way of actually getting these buffers out again, or a way of using the depth buffer in a shader... (there\u0027s a devel-api patch on tizen gerrit we should copy over to vulkan branch)",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 8
+      },
+      "revId": "6bd28c027789b375deb044b98a0616070e102fb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
