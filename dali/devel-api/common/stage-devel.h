@@ -85,6 +85,8 @@ DALI_IMPORT_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface
  *
  * @param[in] stage The stage to clear the FrameCallbackInterface on
  * @param[in] frameCallback The FrameCallbackInterface implementation to remove
+ *
+ * @note If the callback implementation has already been removed, then this is a no-op.
  */
 DALI_IMPORT_API void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback );
 

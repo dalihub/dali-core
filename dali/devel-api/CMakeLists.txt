@@ -19,6 +19,8 @@ SET( SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/conditional-wait.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/mutex.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/thread.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/frame-callback-interface.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/update-proxy.cpp
 
   PARENT_SCOPE )
 
@@ -62,5 +64,8 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/conditional-wait.h
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/mutex.h
   ${CMAKE_CURRENT_SOURCE_DIR}/threading/thread.h
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/frame-callback-interface.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/update-proxy.h
 
   PARENT_SCOPE )

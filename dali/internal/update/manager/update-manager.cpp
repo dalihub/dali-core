@@ -265,7 +265,7 @@ struct UpdateManager::Impl
   {
     if( ! frameCallbackProcessor )
     {
-      frameCallbackProcessor = new FrameCallbackProcessor( transformManager, *root );
+      frameCallbackProcessor = new FrameCallbackProcessor( transformManager );
     }
     return *frameCallbackProcessor;
   }
