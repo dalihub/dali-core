@@ -198,7 +198,7 @@ struct UpdateManager::Impl
     messageQueue( renderController, sceneGraphBuffers ),
     frameCallbackProcessor( NULL ),
     keepRenderingSeconds( 0.0f ),
-    nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
+    nodeDirtyFlags( NodePropertyFlags::TRANSFORM ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
     renderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
     animationFinishedDuringUpdate( false ),
@@ -317,7 +317,7 @@ struct UpdateManager::Impl
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor;        ///< Owned FrameCallbackProcessor, only created if required.
 
   float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
-  int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
+  NodePropertyFlags                    nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
   int                                  frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
 
   DevelStage::Rendering                renderingBehavior;             ///< Set via DevelStage::SetRenderingBehavior
@@ -420,7 +420,7 @@ void UpdateManager::DisconnectNode( Node* node )
 {
   Node* parent = node->GetParent();
   DALI_ASSERT_ALWAYS( NULL != parent );
-  parent->SetDirtyFlag( ChildDeletedFlag ); // make parent dirty so that render items dont get reused
+  parent->SetDirtyFlag( NodePropertyFlags::CHILD_DELETED ); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild( mSceneGraphBuffers.GetUpdateBufferIndex(), *node );
 
@@ -812,7 +812,7 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
-  mImpl->nodeDirtyFlags = NothingFlag;
+  mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
   if ( !mImpl->root )
   {

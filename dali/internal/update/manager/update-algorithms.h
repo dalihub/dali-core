@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_UPDATE_ALGORITHMS_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 
 namespace Dali
 {
@@ -31,7 +32,6 @@ namespace SceneGraph
 {
 
 class Layer;
-class Node;
 class PropertyOwner;
 class RenderQueue;
 
@@ -50,9 +50,9 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
  * @param[in] renderQueue Used to query messages for the next Render.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
-int UpdateNodeTree( Layer& rootNode,
-                    BufferIndex updateBufferIndex,
-                    RenderQueue& renderQueue );
+NodePropertyFlags UpdateNodeTree( Layer& rootNode,
+                                  BufferIndex updateBufferIndex,
+                                  RenderQueue& renderQueue );
 
 } // namespace SceneGraph
 
