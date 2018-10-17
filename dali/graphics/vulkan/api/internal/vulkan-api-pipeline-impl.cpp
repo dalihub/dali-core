@@ -269,8 +269,6 @@ Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const Pi
   mCreateInfo = std::unique_ptr< PipelineCreateInfo >( new PipelineCreateInfo( { factory->GetCreateInfo() } ) );
 
   mPipelineCache = factory->mPipelineCache;
-
-  Initialise();
 }
 
 Pipeline::~Pipeline()
@@ -321,6 +319,11 @@ uint32_t GetLocationIndex( const std::vector< Vulkan::SpirV::SPIRVVertexInputAtt
 
 bool Pipeline::Initialise()
 {
+  if( mVulkanPipelineState )
+  {
+    return false;
+  }
+
   mVulkanPipelineState = std::unique_ptr< VulkanPipelineState >( new VulkanPipelineState() );
 
   // get shaders

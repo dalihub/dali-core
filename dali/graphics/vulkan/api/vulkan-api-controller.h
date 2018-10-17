@@ -184,7 +184,7 @@ public:
 
   void Resume() override;
 
-  void EnableDepthStencilBuffer() override;
+  bool EnableDepthStencilBuffer( bool enableDepth, bool enableStencil ) override;
 
   // VULKAN only
 

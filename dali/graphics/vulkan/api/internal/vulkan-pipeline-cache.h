@@ -72,9 +72,20 @@ public:
    */
   bool RemovePipeline( Internal::Pipeline* pipeline );
 
+  /**
+   * Compiles all pending pipelines
+   */
+  void Compile();
+
 private:
 
   friend class PipelineCacheDebug;
+
+  /**
+   * Computes pipeline cache size
+   * @return
+   */
+  uint32_t GetCacheSize() const;
 
 private:
 

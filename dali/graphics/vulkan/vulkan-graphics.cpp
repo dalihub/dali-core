@@ -208,20 +208,20 @@ Graphics::~Graphics()
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
   mResourceRegister->Clear();
 
-  // Execute any outstanding actions...
-  ExecuteActions();
-  ExecuteActions();
-
   PrintAllocationReport( *mDescriptorAllocator );
 
   mDescriptorAllocator.reset( nullptr );
 
-  // Collect the garbage ( for each buffer index ) and shut down gracefully...
-  CollectGarbage();
-  CollectGarbage();
+  // Execute any outstanding actions...
+  ExecuteActions();
+  ExecuteActions();
 
   // Kill pipeline cache
   mDevice.destroyPipelineCache( mVulkanPipelineCache, mAllocator.get() );
+
+  // Collect the garbage ( for each buffer index ) and shut down gracefully...
+  CollectGarbage();
+  CollectGarbage();
 
   // We are done with all resources (technically... . If not we will get a ton of validation layer errors)
   // Kill the Vulkan logical device
@@ -1538,13 +1538,13 @@ void Graphics::CollectGarbage()
                    "Beginning graphics garbage collection---------------------------------------" )
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[mCurrentGarbageBufferIndex].size() )
 
+  // swap buffer
+  mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
+
   if( mDiscardQueue[mCurrentGarbageBufferIndex].empty() )
   {
     return;
   }
-
-  // swap buffer
-  mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
 
   for( const auto& deleter : mDiscardQueue[mCurrentGarbageBufferIndex] )
   {
@@ -1564,14 +1564,14 @@ void Graphics::ExecuteActions()
                    "Beginning graphics action execution---------------------------------------" )
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Action queue size: %ld\n", mActionQueue.size() )
 
+  mCurrentActionBufferIndex = ((mCurrentActionBufferIndex+1)&1);
+
   if( mActionQueue[mCurrentActionBufferIndex].empty() )
   {
     return;
   }
 
   // swap buffer
-  mCurrentActionBufferIndex = ((mCurrentActionBufferIndex+1)&1);
-
   for( const auto& action : mActionQueue[mCurrentActionBufferIndex] )
   {
     action();
@@ -1605,6 +1605,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
+
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
