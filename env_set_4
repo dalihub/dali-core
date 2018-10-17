@@ -1,0 +1,2832 @@
+추가 설정에 대해 공지 드립니다.
+
+
+
+
+수원 사업장과 서울 R&D 캠퍼스간에 방화벽이 기본적으로 open되어 있지 않아, Proxy 서버를 통하여 다른 사업장의 서버에 접근할 경우 접근이 불가능합니다.
+
+따라서 각 사업장에서 제공하는 PAC파일을 이용하여 Proxy 설정을 진행하여야 합니다.
+1.Windows PC
+ESCORT - PC Download - Proxy 설정파일 (인증서 자동 설치) 
+2.Linux PC
+1) GUI 환경
+System Settings - Network - Network proxy - "Method: Automatic, Configuration URL: 아래URL 입력" - Apply system wide
+서울 R&D 캠퍼스 : http://sRnD.sec.samsung.net:8088/samsungsel.pac
+수원 사업장 : http://168.219.61.251:8088/samsungcs.pac
+
+2) Terminal 환경 (gbs, wget 등 사용 가능)
+vi /etc/environment 안에 아래 내용 추가
+서울 R&D 캠퍼스 : no_proxy="127.0.0.1, localhost, `echo 165.213.149.{1..255} | sed 's/ /,/g'`"
+수원 사업장 : no_proxy="127.0.0.1, localhost, `echo 10.113.136.{1..255} | sed 's/ /,/g'`"
+source /etc/environment
+
+
+
+위 설정을 완료해야, 외부 인터넷과 다른 사업장의 서버(SPIN 서버)를 동시에 사용할 수 있습니다.
+
+
+
+
+추가로 전체 SPIN 서버 정보(변경 사항 포함)에 대해 재공지 드립니다.
+
+Main Server : http://10.113.136.204
+
+Gerrit : http://165.213.149.170/gerrit
+
+Source : http://165.213.149.170/source
+
+Download : http://165.213.149.200/download
+
+Jira : http://10.113.136.204/Jira
+
+
+Confluence : http://10.113.136.204/Confluence
+
+OBS : http://10.113.136.53
+
+Drupal(Account) : http://10.113.136.204/drupal
+ 
+ 
+
+감사합니다.
+
+나세홍 드림
+
+
+rpm -e --nodeps libgbm
+rpm -e --nodeps mesa-libglapi
+rpm -e --nodeps mesa
+rpm -e --nodeps mesa-libEGL
+rpm -e --nodeps mesa-libGLESv2
+
+ git commit --amend
+ git push origin HEAD:refs/changes/70/692870 (패치번호)
+ git push origin HEAD:refs/for/tizen
+git push origin HEAD:refs/for/tizen_4.0
+git push origin HEAD:refs/for/sandbox/upgrade/efl120
+
+git fetch ssh://wonsik@review.tizen.org:29418/platform/upstream/SDL refs/changes/45/68345/1 && git checkout FETCH_HEAD
+git push origin HEAD:refs/changes/45/68345
+
+git push origin HEAD:refs/for/devel/master
+git push origin HEAD:refs/for/devel/vulkan
+
+git push origin tizen
+
+[[[[Aa]]]]] 
+[[[[Bb]]]]] 
+[[[[Cc]]]]] 
+<< SCM AP >>
+AP: tizenSCM5G
+passwd : qwer1234
+
+<< Copy pac >> 
+osc copypac TIZEN:1.0:Public elementary home:sidein 
+osc copypac TIZEN:1.0:Public elementary home:sidein 
+
+<< CPU Clock Setting >> 
+>> Maximum 
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+>> ondemend 
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+
+<< configure for GDB >> 
+./configure --build=armv7l-unknown-linux-gnueabi --host=armv7l-unknown-linux-gnueabi --target=armv7l-tizen-linux-gnueabi --program-prefix= --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --disable-static --disable-image-loader-svg --enable-simple-x11 --with-x --enable-fb --enable-xrender-x11 --enable-line-dither-mask --disable-image-loader-edb --disable-rpath --enable-gl-x11 --enable-gl-flavor-gles --enable-gles-variety-sgx --enable-pixman --enable-pixman-image --enable-pixman-image-scale-sample --enable-tile-rotate --enable-pthreads --enable-cpu-neon --enable-winkcodec=yes CFLAGS=-g 
+
+
+[[ clean repository ]]
+rm /usr/system/RestoreDir/opt.zip  
+mkdir /opt/usr/media/debug
+rm -rf /usr/lib/debug
+ln -s /opt/usr/media/debug /usr/lib/debug
+
+<< Client Side Rotation Sample >>
+  https://git.enlightenment.org/devs/jpeg/evasgl_test.git in glview
+
+[[[[Dd]]]]] 
+<< power saver off >>
+devicectl display stop
+
+<< DLOG setting >> 
+dlogutil -v time LAUNCH -f /mnt/ums/dlog.txt & 
+dlogutil -v time LAUNCH -f 
+dlogutil -v time LAUNCH -f ./FM_X11_00.txt 
+dlogutil -v time | grep -E "setting|e17" 
+
+1. 빌드옵션에 추가할것 
+  configure.ac에서 PKG_CHECK_MODULES에 dlog추가 
+  ex) PKG_CHECK_MODULES(ENLIGHTENMENT, [enlightenment,utilX,dlog]) 
+2. source에 해더 추가 
+ ex) #include <dlog.h> 
+2. source에 DLOG API로 추가 
+  ex)  LOG(LOG_DEBUG, "LAUNCH", "[e17:Application:Launching:done]"); 
+3. build depencency추가 export "DISPLAY=:0"
+  ex) 대상 파일 : debian/control 
+    Build-Depends: debhelper (>= 5), e17-dev, libslp-utilx-dev, libelm-dev, dlog-dev 
+    위와 같이 dlog-dev 처럼 추가 
+
+<<DS-5 User Guide>>
+DS-5 사용 방법에 대해 간략히 말씀 드리겠습니다.
+ 
+DS-5를 사용하시기 위해서는 4가지가 필요합니다.
+1. DS-5 App (Eclipse 기반)
+   - http://www.arm.com/products/tools/software-tools/ds-5/ds-5-downloads.php 에서 받으시면 됩니다.
+   - 최신 버전은 5.14입니다.
+   - 설치 후 Eclipse 의 HELP -> ARM LICENSE MANAGER -> Add License -> License Server 를 고르시고
+     8224@165.213.149.102 라고 넣어 주시면 라이센스가 설치 됩니다.
+2. DS-5를 쓸 수 있도록 configuration 되고 빌드된 커널
+   - 커널 소스코드를 clone 하십니다.
+   - 아마 커널 소스 트리에 접근하시려면 커널팀에 별도로 요청을 하셔야 할 겁니다.
+   - 커널을 빌드하는 방법은 아래 URL을 참고하세요.
+   - http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0482i/BABEJAAI.html
+3. DS-5 용 gator driver
+   - Sampling을 위해 사용되는 kernel driver 입니다.
+   - 소스코드는 DS-5의 install 디렉토리인 /usr/local/DS-5/arm/gator/driver-src에서 찾으실 수 있습니다.
+   - 빌드 방법은 위 URL http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0482i/BABEJAAI.html 을 참고하시면 됩니다.
+4. DS-5 용 daemon
+   - Target에서 Host의 DS-5 App과 통신하는 app 입니다.
+   - 소스코드는 /usr/local/DS-5/arm/gator/daemon-src 에서 찾으실 수 있습니다.
+   - 빌드 방법은 http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0482i/BABEJAAI.html 을 참고하세요.
+ 
+보다 자세한 사항 및 DS-5 Streamline 사용법은 아래 URL을 참고하시면 됩니다.
+http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0482i/BABEJAAI.html
+ 
+감사합니다.
+
+
+<< DDK Test Case >>
+  magnolia/framework/graphics/test_case
+  tizen-graphics-test-suite 요 폴더요
+
+<<Display setting>>
+export "DISPLAY=:0"
+
+[[[[Ee]]]]] 
+<< emulator Proxy settting >> 
+vconftool set -t string memory/dnet/proxy "http://168.219.61.250:8080" 
+
+<< ebook run >> 
+ 아.. idle에 아이콘이 따로 있는건 아니구요.. 
+  My files -> Downloads -> Others 폴더에서 
+  Alice in the ~ .epub 파일을 선택하시면 실행됩니다.. 
+
+<< EINA Log Enable >> 
+export EINA_LOG_DLOG_ENABLE=1
+export EINA_LOG_SYSLOG_ENABLE=1
+export EINA_LOG_LEVEL=5
+export EVAS_GL_API_DEBUG=1
+export EVAS_GL_INFO=1
+
+<< E17 Configuration >> 
+e.cfg => e.src 
+ eet -d e.cfg config e.src 
+e.src => e.cfg 
+eet -e e.cfg config e.src 1 
+
+<< Enlightenment setting on Desktop >> 
+▣ Xephyr 사용법 
+~$ Xephyr :1 -ac -screen 1280x720x32  -dpi 96 -ac & 
+  
+▣ Xephyr 에서 enligthenment 사용법 
+~$ export DISPLAY=:1 
+~$ enlightenment_start 
+
+  e.cfg => e.src 
+#>eet -d e.cfg config e.src 
+  e.src => e.cfg 
+#>eet -e e.cfg config e.src 1 
+
+<< E17 Extended Mode chage >> 
+  devicemgr_sc -set extended 
+  Proxima 타겟 + HDMI 케이블 + HDMI 꼬인 케이블 + HDMI 디바이스 
+  eet -d e.cfg config e.src 
+  e17-misc 에 있는 파일을 사용해 주세요
+
+<< Evas DRI2 Debug enable >>
+EVAS_SWAPPER_DEBUG =1
+
+<< Evas Object Color Set >>
+evas_common_draw_context_set_multiplier
+evas_object_color_set
+
+<< ETC >>
+/opt/usr/apps/V7DdGSrq3j/bin/V7DdGSrq3j.AnalogWatch03
+/opt/usr/apps/g5ENQhs054/bin/g5ENQhs054.AppyGeek
+LOG(LOG_INFO, "EVAS_RENDERING", " mode %d\n", re->mode); 
+
+[[[[Ff]]]]] 
+<< fprintf >> 
+fprintf(stderr, " 
+
+[[[[Gg]]]]] 
+
+<< glbindtext ID >> 
+GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, or GL_TEXTURE_CUBE_MAP. 
+
+<< enable gdb >> 
+  # mv /usr/bin/gdb /root/ 
+  # mv /root/gdb /usr/bin/ 
+  # echo "디버깅하려는 app의 SMACK process label" > /proc/self/attr/current 
+  # echo "4nR0nYwn8y" > /proc/self/attr/current 
+  # gdb 실행~ 
+
+gbs build -A armv7l -R https://아이디:'비번'@download.tizendev.org/snapshots/tizen-2.2/common/latest -B /var/tmp/gbs-root/rsa-tizen-2.2-armv7l --keep-packs --include-all --skip-conf-repos
+
+[[[[Hh]]]]] 
+<< HW Compositor OFF >>
+e_comp_util -l CONFIGURE
+1) memory tab에서 don't composite fullscreen enable
+2) e_comp_util -l CONFIGURE마지막 탭에서 hardware composite option disable
+3) OK -> sync
+
+[[[[Ii]]]]] 
+<< Image File Dump >> 
+static int cnt = 0; 
+char file_name[4096]; 
+memset(file_name,0,4096); 
+cnt++; 
+sprintf(file_name,"/home/app/%d.png",cnt); 
+evas_common_save_image_to_file(im,file_name,NULL,100,0); 
+
+[[[[Jj]]]] 
+[[[[Kk]]]] 
+<< KONA >>
+http://10.41.129.156:8080/kona_server/main/mainPage.do 
+
+[[[[Ll]]]]
+<< Ll >>
+launch pad
+/usr/bin/launchpad_prel
+
+[[[[Mm]]]] 
+<< mali clock, how to watch and modify that >> 
+mali gpu관련 clock 보는 법 및 고정 하는 방법 입니다. 
+1. clock 보는 법 
+cat /sys/module/mali/parameters/mali_gpu_clk 
+실시간으로 계속 보시려면 
+ while true;do cat /sys/module/mali/parameters/mali_gpu_clk;sleep 1;done 
+2. clock 고정 방법 
+echo 원하는 클럭 > /sys/module/mali/parameters/mali_dvfs_control (ex: echo 440 > /sys/module/mali/parameters/mali_dvfs_control) 
+3. 고정 시킨것 해제시 
+echo 999 > /sys/module/mali/parameters/mali_dvfs_control 
+
+<< Mount >> 
+change-booting-mode.sh --update 
+mount -t nfs 192.168.129.1:/home/sidein/ /mnt/nfs -o udp,nolock 
+mount -o remount,rw / 
+
+<< apply MSAA >> 
+GL_APICALL void GL_APIENTRY glRenderbufferStorageMultisampleEXT( GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height); 
+GL_APICALL void GL_APIENTRY glFramebufferTexture2DMultisampleEXT( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLsizei samples); 
+
+[[[[Nn]]]] 
+[[[[Oo]]]] 
+<< Object Dump API >> 
+elm_object_tree_dot_dump 
+
+<< Odroid >>
+direct_set_debug.sh --sdb-set
+ID : root
+pass : tizen
+
+[[[[Pp]]]] 
+<< get image from xpixmap >> 
+   image = XGetImage((Display*)display, window, rel_x, rel_y, width, height, AllPlanes, ZPixmap);image = XGetImage((Display*)display, window, rel_x, rel_y, width, height, AllPlanes, ZPixmap); 
+
+<< Pixel gettor - set to get pixel callback function >> 
+Evas_Object_Image_Pixels_Get_Cb 
+
+<< patch : make patch using diff >> 
+git diff --no-prefix > **.patch 
+
+<< EFL SVN Patch address >> 
+enlightenment-devel@lists.sourceforge.net 
+
+[[[[Qq]]]] 
+[[[[Rr]]]] 
+<< RPM Command >> 
+rpm -qip 패키지.rpm 
+rpm -Va : 설치되어 있는 rpm 정보 
+rpm -qf 파일 절대 경로 : 이미 설치되어 있는 rpm의 버젼 정보 
+rpm -qRp 패키지.rpm : 해당 파일과 의존성을 갖는 파일들 출력 
+rpm -qip 패키지.rpm : 해당 파일에 대한 파일 목록 표시 spec파일에 쓰인 정보 출력 
+rpm -qpl 패키지.rpm : 설치할 파일의 목록 표시 
+rpm2cpio 패키지.rpm | cpio -i --make-directories -E 패키지 
+: rpm 패키지를 설치하지 않고 그냥 풀거나, 특정 파일만 골라내고 싶을때는? rpm -qip 패키지.rpm 
+rpm -Va : 설치되어 있는 rpm 정보 
+rpm -qf 파일 절대 경로 : 이미 설치되어 있는 rpm의 버젼 정보 
+rpm -qRp 패키지.rpm : 해당 파일과 의존성을 갖는 파일들 출력 
+rpm -qip 패키지.rpm : 해당 파일에 대한 파일 목록 표시 spec파일에 쓰인 정보 출력 
+rpm -qpl 패키지.rpm : 설치할 파일의 목록 표시 
+rpm2cpio 패키지.rpm | cpio -i --make-directories -E 패키지 
+: rpm 패키지를 설치하지 않고 그냥 풀거나, 특정 파일만 골라내고 싶을때는? 
+
+[[[[Ss]]]] 
+<< ELM Scale setting >. 
+ELM_SCALE=0.65 
+
+[[[[Tt]]]] 
+[[[[Uu]]]] 
+<< U1 Performance Mode >> 
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+
+[[[[Vv]]]] 
+valgrind --tool=memcheck  --leak-check=full --track-origins=yes --log-file=./setting_wifi.txt /usr/apps/com.samsung.setting/bin/setting 
+valgrind --tool=memcheck  --leak-check=full --track-origins=yes /usr/apps/com.samsung.setting/bin/setting 
+
+1번 shell
+valgrind --vgdb=yes --vgdb-error=0 --leak-check=full --error-limit=no /usr/apps/com.samsung.clocksetting/bin/clocksetting
+2번 shell
+gdb /usr/apps/com.samsung.clocksetting/bin/clocksetting 
+target remote | vgdb
+
+eglibc 반드시 설치할 것   
+
+[[[[Ww]]]] 
+<< WebGL Test Case >> 
+FishTank : http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+
+<< window dump >> 
+xinfo -topvwins 
+xwd -id 0x04600007 -out win690.xwd 
+
+<< window dump - root >> 
+xinfo -xwd_topvwins . 
+
+<< wrt install >> 
+wrt-installer -if 위젯이름.wgt 
+wrt-client -l 위젯번호 
+
+
+[[[[Xx]]]] 
+[[[[Yy]]]] 
+
+[[[[Zz]]]] 
+[[[[Misc]]]] 
+http://platform.sec.samsung.net/slp/Management/Forms/AllItems.aspx?RootFolder=%2fslp%2fManagement%2fWeekly%20Report&FolderCTID=&View=%7b66BEA59B%2d32A2%2d4E52%2d838D%2dA0F1A0FF2B6F%7dhttp://platform.sec.samsung.net/slp/Management/Forms/AllItems.aspx?RootFolder=%2fslp%2fManagement%2fWeekly%20Report&FolderCTID=&View=%7b66BEA59B%2d32A2%2d4E52%2d838D%2dA0F1A0FF2B6F%7d 
+
+
+
+  
+
+근태 문의
+<< SW Center 김명선 과장 >>
+
+
+
+
+# cp /opt/dbspace/.livebox.db /home/developer  # DB 백업
+
+# rpm -Uvh *.rpm # 설치
+
+# cp /home/developer/.livebox.db /opt/dbspace # DB 복구
+
+# reboot
+
+
+
+
+
+
+
+
+
+
+
+
+
+ecore_x_vsync.c, ecore_xcb_vsync.c 
+
+
+ 
+
+[[ COMP Manger Keyword in default.edc ]] 
+///////////////////////////////////////////////////////////////////////////// 
+/*** MOD: COMP ***/ 
+
+[[ vtouchpad log disable ]] 
+ 1. /usr/etc/X11/xorg.conf.d/display.conf 수정 
+Section "ServerLayout" 
+        Identifier              "Test Layout" 
+        Screen          0       "Screen0" 0 0 
+	InputDevice             "Gesture" 
+EndSection 
+위와같이 기존 내용에 
+	InputDevice             "Gesture" 
+라인 추가 
+  2. /usr/etc/X11/xorg.conf.d/input.conf의 하단부에 아래내용 추가 
+Section "InputDevice" 
+	Identifier "Gesture" 
+        Driver  "gesture" 
+        Option  "Device"        "/dev/null" 
+	Option	"Activate"	"1" 
+EndSection 
+
+        group "E_Config_Gadcon" struct { 
+            group "clients" list { 
+                group "E_Config_Gadcon_Client" struct { 
+                    value "name" string: "clock"; 
+                    value "id" string: "clock.209"; 
+                    value "geom.pos" int: 1200; 
+                    value "geom.size" int: 80; 
+                    value "geom.res" int: 1280; 
+                    value "geom.pos_x" double: 0.7874999999999999777955395; 
+                    value "geom.pos_y" double: 0.8263888888888888395456433; 
+                    value "geom.size_w" double: 0.2124999999999999944488849; 
+                    value "geom.size_h" double: 0.1708333333333333370340767; 
+                    value "state_info.seq" int: 0; 
+                    value "state_info.flags" int: 0; 
+                    value "style" string: "plain"; 
+                    value "orient" int: 0; 
+                    value "autoscroll" uchar: 0; 
+                    value "resizable" uchar: 0; 
+                } 
+            } 
+            value "name" string: "gadman"; 
+            value "id" int: 114; 
+            value "zone" uint: 0; 
+        } 
+
+        group "E_Config_Module" struct { 
+            value "name" string: "clock"; 
+            value "enabled" uchar: 1; 
+            value "delayed" uchar: 1; 
+            value "priority" int: 0; 
+        } 
+
+        group "E_Remember" struct { 
+            value "match" int: 51; 
+            value "apply_first_only" uchar: 0; 
+            value "keep_settings" uchar: 0; 
+            value "name" string: "E"; 
+            value "class" string: "_config::utils/clock"; 
+ 
+vtouchpad 
+
+[[ get project ]] 
+osc copypac OBSTF:Private opengl-es-mali400mp home:sidein 
+
+[[check out ]] 
+osc co home:sidein opengl-es-mali400mp 
+
+[[obs clean build]] 
+sudo osc build armv7el --no-verify --clean 
+
+[[rpm install ]] 
+1. update rpm db 
+change-booting-mode.sh --update 
+rpmdb --rebuilddb 
+2. install rpm pkgs 
+rpm -i --force *.rpm 
+ rpmdb --rebuilddb 
+
+[[ Window & window Surface sequence change demending ]] 
+ee->prop.window = ecore_x_window_new(0, 0, 0, 1, 1) 
+ : 1x1 window 생성 
+eglCreateWindowSurface(dpy, cfg, ee->prop.window, …) 
+ : window surface 생성 
+evas_object_resize( 0, 0, 720, 1280 ) 
+  XResizeWindow() 
+evas_object_show() 
+  XMapWindow()  
+  ====> after XMapWindow, should call eglCreateWindowSurface(). 
+
+[[ GFX Test Application ]] 
+git clone ssh://sidein@165.213.149.219:29418/slp/kernel/gpu-ddk 
+testcases/gfxtest-2.0 
+./gfxtest20 t 3 
+
+ devicemgr_sc -set extended 
+ devicemgr_sc  -popup setMenu screen을 GL backend로 돌릴 경우에 eglSwapInterval은 0 으로 
+swapinterval을 설정하는건 app이 결정합니다. 
+  
+eglWaitGL이 호출되는 조건은 
+아래와 같은 코드로 GL_RENDERER 가 PowerVR SGX 540 나 Mali-400 MP 일경우에만 
+safe_native = 1 set해주어 eglWaitGL이 불리지 않고 그외의 경우에는 eglWaitGL이 불리게 됩니다. 
+eglWaitGL을 실행하면, 그 동안 gl command 내려준걸 모두 실행하고, 끝날때까지 기다려주어야하기 때문에 
+느려지는 성능상의 문제가 있습니다.mali는 opengl이 async로 동작하기 떄문에 eglWaitGL이 불리지 않도록 되어있습니다. 
+ 
+s = (const char *)glGetString(GL_RENDERER); 
+
+if (strstr(s, "PowerVR SGX 540") || strstr(s, "Mali-400 MP")) 
+    safe_native = 1;	 
+
+ chmod 666 /dev/uinput 
+
+
+Menu screen을 GL backend로 돌릴 경우에 eglSwapInterval은 0 으로 
+swapinterval을 설정하는건 app이 결정합니다. 
+  
+eglWaitGL이 호출되는 조건은 
+아래와 같은 코드로 GL_RENDERER 가 PowerVR SGX 540 나 Mali-400 MP 일경우에만 
+safe_native = 1 set해주어 eglWaitGL이 불리지 않고 그외의 경우에는 eglWaitGL이 불리게 됩니다. 
+eglWaitGL을 실행하면, 그 동안 gl command 내려준걸 모두 실행하고, 끝날때까지 기다려주어야하기 때문에 
+느려지는 성능상의 문제가 있습니다.mali는 opengl이 async로 동작하기 떄문에 eglWaitGL이 불리지 않도록 되어있습니다. 
+ 
+s = (const char *)glGetString(GL_RENDERER); 
+
+if (strstr(s, "PowerVR SGX 540") || strstr(s, "Mali-400 MP")) 
+    safe_native = 1;	 
+
+> apt-get install qemu-arm-static rpm python-urlgrabber python-m2crypto build osc 
+ 
+If you have Python <= 2.6, you have to install 2.7 
+> wget http://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz 
+> tar xvzf Python-2.7.2.tgz 
+> cd Python-2.7.2/ 
+> ./configure --prefix=/usr/local 
+> make 
+> sudo make install 
+> sudo rm /usr/bin/python 
+> sudo ln -s /usr/local/bin/python2.7 /usr/bin/python // change default python version 
+> export PYTHONPATH=/usr/lib/pymodules/python2.6:$PYTHONPATH // to use python2.6 modules 
+
+
+  " 네. 그리고 그걸 바꾸고 싶으면 /etc/profile.d/simulator-opengl.sh 파일에서" 
+  "if grep "gles=1" ==> if grep "gles=0"  이렇게 서로 바꿔주시면 됩니다." 
+
+ osc copypac SOURCEPRJ SOURCEPAC DESTPRJ 
+ osc copypac SLP:Main evas home eokjin81.kim 
+osc copypac home:sh15.park coregl home:sidein 
+
+[[ Enter the hell ]] 
+osc chroot armv7el 
+
+[[ Browser Performance ]] 
+http://platform.sec.samsung.net/browser/Management1/Browser%EC%84%B1%EB%8A%A5%EC%A7%80%ED%91%9C%EA%B4%80%EB%A6%AC.xlsx 
+
+[[emulator log]] 
+~/tizen_vms/x86/0629/logs$ vim emulator.log 
+
+[[xinfo --topwins]] 
+xinfo -topwins 
+
+http://kms.sec.samsung.net/kms/openKinQuestion.do?mode=VIEW&pid=120710-QU43369 
+
+[GLOBAL_CONFIGURATION] _EGL_GLOBAL_LOCK=1 
+/usr/bin/enlightenment _EGL_SWAP_TYPE=0 _EGL_X11_SWAP_INTERVAL=0 
+
+ecore_exe_run 
+
+sudo ifconfig usb0 192.168.129.1 up 
+sudo ifconfig samsung_device 192.168.129.1 up 
+telnet 192.168.129.3 
+
+mount -t nfs 192.168.129.1:/home/sidein/ /mnt/nfs -o tcp,nolock 
+mount -o remount,rw / 
+
+sungwoo@gmail.com 
+
+rpm -Uvh --force *.rpm 
+
+
+
+[[ Image Capture Problem ]] 
+__ie_insert_text_capture_img_using_xWindow 
+
+set opts console=ttySAC2,115200n8; save 
+
+
+[[ Selective compositor on/off ]] 
+ vi /usr/etc/X11/xorg.conf.d/display.conf 로 triple buffer enable. 
+
+Section "Device" 
+        Identifier              "exynos" 
+        Driver                  "exynos" 
+        Option                  "exa"           "true" 
+        Option                  "tfb"           "true" 
+        Option                  "dri2"          "true" 
+        Option                  "sw_exa"        "true" 
+EndSection 
+
+ 
+
+쉘에서 selective compositor enable 
+
+$> e_comp_util -l CONFIGURE 실행 
+
+1. Memory tab에서 Don't compositor fullscreen 체크 
+
+2. Mobile tab에서 H/W overlay window 체크 --> indicator를 다른 layer에 그려줌. 
+  이게 enable방법이기때문에 
+  반대로 하시면 됩니다 
+  위에서 tfb제거하시고 
+  체크하라는 부분 해제 해주시면 되요 
+
+EVAS_FRAME_QUEUING 
+
+
+[[[ DS-5 install ]]] 
+1. 타겟 네트웍 연결 후 gator.ko 모듈 올리기 
+ $target>insmod gator.ko 
+ 
+2. ds-5용 eclipse 실행 
+ - remote systems view에서 target ip 설정 및 ssh 연결 
+ - remote system view에서 launch terminal 을 통해 target에 terminal 연결 
+ - 연결된 target terminal에서 gatord 실행 
+   $> gatord & 
+   만약 binding 에러 메세지로 실행이 안되면, port 변경하여 실행 
+   $> gator 8080 & 
+ - ARM Streamline Data view에서 connection 정보 설정 
+   : 타겟 IP 및 port 설정 
+   : profiling시 보고 싶은 심볼 및 코드가 있을 경우, Program Images -> Add ELF Image.. 버튼을 통해 debug용 so uploading. 
+ - Capture Option 버튼을 통해 profiling 시작! 
+
+
+
+rpm2cpio *.rpm | cpio -idmv 
+rpm2cpio *.rpm | cpio -idmv 
+
+
+[[ music player error log ]] 
+ 11327 glTexSubImage2D(target = GL_TEXTURE_2D, level = 0, xoffset = 1029, yoffset = 0, width = 28, height = 33, format = GL_ALPHA, type = GL_UNSIGNED_BYTE, pixels = blob(924)) 
+11327: warning: glGetError(glTexSubImage2D) = GL_INVALID_VALUE 
+11339 glTexSubImage2D(target = GL_TEXTURE_2D, level = 0, xoffset = 1127, yoffset = 0, width = 27, height = 33, format = GL_ALPHA, type = GL_UNSIGNED_BYTE, pixels = blob(924)) 
+11339: warning: glGetError(glTexSubImage2D) = GL_INVALID_VALUE 
+
+sudo mount -o bind ~/sparrow_work/work/G2D/ /var/tmp/build-root/home/abuild/g2d/ 
+
+sh-4.1# ps -ef | grep scim-helper 
+app       3326  2081  0 10:10 ?        00:00:06 /usr/lib/scim-1.0/scim-helper-launcher --daemon --config socket --display :0 ise-moakey-korean b70bf6cc-ff77-47dc-a137-60acc32d1e0c 
+root      3864  3862  0 10:58 pts/2    00:00:00 grep scim-helper 
+sh-4.1# gdb --pid=3326 
+
+1. http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+2. aquarium (http://webglsamples.googlecode.com/hg/aquarium/aquarium.html) 
+3. cubemap (http://webglsamples.googlecode.com/hg/dynamic-cubemap/dynamic-cubemap.html) 
+4. space rocks (http://webglsamples.googlecode.com/hg/spacerocks/spacerocks.html) 
+5. toon shading (http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html) 
+
+EVAS_GL_DIRECT_OVERRIDE=1 EVAS_GL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /usr/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+EVAS_GL_DIRECT_OVERRIDE=1  EVAS_GL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /usr/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+EVAS_GL_DIRECT_OVERRIDE=1 EVAS_GL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /usr/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/dynamic-cubemap/dynamic-cubemap.html 
+EVAS_GL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 ECORE_EVAS_FPS_DEBUG=1  /usr/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/spacerocks/spacerocks.html 
+EVAS_GL_DIRECT_OVERRIDE=1 EVAS_GL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /usr/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://learningwebgl.com/lessons/lesson14/index.html 
+
+ECORE_EVAS_FPS_DEBUG=1 COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 /opt/apps/com.samsung.browser/bin/browser url http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+ECORE_EVAS_FPS_DEBUG=1 COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+ COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+ http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/dynamic-cubemap/dynamic-cubemap.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/spacerocks/spacerocks.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://flashcanvas.net/examples/dl.dropbox.com/u/1865210/mindcat/canvas_perf.html 
+EVAS_GL_DIRECT_OVERRIDE=1 COREGL_FASTPATH=1 ECORE_EVAS_FPS_DEBUG=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/google-io/2011/100-objects.html 
+
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg/dynamic-cubemap/dynamic-cubemap.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg/spacerocks/spacerocks.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://flashcanvas.net/examples/dl.dropbox.com/u/1865210/mindcat/canvas_perf.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://webglsamples.googlecode.com/hg/google-io/2011/100-objects.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser2/bin/browser2 url http://ie.microsoft.com/testdrive/mobile/Performance/SpeedReading/Default.html 
+
+
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://learningwebgl.com/lessons/lesson14/index.html 
+
+COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 /opt/apps/com.samsung.browser/bin/browser url http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html 
+COREGL_FASTPATH=1 /opt/apps/com.samsung.browser/bin/browser url http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+
+ELM_ENGINE=gl ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg-history/eca14688aa1adc0def9ca67131d91fb13e7df351/fpstest/fpstest.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg/aquarium/aquarium.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg/dynamic-cubemap/dynamic-cubemap.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg/spacerocks/spacerocks.html 
+ECORE_EVAS_FPS_DEBUG=1 /opt/apps/org.tizen.browser/bin/browser url http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html 
+/opt/apps/com.samsung.browser/bin/browser url http://www.apple.com/html5/showcase/transitions 
+
+
+COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 /opt/apps/com.samsung.browser/bin/browser url http://peacekeeper.futuremark.com/ 
+COREGL_FASTPATH=1 COREGL_TRACE_CTX=1 /opt/apps/com.samsung.browser/bin/browser url http://peacekeeper.futuremark.com/ 
+ECORE_EVAS_FPS_DEBUG=1 COREGL_FASTPATH=1 
+
+1. Normal : 34 fps           FF : 36 - 37        FF + DD : 36 - 37   Global Lock + FF = 27 FPS 
+2. Normal : 4 fps // abmormal drawing FF : 6 FPS FF + DD : 5 FPS Global Lock + FF = 17 FPS 
+3. Normal : 2fps  // FF 2 FPS FPS Global Lock + FF = 4 - 5 FPS 
+4. Normal :  FF : 
+5  Normal :  FF : 12 FPS 
+
+
+1. Normal + Webkit2 => 0.599 
+2. 
+
+
+ http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+
+ sbs -et apt-get -d install com.samsung.browser2 
+
+
+set opts console=ttySAC2,115200n8; save 
+
+ vi /usr/etc/X11/xorg.conf.d/display.conf 로 triple buffer enable. 
+
+Section "Device" 
+        Identifier              "exynos" 
+        Driver                  "exynos" 
+        Option                  "exa"           "true" 
+        Option                  "tfb"           "true" 
+        Option                  "dri2"          "true" 
+        Option                  "sw_exa"        "true" 
+EndSection 
+
+ 
+
+쉘에서 selective compositor enable 
+
+$> e_comp_util -l CONFIGURE 실행 
+
+1. Memory tab에서 Don't compositor fullscreen 체크 
+
+2. Mobile tab에서 H/W overlay window 체크 --> indicator를 다른 layer에 그려줌. 
+  이게 enable방법이기때문에 
+  반대로 하시면 됩니다 
+  위에서 tfb제거하시고 
+  체크하라는 부분 해제 해주시면 되요 
+
+안녕하세요, 호종현입니다. 
+ 
+최근 바이너리에서 gdb 를 실행하면 Operation not permitted 라는 메시지와 함께 
+디버깅을 실패하는 경우가 있습니다. 
+ 
+SMACK 으로 인해 발생하는 문제라고 하는데 아직 확인중이라고 하고요. 
+당분간 꼼수로 사용할 수 있는 방법입니다. 
+ 
+  # mv /usr/bin/gdb /root/ 
+  # mv /root/gdb /usr/bin/ 
+  # echo "디버깅하려는 app의 SMACK process label" > /proc/self/attr/current 
+  # echo "4nR0nYwn8y" > /proc/self/attr/current 
+  # gdb 실행~ 
+ 
+감사합니다. 
+
+
+
+
+[[ XLibrary ]] 
+framework/uifw/xorg/lib/libx11 
+framework/uifw/xorg/lib/libxau 
+framework/uifw/xorg/lib/libxaw 
+framework/uifw/xorg/lib/libxcomposite 
+framework/uifw/xorg/lib/libxcursor 
+framework/uifw/xorg/lib/libxdamage 
+framework/uifw/xorg/lib/libxdmcp 
+framework/uifw/xorg/lib/libxext 
+framework/uifw/xorg/lib/libxfixes 
+framework/uifw/xorg/lib/libxfont 
+framework/uifw/xorg/lib/libxft 
+framework/uifw/xorg/lib/libxgesture 
+framework/uifw/xorg/lib/libxi 
+framework/uifw/xorg/lib/libxinerama 
+framework/uifw/xorg/lib/libxkbfile 
+framework/uifw/xorg/lib/libxmu 
+framework/uifw/xorg/lib/libxpm 
+framework/uifw/xorg/lib/libx11 
+framework/uifw/xorg/lib/libxau 
+framework/uifw/xorg/lib/libxaw 
+framework/uifw/xorg/lib/libxcomposite 
+framework/uifw/xorg/lib/libxcursor 
+framework/uifw/xorg/lib/libxdamage 
+framework/uifw/xorg/lib/libxdmcp 
+framework/uifw/xorg/lib/libxext 
+framework/uifw/xorg/lib/libxfixes 
+framework/uifw/xorg/lib/libxfont 
+framework/uifw/xorg/lib/libxft 
+framework/uifw/xorg/lib/libxgesture 
+framework/uifw/xorg/lib/libxi 
+framework/uifw/xorg/lib/libxinerama 
+framework/uifw/xorg/lib/libxkbfile 
+framework/uifw/xorg/lib/libxmu 
+framework/uifw/xorg/lib/libxpm 
+framework/uifw/xorg/lib/libxrandr 
+framework/uifw/xorg/lib/libxrender 
+framework/uifw/xorg/lib/libxres 
+framework/uifw/xorg/lib/libxscrnsaver 
+framework/uifw/xorg/lib/libxt 
+framework/uifw/xorg/lib/libxtst 
+framework/uifw/xorg/lib/libxv 
+framework/uifw/xorg/lib/libxvmc 
+framework/uifw/xorg/lib/libxxf86dga 
+framework/uifw/xorg/lib/libxxf86vm 
+framework/uifw/xorg/lib/libxrandr 
+framework/uifw/xorg/lib/libxrender 
+framework/uifw/xorg/lib/libxres 
+framework/uifw/xorg/lib/libxscrnsaver 
+framework/uifw/xorg/lib/libxt 
+framework/uifw/xorg/lib/libxtst 
+framework/uifw/xorg/lib/libxv 
+framework/uifw/xorg/lib/libxvmc 
+framework/uifw/xorg/lib/libxxf86dga 
+framework/uifw/xorg/lib/libxxf86vm 
+
+
+[[ App-In-app ]] 
+/usr/apps/com.samsung.video-player/bin/video-player path /opt/usr/media/Videos/Color.mp4 is_multi_win_type TRUE 
+ 
+[[ How to copy pac ]] 
+osc copypac TIZEN:1.0:Public elementary home:sidein 
+
+[[ fprintf log ]] 
+fprintf(stderr, " 
+
+[[emulator Proxy settting]] 
+vconftool set -t string memory/dnet/proxy "http://168.219.61.250:8080" 
+
+[[ ???? ]] 
+http://platform.sec.samsung.net/slp/Management/Forms/AllItems.aspx?RootFolder=%2fslp%2fManagement%2fWeekly%20Report&FolderCTID=&View=%7b66BEA59B%2d32A2%2d4E52%2d838D%2dA0F1A0FF2B6F%7dhttp://platform.sec.samsung.net/slp/Management/Forms/AllItems.aspx?RootFolder=%2fslp%2fManagement%2fWeekly%20Report&FolderCTID=&View=%7b66BEA59B%2d32A2%2d4E52%2d838D%2dA0F1A0FF2B6F%7d 
+
+[[ CPU Clock Setting ]] 
+  >> Maximum 
+ echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+  >> ondemend 
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+
+[[ mali clock, how to watch and modify that ]] 
+mali gpu관련 clock 보는 법 및 고정 하는 방법 입니다. 
+1. clock 보는 법 
+cat /sys/module/mali/parameters/mali_gpu_clk 
+실시간으로 계속 보시려면 
+ while true;do cat /sys/module/mali/parameters/mali_gpu_clk;sleep 1;done 
+ 
+2. clock 고정 방법 
+echo 원하는 클럭 > /sys/module/mali/parameters/mali_dvfs_control (ex: echo 440 > /sys/module/mali/parameters/mali_dvfs_control) 
+3. 고정 시킨것 해제시 
+echo 999 > /sys/module/mali/parameters/mali_dvfs_control 
+ 
+[[ shared git ]] 
+  git clone mailto:git@165.213.180.234:shared/sdk/api 
+
+[[ public git ]] 
+  git clone mailto:git@165.213.180.234:public/sdk/api 
+
+[[ sbs install : Proxy setting ]] 
+http_proxy=http://168.219.61.250:8080/ 
+ftp_proxy=ftp://168.219.61.250:8080/ 
+all_proxy=socks://168.219.61.250:8080/ 
+socks_proxy=socks://168.219.61.250:8080/ 
+https_proxy=https://168.219.61.250:8080/ 
+
+[[ Fish Tank ]] 
+http://ie.microsoft.com/testdrive/mobile/Performance/FishIETank/Default.html 
+
+[[ 3D Gallery ]] 
+git clone ssh://sidein@165.213.149.219:29418/slp/apps/w/web-apps 
+git clone ssh://sidein@165.213.149.219:29418/slp/apps/w/web-apps 
+
+[[ Fast Path Enable Option ]] 
+EVAS_GL_FASTPATH=1 
+
+[[ Direct Rendering Enable Option ]] 
+--- optimization hint 
+EVAS_GL_OPTIONS_DIRECT 
+--- limitation 
+    - alpha option 이 off  
+    - map 이 적용되지 않은 상태 
+    - rotation 이 안된 상태 
+--- log 
+EINA_LOG_LEVEL=6 
+
+[[ pkg archives ]] 
+~/sbs/target-armel/var/cache/apt/archives/ 
+
+[[ U1 Performance Mode ]] 
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 
+
+[[[ get image from xpixmap ]]] 
+   image = XGetImage((Display*)display, window, rel_x, rel_y, width, height, AllPlanes, ZPixmap);image = XGetImage((Display*)display, window, rel_x, rel_y, width, height, AllPlanes, ZPixmap); 
+
+[[[ apply MSAA ]]] 
+GL_APICALL void GL_APIENTRY glRenderbufferStorageMultisampleEXT( GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height); 
+GL_APICALL void GL_APIENTRY glFramebufferTexture2DMultisampleEXT( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLsizei samples); 
+
+[[[ set to get pixel callback function ]]] 
+Evas_Object_Image_Pixels_Get_Cb 
+
+[[[ emulator upgrade ]]] 
+~/sbs-install/bin/sbs -A i386 -uf 
+
+[[[ get source ]]] 
+git clone ssh://<single id>@server-ip:29418/repository_path.git 
+git clone ssh://sidein@165.213.149.219:29418/slp/pkgs/e/evas.git 
+
+[[[ make patch using diff ]]] 
+git diff --no-prefix > **.patch 
+
+[[[ mount ]]] 
+mount -t nfs 192.168.129.1:/home/sidein/ /mnt/nfs -o tcp,nolock 
+mount -o remount,rw / 
+
+[[[ dlog setting ]]] 
+dlogutil -v time LAUNCH -f /mnt/ums/dlog.txt & 
+dlogutil -v time LAUNCH -f 
+dlogutil -v time LAUNCH -f ./FM_X11_00.txt 
+dlogutil -v time | grep -E "setting|e17" 
+
+1. 빌드옵션에 추가할것 
+  configure.ac에서 PKG_CHECK_MODULES에 dlog추가 
+  ex) PKG_CHECK_MODULES(ENLIGHTENMENT, [enlightenment,utilX,dlog]) 
+
+2. source에 해더 추가 
+ ex) #include <dlog.h> 
+
+2. source에 DLOG API로 추가 
+  ex)  LOG(LOG_DEBUG, "LAUNCH", "[e17:Application:Launching:done]"); 
+ 
+3. build depencency추가 
+  ex) 대상 파일 : debian/control 
+    Build-Depends: debhelper (>= 5), e17-dev, libslp-utilx-dev, libelm-dev, dlog-dev 
+    위와 같이 dlog-dev 처럼 추가 
+  
+1. 빌드옵션에 추가할것 
+  configure.ac에서 PKG_CHECK_MODULES에 dlog추가 
+  ex) PKG_CHECK_MODULES(ENLIGHTENMENT, [enlightenment,utilX,dlog]) 
+
+2. source에 해더 추가 
+ ex) #include <dlog.h> 
+
+2. source에 DLOG API로 추가 
+  ex)  LOG(LOG_DEBUG, "LAUNCH", "[e17:Application:Launching:done]"); 
+ 
+3. build depencency추가 
+  ex) 대상 파일 : debian/control 
+    Build-Depends: debhelper (>= 5), e17-dev, libslp-utilx-dev, libelm-dev, dlog-dev 
+    위와 같이 dlog-dev 처럼 추가 
+  
+[[[[ Evas Image Object Draw sequence ]]]] 
+01-01 09:35:25.307 D/EVAS    ( 2329): [EVAS : Function evas_common_scale_rgba_in_to_out_clip_sample, Line 39] 
+01-01 09:44:43.157 D/EVAS    ( 2360): [EVAS : Function evas_common_scale_rgba_in_to_out_clip_smooth, Line 460] 
+
+[[[ GL Engine launching ]]] 
+ECORE_EVAS_FPS_DEBUG=1 LAUNCHER_ENGINE=x11 /opt/apps/com.samsung.menu-screen/bin/menu-screen 
+ECORE_EVAS_FPS_DEBUG=1 LAUNCHER_ENGINE=gl /opt/apps/com.samsung.menu-screen/bin/menu-screen 
+ELM_ENGINE=x11 ELM_SCALE=0.65 ECORE_EVAS_FPS_DEBUG=1 
+
+[[[ Lanuching Option ]]] 
+LAUNCHER_ENGINE=x11 or LAUNCHER_ENGINE=gl 
+ELM_ENGINE=x11 or ELM_ENGINE=gl ELM_ENGINE=gl 
+
+[[[ vsync disable ]]] 
+xberc async_swap 1 
+xberc async_swap 0 
+or 
+(_ecore_evas_app_comp_sync = 0) in ecore 
+
+
+========================================================== 
+Eng_output_redraws_next_update_get : get RGBA_Image 
+evas_software_xlib_x_output_buffer_new  : shared memory malloc 
+Evas_object_image_render : rendering 
+evas_software_xlib_x_output_buffer_free : shared memory free 
+Eng_output_flush : XShmPutImage : flush 
+========================================================== 
+
+[[ evas image cache callback list ]] 
+static const Evas_Cache_Image_Func      _evas_common_image_func = 
+{ 
+  _evas_common_rgba_image_new, 
+  _evas_common_rgba_image_delete, 
+  _evas_common_rgba_image_surface_alloc, 
+  _evas_common_rgba_image_surface_delete, 
+  _evas_common_rgba_image_surface_pixels, 
+  evas_common_load_rgba_image_module_from_file, 
+  _evas_common_rgba_image_unload, 
+  _evas_common_rgba_image_dirty_region, 
+  _evas_common_rgba_image_dirty, 
+  evas_common_rgba_image_size_set, 
+  evas_common_rgba_image_from_copied_data, 
+  evas_common_rgba_image_from_data, 
+  evas_common_rgba_image_colorspace_set, 
+  evas_common_load_rgba_image_data_from_file, 
+  _evas_common_rgba_image_ram_usage, 
+/*   _evas_common_rgba_image_debug */ 
+  NULL 
+}; 
+
+[[[ gerrit patch commend ]]] 
+  gbs submit -m "messages .."
+  gbs submit -c <commit ID> -m "message"
+‎‎윤주갑(S5(책임)/책임/삼성전자)‎‎ [오후 4:18]:
+  SR obs 사이트의 ID/PW은 obs_viewer / obs_viewer 입니다.~
+
+git commit --amend 
+git push origin HEAD:refs/changes/
+git push origin HEAD:refs/changes/70/692870 (패치번호)
+
+[[[ using git patch ]]] 
+sparrow74@sprrow74-MDesktop:~/work/evas_work/upload_evas/upload/evas$ git log 
+sparrow74@sprrow74-MDesktop:~/work/evas_work/upload_evas/upload/evas$ git commit --amend 
+sparrow74@sprrow74-MDesktop:~/work/evas_work/upload_evas/upload/evas$ git diff HEAD^ HEAD 
+sparrow74@sprrow74-MDesktop:~/work/evas_work/upload_evas/upload/evas$ git push gerrithost HEAD:refs/changes/24/59724 
+
+[[[ wrt install ]]] 
+wrt-installer -if 위젯이름.wgt 
+wrt-client -l 위젯번호 
+pkgcmd -i -t wgt -q -p ./000000065506_RunPuppyRun.wgt
+
+[[[ DDK Repository ]]] 
+git clone ssh://sidein@165.213.149.219:29418/slp/kernel/gpu-ddk 
+git clone ssh://sidein@165.213.149.219:29418/slp/pkgs/o/opengl-es-mali400mp 
+git clone ssh://sidein@165.213.149.219:29418/slp/pkgs/l/libump 
+
+[[[ RPM Command ]]] 
+rpm -qip 패키지.rpm 
+rpm -Va : 설치되어 있는 rpm 정보 
+rpm -qf 파일 절대 경로 : 이미 설치되어 있는 rpm의 버젼 정보 
+rpm -qRp 패키지.rpm : 해당 파일과 의존성을 갖는 파일들 출력 
+rpm -qip 패키지.rpm : 해당 파일에 대한 파일 목록 표시 spec파일에 쓰인 정보 출력 
+rpm -qpl 패키지.rpm : 설치할 파일의 목록 표시 
+rpm2cpio 패키지.rpm | cpio -i --make-directories -E 패키지 
+: rpm 패키지를 설치하지 않고 그냥 풀거나, 특정 파일만 골라내고 싶을때는? rpm -qip 패키지.rpm 
+rpm -Va : 설치되어 있는 rpm 정보 
+rpm -qf 파일 절대 경로 : 이미 설치되어 있는 rpm의 버젼 정보 
+rpm -qRp 패키지.rpm : 해당 파일과 의존성을 갖는 파일들 출력 
+rpm -qip 패키지.rpm : 해당 파일에 대한 파일 목록 표시 spec파일에 쓰인 정보 출력 
+rpm -qpl 패키지.rpm : 설치할 파일의 목록 표시 
+rpm2cpio 패키지.rpm | cpio -i --make-directories -E 패키지 
+: rpm 패키지를 설치하지 않고 그냥 풀거나, 특정 파일만 골라내고 싶을때는? 
+
+[[[ ebook run ]]]  
+  My files -> Downloads -> Others 폴더에서 
+  Alice in the ~ .epub 파일을 선택하시면 실행됩니다.. 
+  My files -> Downloads -> Others 폴더에서 
+  Alice in the ~ .epub 파일을 선택하시면 실행됩니다. 
+
+[[ Object Dump API ]] 
+elm_object_tree_dot_dumpelm_object_tree_dot_dump 
+
+[[PKG Upload ]] 
+1. Add changelog 
+#>~/sbs-install/bin/sbs -e dch -i 
+#>vi packaging/opengl-es-mali400mp.spec 
+#>git add . 
+#>git push origin HEAD:refs/for/master 
+2. Add Git 
+#>git tag 
+#>git tag -a opengl-es-mali400mp_0.1.3-56 
+#>git push origin tag opengl-es-mali400mp_0.1.3-56 
+3. pkg upload 
+#>~/sbs-install/bin/sbs -e dpkg-buildpackage -S 
+#>dupload --to slp2-unstable ../opengl-es-mali400mp 
+
+[[ glbindtext ID ]] 
+GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, or GL_TEXTURE_CUBE_MAP. 
+
+[[ EFL SVN Patch address ]] 
+enlightenment-devel@lists.sourceforge.net 
+
+ecore_x_vsync.c, ecore_xcb_vsync.c 
+
+[[ can't enable usb mode through Setting Application ]] 
+echo 4 > /sys/devices/platform/usb_mode/UsbMenuSel  
+e.cfg => e.src 
+ eet -d e.cfg config e.src 
+e.src => e.cfg 
+eet -e e.cfg config e.src 1 
+ifconfig usb0 192.168.129.3 up 
+
+[[ Enlightenment setting on Desktop ]] 
+▣ Xephyr 사용법 
+~$ Xephyr :1 -ac -screen 1280x720x32  -dpi 96 -ac & 
+ 
+▣ Xephyr 에서 enligthenment 사용법 
+~$ export DISPLAY=:1 
+~$ enlightenment_start 
+
+  e.cfg => e.src 
+#>eet -d e.cfg config e.src 
+  e.src => e.cfg 
+#>eet -e e.cfg config e.src 1 
+
+[[ E17 Extended Mode chage ]] 
+  devicemgr_sc -set extended 
+  Proxima 타겟 + HDMI 케이블 + HDMI 꼬인 케이블 + HDMI 디바이스 
+  eet -d e.cfg config e.src 
+  e17-misc 에 있는 파일을 사용해 주세요 
+
+[[ COMP Manger Keyword in default.edc ]] 
+///////////////////////////////////////////////////////////////////////////// 
+/*** MOD: COMP ***/ 
+
+[[ vtouchpad log disable ]] 
+ 1. /usr/etc/X11/xorg.conf.d/display.conf 수정 
+Section "ServerLayout" 
+        Identifier              "Test Layout" 
+        Screen          0       "Screen0" 0 0 
+	InputDevice             "Gesture" 
+EndSection 
+위와같이 기존 내용에 
+	InputDevice             "Gesture" 
+라인 추가 
+  2. /usr/etc/X11/xorg.conf.d/input.conf의 하단부에 아래내용 추가 
+Section "InputDevice" 
+	Identifier "Gesture" 
+        Driver  "gesture" 
+        Option  "Device"        "/dev/null" 
+	Option	"Activate"	"1" 
+EndSection 
+
+        group "E_Config_Gadcon" struct { 
+            group "clients" list { 
+                group "E_Config_Gadcon_Client" struct { 
+                    value "name" string: "clock"; 
+                    value "id" string: "clock.209"; 
+                    value "geom.pos" int: 1200; 
+                    value "geom.size" int: 80; 
+                    value "geom.res" int: 1280; 
+                    value "geom.pos_x" double: 0.7874999999999999777955395; 
+                    value "geom.pos_y" double: 0.8263888888888888395456433; 
+                    value "geom.size_w" double: 0.2124999999999999944488849; 
+                    value "geom.size_h" double: 0.1708333333333333370340767; 
+                    value "state_info.seq" int: 0; 
+                    value "state_info.flags" int: 0; 
+                    value "style" string: "plain"; 
+                    value "orient" int: 0; 
+                    value "autoscroll" uchar: 0; 
+                    value "resizable" uchar: 0; 
+                } 
+            } 
+            value "name" string: "gadman"; 
+            value "id" int: 114; 
+            value "zone" uint: 0; 
+        } 
+ 
+        group "E_Config_Module" struct { 
+            value "name" string: "clock"; 
+            value "enabled" uchar: 1; 
+            value "delayed" uchar: 1; 
+            value "priority" int: 0; 
+        } 
+
+        group "E_Remember" struct { 
+            value "match" int: 51; 
+            value "apply_first_only" uchar: 0; 
+            value "keep_settings" uchar: 0; 
+            value "name" string: "E"; 
+            value "class" string: "_config::utils/clock"; 
+
+vtouchpad 
+
+[[ get project ]] 
+osc copypac OBSTF:Private opengl-es-mali400mp home:sidein 
+
+[[check out ]] 
+osc co home:sidein opengl-es-mali400mp 
+
+[[obs clean build]] 
+sudo osc build armv7el --no-verify --clean 
+
+[[rpm install ]] 
+1. update rpm db 
+change-booting-mode.sh --update 
+rpmdb --rebuilddb 
+2. install rpm pkgs 
+rpm -i --force *.rpm 
+ rpmdb --rebuilddb 
+
+[[ Window & window Surface sequence change demending ]] 
+ee->prop.window = ecore_x_window_new(0, 0, 0, 1, 1) 
+ : 1x1 window 생성 
+eglCreateWindowSurface(dpy, cfg, ee->prop.window, …) 
+ : window surface 생성 
+evas_object_resize( 0, 0, 720, 1280 ) 
+  XResizeWindow() 
+evas_object_show() 
+  XMapWindow()  
+  ====> after XMapWindow, should call eglCreateWindowSurface(). 
+
+[[ GFX Test Application ]] 
+git clone ssh://sidein@165.213.149.219:29418/slp/kernel/gpu-ddk 
+testcases/gfxtest-2.0 
+./gfxtest20 t 3 
+
+ devicemgr_sc -set extended 
+ devicemgr_sc  -popup setMenu screen을 GL backend로 돌릴 경우에 eglSwapInterval은 0 으로 
+swapinterval을 설정하는건 app이 결정합니다. 
+  
+eglWaitGL이 호출되는 조건은 
+아래와 같은 코드로 GL_RENDERER 가 PowerVR SGX 540 나 Mali-400 MP 일경우에만 
+safe_native = 1 set해주어 eglWaitGL이 불리지 않고 그외의 경우에는 eglWaitGL이 불리게 됩니다. 
+eglWaitGL을 실행하면, 그 동안 gl command 내려준걸 모두 실행하고, 끝날때까지 기다려주어야하기 때문에 
+느려지는 성능상의 문제가 있습니다.mali는 opengl이 async로 동작하기 떄문에 eglWaitGL이 불리지 않도록 되어있습니다. 
+ 
+s = (const char *)glGetString(GL_RENDERER); 
+
+if (strstr(s, "PowerVR SGX 540") || strstr(s, "Mali-400 MP")) 
+    safe_native = 1;	 
+ 
+ chmod 666 /dev/uinput 
+
+
+Menu screen을 GL backend로 돌릴 경우에 eglSwapInterval은 0 으로 
+swapinterval을 설정하는건 app이 결정합니다. 
+  
+eglWaitGL이 호출되는 조건은 
+아래와 같은 코드로 GL_RENDERER 가 PowerVR SGX 540 나 Mali-400 MP 일경우에만 
+safe_native = 1 set해주어 eglWaitGL이 불리지 않고 그외의 경우에는 eglWaitGL이 불리게 됩니다. 
+eglWaitGL을 실행하면, 그 동안 gl command 내려준걸 모두 실행하고, 끝날때까지 기다려주어야하기 때문에 
+느려지는 성능상의 문제가 있습니다.mali는 opengl이 async로 동작하기 떄문에 eglWaitGL이 불리지 않도록 되어있습니다. 
+ 
+s = (const char *)glGetString(GL_RENDERER); 
+
+if (strstr(s, "PowerVR SGX 540") || strstr(s, "Mali-400 MP")) 
+    safe_native = 1;	 
+
+> apt-get install qemu-arm-static rpm python-urlgrabber python-m2crypto build osc 
+ 
+If you have Python <= 2.6, you have to install 2.7 
+> wget http://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz 
+> tar xvzf Python-2.7.2.tgz 
+> cd Python-2.7.2/ 
+> ./configure --prefix=/usr/local 
+> make 
+> sudo make install 
+> sudo rm /usr/bin/python 
+> sudo ln -s /usr/local/bin/python2.7 /usr/bin/python // change default python version 
+> export PYTHONPATH=/usr/lib/pymodules/python2.6:$PYTHONPATH // to use python2.6 modules 
+
+git clone ssh://sidein@165.213.149.219:29418/slp/pkgs/s/slp-ui-pkgs 
+git clone ssh://sidein@165.213.149.219:29418/slp/sdk/api 
+ 
+
+  " 네. 그리고 그걸 바꾸고 싶으면 /etc/profile.d/simulator-opengl.sh 파일에서" 
+  "if grep "gles=1" ==> if grep "gles=0"  이렇게 서로 바꿔주시면 됩니다." 
+
+ osc copypac SOURCEPRJ SOURCEPAC DESTPRJ 
+ osc copypac SLP:Main evas home eokjin81.kim 
+osc copypac home:sh15.park coregl home:sidein 
+
+[[ Enter the hell ]] 
+osc chroot armv7el 
+
+[[ Browser Performance ]] 
+http://platform.sec.samsung.net/browser/Management1/Browser%EC%84%B1%EB%8A%A5%EC%A7%80%ED%91%9C%EA%B4%80%EB%A6%AC.xlsx 
+
+[[emulator log]] 
+~/tizen_vms/x86/0629/logs$ vim emulator.log 
+
+[[xinfo --topwins]] 
+xinfo --topwins xinfo -topwins 
+
+http://kms.sec.samsung.net/kms/openKinQuestion.do?mode=VIEW&pid=120710-QU43369 
+
+[GLOBAL_CONFIGURATION] _EGL_GLOBAL_LOCK=1 
+/usr/bin/enlightenment _EGL_SWAP_TYPE=0 _EGL_X11_SWAP_INTERVAL=0 
+
+
+[[ Image Capture Problem ]] 
+__ie_insert_text_capture_img_using_xWindow 
+
+set opts console=ttySAC2,115200n8; save 
+
+
+[[ Selective compositor on/off ]] 
+ vi /usr/etc/X11/xorg.conf.d/display.conf 로 triple buffer enable. 
+
+Section "Device" 
+        Identifier              "exynos" 
+        Driver                  "exynos" 
+        Option                  "exa"           "true" 
+        Option                  "tfb"           "true" 
+        Option                  "dri2"          "true" 
+        Option                  "sw_exa"        "true" 
+EndSection 
+ 
+
+[[ selective compositor enable]] 
+$> e_comp_util -l CONFIGURE 
+1. Memory tab에서 Don't compositor fullscreen uncheck체크 
+2. Mobile tab에서 H/W overlay window uncheck 
+
+[[[ DS-5 install ]]] 
+1. 타겟 네트웍 연결 후 gator.ko 모듈 올리기 
+ $target>insmod gator.ko 
+ 
+2. ds-5용 eclipse 실행 
+ - remote systems view에서 target ip 설정 및 ssh 연결 
+ - remote system view에서 launch terminal 을 통해 target에 terminal 연결 
+ - 연결된 target terminal에서 gatord 실행 
+   $> gatord & 
+   만약 binding 에러 메세지로 실행이 안되면, port 변경하여 실행 
+   $> gator 8080 & 
+ - ARM Streamline Data view에서 connection 정보 설정 
+   : 타겟 IP 및 port 설정 
+   : profiling시 보고 싶은 심볼 및 코드가 있을 경우, Program Images -> Add ELF Image.. 버튼을 통해 debug용 so uploading. 
+ - Capture Option 버튼을 통해 profiling 시작! 
+
+[[ unpack rpm pkg ]] 
+rpm2cpio *.rpm | cpio -idmv 
+rpm2cpio *.rpm | cpio -idmv 
+
+
+[[ music player error log ]] 
+ 11327 glTexSubImage2D(target = GL_TEXTURE_2D, level = 0, xoffset = 1029, yoffset = 0, width = 28, height = 33, format = GL_ALPHA, type = GL_UNSIGNED_BYTE, pixels = blob(924)) 
+11327: warning: glGetError(glTexSubImage2D) = GL_INVALID_VALUE 
+11339 glTexSubImage2D(target = GL_TEXTURE_2D, level = 0, xoffset = 1127, yoffset = 0, width = 27, height = 33, format = GL_ALPHA, type = GL_UNSIGNED_BYTE, pixels = blob(924)) 
+11339: warning: glGetError(glTexSubImage2D) = GL_INVALID_VALUE 
+
+[[ ??? ]] 
+sudo mount -o bind ~/sparrow_work/work/G2D/ /var/tmp/build-root/home/abuild/g2d/ 
+
+[[ how to attach pid to gdb ]] 
+sh-4.1# gdb --pid={pid} 
+
+[[ ??? ]] 
+/usr/bin/depanneur 
+my ($zname, $zpass, $zuid, $zgid, $zquota, $zcomment, $zgcos, $zdir, $zshell, $zexpire) = getpwnam(getlogin() || getpwuid($<)); 
+
+
+[[ how to run tst application ]] 
+기본 사용법:  ./tst -s (사이즈) -n (갯수) -d (x좌표 diff) 
+ex1) ./tst -s 120 -n 500 -d 1 
+ex2) ./tst -s 600 -n 100 -d 1 
+ex3) ./tst -s 600 -n 100 -d 0 
+
+
+[[ how to connect through telne protocol ]] 
+sudo ifconfig usb0 192.168.129.1 up 
+sudo ifconfig samsung_device 192.168.129.1 up 
+telnet 192.168.129.3 
+
+[[ email list ]] 
+Sanjeev Roy (sanjeev.roy@samsung.com) 
+cedric (cedric.bail@free.fr) 
+SungWoo Park (sungwoo@gmail.com) 
+
+[[ how to mount on device ]] 
+change-booting-mode.sh --update 
+mount -t nfs 192.168.129.1:/home/sidein/ /mnt/nfs -o udp,nolock 
+mount -o remount,rw / 
+export EVAS_DRI_SWAPBUF=1 
+
+[[ serial log - old setting ]] 
+1. *#7284# 
+
+2.Kernel Mode - boot log 
+set silent 
+saveenv 
+reset 
+set_usb_debug.sh --sshon 
+set_usb_debug.sh --sshoff 
+
+[[Print XEvent]] 
+  xev -id 0x~~~ 
+  이런 식으로 하면 해당 id 를 가진 window 의 x event 를 보실 수 있습니다. 
+  xev -root 
+
+[[ Compositor log print]] 
+e_comp_util -l EVENT_X 
+
+[[ git address ]] 
+
+
+[[ AUL Launching ]] 
+aul_open_app(pkg_name); 
+ecore_exe_run 
+
+[[ how to do pkg submit/upload ]] 
+git status 
+코드수정 
+git add . 
+git status										 
+scp -p -P 29418 sidein@slp-info.sec.samsung.net:hooks/commit-msg .git/hooks/ 
+scp -p -P 29418 wonsik@review.tizen.org:hooks/commit-msg .git/hooks/
+git commit -m "." 
+git commit --amend
+git tag -a xxx 
+ex: Master Branch)git tag -a submit/master/`date --utc +%Y%m%d.%H%M%S` 
+git push --tag origin HEAD:refs/for/Title 
+
+git push origin HEAD:refs/for/devel/uifw/master 
+
+git push origin HEAD:refs/for/devel/graphics_engine/tizenw 
+devel/graphics_engine/master 
+
+    [Title] Evas GL support multi window 
+    [Problem] Evas Gl can't support multi window 
+    [Cause] The global value of evas gl engine just support single window 
+    [Solution] Changing evas gl engine global value for supporting multi window 
+    [Team] Graphics 
+
+[Title]    Fix to bug which emoji character is not appeared. 
+[Problem]  emoji is not appeared 
+[Cause]    ttf problem 
+[Solution] fallback 
+[Team]     Graphics 
+
+
+
+
+ 165://213.148.151.snapshots/release/C/?M=O;D=ftp 
+ 165://213.149.206.pub/temp/SEL/Redwood/V_System_20121123_3933_displayc72_1.tar 
+ ftp://165.213.149.206/pub/temp/SEL/Tizen_GPT_Ver10.pit 
+
+[[ Minsu Han's doc]] 
+http://platform.sec.samsung.net/slp/Management/UI/UI%20FWK/Graphics/3D_DDK/MALI_DDK_issue_및_resolve_history_since_20111123_한민수.pptx 
+
+[[ video app-in-app url ]] 
+Media path (http://redirector.c.youtube.com/videoplayback?id=f95d7e2782cd87da&itag=18&source=youtube&uaopt=no-save&upn=D1rl5ymZFHQ&el=videos&devKey=AcyvgFN5JZUG8Kqv89QCVDYO88HsQjpE1a8d1GxQnGDm&app=youtube_gdata&ip=0.0.0.0&ipbits=0&expire=1354774953&sparams=id,itag,source,uaopt,upn,ip,ipbits,expire&signature=48D6C9C648105C27C89BA590D6A40AACFF27E3C2.9D01F9A6C826C270D72950BF5E06954106581F38&key=yta1) 
+
+[[ proxy settting for GBS ]] 
+http_proxy=http://168.219.61.252:8080 
+
+[[ How to do console on ]] 
+keystring *#2667653# -> CONSOLE MODE ON setting 
+
+[[ new eglMapImage/Unmap api define ]] 
+EGLAPI void * EGLAPIENTRY eglMapImageSEC (EGLDisplay dpy, EGLImageKHR image, EGLint device_type, EGLint access_option); 
+EGLAPI EGLBoolean EGLAPIENTRY eglUnmapImageSEC (EGLDisplay dpy, EGLImageKHR image, EGLint device_type); 
+
+[[ how to do login on SSH ]] 
+ssh root@192.168.129.3 
+
+[[ XRander doc path ]] 
+http://platform.sec.samsung.net/slp/Management/UI/UI%20FWK/Graphics/Evas_Backend/Evas%20GL%20vs.%20SW%20비교.xlsx 
+SW Platform Team Knowledge Share > SLP > Management > UI > UI FWK > Graphics > Window System > XRandR    
+
+[[ OSP Server ID/Pass ]] 
+\\10.90.43.40 
+spl / matrix 
+
+[[ xberc fpsdebug log ]] 
+tail -f /var/log/Xorg.0.log 
+"run consoleon" on bootloader 
+
+[[[ get Debug Pkgs ]]] 
+change-booting-mode.sh --update 
+
+zypper ar `zypper lr | grep ^1 | awk '{print $3}' | xargs zypper lr | grep ^URI | awk '{ printf $3 }' | sed 's/packages/debug/'` debug 
+export http_proxy=168.219.61.252:8080 
+zypper ref 
+zypper in ecore-debuginfo ecore-debugsource evas-debuginfo evas-debugsource edje-debuginefo edje-debugsource elementary-debuginfo elementary-debugsource 
+
+[[ how to install tpk pkg ]] 
+pkgcmd -q -i -t tpk -p 파일명 
+rpm -Uvh --force *.rpm 
+
+[[ webkit partial build ]]
+gbs build -A armv7l --incremental --include-all --define="nodebug 1"gbs build -A armv7l --incremental --include-all --define="nodebug 1"
+
+[[ weekly report path ]]
+http://platform.sec.samsung.net/Team%20Documents/Forms/AllItems.aspx?RootFolder=%2FTeam%20Documents%2F%5B%EB%B6%80%EC%84%9C%5D%20OLD%2F%5B%EB%B6%80%EC%84%9C%5D%20%28OLD%29%20%EC%B0%A8%EC%84%B8%EB%8C%80%20%EC%BB%B4%ED%93%A8%ED%8C%85%20%EB%9E%A9%2F%EC%A3%BC%EA%B0%84%ED%9A%8C%EC%9D%98&FolderCTID=0x012000B689DDE62C79D6489BE1CF4DCDB4CBF8&View=%7B7ED62FAD%2DCC13%2D4F98%2DB658%2D4C0166F3C833%7D
+
+[[ window damage area ]] 
+e_comp_util -l CREATE 
+e_comp_util -l EVENT_X 
+DAMAGE 
+
+[[ Screen Capture ]] 
+xinfo -xwd_topvwins . http://platform.sec.samsung.net/Team%20Documents/Forms/AllItems.aspx?RootFolder=%2FTeam%20Documents%2F%5B%EB%B6%80%EC%84%9C%5D%20OLD%2F%5B%EB%B6%80%EC%84%9C%5D%20%28OLD%29%20%EC%B0%A8%EC%84%B8%EB%8C%80%20%EC%BB%B4%ED%93%A8%ED%8C%85%20%EB%9E%A9%2F%EC%A3%BC%EA%B0%84%ED%9A%8C%EC%9D%98&FolderCTID=0x012000B689DDE62C79D6489BE1CF4DCDB4CBF8&View=%7B7ED62FAD%2DCC13%2D4F98%2DB658%2D4C0166F3C833%7D
+
+[[ enable Evas DRI2 ]] 
+export EVAS_DRI_SWAPBUF=1 
+
+[[ cpu/gpu load check ]] 
+cd /sys/devices/system/cpu/cpufreq/slp 
+cat cpu_bus_load_freq 
+
+static void ee_profile_start(char *str) 
+
+
+static void ee_profile_end(char *str) 
+
+[[ baltic ssh enable ]] 
+echo 0 > /sys/class/usb_mode/usb0/enable 
+echo 04e8?> /sys/class/usb_mode/usb0/idVendor 
+echo 6863?> /sys/class/usb_mode/usb0/idProduct 
+echo rndis > /sys/class/usb_mode/usb0/functions 
+echo 224 > /sys/class/usb_mode/usb0/bDeviceClass 
+echo 1 > /sys/class/usb_mode/usb0/enable 
+
+set_usb_debug.sh --sshon 
+
+ifconfig usb0 192.168.129.3 up 
+
+/etc/init.d/ssh start 
+
+ \\165.213.95.176\jonghyun\Downloads\DEMO 
+
+[[[ valgrind ]]] 
+http://www.cprogramming.com/debugging/valgrind.html 
+
+[[ fake image effect ]] 
+*#5333328# 
+ --> how to show mesage log 
+dmesg | grep smack 
+
+[[[  sync release branch  ]]] 
+#>git checkout 3f75fb46512322b2c8e7fc15bd6a274202e311a0 
+#>git branch temp 
+#>git checkout master 
+#>git merge temp 
+
+#>git add . 
+#>git commit -m "Package Upload(release)" 
+#>git push HEAD:refs/for/task/slp/release 
+
+#>git tag -a submit/task/slp/release/20130225 
+[Title] smack rule is modified 
+[Issue#] smack rule is modified          
+[Problem] smack rule is modified 
+[Cause] smack rule is modified 
+[Solution] smack rule is modified 
+[SCMRequest]smack rule is modified 
+#>git push --tag origin HEAD:refs/for/task/slp/release 
+#>scp -p -P 29418 minsu15.seo@slp-info.sec.samsung.net:hooks/commit-msg .git/hooks/ 
+
+
+
+[[ load analyzer ]] 
+cat /sys/devices/system/cpu/cpufreq/system_load_analyzer/cpu_bus_load_freq 
+
+[[ SIOP Disable ]] 
+echo 0 > /sys/devices/platform/sec-thermistor/siop_en 
+
+[[ local file runnig browser ]] 
+/usr/apps/com.samsung.browser/bin/browser __APP_SVC_URI__ http://webglsamples.googlecode.com/hg/toon-shading/toon-shading.html __APPSVC_OP_TYPE__ http://tizen.org/appsvc/operation/view 
+
+[[ canvas perf ]] 
+  http://flashcanvas.net/examples/dl.dropbox.com/u/1865210/mindcat/canvas_perf.html 
+  http://flashcanvas.net/examples/dl.dropbox.com/u/1865210/mindcat/canvas_perf.js 
+ 
+http://www.khronos.org/registry/egl/sdk/docs/man/xhtml/eglGetProcAddress.html 
+
+[[evas font draw call stack ]] 
+#0  _op_blend_mas_can_dp_neon (s=0x0, m=0x3a1a28 "", c=4294967295, d=0xb21b91bc, l=20) at evas_op_blend/op_blend_mask_color_neon.c:208 
+#1  0xb6878eee in evas_common_font_draw_internal (dst=0x34c740, dc=<value optimized out>, x=478, y=131, text_props=0x2db744, func=0xb686b31d <_op_blend_mas_can_dp_neon>, ext_x=478, ext_y=76, 
+    ext_w=108, ext_h=78, im_w=720, im_h=<value optimized out>) at evas_font_draw.c:172 
+#2  0xb6879378 in evas_common_font_draw (dst=0x34c740, dc=0xe5cb0, x=478, y=131, text_props=0x2db744) at evas_font_draw.c:377 
+Backtrace stopped: previous frame inner to this frame (corrupt stack?) 
+
+[[ evas rectangle draw call stack ]] 
+_op_copy_c_dp_neon (s=0x0, m=0x0, c=4294506223, d=0xb216c000, l=720) at evas_op_copy/op_copy_color_neon.c:7 
+7	   uint32_t *e = d + l,*tmp; 
+(gdb) bt 
+#0  _op_copy_c_dp_neon (s=0x0, m=0x0, c=4294506223, d=0xb216c000, l=720) at evas_op_copy/op_copy_color_neon.c:7 
+#1  0xb687fab8 in rectangle_draw_internal (dst=0x34c740, dc=0xe5cb0, x=0, y=<value optimized out>, w=720, h=60) at evas_rectangle_main.c:132 
+#2  0xb687fbe2 in evas_common_rectangle_draw (dst=0x34c740, dc=0xe5cb0, x=0, y=0, w=720, h=1280) at evas_rectangle_main.c:43 
+#3  0xb3b13564 in eng_rectangle_draw (data=<value optimized out>, context=0xe5cb0, surface=0x34c740, x=0, y=0, w=720, h=1280) at evas_engine.c:450 
+#4  0xb682ddbc in evas_object_rectangle_render (obj=0xe6f60, output=0xe44a8, context=0xe5cb0, surface=0x34c740, x=0, y=0) at evas_object_rectangle.c:154 
+#5  0xb684facc in evas_render_mapped (e=0x612f8, obj=0xe6f60, context=0xe5cb0, surface=0x34c740, off_x=0, off_y=0, mapped=0, ecx=0, ecy=0, ecw=720, ech=60, proxy_render=0 '\000') at evas_render.c:1163 
+#6  0xb6851d26 in evas_render_updates_internal (e=<value optimized out>, make_updates=<value optimized out>, do_draw=<value optimized out>) at evas_render.c:1580 
+#7  0xb68530d4 in evas_render_updates (e=<value optimized out>) at evas_render.c:1725 
+#8  0xb67e1d54 in ?? () from /usr/lib/libecore_evas.so.1 
+#9  0xb67e1d54 in ?? () from /usr/lib/libecore_evas.so.1 
+
+[[ valgrind check ]] 
+valgrind --tool=memcheck --track-origins=yes /usr/apps/com.samsung.dailybriefing-accuweather/bin/dali-livebox 
+
+myoungwoon.kim@samsung.com 
+sungho1.kwak@samsung.com 
+jy0703.park@samsung.com 
+chuneon.park@samsung.com 
+seongwon1.cho@samsung.com 
+
+
+http_proxy=http://168.219.61.252:8080 
+
+
+launch_app <<pkg name>> 
+
+BK36166623xwd -id  win_id -out abc.xwd 
+
+xwd -xid <xid> -out <filename> 
+xwd -id  win_id -out abc.xwd 
+xinfo -topvwins 
+
+
+ELM_ENGINE=gl /opt/apps/AZZi3t69K5/bin/dfgdfg 
+
+[[ Tizen Org, Tizen 3.0 ]]
+ git clone ssh://sidein@review.tizen.org:29418/platform/upstream/efl
+
+[[ IMEI Get ]] 
+*#06# 
+
+static int 
+eng_gl_make_current(void *data __UNUSED__, void *surface, void *context/opt/usr/share/crash/dump/) 
+{ 
+   Render_Engine *re  = (Render_Engine *)data; 
+   EVGL_Surface  *sfc = (EVGL_Surface *)surface; 
+   EVGL_Context  *ctx = (EVGL_Context *)context; 
+
+#if 0 
+   if (evas_support_one_window == 0) 
+   { 
+      if ((re != NULL) && (re->evgl_engine != NULL)) 
+        re->evgl_engine->engine_data = re; 
+   } 
+#endif 
+
+   return evgl_make_current(re->evgl_engine, sfc, ctx); 
+} 
+
+[[ AppTray engine 설정 ]] 
+vconftool set -t string file/private/com.samsung.app-tray/engine "gl" -f 
+위의 값을 설정한 후 killall -9 app-tray 하시면 됩니다. 
+참고로 dlogutil APP_TRAY를 하시면, 
+런칭 직후 찍히는 로그에서 엔진값을 확인하실 수 있습니다. 
+D/APP_TRAY( 5954): app_tray.c: main(1612) > ELM_ENGINE is set as [gl] 
+
+[[ AppTray mapbuf 설정 ]] 
+맵버프 
+on : vconftool set -t bool file/private/com.samsung.app-tray/mapbuf "1" -f 
+off : vconftool set -t bool file/private/com.samsung.app-tray/mapbuf "0" -f 
+ 
+
+알파 
+on : vconftool set -t bool file/private/com.samsung.app-tray/alpha "1" -f 
+off : vconftool set -t bool file/private/com.samsung.app-tray/alpha "0" -f 
+
+
+
+
+EVAS_DRI_SWAPBUF=1 /opt/apps/jqmyddt6yy/bin/DioDict 
+             fprintf(stderr,"%s : depth %d, bpp %d, bpl %d, width %d, height %d\n",__FUNCTION__,d,bpp,bpl,ww,hh); 
+
+[[ X Commend ]] 
+xinfo -topvwins 
+xwd -id 0x04600007 -out win690.xwd 
+
+
+
+  display_unlock_state(LCD_OFF, PM_SLEEP_MARGIN);
+  처음에 락을 걸고 위의 함수를 호출하면 이후에 sleep에 진입되는걸로 알고 있는데요
+  정원식 책임님은 이후 sleep에 진입될 때 dlog message를 알고 싶다는 요청입니다.
+  이와 관련해서 PM의 로그가 있을 것 같은데요
+  그 로그가 무엇인지 알려주시면 될 것 같습니다.
+‎‎피승훈(S5(책임)/책임/삼성전자)‎‎ [오후 4:58]:
+  POWER_MANAGER: device-interface.c: system_power_unlock(242) > system power unlock
+
+VMS 
+id : 008100120030069
+pass : white1234
+연변 : 01010895
+
+  -I dir
+    Add the directory dir to the list of directories to be searched for header files. See Search Path. Directories named by -I are searched before the standard system include directories.
+
+<<< JP's Patch >>>
+
+  https://git.enlightenment.org/core/efl.git/tree/src/modules/evas/engines/gl_common/evas_gl_api.c?id=0514cbc1a3c86a86c2abcf39958f562e5bc2e31b#n547
+  no
+  no backport
+‎‎정원식(S5(책임)/책임/삼성전자)‎‎ [오후 8:26]:
+  hehe
+  actually glGetString issus was reported to me.
+‎‎Jean Philippe Andre(S4/Engineer/Samsung Electronics)‎‎ [오후 8:27]:
+  https://git.enlightenment.org/core/efl.git/commit/?id=4cf2d75715d6d9c3bc7f02a246997b0ca7a330cd
+  https://git.enlightenment.org/core/efl.git/commit/?id=e4a11c008c124f246ba410f6398e22559ba6ab00
+  https://git.enlightenment.org/core/efl.git/commit/?id=2a69980959408ccd7cc48c29d7e3939764cb1281
+
+<<SDB issue solution>
+direct_set_debug.sh --sdb-set
+http://165.213.149.170/confluence/display/Tizen3/Odroid+U3
+http://165.213.149.170/confluence/pages/viewpage.action?pageId=38223731
+
+
+[정원식 / WonSik Jung]
+안녕하세요. 이수석님, Score 과제 발의할려고 하는데요.. 발의 단계에서 평가 테이블 결과 필수 첨부라고 되어 있는데요.. 저희도 해야 하는지요?
+
+[이상진 / Sangjin LEE] - 오후 4:08                 
+저는 했어요
+
+[이상진 / Sangjin LEE] - 오후 4:08                 
+그냥 다 최고 점수로... ^^
+
+[이상진 / Sangjin LEE] - 오후 4:09                 
+금액은 계약/중가/완료 1억3천씨 했고
+
+[이상진 / Sangjin LEE] - 오후 4:09                 
+일정은 계약품위를 2/19
+
+[이상진 / Sangjin LEE] - 오후 4:09                 
+중간검수를 8/30
+
+[이상진 / Sangjin LEE] - 오후 4:09                 
+완료검수 12/15 로 우선 잡았습니다.
+
+[이상진 / Sangjin LEE] - 오후 4:15                 
+흠.. 근데.. 제출 마감 시간이 지난후 업체 선정이 가능하다는 군요.
+
+[이상진 / Sangjin LEE] - 오후 4:15                 
+즉 2/11이 되어서야 다음단계 진입이 가능할듯 하네요.tpk-backend -y com.samsung.dali-demo
+
+
+
+[이상진 / Sangjin LEE] - 오후 4:15                 
+쩝
+
+[이상진 / Sangjin LEE] - 오후 4:20                 
+으미.. 저희는 12/15일이 되어야 발의단계 진입이 가능할듯 하네요.
+
+[이상진 / Sangjin LEE]
+제가 제출 마감일을 2/12일로 해 버렸군요.
+
+chsmack -e "User::App::benchmark.example" /usr/apps/com.samsung.dali-demo/bin/dali-demo
+export XDG_RUNTIME_DIR=/run
+
+
+pkg_initdb
+or 
+tpk-backend -y com.samsung.dali-demo
+
+su - owner -c "aul_test reload"
+chsmack -e "User::App::benchmark.example" /usr/apps/com.samsung.dali-demo/bin/dali-demo
+org.tizen.camera-app
+chsmack -e "User::App::org.tizen.myfile" /usr/apps/org.tizen.myfile/bin/myfile
+su - owner -c "XDG_RUNTIME_DIR=/run /usr/apps/com.samsung.dali-demo/bin/dali-demo"
+
+chsmack -e "User::App::hello-world.example" /usr/apps/com.samsung.dali-demo/bin/hello-world.example
+su - owner -c "XDG_RUNTIME_DIR=/run /usr/apps/com.samsung.dali-demo/bin/hello-world.example"
+chsmack -e "User::App::benchmark.example" /usr/apps/com.samsung.dali-demo/bin/dali-demo
+chsmack -e "User::App::org.example.sdltest" /home/owner/apps_rw/org.example.sdltest/bin/sdltest 
+
+[서일지 / ILJI SEO] - 오후 6:34                 
+안녕하세요, Tizen개발팀 서일지 선임입니다.
+
+[서일지 / ILJI SEO] - 오후 6:34                 
+방금 전 유니티 엔진 소스코드 받는 방법 알려 드렸는데요
+
+[서일지 / ILJI SEO] - 오후 6:34                 
+받으실 때 사용할 아이디랑 패스워드 공유해드리려고요
+
+[정원식] - 오후 6:35 
+네
+
+[서일지 / ILJI SEO] - 오후 6:35                 
+아이디는 sukwon.suh_samsung.com
+패스워드는 umtS1234! 입니다
+
+[정원식] - 오후 6:35 
+네.. 알겠습니다. 감사합니다.. ^^
+
+[서일지 / ILJI SEO] - 오후 6:35                 
+참고로 패스워드가 한 번 틀리면 다시 설정을 해야되거든요 ㅠ_ㅠ
+
+[정원식] - 오후 6:35 
+헉..
+
+[서일지 / ILJI SEO] - 오후 6:35                 
+틀리지 않게 주의해서 사용해주시면 감사하겠습니다 ㅎㅎ
+
+[정원식] - 오후 6:35 
+네.. 알겠습니다.
+
+[서일지 / ILJI SEO] - 오후 6:35                 
+S는 대문자 S에요 ㅎㅎ
+
+[정원식] - 오후 6:36 
+엇.. 왠지 함정이 느껴지네요..
+
+[서일지 / ILJI SEO] - 오후 6:36                 
+소스코드 권한은
+
+[서일지 / ILJI SEO] - 오후 6
+해당 리포지터리 가입하고 유니티에 등록요청을 하면 된다고 하는데
+
+const TouchPoint& point = touchEvent.GetPoint(0);
+
+  switch( point.state )
+  {
+    case TouchPoint::Down:
+    {
+      pepper_touch_add_point( mTouch, point.deviceId, point.local.x, point.local.y );
+      pepper_touch_send_down( mTouch, shellClient->GetView(), touchEvent.time, point.deviceId, point.local.x, point.local.y );
+
+      DALI_LOG_INFO( gPepperObjectLogging, Debug::Verbose, "Object::OnTouched: Touch Down (%.2f, %.2f) device = %d surface = %p\n", point.local.x, point.local.y, point.deviceId, mSurface );
+      return true;
+    }
+    case TouchPoint::Up:
+    {
+      pepper_touch_send_up( mTouch, shellClient->GetView(), touchEvent.time, point.deviceId );
+      pepper_touch_remove_point( mTouch, point.deviceId );
+
+      DALI_LOG_INFO( gPepperObjectLogging, Debug::Verbose, "Object::OnTouched: Touch Up (%.2f, %.2f) surface = %p\n", point.local.x, point.local.y, mSurface );
+      return true;
+    }
+    case TouchPoint::Motion:
+    {
+      pepper_touch_send_motion( mTouch, shellClient->GetView(), touchEvent.time, point.deviceId, point.local.x, point.local.y );
+
+//      DALI_LOG_INFO( gPepperObjectLogging, Debug::Verbose, "Object::OnTouched: Touch Motion (%.2f, %.2f)\n", point.local.x, point.local.y );
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+[Wayland / TBM Log]
+wayland log는 환경변수 WAYLAND_DEBUG=1 setting
+TBM_SPRD_DEBUG=1
+dlogutil TBM_BACKEND &
+
+su
+chsmack -e "User::App::org.example.sdltest" /home/owner/apps_rw/org.example.sdltest/bin/sdltest
+chsmack -e "User::App::org.example.basicsdl" /home/owner/apps_rw/org.example.basicsdl/bin/basicsdl
+su - owner
+/apps_rw/org.example.sdltest/bin/sdltest
+export XDG_RUNTIME_DIR=/run
+
+root@localhost:~# chsmack /usr/lib/libCOREGL.so    
+/usr/lib/libCOREGL.so access="_"
+root@localhost:~# chsmack -a "_" /usr/lib/libSDL2-2.0.so.0
+root@localhost:~# chsmack -a "_" /usr/lib/libSDL2-2.0.so.0.4.0
+root@localhost:~# chsmack /usr/lib/libSDL2-2.0.so.0.4.0
+/usr/lib/libSDL2-2.0.so.0.4.0 access="_"
+root@localhost:~# chsmack /usr/lib/libSDL2-2.0.so.0    
+/usr/lib/libSDL2-2.0.so.0 access="_"
+
+gcc -o simple-shm-thread simple-shm-thread.c -O0 `pkg-config --cflags --libs wayland-client wayland-tbm-client libtbm ecore-evas evas` -lpthread
+
+
+huanhuan.zhu@samsung.com chen2.yang@samsung.com junqing.ma@samsung.com   and qiyu.xie@samsung.com(0.5)
+
+
+정원식 책임님,
+안녕하세요. AppFW 파트 전환규 사원입니다.
+ 
+대화로 말씀드린대로 ui_app_init, ui_app_fini 함수에 handle을 추가하였습니다.
+int ui_app_init(int argc, char **argv, ui_app_lifecycle_callback_s *callback, void *user_data, appcore_context_h *handle)
+void ui_app_fini(appcore_context_h handle)
+helloworld 샘플 코드 추가하였습니다.
+gbs로 빌드하신 후에 다음과 같이 설치하시면 됩니다.
+ 
+$ su - root
+$ rpm -ih --force --nodeps <rpm file>
+$ tpk-backend --preload -y <pkgid>
+helloworld의 pkgid는 org.tizen.helloworld 입니다.
+rpm -ih --force --nodeps ./*.rpm
+tpk-backend --preload -y org.tizen.helloworld
+chsmack -e "System::Privileged" /usr/bin/tpk-backend
+app_launcher -s org.tizen.helloworld
+
+tpk-backend --preload -y org.tizen.helloworld
+chsmack -e "User" /usr/bin/tpk-backend
+
+ 
+owner shell에서 다음 명령어로 실행 시키실 수 있습니다. (appid는 org.tizen.helloworld 입니다.)
+$ app_launcher -s <appid> 
+ 
+감사합니다.
+
+[정원식 / WonSik Jung]
+no comp 관련 작업은 수찬 책임께 물어보면 되나요.. ?
+
+[이상진 / Sangjin LEE] - 16:11                 
+음.. 정말 필요한 것은 현재 tpl backend쪽을 참고 하시는 것이 더 좋을것 같으니..
+
+[이상진 / Sangjin LEE] - 16:11                 
+수찬책임님도 좋고.. 고준범 사원이나 이창연 사원
+
+[이상진 / Sangjin LEE]
+구중 실 구현레벨로 가장 잘 아는 분은 아마도 고준범 사원일듯 합니다.
+
+12일 기준으로 appid를 판단하는 방법을 변경시켰습니다. (SMACK rule 증가 이슈로 process label이 package label로 변경될 예정입니다.)
+
+추가로 AUL_APPID={appid}를 같이 환경 변수에 넣고 실행 시켜주셔야 됩니다.
+
+$ chsmack -e "User::App::{ appid }" /usr/apps/{ pkgid }/bin/{ executable file }
+
+$ su - owner -c  "AUL_APPID={appid} /usr/apps/{ pkgid }/bin/{ executable file }"
+
+su - owner -c  "AUL_APPID=call-ui /usr/apps/call-ui/bin/call-ui"
+
+
+chsmack -e "User::App::org.tizen.WonderZoo" /home/owner/apps_rw/org.tizen.WonderZoo/bin/wonderzoo
+su - owner -c  "AUL_APPID=tizen.WonderZoo /home/owner/apps_rw/org.tizen.WonderZoo/bin/wonderzoo"
+
+[이상진 / Sangjin LEE] - 19:06                 
+혹시 TM1 단말의 storage 크기가 2종류 인가요?
+
+[이상진 / Sangjin LEE] - 19:06                 
+여유공간이 680MB밖에 없어서 게임 설치가 안되는데요.
+
+[이상진 / Sangjin LEE] - 19:07                 
+어떤 단말은.. 5.7GB인 것도 있다고 해서요...
+
+[이세문 / Semun Lee] - 19:07                 
+http://suprem.sec.samsung.net/confluence/pages/viewpage.action?pageId=41320697
+
+[이세문 / Semun Lee] - 19:07                 
+예전에 파티션 크기 조정한 걸 원복 안해서 680MB밖에 안나오는 거 같네요
+
+[이상진 / Sangjin LEE] - 19:09                 
+아.. 그렇군요.. 근데.. 이걸 설치하면 system영역이 줄어 드는 거라서 다량의 디버그 패키지설치가 안된다는 제보가 있네요.
+
+[이세문 / Semun Lee] - 19:09                 
+ㅎㅎ
+
+[이세문 / Semun Lee] - 19:09                 
+박명준 책임님이 전에 한번 tip을 주신적이 있는데
+
+[이세문 / Semun Lee] - 19:10                 
+/usr/lib/debug인가 그 경로를 /opt쪽에 symlink 걸어주면
+
+[이세문 / Semun Lee] - 19:10                 
+그것도 우회 가능해요
+
+[박명준 / MyoungJune Park] - 19:10                  
+제가 언제요.. T_T
+
+[이상진 / Sangjin LEE] - 19:10                 
+~~ 굿!!
+
+[이세문 / Semun Lee] - 19:10                 
+아니었나;
+
+[박명준 / MyoungJune Park] - 19:10                  
+아 디저그패키지는
+
+[박명준 / MyoungJune Park] - 19:10                  
+맞습니다. ㅋ
+
+[이세문 / Semun Lee] - 19:10                 
+ㅎㅎ
+
+[이상진 / Sangjin LEE] - 19:10                 
+감사합니다~
+
+[이상진 / Sangjin LEE] - 19:12                 
+ < Tizen 2.4 로 원복하는 방법 - PIT 파일 원복(1회) >
+
+•작업개요: u-boot에서는 PIT 변경이 안되므로 s-boot으로 변경하고 PIT 다운 받은 후 다시 u-boot으로 변경
+
+
+
+1. u-boot-to-sboot_gpt.tar 다운로드, 또는 final-THOR_TM1_sboot_recovery_150723.exe 실행 (u-boot -> s-boot)
+
+2. Odin으로 partition.pit 다운로드 (Odin 상단에 PIT 탭 이용)
+
+3. ODIN_TM1_migration_150810.1.exe 실행  
+
+4. Thor(Thor.exe)로 boot.tar 다운로드 (s-boot -> u-boot)
+
+5. Tizen 2.4 플랫폼 바이너리 다운로드
+
+
+* Setup 및 Z3 (Z300H) 페이지 참고
+
+[이상진 / Sangjin LEE] - 19:12                 
+이걸 하면 되는건가요?
+
+[이세문 / Semun Lee] - 19:12                 
+네
+
+[박지훈 / Jihoon Park] - 19:13                 
+추억의 PIT 원복... ㅎㅎㅎ
+
+[임동철 / DONGCHUL LIM] - 19:13                 
+http://suprem.sec.samsung.net/confluence/pages/viewpage.action?pageId=43548681
+
+[임동철 / DONGCHUL LIM] - 19:13                 
+여기 되어있는데로 밑에 가이드까지 쭉 한번 되게 해주시는게 좋습니다...
+
+[이세문 / Semun Lee] - 19:13                 
+더 좋은게 있었군요
+
+[이상진 / Sangjin LEE] - 19:17                 
+음.. partition.pit,  ODIN_TM1_migration_150810.1.exe, boot.tar 의 링크 주소가 바뀌었나 봅니다.
+
+[이상진 / Sangjin LEE] - 19:17                 
+링크 다운로드가 안되네요..
+
+[임동철 / DONGCHUL LIM] - 19:18                 
+아...
+
+[이상진 / Sangjin LEE] - 19:18                 
+가지고 계신분.. 공유 부탁드려요..
+
+[박종철 / jongchul park] - 19:23                 
+아직 resolved 로 되어 있는 이슈들이 있는데, 오늘까지 모두 확인후 close 나 open 예정인가요? 아니면 남은 것은 주말에 진행 예정인가요. 테스트 일정이 궁금합니다.
+
+[진삼학 / Sam-Hak Jin] - 19:24                 
+금일중으로 모두 확인하여 해결 반영된 이슈들은 close 처리하고 아직 미반영 이슈들은 reopen 예정입니다..
+
+[박종철 / jongchul park] - 19:24                 
+아넵 알겠습니다.
+
+[임동철 / DONGCHUL LIM] - 19:27                 
+김승우책임님께서 http://suprem.sec.samsung.net/confluence/pages/viewpage.action?pageId=43548681
+에 새로 업데이트 중이십니다....
+
+[박지훈 / Jihoon Park] - 19:28                 
+이상진 수석님, partition.pit을 제외하고는 파일들이 모두 http://suprem.sec.samsung.net/confluence/pages/viewpage.action?pageId=41320697 여기에 있는 것 같습니다. partition.pit은 세팅(점3개)-> Attachments에 보시면 partition_orig.pit을 올려놓았는데 이거 쓰시면 되구요.. 그런데 김승우 책임님이 새로 업데이트하시면 그거 쓰시면 되겠습니다. ^^;;;
+
+[김승우 / Seung-Woo Kim] - 19:29                 
+이상진 수석님 타겟 지금 제 자리에서 변경 중입니다 ^^
+
+[김승우 / Seung-Woo Kim] - 19:34                 
+참고로 rootfs가 867MB 이고 User 영역이 5.9GB인 PIT 파일은 다음 위치에 있습니다.
+http://suprem.sec.samsung.net/confluence/pages/viewpage.action?pageId=35225824
+링크의 순서와 같이 mitration 이후 2.4 snapshot 이미지를 한번 받은 후, 3.0 이미지를 받아야 합니다.
+
+[박명준 / MyoungJune Park]
+< debug pkg 설치 TIP > : / 영역이 작아져서 .debug를 설치하기 못하면, /opt 아래로 변경하면 됩니다. 
+# change-booting-mode.sh --update     #
+mkdir /opt/usr/debug -p
+mkdir /opt/usr/lib/debug -p
+mkdir /opt/usr/src/debug -p
+mount -o bind /opt/usr/lib/debug /usr/lib/debug
+mount -o bind /opt/usr/src/debug /usr/src/debug
+https://review.tizen.org/gerrit/#/c/105905/
+
+
+https://vulkan-tutorial.com/
+
+allocdescriptorsets 부분입니다 ㅎ
+
+[Vulkan]
+export VK_TIZEN_ICD="/usr/lib/driver/libMali.so"
+export XDG_RUNTIME_DIR="/run"
+
+
+rpm -ev dlogbackend-logger
+sdb root off
+ 
+[김성현 / sunghyun kim] - 13:38                 
+[repo.adv_tizen3.0_base_migration]
+# Jazz binary for product
+url = http://168.219.244.109/tizen-rsa/tizen-3.0-base-main2017/standard/latest/repos/base/armv7l/packages/
+
+[repo.adv_tizen3.0_product_migration]
+# Jazz binary for product
+url = http://168.219.244.109/releases/00_RELEASED_IMAGES/2017/MAIN/RELEASE/JazzM/TIZEN-3.0-MAIN2017-JazzM-RELEASE_20161214.1/repos/product/armv7l/packages/
+
+[김성현 / sunghyun kim] - 13:48                 
+http://168.219.244.109/releases/00_RELEASED_IMAGES/2017/MAIN2017/JazzM_ATSC/latest/repos/product/armv7l/packages/
+
+[김성현 / sunghyun kim] - 13:52                 
+[profile.3.0_jazzM]
+obs = obs.tizentv
+#repos =repo.adv_tizen3.0_product_migration, repo.adv_tizen3.0_base_migration
+repos =repo.local_tizen3.0_product_migration, repo.adv_tizen3.0_product_migration, repo.adv_tizen3.0_base_migration
+buildroot= ~/GBS-ROOT/TV_2017_JazzM
+[obs.tizentv]
+#url = https://168.219.243.64/api
+#user = obs_viewer
+#passwdx = obs_viewer_64
+url = https://api.tizen.org
+user = obs_viewer
+passwdx = QlpoOTFBWSZTWWV18UwAAAKDgAAAkiCZgCAAMQZMQQDJ6jQwAvxdyRThQkGV18Uw
+
+[김성현 / sunghyun kim] - 13:57 
+보통은 proxy 문제임
+
+
+Auto로 두고 아래 옵션만 남긴채로 전부 지우고 재부팅하면 됨
+no_proxy="127.0.0.1, localhost, `echo 165.213.149.{1..255} | sed 's/ /,/g'`"
+
+[김성현 / sunghyun kim] - 14:00 
+export http_proxy="http://10.112.1.184:8080"
+export https_proxy="https://10.112.1.184:8080"
+export ftp_proxy="http://10.112.1.184:8080"
+
+
+  $ rpm -Uvh org.tizen.tutorial-0.1-1.armv7l.rpm 
+  $ tpk-backend --preload -y org.tizen.tutorial
+  $ launch_app org.tizen.tutorial
+
+launch_app org.example.glviewshader
+
+[류대광 / daekwang ryu] - 14:47                 
+[고준범 / joonbum ko] - 14:46                 
+http://165.213.149.170/gerrit/#/admin/projects/platform/adaptation/gpu-ddk-mali-400
+
+[고준범 / joonbum ko] - 14:46 
+http://165.213.149.170/gerrit/#/admin/projects/platform/adaptation/opengl-es-mali-midgard
+
+[류대광 / daekwang ryu] - 14:59 
+브랜치는 mali 400 - r5p2
+midgard - r12p0-02dev 라고 합니다.
+
++#include <tbm_surface_internal.h>  
++         tbm_surface_internal_dump_start("/tmp", width, height, 1); 
++         tbm_surface_internal_dump_buffer(tbm_surface, "png"); 
++         tbm_surface_internal_dump_end();
+
+mount -o remount,rw /
+
+[enlightenment tbm backend]            
+1. ecore_evas쪽에 이미 들어 있는 USE_EVAS_GL_TBM_ENGINE 을 1로 하시면 됩니다.              
+2. /etc/sysconfig/ 및에 enlightenment 라는 파일에 적어 주시면 부팅할때 자동 설정됩니다.
+
+
+_e_comp_screen_engine_init
+
+[[pop disable write-protection]]
+[이상진 / Sangjin LEE] - 16:58                 verityctl disable && sync; reboot
+verityctl disable && sync; reboot
+
+[이상진 / Sangjin LEE] - 16:58                 
+요거 한번 실행해 주세요.
+
+[정원식 / WonSik Jung] - 16:58 
+네.. 감사합니다.
+
+[이상진 / Sangjin LEE] - 16:58 
+그리고 나서 remount하심 됩니다.
+-----------------------------------------------------
+[이상진 / Sangjin LEE] - 17:23                 
+아 그건.. launch-pad로 실행되니..
+
+[이상진 / Sangjin LEE] - 17:24                 
+gdb /usr/bin/launchpad-loader blabal.core
+
+[이상진 / Sangjin LEE] - 17:24 
+요렇게.. bind해보셔요
+
+[이상진 / Sangjin LEE] - 17:24 
+뒤어 corefile이름은 바꾸시구요
+
+[MCD 2.3.2 Code]                 
+git clone ssh://sidein@slp-info.sec.samsung.net:29418/magnolia/framework/uifw/elementary 
+git clone ssh://sidein@slp-info.sec.samsung.net:29418/framework/uifw/evas
+
+[[ internal SDK Pkg server ]]
+http://10.113.138.168/packages/
+
+[[Test Tizen TCT]]
+[최문희 / MOONHEE CHOI] - 10:17                 
+http://165.213.149.200/download/tct/tizen_4.0/NativeTCT/Auto_Binary/
+
+[최문희 / MOONHEE CHOI] - 10:17                 
+여기에서 최신으로 받으셔서요.
+
+[최문희 / MOONHEE CHOI] - 10:18                 
+1. Install tct-mgr on host device
+-Extract NativeTCT_3.0.tar.gz
+-sudo python tct-setup.py
+
+[최문희 / MOONHEE CHOI] - 10:19                 
+2. Install TCT backend runner on target/emulator
+-sudo python /opt/tct/tizen_native_3.0/scripts/tct-config-device.py
+
+[최문희 / MOONHEE CHOI] - 10:19 
+3. Run TCs 
+ - tct-mgr
+[윤주갑 / JOOGAB YUN] - 10:30                 
+sdk에서 달리 샘플 빌드시 여전히 빌드 에러 나는데 이거 혹시 저만 계속 이런건가요??
+
+[윤주갑 / JOOGAB YUN] - 10:30                 
+In file included from /home/puro/tizen-studio/tools/smart-build-interface/../../platforms/tizen-4.0/mobile/rootstraps/mobile-4.0-device.core/usr/include/dali/public-api/object/property-types.h:23:
+/home/puro/tizen-studio/tools/smart-build-interface/../../platforms/tizen-4.0/mobile/rootstraps/mobile-4.0-device.core/usr/include/dali/public-api/common/extents.h:63:12: error: unknown type name 'uint16_t'
+  Extents( uint16_t start, uint16_t end, uint16_t top, uint16_t bottom );
+           ^
+
+[윤주갑 / JOOGAB YUN] - 10:31                 
+In file included from /home/puro/tizen-studio/tools/smart-build-interface/../../platforms/tizen-4.0/mobile/rootstraps/mobile-4.0-device.core/usr/include/dali/public-api/adaptor-framework/application.h:30:
+/home/puro/tizen-studio/tools/smart-build-interface/../../platforms/tizen-4.0/mobile/rootstraps/mobile-4.0-device.core/usr/include/dali/public-api/adaptor-framework/window.h:154:12: error: unknown type name 'constexpr'
+    static constexpr Type DEFAULT { TIMEOUT }; ///< The default mode. @SINCE_1_2.60
+           ^
+
+[송희용 / Heeyong Song] - 10
+Tizen Studio 에서 Project Properties > C/C++ Build > Settings > C++ Compiler > Miscellaneous에 -std=c++11 추가 필요
+
+
+[Internal SDK PKG Server]
+http://10.113.138.168/packages/
+
+[Internal SDK Sample App server]
+http://sidein:White001!@165.213.149.200/download/samples/dev
+
+[SDK Network Setting]
+http
+https
+socks
+
+VS Studio 설치 : http://suprem.sec.samsung.net/confluence/display/TNET/Installing+Visual+Studio+2017
+Visual stidio for Tizen 가이드 : https://github.sec.samsung.net/dotnet/vs-tools-cps/blob/master/docs/how-to-install.md
+
+#!/bin/sh
+
+export E_CONF_PROFILE=tizen-mobile
+export XDG_RUNTIME_DIR=/run
+export XDG_CACHE_HOME=/run
+export ECORE_DRM_TTY=/dev/tty1
+export ECORE_EVAS_FORCE_SYNC_RENDER=1
+export E_START=enlightenment
+export ECORE_DRM_DEVICE_USER_HANDLER=1
+export ELM_PROFILE=mobile
+export ECTOR_BACKEND=default
+export HOME=/var/lib/enlightenment
+export TDM_THREAD=1
+export TDM_DLOG=1
+export TDM_COMMIT_PER_VBLANK=1
+export TBM_DISPLAY_SERVER=1
+export EDJE_NO_EFREET=1
+export ECORE_INPUT_CANCEL=1
+export ECORE_FILE_NO_DOWNLOAD=1
+export EINA_LOG_DLOG_ENABLE=1
+export E_LOG_DLOG_ENABLE=1
+export LIBINPUT_IGNORE_JOYSTICK=1
+export EVAS_GL_PARTIAL_DISABLE=1
+export ECORE_CON_DISABLE_SOCKET_FROM_SERVER=1
+
+/usr/bin/keymap_update.sh
+/usr/bin/enlightenment
+
+ - 13:19 
+새로 빌드한 EFL 120 rpm pkg 설치 후 리부팅 하면, systemd 서비스 중 deviced가 제대로 실행 되지 않아 sdb 로 연결 안되는 문제가 발생 합니다. deviced를 EFL 120 기반으로 미리 재빌드 하고 설치해 놓으셔야 sdb 연결 및 디버깅이 가능해 집니다. 해당 항목 정리한 내용 공유 드립니다.
+
+1. EFL 120 빌드 후 deviced도 새로운 EFL 기반으로 빌드 (GIT: platform/core/system/deviced)
+   deviced 빌드 후 생성되는 여러 profile용 pkg 중 mobile 만 설치 (정확히는 다음 4개만 설치)
+   deviced-2.0.0-1.armv7l.rpm
+   deviced-profile_mobile-2.0.0-1.armv7l.rpm (*)
+   deviced-tools-2.0.0-1.armv7l.rpm
+   libdeviced-2.0.0-1.armv7l.rpm
+2. 파일 시스템 rw 마운트
+   mount -o remount,rw /
+3. 빌드한 rpm들 TM1에 전송
+4. 설치
+   rpm -Uvh --force --nodeps *.rpm
+5. display-manager systemd service 삭제
+   rm /usr/lib/systemd/system/display-manager.service
+6. deviced 파일 이름 변경
+   mv /usr/bin/deviced.mobile /usr/bin/deviced
+7. sync 그리고 리부팅
+8. run-e.sh 이용해 확인
+
+efl120 설치를 위한 TM1 과정 중에 sdb 가 안붙는다면 한 번 다음과 같은 순서대로 시도해 보세요.
+(display-manager.service 삭제 후 리부팅 하는 과정을 먼저 실행)
+
+0. TM1 최신 바이너리 + DDK 받은 후 바로 display-manager.service 파일 삭제 후 리부팅
+   mount -o remount,rw /
+   rm /usr/lib/systemd/system/display-manager.service
+   sync && reboot -f
+1. EFL 120 빌드 후 deviced도 새로운 EFL 기반으로 빌드 (GIT: platform/core/system/deviced)
+   deviced 빌드 후 생성되는 여러 profile용 pkg 중 mobile 만 설치 (정확히는 다음 4개만 설치)
+   deviced-2.0.0-1.armv7l.rpm
+   deviced-profile_mobile-2.0.0-1.armv7l.rpm (*)
+   deviced-tools-2.0.0-1.armv7l.rpm
+   libdeviced-2.0.0-1.armv7l.rpm
+2. 파일 시스템 rw 마운트
+   mount -o remount,rw /
+3. 빌드한 rpm들 TM1에 전송
+4. 설치
+   rpm -Uvh --force --nodeps *.rpm
+5. deviced 파일 이름 변경
+   mv /usr/bin/deviced.mobile /usr/bin/deviced
+6. sync 그리고 리부팅
+7. run-e.sh 이용해 확인
+
+[[DALI DEMO Install & Launching]]
+rpm -Uvh --force --nodeps com.samsung*
+tpk-backend --preload -y com.samsung.dali-demo
+su - owner -c "aul_test reload"
+su - owner -c "app_launcher -s hello-world.example"
+app_launcher -s buttons.example
+app_launcher -s com.samsung.dali-demo
+
+
+
+desktop:~/source$ mkdir migration_1.20
+desktop:~/source$ cd migration_1.20/
+desktop:~/source/migration_1.20$ mkdir base
+desktop:~/source/migration_1.20$ cd base/
+desktop:~/source/migration_1.20/base$ cp ~/Downloads/automake_1.15.tar.gz  .
+desktop:~/source/migration_1.20/base$ tar -xvf automake_1.15.tar.gz
+desktop:~/source/migration_1.20/base$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/upstream/curl
+desktop:~/source/migration_1.20/base$ cd curl/
+desktop:~/source/migration_1.20/base/curl$ git checkout 96032cf63c4d47004effb3f2ea1920fb45048399
+desktop:~/source/migration_1.20/base/curl$ cd ..
+desktop:~/source/migration_1.20/base$ gbs build -A armv7l -B ~/GBS/upgrade/base --include-all --clean
+desktop:~/source/migration_1.20/base$ cd ..
+ 
+desktop:~/source/migration_1.20$ mkdir main
+desktop:~/source/migration_1.20$ cd main/
+desktop:~/source/migration_1.20/main$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/core/uifw/wayland-extension
+desktop:~/source/migration_1.20/main$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/upstream/efl
+desktop:~/source/migration_1.20/main$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/upstream/libevdev
+desktop:~/source/migration_1.20/main$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/upstream/libxkbcommon
+desktop:~/source/migration_1.20/main$ git clone ssh://tizen_ID@review.tizen.org:29418/platform/upstream/libinput
+desktop:~/source/migration_1.20/main$ cd wayland-extension/
+desktop:~/source/migration_1.20/main/wayland-extension$ git checkout sandbox/upgrade/efl120
+desktop:~/source/migration_1.20/main/wayland-extension$ cd ../efl/
+desktop:~/source/migration_1.20/main/efl$ git checkout sandbox/upgrade/efl120
+desktop:~/source/migration_1.20/main/efl$ cd ../libevdev/
+desktop:~/source/migration_1.20/main/libevdev$ git checkout sandbox/upgrade/efl120
+desktop:~/source/migration_1.20/main/libevdev$ cd ../libxkbcommon/
+desktop:~/source/migration_1.20/main/libxkbcommon$ git checkout sandbox/upgrade/efl120
+desktop:~/source/migration_1.20/main/libxkbcommon$ cd ../libinput/
+desktop:~/source/migration_1.20/main/libinput$ git checkout sandbox/upgrade/efl120
+desktop:~/source/migration_1.20/main/libinput$ cd ..
+desktop:~/source/migration_1.20/main$ gbs build -A armv7l -R ~/GBS/upgrade/base -B ~/GBS/upgrade/build --include-all --clean
+
+[[DIMM OFF]]
+devicectl display stop
+
+[윤주갑 / JOOGAB YUN] - 18:46                 
+tizen-video-player.cpp의
+
+[윤주갑 / JOOGAB YUN] - 18:46                 
+void TizenVideoPlayer::InitializeUnderlayMode( Ecore_Wl_Window* ecoreWlWindow )
+
+[윤주갑 / JOOGAB YUN] - 18:46                 
+여기를 보시면 될 것 같은데요
+
+[윤주갑 / JOOGAB YUN] - 18:46                 
+    if( mAlphaBitChanged )
+    {
+      ecore_wl_window_alpha_set( mEcoreWlWindow, true );
+    }
+
+[정원식 / WonSik Jung] - 18:47 
+네.. 알겠습니다. 감사합니다.. ^^
+
+[윤주갑 / JOOGAB YUN] - 18:47                 
+음....그런데 color 값을 채워주는 부분이 없어보이네요
+
+[정원식 / WonSik Jung] - 18:47 
+네.. 저도 좀 살펴보겠습니다.
+
+[윤주갑 / JOOGAB YUN] - 18:51                 
+아 그리고 dali-extension 여기 프로젝트 입니다.
+
+[윤주갑 / JOOGAB YUN] - 18:51                 
+videoview가 플러그인 형태로 되어 있어요
+
+[윤주갑 / JOOGAB YUN]
+ dali-toolkit/dali-toolkit/public-api/controls/video-view
+ dali-toolkit/dali-toolkit/internal/controls/video-view
+ dali-adaptor/dali/devel-api/adaptor-framework (video-player*)
+ dali-adaptor/dali/internal/video/common (plugin을 dlopen 해서 사용하는 부분)
+
+ dali-extension/dali-extension/video-player (plugin 구현부)
+
+[[Touch event log checking]]
+enlightenment_info -protocol_rule add allow all
+enlightenment_info -protocol_trace console
+enlightenment_info -protocol_trace elog
+dlogutil -c; dlogutil E20 | grep touch
+
+[박지연 / Ji-Youn Park] - 10:33                 
+홈스크린 기준으로
+
+[박지연 / Ji-Youn Park] - 10:33                 
+#ifdef EFL_NET_DIALER_UNIX_CLASS
+
+[박지연 / Ji-Youn Park] - 10:33 
+여기 타구요
+
+[박지연 / Ji-Youn Park] - 10:33                 
+   if ((type & ECORE_IPC_TYPE) == ECORE_IPC_LOCAL_USER)
+
+[박지연 / Ji-Youn Park] - 10:33 
+여기 타요
+
+
+DALi TCT guide - 2018.2.27
+Skip to end of metadata
+Created by Huiyu Eun, last modified on Feb 27, 2018 Go to start of metadata
+ 
+1. Native TCT Download : 최신 TCT 다운로드 (현재 5.0도 4.0 TCT로 돌립니다.)
+http://165.213.149.200/download/tct/tizen_4.0/NativeTCT/Auto_Binary/
+NUI의 경우 CSharpTCT 다운로드
+http://165.213.149.200/download/tct/tizen_4.0/CSharpTCT/Auto_Binary/
+ 
+2. 다운로드받은 tar.gz파일 압축해제
+ 
+3. 압축푼 폴더에서 아래 명령어 실행
+ sudo python tct-setup.py clean  
+ sudo python tct-setup.py
+ sudo python /opt/tct/tizen_native_4.0/scripts/tct-config-device.py  
+ 
+4. tct-mgr 실행
+ sudo tct-mgr
+ 
+5. dali tct 선택 후 'Run'
+ itc
+ - tct-dali-adaptor-native-itc
+ - tct-dali-core-native-itc
+ - tct-dali-toolkit-native-itc
+ utc
+ - tct-dali-adaptor-native-utc
+ - tct-dali-core-native-utc
+ - tct-dali-toolkit-native-utc
+ - tct-widget_viewer_dali-native-utc
+ 
+*tct 수행시 화면 꺼지지 않게 설정
+sdb shell
+devicectl display stop
+*sdb version이 안맞다고 실패할 경우
+sdb kill-server
+*sudo pip install request 관련 오류가 날경우
+  sudo apt-get install python-pip python-dev build-essential   
+  sudo pip install --upgrade pip  
+  sudo pip install --upgrade virtualenv
+  sudo pip install request
+
+[[e20 debugging]]
+[이상진 / Sangjin LEE] - 13:47                 
+h-3.2# enlightenment_info -protocol_rule --help[
+##########################################################
+###     Enlightenment Protocol Log filtering.          ###
+##########################################################
+
+-----------------------------------------------------------------
+How to read enlightenment_info protocol messages :
+[timestamp]   Server --> Client [PID: [pid]] interface@id.message(arguments..) cmd: CMD
+  ex)
+[1476930.145] Server --> Client [PID: 103] wl_touch@10.down(758, 6769315, wl_surface@23, 0, 408.000, 831.000) cmd: /usr/bin/launchpad-loader
+             ==> type = event && pid = 103 && cmd = launchpad-loader && iface = wl_touch && msg = up
+[4234234.123] Server <-- Client [PID: 123] wl_seat@32.get_touch(new id wl_touch@22) cmd: /usr/bin/launchpad-loader
+             ==> type = request && pid = 123 && cmd = launchpad-loader && iface = wl_seat && msg = get_touch
+-----------------------------------------------------------------
+Usage : enlightenment_info -protocol_rule add [POLICY] [RULE]
+        enlightenment_info -protocol_rule remove [INDEX]
+        enlightenment_info -protocol_rule file [RULE_FILE]
+        enlightenment_info -protocol_rule print
+        enlightenment_info -protocol_rule help
+        [POLICY] : allow / deny
+        [RULE] : C Language-style boolean expression syntax. [VARIABLE] [COMPAROTOR] [VALUE]
+        [VARIABLE] : type / iface / msg / cmd(command) / pid
+        [COMPARATOR] : & / && / and / | / || / or / = / == / != / > / >= / < / <=
+        [VALUE] : string / number
+  ex)
+        enlightenment_info -protocol_rule add allow "(type=request) && (iface == wl_pointer and (msg = down or msg = up))"
+        enlightenment_info -protocol_rule add deny cmd!= launch-loader
+        enlightenment_info -protocol_rule remove all
+        enlightenment_info -protocol_rule remove 3
+
+
+Unknown command : [--help[].
+
+
+sh-3.2# enlightenment_info -protocol_rule --help
+  Add/remove wayland protocol rule you want to trace
+
+  enlightenment_info -protocol_rule [COMMAND] [ARG]...
+    add    : add the rule to trace events (Usage: add [allow|deny] [RULE(iface=wl_touch and msg=down)]
+    remove  : remove the rule (Usage: remove [all|RULE_INDEX])
+    file    : add rules from file (Usage: file [RULE_FILE_PATH])
+    print   : print current rules
+    help
+
+[이상진 / Sangjin LEE] - 13:48                 
+enlightenment_info -protocol_rule을 통해서 원하는 이벤트를 뽑을수가 있어요.
+
+[이상진 / Sangjin LEE] - 13:49                 
+가장 단순하게느 enlightenment_info -protocol_rule add allow all
+
+[이상진 / Sangjin LEE] - 13:49                 
+하고 enlightenment_info -protocol_trace console
+
+[이상진 / Sangjin LEE] - 13:50                 
+하시면 지금 보고있는 콘솔로 모든 서버 client간의 통신 로그가 찍힙니다.
+
+[이상진 / Sangjin LEE] - 13:50                 
+그리고 말씀하신것처럼 특정 app의 로그만 보고 싶다면..
+
+[이상진 / Sangjin LEE] - 13:50                 
+add deny cmd != "xxxx" 혹은 add deny pid != "xxx"
+
+[이상진 / Sangjin LEE] - 13:51                 
+를 rule에 추가하여 특정 pid혹은 특정 app과 주고 받는 프로토콜만 찍으시면 되요.
+
+[이상진 / Sangjin LEE] - 13:51 
+일단 한번 해보시고 더 자세한 컨트롤 방법이 있으면 말씀하세요./
+
+[[glClear, DiscardFrameBuffer]]
+[정원식 / WonSik Jung] - 17:34 
+https://community.arm.com/graphics/b/blog/posts/mali-performance-2-how-to-correctly-handle-framebuffers
+
+[신현주 / HyunJu Shin] - 17:41                 
+ mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+[신현주 / HyunJu Shin] - 17:42
+Render-manager.cpp
+
+r -t 1 -o 3000 -ot 2
+
+아담패치넣어서
+
+확인한 로그 첨부합니다.
+
+ 
+
+validation layer는 압축푸셔서
+
+/usr/lib에 다 push 하시구요.
+
+ 
+
+타겟에서
+
+# chsmack -a "_" *
+
+날려주세요. ㅎ
+
+원래는 push한 파일만 해야할텐데 위와같이 날려주어도 무방할거에요.
+
+ 
+
+그리고 dali-core에는 validation이 켜져있어야하구요.
+
+실행하시기전에
+
+# export VK_LAYER_PATH="/usr/lib"
+
+해주시고
+
+dali-demo 실행하시면 로그 출력되실거에요.
+
+ 
+
+안되시면 알려주세요.
+
+감사합니다.
+
+
+Tizen5 테스트환경 공유드립니다.
+
+ 
+
+5.0리포에서
+
+Vulkan header는 1.0.68로 확인이되네요.
+
+dali를 빌드하려면 VulkanLoader 1.0.54를 GBSROOT에 넣어주시던지.
+
+아님  컴파일 옵션 -Werror를 삭제하시면 빌드가 될것으로 생각되구요.
+
+ 
+
+앱실행방법은
+
+# export AUL_APPID=com.samsung.dali-demo
+
+를 먼저 하셔야 잘 되는 것 같습니다.
+
+ 
+
+첨부파일에 Vulkan Validation은 core기능만 있는 버전입니다.
+
+(드라이버팀에서 머지준비중인 버전)
+
+사용하려면
+
+# export VK_LAYER_PATH="/usr/lib/staging-json"
+
+하시고 사용하시면 되구요.
+
+ 
+
+api-dump까지 보시려면 제가 이전에 공유드린 파일을
+
+이전가이드 대로 하시면 되실거에요.
+
+(# export VK_LAYER_PATH="/usr/lib")
+
+ 
+
+디폴트사이즈 변경은 vulkan-wsi에서 아래와 같습니다.
+Tizen5 테스트환경 공유드립니다.
+
+ 
+
+5.0리포에서
+
+Vulkan header는 1.0.68로 확인이되네요.
+
+dali를 빌드하려면 VulkanLoader 1.0.54를 GBSROOT에 넣어주시던지.
+
+아님  컴파일 옵션 -Werror를 삭제하시면 빌드가 될것으로 생각되구요.
+
+ 
+
+앱실행방법은
+
+# export AUL_APPID=com.samsung.dali-demo
+ devicectl display stop
+export AUL_APPID=org.tizen.dali_simple
+export AUL_APPID=video-view.example
+export AUL_APPID=image-view.example
+export AUL_APPID=org.tizen.dali_tbm_surface_example
+
+를 먼저 하셔야 잘 되는 것 같습니다.
+
+ 
+
+첨부파일에 Vulkan Validation은 core기능만 있는 버전입니다.
+
+(드라이버팀에서 머지준비중인 버전)
+
+사용하려면
+
+# export VK_LAYER_PATH="/usr/lib/staging-json"
+
+export VK_LAYER_PATH="/etc/vulkan/explicit_layer.d"
+
+하시고 사용하시면 되구요.
+
+ 
+
+api-dump까지 보시려면 제가 이전에 공유드린 파일을
+
+이전가이드 대로 하시면 되실거에요.
+
+(# export VK_LAYER_PATH="/usr/lib")
+
+ 
+
+디폴트사이즈 변경은 vulkan-wsi에서 아래와 같습니다.
+
+
+
+evas_image_main.c 
+static const Evas_Cache_Image_Func _evas_common_image_func =
+{
+  _evas_common_rgba_image_new,
+  _evas_common_rgba_image_delete,
+  _evas_common_rgba_image_surface_alloc,
+  _evas_common_rgba_image_surface_delete,
+  _evas_common_rgba_image_surface_pixels,
+  evas_common_load_rgba_image_module_from_file,
+  _evas_common_rgba_image_unload,
+  _evas_common_rgba_image_dirty_region,
+  _evas_common_rgba_image_dirty,
+  evas_common_rgba_image_size_set,
+  evas_common_rgba_image_from_copied_data,
+  evas_common_rgba_image_from_data,
+  evas_common_rgba_image_colorspace_set,
+  evas_common_load_rgba_image_data_from_file,
+  _evas_common_rgba_image_ram_usage,
+  NULL // _evas_common_rgba_image_debug
+};
+
+Evas GL: Apply patches for 'run-time generation and load of shaders' feature
+
+eng_image_alpha_set
+
+eng_image_orient_set
+_rotate_image_data
+
+eng_image_data_get
+
+eng_image_data_put
+
+
+
+evas_cache_image_load_data
+
+root@localhost:/tmp# export EVAS_GL_DIRECT_OVERRIDE=1
+root@localhost:/tmp# export AUL_APPID=org.tizen.HelloEFL
+
+Git merge from another remote
+
+
+1. remote 추가하기 : git remote add [remote이름] [remote git 저장소 주소]
+ex)
+git remote add SLP ssh://dkdk.ryu@slp-info.sec.samsung.net:29418/magnolia/framework/graphics/Evas_GL_TestCase
+git 
+
+
+
+2. fetch 하기 : git fetch [추가된 remote이름] → git branch -a을 하면 추가된 branch를 확인 할 수 있음
+
+
+3. 필요에 맞는 branch 생성
+(git checkout -b [new local branch] [remote branch]
+
+
+4. merge 작업을 진행하기 전 to, from branch 모두 git pull을 통해서 최신상태로 만들어주기
+
+
+5. git merge [from branch name] –no-ff
+
+
+6. git merge의 경우 3가지의 경우가 발생한다
+
+a. Already to update : merge 할 내용이 없는 경우 나타는 문구
+
+
+b. merge 후 commit 화면 : merge가 아무 이상없이 완료됨. 이 경우 packaging의 spec파일의 version을 1 증가시킨 뒤 git add → git commit –amend
+
+
+c. complic 발생 : complic이 발생한 부분을 해결 한 뒤 git commit으로 commit하기(merge와 다르게 commit이 생성되지 않았기 때문에 git commit을 해야함)
+
+
+
+7. push 
+
+a. merge 후 git history를 유지해야되는 경우, 다이렉트 push 권한을 가진 사람이 바로 push를 해야합니다.
+
+
+b. history를 유지하지 않아도 되는 경우, git push를 통해서 merge commit을 gerrit에 올립니다.
+
+
+
+8. 만약 gbs submit이 필요한 경우, gbs submit 을 사용해서 내용을 작성한 뒤 보내면 됩니다.
+
+
+[DALI TC Guide]
+http://suprem.sec.samsung.net/confluence/display/GFX/DALi+TCT+guide+-+2018.2.27
+rm -rf
+[DALI Integration Guide]
+http://suprem.sec.samsung.net/confluence/display/GFX/How+to+do+tizen+branch+integration
+
+[How to Install JAVA in ubuntu]
+sudo apt-get update
+sudo apt-get install libjaxb-java
+
+TBM_FORMAT_NV12
+
+git fetch ssh://sparrow74@review.gerrithub.io:29418/dalihub/dali-core refs/changes/04/420704/2 && git cherry-pick FETCH_HEAD
+
+
+[최문희 / MOONHEE CHOI] - 20:27                 
+이런 디버그 테그를 없애고  nocomp로 동작시키고 싶으시면 아래와 같이 하시면 됩니다.
+
+[최문희 / MOONHEE CHOI]
+1. rm -f /usr/bin/TagDebug
+2. ps -ef | grep TagDebug
+3. kill -9 TagDebug의 PID
+
+launch_app org.tizen.factory type 40A6AU0NN localset KOR model UNU8000
+
+아, 넵 어제 또 추가로 만든게 있는데 
+아니면 아래 이미지로 확인하셔도 될거에요 
+
+http://vdcosmos-hub.sec.samsung.net/build/1617158
+http://168.219.245.202:8080/priv/168.219.245.168:81/PRV/builds/b978/804978/artifacts/tizen_20180827.804978/
+
+
+*****************<VD Device Debugging>
+systemctl stop smart-deadlock.service
+systemctl stop stability-monitor.service
+or
+mv /usr/lib/systemd/system/smart-deadlock.service  /usr/lib/systemd/system/smart-deadlock.service.bak
+mv /usr/lib/systemd/system/stability-monitor.service  /usr/lib/systemd/system/stability-monitor.service.bak
+
+gdb -p 401 -ex "handle SIG34 nostop"
+
+<KantSU Factory Reset>
+Type : NONE_18
+SW Model : UNU7090
+BOM Model : 7090
+TUNER : S_T2C
+
+--define "disable_cxx03_build 1"
+
+-ex "handle SIG34 nostop"
+
+
+dlogutil TBM WL_TBM TPL DALI | grep 2343 
+
+vconftool set "db/sdk/develop/mode" -t int 1 -f
+vconftool set "db/sdk/develop/ip" -t string 10.113.111.216 -f
+
+
+launch_app org.tizen.factory type NONE_18 localset KOR model UNU7090
+
+ - 14:27 
+http://wiki.vd.sec.samsung.net/display/TVSDK/Turn+off+memory+alarm+on+Target
+
+*# Key record 방법
+    Mute + 9 + 8 + 7 + Exit     => 원하는 key senario저장시작  
+    Mute + Mute + Exit + Exit + Exit => key senario 저장 종료  
+    Mute + Play + Play + Play + Exit   => key senario play
+    Mute + Stop + Stop + Stop + Exit   => key senario stop
+
+<how to print with vulkan validation layer in VD Device>
+1. -gdb에서 
+(gdb)#>p freopen("/tmp/csfs.txt", "w+", stdout)
+2. exit from gdb
+3. how to do monitoring in real time
+#>tail -f /tmp/csfs.txt
+
+window type 상관없이 0, 0, 0, 1 로 강제 설정된 값이 특정 조건에서 동작하는 것 같아요..
+Vulkan-api-framebuffer.cpp (dali-core-vulkan\dali\graphics\vulkan\api):    auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+Vulkan-graphics.cpp (dali-core-vulkan\dali\graphics\vulkan):  auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+Vulkan-swapchain.cpp (dali-core-vulkan\dali\graphics\vulkan\internal):  auto clearColor = vk::ClearColorValue{}.setFloat32( { 0.0f, 0.0f, 0.0f, 1.0f } );
+
+git fetch ssh://sparrow74@review.gerrithub.io:29418/dalihub/dali-core refs/changes/04/420804/7 && git cherry-pick FETCH_HEAD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
