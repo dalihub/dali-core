@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e066b285_750b78b1",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-18T08:59:41Z",
+      "side": 1,
+      "message": "No need to treat this case differently - just remove the if, and iterate over the cache.",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 5
+      },
+      "revId": "44129a20dbaf44acfcc3b479abdd7c86ba66a821",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6335f1b_df727d8b",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-18T08:59:41Z",
+      "side": 1,
+      "message": "You have removed UpdateDepthStencilBuffer from the logic - it\u0027s now only in EnableDepthStencilBuffer, so the timing of this logic is now dependent on the calling implementation in graphics-algorithms.cpp - this doesn\u0027t seem quite right to me - we should have full control over the timing in the vulkan implementation.",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 182,
+        "endChar": 29
+      },
+      "revId": "44129a20dbaf44acfcc3b479abdd7c86ba66a821",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79f2bc86_0da96226",
+        "filename": "dali/graphics/vulkan/vulkan-graphics.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1567,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-18T08:59:41Z",
+      "side": 1,
+      "message": "I think both buffer indices will remain in step now you\u0027ve moved the toggle above the early out; potentially, you could use a single index, and increment it elsewhere, e.g. on acquire next swapchain?",
+      "range": {
+        "startLine": 1567,
+        "startChar": 2,
+        "endLine": 1567,
+        "endChar": 27
+      },
+      "revId": "44129a20dbaf44acfcc3b479abdd7c86ba66a821",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}

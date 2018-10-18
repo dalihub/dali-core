@@ -46,6 +46,30 @@
       "revId": "6bd28c027789b375deb044b98a0616070e102fb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8f91a0c_53d0a166",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-18T08:59:41Z",
+      "side": 1,
+      "message": "Sure, just a reminder :D",
+      "parentUuid": "09cba20b_a0cd85ae",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 8
+      },
+      "revId": "6bd28c027789b375deb044b98a0616070e102fb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     }
   ]
 }
