@@ -79,12 +79,12 @@ public:
   /**
    * @copydoc Dali::RenderTaskList::GetTaskCount()
    */
-  unsigned int GetTaskCount() const;
+  uint32_t GetTaskCount() const;
 
   /**
    * @copydoc Dali::RenderTaskList::GetTask()
    */
-  Dali::RenderTask GetTask( unsigned int index ) const;
+  Dali::RenderTask GetTask( uint32_t index ) const;
 
   /**
    * Retrieve the container of render-tasks.

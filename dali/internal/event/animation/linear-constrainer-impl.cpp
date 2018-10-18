@@ -68,7 +68,7 @@ void LinearConstrainer::GetDefaultPropertyIndices( Property::IndexContainer& ind
 {
   indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for ( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     indices.PushBack( i );
   }
@@ -90,7 +90,7 @@ Property::Index LinearConstrainer::GetDefaultPropertyIndex(const std::string& na
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == strcmp( name.c_str(), property->name ) )
@@ -218,10 +218,9 @@ void LinearConstrainer::Apply( Property target, Property source, const Vector2& 
   Dali::Constraint constraint = Dali::Constraint::New<float>( target.object, target.propertyIndex, LinearConstraintFunctor( mValue, mProgress, range, wrap ) );
   constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
-  constraint.SetTag( reinterpret_cast<size_t>( this ) );
+  constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
   constraint.SetRemoveAction( Dali::Constraint::Discard );
   constraint.Apply();
-
 
   //Start observing the object
   Observe( target.object );

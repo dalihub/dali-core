@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
@@ -122,7 +125,7 @@ public:
   /**
    * Get item at a given position in the list
    */
-  RenderItem& GetItem( RenderItemContainer::SizeType index ) const
+  RenderItem& GetItem( uint32_t index ) const
   {
     DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
     return *mItems[ index ];
@@ -131,7 +134,7 @@ public:
   /**
    * Get renderer from an item in the list
    */
-  const Render::Renderer& GetRenderer( RenderItemContainer::SizeType index ) const
+  const Render::Renderer& GetRenderer( uint32_t index ) const
   {
     DALI_ASSERT_DEBUG( index < GetCachedItemCount() );
     return *mItems[ index ]->mRenderer;
@@ -142,7 +145,7 @@ public:
    * Because of caching, the actual size may be bit more
    * @return The number of items
    */
-  RenderItemContainer::SizeType Count() const
+  uint32_t Count() const
   {
     return mNextFree;
   }
@@ -150,9 +153,9 @@ public:
   /**
    * @return the number of items cached by the list
    */
-  RenderItemContainer::SizeType GetCachedItemCount() const
+  uint32_t GetCachedItemCount() const
   {
-    return mItems.Count();
+    return static_cast<uint32_t>( mItems.Count() );
   }
 
   /**
@@ -160,7 +163,7 @@ public:
    */
   void ReuseCachedItems()
   {
-    mNextFree = mItems.Count();
+    mNextFree = static_cast<uint32_t>( mItems.Count() );
   }
 
   /**
@@ -264,7 +267,7 @@ private:
   const RenderList& operator=( const RenderList& rhs );
 
   RenderItemContainer mItems; ///< Each item is a renderer and matrix pair
-  RenderItemContainer::SizeType mNextFree;              ///< index for the next free item to use
+  uint32_t mNextFree;         ///< index for the next free item to use
 
   ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;              ///< The originating layer where the renderers are from

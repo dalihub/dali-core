@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,17 +79,17 @@ void Core::RecoverFromContextLoss()
   mImpl->RecoverFromContextLoss();
 }
 
-void Core::SurfaceResized(unsigned int width, unsigned int height)
+void Core::SurfaceResized(uint32_t width, uint32_t height)
 {
   mImpl->SurfaceResized(width, height);
 }
 
-void Core::SetTopMargin( unsigned int margin )
+void Core::SetTopMargin( uint32_t margin )
 {
   mImpl->SetTopMargin(margin);
 }
 
-void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
+void Core::SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical)
 {
   mImpl->SetDpi(dpiHorizontal, dpiVertical);
 }
@@ -109,12 +109,12 @@ void Core::ProcessEvents()
   mImpl->ProcessEvents();
 }
 
-unsigned int Core::GetMaximumUpdateCount() const
+uint32_t Core::GetMaximumUpdateCount() const
 {
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }

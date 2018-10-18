@@ -108,7 +108,7 @@ void Path::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
   indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for ( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     indices.PushBack( i );
   }
@@ -130,7 +130,7 @@ Property::Index Path::GetDefaultPropertyIndex(const std::string& name) const
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
@@ -267,7 +267,7 @@ void Path::AddControlPoint(const Vector3& point )
 
 unsigned int Path::GetNumberOfSegments() const
 {
-  return (mPoint.Size()>1)?mPoint.Size()-1:0;
+  return static_cast<unsigned int>( (mPoint.Size()>1) ? mPoint.Size()-1 : 0 );
 }
 
 void Path::GenerateControlPoints( float curvature )
@@ -346,10 +346,10 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   }
   else
   {
-    segment = t * numSegs;
-    float segLength = 1.0f / numSegs;
+    segment = static_cast<unsigned int>( t * static_cast<float>( numSegs ) );
+    float segLength = 1.0f / static_cast<float>( numSegs );
     float segStart  = static_cast<float>( segment ) * segLength;
-    tLocal = (t - segStart) * numSegs;
+    tLocal = (t - segStart) * static_cast<float>( numSegs );
   }
 }
 

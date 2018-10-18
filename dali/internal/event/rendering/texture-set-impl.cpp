@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ TextureSetPtr TextureSet::New()
   return textureSet;
 }
 
-void TextureSet::SetTexture( size_t index, TexturePtr texture )
+void TextureSet::SetTexture( uint32_t index, TexturePtr texture )
 {
-  size_t textureCount( mTextures.size() );
+  uint32_t textureCount = static_cast<uint32_t>( mTextures.size() );
   if( index >= textureCount )
   {
     mTextures.resize(index + 1);
@@ -50,7 +50,7 @@ void TextureSet::SetTexture( size_t index, TexturePtr texture )
       samplerExist = false;
     }
 
-    for( size_t i(textureCount); i<=index; ++i )
+    for( uint32_t i(textureCount); i<=index; ++i )
     {
       mTextures[i] = NULL;
 
@@ -72,7 +72,7 @@ void TextureSet::SetTexture( size_t index, TexturePtr texture )
   SceneGraph::SetTextureMessage( mEventThreadServices, *mSceneObject, index, renderTexture );
 }
 
-Texture* TextureSet::GetTexture( size_t index ) const
+Texture* TextureSet::GetTexture( uint32_t index ) const
 {
   Texture* result(0);
   if( index < mTextures.size() )
@@ -87,13 +87,13 @@ Texture* TextureSet::GetTexture( size_t index ) const
   return result;
 }
 
-void TextureSet::SetSampler( size_t index, SamplerPtr sampler )
+void TextureSet::SetSampler( uint32_t index, SamplerPtr sampler )
 {
-  size_t samplerCount( mSamplers.size() );
+  uint32_t samplerCount = static_cast<uint32_t>( mSamplers.size() );
   if( samplerCount < index + 1  )
   {
     mSamplers.resize( index + 1 );
-    for( size_t i(samplerCount); i<=index; ++i )
+    for( uint32_t i = samplerCount; i<=index; ++i )
     {
       mSamplers[i] = NULL;
     }
@@ -110,7 +110,7 @@ void TextureSet::SetSampler( size_t index, SamplerPtr sampler )
   SceneGraph::SetSamplerMessage( mEventThreadServices, *mSceneObject, index, renderSampler );
 }
 
-Sampler* TextureSet::GetSampler( size_t index ) const
+Sampler* TextureSet::GetSampler( uint32_t index ) const
 {
   Sampler* result(0);
   if( index < mSamplers.size() )
@@ -125,9 +125,9 @@ Sampler* TextureSet::GetSampler( size_t index ) const
   return result;
 }
 
-size_t TextureSet::GetTextureCount() const
+uint32_t TextureSet::GetTextureCount() const
 {
-  return mTextures.size();
+  return static_cast<uint32_t>( mTextures.size() );
 }
 
 const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,9 @@ struct PropertyImplementationTypeAlignment
   enum { VALUE = offsetof( TestStructure, data ) };
 };
 
-unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
+uint32_t GetPropertyImplementationAlignment( Property::Type& propertyType )
 {
-  unsigned int alignment = 0u;
+  uint32_t alignment = 0u;
 
   switch( propertyType )
   {
@@ -131,27 +131,27 @@ PropertyBufferPtr PropertyBuffer::New( Dali::Property::Map& format )
   return propertyBuffer;
 }
 
-void PropertyBuffer::SetData( const void* data, std::size_t size )
+void PropertyBuffer::SetData( const void* data, uint32_t size )
 {
   mSize = size; // size is the number of elements
 
-  unsigned int bufferSize = mBufferFormatSize * mSize;
+  uint32_t bufferSize = mBufferFormatSize * mSize;
 
   // create a new DALi vector to store the buffer data
   // the heap allocated vector will end up being owned by Render::PropertyBuffer
-  OwnerPointer< Vector<char> > bufferCopy = new Dali::Vector<char>();
+  OwnerPointer< Vector<uint8_t> > bufferCopy = new Dali::Vector<uint8_t>();
   bufferCopy->Resize( bufferSize );
 
   // copy the data
-  const char* source = static_cast<const char*>( data );
-  char *destination = &((*bufferCopy)[0]);
+  const uint8_t* source = static_cast<const uint8_t*>( data );
+  uint8_t* destination = &((*bufferCopy)[0]);
   std::copy( source, source + bufferSize, destination );
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
   SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
 }
 
-std::size_t PropertyBuffer::GetSize() const
+uint32_t PropertyBuffer::GetSize() const
 {
   return mSize;
 }
@@ -183,16 +183,16 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
   OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
   SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 
-  size_t numComponents = formatMap.Count();
+  uint32_t numComponents = static_cast<uint32_t>( formatMap.Count() );
 
   // Create the format
   OwnerPointer< Render::PropertyBuffer::Format> format = new Render::PropertyBuffer::Format();
   format->components.resize( numComponents );
 
-  unsigned int currentAlignment = 0u;
-  unsigned int maxAlignmentRequired = 0u;
+  uint32_t currentAlignment = 0u;
+  uint32_t maxAlignmentRequired = 0u;
 
-  for( size_t i = 0u; i < numComponents; ++i )
+  for( uint32_t i = 0u; i < numComponents; ++i )
   {
     KeyValuePair component = formatMap.GetKeyValue( i );
 
@@ -214,11 +214,11 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
     {
       DALI_ABORT( "Property::Type not supported in PropertyBuffer" );
     }
-    unsigned int elementSize = GetPropertyImplementationSize( type );
-    unsigned int elementAlignment = GetPropertyImplementationAlignment( type );
+    uint32_t elementSize = GetPropertyImplementationSize( type );
+    uint32_t elementAlignment = GetPropertyImplementationAlignment( type );
 
     // check if current alignment is compatible with new member
-    if( unsigned int offset = currentAlignment % elementAlignment )
+    if( uint32_t offset = currentAlignment % elementAlignment )
     {
       // Not compatible, realign
       currentAlignment = currentAlignment + elementSize - offset;
@@ -243,7 +243,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
   // Check the alignment for the maxAlignment required to calculate the size of the format
   if( maxAlignmentRequired != 0 )
   {
-    if( unsigned int offset = currentAlignment % maxAlignmentRequired )
+    if( uint32_t offset = currentAlignment % maxAlignmentRequired )
     {
       // Not compatible, realign
       currentAlignment = currentAlignment + maxAlignmentRequired - offset;
@@ -258,9 +258,9 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
   SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
 }
 
-unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
+uint32_t GetPropertyImplementationSize( Property::Type& propertyType )
 {
-  unsigned int size = 0u;
+  uint32_t size = 0u;
 
   switch( propertyType )
   {

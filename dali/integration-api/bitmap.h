@@ -43,7 +43,7 @@ DALI_CORE_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelD
 
 class Bitmap;
 typedef IntrusivePtr<Bitmap>    BitmapPtr;
-typedef unsigned char                 PixelBuffer;  ///< Pixel data buffers are composed of these
+typedef uint8_t                 PixelBuffer;  ///< Pixel data buffers are composed of these
 
 /**
  * Bitmap class.
@@ -68,8 +68,8 @@ protected:
    * @param[in] height        Image height in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           unsigned int width,
-                           unsigned int height);
+                           uint32_t width,
+                           uint32_t height);
 
 
 public:
@@ -113,7 +113,7 @@ public:
    * Get the width of the image
    * @return The width of the image
    */
-  unsigned int GetImageWidth() const
+  uint32_t GetImageWidth() const
   {
     return mImageWidth;
   }
@@ -122,7 +122,7 @@ public:
    * Get the height of the image
    * @return The height of the image
    */
-  unsigned int GetImageHeight() const
+  uint32_t GetImageHeight() const
   {
     return mImageHeight;
   }
@@ -159,7 +159,7 @@ public:
    * @return The buffer size in bytes.
    * @sa ReserveBuffer GetBuffer
    */
-  virtual size_t GetBufferSize() const = 0;
+  virtual uint32_t GetBufferSize() const = 0;
 
   /**
    * Queries if the bitmap has an alpha channel
@@ -211,10 +211,10 @@ public:
      * @return pixel buffer pointer
      */
     virtual PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
-                                       unsigned int width,
-                                       unsigned int height,
-                                       unsigned int bufferWidth = 0,
-                                       unsigned int bufferHeight = 0) = 0;
+                                       uint32_t width,
+                                       uint32_t height,
+                                       uint32_t bufferWidth = 0,
+                                       uint32_t bufferHeight = 0) = 0;
 
     /**
      * Assign a pixel buffer. Any previously allocated pixel buffer is deleted.
@@ -238,29 +238,29 @@ public:
      */
     virtual void AssignBuffer(Pixel::Format pixelFormat,
                               PixelBuffer* buffer,
-                              std::size_t bufferSize,
-                              unsigned int width,
-                              unsigned int height,
-                              unsigned int bufferWidth = 0,
-                              unsigned int bufferHeight = 0) = 0;
+                              uint32_t bufferSize,
+                              uint32_t width,
+                              uint32_t height,
+                              uint32_t bufferWidth = 0,
+                              uint32_t bufferHeight = 0) = 0;
     /**
      * Get the width of the buffer (stride)
      * @return The width of the buffer in pixels
      */
-    virtual unsigned int GetBufferWidth() const = 0;
+    virtual uint32_t GetBufferWidth() const = 0;
 
     /**
      * Get the height of the buffer
      * @return The height of the buffer in pixels
      */
-    virtual unsigned int GetBufferHeight() const = 0;
+    virtual uint32_t GetBufferHeight() const = 0;
 
     /**
      * Get the pixel buffer stride.
      * @return The buffer stride (in bytes) if this is bitmap of non-compressed
      * packed pixels for which a stride is meaningful or 0 otherwise.
      */
-    virtual unsigned int GetBufferStride() const = 0;
+    virtual uint32_t GetBufferStride() const = 0;
 
     /**
      * Check the bitmap data and test whether it has any transparent pixels.
@@ -310,7 +310,7 @@ public:
     virtual PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
                                        const unsigned width,
                                        const unsigned height,
-                                       const size_t numBytes ) = 0;
+                                       const uint32_t numBytes ) = 0;
   protected:
 
     /**
@@ -353,8 +353,8 @@ protected:
 
 protected:
 
-  unsigned int  mImageWidth;          ///< Image width in pixels
-  unsigned int  mImageHeight;         ///< Image height in pixels
+  uint32_t  mImageWidth;          ///< Image width in pixels
+  uint32_t  mImageHeight;         ///< Image height in pixels
   Pixel::Format mPixelFormat;         ///< Pixel format
   bool          mHasAlphaChannel;   ///< Whether the image has an alpha channel
   bool          mAlphaChannelUsed;  ///< Whether the alpha channel is used in case the image owns one.

@@ -60,9 +60,9 @@ public:
   TypeInfo(const std::string& name, const std::string& baseName, Dali::CSharpTypeInfo::CreateFunction creator);
 
   /**
-   *
+   * Destructor
    */
-  ~TypeInfo();
+  virtual ~TypeInfo();
 
   /**
    * @copydoc Dali::TypeInfo::GetName
@@ -107,12 +107,7 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetPropertyCount
    */
-  size_t GetPropertyCount() const;
-
-  /**
-   * @copydoc Dali::TypeInfo::GetPropertyName
-   */
-  std::string GetPropertyName(size_t index) const;
+  uint32_t GetPropertyCount() const;
 
   /**
    * Adds the property indices to the container specified.
@@ -181,7 +176,7 @@ public:
    * @param[in] baseIndex The index of the base animatable property
    * @param[in] component The index The index of the component.
    */
-  void AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+  void AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex );
 
   /**
    * Adds a child property to the type.
@@ -230,7 +225,7 @@ public:
    * @param[in] index The index of the property.
    * @return The component index associated with that property index.
    */
-  int GetComponentIndex( Property::Index index ) const;
+  int32_t GetComponentIndex( Property::Index index ) const;
 
   /**
    * Checks if there is a setter for the property. If there is then it is writable.
@@ -326,7 +321,7 @@ private:
     {
     }
 
-    RegisteredProperty( Property::Type propType, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
+    RegisteredProperty( Property::Type propType, const std::string& propName, Property::Index basePropertyIndex, int32_t componentIndex )
         : type( propType ),
           setFunc( NULL ),
           getFunc( NULL ),
@@ -371,7 +366,7 @@ private:
     };
     std::string name;
     Property::Index basePropertyIndex;
-    int componentIndex;
+    int32_t componentIndex;
   };
 
   typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction > ConnectionPair;

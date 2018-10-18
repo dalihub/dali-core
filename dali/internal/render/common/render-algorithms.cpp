@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -424,7 +424,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
   }
 
   // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
-  for( size_t index( 0u ); index < count; ++index )
+  for( uint32_t index = 0u; index < count; ++index )
   {
     const RenderItem& item = renderList.GetItem( index );
     DALI_PRINT_RENDER_ITEM( item );

@@ -86,7 +86,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
     image->mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
-    size_t bufferSize = bitmap->GetBufferSize();
+    uint32_t bufferSize = bitmap->GetBufferSize();
     PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
                                              static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
     image->mTexture->Upload( pixelData );

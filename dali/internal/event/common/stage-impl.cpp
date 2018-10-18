@@ -202,14 +202,14 @@ void Stage::Remove( Actor& actor )
 
 void Stage::SurfaceResized( float width, float height )
 {
-  if( ( fabs( width - mSurfaceSize.width ) > Math::MACHINE_EPSILON_1000 ) || ( fabs( height - mSurfaceSize.height ) > Math::MACHINE_EPSILON_1000 ) )
+  if( ( fabsf( width - mSurfaceSize.width ) > Math::MACHINE_EPSILON_1000 ) || ( fabsf( height - mSurfaceSize.height ) > Math::MACHINE_EPSILON_1000 ) )
   {
     mSurfaceSize.width = width;
     mSurfaceSize.height = height;
 
     // Internally we want to report the actual size of the stage.
     mSize.width = width;
-    mSize.height = height - mTopMargin;
+    mSize.height = height - static_cast<float>( mTopMargin );
 
     // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
     mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
@@ -227,7 +227,7 @@ void Stage::SurfaceResized( float width, float height )
       mSystemOverlay->GetImpl()->SetSize( width, height );
     }
 
-    SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+    SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int32_t>( 0, 0, static_cast<int32_t>( width ), static_cast<int32_t>( height ) ) ); // truncated
 
     // if single render task to screen then set its viewport parameters
     if( 1 == mRenderTaskList->GetTaskCount() )
@@ -236,14 +236,14 @@ void Stage::SurfaceResized( float width, float height )
 
       if(!defaultRenderTask.GetTargetFrameBuffer())
       {
-        defaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
+        defaultRenderTask.SetViewport( Viewport( 0, 0, static_cast<int32_t>( width ), static_cast<int32_t>( height ) ) ); // truncated
       }
     }
 
     if( mRenderToFbo )
     {
-      Dali::FrameBuffer frameBuffer = Dali::FrameBuffer::New( width, height, Dali::FrameBuffer::Attachment::NONE );
-      Dali::Texture texture = Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGB888, width, height );
+      Dali::FrameBuffer frameBuffer = Dali::FrameBuffer::New( static_cast<uint32_t>( width ), static_cast<uint32_t>( height ), Dali::FrameBuffer::Attachment::NONE );
+      Dali::Texture texture = Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGB888, static_cast<uint32_t>( width ), static_cast<uint32_t>( height ) );
       frameBuffer.AttachColorTexture( texture );
 
       Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
@@ -257,7 +257,7 @@ Vector2 Stage::GetSize() const
   return mSize;
 }
 
-void Stage::SetTopMargin( unsigned int margin )
+void Stage::SetTopMargin( uint32_t margin )
 {
   if (mTopMargin == margin)
   {
@@ -266,7 +266,7 @@ void Stage::SetTopMargin( unsigned int margin )
   mTopMargin = margin;
 
   mSize.width = mSurfaceSize.width;
-  mSize.height = mSurfaceSize.height - mTopMargin;
+  mSize.height = mSurfaceSize.height - static_cast<float>( mTopMargin );
 
   // Adjust the camera height to allow for top-margin
   SetDefaultCameraPosition();
@@ -304,12 +304,12 @@ CameraActor& Stage::GetDefaultCameraActor()
   return *mDefaultCamera;
 }
 
-unsigned int Stage::GetLayerCount() const
+uint32_t Stage::GetLayerCount() const
 {
   return mLayerList->GetLayerCount();
 }
 
-Dali::Layer Stage::GetLayer( unsigned int depth ) const
+Dali::Layer Stage::GetLayer( uint32_t depth ) const
 {
   return Dali::Layer(mLayerList->GetLayer( depth ));
 }
@@ -418,13 +418,13 @@ void Stage::SetViewMode( ViewMode viewMode )
 
         mLeftCamera->SetOrientation( -Dali::ANGLE_90, Vector3::ZAXIS );
         mLeftCamera->SetPosition( Vector3( stereoBase, 0.0f, 0.0f ) );
-        mLeftRenderTask.SetViewport( Viewport(0, mSize.height * 0.5f, mSize.width, mSize.height * 0.5f) );
+        mLeftRenderTask.SetViewport( Viewport(0, static_cast<int32_t>( mSize.height * 0.5f ), static_cast<int32_t>( mSize.width ), static_cast<int32_t>( mSize.height * 0.5f ) ) ); // truncated
 
-        mRightCamera->SetPerspectiveProjection( mSize, Vector2( 0.0,  -stereoBase) );
+        mRightCamera->SetPerspectiveProjection( mSize, Vector2( 0.0,  -stereoBase ) );
         mRightCamera->SetAspectRatio( aspect );
         mRightCamera->SetOrientation( -Dali::ANGLE_90, Vector3::ZAXIS );
         mRightCamera->SetPosition( Vector3(-stereoBase, 0.0f, 0.0f ) );
-        mRightRenderTask.SetViewport( Viewport(0, 0, mSize.width, mSize.height * 0.5f ) );
+        mRightRenderTask.SetViewport( Viewport(0, 0, static_cast<int32_t>( mSize.width ), static_cast<int32_t>( mSize.height * 0.5f ) ) ); // truncated
 
         break;
       }
@@ -440,13 +440,13 @@ void Stage::SetViewMode( ViewMode viewMode )
         mLeftCamera->SetFieldOfView( fov );
         mLeftCamera->SetOrientation( Dali::ANGLE_0, Vector3::ZAXIS );
         mLeftCamera->SetPosition( Vector3( stereoBase, 0.0f, 0.0f ) );
-        mLeftRenderTask.SetViewport( Viewport(0, 0, mSize.width * 0.5f, mSize.height ) );
+        mLeftRenderTask.SetViewport( Viewport(0, 0, static_cast<int32_t>( mSize.width * 0.5f ), static_cast<int32_t>( mSize.height ) ) ); // truncated
 
         mRightCamera->SetPerspectiveProjection( Size( mSize.x * 0.5f, mSize.y ), Vector2(-stereoBase,0.0f) );
         mRightCamera->SetFieldOfView( fov );
         mRightCamera->SetOrientation( Dali::ANGLE_0, Vector3::ZAXIS );
         mRightCamera->SetPosition( Vector3( -stereoBase, 0.0f, 0.0f ) );
-        mRightRenderTask.SetViewport( Viewport(mSize.width * 0.5f, 0, mSize.width * 0.5f, mSize.height ) );
+        mRightRenderTask.SetViewport( Viewport( static_cast<int32_t>( mSize.width * 0.5f ), 0, static_cast<int32_t>( mSize.width * 0.5f ), static_cast<int32_t>( mSize.height ) ) ); // truncated
 
         break;
       }
@@ -779,7 +779,7 @@ Integration::RenderController& Stage::GetRenderController()
   return mRenderController;
 }
 
-unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
+uint32_t* Stage::ReserveMessageSlot( uint32_t size, bool updateScene )
 {
   return mUpdateManager.ReserveMessageSlot( size, updateScene );
 }

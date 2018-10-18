@@ -28,8 +28,8 @@ namespace SceneGraph
 {
 
 #ifdef DEBUG_ENABLED
-  unsigned int ConstraintBase::mCurrentInstanceCount = 0;
-  unsigned int ConstraintBase::mTotalInstanceCount   = 0;
+  uint32_t ConstraintBase::mCurrentInstanceCount = 0;
+  uint32_t ConstraintBase::mTotalInstanceCount   = 0;
 #endif
 
 ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet, RemoveAction removeAction )
@@ -62,7 +62,7 @@ ConstraintBase::~ConstraintBase()
 #endif
 }
 
-unsigned int ConstraintBase::GetCurrentInstanceCount()
+uint32_t ConstraintBase::GetCurrentInstanceCount()
 {
 #ifdef DEBUG_ENABLED
   return mCurrentInstanceCount;
@@ -71,7 +71,7 @@ unsigned int ConstraintBase::GetCurrentInstanceCount()
 #endif
 }
 
-unsigned int ConstraintBase::GetTotalInstanceCount()
+uint32_t ConstraintBase::GetTotalInstanceCount()
 {
 #ifdef DEBUG_ENABLED
   return mTotalInstanceCount;

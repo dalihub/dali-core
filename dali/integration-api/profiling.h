@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstddef>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -48,20 +49,20 @@ DALI_CORE_API void EnableProfiling( ProfilingType type );
 namespace Profiling
 {
 
-DALI_CORE_API extern const int ANIMATION_MEMORY_SIZE;    ///< Total size of animation and associated internal objects
-DALI_CORE_API extern const int CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
-DALI_CORE_API extern const int ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
-DALI_CORE_API extern const int CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
-DALI_CORE_API extern const int IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
-DALI_CORE_API extern const int LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
-DALI_CORE_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
+DALI_CORE_API extern const std::size_t ANIMATION_MEMORY_SIZE;    ///< Total size of animation and associated internal objects
+DALI_CORE_API extern const std::size_t CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
+DALI_CORE_API extern const std::size_t ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
+DALI_CORE_API extern const std::size_t CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
+DALI_CORE_API extern const std::size_t IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
+DALI_CORE_API extern const std::size_t LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
+DALI_CORE_API extern const std::size_t IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
 
-DALI_CORE_API extern const int RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
-DALI_CORE_API extern const int GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
-DALI_CORE_API extern const int PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
-DALI_CORE_API extern const int TEXTURE_SET_MEMORY_SIZE;     ///< Total size of TextureSet and associated internal objects
-DALI_CORE_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of Sampler and associated internal objects
-DALI_CORE_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of shader and associated internal objects
+DALI_CORE_API extern const std::size_t RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
+DALI_CORE_API extern const std::size_t GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
+DALI_CORE_API extern const std::size_t PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
+DALI_CORE_API extern const std::size_t TEXTURE_SET_MEMORY_SIZE;     ///< Total size of TextureSet and associated internal objects
+DALI_CORE_API extern const std::size_t SAMPLER_MEMORY_SIZE;     ///< Total size of Sampler and associated internal objects
+DALI_CORE_API extern const std::size_t SHADER_MEMORY_SIZE;     ///< Total size of shader and associated internal objects
 } // namespace Profiling
 
 } // namespace Integration

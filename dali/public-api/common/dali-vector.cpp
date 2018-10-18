@@ -115,13 +115,13 @@ void VectorBase::Swap( VectorBase& vector )
   std::swap( mData, vector.mData );
 }
 
-void VectorBase::Erase( char* address, SizeType elementSize )
+void VectorBase::Erase( uint8_t* address, SizeType elementSize )
 {
   // erase can be called on an unallocated vector
   if( mData )
   {
-    char* startAddress = address + elementSize;
-    const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
+    uint8_t* startAddress = address + elementSize;
+    const uint8_t* endAddress = reinterpret_cast< uint8_t* >( mData ) + Count() * elementSize;
     SizeType numberOfBytes = endAddress - startAddress;
     // addresses overlap so use memmove
     memmove( address, startAddress, numberOfBytes );
@@ -129,14 +129,14 @@ void VectorBase::Erase( char* address, SizeType elementSize )
   }
 }
 
-char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
+uint8_t* VectorBase::Erase( uint8_t* first, uint8_t* last, SizeType elementSize )
 {
-  char* next = NULL;
+  uint8_t* next = NULL;
 
   if( mData )
   {
-    char* startAddress = last;
-    const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
+    uint8_t* startAddress = last;
+    const uint8_t* endAddress = reinterpret_cast< uint8_t* >( mData ) + Count() * elementSize;
     SizeType numberOfBytes = endAddress - startAddress;
     // addresses overlap so use memmove
     memmove( first, startAddress, numberOfBytes );
@@ -148,7 +148,7 @@ char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
   return next;
 }
 
-void VectorBase::CopyMemory( char* destination, const char* source, size_t numberOfBytes )
+void VectorBase::CopyMemory( uint8_t* destination, const uint8_t* source, size_t numberOfBytes )
 {
   if( ( ( source < destination ) && ( source + numberOfBytes > destination ) ) ||
       ( ( destination < source ) && ( destination + numberOfBytes > source ) ) )

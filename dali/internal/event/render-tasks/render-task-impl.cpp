@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,8 +227,8 @@ Vector2 RenderTask::GetCurrentViewportSize() const
 
 void RenderTask::SetViewport( const Viewport& viewport )
 {
-  SetViewportPosition(Vector2(viewport.x, viewport.y));
-  SetViewportSize(Vector2(viewport.width, viewport.height));
+  SetViewportPosition( Vector2( static_cast<float>( viewport.x ), static_cast<float>( viewport.y ) ) );
+  SetViewportSize( Vector2( static_cast<float>( viewport.width ), static_cast<float>( viewport.height ) ) );
 }
 
 void RenderTask::GetViewport( Viewport& viewPort ) const
@@ -250,8 +250,8 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
       {
         Vector2 size( stage->GetSize() );
         viewPort.x = viewPort.y = 0;
-        viewPort.width = size.width;
-        viewPort.height = size.height;
+        viewPort.width = static_cast<int32_t>( size.width ); // truncated
+        viewPort.height = static_cast<int32_t>( size.height ); // truncated
       }
     }
   }
@@ -259,10 +259,10 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
   {
     const Vector2& position = mSceneObject->GetViewportPosition(bufferIndex);
     const Vector2& size = mSceneObject->GetViewportSize(bufferIndex);
-    viewPort.x = position.x;
-    viewPort.y = position.y;
-    viewPort.width = size.width;
-    viewPort.height = size.height;
+    viewPort.x = static_cast<int32_t>( position.x ); // truncated
+    viewPort.y = static_cast<int32_t>( position.y ); // truncated
+    viewPort.width = static_cast<int32_t>( size.width ); // truncated
+    viewPort.height = static_cast<int32_t>( size.height ); // truncated
   }
 }
 
@@ -342,7 +342,7 @@ bool RenderTask::GetCullMode() const
   return mCullMode;
 }
 
-void RenderTask::SetRefreshRate( unsigned int refreshRate )
+void RenderTask::SetRefreshRate( uint32_t refreshRate )
 {
   DALI_LOG_TRACE_METHOD_FMT(gLogRender, "this:%p  rate:%d\n", this, refreshRate);
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::SetRefreshRate(this:%p, %d)\n", this, refreshRate);
@@ -358,7 +358,7 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
   }
 }
 
-unsigned int RenderTask::GetRefreshRate() const
+uint32_t RenderTask::GetRefreshRate() const
 {
   return mRefreshRate;
 }
@@ -407,8 +407,8 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
         Viewport viewport;
         Vector2 size( stage->GetSize() );
         viewport.x = viewport.y = 0;
-        viewport.width = size.width;
-        viewport.height = size.height;
+        viewport.width = static_cast<int32_t>( size.width ); // truncated
+        viewport.height = static_cast<int32_t>( size.height ); // truncated
 
         float localX, localY;
         inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
@@ -456,10 +456,10 @@ bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, floa
   bool ok = ProjectFull(pos,
                         cam->GetViewMatrix(),
                         cam->GetProjectionMatrix(),
-                        viewport.x,
-                        viewport.y,
-                        viewport.width,
-                        viewport.height,
+                        static_cast<float>( viewport.x ), // truncated
+                        static_cast<float>( viewport.y ), // truncated
+                        static_cast<float>( viewport.width ), // truncated
+                        static_cast<float>( viewport.height ), // truncated
                         viewportPosition);
   if(ok)
   {
@@ -511,7 +511,7 @@ void RenderTask::DiscardSceneObject()
  ********************************   PROPERTY METHODS   **************************
  ********************************************************************************/
 
-unsigned int RenderTask::GetDefaultPropertyCount() const
+uint32_t RenderTask::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
 }
@@ -820,7 +820,7 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty( Property::Inde
 bool RenderTask::HasFinished()
 {
   bool finished = false;
-  const unsigned int counter = mSceneObject->GetRenderedOnceCounter();
+  const uint32_t counter = mSceneObject->GetRenderedOnceCounter();
 
   if( mRefreshOnceCounter < counter )
   {

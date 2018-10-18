@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ struct ImageAttributes::ImageAttributesImpl
     return *this;
   }
 
-  unsigned int  width : 16;       ///< image width in pixels
-  unsigned int  height : 16;      ///< image height in pixels
+  uint16_t  width;       ///< image width in pixels
+  uint16_t  height;      ///< image height in pixels
   ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
   FilterMode    filtering : 4;    ///< filtering option. Box is the default
   bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
@@ -97,16 +97,16 @@ ImageAttributes::~ImageAttributes()
   delete impl;
 }
 
-void ImageAttributes::SetSize(unsigned int width, unsigned int height)
+void ImageAttributes::SetSize(uint32_t width, uint32_t height)
 {
-  impl->width = width;
-  impl->height = height;
+  impl->width = static_cast<uint16_t>( width ); // truncated
+  impl->height = static_cast<uint16_t>( height ); // truncated
 }
 
 void ImageAttributes::SetSize( const Size& size )
 {
-  impl->width = size.width;
-  impl->height = size.height;
+  impl->width = static_cast<uint16_t>( size.width ); // truncated
+  impl->height = static_cast<uint16_t>( size.height ); // truncated
 }
 
 void ImageAttributes::SetScalingMode( ScalingMode scale )
@@ -133,12 +133,12 @@ void ImageAttributes::Reset( ImageDimensions dimensions, ScalingMode scaling, Fi
   impl->mOrientationCorrection = orientationCorrection;
 }
 
-unsigned int ImageAttributes::GetWidth() const
+uint32_t ImageAttributes::GetWidth() const
 {
   return impl->width;
 }
 
-unsigned int ImageAttributes::GetHeight() const
+uint32_t ImageAttributes::GetHeight() const
 {
   return impl->height;
 }
@@ -166,14 +166,6 @@ bool ImageAttributes::GetOrientationCorrection() const
 ImageAttributes ImageAttributes::New()
 {
   return ImageAttributes();
-}
-
-ImageAttributes ImageAttributes::New(unsigned int imageWidth, unsigned int imageHeight)
-{
-  ImageAttributes attributes;
-  attributes.impl->width = imageWidth;
-  attributes.impl->height = imageHeight;
-  return attributes;
 }
 
 /**

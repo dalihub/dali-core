@@ -50,7 +50,7 @@ Dali::Scripting::StringEnum ShaderHintsTable[] =
     { "MODIFIES_GEOMETRY",        Dali::Shader::Hint::MODIFIES_GEOMETRY}
   };
 
-const unsigned int ShaderHintsTableSize = sizeof( ShaderHintsTable ) / sizeof( ShaderHintsTable[0] );
+const uint32_t ShaderHintsTableSize = static_cast<uint32_t>( sizeof( ShaderHintsTable ) / sizeof( ShaderHintsTable[0] ) );
 
 BaseHandle Create()
 {

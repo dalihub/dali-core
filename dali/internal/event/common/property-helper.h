@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h>
@@ -50,7 +53,7 @@ struct PropertyDetails
  */
 #define DALI_PROPERTY_TABLE_BEGIN const Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
 #ifdef DEBUG_ENABLED
-#define DALI_PROPERTY_TABLE_END( startIndex )   }; const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails ); \
+#define DALI_PROPERTY_TABLE_END( startIndex )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails ) ); \
   struct PROPERTY_CHECK \
   { \
     PROPERTY_CHECK() \
@@ -68,7 +71,7 @@ struct PropertyDetails
   }; \
   static PROPERTY_CHECK PROPERTY_CHECK_INSTANCE;
 #else
-#define DALI_PROPERTY_TABLE_END( startIndex )   }; const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails );
+#define DALI_PROPERTY_TABLE_END( startIndex )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails ) );
 #endif
 #ifdef DEBUG_ENABLED
 #define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, Dali::Property::type, writable, animatable, constraint, index },
@@ -88,7 +91,7 @@ struct PropertyDetails
  *
  * @return true if strings are the same
  */
-bool CompareTokens( const char * first, const char * second, size_t& size );
+bool CompareTokens( const char * first, const char * second, uint32_t& size );
 
 
 /**

@@ -164,7 +164,7 @@ Property::Value KeyFrames::GetLastKeyFrameValue() const
 {
   Property::Value value;
 
-  unsigned int noOfKeyFrames = mKeyFrames->GetNumberOfKeyFrames();
+  std::size_t noOfKeyFrames = mKeyFrames->GetNumberOfKeyFrames();
   if( noOfKeyFrames )
   {
     mKeyFrames->GetKeyFrameAsValue( noOfKeyFrames - 1, value );

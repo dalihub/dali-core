@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace Dali
 namespace Internal
 {
 
-bool CompareTokens( const char * first, const char * second, size_t& size )
+bool CompareTokens( const char * first, const char * second, uint32_t& size )
 {
   size = 0;
   while( ( *first != '\0' ) && ( *second != '\0' ) && ( *first != ',') && ( *second != ',') )
@@ -43,12 +43,12 @@ bool CompareTokens( const char * first, const char * second, size_t& size )
 
     if( ( 'A' <= ca ) && ( ca <= 'Z') )
     {
-      ca = ca + ( 'a' - 'A' );
+      ca = static_cast<char>( ca + ( 'a' - 'A' ) ); // don't expect overflow
     }
 
     if( ( 'A' <= cb ) && ( cb <= 'Z') )
     {
-      cb = cb + ( 'a' - 'A' );
+      cb = static_cast<char>( cb + ( 'a' - 'A' ) ); // don't expect overflow
     }
 
     if( ca != cb )

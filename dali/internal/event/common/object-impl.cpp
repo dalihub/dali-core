@@ -135,22 +135,22 @@ bool Object::Supports( Capability capability ) const
   return (capability & SUPPORTED_CAPABILITIES);
 }
 
-unsigned int Object::GetPropertyCount() const
+uint32_t Object::GetPropertyCount() const
 {
-  unsigned int count = GetDefaultPropertyCount();
+  uint32_t count = GetDefaultPropertyCount();
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Default Properties: %d\n", count );
 
   const TypeInfo* typeInfo( GetTypeInfo() );
   if ( typeInfo )
   {
-    unsigned int manual( typeInfo->GetPropertyCount() );
+    uint32_t manual( typeInfo->GetPropertyCount() );
     count += manual;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Manual Properties:  %d\n", manual );
   }
 
-  unsigned int custom( mCustomProperties.Count() );
+  uint32_t custom = static_cast<uint32_t>( mCustomProperties.Count() );
   count += custom;
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Custom Properties:  %d\n", custom );
 
@@ -779,10 +779,6 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     // queue a message to add the property
     InstallCustomPropertyMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *scenePropertyOwner, newProperty ); // Message takes ownership
 
-    // notify the derived class (optional) method in case it needs to do some more work on the new property
-    // note! have to use the local pointer as OwnerPointer now points to NULL as it handed over its ownership
-    NotifyScenePropertyInstalled( *property, name, index );
-
     return index;
   }
   else
@@ -830,13 +826,13 @@ Property::Index Object::RegisterProperty( const std::string& name, Property::Ind
 
     if( Property::ANIMATABLE == accessMode )
     {
-      index = RegisterSceneGraphProperty( name, key, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue );
+      index = RegisterSceneGraphProperty( name, key, PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() ), propertyValue );
       AddUniformMapping( index, name );
     }
     else
     {
       // Add entry to the property lookup
-      index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+      index = PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() );
 
       CustomPropertyMetadata* customProperty = new CustomPropertyMetadata( name, propertyValue, accessMode );
 
@@ -1417,7 +1413,7 @@ void Object::RemoveConstraints()
   }
 }
 
-void Object::RemoveConstraints( unsigned int tag )
+void Object::RemoveConstraints( uint32_t tag )
 {
   // guard against constraint sending messages during core destruction
   if( mConstraints && Stage::IsInstalled() )

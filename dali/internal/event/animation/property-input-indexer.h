@@ -159,7 +159,7 @@ public:
 
 public:
 
-  unsigned int mBufferIndex;
+  BufferIndex mBufferIndex;
   const AccessorType* mInput;
 };
 

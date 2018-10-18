@@ -139,12 +139,12 @@ public:
    /**
     * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
     */
-   void SetIndexedDrawFirstElement( size_t firstElement );
+   void SetIndexedDrawFirstElement( uint32_t firstElement );
 
    /**
     * @copydoc Dali::Renderer::SetIndexedDrawElementsCount
     */
-   void SetIndexedDrawElementsCount( size_t elementsCount );
+   void SetIndexedDrawElementsCount( uint32_t elementsCount );
 
    /**
     * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -317,8 +317,8 @@ private: // data
 
   int                                 mDepthIndex;
 
-  size_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
-  size_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
+  uint32_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
+  uint32_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
 
   Render::Renderer::StencilParameters mStencilParameters;            ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask

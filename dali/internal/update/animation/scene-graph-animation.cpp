@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,12 @@ namespace Internal
 namespace SceneGraph
 {
 
-Animation* Animation::New( float durationSeconds, float speedFactor, const Vector2& playRange, int loopCount, EndAction endAction, EndAction disconnectAction )
+Animation* Animation::New( float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction )
 {
   return new ( gAnimationMemoryPool.AllocateRawThreadSafe() ) Animation( durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction );
 }
 
-Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, int loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
+Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
 : mPlayRange( playRange ),
   mDurationSeconds( durationSeconds ),
   mDelaySeconds( 0.0f ),
@@ -105,7 +105,7 @@ void Animation::SetProgressNotification( float progress )
   }
 }
 
-void Animation::SetLoopCount(int loopCount)
+void Animation::SetLoopCount(int32_t loopCount)
 {
   mLoopCount = loopCount;
   mCurrentLoop = 0;
@@ -316,7 +316,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
   if (mState == Playing)
   {
     // Sign value of speed factor. It can optimize many arithmetic comparision
-    int signSpeedFactor = ( mSpeedFactor < 0.0f ) ? -1 : 1;
+    float signSpeedFactor = ( mSpeedFactor < 0.0f ) ? -1.f : 1.f;
 
     // If there is delay time before Animation starts, wait the Animation until mDelaySeconds.
     if( mDelaySeconds > 0.0f )

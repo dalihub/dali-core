@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -653,8 +653,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mGlInternalFormat( GL_RGB ),
   mGlFormat( GL_RGB ),
   mPixelDataType( GL_UNSIGNED_BYTE ),
-  mWidth( nativeImageInterface->GetWidth() ),
-  mHeight( nativeImageInterface->GetHeight() ),
+  mWidth( static_cast<uint16_t >( nativeImageInterface->GetWidth() ) ), // ignoring overflow, not happening in practice
+  mHeight( static_cast<uint16_t >( nativeImageInterface->GetHeight() ) ), // ignoring overflow, not happening in practice
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
@@ -742,14 +742,14 @@ void Texture::Initialize(Context& context)
     {
       if( !mIsCompressed )
       {
-        for( unsigned int i(0); i<6; ++i )
+        for( uint32_t i(0); i<6; ++i )
         {
           context.TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, mGlFormat, mPixelDataType, 0 );
         }
       }
       else
       {
-        for( unsigned int i(0); i<6; ++i )
+        for( uint32_t i(0); i<6; ++i )
         {
           context.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, mWidth, mHeight, 0, 0, 0 );
         }
@@ -764,10 +764,10 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   DALI_ASSERT_ALWAYS( mNativeImage == NULL );
 
   //Get pointer to the data of the PixelData object
-  unsigned char* buffer( pixelData->GetBuffer() );
+  uint8_t* buffer( pixelData->GetBuffer() );
 
   //This buffer is only used if manually converting from RGB to RGBA
-  unsigned char* tempBuffer(0);
+  uint8_t* tempBuffer(0);
 
   //Retrieves the pixel data element type, the gl format and gl internal format of the data contained in the PixelData object.
   GLenum glFormat;
@@ -792,9 +792,9 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
 
   if( convert )
   {
-    size_t dataSize = static_cast< size_t >( params.width ) * params.height;
-    tempBuffer = new unsigned char[dataSize*4u];
-    for( size_t i(0u); i<dataSize; i++ )
+    uint32_t dataSize = static_cast< uint32_t >( params.width ) * params.height;
+    tempBuffer = new uint8_t[dataSize*4u];
+    for( uint32_t i = 0u; i < dataSize; ++i )
     {
       tempBuffer[i*4u]   = buffer[i*3u];
       tempBuffer[i*4u+1] = buffer[i*3u+1];
@@ -826,7 +826,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
     }
     else
     {
-      context.CompressedTexImage2D( target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, pixelData->GetBufferSize(), buffer );
+      context.CompressedTexImage2D( target, params.mipmap, mGlInternalFormat, params.width, params.height, 0, static_cast<GLsizei>( pixelData->GetBufferSize() ), buffer );
     }
   }
   else
@@ -842,7 +842,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
     {
       context.CompressedTexSubImage2D( target, params.mipmap,
                                        params.xOffset, params.yOffset, params.width, params.height,
-                                       glFormat, pixelData->GetBufferSize(), buffer );
+                                       glFormat, static_cast<GLsizei>( pixelData->GetBufferSize() ), buffer );
     }
   }
 
@@ -851,7 +851,7 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   delete[] tempBuffer;
 }
 
-bool Texture::Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler )
+bool Texture::Bind( Context& context, uint32_t textureUnit, Render::Sampler* sampler )
 {
   if( mNativeImage && mId == 0 )
   {

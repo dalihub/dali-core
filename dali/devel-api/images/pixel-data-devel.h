@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/images/pixel-data.h>
+// EXTERNAL INCLUDES
+#include <cstdint>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
 
 namespace Dali
@@ -39,12 +40,12 @@ namespace DevelPixelData
  */
 struct PixelDataBuffer
 {
-  unsigned char* buffer;
-  unsigned int bufferSize;
+  uint8_t* buffer;
+  uint32_t bufferSize;
   PixelData::ReleaseFunction releaseFunction;
 
-  PixelDataBuffer(  unsigned char* buffer,
-                    unsigned int bufferSize,
+  PixelDataBuffer(  uint8_t* buffer,
+                    uint32_t bufferSize,
                     PixelData::ReleaseFunction releaseFunction )
   : buffer(buffer),
     bufferSize(bufferSize),

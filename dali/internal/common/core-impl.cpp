@@ -56,7 +56,7 @@ using Dali::Internal::SceneGraph::RenderQueue;
 namespace
 {
 // The Update for frame N+1 may be processed whilst frame N is being rendered.
-const unsigned int MAXIMUM_UPDATE_COUNT = 2u;
+const uint32_t MAXIMUM_UPDATE_COUNT = 2u;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE");
@@ -187,30 +187,30 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized( unsigned int width, unsigned int height )
+void Core::SurfaceResized( uint32_t width, uint32_t height )
 {
-  mStage->SurfaceResized( width, height );
+  mStage->SurfaceResized( static_cast<float>( width ), static_cast<float>( height ) );
 
   // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 size = mStage->GetSize();
-  mRelayoutController->SetStageSize( size.width, size.height );
+  mRelayoutController->SetStageSize( static_cast<uint32_t>( size.width ), static_cast<uint32_t>( size.height ) ); // values get truncated
 }
 
-void Core::SetTopMargin( unsigned int margin )
+void Core::SetTopMargin( uint32_t margin )
 {
   mStage->SetTopMargin( margin );
 
   // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 size = mStage->GetSize();
-  mRelayoutController->SetStageSize( size.width, size.height );
+  mRelayoutController->SetStageSize( static_cast<uint32_t>( size.width ), static_cast<uint32_t>( size.height ) ); // values get truncated
 }
 
-void Core::SetDpi( unsigned int dpiHorizontal, unsigned int dpiVertical )
+void Core::SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical )
 {
-  mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
+  mStage->SetDpi( Vector2( static_cast<float>( dpiHorizontal ), static_cast<float>( dpiVertical ) ) );
 }
 
-void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
@@ -304,7 +304,7 @@ void Core::ProcessEvents()
   mProcessingEvent = false;
 }
 
-unsigned int Core::GetMaximumUpdateCount() const
+uint32_t Core::GetMaximumUpdateCount() const
 {
   return MAXIMUM_UPDATE_COUNT;
 }

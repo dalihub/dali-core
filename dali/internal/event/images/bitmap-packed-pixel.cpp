@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ BitmapPackedPixel::BitmapPackedPixel( ResourcePolicy::Discardable discardable, D
 }
 
 // use power of two bufferWidth and bufferHeight for better performance
-Dali::Integration::PixelBuffer* BitmapPackedPixel::ReserveBuffer(Pixel::Format pixelFormat,
-                                    unsigned int  width,
-                                    unsigned int  height,
-                                    unsigned int  bufferWidth,
-                                    unsigned int  bufferHeight)
+Dali::Integration::PixelBuffer* BitmapPackedPixel::ReserveBuffer( Pixel::Format pixelFormat,
+                                                                  uint32_t width,
+                                                                  uint32_t height,
+                                                                  uint32_t bufferWidth,
+                                                                  uint32_t bufferHeight )
 {
   // delete existing buffer
   DeletePixelBuffer();
@@ -55,20 +55,20 @@ Dali::Integration::PixelBuffer* BitmapPackedPixel::ReserveBuffer(Pixel::Format p
   Initialize(pixelFormat, width, height, bufferWidth, bufferHeight);
 
   //allocate buffer
-  unsigned int bufSize = mBufferWidth * mBufferHeight * mBytesPerPixel;
+  uint32_t bufSize = mBufferWidth * mBufferHeight * mBytesPerPixel;
 
   mData = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufSize) );
 
   return mData;
 }
 
-void BitmapPackedPixel::AssignBuffer(Pixel::Format pixelFormat,
-                                     Dali::Integration::PixelBuffer* buffer,
-                                     std::size_t bufferSize,
-                                     unsigned int width,
-                                     unsigned int height,
-                                     unsigned int bufferWidth,
-                                     unsigned int bufferHeight)
+void BitmapPackedPixel::AssignBuffer( Pixel::Format pixelFormat,
+                                      Dali::Integration::PixelBuffer* buffer,
+                                      uint32_t bufferSize,
+                                      uint32_t width,
+                                      uint32_t height,
+                                      uint32_t bufferWidth,
+                                      uint32_t bufferHeight)
 {
   DALI_ASSERT_DEBUG( buffer );
 
@@ -91,21 +91,21 @@ void BitmapPackedPixel::TestForTransparency()
 
   if(HasAlphaChannel())
   {
-    unsigned char* pixelBuffer=GetBuffer();
+    uint8_t* pixelBuffer=GetBuffer();
     if(pixelBuffer != NULL)
     {
-      unsigned char* row = pixelBuffer;
+      uint8_t* row = pixelBuffer;
 
-      int byte; int bits;
+      int32_t byte; int32_t bits;
       Pixel::GetAlphaOffsetAndMask(mPixelFormat, byte, bits);
 
-      int stride       = mBufferWidth * mBytesPerPixel;
-      int pixelsPerRow = mImageWidth;
+      int32_t stride       = mBufferWidth * mBytesPerPixel;
+      int32_t pixelsPerRow = mImageWidth;
 
-      for(size_t j=0; j<mImageHeight; j++)
+      for(uint32_t j=0; j<mImageHeight; j++)
       {
-        unsigned char* pixels = row;
-        for(int i=0; i<pixelsPerRow; i++)
+        uint8_t* pixels = row;
+        for(int32_t i=0; i<pixelsPerRow; i++)
         {
           if((pixels[byte] & bits) != bits)
           {
@@ -127,10 +127,10 @@ BitmapPackedPixel::~BitmapPackedPixel()
 }
 
 void BitmapPackedPixel::Initialize( Pixel::Format pixelFormat,
-                          unsigned int width,
-                          unsigned int height,
-                          unsigned int bufferWidth,
-                          unsigned int bufferHeight)
+                                    uint32_t width,
+                                    uint32_t height,
+                                    uint32_t bufferWidth,
+                                    uint32_t bufferHeight)
 {
   Dali::Integration::Bitmap::Initialize(pixelFormat, width, height);
   mBufferWidth  = (bufferWidth  != 0) ? bufferWidth  : width;
@@ -139,7 +139,7 @@ void BitmapPackedPixel::Initialize( Pixel::Format pixelFormat,
   DALI_ASSERT_DEBUG(mBufferWidth >= mImageWidth && mBufferHeight >= mImageHeight);
 }
 
-unsigned int BitmapPackedPixel::GetBufferStride() const
+uint32_t BitmapPackedPixel::GetBufferStride() const
 {
   return mBufferWidth*mBytesPerPixel;
 }

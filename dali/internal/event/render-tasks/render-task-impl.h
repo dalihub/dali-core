@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,12 +208,12 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetRefreshRate()
    */
-  void SetRefreshRate( unsigned int refreshRate );
+  void SetRefreshRate( uint32_t refreshRate );
 
   /**
    * @copydoc Dali::RenderTask::GetRefreshRate()
    */
-  unsigned int GetRefreshRate() const;
+  uint32_t GetRefreshRate() const;
 
   /**
    * Check if the render-task is hittable. If render task is offscreen, the screen coordinates may be translated.
@@ -270,7 +270,7 @@ public: // Implementation of Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
    */
-  virtual unsigned int GetDefaultPropertyCount() const;
+  virtual uint32_t GetDefaultPropertyCount() const;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
@@ -470,9 +470,9 @@ private:
   Vector2 mViewportPosition; ///< The cached viewport position
   Vector2 mViewportSize;     ///< The cached viewport size
 
-  unsigned int mRefreshRate; ///< Determines how often the task is processed.
+  uint32_t mRefreshRate; ///< Determines how often the task is processed.
 
-  unsigned int mRefreshOnceCounter;
+  uint32_t mRefreshOnceCounter;
 
   FrameBufferImagePtr mFrameBufferImage;  ///< Optional off-screen render target.
   FrameBufferPtr  mFrameBuffer;

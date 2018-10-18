@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ void RenderMessageDispatcher::AddRenderer( OwnerPointer< Render::Renderer >& ren
   typedef MessageValue1< RenderManager, OwnerPointer< Render::Renderer > > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  uint32_t* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderer, renderer );
@@ -61,7 +61,7 @@ void RenderMessageDispatcher::RemoveRenderer( Render::Renderer& renderer )
   typedef MessageValue1< RenderManager, Render::Renderer* > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  uint32_t* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mRenderManager, &RenderManager::RemoveRenderer, &renderer );
@@ -72,7 +72,7 @@ void RenderMessageDispatcher::AddRenderTracker( Render::RenderTracker& renderTra
   typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  uint32_t* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mRenderManager, &RenderManager::AddRenderTracker, &renderTracker );
@@ -83,7 +83,7 @@ void RenderMessageDispatcher::RemoveRenderTracker( Render::RenderTracker& render
   typedef MessageValue1< RenderManager, Render::RenderTracker* > DerivedType;
 
   // Reserve some memory inside the render queue
-  unsigned int* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+  uint32_t* slot = mRenderQueue.ReserveMessageSlot( mBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mRenderManager, &RenderManager::RemoveRenderTracker, &renderTracker );

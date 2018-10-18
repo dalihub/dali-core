@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,8 +199,8 @@ NinePatchImage::NinePatchImage( const std::string& filename )
     mHeight = mBitmap->GetImageHeight();
     mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, mBitmap->GetPixelFormat(), mWidth, mHeight );
 
-    size_t bufferSize = mBitmap->GetBufferSize();
-    unsigned char* buffer = new unsigned char[bufferSize];
+    uint32_t bufferSize = mBitmap->GetBufferSize();
+    uint8_t* buffer = new uint8_t[bufferSize];
     memcpy( buffer, mBitmap->GetBuffer(), bufferSize );
     PixelDataPtr pixelData = PixelData::New( buffer, bufferSize, mWidth, mHeight, mBitmap->GetPixelFormat(), Dali::PixelData::DELETE_ARRAY );
     mTexture->Upload( pixelData );
@@ -269,13 +269,13 @@ Internal::BufferImagePtr NinePatchImage::CreateCroppedBufferImage()
     if( srcProfile )
     {
       PixelBuffer* destPixels = cropped->GetBuffer();
-      unsigned int destStride = cropped->GetBufferStride();
-      unsigned int pixelWidth = GetBytesPerPixel(pixelFormat);
+      uint32_t destStride = cropped->GetBufferStride();
+      uint32_t pixelWidth = GetBytesPerPixel(pixelFormat);
 
       PixelBuffer* srcPixels = mBitmap->GetBuffer();
-      unsigned int srcStride = srcProfile->GetBufferStride();
+      uint32_t srcStride = srcProfile->GetBufferStride();
 
-      for( unsigned int row=1; row < mHeight-1; ++row )
+      for( uint32_t row=1; row < mHeight-1; ++row )
       {
         PixelBuffer* src  = srcPixels + row*srcStride + pixelWidth;
         PixelBuffer* dest = destPixels + (row-1)*destStride;
@@ -325,15 +325,15 @@ void NinePatchImage::ParseBorders()
       testValue = 0;           // Black == stretch
     }
 
-    unsigned int pixelWidth = GetBytesPerPixel( pixelFormat );
+    uint32_t pixelWidth = GetBytesPerPixel( pixelFormat );
     const PixelBuffer* srcPixels = mBitmap->GetBuffer();
-    unsigned int srcStride = srcProfile->GetBufferStride();
+    uint32_t srcStride = srcProfile->GetBufferStride();
 
     //TOP
     const PixelBuffer* top = srcPixels + pixelWidth;
-    unsigned int index = 0;
-    unsigned int width = mBitmap->GetImageWidth();
-    unsigned int height = mBitmap->GetImageHeight();
+    uint32_t index = 0;
+    uint32_t width = mBitmap->GetImageWidth();
+    uint32_t height = mBitmap->GetImageHeight();
 
     for(; index < width - 2; )
     {
@@ -394,9 +394,9 @@ void NinePatchImage::ParseBorders()
   }
 }
 
-Uint16Pair NinePatchImage::ParseRange( unsigned int& index, unsigned int width, const PixelBuffer* & pixel, unsigned int pixelStride, int testByte, int testBits, int testValue )
+Uint16Pair NinePatchImage::ParseRange( uint32_t& index, uint32_t width, const PixelBuffer* & pixel, uint32_t pixelStride, int testByte, int testBits, int testValue )
 {
-  unsigned int start = 0xFFFF;
+  uint32_t start = 0xFFFF;
   for( ; index < width; ++index, pixel += pixelStride )
   {
     if( ( pixel[ testByte ] & testBits ) == testValue )
@@ -408,7 +408,7 @@ Uint16Pair NinePatchImage::ParseRange( unsigned int& index, unsigned int width, 
     }
   }
 
-  unsigned int end = width;
+  uint32_t end = width;
   for( ; index < width; ++index, pixel += pixelStride )
   {
     if( ( pixel[ testByte ] & testBits ) != testValue )

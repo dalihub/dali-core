@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ namespace
 {
 void LogWithLineNumbers( const char * source )
 {
-  unsigned int lineNumber = 0u;
-  const char *prev = source;
-  const char *ptr = prev;
+  uint32_t lineNumber = 0u;
+  const char* prev = source;
+  const char* ptr = prev;
 
   while( true )
   {
@@ -144,11 +144,11 @@ GLint Program::GetAttribLocation( AttribType type )
   return GetCustomAttributeLocation( type );
 }
 
-unsigned int Program::RegisterCustomAttribute( const std::string& name )
+uint32_t Program::RegisterCustomAttribute( const std::string& name )
 {
-  unsigned int index = 0;
+  uint32_t index = 0;
   // find the value from cache
-  for( ;index < mAttributeLocations.size(); ++index )
+  for( ;index < static_cast<uint32_t>( mAttributeLocations.size() ); ++index )
   {
     if( mAttributeLocations[ index ].first == name )
     {
@@ -161,7 +161,7 @@ unsigned int Program::RegisterCustomAttribute( const std::string& name )
   return index;
 }
 
-GLint Program::GetCustomAttributeLocation( unsigned int attributeIndex )
+GLint Program::GetCustomAttributeLocation( uint32_t attributeIndex )
 {
   // debug check that index is within name cache
   DALI_ASSERT_DEBUG( mAttributeLocations.size() > attributeIndex );
@@ -181,11 +181,11 @@ GLint Program::GetCustomAttributeLocation( unsigned int attributeIndex )
 }
 
 
-unsigned int Program::RegisterUniform( const std::string& name )
+uint32_t Program::RegisterUniform( const std::string& name )
 {
-  unsigned int index = 0;
+  uint32_t index = 0;
   // find the value from cache
-  for( ;index < mUniformLocations.size(); ++index )
+  for( ;index < static_cast<uint32_t>( mUniformLocations.size() ); ++index )
   {
     if( mUniformLocations[ index ].first == name )
     {
@@ -198,7 +198,7 @@ unsigned int Program::RegisterUniform( const std::string& name )
   return index;
 }
 
-GLint Program::GetUniformLocation( unsigned int uniformIndex )
+GLint Program::GetUniformLocation( uint32_t uniformIndex )
 {
   // debug check that index is within name cache
   DALI_ASSERT_DEBUG( mUniformLocations.size() > uniformIndex );
@@ -226,8 +226,8 @@ namespace
 struct LocationPosition
 {
   GLint uniformLocation; ///< The location of the uniform (used as an identifier)
-  int position;          ///< the position of the uniform declaration
-  LocationPosition( GLint uniformLocation, int position )
+  int32_t position;          ///< the position of the uniform declaration
+  LocationPosition( GLint uniformLocation, int32_t position )
   : uniformLocation(uniformLocation), position(position)
   {
   }
@@ -247,8 +247,8 @@ void Program::GetActiveSamplerUniforms()
   mGlAbstraction.GetProgramiv( mProgramId, GL_ACTIVE_UNIFORMS, &numberOfActiveUniforms );
   mGlAbstraction.GetProgramiv( mProgramId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformMaxNameLength );
 
-  std::vector<std::string> samplerNames;
-  std::vector<char> name(uniformMaxNameLength + 1); // Allow for null terminator
+  std::vector< std::string > samplerNames;
+  std::vector< char > name(uniformMaxNameLength + 1); // Allow for null terminator
   std::vector< LocationPosition >  samplerUniformLocations;
 
   {
@@ -283,7 +283,7 @@ void Program::GetActiveSamplerUniforms()
     {
       bool found( false );
       token = strtok_r( NULL, " ;\n", &nextPtr );
-      for( size_t i=0; i<samplerUniformLocations.size(); ++i )
+      for( uint32_t i=0; i < static_cast<uint32_t>( samplerUniformLocations.size() ); ++i )
       {
         if( samplerUniformLocations[i].position == -1 &&
             strncmp( token, samplerNames[i].c_str(), samplerNames[i].size() ) == 0 )
@@ -307,20 +307,20 @@ void Program::GetActiveSamplerUniforms()
   free( fragShader );
 
   // Re-order according to declaration order in the fragment source.
-  size_t samplerUniformCount = samplerUniformLocations.size();
+  uint32_t samplerUniformCount = static_cast<uint32_t>( samplerUniformLocations.size() );
   if( samplerUniformCount > 1 )
   {
     std::sort( samplerUniformLocations.begin(), samplerUniformLocations.end(), sortByPosition);
   }
 
   mSamplerUniformLocations.resize( samplerUniformCount );
-  for( size_t i=0; i<samplerUniformCount; ++i )
+  for( uint32_t i=0; i<samplerUniformCount; ++i )
   {
     mSamplerUniformLocations[i] = samplerUniformLocations[i].uniformLocation;
   }
 }
 
-bool Program::GetSamplerUniformLocation( unsigned int index, GLint& location  )
+bool Program::GetSamplerUniformLocation( uint32_t index, GLint& location  )
 {
   bool result = false;
   if( index < mSamplerUniformLocations.size() )
@@ -331,9 +331,9 @@ bool Program::GetSamplerUniformLocation( unsigned int index, GLint& location  )
   return result;
 }
 
-size_t Program::GetActiveSamplerCount() const
+uint32_t Program::GetActiveSamplerCount() const
 {
-  return mSamplerUniformLocations.size();
+  return static_cast<uint32_t>( mSamplerUniformLocations.size() );
 }
 
 void Program::SetUniform1i( GLint location, GLint value0 )
@@ -598,7 +598,7 @@ Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool 
 {
   // reserve space for standard attributes
   mAttributeLocations.reserve( ATTRIB_TYPE_LAST );
-  for( int i=0; i<ATTRIB_TYPE_LAST; ++i )
+  for( uint32_t i = 0; i < ATTRIB_TYPE_LAST; ++i )
   {
     RegisterCustomAttribute( gStdAttribs[i] );
   }
@@ -606,7 +606,7 @@ Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool 
   // reserve space for standard uniforms
   mUniformLocations.reserve( UNIFORM_TYPE_LAST );
   // reset built in uniform names in cache
-  for( int i = 0; i < UNIFORM_TYPE_LAST; ++i )
+  for( uint32_t i = 0; i < UNIFORM_TYPE_LAST; ++i )
   {
     RegisterUniform( gStdUniforms[ i ] );
   }
@@ -637,7 +637,7 @@ void Program::Load()
   {
     DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Using Compiled Shader, Size = %d\n", mProgramData->GetBufferSize());
 
-    CHECK_GL( mGlAbstraction, mGlAbstraction.ProgramBinary(mProgramId, mCache.ProgramBinaryFormat(), mProgramData->GetBufferData(), mProgramData->GetBufferSize()) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ProgramBinary(mProgramId, mCache.ProgramBinaryFormat(), mProgramData->GetBufferData(), static_cast<GLsizei>( mProgramData->GetBufferSize() ) ) ); // truncated
 
     CHECK_GL( mGlAbstraction, mGlAbstraction.ValidateProgram(mProgramId) );
 
@@ -821,13 +821,13 @@ void Program::FreeShaders()
 void Program::ResetAttribsUniformCache()
 {
   // reset attribute locations
-  for( unsigned i = 0; i < mAttributeLocations.size() ; ++i )
+  for( uint32_t i = 0; i < mAttributeLocations.size() ; ++i )
   {
     mAttributeLocations[ i ].second = ATTRIB_UNKNOWN;
   }
 
   // reset all gl uniform locations
-  for( unsigned int i = 0; i < mUniformLocations.size(); ++i )
+  for( uint32_t i = 0; i < mUniformLocations.size(); ++i )
   {
     // reset gl program locations and names
     mUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
@@ -838,7 +838,7 @@ void Program::ResetAttribsUniformCache()
   // reset uniform caches
   mSizeUniformCache.x = mSizeUniformCache.y = mSizeUniformCache.z = 0.f;
 
-  for( int i = 0; i < MAX_UNIFORM_CACHE_SIZE; ++i )
+  for( uint32_t i = 0; i < MAX_UNIFORM_CACHE_SIZE; ++i )
   {
     // GL initializes uniforms to 0
     mUniformCacheInt[ i ] = 0;
