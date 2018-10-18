@@ -971,17 +971,30 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
   }
 
+  const uint32_t UBO_PAGE_SIZE = 8192u;
+
+  auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
+
+  printf("Allocation: %d, Paged: %d\n", int( mUniformBlockAllocationBytes ), int(pagedAllocation ));
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
   if( mUniformBlockAllocationBytes && !mUniformBuffer[uboIndex] )
   {
-    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( mUniformBlockAllocationBytes * 2 ) );
+    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
-  else if( mUniformBlockAllocationBytes && mUniformBuffer[uboIndex]->GetSize() < mUniformBlockAllocationBytes )
+  else if( mUniformBlockAllocationBytes && (
+    mUniformBuffer[uboIndex]->GetSize() < pagedAllocation ||
+    (pagedAllocation < uint32_t(float(mUniformBuffer[uboIndex]->GetSize()) * 0.75f )) )
+    )
   {
-    mUniformBuffer[uboIndex]->Reserve( mUniformBlockAllocationBytes*2 );
+    puts("RESERVING");
+    mUniformBuffer[uboIndex]->Reserve( pagedAllocation );
   }
 
+  if( mUniformBuffer[0] && mUniformBuffer[1])
+  {
+    printf("Total UBO memory usage: current = %d, both = %d\n", int(mUniformBuffer[uboIndex]->GetSize()), int(mUniformBuffer[0]->GetSize()+mUniformBuffer[1]->GetSize()));
+  }
   mUboOffset = 0u;
 
   controller.BeginFrame();
@@ -999,6 +1012,8 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   }
 
   controller.EndFrame();
+
+  printf("Top offset: %d\n", int(mUboOffset));
 
   mCurrentFrameIndex++;
 }
