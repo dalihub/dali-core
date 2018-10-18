@@ -105,17 +105,23 @@ public:
    */
   void Clear( BufferIndex updateBufferIndex );
 
+  /**
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return true if the queues for the given buffer index are empty
+   */
+  bool IsEmpty( BufferIndex updateBufferIndex );
+
+  /**
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return size of the renderer discard queue.
+   */
+  RendererQueue::SizeType GetRendererCount( BufferIndex updateBufferIndex );
+
 private:
-
-  // Undefined
-  DiscardQueue( const DiscardQueue& );
-
-  // Undefined
-  DiscardQueue& operator=( const DiscardQueue& rhs );
+  DiscardQueue( const DiscardQueue& ) = delete;
+  DiscardQueue& operator=( const DiscardQueue& rhs ) = delete;
 
 private:
-
-  //RenderQueue& mRenderQueue; ///< Used to send GL clean-up messages for the next Render.
 
   // Messages are queued here following the current update buffer number
   OwnerContainer< Node* >      mNodeQueue[2];
