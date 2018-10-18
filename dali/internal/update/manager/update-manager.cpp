@@ -797,6 +797,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   //Clear nodes/resources which were previously discarded
+  size_t numberOfDiscardedRenderers = mImpl->discardQueue.GetRendererCount( bufferIndex );
   mImpl->discardQueue.Clear( bufferIndex );
 
   //Process Touches & Gestures
@@ -905,6 +906,13 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
         }
       }
 
+      // Pass the graphics back end the total number of renderers that were discarded this frame.
+      // This may trigger garbage collection.
+      if( numberOfDiscardedRenderers > 0 )
+      {
+        mImpl->graphics.GetController().RunGarbageCollector( numberOfDiscardedRenderers );
+      }
+
       // generate graphics objects
       PrepareRenderers( bufferIndex );
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
@@ -986,6 +994,12 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
   if ( mImpl->renderTaskWaiting )
   {
     keepUpdatingRequest |= KeepUpdating::RENDER_TASK_SYNC;
+  }
+
+  const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+  if( ! mImpl->discardQueue.IsEmpty( bufferIndex ) )
+  {
+    keepUpdatingRequest |= KeepUpdating::DISCARD_RESOURCES;
   }
 
   return keepUpdatingRequest;

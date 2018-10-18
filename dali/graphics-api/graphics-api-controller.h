@@ -155,6 +155,13 @@ public:
    */
   virtual void EnableDepthStencilBuffer() = 0;
 
+  /**
+   * @brief Inform graphics backend if renderers have been discarded.
+   *
+   * @note The graphics backend does not have to run the GC if it is not overly fragmented
+   */
+  virtual void RunGarbageCollector( size_t numberOfDiscardedRenderers ) = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

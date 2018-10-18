@@ -93,6 +93,19 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   mCameraQueue[ updateBufferIndex ].Clear();
 }
 
+bool DiscardQueue::IsEmpty( BufferIndex updateBufferIndex )
+{
+  return mNodeQueue[ updateBufferIndex ].Empty() ||
+    mShaderQueue[ updateBufferIndex ].Empty() ||
+    mRendererQueue[ updateBufferIndex ].Empty() ||
+    mCameraQueue[ updateBufferIndex ].Empty();
+}
+
+DiscardQueue::RendererQueue::SizeType DiscardQueue::GetRendererCount( BufferIndex updateBufferIndex )
+{
+  return mRendererQueue[ updateBufferIndex ].Count();
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

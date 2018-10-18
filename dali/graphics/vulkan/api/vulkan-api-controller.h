@@ -186,6 +186,8 @@ public:
 
   void EnableDepthStencilBuffer() override;
 
+  void RunGarbageCollector( size_t numberOfDiscardedRenderers ) override;
+
   // VULKAN only
 
 public:

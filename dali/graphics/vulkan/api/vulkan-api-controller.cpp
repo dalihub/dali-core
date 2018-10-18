@@ -620,6 +620,12 @@ struct Controller::Impl
     }
   }
 
+  void RunGarbageCollector( size_t numberOfDiscardedRenderers )
+  {
+    // @todo Decide what GC's to run.
+    printf(" RunGarbageCollector: %lu renderers discarded\n", numberOfDiscardedRenderers );
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
 
   Vulkan::Graphics& mGraphics;
@@ -851,6 +857,11 @@ std::unique_ptr< API::RenderCommand > Controller::AllocateRenderCommand()
 void Controller::EnableDepthStencilBuffer()
 {
   mImpl->EnableDepthStencilBuffer();
+}
+
+void Controller::RunGarbageCollector( size_t numberOfDiscardedRenderers )
+{
+  mImpl->RunGarbageCollector( numberOfDiscardedRenderers );
 }
 
 } // namespace VulkanAPI
