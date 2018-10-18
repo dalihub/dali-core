@@ -18,7 +18,6 @@
  *
  */
 
-
 // EXTERNAL INCLUDES
 #include <typeinfo>
 #include <cstdint> // uint32_t
@@ -38,6 +37,7 @@ namespace Internal DALI_INTERNAL
 {
 class TypeRegistry;
 }
+class DefaultPropertyMetadata;
 
 /**
  * @brief The TypeRegistry allows registration of type instance creation functions.
@@ -211,6 +211,17 @@ public:
    */
   TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
                     TypeInfo::CreateFunction f, bool callCreateOnInit );
+
+  /**
+   * @brief Constructor registers the type creation function.
+   *
+   * @param[in] registerType the type info for the type to be registered
+   * @param[in] baseType the base type info of registerType
+   * @param[in] f registerType instance creation function
+   * @param[in] defaultProperties the default property meta-data
+   */
+  TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
+                    TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties );
 
   /**
    * @brief Constructor registers the type creation function for a named class or type.

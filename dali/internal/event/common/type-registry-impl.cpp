@@ -89,7 +89,6 @@ size_t TypeRegistry::GetTypeNameCount() const
   return mRegistryLut.size();
 }
 
-
 std::string TypeRegistry::GetTypeName( size_t index ) const
 {
   std::string name;
@@ -102,8 +101,7 @@ std::string TypeRegistry::GetTypeName( size_t index ) const
   return name;
 }
 
-
-bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
+std::string TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
                              Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
 {
   std::string uniqueTypeName  = DemangleClassName( theTypeInfo.name() );
@@ -111,8 +109,18 @@ bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit );
 }
 
-bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
-                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
+std::string TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
+                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
+                             const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount )
+{
+  std::string uniqueTypeName  = DemangleClassName( theTypeInfo.name() );
+
+  return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount );
+}
+
+std::string TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
+                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
+                             const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount )
 {
   std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
@@ -123,11 +131,11 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
     {
       DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
       DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
-      return false;
+      return uniqueTypeName; // never actually happening due to the assert
     }
   }
 
-  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
+  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount ) ) );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 
   if( callCreateOnInit )
@@ -135,10 +143,10 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
     mInitFunctions.push_back(createInstance);
   }
 
-  return true;
+  return uniqueTypeName;
 }
 
-bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
+void TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
     Dali::CSharpTypeInfo::CreateFunction createInstance )
 {
   std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
@@ -150,14 +158,12 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
     {
       DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
       DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
-      return false;
+      return; // never actually happening due to the assert
     }
   }
 
   mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
-
-  return true;
 }
 
 void TypeRegistry::CallInitFunctions(void) const
@@ -302,15 +308,13 @@ bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string& act
 
   Dali::TypeInfo type = GetTypeInfo( object );
 
-  while( type )
+  auto&& impl = GetImplementation( type );
+  // DoActionTo recurses through base classes
+  done = impl.DoActionTo( object, actionName, properties );
+
+  if( !done )
   {
-    auto&& impl = GetImplementation( type );
-    if( impl.DoActionTo( object, actionName, properties ) )
-    {
-      done = true;
-      break;
-    }
-    type = GetTypeInfo( impl.GetBaseName() );
+    DALI_LOG_WARNING("Type '%s' cannot do action '%s'\n", type.GetName().c_str(), actionName.c_str());
   }
 
   return done;
@@ -353,6 +357,12 @@ Dali::TypeInfo TypeRegistry::GetTypeInfo(const Dali::BaseObject * const pBaseObj
   {
     const Dali::CustomActorImpl& custom = pCustom->GetImplementation();
     type = GetTypeInfo( typeid( custom ) );
+    if( !type )
+    {
+      // the most derived type is a descendant of custom actor but has not registered itself
+      // so we'll just treat it as a custom actor for now so it "inherits" all of actors properties, actions and signals
+      type = GetTypeInfo( typeid( Dali::Internal::CustomActor ) );
+    }
   }
   else
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/common/property-helper.h>
 
 namespace Dali
 {
@@ -41,7 +42,14 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "forward",       VECTOR3,   true,    false,       false,        Dali::PathConstrainer::Property::FORWARD )
 DALI_PROPERTY( "points",         ARRAY,    true,    false,       false,        Dali::PathConstrainer::Property::POINTS )
 DALI_PROPERTY( "controlPoints",  ARRAY,    true,    false,       false,        Dali::PathConstrainer::Property::CONTROL_POINTS )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, PathConstrainerDefaultProperties )
+
+BaseHandle Create()
+{
+  return Dali::PathConstrainer::New();
+}
+
+TypeRegistration mType( typeid( Dali::PathConstrainer ), typeid( Dali::Handle ), Create, PathConstrainerDefaultProperties );
 
 } //Unnamed namespace
 
@@ -58,60 +66,6 @@ PathConstrainer::PathConstrainer()
 
 PathConstrainer::~PathConstrainer()
 {
-}
-
-unsigned int PathConstrainer::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void PathConstrainer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  for ( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    indices.PushBack( i );
-  }
-}
-
-const char* PathConstrainer::GetDefaultPropertyName(Property::Index index) const
-{
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].name;
-  }
-
-  // index out of range
-  return NULL;
-}
-
-Property::Index PathConstrainer::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
-    {
-      index = i;
-      break;
-    }
-  }
-  return index;
-}
-
-Property::Type PathConstrainer::GetDefaultPropertyType(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].type;
-  }
-
-  // index out of range
-  return Property::NONE;
 }
 
 Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) const
@@ -200,36 +154,6 @@ void PathConstrainer::SetDefaultProperty( Property::Index index, const Property:
       }
     }
   }
-}
-
-bool PathConstrainer::IsDefaultPropertyWritable(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].writable;
-  }
-
-  return false;
-}
-
-bool PathConstrainer::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].animatable;
-  }
-
-  return false;
-}
-
-bool PathConstrainer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].constraintInput;
-  }
-
-  return false;
 }
 
 void PathConstrainer::Apply( Property target, Property source, const Vector2& range, const Vector2& wrap)

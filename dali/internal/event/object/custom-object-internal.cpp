@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,45 +56,6 @@ const PropertyBase* CustomObject::GetSceneObjectAnimatableProperty( Property::In
 const PropertyInputImpl* CustomObject::GetSceneObjectInputProperty( Property::Index index ) const
 {
   return GetSceneObjectAnimatableProperty( index );
-}
-
-unsigned int CustomObject::GetDefaultPropertyCount() const
-{
-  return 0u;
-}
-
-void CustomObject::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-}
-
-const char* CustomObject::GetDefaultPropertyName( Property::Index index ) const
-{
-  return NULL;
-}
-
-Property::Index CustomObject::GetDefaultPropertyIndex(const std::string& name) const
-{
-  return Property::INVALID_INDEX;
-}
-
-bool CustomObject::IsDefaultPropertyWritable(Property::Index index) const
-{
-  return false;
-}
-
-bool CustomObject::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  return false;
-}
-
-bool CustomObject::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return false;
-}
-
-Property::Type CustomObject::GetDefaultPropertyType(Property::Index index) const
-{
-  return Property::NONE;
 }
 
 void CustomObject::SetDefaultProperty( Property::Index index, const Property::Value& property )

@@ -1617,6 +1617,7 @@ public:
   void RebuildDepthTree();
 
 protected:
+
   /**
    * Traverse the actor tree, inserting actors into the depth tree in sibling order.
    * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
@@ -1627,46 +1628,6 @@ protected:
 public:
 
   // Default property extensions from Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual uint32_t GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()

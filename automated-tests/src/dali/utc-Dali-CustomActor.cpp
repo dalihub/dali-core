@@ -1331,7 +1331,6 @@ int UtcDaliCustomActorSetGetProperty(void)
   END_TEST;
 }
 
-
 int utcDaliActorGetTypeInfo(void)
 {
   TestApplication application;
@@ -1345,3 +1344,145 @@ int utcDaliActorGetTypeInfo(void)
 
   END_TEST;
 }
+
+/**
+ * A custom actor that is not type registered on purpose
+ */
+struct UnregisteredCustomActor : public Dali::CustomActorImpl
+{
+  UnregisteredCustomActor() : CustomActorImpl( ACTOR_BEHAVIOUR_NONE )
+  { }
+  virtual ~UnregisteredCustomActor()
+  { }
+  virtual void OnStageConnection( int32_t depth )
+  { }
+  virtual void OnStageDisconnection()
+  { }
+  virtual void OnChildAdd(Actor& child)
+  { }
+  virtual void OnChildRemove(Actor& child)
+  { }
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  { }
+  virtual void OnSizeSet(const Vector3& targetSize)
+  { }
+  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+  { }
+  virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API
+  { return false; }
+  virtual bool OnHoverEvent(const HoverEvent& event)
+  { return false; }
+  virtual bool OnKeyEvent(const KeyEvent& event)
+  { return false; }
+  virtual bool OnWheelEvent(const WheelEvent& event)
+  { return false; }
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  { }
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+  { }
+  virtual Vector3 GetNaturalSize()
+  { return Vector3(); }
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+  { return 0.f; }
+  virtual float GetHeightForWidth( float width )
+  { return 0.f; }
+  virtual float GetWidthForHeight( float height )
+  { return 0.f; }
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
+  { return false; }
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
+  { }
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
+  { }
+};
+
+struct UnregisteredCustomActorHandle : public Dali::CustomActor
+{
+  static UnregisteredCustomActorHandle New()
+  {
+    UnregisteredCustomActor* impl = new UnregisteredCustomActor;
+    UnregisteredCustomActorHandle custom( *impl ); // takes ownership
+    return custom;
+  }
+  UnregisteredCustomActorHandle()
+  {
+  }
+  UnregisteredCustomActorHandle( Internal::CustomActor* impl )
+  : CustomActor( impl )
+  {
+  }
+  UnregisteredCustomActorHandle( UnregisteredCustomActor& impl )
+  : CustomActor( impl )
+  {
+  }
+  static UnregisteredCustomActorHandle DownCast( BaseHandle handle )
+  {
+    UnregisteredCustomActorHandle hndl;
+    CustomActor custom = Dali::CustomActor::DownCast( handle );
+    if( custom )
+    {
+      CustomActorImpl& customImpl = custom.GetImplementation();
+
+      UnregisteredCustomActor* impl = dynamic_cast<UnregisteredCustomActor*>(&customImpl);
+
+      if( impl )
+      {
+        hndl = UnregisteredCustomActorHandle(customImpl.GetOwner());
+      }
+    }
+    return hndl;
+  }
+
+};
+
+int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
+{
+  TestApplication application; // Need the type registry
+
+  auto custom = UnregisteredCustomActorHandle::New();
+  Stage::GetCurrent().Add( custom );
+
+  // should have all actor properties
+  DALI_TEST_EQUALS( custom.GetPropertyType( Actor::Property::COLOR ), Property::VECTOR4, TEST_LOCATION );
+  auto actorHandle = Actor::New();
+  DALI_TEST_EQUALS( custom.GetPropertyCount(), actorHandle.GetPropertyCount(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( custom.IsVisible(), true, TEST_LOCATION );
+  custom.SetProperty( Actor::Property::VISIBLE, false );
+  application.SendNotification();
+  application.Render(); // IsVisible returns scene value
+  DALI_TEST_EQUALS( custom.IsVisible(), false, TEST_LOCATION );
+
+  // should have custom actor typename (as it has not registered itself)
+  DALI_TEST_EQUALS( "CustomActor", custom.GetTypeName(), TEST_LOCATION );
+
+  // should have actor actions
+  custom.DoAction( "show",  Property::Map() );
+  DALI_TEST_EQUALS( custom.GetProperty( Actor::Property::VISIBLE ).Get<bool>(), true, TEST_LOCATION );
+
+  Animation animation = Animation::New(0.01f); // very short animation
+  // should be able to animate actor property
+  animation.AnimateTo( Property( custom, Actor::Property::POSITION ), Vector3( 100.0f, 150.0f, 200.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1000.f);
+
+  DALI_TEST_EQUALS( Vector3( 100.0f, 150.0f, 200.0f ), custom.GetProperty( Actor::Property::POSITION ).Get<Vector3>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 100.0f, 150.0f, 200.0f ), custom.GetCurrentPosition(), TEST_LOCATION );
+
+  Dali::WeakHandle<UnregisteredCustomActorHandle> weakRef( custom );
+  // should have actor signals
+  custom.ConnectSignal( &application, "offStage",
+    [weakRef]()
+      {
+        DALI_TEST_EQUALS( weakRef.GetHandle().OnStage(), false, TEST_LOCATION );
+      } );
+
+  Stage::GetCurrent().Remove( custom );
+  Stage::GetCurrent().Add( custom );
+
+
+  END_TEST;
+}
+

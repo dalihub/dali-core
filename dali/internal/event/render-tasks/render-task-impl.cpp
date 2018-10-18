@@ -59,13 +59,13 @@ DALI_PROPERTY( "viewportPosition",   VECTOR2,    true,    true,    true,    Dali
 DALI_PROPERTY( "viewportSize",       VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
 DALI_PROPERTY( "clearColor",         VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
 DALI_PROPERTY( "requiresSync",       BOOLEAN,    true,    false,   false,   Dali::RenderTask::Property::REQUIRES_SYNC     )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, RenderTaskDefaultProperties )
 
 // Signals
 
 const char* const SIGNAL_FINISHED = "finished";
 
-TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL );
+TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL, RenderTaskDefaultProperties );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal );
 
@@ -505,76 +505,6 @@ void RenderTask::DiscardSceneObject()
 /********************************************************************************
  ********************************   PROPERTY METHODS   **************************
  ********************************************************************************/
-
-uint32_t RenderTask::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void RenderTask::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    indices.PushBack( i );
-  }
-}
-
-const char* RenderTask::GetDefaultPropertyName( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].name;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-Property::Index RenderTask::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    if( 0 == strcmp( name.c_str(), DEFAULT_PROPERTY_DETAILS[i].name ) ) // dont want to convert rhs to string
-    {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
-}
-
-bool RenderTask::IsDefaultPropertyWritable(Property::Index index) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].writable;
-}
-
-bool RenderTask::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].animatable;
-}
-
-bool RenderTask::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].constraintInput;
-}
-
-Property::Type RenderTask::GetDefaultPropertyType(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].type;
-  }
-
-  // index out of range...return Property::NONE
-  return Property::NONE;
-}
 
 void RenderTask::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
