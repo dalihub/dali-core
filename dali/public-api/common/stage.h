@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -198,7 +201,7 @@ public:
    * @SINCE_1_0.0
    * @return The number of layers
    */
-  unsigned int GetLayerCount() const;
+  uint32_t GetLayerCount() const;
 
   /**
    * @brief Retrieves the layer at a specified depth.
@@ -208,7 +211,7 @@ public:
    * @return The layer found at the given depth
    * @pre Depth is less than layer count; see GetLayerCount().
    */
-  Layer GetLayer(unsigned int depth) const;
+  Layer GetLayer(uint32_t depth) const;
 
   /**
    * @brief Returns the Stage's Root Layer.

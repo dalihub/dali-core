@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
@@ -69,7 +70,7 @@ public:
    * @return A GL error code
    * @pre There is a GL context for the current thread.
    */
-  virtual unsigned int TargetTexture() = 0;
+  virtual uint32_t TargetTexture() = 0;
 
   /**
    * @brief Called internally for each Bind call for this texture to allow implementation specific operations.
@@ -86,7 +87,7 @@ public:
    * @SINCE_1_0.0
    * @return Width
    */
-  virtual unsigned int GetWidth() const = 0;
+  virtual uint32_t GetWidth() const = 0;
 
   /**
    * @brief Returns the height of the NativeImage.
@@ -94,7 +95,7 @@ public:
    * @SINCE_1_0.0
    * @return Height
    */
-  virtual unsigned int GetHeight() const = 0;
+  virtual uint32_t GetHeight() const = 0;
 
  /**
   * @brief Queries whether blending is required.

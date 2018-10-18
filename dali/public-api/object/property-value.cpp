@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ struct Property::Value::Impl
     floatValue( floatValue )
   { }
 
-  Impl( int integerValue )
+  Impl( int32_t integerValue )
   : type( Property::INTEGER ),
     integerValue( integerValue )
   { }
@@ -119,7 +119,7 @@ struct Property::Value::Impl
   {
   }
 
-  Impl( const Rect<int>& rectValue )
+  Impl( const Rect<int32_t>& rectValue )
   : type( Property::RECTANGLE ),
     rectValue( new Rect<int>( rectValue ) )
   {
@@ -220,7 +220,7 @@ public: // Data
   Type type;
   union
   {
-    int integerValue;
+    int32_t integerValue;
     float floatValue;
     // must use pointers for any class value pre c++ 11
     Vector2* vector2Value;
@@ -230,7 +230,7 @@ public: // Data
     Matrix* matrixValue;
     AngleAxis* angleAxisValue;
     std::string* stringValue;
-    Rect<int>* rectValue;
+    Rect<int32_t>* rectValue;
     Property::Array* arrayValue;
     Property::Map* mapValue;
     Extents* extentsValue;
@@ -257,7 +257,7 @@ Property::Value::Value( float floatValue )
 {
 }
 
-Property::Value::Value( int integerValue )
+Property::Value::Value( int32_t integerValue )
 : mImpl( new Impl( integerValue ) )
 {
 }
@@ -372,7 +372,7 @@ Property::Value::Value( Type type )
     }
     case Property::RECTANGLE:
     {
-      mImpl = new Impl( Rect<int>(0,0,0,0) );
+      mImpl = new Impl( Rect<int32_t>(0,0,0,0) );
       break;
     }
     case Property::ROTATION:
@@ -663,7 +663,7 @@ bool Property::Value::Get( int& integerValue ) const
     }
     else if( mImpl->type == FLOAT )
     {
-      integerValue = static_cast< int >( mImpl->floatValue );
+      integerValue = static_cast< int32_t >( mImpl->floatValue );
       converted = true;
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -25,7 +25,7 @@
 namespace Dali
 {
 
-FrameBuffer FrameBuffer::New( unsigned int width, unsigned int height, unsigned int attachments )
+FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, uint32_t attachments )
 {
   Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, attachments );
   return FrameBuffer( frameBuffer.Get() );
@@ -65,7 +65,7 @@ void FrameBuffer::AttachColorTexture( Texture& texture )
   AttachColorTexture( texture, 0u, 0u );
 }
 
-void FrameBuffer::AttachColorTexture( Texture& texture, unsigned int mipmapLevel, unsigned int layer )
+void FrameBuffer::AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer )
 {
   if( texture )
   {

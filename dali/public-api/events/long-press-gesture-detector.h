@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -92,7 +95,7 @@ public: // Creation & Destruction
    * @param[in] touchesRequired The number of touches required
    * @return A handle to a newly allocated Dali resource
    */
-  static LongPressGestureDetector New(unsigned int touchesRequired);
+  static LongPressGestureDetector New(uint32_t touchesRequired);
 
   /**
    * @brief Creates an initialized LongPressGestureDetector with the minimum and maximum number of touches required.
@@ -104,7 +107,7 @@ public: // Creation & Destruction
    * @param[in] maxTouches The maximum number of touches required
    * @return A handle to a newly allocated Dali resource
    */
-  static LongPressGestureDetector New(unsigned int minTouches, unsigned int maxTouches);
+  static LongPressGestureDetector New(uint32_t minTouches, uint32_t maxTouches);
 
   /**
    * @brief Downcasts a handle to LongPressGestureDetector handle.
@@ -156,7 +159,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetTouchesRequired(unsigned int touches);
+  void SetTouchesRequired(uint32_t touches);
 
   /**
    * @brief Sets the minimum and maximum touches required.
@@ -170,7 +173,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetTouchesRequired(unsigned int minTouches, unsigned int maxTouches);
+  void SetTouchesRequired(uint32_t minTouches, uint32_t maxTouches);
 
 public: // Getters
 
@@ -181,7 +184,7 @@ public: // Getters
    * @return The minimum number of touches required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMinimumTouchesRequired() const;
+  uint32_t GetMinimumTouchesRequired() const;
 
   /**
    * @brief Retrieves the maximum number of touches required.
@@ -190,7 +193,7 @@ public: // Getters
    * @return The maximum number of touches required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMaximumTouchesRequired() const;
+  uint32_t GetMaximumTouchesRequired() const;
 
 public: // Signals
 

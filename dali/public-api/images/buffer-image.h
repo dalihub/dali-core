@@ -35,8 +35,8 @@ namespace Internal DALI_INTERNAL
 class BufferImage;
 }
 
-typedef unsigned char         PixelBuffer;  ///< pixel data buffer @SINCE_1_0.0
-typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h) @SINCE_1_0.0
+typedef uint8_t        PixelBuffer;  ///< pixel data buffer @SINCE_1_0.0
+typedef Rect<uint32_t> RectArea;     ///< rectangular area (x,y,w,h) @SINCE_1_0.0
 
 
 /**
@@ -84,8 +84,8 @@ public:
    * @note default resource management policies are Immediate and Never
    *
    */
-  static BufferImage New(unsigned int width,
-                         unsigned int height,
+  static BufferImage New(uint32_t width,
+                         uint32_t height,
                          Pixel::Format pixelformat=Pixel::RGBA8888) DALI_DEPRECATED_API;
 
   /**
@@ -113,10 +113,10 @@ public:
    * @pre width & height are greater than zero
    */
   static BufferImage New(PixelBuffer*  pixelBuffer,
-                         unsigned int  width,
-                         unsigned int  height,
+                         uint32_t  width,
+                         uint32_t  height,
                          Pixel::Format pixelFormat=Pixel::RGBA8888,
-                         unsigned int  stride=0) DALI_DEPRECATED_API;
+                         uint32_t  stride=0) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_2.41
@@ -200,7 +200,7 @@ public:
    * @SINCE_1_0.0
    * @return The buffer size in bytes
    */
-  unsigned int GetBufferSize() const DALI_DEPRECATED_API;
+  uint32_t GetBufferSize() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_2.41
@@ -210,7 +210,7 @@ public:
    * @SINCE_1_0.0
    * @return The buffer stride
    */
-  unsigned int GetBufferStride() const DALI_DEPRECATED_API;
+  uint32_t GetBufferStride() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_2.41

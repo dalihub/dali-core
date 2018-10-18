@@ -24,54 +24,69 @@
 namespace Dali
 {
 
-Vector3 UpdateProxy::GetPosition( unsigned int id ) const
+bool UpdateProxy::GetPosition( uint32_t id, Vector3& position ) const
 {
-  return mImpl.GetPosition( id );
+  return mImpl.GetPosition( id, position );
 }
 
-void UpdateProxy::SetPosition( unsigned int id, const Vector3& position )
+bool UpdateProxy::SetPosition( uint32_t id, const Vector3& position )
 {
-  mImpl.SetPosition( id, position );
+  return mImpl.SetPosition( id, position );
 }
 
-const Vector3& UpdateProxy::GetSize( unsigned int id ) const
+bool UpdateProxy::BakePosition( uint32_t id, const Vector3& position )
 {
-  return mImpl.GetSize( id );
+  return mImpl.BakePosition( id, position );
 }
 
-void UpdateProxy::SetSize( unsigned int id, const Vector3& size )
+bool UpdateProxy::GetSize( uint32_t id, Vector3& size ) const
 {
-  mImpl.SetSize( id, size );
+  return mImpl.GetSize( id, size );
 }
 
-void UpdateProxy::GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const
+bool UpdateProxy::SetSize( uint32_t id, const Vector3& size )
 {
-  mImpl.GetPositionAndSize( id, position, size );
+  return mImpl.SetSize( id, size );
 }
 
-Vector4 UpdateProxy::GetWorldColor( unsigned int id ) const
+bool UpdateProxy::BakeSize( uint32_t id, const Vector3& size )
 {
-  return mImpl.GetWorldColor( id );
+  return mImpl.BakeSize( id, size );
 }
 
-void UpdateProxy::SetWorldColor( unsigned int id, const Vector4& color ) const
+bool UpdateProxy::GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const
 {
-  mImpl.SetWorldColor( id, color );
+  return mImpl.GetPositionAndSize( id, position, size );
 }
 
-void UpdateProxy::GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const
+bool UpdateProxy::GetScale( uint32_t id, Vector3& scale ) const
 {
-  mImpl.GetWorldMatrixAndSize( id, worldMatrix, size );
+  return mImpl.GetScale( id, scale );
 }
 
-const Matrix& UpdateProxy::GetWorldMatrix( unsigned int id ) const
+bool UpdateProxy::SetScale( uint32_t id, const Vector3& scale )
 {
-  return mImpl.GetWorldMatrix( id );
+  return mImpl.SetScale( id, scale );
 }
 
-void UpdateProxy::SetWorldMatrix( unsigned int id, const Matrix& worldMatrix )
+bool UpdateProxy::BakeScale( uint32_t id, const Vector3& scale )
 {
-  mImpl.SetWorldMatrix( id, worldMatrix );
+  return mImpl.BakeScale( id, scale );
+}
+
+bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
+{
+  return mImpl.GetColor( id, color );
+}
+
+bool UpdateProxy::SetColor( uint32_t id, const Vector4& color ) const
+{
+  return mImpl.SetColor( id, color );
+}
+
+bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color ) const
+{
+  return mImpl.BakeColor( id, color );
 }
 
 UpdateProxy::UpdateProxy( Internal::UpdateProxy& impl )

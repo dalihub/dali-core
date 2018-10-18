@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -470,7 +470,7 @@ float Quaternion::AngleBetween( const Quaternion& q1, const Quaternion& q2 )
   //Formula for angle θ between two quaternion is:
   //θ = cos^−1 (2⟨q1,q2⟩^2 − 1), Where (q1,q2) is inner product of the quaternions.
   float X = from.mVector.Dot4(to.mVector);
-  float theta = acos( (2 * X * X) - 1);
+  float theta = acosf( (2 * X * X) - 1); // float arc cosine
 
   return theta;
 }

@@ -1660,6 +1660,41 @@ int UtcDaliActorSetInheritPosition(void)
   END_TEST;
 }
 
+int UtcDaliActorInheritOpacity(void)
+{
+  tet_infoline("Testing Actor::Inherit Opacity");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor child = Actor::New();
+  parent.Add( child );
+  Stage::GetCurrent().Add( parent );
+
+  DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  parent.SetOpacity( 0.1f );
+
+  DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::WORLD_COLOR ).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty( Actor::Property::WORLD_COLOR ).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty( Actor::Property::WORLD_COLOR ).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty( Actor::Property::WORLD_COLOR ).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.f, 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 // SetOrientation(float angleRadians, Vector3 axis)
 int UtcDaliActorSetOrientation01(void)
 {

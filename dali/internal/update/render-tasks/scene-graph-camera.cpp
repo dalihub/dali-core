@@ -297,7 +297,7 @@ void Camera::Update( BufferIndex updateBufferIndex )
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if( mNode->GetDirtyFlags() & VisibleFlag )
+  if( mNode->GetDirtyFlags() & NodePropertyFlags::VISIBLE )
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,

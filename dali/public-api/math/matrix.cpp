@@ -192,9 +192,9 @@ static bool InvertMatrix(const float* m, float* out)
     return false;
   }
 
-  det = 1.0 / det;
+  det = 1.0f / det;
 
-  for (int i = 0; i < 16; i++)
+  for( int32_t i = 0; i < 16; i++)
   {
     out[i] = inv[i] * det;
   }
@@ -274,13 +274,13 @@ void Matrix::Multiply( Matrix& result, const Matrix& lhs, const Matrix& rhs )
 
 #ifndef  __ARM_NEON__
 
-  for( int i=0; i < 4; i++ )
+  for( int32_t i=0; i < 4; i++ )
   {
     // i<<2 gives the first vector / column
-    int loc = i<<2;
-    int loc1 = loc + 1;
-    int loc2 = loc + 2;
-    int loc3 = loc + 3;
+    int32_t loc = i<<2;
+    int32_t loc1 = loc + 1;
+    int32_t loc2 = loc + 2;
+    int32_t loc3 = loc + 3;
     float value0 = lhsPtr[loc];
     float value1 = lhsPtr[loc1];
     float value2 = lhsPtr[loc2];
@@ -360,13 +360,13 @@ void Matrix::Multiply( Matrix& result, const Matrix& lhs, const Quaternion& rhs 
 
 #ifndef  __ARM_NEON__
 
-  for( int i=0; i < 4; i++ )
+  for( int32_t i=0; i < 4; i++ )
   {
     // i<<2 gives the first vector / column
-    int loc = i<<2;
-    int loc1 = loc + 1;
-    int loc2 = loc + 2;
-    int loc3 = loc + 3;
+    int32_t loc = i<<2;
+    int32_t loc1 = loc + 1;
+    int32_t loc2 = loc + 2;
+    int32_t loc3 = loc + 3;
     float value0 = lhsPtr[loc];
     float value1 = lhsPtr[loc1];
     float value2 = lhsPtr[loc2];

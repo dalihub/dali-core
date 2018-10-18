@@ -327,7 +327,7 @@ std::ostream& operator<<( std::ostream& stream, const Property::Map& map )
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  int count = 0;
+  int32_t count = 0;
   // Output the String-Value pairs
   for ( StringValueContainer::iterator iter = map.mImpl->mStringValueContainer.begin(), endIter = map.mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {

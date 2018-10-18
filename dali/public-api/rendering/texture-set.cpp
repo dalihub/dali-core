@@ -61,17 +61,17 @@ void TextureSet::SetTexture( size_t index, Texture texture )
   if( texture )
   {
     Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
-    GetImplementation(*this).SetTexture( index, texturePtr );
+    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), texturePtr ); // only support 4,294,967,295 textures
   }
   else
   {
-    GetImplementation(*this).SetTexture( index, NULL );
+    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 textures
   }
 }
 
 Texture TextureSet::GetTexture( size_t index ) const
 {
-  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture( index );
+  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture( static_cast<uint32_t>( index ) ); // only support 4,294,967,295 textures
   return Dali::Texture( texturePtr );
 }
 
@@ -80,17 +80,17 @@ void TextureSet::SetSampler( size_t index, Sampler sampler )
   if( sampler )
   {
     Internal::SamplerPtr samplerPtr( &GetImplementation( sampler ) );
-    GetImplementation(*this).SetSampler( index, samplerPtr );
+    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), samplerPtr ); // only support 4,294,967,295 samplers
   }
   else
   {
-    GetImplementation(*this).SetSampler( index, NULL );
+    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 samplers
   }
 }
 
 Sampler TextureSet::GetSampler( size_t index ) const
 {
-  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler( index );
+  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler( static_cast<uint32_t>( index ) ); // only support 4,294,967,295 samplers
   return Dali::Sampler( samplerPtr );
 }
 

@@ -2,7 +2,7 @@
 #define __DALI_MATH_UTILS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -38,9 +41,9 @@ namespace Dali
  * @param[in] i Input number
  * @return The next power of two or i itself in case it's a power of two
  */
-inline unsigned int NextPowerOfTwo( unsigned int i )
+inline uint32_t NextPowerOfTwo( uint32_t i )
 {
-  DALI_ASSERT_ALWAYS(i <= 1u << (sizeof(unsigned) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
+  DALI_ASSERT_ALWAYS(i <= 1u << (sizeof(uint32_t) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
   if(i==0u)
   {
     return 1u;
@@ -63,7 +66,7 @@ inline unsigned int NextPowerOfTwo( unsigned int i )
  * @param[in] i Input number
  * @return    True if i is power of two.
  */
-inline bool IsPowerOfTwo( unsigned int i )
+inline bool IsPowerOfTwo( uint32_t i )
 {
   return (i != 0u) && ((i & (i - 1u)) == 0u);
 }
@@ -131,7 +134,7 @@ inline float GetRangedEpsilon( float a, float b )
   const float absA = fabsf( a );
   const float absB = fabsf( b );
   const float absF = absA > absB ? absA : absB;
-  const int absI = absF;
+  const int32_t absI = static_cast<int32_t>( absF ); // truncated
 
   float epsilon = Math::MACHINE_EPSILON_10000;
   if (absF < 0.1f)
@@ -207,12 +210,12 @@ inline bool Equals( float a, float b, float epsilon )
  * @param[in] pos decimal place
  * @return a rounded float
  */
-inline float Round(float value, int pos)
+inline float Round( float value, int32_t pos )
 {
   float temp;
-  temp = value * powf( 10, pos );
-  temp = floorf( temp + 0.5 );
-  temp *= powf( 10, -pos );
+  temp = value * powf( 10.f, static_cast<float>( pos ) );
+  temp = floorf( temp + 0.5f );
+  temp *= powf( 10.f, static_cast<float>( -pos ) );
   return temp;
 }
 
@@ -334,7 +337,7 @@ inline float ShortestDistanceInDomain( float a, float b, float start, float end 
  * @return -1 for negative values, +1 for positive values and 0 if value is 0
  */
 template <typename T>
-int Sign( T value )
+int32_t Sign( T value )
 {
   return ( T(0) < value ) - ( value < T(0) );
 }

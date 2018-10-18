@@ -21,6 +21,7 @@
 
 // EXTERNAL INCLUDES
 #include <typeinfo>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
@@ -378,7 +379,7 @@ public:
    * @param[in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property)
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex );
 };
 
 /**

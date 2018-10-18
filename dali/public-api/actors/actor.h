@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
@@ -417,7 +418,7 @@ public:
    * @return The ID
    * @pre The Actor has been initialized.
    */
-  unsigned int GetId() const;
+  uint32_t GetId() const;
 
   // Containment
 
@@ -503,7 +504,7 @@ public:
    * @return The number of children
    * @pre The Actor has been initialized.
    */
-  unsigned int GetChildCount() const;
+  uint32_t GetChildCount() const;
 
   /**
    * @brief Retrieve and child actor by index.
@@ -513,7 +514,7 @@ public:
    * @return The actor for the given index or empty handle if children not initialized
    * @pre The Actor has been initialized.
    */
-  Actor GetChildAt(unsigned int index) const;
+  Actor GetChildAt( uint32_t index ) const;
 
   /**
    * @brief Search through this actor's hierarchy for an actor with the given name.
@@ -535,7 +536,7 @@ public:
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildById(const unsigned int id);
+  Actor FindChildById( const uint32_t id );
 
   /**
    * @brief Retrieves the actor's parent.
@@ -1458,7 +1459,7 @@ public:
    * @SINCE_1_0.0
    * @return The current depth in the hierarchy of the actor, or @c -1 if actor is not in the hierarchy
    */
-  int GetHierarchyDepth();
+  int32_t GetHierarchyDepth();
 
 public: // Renderer
 
@@ -1471,7 +1472,7 @@ public: // Renderer
    * @pre The renderer must be initialized.
    *
    */
-  unsigned int AddRenderer( Renderer& renderer );
+  uint32_t AddRenderer( Renderer& renderer );
 
   /**
    * @brief Gets the number of renderers on this actor.
@@ -1479,7 +1480,7 @@ public: // Renderer
    * @SINCE_1_0.0
    * @return The number of renderers on this actor
    */
-  unsigned int GetRendererCount() const;
+  uint32_t GetRendererCount() const;
 
   /**
    * @brief Gets a Renderer by index.
@@ -1490,7 +1491,7 @@ public: // Renderer
    * @pre The index must be between 0 and GetRendererCount()-1
    *
    */
-  Renderer GetRendererAt( unsigned int index );
+  Renderer GetRendererAt( uint32_t index );
 
   /**
    * @brief Removes a renderer from the actor.
@@ -1508,7 +1509,7 @@ public: // Renderer
    * @pre The index must be between 0 and GetRendererCount()-1
    *
    */
-  void RemoveRenderer( unsigned int index );
+  void RemoveRenderer( uint32_t index );
 
 public: // Signals
 

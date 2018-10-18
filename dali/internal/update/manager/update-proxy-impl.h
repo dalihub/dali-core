@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <cstdint>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/common/buffer-index.h>
@@ -67,52 +68,67 @@ public:
   /**
    * @copydoc Dali::UpdateProxy::GetPosition()
    */
-  Vector3 GetPosition( unsigned int id ) const;
+  bool GetPosition( uint32_t id, Vector3& position) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetPosition()
    */
-  void SetPosition( unsigned int id, const Vector3& position );
+  bool SetPosition( uint32_t id, const Vector3& position );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakePosition()
+   */
+  bool BakePosition( uint32_t id, const Vector3& position );
 
   /**
    * @copydoc Dali::UpdateProxy::GetSize()
    */
-  const Vector3& GetSize( unsigned int id ) const;
+  bool GetSize( uint32_t id, Vector3& size ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetSize()
    */
-  void SetSize( unsigned int id, const Vector3& size );
+  bool SetSize( uint32_t id, const Vector3& size );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeSize()
+   */
+  bool BakeSize( uint32_t id, const Vector3& size );
 
   /**
    * @copydoc Dali::UpdateProxy::GetPositionAndSize()
    */
-  void GetPositionAndSize( unsigned int id, Vector3& position, Vector3& size ) const;
+  bool GetPositionAndSize( uint32_t id, Vector3& position, Vector3& size ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetScale()
+   */
+  bool GetScale( uint32_t id, Vector3& scale ) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::SetScale()
+   */
+  bool SetScale( uint32_t id, const Vector3& scale );
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeScale()
+   */
+  bool BakeScale( uint32_t id, const Vector3& scale );
 
   /**
    * @copydoc Dali::UpdateProxy::GetColor()
    */
-  Vector4 GetWorldColor( unsigned int id ) const;
+  bool GetColor( uint32_t id, Vector4& color ) const;
 
   /**
    * @copydoc Dali::UpdateProxy::SetColor()
    */
-  void SetWorldColor( unsigned int id, const Vector4& color ) const;
+  bool SetColor( uint32_t id, const Vector4& color ) const;
 
   /**
-   * @copydoc Dali::UpdateProxy::GetWorldMatrixAndSize()
+   * @copydoc Dali::UpdateProxy::BakeColor()
    */
-  void GetWorldMatrixAndSize( unsigned int id, Matrix& worldMatrix, Vector3& size ) const;
-
-  /**
-   * @copydoc Dali::UpdateProxy::GetWorldMatrix()
-   */
-  const Matrix& GetWorldMatrix( unsigned int id ) const;
-
-  /**
-   * @copydoc Dali::UpdateProxy::SetWorldMatrix()
-   */
-  void SetWorldMatrix( unsigned int id, const Matrix& worldMatrix );
+  bool BakeColor( uint32_t id, const Vector4& color ) const;
 
   /**
    * @brief Retrieves the root-node used by this class
@@ -123,10 +139,19 @@ public:
     return mRootNode;
   }
 
+  /**
+   * @brief Sets the buffer index to use when processing the next callback.
+   * @param[in]  bufferIndex  The current buffer index
+   */
   void SetCurrentBufferIndex( BufferIndex bufferIndex )
   {
     mCurrentBufferIndex = bufferIndex;
   }
+
+  /**
+   * @brief Informs the update-proxy that the node hierarchy has changed.
+   */
+  void NodeHierarchyChanged();
 
 private:
 
@@ -136,7 +161,7 @@ private:
    * @return A pointer to the required node if found.
    * @note This caches the last accessed node.
    */
-  SceneGraph::Node* GetNodeWithId( unsigned int id ) const;
+  SceneGraph::Node* GetNodeWithId( uint32_t id ) const;
 
 private:
 
@@ -145,13 +170,13 @@ private:
    */
   struct IdNodePair
   {
-    unsigned int id; ///< The ID of the node
+    uint32_t id; ///< The ID of the node
     SceneGraph::Node* node; ///< The node itself
   };
 
   mutable std::vector< IdNodePair > mNodeContainer; ///< Used to store cached pointers to already searched for Nodes.
   mutable IdNodePair mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
-  unsigned int mCurrentBufferIndex;
+  BufferIndex mCurrentBufferIndex;
 
   SceneGraph::TransformManager& mTransformManager; ///< Reference to the Transform Manager.
   SceneGraph::Node& mRootNode; ///< The root node of this update proxy.

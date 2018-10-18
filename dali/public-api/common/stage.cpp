@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,12 +90,12 @@ Vector2 Stage::GetSize() const
   return GetImplementation(*this).GetSize();
 }
 
-unsigned int Stage::GetLayerCount() const
+uint32_t Stage::GetLayerCount() const
 {
   return GetImplementation(*this).GetLayerCount();
 }
 
-Layer Stage::GetLayer(unsigned int depth) const
+Layer Stage::GetLayer(uint32_t depth) const
 {
   return GetImplementation(*this).GetLayer(depth);
 }

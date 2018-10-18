@@ -16,29 +16,26 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/update/frame-callback-interface.h>
+
+// INTERNAL INCLUDES
+#include <dali/devel-api/update/update-proxy.h>
+#include <dali/internal/event/common/stage-impl.h>
 
 namespace Dali
 {
 
-TouchPoint::TouchPoint(int32_t id, State state, float screenX, float screenY)
-: deviceId(id),
-  state(state),
-  local(screenX, screenY),
-  screen(screenX, screenY)
+FrameCallbackInterface::~FrameCallbackInterface()
 {
-}
-
-TouchPoint::TouchPoint(int32_t id, State state, float screenX, float screenY, float localX, float localY)
-: deviceId(id),
-  state(state),
-  local(localX, localY),
-  screen(screenX, screenY)
-{
-}
-
-TouchPoint::~TouchPoint()
-{
+  if( Internal::Stage::IsInstalled() )
+  {
+    Internal::StagePtr stage = Internal::Stage::GetCurrent();
+    if( stage )
+    {
+      // This will be a no-op if the callback has already been removed
+      stage->RemoveFrameCallback( *this );
+    }
+  }
 }
 
 } // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 namespace Dali
 {
 
-const int Property::INVALID_INDEX           = -1;
-const int Property::INVALID_KEY             = -1;
-const int Property::INVALID_COMPONENT_INDEX = -1;
+const int32_t Property::INVALID_INDEX           = -1;
+const int32_t Property::INVALID_KEY             = -1;
+const int32_t Property::INVALID_COMPONENT_INDEX = -1;
 
 Property::Property(Handle& obj, Property::Index propIndex)
 : object(obj),
@@ -35,7 +35,7 @@ Property::Property(Handle& obj, Property::Index propIndex)
 {
 }
 
-Property::Property(Handle& obj, Property::Index propIndex, int compIndex)
+Property::Property(Handle& obj, Property::Index propIndex, int32_t compIndex)
 : object(obj),
   propertyIndex(propIndex),
   componentIndex(compIndex)
@@ -50,7 +50,7 @@ Property::Property(Handle& obj, const std::string& propertyName)
   propertyIndex = object.GetPropertyIndex( propertyName );
 }
 
-Property::Property(Handle& obj, const std::string& propertyName, int compIndex)
+Property::Property(Handle& obj, const std::string& propertyName, int32_t compIndex)
 : object(obj),
   propertyIndex(Property::INVALID_INDEX),
   componentIndex(compIndex)

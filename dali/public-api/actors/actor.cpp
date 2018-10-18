@@ -75,7 +75,7 @@ void Actor::SetName(const std::string& name)
   GetImplementation(*this).SetName(name);
 }
 
-unsigned int Actor::GetId() const
+uint32_t Actor::GetId() const
 {
   return GetImplementation(*this).GetId();
 }
@@ -115,12 +115,12 @@ void Actor::Unparent()
   GetImplementation(*this).Unparent();
 }
 
-unsigned int Actor::GetChildCount() const
+uint32_t Actor::GetChildCount() const
 {
   return GetImplementation(*this).GetChildCount();
 }
 
-Actor Actor::GetChildAt(unsigned int index) const
+Actor Actor::GetChildAt( uint32_t index ) const
 {
   Internal::ActorPtr child = GetImplementation(*this).GetChildAt( index );
   return Actor( child.Get() );
@@ -132,7 +132,7 @@ Actor Actor::FindChildByName(const std::string& actorName)
   return Actor( child.Get() );
 }
 
-Actor Actor::FindChildById(const unsigned int id)
+Actor Actor::FindChildById( const uint32_t id )
 {
   Internal::ActorPtr child = GetImplementation(*this).FindChildById( id );
   return Actor( child.Get() );
@@ -563,7 +563,7 @@ Vector2 Actor::GetMaximumSize()
   return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
-int Actor::GetHierarchyDepth()
+int32_t Actor::GetHierarchyDepth()
 {
   return GetImplementation(*this).GetHierarchyDepth();
 }
@@ -600,17 +600,17 @@ Actor::OffStageSignalType& Actor::OffStageSignal()
   return GetImplementation(*this).OffStageSignal();
 }
 
-unsigned int Actor::AddRenderer( Renderer& renderer )
+uint32_t Actor::AddRenderer( Renderer& renderer )
 {
   return GetImplementation(*this).AddRenderer( GetImplementation( renderer ) );
 }
 
-unsigned int Actor::GetRendererCount() const
+uint32_t Actor::GetRendererCount() const
 {
   return GetImplementation(*this).GetRendererCount();
 }
 
-Renderer Actor::GetRendererAt( unsigned int index )
+Renderer Actor::GetRendererAt( uint32_t index )
 {
   Internal::RendererPtr renderer = GetImplementation(*this).GetRendererAt( index );
   return Renderer( renderer.Get() );
@@ -621,7 +621,7 @@ void Actor::RemoveRenderer( Renderer& renderer )
   GetImplementation(*this).RemoveRenderer( GetImplementation( renderer ) );
 }
 
-void Actor::RemoveRenderer( unsigned int index )
+void Actor::RemoveRenderer( uint32_t index )
 {
   GetImplementation(*this).RemoveRenderer( index );
 }
