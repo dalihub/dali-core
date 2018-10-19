@@ -60,8 +60,6 @@ public:
   bool mCalled{ false };
 };
 
-} // anon namespace
-
 class FrameCallbackOneActor : public FrameCallbackBasic
 {
 public:
@@ -269,6 +267,8 @@ public:
   bool mBakeColorCallSuccess{ false };
   bool mBakeScaleCallSuccess{ false };
 };
+
+} // anon namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -876,6 +876,29 @@ int UtcDaliFrameCallbackDestroyedBeforeRemoving(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( true ); // If it runs to here then there's no segmentation fault
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackDoubleAddition(void)
+{
+  // Ensure we don't connect the same frame-callback twice
+
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  Actor rootActor = stage.GetRootLayer();
+
+  FrameCallbackBasic frameCallback;
+  DevelStage::AddFrameCallback( stage, frameCallback, rootActor );
+
+  try
+  {
+    DevelStage::AddFrameCallback( stage, frameCallback, rootActor );
+  }
+  catch( ... )
+  {
+    DALI_TEST_CHECK( true );
+  }
 
   END_TEST;
 }

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -59,12 +62,20 @@ protected:
   /**
    * @brief Protected constructor.
    */
-  FrameCallbackInterface() {}
+  FrameCallbackInterface();
 
   /**
    * @brief Protected virtual destructor.
    */
   virtual ~FrameCallbackInterface();
+
+public:
+  /// @cond internal
+  class Impl;
+
+private:
+  std::unique_ptr< Impl > mImpl;
+  /// @endcond
 };
 
 } // namespace Dali

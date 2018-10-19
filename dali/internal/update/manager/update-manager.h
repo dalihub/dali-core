@@ -34,6 +34,7 @@
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h> // for OwnerPointer< FrameCallback >
 #include <dali/internal/update/rendering/scene-graph-renderer.h>  // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -614,10 +615,10 @@ public:
 
   /**
    * Adds an implementation of the FrameCallbackInterface.
-   * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface
+   * @param[in] frameCallback An OwnerPointer to the SceneGraph FrameCallback object
    * @param[in] rootNode A pointer to the root node to apply the FrameCallback to
    */
-  void AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode );
+  void AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode );
 
   /**
    * Removes the specified implementation of FrameCallbackInterface.
@@ -1352,15 +1353,15 @@ inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyRes
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
 }
 
-inline void AddFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback, const Node& rootNode )
+inline void AddFrameCallbackMessage( UpdateManager& manager, OwnerPointer< FrameCallback >& frameCallback, const Node& rootNode )
 {
-  typedef MessageValue2< UpdateManager, FrameCallbackInterface*, const Node* > LocalType;
+  typedef MessageValue2< UpdateManager, OwnerPointer< FrameCallback >, const Node* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddFrameCallback, &frameCallback, &rootNode );
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameCallback, frameCallback, &rootNode );
 }
 
 inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback )

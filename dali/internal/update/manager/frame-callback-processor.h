@@ -24,7 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
 namespace Dali
@@ -44,7 +45,7 @@ class TransformManager;
 /**
  * This class processes all the registered frame-callbacks.
  */
-class FrameCallbackProcessor : public PropertyOwner::Observer
+class FrameCallbackProcessor
 {
 public:
 
@@ -67,10 +68,10 @@ public:
 
   /**
    * Adds an implementation of the FrameCallbackInterface.
-   * @param[in]  frameCallback  A pointer to the implementation of the FrameCallbackInterface
+   * @param[in]  frameCallback  An OwnerPointer to the SceneGraph FrameCallback object
    * @param[in]  rootNode       A pointer to the root node to apply the FrameCallback to
    */
-  void AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode );
+  void AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode );
 
   /**
    * Removes the specified implementation of FrameCallbackInterface.
@@ -95,55 +96,7 @@ public:
 
 private:
 
-  // From PropertyOwner::Observer
-
-  /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
-   */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner ) { /* Nothing to do */ }
-
-  /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
-   */
-  virtual void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) { /* Nothing to do */ }
-
-  /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
-   *
-   * Will use this to disconnect the frame-callback if the accompanying node is destroyed
-   */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner );
-
-private:
-
-  struct FrameCallbackInfo
-  {
-    /**
-     * Default Constructor
-     * @param[in]  frameCallbackObject  A pointer to the frame-callback object
-     * @param[in]  updateProxyPtr       A raw pointer to the newly created updateProxy
-     * @note Ownership of @updateProxyPtr is passed to this class.
-     */
-    FrameCallbackInfo( FrameCallbackInterface* frameCallbackObject, UpdateProxy* updateProxyPtr )
-    : frameCallback( frameCallbackObject ),
-      updateProxyImpl( updateProxyPtr )
-    {
-    }
-
-    ~FrameCallbackInfo() = default; ///< Default destructor.
-
-    // Movable but not copyable
-    FrameCallbackInfo( const FrameCallbackInfo& )            = delete;  ///< Deleted copy constructor.
-    FrameCallbackInfo( FrameCallbackInfo&& )                 = default; ///< Default move constructor.
-    FrameCallbackInfo& operator=( const FrameCallbackInfo& ) = delete;  ///< Deleted copy assignment operator.
-    FrameCallbackInfo& operator=( FrameCallbackInfo&& )      = default; ///< Default move assignment operator.
-
-    // Data
-    FrameCallbackInterface* frameCallback{ nullptr }; ///< Pointer to the implementation of the FrameCallbackInterface.
-    std::unique_ptr< UpdateProxy > updateProxyImpl{ nullptr }; ///< A unique pointer to the implementation of the UpdateProxy.
-  };
-
-  std::vector< FrameCallbackInfo > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
+  std::vector< OwnerPointer< FrameCallback > > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
 
   TransformManager& mTransformManager;
 

@@ -21,9 +21,15 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/update-proxy.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/update/frame-callback-interface-impl.h>
 
 namespace Dali
 {
+
+FrameCallbackInterface::FrameCallbackInterface()
+: mImpl( std::unique_ptr< Impl >( new Impl ) )
+{
+}
 
 FrameCallbackInterface::~FrameCallbackInterface()
 {

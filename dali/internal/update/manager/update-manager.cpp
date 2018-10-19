@@ -47,6 +47,7 @@
 #include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/manager/transform-manager.h>
@@ -1102,7 +1103,7 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
   return surfaceRectChanged;
 }
 
-void UpdateManager::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+void UpdateManager::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {
   mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
 }
