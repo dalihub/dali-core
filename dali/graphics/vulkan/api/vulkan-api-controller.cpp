@@ -53,6 +53,14 @@ namespace Graphics
 {
 namespace VulkanAPI
 {
+namespace DepthStencilFlagBits
+{
+static constexpr uint32_t DEPTH_BUFFER_BIT   = 1; // depth buffer enabled
+static constexpr uint32_t STENCIL_BUFFER_BIT = 2; // stencil buffer enabled
+}
+
+// State of the depth-stencil buffer
+using DepthStencilFlags = uint32_t;
 
 struct Controller::Impl
 {
@@ -82,7 +90,8 @@ struct Controller::Impl
   Impl( Controller& owner, Dali::Graphics::Vulkan::Graphics& graphics )
   : mGraphics( graphics ),
     mOwner( owner ),
-    mHasDepthEnabled( mGraphics.HasDepthEnabled() )
+    mDepthStencilBufferCurrentState( 0u ),
+    mDepthStencilBufferRequestedState( 0u )
   {
   }
 
@@ -105,7 +114,34 @@ struct Controller::Impl
     return mThreadPool.Initialize();
   }
 
-  void BeginFrame()
+  void UpdateDepthStencilBuffer()
+  {
+    // if we enable depth/stencil dynamically we need to block and invalidate pipeline cache
+    // enable depth-stencil
+    if( mDepthStencilBufferCurrentState != mDepthStencilBufferRequestedState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "UpdateDepthStencilBuffer(): New state: DEPTH: %d, STENCIL: %d\n", int(mDepthStencilBufferRequestedState&1), int((mDepthStencilBufferRequestedState>>1)&1) );
+
+      // Formats
+      const std::array<vk::Format, 4> DEPTH_STENCIL_FORMATS = {
+        vk::Format::eUndefined,       // no depth nor stencil needed
+        vk::Format::eD16Unorm,        // only depth buffer
+        vk::Format::eS8Uint,          // only stencil buffer
+        vk::Format::eD24UnormS8Uint   // depth and stencil buffers
+      };
+
+      mGraphics.DeviceWaitIdle();
+
+      mGraphics.GetSwapchainForFBID(0u)->SetDepthStencil( DEPTH_STENCIL_FORMATS[mDepthStencilBufferRequestedState] );
+
+      // make sure GPU finished any pending work
+      mGraphics.DeviceWaitIdle();
+
+      mDepthStencilBufferCurrentState = mDepthStencilBufferRequestedState;
+    }
+  }
+
+  void AcquireNextFramebuffer()
   {
     // for all swapchains acquire new framebuffer
     auto surface = mGraphics.GetSurface( 0u );
@@ -120,8 +156,6 @@ struct Controller::Impl
     // We won't run garbage collection in case there are pending resource transfers.
     swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
 
-    mRenderPasses.clear();
-
     if( !swapchain->IsValid() )
     {
       // make sure device doesn't do any work before replacing swapchain
@@ -133,7 +167,23 @@ struct Controller::Impl
       // get new valid framebuffer
       swapchain->AcquireNextFramebuffer( !mOwner.HasPendingResourceTransfers() );
     }
+  }
 
+  void CompilePipelines()
+  {
+    // could be using another thread...could be...
+    mDefaultPipelineCache->Compile();
+  }
+
+  void BeginFrame()
+  {
+    // Acquire next framebuffer image
+    AcquireNextFramebuffer();
+
+    // Compile all pipelines that haven't been initialised yet
+    CompilePipelines();
+
+    mRenderPasses.clear();
     mCurrentFramebuffer.Reset();
   }
 
@@ -172,19 +222,6 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
-
-    // if we enable depth/stencil dynamically we need to block and invalidate pipeline cache
-    // enable depth-stencil
-    if( !mHasDepthEnabled && mShouldEnableDepthStencil )
-    {
-      // add depth stencil to main framebuffer
-      mGraphics.GetSwapchainForFBID(0u)->SetDepthStencil(vk::Format::eD24UnormS8Uint);
-      mHasDepthEnabled = true;
-      mShouldEnableDepthStencil = false;
-
-      // make sure GPU finishe any pending work
-      mGraphics.DeviceWaitIdle();
-    }
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -611,13 +648,16 @@ struct Controller::Impl
     primaryCommandBuffer->EndRenderPass();
   }
 
-  void EnableDepthStencilBuffer()
+  bool EnableDepthStencilBuffer( bool enableDepth, bool enableStencil )
   {
-    // enable depth-stencil
-    if( !mHasDepthEnabled )
-    {
-      mShouldEnableDepthStencil = true;
-    }
+    mDepthStencilBufferRequestedState = ( enableDepth ? DepthStencilFlagBits::DEPTH_BUFFER_BIT : 0u ) |
+                                        ( enableStencil ? DepthStencilFlagBits::STENCIL_BUFFER_BIT : 0u );
+
+    auto retval = mDepthStencilBufferRequestedState != mDepthStencilBufferCurrentState;
+
+    UpdateDepthStencilBuffer();
+
+    return retval;
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
@@ -657,8 +697,9 @@ struct Controller::Impl
 
   std::mutex mDescriptorWriteMutex{};
   std::recursive_mutex mResourceTransferMutex{};
-  bool mHasDepthEnabled { false };
-  bool mShouldEnableDepthStencil { false };
+
+  DepthStencilFlags mDepthStencilBufferCurrentState { 0u };
+  DepthStencilFlags mDepthStencilBufferRequestedState { 0u };
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -848,9 +889,9 @@ std::unique_ptr< API::RenderCommand > Controller::AllocateRenderCommand()
   return mImpl->AllocateRenderCommand();
 }
 
-void Controller::EnableDepthStencilBuffer()
+bool Controller::EnableDepthStencilBuffer( bool enableDepth, bool enableStencil )
 {
-  mImpl->EnableDepthStencilBuffer();
+  return mImpl->EnableDepthStencilBuffer( enableDepth, enableStencil );
 }
 
 } // namespace VulkanAPI

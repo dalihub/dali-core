@@ -950,16 +950,20 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 {
   bool usesDepth = false;
   bool usesStencil = false;
+
   PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
 
-  if(usesDepth || usesStencil)
+  // If state of depth/stencil has changed between frames then the pipelines must be
+  // prepared again. Note, this stage does not recompile shader but collects necessary
+  // data to compile pipelines at the further stage.
+  if( controller.EnableDepthStencilBuffer( usesDepth, usesStencil ) )
   {
-    controller.EnableDepthStencilBuffer();
+    PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
   }
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
-  auto uboIndex = bufferIndex;//mCurrentFrameIndex % MAX_BUFFERS;
+  auto uboIndex = bufferIndex;
 
   // Prepare uniform buffers
   if( !mGraphicsBufferManager )

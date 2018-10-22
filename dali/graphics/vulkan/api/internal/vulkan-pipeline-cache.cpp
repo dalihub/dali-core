@@ -83,6 +83,17 @@ bool PipelineCache::SavePipeline( const VulkanAPI::PipelineFactory& factory, std
   return true;
 }
 
+void PipelineCache::Compile()
+{
+  for( auto& item : mCacheMap )
+  {
+    for( auto& pipeline : item.second )
+    {
+      pipeline.pipelineImpl->Initialise();
+    }
+  }
+}
+
 bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
 {
   auto hashCode = pipeline->GetHashCode();
@@ -118,6 +129,16 @@ bool PipelineCache::RemovePipeline( Internal::Pipeline* pipeline )
   }
 
   return true;
+}
+
+uint32_t PipelineCache::GetCacheSize() const
+{
+  auto retval = 0u;
+  for( auto& item : mCacheMap )
+  {
+    retval += uint32_t(item.second.size());
+  }
+  return retval;
 }
 
 } // VulkanAPI

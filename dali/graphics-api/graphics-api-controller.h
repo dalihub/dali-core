@@ -152,8 +152,10 @@ public:
 
   /**
    * @brief Enables depth/stencil buffer if supported
+   *
+   * @return True if state changed, False otherwise
    */
-  virtual void EnableDepthStencilBuffer() = 0;
+  virtual bool EnableDepthStencilBuffer( bool enableDepth, bool enableStencil ) = 0;
 
 public:
   // not copyable

@@ -358,7 +358,7 @@ void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
   // Before replacing framebuffers in the swapchain, wait until all is done
   mGraphics->DeviceWaitIdle();
 
-  mFramebuffers = framebuffers;
+  mFramebuffers = std::move( framebuffers );
 }
 
 } // namespace Vulkan

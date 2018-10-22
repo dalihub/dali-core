@@ -33,23 +33,28 @@ Image::Image( Graphics& graphics, const vk::ImageCreateInfo& createInfo, vk::Ima
           mImageLayout( mCreateInfo.initialLayout ),
           mIsExternal( static_cast<bool>(externalImage) )
 {
-  auto depthFormats = std::vector< vk::Format >{
+  auto depthStencilFormats = std::vector< vk::Format >{
           vk::Format::eD32Sfloat,
           vk::Format::eD16Unorm,
           vk::Format::eD32SfloatS8Uint,
           vk::Format::eD24UnormS8Uint,
-          vk::Format::eD16UnormS8Uint
+          vk::Format::eD16UnormS8Uint,
+          vk::Format::eS8Uint,
   };
 
-  auto hasDepth = std::find( depthFormats.begin(), depthFormats.end(), createInfo.format );
+  auto hasDepth = std::find( depthStencilFormats.begin(), depthStencilFormats.end(), createInfo.format );
 
-  if( hasDepth != depthFormats.end() )
+  if( hasDepth != depthStencilFormats.end() )
   {
     auto format = *hasDepth;
 
     if( format == vk::Format::eD32Sfloat || format == vk::Format::eD16Unorm )
     {
       mAspectFlags = vk::ImageAspectFlagBits::eDepth;
+    }
+    else if( format == vk::Format::eS8Uint )
+    {
+      mAspectFlags = vk::ImageAspectFlagBits::eStencil;
     }
     else
     {
