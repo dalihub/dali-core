@@ -2849,7 +2849,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      ResizePolicy::Type type;
+      ResizePolicy::Type type = GetResizePolicy( Dimension::WIDTH );
       if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::WIDTH );
@@ -2859,7 +2859,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      ResizePolicy::Type type;
+      ResizePolicy::Type type = GetResizePolicy( Dimension::HEIGHT );
       if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::HEIGHT );
@@ -2869,7 +2869,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SizeScalePolicy::Type type;
+      SizeScalePolicy::Type type = GetSizeScalePolicy();
       if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
       {
         SetSizeScalePolicy( type );
