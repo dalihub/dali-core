@@ -49,6 +49,12 @@ public:
   Swapchain& operator=( const Swapchain& ) = delete;
 
   /**
+   * Allocate command buffers for each render pass.
+   * @param[in] renderPassCount The number of render passes to allocate for (includes main renderpass)
+   */
+  void AllocateCommandBuffers( size_t renderPassCount );
+
+  /**
    * Returns current framebuffer ( the one which is rendering to )
    * @return
    */
@@ -69,11 +75,16 @@ public:
   RefCountedFramebuffer AcquireNextFramebuffer( bool shouldCollectGarbageNow = true );
 
   /**
-   * Returns primary command buffer associated with currently
-   * being recorded frame
-   * @return
+   * Return the primary command buffer associated with the swapchain
    */
-  RefCountedCommandBuffer GetCurrentCommandBuffer() const;
+  RefCountedCommandBuffer GetLastCommandBuffer() const;
+
+  /**
+   * Returns the primary command buffers associated with each render pass
+   * being recorded
+   * @return mutable vector of command buffers
+   */
+  std::vector<RefCountedCommandBuffer>& GetCommandBuffers() const;
 
   /**
    * Presents using default present queue, asynchronously
@@ -134,10 +145,12 @@ private:
    */
   std::vector<std::unique_ptr<SwapchainBuffer>> mSwapchainBuffers;
 
-  bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
+  RefCountedFence mBetweenRenderPassFence;
 
   uint32_t mFrameCounter { 0u }; ///< Current frame number
   uint32_t mBufferIndex { 0u }; ///< Current buffer index number
+
+  bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
 };
 
 } // namespace Vulkan

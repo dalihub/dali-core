@@ -143,17 +143,22 @@ struct Controller::Impl
     // swap all swapchains
     auto swapchain = mGraphics.GetSwapchainForFBID( 0u );
 
-    auto primaryCommandBuffer = swapchain->GetCurrentCommandBuffer();
-
     if( !mRenderPasses.empty() )
     {
+      // Ensure there are enough command buffers for each render pass,
+      swapchain->AllocateCommandBuffers( mRenderPasses.size() );
+      std::vector<Vulkan::RefCountedCommandBuffer>& renderPassBuffers = swapchain->GetCommandBuffers();
+
+      uint32_t index = 0;
       for( auto& renderPassData : mRenderPasses )
       {
-        ProcessRenderPassData( primaryCommandBuffer, renderPassData );
+        ProcessRenderPassData( renderPassBuffers[index], renderPassData );
+        ++index;
       }
     }
     else
     {
+      auto primaryCommandBuffer = swapchain->GetLastCommandBuffer();
       primaryCommandBuffer->BeginRenderPass( vk::RenderPassBeginInfo{}
         .setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() )
         .setRenderPass(swapchain->GetCurrentFramebuffer()->GetRenderPass() )
@@ -235,10 +240,6 @@ struct Controller::Impl
     if( framebuffer != mCurrentFramebuffer )
     {
       mCurrentFramebuffer = framebuffer;
-
-      // @todo Add Pipeline Barrier
-
-
 
       // @todo Only do if there is a color attachment and color clear is enabled and there is a clear color
       auto newColors = mCurrentFramebuffer->GetClearValues();
@@ -506,9 +507,9 @@ struct Controller::Impl
     swapchain->Invalidate();
   }
 
-  void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer primaryCommandBuffer, const RenderPassData& renderPassData )
+  void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer commandBuffer, const RenderPassData& renderPassData )
   {
-    primaryCommandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
+    commandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
 
     // update descriptor sets
     for( auto&& command : renderPassData.renderCommands )
@@ -541,7 +542,7 @@ struct Controller::Impl
         continue;
       }
 
-      apiCommand->BindPipeline( primaryCommandBuffer );
+      apiCommand->BindPipeline( commandBuffer );
 
       //@todo add assert to check the pipeline render pass nad the inherited render pass are the same
 
@@ -553,7 +554,7 @@ struct Controller::Impl
                                 { apiCommand->mDrawCommand.scissor.width,
                                   apiCommand->mDrawCommand.scissor.height } );
 
-        primaryCommandBuffer->SetScissor( 0, 1, &scissorRect );
+        commandBuffer->SetScissor( 0, 1, &scissorRect );
       }
 
       // dynamic state: viewport
@@ -571,19 +572,19 @@ struct Controller::Impl
                                viewportRect.minDepth,
                                viewportRect.maxDepth );
 
-        primaryCommandBuffer->SetViewport( 0, 1, &viewport );
+        commandBuffer->SetViewport( 0, 1, &viewport );
       }
 
       // bind vertex buffers
       auto binding = 0u;
       for( auto&& vb : apiCommand->GetVertexBufferBindings() )
       {
-        primaryCommandBuffer->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
+        commandBuffer->BindVertexBuffer( binding++, static_cast<const VulkanAPI::Buffer&>( *vb ).GetBufferRef(), 0 );
       }
 
       // note: starting set = 0
       const auto& descriptorSets = apiCommand->GetDescriptorSets();
-      primaryCommandBuffer->BindDescriptorSets( descriptorSets, vulkanApiPipeline->GetVkPipelineLayout(), 0, uint32_t( descriptorSets.size() ) );
+      commandBuffer->BindDescriptorSets( descriptorSets, vulkanApiPipeline->GetVkPipelineLayout(), 0, uint32_t( descriptorSets.size() ) );
 
       // draw
       const auto& drawCommand = apiCommand->GetDrawCommand();
@@ -591,9 +592,9 @@ struct Controller::Impl
       const auto& indexBinding = apiCommand->GetIndexBufferBinding();
       if( indexBinding.buffer )
       {
-        primaryCommandBuffer->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
+        commandBuffer->BindIndexBuffer( static_cast<const VulkanAPI::Buffer&>(*indexBinding.buffer).GetBufferRef(),
                                  0, vk::IndexType::eUint16 );
-        primaryCommandBuffer->DrawIndexed( drawCommand.indicesCount,
+        commandBuffer->DrawIndexed( drawCommand.indicesCount,
                              drawCommand.instanceCount,
                              drawCommand.firstIndex,
                              0,
@@ -601,14 +602,14 @@ struct Controller::Impl
       }
       else
       {
-        primaryCommandBuffer->Draw( drawCommand.vertexCount,
+        commandBuffer->Draw( drawCommand.vertexCount,
                       drawCommand.instanceCount,
                       drawCommand.firstVertex,
                       drawCommand.firstInstance );
       }
     }
 
-    primaryCommandBuffer->EndRenderPass();
+    commandBuffer->EndRenderPass();
   }
 
   void EnableDepthStencilBuffer()
@@ -623,7 +624,6 @@ struct Controller::Impl
   void RunGarbageCollector( size_t numberOfDiscardedRenderers )
   {
     // @todo Decide what GC's to run.
-    printf(" RunGarbageCollector: %lu renderers discarded\n", numberOfDiscardedRenderers );
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
