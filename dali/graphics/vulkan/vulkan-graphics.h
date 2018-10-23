@@ -260,7 +260,7 @@ public: // Getters
 
   vk::Instance GetInstance() const;
 
-  const vk::AllocationCallbacks& GetAllocator() const;
+  const vk::AllocationCallbacks& GetAllocator( const char* tag  = nullptr );
 
   const vk::PhysicalDeviceMemoryProperties& GetMemoryProperties() const;
 
@@ -283,6 +283,8 @@ public: // Getters
   bool HasStencilEnabled() const;
 
   bool IsSurfaceResized() const;
+
+  DescriptorSetAllocator& GetDescriptorSetAllocator() const;
 
 public: //Cache management methods
 

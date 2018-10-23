@@ -24,6 +24,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 
 namespace Dali
 {
@@ -44,6 +45,10 @@ struct SignatureAndPools
   : signature( signature_ ),
     pools( std::move( pools_ ) )
   {}
+
+  //uint32_t totalAllocationCount { 0u };
+  //uint32_t totalCapacity { 0u };
+  bool valid { true };
 };
 
 struct SignatureAndPoolsPerThread
@@ -74,6 +79,10 @@ public:
 
   friend void PrintAllocationReport( DescriptorSetAllocator& allocator);
 
+  bool ValidateSignatures( const std::vector<DescriptorSetLayoutSignature>& signature );
+
+  void Optimize();
+
 private:
 
 private:
@@ -85,6 +94,15 @@ private:
                                      uint32_t count );
 
 private:
+
+
+public:
+
+
+
+
+private:
+
   Graphics* mGraphics;
 
   uint32_t mMaxPoolSize;

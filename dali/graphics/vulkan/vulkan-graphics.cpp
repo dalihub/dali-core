@@ -35,6 +35,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug-allocator.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -183,7 +184,11 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_standard_validation", // standard
 };
 
-Graphics::Graphics() = default;
+Graphics::Graphics()
+{
+  // set up debug allocation callbacks
+  //mAllocator.reset( new vk::AllocationCallbacks( *GetDebugAllocator() ) );
+}
 
 Graphics::~Graphics()
 {
@@ -331,7 +336,7 @@ void Graphics::CreateDevice()
   }
 
   mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
-  mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
+  mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 100001u );
 }
 
 FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
@@ -737,7 +742,7 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 
   auto imageView = new ImageView( *this, image, imageViewCreateInfo );
 
-  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, &imageView->mImageView ) );
+  VkAssert( mDevice.createImageView( &imageViewCreateInfo, &GetAllocator("ImageView"), &imageView->mImageView ) );
 
   auto refCountedImageView = RefCountedImageView( imageView );
 
@@ -1334,8 +1339,12 @@ vk::Instance Graphics::GetInstance() const
   return mInstance;
 }
 
-const vk::AllocationCallbacks& Graphics::GetAllocator() const
+const vk::AllocationCallbacks& Graphics::GetAllocator( const char* tag )
 {
+  if( mAllocator )
+  {
+    mAllocator->setPUserData( CreateMemoryAllocationTag( tag ) );
+  }
   return *mAllocator;
 }
 
@@ -1403,6 +1412,11 @@ Dali::Graphics::API::Controller& Graphics::GetController()
 bool Graphics::IsSurfaceResized() const
 {
   return mSurfaceResized;
+}
+
+DescriptorSetAllocator& Graphics::GetDescriptorSetAllocator() const
+{
+  return *mDescriptorAllocator;
 }
 
 // --------------------------------------------------------------------------------------------------------------
@@ -1605,7 +1619,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-
+#if 0
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1614,7 +1628,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
 #else
   info.setEnabledLayerCount(0);
 #endif
-
+#endif
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
 
