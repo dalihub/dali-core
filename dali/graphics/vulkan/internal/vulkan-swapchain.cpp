@@ -45,11 +45,10 @@ struct SwapchainBuffer
 
   ~SwapchainBuffer();
 
-  /*
-   * Each buffer has own master command buffer which executes
-   * secondary buffers
+  /**
+   * Separate command buffer for each render pass (the final pass is for the swapchain fb)
    */
-  RefCountedCommandBuffer masterCmdBuffer;
+  std::vector<RefCountedCommandBuffer> commandBuffers;
 
   /**
    * Semaphore signalled on acquire next image
@@ -61,6 +60,7 @@ struct SwapchainBuffer
    */
   vk::Semaphore submitSemaphore;
 
+  RefCountedFence betweenRenderPassFence;
   RefCountedFence endOfFrameFence;
 
   Graphics& graphics;
@@ -71,7 +71,11 @@ SwapchainBuffer::SwapchainBuffer(Graphics& _graphics)
 {
   acquireNextImageSemaphore = graphics.GetDevice().createSemaphore( {}, graphics.GetAllocator() ).value;
   submitSemaphore = graphics.GetDevice().createSemaphore( {}, graphics.GetAllocator() ).value;
-  masterCmdBuffer = graphics.CreateCommandBuffer( true );
+
+  // Ensure there is at least 1 allocated primary command buffer
+  commandBuffers.emplace_back( graphics.CreateCommandBuffer( true ) );
+
+  betweenRenderPassFence = graphics.CreateFence({});
   endOfFrameFence = graphics.CreateFence({});
 }
 
@@ -173,8 +177,13 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
     }
   }
 
-  swapBuffer->masterCmdBuffer->Reset();
-  swapBuffer->masterCmdBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "Resetting " << swapBuffer->commandBuffers.size() << " command buffers" );
+
+  for( auto& commandBuffer : swapBuffer->commandBuffers )
+  {
+    commandBuffer->Reset();
+    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+  }
 
   return mFramebuffers[mSwapchainImageIndex];
 }
@@ -190,19 +199,41 @@ void Swapchain::Present()
 
   auto& swapBuffer = mSwapchainBuffers[mBufferIndex];
 
-  // end command buffer
-  swapBuffer->masterCmdBuffer->End();
+  // End any render pass command buffers
+  size_t count = swapBuffer->commandBuffers.size();
+  size_t index = 0;
+  for( auto& commandBuffer : swapBuffer->commandBuffers )
+  {
+    commandBuffer->End();
 
-  // submit
-  mGraphics->ResetFence( swapBuffer->endOfFrameFence );
+    // @todo Add semaphores between each render pass
+    if( index < count-1 )
+    {
+      auto submissionData = SubmissionData{};
+      submissionData.SetCommandBuffers( { commandBuffer  } )
+        .SetSignalSemaphores( { } )
+        .SetWaitSemaphores( { } )
+        .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
+      mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer->betweenRenderPassFence );
 
-  auto submissionData = SubmissionData{}
-  .SetCommandBuffers( { swapBuffer->masterCmdBuffer } )
-  .SetSignalSemaphores( { swapBuffer->submitSemaphore } )
-  .SetWaitSemaphores( { swapBuffer->acquireNextImageSemaphore } )
-  .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
+      mGraphics->WaitForFence(swapBuffer->betweenRenderPassFence);
+      mGraphics->ResetFence( swapBuffer->betweenRenderPassFence );
+    }
+    else // last frame
+    {
+      mGraphics->ResetFence( swapBuffer->endOfFrameFence );
 
-  mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer->endOfFrameFence );
+      auto submissionData = SubmissionData{};
+
+      submissionData.SetCommandBuffers( { commandBuffer  } )
+        .SetSignalSemaphores( { swapBuffer->submitSemaphore } )
+        .SetWaitSemaphores( { swapBuffer->acquireNextImageSemaphore } )
+        .SetWaitDestinationStageMask( vk::PipelineStageFlagBits::eFragmentShader );
+      mGraphics->Submit( *mQueue, { std::move( submissionData ) }, swapBuffer->endOfFrameFence );
+    }
+
+    ++index;
+  }
 
   vk::PresentInfoKHR presentInfo{};
   vk::Result result;
@@ -255,10 +286,6 @@ void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
   mGraphics->Present( *mQueue, presentInfo );
 }
 
-RefCountedCommandBuffer Swapchain::GetCurrentCommandBuffer() const
-{
-  return mSwapchainBuffers[mBufferIndex]->masterCmdBuffer;
-}
 
 bool Swapchain::OnDestroy()
 {
@@ -359,6 +386,36 @@ void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
   mGraphics->DeviceWaitIdle();
 
   mFramebuffers = std::move( framebuffers );
+}
+
+
+void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
+{
+  size_t commandBuffersCount = mSwapchainBuffers[mBufferIndex]->commandBuffers.size();
+
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "AllocateCommandBuffers: cbCount:" << commandBuffersCount
+                                                  << " renderPassCount: " << renderPassCount );
+
+  if( commandBuffersCount < renderPassCount )
+  {
+    for( size_t index = commandBuffersCount; index < renderPassCount ; ++index )
+    {
+      // Create primary buffer for each render pass & begin recording
+      auto commandBuffer = mGraphics->CreateCommandBuffer(true);
+      commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
+      mSwapchainBuffers[mBufferIndex]->commandBuffers.emplace_back( commandBuffer );
+    }
+  }
+}
+
+RefCountedCommandBuffer Swapchain::GetLastCommandBuffer() const
+{
+  return mSwapchainBuffers[mBufferIndex]->commandBuffers.back();
+}
+
+std::vector<RefCountedCommandBuffer>& Swapchain::GetCommandBuffers() const
+{
+  return mSwapchainBuffers[mBufferIndex]->commandBuffers;
 }
 
 } // namespace Vulkan
