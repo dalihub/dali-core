@@ -198,7 +198,15 @@ public:
 
   void PushDescriptorWrite( const vk::WriteDescriptorSet& write );
 
+  /**
+   * Pushes descriptorsets to be freed by the allocator.
+   * The descriptor sets must not be used any more by the renderer
+   * @param descriptorSets
+   */
+  void FreeDescriptorSets( const std::vector<vk::DescriptorSet>& descriptorSets );
+
   bool HasPendingResourceTransfers() const;
+
 public:
 
   API::TextureFactory& GetTextureFactory() const override;

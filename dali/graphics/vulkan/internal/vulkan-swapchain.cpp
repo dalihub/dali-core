@@ -166,11 +166,18 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
     mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
-    if( mFrameCounter > mSwapchainBuffers.size() && shouldCollectGarbageNow )
+    if(shouldCollectGarbageNow)
     {
       mGraphics->ExecuteActions();
       mGraphics->CollectGarbage();
     }
+  }
+  else
+  {
+    puts("Collecting garbage");
+    mGraphics->DeviceWaitIdle();
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
 
   swapBuffer->masterCmdBuffer->Reset();

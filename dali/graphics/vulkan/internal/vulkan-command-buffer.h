@@ -107,7 +107,7 @@ public:
 
   /**
    * Binds descriptor sets to the most recently bound Pipeline
-   * @param descriptorSets array of descriptor sets
+   * @param descriptorSets array of refcounted descriptor sets
    * @param pipelineLayout pipeline layout
    * @param firstSet index of the first descriptor set
    * @param descriptorSetCount number of descriptor sets to bind
@@ -117,6 +117,17 @@ public:
                            const vk::PipelineLayout& pipelineLayout,
                            uint32_t firstSet,
                            uint32_t descriptorSetCount );
+  /**
+   * Binds descriptor sets to the most recently bound Pipeline
+   * @param descriptorSets array of not-managed Vulkan descriptor sets
+   * @param pipelineLayout pipeline layout
+   * @param firstSet index of the first descriptor set
+   * @param descriptorSetCount number of descriptor sets to bind
+   */
+  void BindDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets,
+                                          const vk::PipelineLayout& pipelineLayout,
+                                          uint32_t firstSet,
+                                          uint32_t descriptorSetCount );
 
   /**
    * Issues draw command

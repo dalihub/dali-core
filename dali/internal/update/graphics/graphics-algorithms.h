@@ -56,7 +56,7 @@ public:
    */
   void SubmitRenderInstructions(Graphics::API::Controller &graphics,
                                 SceneGraph::RenderInstructionContainer &renderInstructions,
-                                BufferIndex bufferIndex);
+                                BufferIndex bufferIndex );
 
 private:
 
@@ -77,11 +77,13 @@ private:
                              Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
                              Matrix                               viewProjection,
                              RenderInstruction&                   instruction,
-                             const RenderList&                    renderItemList );
+                             const RenderList&                    renderItemList,
+                             std::vector<Graphics::API::RenderCommand*>& commandList );
 
   void SubmitInstruction( Graphics::API::Controller& graphics,
                           BufferIndex                bufferIndex,
-                          RenderInstruction&         instruction );
+                          RenderInstruction&         instruction,
+                          std::vector<Graphics::API::RenderCommand*>& commandList );
 
   bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
                                 RenderInstruction& instruction,

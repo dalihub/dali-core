@@ -25,6 +25,8 @@ namespace Graphics
 namespace Vulkan
 {
 
+
+
 DescriptorSetAllocator::DescriptorSetAllocator( Graphics& graphics, uint32_t maxPoolSize )
 : mGraphics( &graphics ),
   mMaxPoolSize( maxPoolSize )
@@ -120,6 +122,8 @@ DescriptorSetAllocator::AllocateDescriptorSets( const std::vector< DescriptorSet
     // Get the vector of pools
     auto& pools = ( *foundIterator ).pools;
 
+    //(*foundIterator).totalAllocationCount += totalSetsToAllocate;
+
     // Iterator that determines from which point in the vector
     // the descriptor set layouts should be read for the allocation.
     auto allocationIterator = descriptorSetLayouts.begin();
@@ -188,6 +192,19 @@ DescriptorSetAllocator::AllocateDescriptorSets( const std::vector< DescriptorSet
   PrintAllocationReport( *this );
 
   return refCountedDescriptorSets;
+}
+
+void DescriptorSetAllocator::Optimize()
+{
+#if 0
+  for( auto& item : mStorage )
+  {
+    for( auto& signature : item.signatureAndPools )
+    {
+
+    }
+  }
+#endif
 }
 
 std::vector< vk::DescriptorPoolSize >
@@ -265,6 +282,28 @@ void DescriptorSetAllocator::ExtendPoolVectorForSignature( const DescriptorSetLa
   {
     poolVector.emplace_back( DescriptorPool::New( *mGraphics, poolCreateInfo ) );
   }
+}
+
+bool DescriptorSetAllocator::ValidateSignatures( const std::vector<DescriptorSetLayoutSignature>& signatures )
+{
+
+  for( auto& signature : signatures )
+  {
+    for( auto& item : mStorage )
+    {
+      auto it = std::find_if( item.signatureAndPools.begin(), item.signatureAndPools.end(), [&]( auto& i )->bool
+      {
+        return signature == i.signature;
+      });
+
+      if( it != item.signatureAndPools.end() && !it->valid )
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 } //namespace Vulkan

@@ -149,6 +149,7 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+  puts("Renderer dying");
   if( mTextureSet )
   {
     mTextureSet->RemoveObserver( this );

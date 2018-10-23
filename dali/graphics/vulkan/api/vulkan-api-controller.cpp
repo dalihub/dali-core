@@ -45,6 +45,8 @@
 #include <dali/graphics/vulkan/api/vulkan-api-sampler-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
+#include <dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.h>
+
 #include <dali/graphics/thread-pool.h>
 
 namespace Dali
@@ -110,6 +112,7 @@ struct Controller::Impl
     mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
 
     mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >();
+    mDescriptorSetAllocator = MakeUnique< VulkanAPI::Internal::DescriptorSetAllocator>( mOwner );
 
     return mThreadPool.Initialize();
   }
@@ -175,8 +178,16 @@ struct Controller::Impl
     mDefaultPipelineCache->Compile();
   }
 
+  void OptimizeMemoryUsage()
+  {
+    auto& allocator = mGraphics.GetDescriptorSetAllocator();
+    allocator.Optimize();
+  }
+
   void BeginFrame()
   {
+    OptimizeMemoryUsage();
+
     // Acquire next framebuffer image
     AcquireNextFramebuffer();
 
@@ -222,6 +233,8 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
+
+    mDescriptorSetAllocator->SwapBuffers();
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -304,12 +317,50 @@ struct Controller::Impl
     }
   }
 
+  void GetDescriptorSetRequirements( std::vector< Dali::Graphics::API::RenderCommand* >& commands )
+  {
+    // make sure pipelines are bound
+
+  }
+
   /**
    * Submits number of commands in one go ( simiar to vkCmdExecuteCommands )
    * @param commands
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
+    /*
+     * analyze descriptorset needs pers signature
+     */
+    std::vector<DescriptorSetRequirements> dsRequirements {};
+    printf("Controller: UpdatingRequirements: commands = %d\n", int(commands.size()));
+    for( auto& command : commands )
+    {
+      auto vulkanCommand = static_cast<VulkanAPI::RenderCommand*>( command );
+      vulkanCommand->UpdateDescriptorSetAllocationRequirements( dsRequirements );
+    }
+
+    /*
+     * Update descriptor pools based on the requirements
+     */
+    printf("Controller: Obtained requirements: %d\n", int(dsRequirements.size()));
+    if( dsRequirements.size() )
+    {
+      printf("Controller::DescriptorSetAllocator(): UpdateWithRequirements()\n");
+      mDescriptorSetAllocator->UpdateWithRequirements( dsRequirements, 0u );
+    }
+
+    /**
+     * Allocate descriptor sets for all signatures that requirements forced
+     * recreating pools
+     */
+    printf("Controller: Allocating descriptor sets\n");
+    for( auto& command : commands )
+    {
+      auto vulkanCommand = static_cast<VulkanAPI::RenderCommand*>( command );
+      vulkanCommand->AllocateDescriptorSets( *mDescriptorSetAllocator );
+    }
+
     mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(0, Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
@@ -661,6 +712,7 @@ struct Controller::Impl
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
+  std::unique_ptr< VulkanAPI::Internal::DescriptorSetAllocator > mDescriptorSetAllocator;
 
   Vulkan::Graphics& mGraphics;
   Controller& mOwner;
@@ -700,6 +752,8 @@ struct Controller::Impl
 
   DepthStencilFlags mDepthStencilBufferCurrentState { 0u };
   DepthStencilFlags mDepthStencilBufferRequestedState { 0u };
+
+  std::vector<vk::DescriptorSet> mDescriptorSetsFreeList;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -793,6 +847,11 @@ void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
   mImpl->mDescriptorWrites.emplace_back( write );
   mImpl->mDescriptorWrites.back().pBufferInfo = pBufferInfo;
   mImpl->mDescriptorWrites.back().pImageInfo = pImageInfo;
+}
+
+void Controller::FreeDescriptorSets( const std::vector<vk::DescriptorSet>& descriptorSets )
+{
+  mImpl->mDescriptorSetsFreeList.insert( mImpl->mDescriptorSetsFreeList.end(), descriptorSets.begin(), descriptorSets.end() );
 }
 
 void Controller::EndFrame()

@@ -161,6 +161,21 @@ void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > d
                                      nullptr );
 }
 
+void CommandBuffer::BindDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets,
+                                        const vk::PipelineLayout& pipelineLayout,
+                                        uint32_t firstSet,
+                                        uint32_t descriptorSetCount )
+{
+  // TODO: support dynamic offsets
+  mCommandBuffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics,
+                                     pipelineLayout,
+                                     firstSet,
+                                     descriptorSetCount,
+                                     descriptorSets.data(),
+                                     0,
+                                     nullptr );
+}
+
 void CommandBuffer::Draw( uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance )
 {
   mCommandBuffer.draw( vertexCount, instanceCount, firstVertex, firstInstance );
