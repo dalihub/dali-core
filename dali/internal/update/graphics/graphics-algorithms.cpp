@@ -456,7 +456,8 @@ void GraphicsAlgorithms::SubmitRenderItemList(
   Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
   Matrix                               viewProjection,
   RenderInstruction&                   instruction,
-  const RenderList&                    renderItemList )
+  const RenderList&                    renderItemList,
+  std::vector<Graphics::API::RenderCommand*>& commandList )
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -465,8 +466,6 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   Matrix vulkanProjectionMatrix;
   Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
-
-  std::vector<Graphics::API::RenderCommand*> commandList;
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
@@ -554,13 +553,14 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     commandList.push_back(&cmd);
   }
 
-  graphics.SubmitCommands( std::move(commandList) );
+  //graphics.SubmitCommands( std::move(commandList) );
 }
 
 void GraphicsAlgorithms::SubmitInstruction(
   Graphics::API::Controller& graphics,
   BufferIndex                bufferIndex,
-  RenderInstruction&         instruction )
+  RenderInstruction&         instruction,
+  std::vector<Graphics::API::RenderCommand*>& commandList )
 {
   using namespace Graphics::API;
 
@@ -592,7 +592,8 @@ void GraphicsAlgorithms::SubmitInstruction(
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
     SubmitRenderItemList( graphics, bufferIndex, renderTargetBinding,
-                          viewProjection, instruction, *instruction.GetRenderList( i ) );
+                          viewProjection, instruction, *instruction.GetRenderList( i ),
+                          commandList );
   }
 }
 
@@ -975,7 +976,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
 
-  printf("Allocation: %d, Paged: %d\n", int( mUniformBlockAllocationBytes ), int(pagedAllocation ));
+  //printf("Allocation: %d, Paged: %d\n", int( mUniformBlockAllocationBytes ), int(pagedAllocation ));
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
   if( mUniformBlockAllocationBytes && !mUniformBuffer[uboIndex] )
@@ -987,24 +988,29 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     (pagedAllocation < uint32_t(float(mUniformBuffer[uboIndex]->GetSize()) * 0.75f )) )
     )
   {
-    puts("RESERVING");
+    //puts("RESERVING");
     mUniformBuffer[uboIndex]->Reserve( pagedAllocation );
   }
 
   if( mUniformBuffer[0] && mUniformBuffer[1])
   {
-    printf("Total UBO memory usage: current = %d, both = %d\n", int(mUniformBuffer[uboIndex]->GetSize()), int(mUniformBuffer[0]->GetSize()+mUniformBuffer[1]->GetSize()));
+    //printf("Total UBO memory usage: current = %d, both = %d\n", int(mUniformBuffer[uboIndex]->GetSize()), int(mUniformBuffer[0]->GetSize()+mUniformBuffer[1]->GetSize()));
   }
   mUboOffset = 0u;
 
   controller.BeginFrame();
 
+  std::vector<Graphics::API::RenderCommand*> commandList{};
+
   for( size_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 
-    SubmitInstruction( controller, bufferIndex, instruction );
+    SubmitInstruction( controller, bufferIndex, instruction, commandList );
   }
+
+  // Submit all render commands in one go
+  controller.SubmitCommands( std::move(commandList) );
 
   if( mUniformBlockAllocationBytes && mUniformBuffer[uboIndex] )
   {
@@ -1013,7 +1019,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   controller.EndFrame();
 
-  printf("Top offset: %d\n", int(mUboOffset));
+  //printf("Top offset: %d\n", int(mUboOffset));
 
   mCurrentFrameIndex++;
 }

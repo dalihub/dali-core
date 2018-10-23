@@ -34,10 +34,15 @@ class PipelineCache;
 namespace VulkanAPI
 {
 class Controller;
-
 class Ubo;
-
 class Pipeline;
+class DescriptorSetList;
+class DescriptorSetRequirements;
+
+namespace Internal
+{
+class DescriptorSetAllocator;
+}
 
 /**
  * Render command stores internal command buffer per draw call
@@ -82,7 +87,7 @@ public:
    * Returns an array of updated descriptor sets
    * @return
    */
-  const std::vector< Vulkan::RefCountedDescriptorSet >& GetDescriptorSets() const;
+  const std::vector< vk::DescriptorSet >& GetDescriptorSets() const;
 
   /**
    * Returns Vulkan backed pipeline
@@ -96,13 +101,37 @@ public:
    */
   void BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer ) const;
 
+  void UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements );
+
+  void AllocateDescriptorSets( Internal::DescriptorSetAllocator& dsAllocator );
+
 private:
 
+  /**
+   * Retrieves array of requirements of used descriptor sets
+   */
+  void BuildDescriptorSetRequirements();
+
+  /**
+   * Tests whether anything changed and does stuff
+   */
+  void UpdateDescriptorSets( bool force );
+
+  /**
+   * Discards existing descriptor sets
+   */
+  void DiscardDescriptorSets();
+
+private:
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
   vk::Pipeline mVulkanPipeline;
 
-  std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
+  /**
+   * Internal descriptor set data
+   */
+  struct DescriptorSetData;
+  std::unique_ptr<DescriptorSetData> mData;
 
   bool mUBONeedsBinding { false };
 };

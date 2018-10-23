@@ -21,6 +21,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug-allocator.h>
 
 namespace Dali
 {
@@ -47,7 +48,12 @@ DescriptorPool::~DescriptorPool() = default;
 
 bool DescriptorPool::Initialise()
 {
-  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator() ));
+  //PrintAllocationStatus();
+
+  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator( "DescriptorPool" ) ));
+
+  //PrintAllocationStatus();
+
   return true;
 }
 
@@ -163,6 +169,7 @@ bool DescriptorSet::OnDestroy()
   auto descriptorPool = mPool;
   auto descriptorSet = mDescriptorSet;
 
+  puts("DescriptorSet::OnDestroy");
   mGraphics->EnqueueAction( [ descriptorPool, descriptorSet ]()
                               {
                                 DALI_LOG_INFO( gVulkanFilter,
