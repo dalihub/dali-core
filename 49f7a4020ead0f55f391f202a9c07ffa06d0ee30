@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a11de57_73e7d793",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-24T16:49:25Z",
+      "side": 1,
+      "message": "Don\u0027t we need a post layout barrier? If not, please comment why.",
+      "range": {
+        "startLine": 419,
+        "startChar": 0,
+        "endLine": 419,
+        "endChar": 142
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be29ded8_70140ae6",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-24T16:49:25Z",
+      "side": 1,
+      "message": "spelling",
+      "range": {
+        "startLine": 1024,
+        "startChar": 8,
+        "endLine": 1024,
+        "endChar": 18
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40488bf9_9944dd7f",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1298,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-24T16:49:25Z",
+      "side": 1,
+      "message": "No tabs; remove commented out code.",
+      "range": {
+        "startLine": 1298,
+        "startChar": 17,
+        "endLine": 1298,
+        "endChar": 18
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63ef696b_1a29d5aa",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-24T16:49:25Z",
+      "side": 1,
+      "message": "Please clean up code!",
+      "range": {
+        "startLine": 1374,
+        "startChar": 24,
+        "endLine": 1374,
+        "endChar": 25
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "66d2bbe0_d9979f78",
+        "filename": "dali/public-api/images/native-image-interface.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-10-24T16:49:25Z",
+      "side": 1,
+      "message": "Changing Vtable - won\u0027t be binary compatible.",
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
