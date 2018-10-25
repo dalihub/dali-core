@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "27fa79e0_1ed65638",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-10-25T09:09:05Z",
+      "side": 1,
+      "message": "Hmm, I saw the tbm native sample from VD. Pre Image Memory Barrier is just used in the sample. I guess if the staging buffer is not used, one image memory barrier is only used. I\u0027m not sure whether is correct or not.",
+      "parentUuid": "9a11de57_73e7d793",
+      "range": {
+        "startLine": 419,
+        "startChar": 0,
+        "endLine": 419,
+        "endChar": 142
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "be29ded8_70140ae6",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2018-10-24T16:49:25Z",
       "side": 1,
       "message": "spelling",
+      "range": {
+        "startLine": 1024,
+        "startChar": 8,
+        "endLine": 1024,
+        "endChar": 18
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3cf1eff1_81958297",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-10-25T09:09:05Z",
+      "side": 1,
+      "message": "Ah It is temporary name, When this patch works fine, I will change and fix coding convension.\nSorry for my ugly writting.",
+      "parentUuid": "be29ded8_70140ae6",
       "range": {
         "startLine": 1024,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "4ff44727_a7d9affe",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1298,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-10-25T09:09:05Z",
+      "side": 1,
+      "message": "I will fix it.",
+      "parentUuid": "40488bf9_9944dd7f",
+      "range": {
+        "startLine": 1298,
+        "startChar": 17,
+        "endLine": 1298,
+        "endChar": 18
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "63ef696b_1a29d5aa",
         "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
         "patchSetId": 4
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "e0f000b2_5262b801",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-10-25T09:09:05Z",
+      "side": 1,
+      "message": "I\u0027m so sorry. I will fix it.",
+      "parentUuid": "63ef696b_1a29d5aa",
+      "range": {
+        "startLine": 1374,
+        "startChar": 24,
+        "endLine": 1374,
+        "endChar": 25
+      },
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "66d2bbe0_d9979f78",
         "filename": "dali/public-api/images/native-image-interface.h",
         "patchSetId": 4
@@ -105,6 +201,24 @@
       "writtenOn": "2018-10-24T16:49:25Z",
       "side": 1,
       "message": "Changing Vtable - won\u0027t be binary compatible.",
+      "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e09c05f_5400a283",
+        "filename": "dali/public-api/images/native-image-interface.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013840
+      },
+      "writtenOn": "2018-10-25T09:09:05Z",
+      "side": 1,
+      "message": "I see, Is it possible this interface is moved to extension?",
+      "parentUuid": "66d2bbe0_d9979f78",
       "revId": "49f7a4020ead0f55f391f202a9c07ffa06d0ee30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
