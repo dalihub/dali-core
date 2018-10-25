@@ -92,7 +92,7 @@ LayerPtr Layer::New()
   return layer;
 }
 
-LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool systemLevel )
+LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager )
 {
   LayerPtr root( new Layer( Actor::ROOT_LAYER ) );
 
@@ -100,7 +100,7 @@ LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool syst
   SceneGraph::Layer* rootLayer = static_cast<SceneGraph::Layer*>( root->CreateNode() );
   root->mNode = rootLayer;
   OwnerPointer< SceneGraph::Layer > transferOwnership( rootLayer );
-  InstallRootMessage( manager, transferOwnership, systemLevel );
+  InstallRootMessage( manager, transferOwnership );
 
   // root actor is immediately considered to be on-stage
   root->mIsOnStage = true;
@@ -110,6 +110,7 @@ LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool syst
 
   // layer-list must be set for the root layer
   root->mLayerList = &layerList;
+  layerList.SetRootLayer( &(*root) );
   layerList.RegisterLayer( *root );
 
   return root;

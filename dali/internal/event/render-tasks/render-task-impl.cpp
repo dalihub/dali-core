@@ -71,9 +71,9 @@ SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoCon
 
 } // Unnamed namespace
 
-RenderTask* RenderTask::New( bool isSystemLevel )
+RenderTask* RenderTask::New()
 {
-  RenderTask* task( new RenderTask( isSystemLevel ) );
+  RenderTask* task( new RenderTask() );
 
   return task;
 }
@@ -434,11 +434,6 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
     inside = mScreenToFrameBufferFunction( screenCoords );
   }
   return inside;
-}
-
-bool RenderTask::IsSystemLevel() const
-{
-  return mIsSystemLevel;
 }
 
 bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const
@@ -867,7 +862,7 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-RenderTask::RenderTask( bool isSystemLevel )
+RenderTask::RenderTask()
 : mSceneObject( NULL ),
   mSourceConnector( Connector::SOURCE_CONNECTOR, *this ),
   mCameraConnector( Connector::CAMERA_CONNECTOR, *this ),
@@ -882,7 +877,6 @@ RenderTask::RenderTask( bool isSystemLevel )
   mInputEnabled( Dali::RenderTask::DEFAULT_INPUT_ENABLED ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
   mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mIsSystemLevel( isSystemLevel ),
   mRequiresSync( false )
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);

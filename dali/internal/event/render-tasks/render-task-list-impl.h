@@ -34,6 +34,10 @@ namespace Internal
 class EventThreadServices;
 class RenderTaskDefaults;
 class Actor;
+class CameraActor;
+
+class RenderTaskList;
+typedef IntrusivePtr<RenderTaskList> RenderTaskListPtr;
 
 namespace SceneGraph
 {
@@ -59,17 +63,25 @@ public:
 
   /**
    * Create a RenderTaskList.
-   * @param[in] eventServices Used for sending message to the scene graph.
-   * @param[in] defaults Provides the default source & camera actors.
-   * @param[in] systemLevel True if this is the LayerList for actors added via the SystemLevel::Add().
    * @return A newly allocated RenderTaskList; the caller takes ownership.
    */
-  static RenderTaskList* New( EventThreadServices& eventServices, RenderTaskDefaults& defaults, bool systemLevel );
+  static RenderTaskListPtr New();
 
   /**
    * @copydoc Dali::RenderTaskList::CreateTask()
    */
   Dali::RenderTask CreateTask();
+
+  /**
+   * @brief Creates a new RenderTask.
+   *
+   * This will be appended to the list of render-tasks.
+   *
+   * @param[in] sourceActor The actor and its children to be rendered for this render task.
+   * @param[in] cameraActor The actor from which the scene is viewed for this render task.
+   * @return A valid handle to a new RenderTask
+   */
+  Dali::RenderTask CreateTask( Actor* sourceActor, CameraActor* cameraActor);
 
   /**
    * @copydoc Dali::RenderTaskList::RemoveTask()
@@ -131,11 +143,8 @@ protected:
 
   /**
    * Construct a new RenderTaskList.
-   * @param[in] eventThreadServices Used for creating render-tasks in the scene graph.
-   * @param[in] defaults Provides the default source & camera actors.
-   * @param[in] systemLevel True if this is the system-level list.
    */
-  RenderTaskList( EventThreadServices& eventThreadServices, RenderTaskDefaults& defaults, bool systemLevel );
+  RenderTaskList();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -145,7 +154,17 @@ protected:
   /**
    * 2nd-phase construction
    */
-  void Initialize( SceneGraph::UpdateManager& updateManager );
+  void Initialize();
+
+  /**
+   * Helper to create a scene-graph render task list
+   */
+  void CreateSceneObject();
+
+  /**
+   * Helper to destroy a scene-graph render task list
+   */
+  void DestroySceneObject();
 
 private: // from CompleteNotificationInterface
 
@@ -158,8 +177,6 @@ private:
 
   EventThreadServices& mEventThreadServices;
   RenderTaskDefaults& mDefaults;
-
-  bool mIsSystemLevel; ///< True if the layers are added via the SystemLevel API
 
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 

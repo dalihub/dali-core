@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 namespace Dali
 {
@@ -46,15 +47,27 @@ public:
   typedef OwnerContainer< RenderTask* > RenderTaskContainer;
 
   /**
-   * Constructor
-   * @param renderMessageDispatcher to send messages
+   * Construct a new RenderTaskList.
+   * @return A new RenderTaskList
    */
-  RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher );
+  static RenderTaskList* New();
 
   /**
    * Destructor
    */
   ~RenderTaskList();
+
+  /**
+   * Overriden delete operator
+   * Deletes the RenderTaskList from its global memory pool
+   */
+  void operator delete( void* ptr );
+
+  /**
+   * Set the renderMessageDispatcher to send message.
+   * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
+   */
+  void SetRenderMessageDispatcher( RenderMessageDispatcher* renderMessageDispatcher );
 
   /**
    * Add a new RenderTask to the list.
@@ -97,6 +110,13 @@ public:
    */
   CompleteNotificationInterface* GetCompleteNotificationInterface();
 
+protected:
+
+  /**
+   * Protected constructor. See New()
+   */
+  RenderTaskList();
+
 private:
 
   // Undefined
@@ -108,7 +128,7 @@ private:
 private:
 
   CompleteNotificationInterface* mNotificationObject; ///< object to pass in to the complete notification
-  RenderMessageDispatcher& mRenderMessageDispatcher; ///< for sending messages to render thread
+  RenderMessageDispatcher* mRenderMessageDispatcher; ///< for sending messages to render thread
   RenderTaskContainer mRenderTasks; ///< A container of owned RenderTasks
 
 };

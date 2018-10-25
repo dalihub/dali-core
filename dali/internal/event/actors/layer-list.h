@@ -50,9 +50,8 @@ public:
   /**
    * Create a new list of layers.
    * @param[in] updateManager A reference to the update manager.
-   * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  static LayerList* New( SceneGraph::UpdateManager& updateManager, bool systemLevel );
+  static LayerList* New( SceneGraph::UpdateManager& updateManager );
 
   /**
    * Non-virtual destructor; not suitable as a base class.
@@ -134,14 +133,20 @@ public:
    */
   void MoveLayerBelow( const Layer& layer, const Layer& target );
 
+  /**
+   * Sets the root layer that this layer list belongs to
+   * @pre the root layer is created
+   * @param rootLayer The root layer
+   */
+  void SetRootLayer(Layer* rootLayer);
+
 private:
 
   /**
    * Protected constructor; see also LayerList::New().
    * @param[in] updateManager to send messages.
-   * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel );
+  LayerList( SceneGraph::UpdateManager& updateManager );
 
   /**
    * A private helper method to set the depth for each layer.
@@ -154,7 +159,7 @@ private:
 
   SceneGraph::UpdateManager& mUpdateManager;
 
-  bool mIsSystemLevel; ///< True if the layers are added via the SystemOverlay API.
+  Layer* mRoot;        ///< The root layer that this ordered list of layers belong to
 
   typedef std::vector<Layer*> LayerContainer;
 

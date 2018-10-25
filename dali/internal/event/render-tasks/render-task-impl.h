@@ -49,9 +49,8 @@ public:
 
   /**
    * Creates a new RenderTask.
-   * @param[in] isSystemLevel Whether the render-task is on the system level task list.
    */
-  static RenderTask* New( bool isSystemLevel );
+  static RenderTask* New();
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
@@ -230,12 +229,6 @@ public:
   bool TranslateCoordinates( Vector2& screenCoords ) const;
 
   /**
-   * Query whether the RenderTask is on the system level render-task list.
-   * @return true, if on the system level task list, false otherwise.
-   */
-  bool IsSystemLevel() const;
-
-  /**
    * @copydoc Dali::RenderTask::WorldToViewport()
    */
   bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
@@ -378,9 +371,8 @@ protected:
 
   /**
    * Construct a new RenderTask.
-   * @param[in] isSystemLevel Whether the RenderTask is on the system level task list.
    */
-  RenderTask( bool isSystemLevel );
+  RenderTask();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -484,7 +476,6 @@ private:
   bool mInputEnabled  : 1; ///< True if the render-task should be considered for input handling.
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode      : 1; ///< True if the render-task's actors should be culled
-  bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
   bool mRequiresSync  : 1; ///< True if the GL sync is required to track the render of.
 
   //Signals

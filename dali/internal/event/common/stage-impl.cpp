@@ -104,10 +104,10 @@ void Stage::Initialize( bool renderToFbo )
   mObjectRegistry = ObjectRegistry::New();
 
   // Create the ordered list of layers
-  mLayerList = LayerList::New( mUpdateManager, false/*not system-level*/ );
+  mLayerList = LayerList::New( mUpdateManager );
 
   // The stage owns the default layer
-  mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager, false/*not system-level*/ );
+  mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager );
   mRootLayer->SetName("RootLayer");
   // The root layer needs to have a fixed resize policy (as opposed to the default USE_NATURAL_SIZE).
   // This stops actors parented to the stage having their relayout requests propagating
@@ -118,10 +118,10 @@ void Stage::Initialize( bool renderToFbo )
   CreateDefaultCameraActor();
 
   // Create the list of render-tasks
-  mRenderTaskList = RenderTaskList::New( *this, *this, false/*not system-level*/ );
+  mRenderTaskList = RenderTaskList::New();
 
   // Create the default render-task
-  Dali::RenderTask defaultRenderTask = mRenderTaskList->CreateTask();
+  Dali::RenderTask defaultRenderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
 }
 
 void Stage::Uninitialize()
@@ -142,6 +142,11 @@ void Stage::Uninitialize()
     // we are closing down so just delete the root, no point emit disconnect
     // signals or send messages to update
     mRootLayer.Reset();
+  }
+
+  if( mRenderTaskList )
+  {
+    mRenderTaskList.Reset();
   }
 }
 

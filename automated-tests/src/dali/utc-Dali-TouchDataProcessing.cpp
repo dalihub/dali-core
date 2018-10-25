@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -1404,7 +1405,12 @@ int UtcDaliTouchDataSystemOverlayActor(void)
   TestApplication application;
   Dali::Integration::Core& core( application.GetCore() );
   Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  Dali::RenderTaskList overlayRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+  Integration::RenderTaskList::CreateTask( overlayRenderTaskList, overlayRootActor, overlayCameraActor );
+  systemOverlay.SetOverlayRenderTasks( overlayRenderTaskList );
 
   // Create an actor and add it to the system overlay.
   Actor systemActor = Actor::New();
