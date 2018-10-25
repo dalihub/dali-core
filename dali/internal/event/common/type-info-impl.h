@@ -405,6 +405,7 @@ private:
 private:
 
   TypeRegistry& mTypeRegistry;
+  mutable Internal::TypeInfo* mBaseType; // allow changing from const methods, initialised inside constructor
   std::string mTypeName;
   std::string mBaseTypeName;
   union

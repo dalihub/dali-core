@@ -61,23 +61,23 @@ TypeRegistry::~TypeRegistry()
   mRegistryLut.clear();
 }
 
-Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::string& uniqueTypeName )
+TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo( const std::string& uniqueTypeName )
 {
   for( auto&& iter : mRegistryLut )
   {
     // Note! mRegistryLut contains Dali::TypeInfo handles, so cannot call GetTypeName()
     // as it calls us back resulting in infinite loop (GetTypeName is in BaseHandle part)
-    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    if( iter->GetName() == uniqueTypeName )
     {
       return iter;
     }
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", uniqueTypeName.c_str() );
 
-  return Dali::TypeInfo();
+  return TypeRegistry::TypeInfoPointer();
 }
 
-Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
+TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo( const std::type_info& registerType )
 {
   std::string typeName = DemangleClassName( registerType.name() );
 
@@ -95,7 +95,7 @@ std::string TypeRegistry::GetTypeName( size_t index ) const
 
   if( index < mRegistryLut.size() )
   {
-    name = GetImplementation( mRegistryLut[ index ] ).GetName();
+    name = mRegistryLut[ index ]->GetName();
   }
 
   return name;
@@ -127,7 +127,7 @@ std::string TypeRegistry::Register( const std::string& uniqueTypeName, const std
   // check for duplicates using uniqueTypeName
   for( auto&& iter : mRegistryLut )
   {
-    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    if( iter->GetName() == uniqueTypeName )
     {
       DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
       DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
@@ -135,7 +135,7 @@ std::string TypeRegistry::Register( const std::string& uniqueTypeName, const std
     }
   }
 
-  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount ) ) );
+  mRegistryLut.push_back( TypeRegistry::TypeInfoPointer( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount ) ) );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 
   if( callCreateOnInit )
@@ -154,7 +154,7 @@ void TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
   // check for duplicates using uniqueTypeName
   for( auto&& iter : mRegistryLut )
   {
-    if( GetImplementation( iter ).GetName() == uniqueTypeName )
+    if( iter->GetName() == uniqueTypeName )
     {
       DALI_LOG_WARNING( "Duplicate name in TypeRegistry for '%s'\n", + uniqueTypeName.c_str() );
       DALI_ASSERT_ALWAYS( !"Duplicate type name in Type Registration" );
@@ -162,7 +162,7 @@ void TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
     }
   }
 
-  mRegistryLut.push_back( Dali::TypeInfo( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
+  mRegistryLut.push_back( TypeRegistry::TypeInfoPointer( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance ) ) );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 }
 
@@ -183,10 +183,9 @@ void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddConnectorFunction( name, func );
+      iter->AddConnectorFunction( name, func );
       break;
     }
   }
@@ -196,10 +195,9 @@ bool TypeRegistry::RegisterAction( TypeRegistration& typeRegistration, const std
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddActionFunction( name, f );
+      iter->AddActionFunction( name, f );
       return true;
     }
   }
@@ -210,10 +208,9 @@ bool TypeRegistry::RegisterProperty( TypeRegistration& typeRegistration, const s
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddProperty( name, index, type, setFunc, getFunc );
+      iter->AddProperty( name, index, type, setFunc, getFunc );
       return true;
     }
   }
@@ -225,10 +222,9 @@ bool TypeRegistry::RegisterProperty( const std::string& objectName, const std::s
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == objectName )
+    if( iter->GetName() == objectName )
     {
-      impl.AddProperty( name, index, type, setFunc, getFunc );
+      iter->AddProperty( name, index, type, setFunc, getFunc );
       return true;
     }
   }
@@ -241,10 +237,9 @@ bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistratio
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddAnimatableProperty( name, index, type );
+      iter->AddAnimatableProperty( name, index, type );
       return true;
     }
   }
@@ -256,10 +251,9 @@ bool TypeRegistry::RegisterAnimatableProperty( TypeRegistration& typeRegistratio
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddAnimatableProperty( name, index, value );
+      iter->AddAnimatableProperty( name, index, value );
       return true;
     }
   }
@@ -271,10 +265,9 @@ bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& typeRe
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == typeRegistration.RegisteredName() )
+    if( iter->GetName() == typeRegistration.RegisteredName() )
     {
-      impl.AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
+      iter->AddAnimatablePropertyComponent( name, index, baseIndex, componentIndex );
       return true;
     }
   }
@@ -286,10 +279,9 @@ bool TypeRegistry::RegisterChildProperty( const std::string& registeredType, con
 {
   for( auto&& iter : mRegistryLut )
   {
-    auto&& impl = GetImplementation( iter );
-    if( impl.GetName() == registeredType )
+    if( iter->GetName() == registeredType )
     {
-      impl.AddChildProperty( name, index, type );
+      iter->AddChildProperty( name, index, type );
       return true;
     }
   }
@@ -306,15 +298,14 @@ bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string& act
 {
   bool done = false;
 
-  Dali::TypeInfo type = GetTypeInfo( object );
+  auto&& type = GetTypeInfo( object );
 
-  auto&& impl = GetImplementation( type );
   // DoActionTo recurses through base classes
-  done = impl.DoActionTo( object, actionName, properties );
+  done = type->DoActionTo( object, actionName, properties );
 
   if( !done )
   {
-    DALI_LOG_WARNING("Type '%s' cannot do action '%s'\n", type.GetName().c_str(), actionName.c_str());
+    DALI_LOG_WARNING("Type '%s' cannot do action '%s'\n", type->GetName().c_str(), actionName.c_str());
   }
 
   return done;
@@ -324,21 +315,14 @@ bool TypeRegistry::ConnectSignal( BaseObject* object, ConnectionTrackerInterface
 {
   bool connected( false );
 
-  Dali::TypeInfo type = GetTypeInfo( object );
+  auto&& type = GetTypeInfo( object );
 
-  while( type )
-  {
-    auto&& impl = GetImplementation( type );
-    connected = impl.ConnectSignal( object, connectionTracker, signalName, functor );
-    if( connected )
-    {
-      break;
-    }
-    type = GetTypeInfo( impl.GetBaseName() );
-  }
+  // Connect iterates through base classes
+  connected = type->ConnectSignal( object, connectionTracker, signalName, functor );
 
   if( !connected )
   {
+    DALI_LOG_WARNING("Type '%s' signal '%s' connection failed \n", type->GetName().c_str(), signalName.c_str());
     // Ownership of functor was not passed to Dali::CallbackBase, so clean-up now
     delete functor;
   }
@@ -346,14 +330,14 @@ bool TypeRegistry::ConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-Dali::TypeInfo TypeRegistry::GetTypeInfo(const Dali::BaseObject * const pBaseObject)
+TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const Dali::BaseObject * const pBaseObject)
 {
-  Dali::TypeInfo type;
+  TypeInfoPointer type;
 
   // test for custom actor which has another indirection to get to the type hiearchy we're after
   const Dali::Internal::CustomActor * const pCustom = dynamic_cast<const Dali::Internal::CustomActor*>(pBaseObject);
 
-  if(pCustom)
+  if( pCustom )
   {
     const Dali::CustomActorImpl& custom = pCustom->GetImplementation();
     type = GetTypeInfo( typeid( custom ) );

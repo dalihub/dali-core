@@ -954,10 +954,10 @@ const TypeInfo* Object::GetTypeInfo() const
     // This uses a dynamic_cast so can be quite expensive so we only really want to do it once
     // especially as the type-info does not change during the life-time of an application
 
-    Dali::TypeInfo typeInfoHandle = TypeRegistry::Get()->GetTypeInfo( this );
+    TypeRegistry::TypeInfoPointer typeInfoHandle = TypeRegistry::Get()->GetTypeInfo( this );
     if ( typeInfoHandle )
     {
-      mTypeInfo = &GetImplementation( typeInfoHandle );
+      mTypeInfo = typeInfoHandle.Get(); // just a raw pointer to use, ownership is kept
     }
   }
 
@@ -1110,7 +1110,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
 
 void Object::RegisterAnimatableProperty( const TypeInfo& typeInfo,
                                           Property::Index index,
-                                          const Property::Value* value) const
+                                          const Property::Value* value ) const
 {
   // If the property is not a component of a base property, register the whole property itself.
   const std::string& propertyName = typeInfo.GetPropertyName( index );

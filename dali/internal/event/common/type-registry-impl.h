@@ -40,6 +40,10 @@ class PropertyDetails;
 class TypeRegistry : public Dali::BaseObject
 {
 public:
+
+  // using intrusive pointer instead of handles internally as they are considerably cheaper
+  using TypeInfoPointer = IntrusivePtr<Dali::Internal::TypeInfo>;
+
   /**
    * Get the TypeRegistry
    */
@@ -48,12 +52,12 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
    */
-  Dali::TypeInfo GetTypeInfo( const std::string &uniqueTypeName );
+  TypeInfoPointer GetTypeInfo( const std::string &uniqueTypeName );
 
   /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
    */
-  Dali::TypeInfo GetTypeInfo( const std::type_info& registerType );
+  TypeInfoPointer GetTypeInfo( const std::type_info& registerType );
 
   /**
    * @copydoc Dali::TypeRegistry::GetTypeNameCount
@@ -222,7 +226,7 @@ public:
    * @param [in] pBaseObject Pointer to a BaseObject
    * @return TypeInfo for the BaseObject.
    */
-  Dali::TypeInfo GetTypeInfo(const Dali::BaseObject * const pBaseObject);
+  TypeInfoPointer GetTypeInfo(const Dali::BaseObject * const pBaseObject);
 
   /**
    * Calls any type creation functions that have been flagged as initialization functions
@@ -242,7 +246,7 @@ private:
   /*
    * Mapping from type name to TypeInfo
    */
-  std::vector< Dali::TypeInfo > mRegistryLut;
+  std::vector< TypeInfoPointer > mRegistryLut;
 
   std::vector< Dali::TypeInfo::CreateFunction > mInitFunctions;
 
