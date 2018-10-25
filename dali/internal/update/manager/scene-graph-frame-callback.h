@@ -62,10 +62,11 @@ public:
 
   /**
    * Called from the update-thread when connecting to the scene-graph.
-   * @param[in]  transformManager  The transform Manager
+   * @param[in]  updateManager     The Update Manager
+   * @param[in]  transformManager  The Transform Manager
    * @param[in]  rootNode          The rootNode of this frame-callback
    */
-  void ConnectToSceneGraph( TransformManager& transformManager, Node& rootNode );
+  void ConnectToSceneGraph( UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode );
 
   // Movable but not copyable
 

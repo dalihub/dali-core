@@ -149,7 +149,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
    */
-  bool SetColor( uint32_t id, const Vector4& color ) const;
+  bool SetColor( uint32_t id, const Vector4& color );
 
   /**
    * @brief Allows baking an Actor's local color from the Frame callback function.
@@ -158,7 +158,7 @@ public:
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
    */
-  bool BakeColor( uint32_t id, const Vector4& color ) const;
+  bool BakeColor( uint32_t id, const Vector4& color );
 
 public: // Not intended for application developers
 

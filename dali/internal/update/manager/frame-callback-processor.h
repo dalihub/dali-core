@@ -41,6 +41,7 @@ namespace SceneGraph
 
 class Node;
 class TransformManager;
+class UpdateManager;
 
 /**
  * This class processes all the registered frame-callbacks.
@@ -51,8 +52,10 @@ public:
 
   /**
    * Construct a new FrameCallbackProcessor.
+   * @param[in]  updateManager     A reference to the UpdateManager
+   * @param[in]  transformManager  A reference to the TransformManager
    */
-  FrameCallbackProcessor( TransformManager& transformManager );
+  FrameCallbackProcessor( UpdateManager& updateManager, TransformManager& transformManager );
 
   /**
    * Non-virtual Destructor.
@@ -97,6 +100,8 @@ public:
 private:
 
   std::vector< OwnerPointer< FrameCallback > > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
+
+  UpdateManager& mUpdateManager;
 
   TransformManager& mTransformManager;
 
