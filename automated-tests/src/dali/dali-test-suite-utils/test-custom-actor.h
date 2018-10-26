@@ -67,7 +67,7 @@ public:
   float TestGetWidthForHeightBase( float height );
   float TestCalculateChildSizeBase( const Dali::Actor& child, Dali::Dimension::Type dimension );
   bool TestRelayoutDependentOnChildrenBase( Dali::Dimension::Type dimension );
-  unsigned int GetDepth();
+  uint32_t GetDepth();
 
 private:
   TestCustomActor( Impl::TestCustomActor& impl );
@@ -148,7 +148,7 @@ public:
   Dali::Vector3         mSizeSet;
   Dali::Vector3         mTargetSize;
   bool                  mNego;
-  unsigned int          mDepth;
+  uint32_t          mDepth;
 
   float         prop1;
   Dali::Vector4 prop2;
@@ -218,7 +218,7 @@ struct TestCustomActorVariant2 : public TestCustomActor
     TestCustomActor::OnStageConnection( depth );
 
     // Remove all the children
-    for( unsigned int i=0, num=Self().GetChildCount(); i<num; ++i )
+    for( uint32_t i=0, num=Self().GetChildCount(); i<num; ++i )
     {
       Self().Remove( Self().GetChildAt(0) );
     }
@@ -270,7 +270,7 @@ struct TestCustomActorVariant4 : public TestCustomActor
     TestCustomActor::OnStageDisconnection();
 
     // Remove all the children
-    for( unsigned int i=0, num=Self().GetChildCount(); i<num; ++i )
+    for( uint32_t i=0, num=Self().GetChildCount(); i<num; ++i )
     {
       Self().Remove( Self().GetChildAt(0) );
     }

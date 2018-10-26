@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// INTERNAL INCLUDES
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
@@ -36,10 +38,10 @@ public:
 
   struct Component
   {
-    std::string     name;
-    unsigned int    offset;
-    unsigned int    size;
-    Property::Type  type;
+    std::string    name;
+    uint32_t       offset;
+    uint32_t       size;
+    Property::Type type;
   };
 
   /**
@@ -48,7 +50,7 @@ public:
   struct Format
   {
     std::vector<Component> components;
-    unsigned int           size;
+    uint32_t               size;
   };
 
   /**
@@ -77,13 +79,13 @@ public:
    * @param[in] data The new data of the PropertyBuffer
    * @param[in] size The new size of the buffer
    */
-  void SetData( Dali::Vector<char>* data, size_t size );
+  void SetData( Dali::Vector<uint8_t>* data, uint32_t size );
 
   /**
    * @brief Set the number of elements
    * @param[in] size The number of elements
    */
-  void SetSize( unsigned int size );
+  void SetSize( uint32_t size );
 
   /**
    * @brief Bind the property buffer
@@ -104,16 +106,16 @@ public:
    * @param[in] vAttributeLocation Vector containing attributes location for current program
    * @param[in] locationBase Index in vAttributeLocation corresponding to the first attribute defined by this buffer
    */
-  unsigned int EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, unsigned int locationBase );
+  uint32_t EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase );
 
   /**
    * Get the number of attributes present in the buffer
    * @return The number of attributes stored in this buffer
    */
-  inline unsigned int GetAttributeCount() const
+  inline uint32_t GetAttributeCount() const
   {
     DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
-    return mFormat->components.size();
+    return static_cast<uint32_t>( mFormat->components.size() );
   }
 
   /**
@@ -121,7 +123,7 @@ public:
    * @param[in] index The index of the attribute
    * @return The name of the attribute
    */
-  inline const std::string& GetAttributeName(unsigned int index ) const
+  inline const std::string& GetAttributeName( uint32_t index ) const
   {
     DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
     return mFormat->components[index].name;
@@ -131,7 +133,7 @@ public:
    * Retrieve the size of the buffer in bytes
    * @return The total size of the buffer
    */
-  inline std::size_t GetDataSize() const
+  inline uint32_t GetDataSize() const
   {
     DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
     return mFormat->size * mSize;
@@ -141,7 +143,7 @@ public:
    * Retrieve the size of one element of the buffer
    * @return The size of one element
    */
-  inline std::size_t GetElementSize() const
+  inline uint32_t GetElementSize() const
   {
     DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
     return mFormat->size;
@@ -151,7 +153,7 @@ public:
    * Retrieve the number of elements in the buffer
    * @return The total number of elements
    */
-  inline unsigned int GetElementCount() const
+  inline uint32_t GetElementCount() const
   {
     return mSize;
   }
@@ -160,7 +162,7 @@ public:
    * Retrieve reference to the data storage vector
    * @return Reference to the data storage
    */
-  inline const Dali::Vector< char >& GetData() const
+  inline const Dali::Vector< uint8_t >& GetData() const
   {
     return *mData.Get();
   }
@@ -184,10 +186,10 @@ public:
 
 private:
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
-  OwnerPointer< Dali::Vector< char > >    mData;      ///< Data
+  OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
   OwnerPointer< GpuBuffer >               mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
 
-  size_t mSize;       ///< Number of Elements in the buffer
+  uint32_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
 };
 

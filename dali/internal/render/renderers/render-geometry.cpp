@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+// CLASS HEADER
 #include <dali/internal/render/renderers/render-geometry.h>
+
+// INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
@@ -56,7 +59,7 @@ void Geometry::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
   mAttributesChanged = true;
 }
 
-void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
+void Geometry::SetIndexBuffer( Dali::Vector<uint16_t>& indices )
 {
   mIndices.Swap( indices );
   mIndicesChanged = true;
@@ -64,13 +67,13 @@ void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
 
 void Geometry::RemovePropertyBuffer( const Render::PropertyBuffer* propertyBuffer )
 {
-  size_t bufferCount = mVertexBuffers.Size();
-  for( size_t i(0); i<bufferCount; ++i )
+  const auto&& end = mVertexBuffers.End();
+  for( auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter )
   {
-    if( propertyBuffer == mVertexBuffers[i] )
+    if( *iter == propertyBuffer )
     {
       //This will delete the gpu buffer associated to the RenderPropertyBuffer if there is one
-      mVertexBuffers.Remove( mVertexBuffers.Begin()+i );
+      mVertexBuffers.Remove( iter );
       mAttributesChanged = true;
       break;
     }
@@ -81,13 +84,13 @@ void Geometry::GetAttributeLocationFromProgram( Vector<GLint>& attributeLocation
 {
   attributeLocation.Clear();
 
-  for( size_t i(0); i< mVertexBuffers.Size(); ++i )
+  for( auto&& vertexBuffer : mVertexBuffers )
   {
-    unsigned int attributeCount = mVertexBuffers[i]->GetAttributeCount();
-    for( unsigned int j = 0; j < attributeCount; ++j )
+    const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
+    for( uint32_t j = 0; j < attributeCount; ++j )
     {
-      const std::string& attributeName = mVertexBuffers[i]->GetAttributeName( j );
-      unsigned int index = program.RegisterCustomAttribute( attributeName );
+      const std::string& attributeName = vertexBuffer->GetAttributeName( j );
+      uint32_t index = program.RegisterCustomAttribute( attributeName );
       GLint location = program.GetCustomAttributeLocation( index );
 
       if( -1 == location )
@@ -110,8 +113,8 @@ void Geometry::UploadAndDraw(
     Context& context,
     BufferIndex bufferIndex,
     Vector<GLint>& attributeLocation,
-    size_t elementBufferOffset,
-    size_t elementBufferCount )
+    uint32_t elementBufferOffset,
+    uint32_t elementBufferCount )
 {
   if( !mHasBeenUpdated )
   {
@@ -129,18 +132,16 @@ void Geometry::UploadAndDraw(
           mIndexBuffer = new GpuBuffer( context );
         }
 
-        std::size_t bufferSize =  sizeof( unsigned short ) * mIndices.Size();
+        uint32_t bufferSize = static_cast<uint32_t>( sizeof( uint16_t ) * mIndices.Size() );
         mIndexBuffer->UpdateDataBuffer( bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER );
       }
 
       mIndicesChanged = false;
     }
 
-    size_t count = mVertexBuffers.Count();
-    for( unsigned int i = 0; i < count; ++i )
+    for( auto&& buffer : mVertexBuffers )
     {
-
-      if( !mVertexBuffers[i]->Update( context ) )
+      if( !buffer->Update( context ) )
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
@@ -151,23 +152,23 @@ void Geometry::UploadAndDraw(
   }
 
   //Bind buffers to attribute locations
-  unsigned int base = 0u;
-  size_t vertexBufferCount(mVertexBuffers.Count());
-  for( unsigned int i = 0; i < vertexBufferCount; ++i )
+  uint32_t base = 0u;
+  const uint32_t vertexBufferCount = static_cast<uint32_t>( mVertexBuffers.Count() );
+  for( uint32_t i = 0; i < vertexBufferCount; ++i )
   {
     mVertexBuffers[i]->BindBuffer( GpuBuffer::ARRAY_BUFFER );
     base += mVertexBuffers[i]->EnableVertexAttributes( context, attributeLocation, base );
   }
 
-  size_t numIndices(0u);
+  uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
   if( mIndexBuffer )
   {
-    numIndices = mIndices.Size();
+    numIndices = static_cast<uint32_t>( mIndices.Size() );
 
     if( elementBufferOffset != 0u )
     {
-      elementBufferOffset = elementBufferOffset >= numIndices ? numIndices - 1 : elementBufferOffset;
+      elementBufferOffset = (elementBufferOffset >= numIndices ) ? numIndices - 1 : elementBufferOffset;
       firstIndexOffset = elementBufferOffset * sizeof(GLushort);
       numIndices -= elementBufferOffset;
     }
@@ -223,26 +224,28 @@ void Geometry::UploadAndDraw(
   {
     //Indexed draw call
     mIndexBuffer->Bind( GpuBuffer::ELEMENT_ARRAY_BUFFER );
-    context.DrawElements(geometryGLType, numIndices, GL_UNSIGNED_SHORT, reinterpret_cast<void*>(firstIndexOffset));
+    // numIndices truncated, no value loss happening in practice
+    context.DrawElements( geometryGLType, static_cast<GLsizei>( numIndices ), GL_UNSIGNED_SHORT, reinterpret_cast<void*>( firstIndexOffset ) );
   }
   else
   {
     //Unindex draw call
-    unsigned int numVertices(0u);
+    GLsizei numVertices(0u);
     if( vertexBufferCount > 0 )
     {
-      numVertices = mVertexBuffers[0]->GetElementCount();
+      // truncated, no value loss happening in practice
+      numVertices = static_cast<GLsizei>( mVertexBuffers[0]->GetElementCount() );
     }
 
     context.DrawArrays( geometryGLType, 0, numVertices );
   }
 
   //Disable attributes
-  for( unsigned int i = 0; i < attributeLocation.Count(); ++i )
+  for( auto&& attribute : attributeLocation )
   {
-    if( attributeLocation[i] != -1 )
+    if( attribute != -1 )
     {
-      context.DisableVertexAttributeArray( attributeLocation[i] );
+      context.DisableVertexAttributeArray( static_cast<GLuint>( attribute ) );
     }
   }
 }

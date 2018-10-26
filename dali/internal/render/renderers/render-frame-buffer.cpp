@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Internal
 namespace Render
 {
 
-FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
+FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, uint32_t attachments )
 :mId( 0u ),
  mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
  mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
@@ -78,7 +78,7 @@ void FrameBuffer::Initialize(Context& context)
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-void FrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
+void FrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 
@@ -108,12 +108,12 @@ void FrameBuffer::Bind( Context& context )
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 }
 
-unsigned int FrameBuffer::GetWidth() const
+uint32_t FrameBuffer::GetWidth() const
 {
   return mWidth;
 }
 
-unsigned int FrameBuffer::GetHeight() const
+uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
 }

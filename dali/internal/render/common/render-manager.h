@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ public:
    * @param[in] minFilterMode Filter mode to use when the texture is minificated
    * @param[in] magFilterMode Filter mode to use when the texture is magnified
    */
-  void SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode );
+  void SetFilterMode( Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode );
 
   /**
    * Set wrapping mode for a sampler
@@ -178,7 +178,7 @@ public:
    * @param[in] uWrapMode Wrap mode in the x direction
    * @param[in] vWrapMode Wrap mode in the y direction
    */
-  void SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode );
+  void SetWrapMode( Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode );
 
   /**
    * Add a property buffer to the render manager.
@@ -236,21 +236,21 @@ public:
    * @param[in] data The new data of the buffer
    * @param[in] size The new size of the buffer
    */
-  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size );
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size );
 
   /**
    * Sets the data for the index buffer of an existing geometry
    * @param[in] geometry The geometry
    * @param[in] data A vector containing the indices
    */
-  void SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& data );
+  void SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uint16_t>& data );
 
   /**
    * Set the geometry type of an existing render geometry
    * @param[in] geometry The render geometry
    * @param[in] geometryType The new geometry type
    */
-  void SetGeometryType( Render::Geometry* geometry, unsigned int geometryType );
+  void SetGeometryType( Render::Geometry* geometry, uint32_t geometryType );
 
   /**
    * Adds a texture to the render manager
@@ -297,7 +297,7 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

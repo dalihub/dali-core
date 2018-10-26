@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,43 +80,43 @@ void EnableProfiling( ProfilingType type )
 namespace Profiling
 {
 
-const int ANIMATION_MEMORY_SIZE(
+const std::size_t ANIMATION_MEMORY_SIZE(
   sizeof( Internal::Animation ) +
   sizeof( Internal::AnimatorConnector<float> ) +
   sizeof( Internal::SceneGraph::Animation ) );
-const int CONSTRAINT_MEMORY_SIZE(
+const std::size_t CONSTRAINT_MEMORY_SIZE(
   sizeof( Internal::Constraint<float> ) +
   sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
-const int ACTOR_MEMORY_SIZE(
+const std::size_t ACTOR_MEMORY_SIZE(
   sizeof( Internal::Actor ) +
   sizeof( Internal::SceneGraph::Node ) );
-const int CAMERA_ACTOR_MEMORY_SIZE(
+const std::size_t CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraActor ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::Camera ) );
-const int LAYER_MEMORY_SIZE(
+const std::size_t LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
   sizeof( Internal::SceneGraph::Layer ) );
-const int IMAGE_MEMORY_SIZE(
+const std::size_t IMAGE_MEMORY_SIZE(
   sizeof( Internal::Image ) +
   sizeof( Integration::Bitmap ) );
-const int RENDERER_MEMORY_SIZE(
+const std::size_t RENDERER_MEMORY_SIZE(
   sizeof( Internal::Renderer ) +
   sizeof( Internal::SceneGraph::Renderer ) +
   sizeof( Internal::Render::Renderer ) );
-const int GEOMETRY_MEMORY_SIZE(
+const std::size_t GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::Geometry ) +
   sizeof( Internal::Render::Geometry) );
-const int PROPERTY_BUFFER_MEMORY_SIZE(
+const std::size_t PROPERTY_BUFFER_MEMORY_SIZE(
   sizeof( Internal::PropertyBuffer ) +
   sizeof( Internal::Render::PropertyBuffer ) );
-const int TEXTURE_SET_MEMORY_SIZE(
+const std::size_t TEXTURE_SET_MEMORY_SIZE(
   sizeof( Internal::TextureSet ) +
   sizeof( Internal::SceneGraph::TextureSet ) );
-const int SAMPLER_MEMORY_SIZE(
+const std::size_t SAMPLER_MEMORY_SIZE(
   sizeof( Internal::Sampler ) +
   sizeof( Internal::Render::Sampler ) );
-const int SHADER_MEMORY_SIZE(
+const std::size_t SHADER_MEMORY_SIZE(
   sizeof( Internal::Shader ) +
   sizeof( Internal::SceneGraph::Shader ) );
 

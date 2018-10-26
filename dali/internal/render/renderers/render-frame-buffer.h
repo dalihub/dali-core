@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public:
    * @param[in] height The height of the FrameBuffer
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments );
+  FrameBuffer( uint32_t width, uint32_t height, uint32_t attachments );
 
   /**
    * Destructor
@@ -72,7 +72,7 @@ public:
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
-  void AttachColorTexture( Context& context, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
    * @brief Bind the framebuffer
@@ -84,21 +84,21 @@ public:
    * @brief Get the width of the FrameBuffer
    * @return The width of the framebuffer
    */
-  unsigned int GetWidth() const;
+  uint32_t GetWidth() const;
 
   /**
    * @brief Get the height of the FrameBuffer
    * @return The height of the framebuffer
    */
-  unsigned int GetHeight() const;
+  uint32_t GetHeight() const;
 
 private:
 
   GLuint mId;
   GLuint mDepthBuffer;
   GLuint mStencilBuffer;
-  unsigned int mWidth;
-  unsigned int mHeight;
+  uint32_t mWidth;
+  uint32_t mHeight;
 };
 
 

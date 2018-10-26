@@ -98,7 +98,7 @@ public:
    * @param [in] index The parameter index.
    * @param [in] input The interface for receiving a property value.
    */
-  void SetInput( unsigned int index, int componentIndex, const PropertyInputImpl& input )
+  void SetInput( std::size_t index, int componentIndex, const PropertyInputImpl& input )
   {
     if ( index >= mInputs.size() )
     {
@@ -180,7 +180,7 @@ public:
   {
     InputIndexerContainer mInputIndices;
     PropertyInputContainer mIndices;
-    const unsigned int noOfInputs = mInputs.size();
+    const std::size_t noOfInputs = mInputs.size();
 
     mInputIndices.reserve( noOfInputs );
     mIndices.Reserve( noOfInputs );

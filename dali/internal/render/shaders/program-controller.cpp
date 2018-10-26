@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ bool ProgramController::IsBinarySupported()
   return mNumberOfProgramBinaryFormats > 0;
 }
 
-unsigned int ProgramController::ProgramBinaryFormat()
+GLenum ProgramController::ProgramBinaryFormat()
 {
   return mProgramBinaryFormat;
 }

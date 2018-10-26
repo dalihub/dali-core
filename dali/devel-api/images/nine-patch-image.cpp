@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,10 +72,10 @@ Vector4 NinePatchImage::GetStretchBorders()
   if( stretchPixelsX.Size() > 0 && stretchPixelsY.Size() > 0 )
   {
     //The NinePatchImage stretch pixels are in the cropped image space, inset by 1 to get it to uncropped image space
-    border.x = stretchPixelsX[ 0 ].GetX() + 1;
-    border.y = stretchPixelsY[ 0 ].GetX() + 1;
-    border.z = GetWidth() - stretchPixelsX[ 0 ].GetY() - 1;
-    border.w = GetHeight() - stretchPixelsY[ 0 ].GetY() - 1;
+    border.x = static_cast<float>( stretchPixelsX[ 0 ].GetX() + 1 );
+    border.y = static_cast<float>( stretchPixelsY[ 0 ].GetX() + 1 );
+    border.z = static_cast<float>( GetWidth() - stretchPixelsX[ 0 ].GetY() - 1 );
+    border.w = static_cast<float>( GetHeight() - stretchPixelsY[ 0 ].GetY() - 1 );
   }
 
   return border;

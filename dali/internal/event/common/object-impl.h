@@ -139,7 +139,7 @@ public:
   /**
    * @copydoc Dali::Handle::GetPropertyCount()
    */
-  virtual unsigned int GetPropertyCount() const;
+  virtual uint32_t GetPropertyCount() const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyName()
@@ -294,9 +294,9 @@ public:
   void RemoveConstraints();
 
   /**
-   * Remove all constraints from a Object with a matching tag
+   * @copydoc Dali::Handle::RemoveConstraints( uint32_t )
    */
-  void RemoveConstraints( unsigned int tag );
+  void RemoveConstraints( uint32_t tag );
 
   /**
    * Called by TypeInfo to set the type-info that this object-impl is created by.
@@ -307,7 +307,7 @@ public:
   /**
    * @return the index from which custom properties start
    */
-  unsigned int CustomPropertyStartIndex()
+  uint32_t CustomPropertyStartIndex()
   {
     return PROPERTY_CUSTOM_START_INDEX;
   }
@@ -432,7 +432,7 @@ private: // Default property extensions for derived classes
    * Query how many default properties the derived class supports.
    * @return The number of default properties.
    */
-  virtual unsigned int GetDefaultPropertyCount() const = 0;
+  virtual uint32_t GetDefaultPropertyCount() const = 0;
 
   /**
    * Retrieve all the indices that are associated with the default properties supported by the derived class.
@@ -527,23 +527,10 @@ private: // Default property extensions for derived classes
     return GetSceneObject();
   }
 
-  /**
-   * Notify derived class of installation of a new scene-object property.
-   * This method is called after the message is to sent to install the property
-   * @param [in] newProperty A newly allocated scene-object property. Ownership is obviously not passed.
-   * @param [in] name The name allocated to this custom property.
-   * @param [in] index The index allocated to this custom property.
-   */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
-  { }
-
 private:
 
-  // Not implemented
-  Object(const Object& rhs);
-
-  // Not implemented
-  Object& operator=(const Object& rhs);
+  Object(const Object& rhs) = delete;
+  Object& operator=(const Object& rhs) = delete;
 
   /**
    * Enable property notifications in scene graph

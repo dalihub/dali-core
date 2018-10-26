@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ enum TransformManagerProperty
   TRANSFORM_PROPERTY_COUNT,
 };
 
-typedef unsigned int TransformId;
+typedef uint32_t TransformId; // 4,294,967,295 transforms supported
 static const TransformId INVALID_TRANSFORM_ID = -1;
 
 } //SceneGraph
@@ -220,7 +220,7 @@ public:
    * @param[in] property The property
    * param[in] component The component (0,1,2)
    */
-  const float& GetVector3PropertyComponentValue(TransformId id, TransformManagerProperty property, unsigned int component ) const;
+  const float& GetVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, uint32_t component ) const;
 
   /**
    * Set the value of a Vector3 property
@@ -237,7 +237,7 @@ public:
    * @param[in] value The new value
    * param[in] component The component (0,1,2)
    */
-  void SetVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, unsigned int component );
+  void SetVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, uint32_t component );
 
   /**
    * Bakes the value of a Vector3 property
@@ -269,7 +269,7 @@ public:
    * @param[in] property The property
    * @param[in] value The new value
    */
-  void BakeVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, unsigned int component );
+  void BakeVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, uint32_t component );
 
   /**
    * Bakes the value of the x component of Vector3 property
@@ -358,7 +358,7 @@ private:
     bool operator<(const SOrderItem& item) const {return level < item.level;}
 
     TransformId  id;
-    unsigned int level;
+    uint32_t level;
   };
 
   /**
@@ -366,7 +366,7 @@ private:
    * @param[in] i Index of a component
    * @param[in] j Index of a component
    */
-  void SwapComponents( unsigned int i, unsigned int j );
+  void SwapComponents( uint32_t i, uint32_t j );
 
   /**
    * Reorders components in hierarchical order so update can iterate sequentially
@@ -374,23 +374,23 @@ private:
    */
   void ReorderComponents();
 
-  unsigned int mComponentCount;                                            ///< Total number of components
-  FreeList mIds;                                                           ///< FreeList of Ids
-  Vector< TransformComponentAnimatable > mTxComponentAnimatable;           ///< Animatable part of the components
-  Vector< TransformComponentStatic > mTxComponentStatic;                   ///< Static part of the components
-  Vector< unsigned int > mInheritanceMode;                                 ///< Inheritance mode of the components
-  Vector< TransformId > mComponentId;                                      ///< Ids of the components
-  Vector< Vector3 > mSize;                                                 ///< Size of the components
-  Vector< TransformId > mParent;                                           ///< Parent of the components
-  Vector< Matrix > mWorld;                                                 ///< Local to world transform of the components
-  Vector< Matrix > mLocal;                                                 ///< Local to parent space transform of the components
-  Vector< Vector4 > mBoundingSpheres;                                      ///< Bounding spheres. xyz is the center and w is the radius
-  Vector< TransformComponentAnimatable > mTxComponentAnimatableBaseValue;  ///< Base values for the animatable part of the components
-  Vector< Vector3 > mSizeBase;                                             ///< Base value for the size of the components
-  Vector< bool > mComponentDirty;                                          ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
-  Vector< bool > mLocalMatrixDirty;                                        ///< 1u if the local matrix has been updated in this frame, 0 otherwise
-  Vector< SOrderItem > mOrderedComponents;                                 ///< Used to reorder components when hierarchy changes
-  bool mReorder;                                                           ///< Flag to determine if the components have to reordered in the next Update
+  uint32_t mComponentCount;                                               ///< Total number of components
+  FreeList mIds;                                                          ///< FreeList of Ids
+  Vector< TransformComponentAnimatable > mTxComponentAnimatable;          ///< Animatable part of the components
+  Vector< TransformComponentStatic > mTxComponentStatic;                  ///< Static part of the components
+  Vector< uint32_t > mInheritanceMode;                                    ///< Inheritance mode of the components
+  Vector< TransformId > mComponentId;                                     ///< Ids of the components
+  Vector< Vector3 > mSize;                                                ///< Size of the components
+  Vector< TransformId > mParent;                                          ///< Parent of the components
+  Vector< Matrix > mWorld;                                                ///< Local to world transform of the components
+  Vector< Matrix > mLocal;                                                ///< Local to parent space transform of the components
+  Vector< Vector4 > mBoundingSpheres;                                     ///< Bounding spheres. xyz is the center and w is the radius
+  Vector< TransformComponentAnimatable > mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
+  Vector< Vector3 > mSizeBase;                                            ///< Base value for the size of the components
+  Vector< bool > mComponentDirty;                                         ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
+  Vector< bool > mLocalMatrixDirty;                                       ///< 1u if the local matrix has been updated in this frame, 0 otherwise
+  Vector< SOrderItem > mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
+  bool mReorder;                                                          ///< Flag to determine if the components have to reordered in the next Update
 };
 
 } //namespace SceneGraph

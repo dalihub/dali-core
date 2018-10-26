@@ -128,10 +128,10 @@ bool RenderTask::QueryViewport( BufferIndex bufferIndex, Viewport& viewport ) co
     return false;
   }
 
-  viewport.x = mViewportPosition[bufferIndex].x;
-  viewport.y = mViewportPosition[bufferIndex].y;
-  viewport.width = mViewportSize[bufferIndex].width;
-  viewport.height = mViewportSize[bufferIndex].height;
+  viewport.x = static_cast<int>( mViewportPosition[bufferIndex].x ); // truncated
+  viewport.y = static_cast<int>( mViewportPosition[bufferIndex].y ); // truncated
+  viewport.width = static_cast<int>( mViewportSize[bufferIndex].width ); // truncated
+  viewport.height = static_cast<int>( mViewportSize[bufferIndex].height ); // truncated
 
   return true;
 }
@@ -171,7 +171,7 @@ bool RenderTask::GetCullMode() const
   return mCullMode;
 }
 
-void RenderTask::SetRefreshRate( unsigned int refreshRate )
+void RenderTask::SetRefreshRate( uint32_t refreshRate )
 {
   DALI_LOG_TRACE_METHOD_FMT(gRenderTaskLogFilter, "this:%p RefreshRate:%d\n", this, refreshRate);
 
@@ -191,7 +191,7 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
   mFrameCounter = 0u;
 }
 
-unsigned int RenderTask::GetRefreshRate() const
+uint32_t RenderTask::GetRefreshRate() const
 {
   return mRefreshRate;
 }
@@ -336,7 +336,7 @@ bool RenderTask::HasRendered()
   return notify;
 }
 
-unsigned int RenderTask::GetRenderedOnceCounter() const
+uint32_t RenderTask::GetRenderedOnceCounter() const
 {
   return mRenderedOnceCounter;
 }

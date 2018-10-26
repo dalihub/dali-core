@@ -68,7 +68,7 @@ namespace Dali
 namespace Internal
 {
 
-unsigned int Actor::mActorCounter = 0;
+uint32_t Actor::mActorCounter = 0;
 
 namespace
 {
@@ -103,7 +103,7 @@ struct Actor::RelayoutData
     : sizeModeFactor( GetDefaultSizeModeFactor() ), preferredSize( GetDefaultPreferredSize() ), sizeSetPolicy( DEFAULT_SIZE_SCALE_POLICY ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       resizePolicies[ i ] = ResizePolicy::DEFAULT;
       useAssignedSize[ i ] = false;
@@ -324,9 +324,9 @@ DALI_ENUM_TO_STRING_TABLE_END( LAYOUT_DIRECTION )
 
 bool GetAnchorPointConstant( const std::string& value, Vector3& anchor )
 {
-  for( unsigned int i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
+  for( uint32_t i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
   {
-    size_t sizeIgnored = 0;
+    uint32_t sizeIgnored = 0;
     if( CompareTokens( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name, sizeIgnored ) )
     {
       anchor = ANCHOR_CONSTANT_TABLE[ i ].value;
@@ -432,7 +432,7 @@ void Actor::SetName( const std::string& name )
   }
 }
 
-unsigned int Actor::GetId() const
+uint32_t Actor::GetId() const
 {
   return mId;
 }
@@ -571,12 +571,12 @@ void Actor::Unparent()
   }
 }
 
-unsigned int Actor::GetChildCount() const
+uint32_t Actor::GetChildCount() const
 {
-  return ( NULL != mChildren ) ? mChildren->size() : 0;
+  return ( NULL != mChildren ) ? static_cast<uint32_t>( mChildren->size() ) : 0; // only 4,294,967,295 children per actor
 }
 
-ActorPtr Actor::GetChildAt( unsigned int index ) const
+ActorPtr Actor::GetChildAt( uint32_t index ) const
 {
   DALI_ASSERT_ALWAYS( index < GetChildCount() );
 
@@ -606,7 +606,7 @@ ActorPtr Actor::FindChildByName( const std::string& actorName )
   return child;
 }
 
-ActorPtr Actor::FindChildById( const unsigned int id )
+ActorPtr Actor::FindChildById( const uint32_t id )
 {
   ActorPtr child = 0;
   if( id == mId )
@@ -1092,7 +1092,7 @@ ClippingMode::Type Actor::GetClippingMode() const
   return mClippingMode;
 }
 
-unsigned int Actor::GetSortingDepth()
+uint32_t Actor::GetSortingDepth()
 {
   return mSortedDepth;
 }
@@ -1367,7 +1367,7 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
   ResizePolicy::Type originalWidthPolicy = GetResizePolicy(Dimension::WIDTH);
   ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1438,7 +1438,7 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
   if ( mRelayoutData )
   {
     // If more than one dimension is requested, just return the first one found
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( ( dimension & ( 1 << i ) ) )
       {
@@ -1478,7 +1478,7 @@ void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type d
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1492,7 +1492,7 @@ Dimension::Type Actor::GetDimensionDependency( Dimension::Type dimension ) const
   if ( mRelayoutData )
   {
     // If more than one dimension is requested, just return the first one found
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( ( dimension & ( 1 << i ) ) )
       {
@@ -1529,7 +1529,7 @@ void Actor::SetLayoutDirty( bool dirty, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1542,7 +1542,7 @@ bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionDirty[ i ] )
       {
@@ -1564,32 +1564,32 @@ bool Actor::RelayoutRequired( Dimension::Type dimension ) const
   return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
 }
 
-unsigned int Actor::AddRenderer( Renderer& renderer )
+uint32_t Actor::AddRenderer( Renderer& renderer )
 {
   if( !mRenderers )
   {
     mRenderers = new RendererContainer;
   }
 
-  unsigned int index = mRenderers->size();
+  uint32_t index = static_cast<uint32_t>( mRenderers->size() ); //  4,294,967,295 renderers per actor
   RendererPtr rendererPtr = RendererPtr( &renderer );
   mRenderers->push_back( rendererPtr );
   AddRendererMessage( GetEventThreadServices(), *mNode, renderer.GetRendererSceneObject() );
   return index;
 }
 
-unsigned int Actor::GetRendererCount() const
+uint32_t Actor::GetRendererCount() const
 {
-  unsigned int rendererCount(0);
+  uint32_t rendererCount(0);
   if( mRenderers )
   {
-    rendererCount = mRenderers->size();
+    rendererCount = static_cast<uint32_t>( mRenderers->size() ); //  4,294,967,295 renderers per actor
   }
 
   return rendererCount;
 }
 
-RendererPtr Actor::GetRendererAt( unsigned int index )
+RendererPtr Actor::GetRendererAt( uint32_t index )
 {
   RendererPtr renderer;
   if( index < GetRendererCount() )
@@ -1617,7 +1617,7 @@ void Actor::RemoveRenderer( Renderer& renderer )
   }
 }
 
-void Actor::RemoveRenderer( unsigned int index )
+void Actor::RemoveRenderer( uint32_t index )
 {
   if( index < GetRendererCount() )
   {
@@ -1659,10 +1659,10 @@ bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float sc
     Vector2 converted( screenX, screenY );
 
     // do a reverse traversal of all lists (as the default onscreen one is typically the last one)
-    const int taskCount = taskList.GetTaskCount();
-    for( int i = taskCount - 1; i >= 0; --i )
+    uint32_t taskCount = taskList.GetTaskCount();
+    for( uint32_t i = taskCount; i > 0; --i )
     {
-      Dali::RenderTask task = taskList.GetTask( i );
+      Dali::RenderTask task = taskList.GetTask( i - 1 );
       if( ScreenToLocal( Dali::GetImplementation( task ), localX, localY, screenX, screenY ) )
       {
         // found a task where this conversion was ok so return
@@ -1714,19 +1714,19 @@ bool Actor::ScreenToLocal( const Matrix& viewMatrix, const Matrix& projectionMat
   bool success = invertedMvp.Invert();
 
   // Convert to GL coordinates
-  Vector4 screenPos( screenX - viewport.x, viewport.height - ( screenY - viewport.y ), 0.f, 1.f );
+  Vector4 screenPos( screenX - static_cast<float>( viewport.x ), static_cast<float>( viewport.height ) - screenY - static_cast<float>( viewport.y ), 0.f, 1.f );
 
   Vector4 nearPos;
   if( success )
   {
-    success = Unproject( screenPos, invertedMvp, viewport.width, viewport.height, nearPos );
+    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), nearPos );
   }
 
   Vector4 farPos;
   if( success )
   {
     screenPos.z = 1.0f;
-    success = Unproject( screenPos, invertedMvp, viewport.width, viewport.height, farPos );
+    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), farPos );
   }
 
   if( success )
@@ -2260,7 +2260,7 @@ Actor::~Actor()
   }
 }
 
-void Actor::ConnectToStage( unsigned int parentDepth )
+void Actor::ConnectToStage( uint32_t parentDepth )
 {
   // This container is used instead of walking the Actor hierarchy.
   // It protects us when the Actor hierarchy is modified during OnStageConnectionExternal callbacks.
@@ -2285,12 +2285,12 @@ void Actor::ConnectToStage( unsigned int parentDepth )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, uint32_t depth )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
-  mDepth = depth;
+  mDepth = static_cast< uint16_t >( depth ); // overflow ignored, not expected in practice
 
   ConnectToSceneGraph();
 
@@ -2306,7 +2306,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned in
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
-      (*iter)->RecursiveConnectToStage( connectionList, depth+1 );
+      (*iter)->RecursiveConnectToStage( connectionList, depth + 1 );
     }
   }
 }
@@ -2468,14 +2468,14 @@ void Actor::RebuildDepthTree()
   // in a single message
   OwnerPointer<SceneGraph::NodeDepths> sceneGraphNodeDepths( new SceneGraph::NodeDepths() );
 
-  int depthIndex = 1;
+  int32_t depthIndex = 1;
   DepthTraverseActorTree( sceneGraphNodeDepths, depthIndex );
 
   SetDepthIndicesMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphNodeDepths );
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int& depthIndex )
+void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex )
 {
   mSortedDepth = depthIndex * DevelLayer::SIBLING_ORDER_MULTIPLIER;
   sceneGraphNodeDepths->Add( const_cast<SceneGraph::Node*>( mNode ), mSortedDepth );
@@ -2492,7 +2492,7 @@ void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneG
   }
 }
 
-unsigned int Actor::GetDefaultPropertyCount() const
+uint32_t Actor::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
 }
@@ -2501,7 +2501,7 @@ void Actor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
   indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     indices.PushBack( i );
   }
@@ -2522,7 +2522,7 @@ Property::Index Actor::GetDefaultPropertyIndex( const std::string& name ) const
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == name.compare( property->name ) )
@@ -2849,7 +2849,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      ResizePolicy::Type type = static_cast< ResizePolicy::Type >( -1 ); // Set to invalid number so it definitely gets set.
+      ResizePolicy::Type type = GetResizePolicy( Dimension::WIDTH );
       if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::WIDTH );
@@ -2859,7 +2859,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      ResizePolicy::Type type = static_cast< ResizePolicy::Type >( -1 ); // Set to invalid number so it definitely gets set.
+      ResizePolicy::Type type = GetResizePolicy( Dimension::HEIGHT );
       if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
       {
         SetResizePolicy( type, Dimension::HEIGHT );
@@ -2869,7 +2869,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SizeScalePolicy::Type type;
+      SizeScalePolicy::Type type = GetSizeScalePolicy();
       if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
       {
         SetSizeScalePolicy( type );
@@ -4447,7 +4447,7 @@ void Actor::EnsureRelayoutData()
 bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
 {
   // Check if actor is dependent on parent
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -4465,7 +4465,7 @@ bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
 bool Actor::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   // Check if actor is dependent on children
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -4497,7 +4497,7 @@ bool Actor::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
 bool Actor::RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::Type dependentDimension )
 {
   // Check each possible dimension and see if it is dependent on the input one
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4510,7 +4510,7 @@ bool Actor::RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::
 
 void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension::Type dimension )
 {
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4522,7 +4522,7 @@ void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension::Type d
 float Actor::GetNegotiatedDimension( Dimension::Type dimension ) const
 {
   // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -4537,7 +4537,7 @@ void Actor::SetPadding( const Vector2& padding, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4551,7 +4551,7 @@ Vector2 Actor::GetPadding( Dimension::Type dimension ) const
   if ( mRelayoutData )
   {
     // If more than one dimension is requested, just return the first one found
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( ( dimension & ( 1 << i ) ) )
       {
@@ -4567,7 +4567,7 @@ void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4580,7 +4580,7 @@ bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionNegotiated[ i ] )
       {
@@ -4700,7 +4700,7 @@ float Actor::NegotiateFromChildren( Dimension::Type dimension )
 {
   float maxDimensionPoint = 0.0f;
 
-  for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
+  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
   {
     ActorPtr child = GetChildAt( i );
 
@@ -4815,7 +4815,7 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       recursionStack.push_back( ActorDimensionPair( this, dimension ) );
 
       // Dimension dependency check
-      for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+      for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
       {
         Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
@@ -4835,7 +4835,7 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       // Children dependency check
       if( RelayoutDependentOnChildren( dimension ) )
       {
-        for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
+        for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
         {
           ActorPtr child = GetChildAt( i );
 
@@ -4875,7 +4875,7 @@ void Actor::NegotiateDimensions( const Vector2& allocatedSize )
   // Negotiate all dimensions that require it
   ActorDimensionStack recursionStack;
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     const Dimension::Type dimension = static_cast< Dimension::Type >( 1 << i );
 
@@ -5006,7 +5006,7 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   SetNegotiatedSize( container );
 
   // Negotiate down to children
-  for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
+  for( uint32_t i = 0, count = GetChildCount(); i < count; ++i )
   {
     ActorPtr child = GetChildAt( i );
 
@@ -5037,7 +5037,7 @@ void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
 {
   if( mRelayoutData )
   {
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( dimension & ( 1 << i ) )
       {
@@ -5052,7 +5052,7 @@ bool Actor::GetUseAssignedSize( Dimension::Type dimension ) const
   if ( mRelayoutData )
   {
     // If more than one dimension is requested, just return the first one found
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( dimension & ( 1 << i ) )
       {
@@ -5115,7 +5115,7 @@ void Actor::SetMinimumSize( float size, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -5130,7 +5130,7 @@ float Actor::GetMinimumSize( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( dimension & ( 1 << i ) )
       {
@@ -5146,7 +5146,7 @@ void Actor::SetMaximumSize( float size, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -5161,7 +5161,7 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       if( dimension & ( 1 << i ) )
       {
@@ -5195,12 +5195,12 @@ void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
   }
 }
 
-void Actor::SetSiblingOrder( unsigned int order )
+void Actor::SetSiblingOrder( uint32_t order )
 {
   if ( mParent )
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    unsigned int currentOrder = GetSiblingOrder();
+    uint32_t currentOrder = GetSiblingOrder();
 
     if( order != currentOrder )
     {
@@ -5227,18 +5227,18 @@ void Actor::SetSiblingOrder( unsigned int order )
   }
 }
 
-unsigned int Actor::GetSiblingOrder() const
+uint32_t Actor::GetSiblingOrder() const
 {
-  unsigned int order = 0;
+  uint32_t order = 0;
 
   if ( mParent )
   {
     ActorContainer& siblings = *(mParent->mChildren);
-    for( size_t i=0; i<siblings.size(); ++i )
+    for( std::size_t i = 0; i < siblings.size(); ++i )
     {
       if( siblings[i] == this )
       {
-        order = i;
+        order = static_cast<uint32_t>( i );
         break;
       }
     }
@@ -5266,7 +5266,7 @@ void Actor::Raise()
     ActorContainer& siblings = *(mParent->mChildren);
     if( siblings.back() != this ) // If not already at end
     {
-      for( size_t i=0; i<siblings.size(); ++i )
+      for( std::size_t i=0; i<siblings.size(); ++i )
       {
         if( siblings[i] == this )
         {
@@ -5297,7 +5297,7 @@ void Actor::Lower()
     ActorContainer& siblings = *(mParent->mChildren);
     if( siblings.front() != this ) // If not already at beginning
     {
-      for( size_t i=1; i<siblings.size(); ++i )
+      for( std::size_t i=1; i<siblings.size(); ++i )
       {
         if( siblings[i] == this )
         {
@@ -5460,7 +5460,7 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirec
 {
   if( actor && ( actor->mInheritLayoutDirection || set ) )
   {
-    if( actor->mLayoutDirection != direction)
+    if( actor->mLayoutDirection != direction )
     {
       actor->mLayoutDirection = direction;
       actor->EmitLayoutDirectionChangedSignal( direction );

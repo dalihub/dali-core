@@ -107,7 +107,7 @@ namespace Render
 
 Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
                          Render::Geometry* geometry,
-                         unsigned int blendingBitmask,
+                         uint32_t blendingBitmask,
                          const Vector4& blendColor,
                          FaceCullingMode::Type faceCullingMode,
                          bool preMultipliedAlphaEnabled,
@@ -123,7 +123,7 @@ Renderer* Renderer::New( SceneGraph::RenderDataProvider* dataProvider,
 
 Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
                     Render::Geometry* geometry,
-                    unsigned int blendingBitmask,
+                    uint32_t blendingBitmask,
                     const Vector4& blendColor,
                     FaceCullingMode::Type faceCullingMode,
                     bool preMultipliedAlphaEnabled,
@@ -221,22 +221,22 @@ void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataP
     const SceneGraph::CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
     const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap( bufferIndex );
 
-    unsigned int maxMaps = uniformMap.Count() + uniformMapNode.Count();
+    uint32_t maxMaps = static_cast<uint32_t>( uniformMap.Count() + uniformMapNode.Count() ); // 4,294,967,295 maps should be enough
     mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
     mUniformIndexMap.Resize( maxMaps );
 
-    unsigned int mapIndex(0);
+    uint32_t mapIndex = 0;
     for(; mapIndex < uniformMap.Count() ; ++mapIndex )
     {
       mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex]->propertyPtr;
       mUniformIndexMap[mapIndex].uniformIndex = program.RegisterUniform( uniformMap[mapIndex]->uniformName );
     }
 
-    for( unsigned int nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count() ; ++nodeMapIndex )
+    for( uint32_t nodeMapIndex = 0; nodeMapIndex < uniformMapNode.Count() ; ++nodeMapIndex )
     {
-      unsigned int uniformIndex = program.RegisterUniform( uniformMapNode[nodeMapIndex]->uniformName );
+      uint32_t uniformIndex = program.RegisterUniform( uniformMapNode[nodeMapIndex]->uniformName );
       bool found(false);
-      for( unsigned int i(0); i<uniformMap.Count(); ++i )
+      for( uint32_t i = 0; i<uniformMap.Count(); ++i )
       {
         if( mUniformIndexMap[i].uniformIndex == uniformIndex )
         {
@@ -344,13 +344,13 @@ void Renderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program
 
 bool Renderer::BindTextures( Context& context, Program& program )
 {
-  unsigned int textureUnit = 0;
+  uint32_t textureUnit = 0;
   bool result = true;
 
   GLint uniformLocation(-1);
   std::vector<Render::Sampler*>& samplers( mRenderDataProvider->GetSamplers() );
   std::vector<Render::Texture*>& textures( mRenderDataProvider->GetTextures() );
-  for( size_t i(0); i<textures.size() && result; ++i )
+  for( uint32_t i = 0; i < static_cast<uint32_t>( textures.size() ) && result; ++i ) // not expecting more than uint32_t of textures
   {
     if( textures[i] )
     {
@@ -371,7 +371,7 @@ void Renderer::SetFaceCullingMode( FaceCullingMode::Type mode )
   mFaceCullingMode =  mode;
 }
 
-void Renderer::SetBlendingBitMask( unsigned int bitmask )
+void Renderer::SetBlendingBitMask( uint32_t bitmask )
 {
   mBlendingOptions.SetBitmask( bitmask );
 }
@@ -381,12 +381,12 @@ void Renderer::SetBlendColor( const Vector4& color )
   mBlendingOptions.SetBlendColor( color );
 }
 
-void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+void Renderer::SetIndexedDrawFirstElement( uint32_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
 }
 
-void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+void Renderer::SetIndexedDrawElementsCount( uint32_t elementsCount )
 {
   mIndexedDrawElementsCount = elementsCount;
 }

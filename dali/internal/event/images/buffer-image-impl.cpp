@@ -139,8 +139,8 @@ void BufferImage::UploadArea( const RectArea& area )
 
   mBufferWidth = area.width ? area.width : mWidth;
   uint32_t bufferHeight = area.height ? area.height : mHeight;
-  size_t bufferSize = mBytesPerPixel * mBufferWidth * bufferHeight;
-  unsigned char* buffer = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
+  uint32_t bufferSize = mBytesPerPixel * mBufferWidth * bufferHeight;
+  Dali::Integration::PixelBuffer* buffer = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
   DALI_ASSERT_DEBUG(buffer != 0);
 
   // Are we uploading from an external or internal buffer ?

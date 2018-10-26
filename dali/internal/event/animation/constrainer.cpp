@@ -36,7 +36,7 @@ Constrainer::Constrainer()
 Constrainer::~Constrainer()
 {
   //Remove all the constraints created by the object
-  size_t tag = reinterpret_cast<size_t>( this );
+  uint32_t tag = static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ); // taking 32bits of this as tag
   const ObjectIter end = mObservedObjects.End();
   for( ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter )
   {
@@ -64,7 +64,7 @@ void Constrainer::ObjectDestroyed( Object& object )
 
 void Constrainer::Remove( Dali::Handle& target )
 {
-  size_t tag = reinterpret_cast<size_t>( this );
+  uint32_t tag = static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ); // taking 32bits of this as tag
   Object& object = GetImplementation(target);
   const ObjectIter end = mObservedObjects.End();
   for( ObjectIter iter = mObservedObjects.Begin(); iter != end; ++iter )

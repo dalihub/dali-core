@@ -146,12 +146,12 @@ ConstraintBase::RemoveAction ConstraintBase::GetRemoveAction() const
   return mRemoveAction;
 }
 
-void ConstraintBase::SetTag(const unsigned int tag)
+void ConstraintBase::SetTag( uint32_t tag )
 {
   mTag = tag;
 }
 
-unsigned int ConstraintBase::GetTag() const
+uint32_t ConstraintBase::GetTag() const
 {
   return mTag;
 }

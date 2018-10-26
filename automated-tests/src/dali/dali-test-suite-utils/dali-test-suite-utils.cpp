@@ -26,9 +26,9 @@
 
 using namespace Dali;
 
-int test_return_value = TET_UNDEF;
+int32_t test_return_value = TET_UNDEF;
 
-void tet_result(int value)
+void tet_result(int32_t value)
 {
   // First TET_PASS should set to zero
   // first TET_FAIL should prevent any further TET_PASS from setting back to zero
@@ -81,14 +81,14 @@ void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHand
   DALI_TEST_EQUALS< const BaseHandle& >( baseHandle1, baseHandle2, location );
 }
 
-void DALI_TEST_EQUALS( const size_t value1, const unsigned int value2, const char* location )
+void DALI_TEST_EQUALS( const size_t value1, const uint32_t value2, const char* location )
 {
-  DALI_TEST_EQUALS< unsigned int>( ( unsigned int )( value1 ), value2, location );
+  DALI_TEST_EQUALS< uint32_t >( ( uint32_t )( value1 ), value2, location );
 }
 
-void DALI_TEST_EQUALS( const unsigned int value1, const size_t value2, const char* location )
+void DALI_TEST_EQUALS( const uint32_t value1, const size_t value2, const char* location )
 {
-  DALI_TEST_EQUALS< unsigned int >( value1, ( unsigned int )( value2 ), location );
+  DALI_TEST_EQUALS< uint32_t >( value1, ( uint32_t )( value2 ), location );
 }
 
 void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const char* location)
@@ -97,7 +97,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
   const float* m2 = matrix2.AsFloat();
   bool equivalent = true;
 
-  for (int i=0;i<9;++i)
+  for (int32_t i=0;i<9;++i)
   {
     if( ! (fabsf(m1[i] - m2[i])< GetRangedEpsilon(m1[i], m2[i])) )
     {
@@ -132,7 +132,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, float eps
   const float* m2 = matrix2.AsFloat();
   bool equivalent = true;
 
-  for (int i=0;i<9;++i)
+  for (int32_t i=0;i<9;++i)
   {
     equivalent &= (fabsf(m1[i] - m2[i])<epsilon);
   }
@@ -164,7 +164,7 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, const char*
   const float* m2 = matrix2.AsFloat();
   bool identical = true;
 
-  int i;
+  int32_t i;
   for (i=0;i<16;++i)
   {
     if(m1[i] != m2[i])
@@ -203,7 +203,7 @@ void DALI_TEST_EQUALS( const Matrix& matrix1, const Matrix& matrix2, float epsil
   const float* m2 = matrix2.AsFloat();
   bool equivalent = true;
 
-  for (int i=0;i<16;++i)
+  for (int32_t i=0;i<16;++i)
   {
     equivalent &= (fabsf(m1[i] - m2[i])<epsilon);
   }
@@ -328,7 +328,7 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-BufferImage CreateBufferImage(int width, int height, const Vector4& color)
+BufferImage CreateBufferImage(int32_t width, int32_t height, const Vector4& color)
 {
   BufferImage image = BufferImage::New(width, height, Pixel::RGBA8888);
 
@@ -352,15 +352,15 @@ BufferImage CreateBufferImage()
   return CreateBufferImage(4, 4, Color::WHITE);
 }
 
-void PrepareResourceImage( TestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
+void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat )
 {
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetClosestImageSize(Vector2( imageWidth, imageHeight));
 
   Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
   Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
-  unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
-  unsigned int initialColor = 0xFF;
+  uint32_t bytesPerPixel = GetBytesPerPixel(  pixelFormat );
+  uint32_t initialColor = 0xFF;
   memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
 
   Integration::ResourcePointer resourcePtr(bitmap);

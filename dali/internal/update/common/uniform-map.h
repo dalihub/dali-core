@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,13 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <string>
+#include <cstdint> // uint32_t
+
+// INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <string>
 
 namespace Dali
 {
@@ -71,6 +75,8 @@ public:
 class UniformMap
 {
 public:
+  using SizeType = uint32_t;
+
   class Observer
   {
   public:
@@ -129,14 +135,14 @@ public:
    * Get the count of uniforms in the map
    * @return The number of uniform mappings
    */
-  unsigned int Count() const;
+  SizeType Count() const;
 
   /**
    * @pre index must be in the range 0 :: Count()-1
    * @param[in] index The index of the element to fetch
    * @return reference to the element in the map
    */
-  const UniformPropertyMapping& operator[]( unsigned int index ) const;
+  const UniformPropertyMapping& operator[]( SizeType index ) const;
 
 private:
   /**

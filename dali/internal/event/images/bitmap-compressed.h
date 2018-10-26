@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_COMPRESSED_BITMAP_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,9 +58,9 @@ private:
    * @param[in] bufferSize    Buffer cpacity in pixels
    */
   void Initialize(Pixel::Format pixelFormat,
-                           unsigned int width,
-                           unsigned int height,
-                           const std::size_t bufferSize);
+                           uint32_t width,
+                           uint32_t height,
+                           uint32_t bufferSize);
 public:
   /**
    * (Re-)Allocate pixel buffer for the Bitmap. Any previously allocated pixel buffer
@@ -75,15 +75,15 @@ public:
    * @return pixel buffer pointer
    */
   virtual Dali::Integration::PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
-                                     const unsigned width,
-                                     const unsigned height,
-                                     const std::size_t numBytes );
+                                     const uint32_t width,
+                                     const uint32_t height,
+                                     const uint32_t numBytes );
 
   /**
    * Get the pixel buffer size in bytes
    * @return The buffer size in bytes.
    */
-  virtual std::size_t GetBufferSize() const
+  virtual uint32_t GetBufferSize() const
   {
     return mBufferSize;
   }
@@ -102,7 +102,7 @@ protected:
 
 private:
 
-  std::size_t mBufferSize;
+  uint32_t mBufferSize;
 
   BitmapCompressed(const BitmapCompressed& other);  ///< defined private to prevent use
   BitmapCompressed& operator = (const BitmapCompressed& other); ///< defined private to prevent use

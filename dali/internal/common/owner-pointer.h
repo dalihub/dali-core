@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OWNER_POINTER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstddef>    // NULL
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -30,15 +27,19 @@ namespace Dali
 namespace Internal
 {
 
-template < typename T >
+template< typename T >
 class OwnerPointer
 {
 public:
+
   /**
    * Default constructor. Creates an OwnerPointer that does not own any object.
+   * @note This does not protect against two different OwnerPointers pointing to the same object.
+   *       Both OwnerPointers will try to release the memory of the same object in that case which
+   *       could lead to a crash.
    */
   OwnerPointer()
-  : mObject(NULL)
+  : mObject( nullptr )
   {
   }
 
@@ -47,7 +48,7 @@ public:
    * @param[in] object A pointer to a heap allocated object.
    */
   OwnerPointer( T* object )
-  : mObject(object)
+  : mObject( object )
   {
   }
 
@@ -56,11 +57,20 @@ public:
    * @param[in] other The pointer that gives away the ownership.
    */
   OwnerPointer( const OwnerPointer& other )
-  : mObject(NULL)
+  : OwnerPointer( static_cast< OwnerPointer&& >( const_cast<OwnerPointer&>( other ) ) ) // Remove constness & cast to rvalue to use the move constructor
   {
     // other needs to be const for compiler to pick up this as copy constructor;
     // though we are using this as move as there can only be one owner
-    Swap( const_cast<OwnerPointer&>( other ) );
+  }
+
+  /**
+   * Move constructor. Passes the ownership of a pointer to another.
+   * @param[in] other The pointer that gives away the ownership.
+   */
+  OwnerPointer( OwnerPointer&& other )
+  : mObject( nullptr )
+  {
+    Swap( other );
   }
 
   /**
@@ -71,12 +81,23 @@ public:
   {
     if( this != &other )    // no self-assignment
     {
-      // Creation of temportaty object to prevent premature deletion of object
-      OwnerPointer(other).Swap(*this);
+      delete mObject;
+      mObject = other.mObject;
+      other.mObject = nullptr;
     }
 
     // return self
     return *this;
+  }
+
+  /**
+   * Move assignment operator. Passes the ownership of a pointer to another.
+   * @param[in] other The pointer that gives away the ownership.
+   */
+  OwnerPointer& operator=( OwnerPointer&& other )
+  {
+    // Reuse operator=
+    return operator=( other );
   }
 
   /**
@@ -109,7 +130,7 @@ public:
    */
   T& operator*()
   {
-    DALI_ASSERT_DEBUG( mObject != NULL );
+    DALI_ASSERT_DEBUG( mObject );
 
     return *mObject;
   }
@@ -120,7 +141,7 @@ public:
    */
   T& operator*() const
   {
-    DALI_ASSERT_DEBUG( mObject != NULL );
+    DALI_ASSERT_DEBUG( mObject );
 
     // Pointer semantics: A const pointer does not mean const data.
     return const_cast< T& >( *mObject );
@@ -159,11 +180,8 @@ public:
    */
   void Reset()
   {
-    if ( mObject != NULL )
-    {
-      delete mObject;
-      mObject = NULL;
-    }
+    delete mObject;
+    mObject = nullptr;
   }
 
   /**
@@ -173,7 +191,7 @@ public:
   T* Release()
   {
     T* tmp = mObject;
-    mObject = NULL;
+    mObject = nullptr;
     return tmp;
   }
 
@@ -188,12 +206,16 @@ public:
 
   /**
    * Swap owned objects
+   * @param[in] other The pointer to swap the owned objects with.
    */
   void Swap( OwnerPointer& other )
   {
-    T* tmp = mObject;
-    mObject = other.mObject;
-    other.mObject = tmp;
+    if( this != &other )
+    {
+      T* tmp = mObject;
+      mObject = other.mObject;
+      other.mObject = tmp;
+    }
   }
 
   // Handle comparisons - This is a variation of the safe bool idiom
@@ -209,7 +231,7 @@ public:
    */
   operator BooleanType() const
   {
-    return (mObject != NULL) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : NULL;
+    return ( mObject != nullptr ) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : nullptr;
   }
 
 private:

@@ -69,7 +69,7 @@ void PathConstrainer::GetDefaultPropertyIndices( Property::IndexContainer& indic
 {
   indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for ( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     indices.PushBack( i );
   }
@@ -91,7 +91,7 @@ Property::Index PathConstrainer::GetDefaultPropertyIndex(const std::string& name
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  for( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
     if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
@@ -241,7 +241,7 @@ void PathConstrainer::Apply( Property target, Property source, const Vector2& ra
     Dali::Constraint constraint = Dali::Constraint::New<Vector3>( target.object, target.propertyIndex, PathConstraintFunctor( mPath, range, wrap ) );
     constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
-    constraint.SetTag( reinterpret_cast<size_t>( this ) );
+    constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
     constraint.SetRemoveAction( Dali::Constraint::Discard );
     constraint.Apply();
   }
@@ -251,7 +251,7 @@ void PathConstrainer::Apply( Property target, Property source, const Vector2& ra
     Dali::Constraint constraint = Dali::Constraint::New<Quaternion>( target.object, target.propertyIndex, PathConstraintFunctor( mPath, range, mForward, wrap) );
     constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
-    constraint.SetTag( reinterpret_cast<size_t>( this ) );
+    constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
     constraint.SetRemoveAction( Dali::Constraint::Discard );
     constraint.Apply();
   }

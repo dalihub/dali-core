@@ -602,7 +602,7 @@ int UtcDaliStageGetDpiP2(void)
 
 int UtcDaliStageGetDpiP3(void)
 {
-  TestApplication application( 480, 800, 72.0f, 120.0f ); // Initializes core DPI with specific values
+  TestApplication application( 480, 800, 72, 120 ); // Initializes core DPI with specific values
 
   Stage stage = Stage::GetCurrent();
 

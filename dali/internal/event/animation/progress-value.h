@@ -84,12 +84,12 @@ inline void Interpolate (bool& result, bool a, bool b, float progress)
 
 inline void Interpolate (int& result, int a, int b, float progress)
 {
-  result = static_cast<int>(a + (b - a) * progress + 0.5f);
+  result = static_cast<int>(static_cast<float>( a ) + static_cast<float>(b - a) * progress + 0.5f);
 }
 
 inline void Interpolate (unsigned int& result, unsigned int a, unsigned int b, float progress)
 {
-  result = static_cast<unsigned int>(a + (b - a) * progress + 0.5f);
+  result = static_cast<unsigned int>( static_cast<float>( a ) + static_cast<float>(b - a) * progress + 0.5f);
 }
 
 inline void Interpolate (float& result, float a, float b, float progress)
@@ -121,20 +121,20 @@ inline void Interpolate (Vector4& result, const Vector4& a, const Vector4& b, fl
 
 inline void CubicInterpolate( int& result, int p0, int p1, int p2, int p3, float progress )
 {
-  float a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
-  float a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
-  float a1 = (p2-p0)*0.5f;
+  float a3 = static_cast<float>( p3 ) * 0.5f - static_cast<float>( p2 ) * 1.5f + static_cast<float>( p1 ) * 1.5f - static_cast<float>( p0 ) * 0.5f;
+  float a2 = static_cast<float>( p0 ) - static_cast<float>( p1 ) * 2.5f + static_cast<float>( p2 ) * 2.0f - static_cast<float>( p3 ) * 0.5f;
+  float a1 = static_cast<float>( p2 - p0 ) * 0.5f;
 
-  result = static_cast<int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + p1 + 0.5f );
+  result = static_cast<int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + static_cast<float>( p1 ) + 0.5f );
 }
 
 inline void CubicInterpolate( unsigned int& result, unsigned int p0, unsigned int p1, unsigned int p2, unsigned int p3, float progress )
 {
-  float a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
-  float a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
-  float a1 = (p2-p0)*0.5f;
+  float a3 = static_cast<float>( p3 ) * 0.5f - static_cast<float>( p2 ) * 1.5f + static_cast<float>( p1 ) * 1.5f - static_cast<float>( p0 ) * 0.5f;
+  float a2 = static_cast<float>( p0 ) - static_cast<float>( p1 ) * 2.5f + static_cast<float>( p2 ) * 2.0f - static_cast<float>( p3 ) * 0.5f;
+  float a1 = static_cast<float>( p2 - p0 ) * 0.5f;
 
-  result = static_cast<unsigned int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + p1 + 0.5f );
+  result = static_cast<unsigned int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + static_cast<float>( p1 ) + 0.5f );
 }
 
 inline void CubicInterpolate( float& result, float p0, float p1, float  p2, float  p3, float progress )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,30 +60,30 @@ template<class InputIterator> InputIterator Find( InputIterator first, InputIter
 
 } // unnamed namespace
 
-LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager, bool systemLevel )
+LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager )
 {
-  return new LayerList( updateManager, systemLevel );
+  return new LayerList( updateManager );
 }
 
 LayerList::~LayerList()
 {
 }
 
-unsigned int LayerList::GetLayerCount() const
+uint32_t LayerList::GetLayerCount() const
 {
-  return mLayers.size();
+  return static_cast<uint32_t>( mLayers.size() ); //  // only 4,294,967,295 layers supported
 }
 
-Layer* LayerList::GetLayer( unsigned int depth ) const
+Layer* LayerList::GetLayer( uint32_t depth ) const
 {
   DALI_ASSERT_ALWAYS( depth < mLayers.size() );
 
   return mLayers[ depth ];
 }
 
-unsigned int LayerList::GetDepth( const Layer* layer ) const
+uint32_t LayerList::GetDepth( const Layer* layer ) const
 {
-  for( unsigned int count = 0; count < mLayers.size(); ++count )
+  for( uint32_t count = 0; count < mLayers.size(); ++count )
   {
     if( layer == mLayers[ count ] )
     {
@@ -234,9 +234,9 @@ void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
   }
 }
 
-LayerList::LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel )
+LayerList::LayerList( SceneGraph::UpdateManager& updateManager )
 : mUpdateManager( updateManager ),
-  mIsSystemLevel( systemLevel )
+  mRoot( NULL )
 {
 }
 
@@ -255,7 +255,14 @@ void LayerList::SetLayerDepths()
   }
 
   // Layers are being used in a separate thread; queue a message to set order
-  SetLayerDepthsMessage( mUpdateManager, layers, mIsSystemLevel );
+  SetLayerDepthsMessage( mUpdateManager, layers, &( mRoot->GetSceneLayerOnStage() ) );
+}
+
+void LayerList::SetRootLayer(Layer* rootLayer)
+{
+  mRoot = rootLayer;
+
+  SetLayerDepths();
 }
 
 } // namespace Internal

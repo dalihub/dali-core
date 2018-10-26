@@ -20,9 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/system-overlay-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 namespace Dali
 {
@@ -45,9 +47,24 @@ void SystemOverlay::Remove( Actor actor )
   mImpl->Remove( GetImplementation(actor) );
 }
 
+void SystemOverlay::SetOverlayRenderTasks(RenderTaskList& taskList)
+{
+  mImpl->SetOverlayRenderTasks( GetImplementation( taskList ) );
+}
+
 RenderTaskList SystemOverlay::GetOverlayRenderTasks()
 {
   return RenderTaskList( &mImpl->GetOverlayRenderTasks() );
+}
+
+Actor SystemOverlay::GetDefaultRootActor()
+{
+  return Actor( &mImpl->GetDefaultRootActor() );
+}
+
+CameraActor SystemOverlay::GetDefaultCameraActor()
+{
+  return CameraActor( &mImpl->GetDefaultCameraActor() );
 }
 
 SystemOverlay::SystemOverlay( Internal::SystemOverlay* impl )

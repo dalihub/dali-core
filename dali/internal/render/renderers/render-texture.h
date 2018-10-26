@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // uint16_t, uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
@@ -95,7 +96,7 @@ public:
    * @param[in] sampler The sampler to be used with the texture
    * @return true if the bind succeeded, false otherwise
    */
-  bool Bind( Context& context, unsigned int textureUnit, Render::Sampler* sampler );
+  bool Bind( Context& context, uint32_t textureUnit, Render::Sampler* sampler );
 
   /**
    * Auto generates mipmaps for the texture

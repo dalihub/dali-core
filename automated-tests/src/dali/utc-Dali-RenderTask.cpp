@@ -2698,7 +2698,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
 int UtcDaliRenderTaskWorldToViewport(void)
 {
-  TestApplication application( static_cast<size_t>(400), static_cast<size_t>(400) ); // square surface
+  TestApplication application( 400u, 400u ); // square surface
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 

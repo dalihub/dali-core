@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_LINEAR_CONSTRAINER_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ struct LinearConstraintFunctor
   void operator()( float& value,
                    const PropertyInputContainer& inputs)
   {
-    size_t valueCount(  mValue.Size() );
+    uint32_t valueCount = static_cast<uint32_t>(  mValue.Size() );
     if( valueCount == 0 )
     {
       //No values.
@@ -84,29 +84,29 @@ struct LinearConstraintFunctor
       float t = (( inputWrapped - mRange.x ) / ( mRange.y-mRange.x ));
 
       //Find min and max values and local t between them
-      size_t min(0);
-      size_t max(0);
+      uint32_t min(0);
+      uint32_t max(0);
       float tLocal(0.0f);
       if( mProgress.Size() < valueCount )
       {
-        float step = 1.0f / (valueCount-1.0f);
-        float tLocation = t/step;
-        if( tLocation < 0)
+        float step = 1.0f / (static_cast<float>( valueCount ) - 1.0f);
+        float tLocation = t / step;
+        if( tLocation < 0 )
         {
           min = 0;
           max = 1;
         }
-        else if( tLocation >= valueCount-1 )
+        else if( tLocation >= static_cast<float>( valueCount-1 ) )
         {
           min = max = valueCount-1;
         }
         else
         {
-          min = static_cast<size_t>(tLocation);
+          min = static_cast<uint32_t>(tLocation);
           max = min+1;
         }
 
-        tLocal = (t - min*step) / step;
+        tLocal = (t - static_cast<float>(min)*step) / step;
       }
       else
       {

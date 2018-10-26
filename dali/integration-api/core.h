@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
@@ -86,7 +89,7 @@ public:
    * Query whether the Core has further frames to update & render e.g. when animations are ongoing.
    * @return A bitmask of KeepUpdating values
    */
-  unsigned int KeepUpdating() { return keepUpdating; }
+  uint32_t KeepUpdating() { return keepUpdating; }
 
   /**
    * Query whether the Core requires an Notification event.
@@ -110,7 +113,7 @@ public:
 
 public:
 
-  unsigned int keepUpdating; ///< A bitmask of KeepUpdating values
+  uint32_t keepUpdating; ///< A bitmask of KeepUpdating values
   bool needsNotification;
   bool surfaceRectChanged;
   float secondsFromLastFrame;
@@ -304,7 +307,7 @@ public:
    * @param[in] width The new surface width.
    * @param[in] height The new surface height.
    */
-  void SurfaceResized(unsigned int width, unsigned int height);
+  void SurfaceResized( uint32_t width, uint32_t height );
 
   /**
    * Notify the Core about the top margin size.
@@ -313,7 +316,7 @@ public:
    * It is mainly useful for indicator in mobile device
    * @param[in] margin margin size
    */
-  void SetTopMargin( unsigned int margin );
+  void SetTopMargin( uint32_t margin );
 
   // Core setters
 
@@ -325,7 +328,7 @@ public:
    * @param[in] dpiHorizontal Horizontal DPI value.
    * @param[in] dpiVertical   Vertical DPI value.
    */
-  void SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical);
+  void SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical );
 
   // Core Lifecycle
 
@@ -357,7 +360,7 @@ public:
    * the Core::Render() method for frame N has returned.
    * @return The maximum update count (>= 1).
    */
-  unsigned int GetMaximumUpdateCount() const;
+  uint32_t GetMaximumUpdateCount() const;
 
   /**
    * Update the scene for the next frame. This method must be called before each frame is rendered.
@@ -375,8 +378,8 @@ public:
    * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
    */
   void Update( float elapsedSeconds,
-               unsigned int lastVSyncTimeMilliseconds,
-               unsigned int nextVSyncTimeMilliseconds,
+               uint32_t lastVSyncTimeMilliseconds,
+               uint32_t nextVSyncTimeMilliseconds,
                UpdateStatus& status,
                bool renderToFboEnabled,
                bool isRenderingToFbo );

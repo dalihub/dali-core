@@ -132,9 +132,9 @@ void TestGlSyncAbstraction::ResetTrace() { mTrace.Reset(); }
  */
 TraceCallStack& TestGlSyncAbstraction::GetTrace() { return mTrace; }
 
-int TestGlSyncAbstraction::GetNumberOfSyncObjects()
+int32_t TestGlSyncAbstraction::GetNumberOfSyncObjects()
 {
-  return mSyncObjects.size();
+  return static_cast<int32_t>( mSyncObjects.size() );
 }
 
 
