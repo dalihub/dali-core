@@ -971,15 +971,21 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
   }
 
+  const uint32_t UBO_PAGE_SIZE = 8192u;
+
+  auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
+
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
   if( mUniformBlockAllocationBytes && !mUniformBuffer[uboIndex] )
   {
-    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( mUniformBlockAllocationBytes * 2 ) );
+    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
-  else if( mUniformBlockAllocationBytes && mUniformBuffer[uboIndex]->GetSize() < mUniformBlockAllocationBytes )
+  else if( mUniformBlockAllocationBytes && (
+    mUniformBuffer[uboIndex]->GetSize() < pagedAllocation ||
+    (pagedAllocation < uint32_t(float(mUniformBuffer[uboIndex]->GetSize()) * 0.75f ))))
   {
-    mUniformBuffer[uboIndex]->Reserve( mUniformBlockAllocationBytes*2 );
+    mUniformBuffer[uboIndex]->Reserve( pagedAllocation );
   }
 
   mUboOffset = 0u;
