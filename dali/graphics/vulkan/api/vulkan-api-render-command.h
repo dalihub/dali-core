@@ -21,6 +21,7 @@
 #include <dali/graphics-api/graphics-api-render-command.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug.h>
 
 namespace Dali
 {
@@ -34,10 +35,15 @@ class PipelineCache;
 namespace VulkanAPI
 {
 class Controller;
-
 class Ubo;
-
 class Pipeline;
+class DescriptorSetList;
+class DescriptorSetRequirements;
+
+namespace Internal
+{
+class DescriptorSetAllocator;
+}
 
 /**
  * Render command stores internal command buffer per draw call
@@ -82,7 +88,7 @@ public:
    * Returns an array of updated descriptor sets
    * @return
    */
-  const std::vector< Vulkan::RefCountedDescriptorSet >& GetDescriptorSets() const;
+  const std::vector< vk::DescriptorSet >& GetDescriptorSets();
 
   /**
    * Returns Vulkan backed pipeline
@@ -94,7 +100,28 @@ public:
    * Binds pipeline in the given command buffer
    * @param commandBuffer
    */
-  void BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer ) const;
+  void BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer );
+
+  void UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements );
+
+  void AllocateDescriptorSets( Internal::DescriptorSetAllocator& dsAllocator );
+
+private:
+
+  /**
+   * Retrieves array of requirements of used descriptor sets
+   */
+  void BuildDescriptorSetRequirements();
+
+  /**
+   * Tests whether anything changed and does stuff
+   */
+  void UpdateDescriptorSets( bool force );
+
+  /**
+   * Discards existing descriptor sets
+   */
+  void DiscardDescriptorSets();
 
 private:
 
@@ -102,9 +129,11 @@ private:
   Vulkan::Graphics& mGraphics;
   vk::Pipeline mVulkanPipeline;
 
-  std::vector< Vulkan::RefCountedDescriptorSet > mDescriptorSets;
-
-  bool mUBONeedsBinding { false };
+  /**
+   * Internal descriptor set data
+   */
+  struct DescriptorSetData;
+  std::unique_ptr<DescriptorSetData> mData;
 };
 
 }

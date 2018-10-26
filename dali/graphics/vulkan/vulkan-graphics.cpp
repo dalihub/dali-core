@@ -27,7 +27,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-shader.h>
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
@@ -35,6 +34,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug-allocator.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
@@ -183,7 +183,11 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_standard_validation", // standard
 };
 
-Graphics::Graphics() = default;
+Graphics::Graphics()
+{
+  // set up debug allocation callbacks
+  //mAllocator.reset( new vk::AllocationCallbacks( *GetDebugAllocator() ) );
+}
 
 Graphics::~Graphics()
 {
@@ -207,10 +211,6 @@ Graphics::~Graphics()
   // This should ensure that all resources have been queued for garbage collection
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
   mResourceRegister->Clear();
-
-  PrintAllocationReport( *mDescriptorAllocator );
-
-  mDescriptorAllocator.reset( nullptr );
 
   // Execute any outstanding actions...
   ExecuteActions();
@@ -331,7 +331,6 @@ void Graphics::CreateDevice()
   }
 
   mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
-  mDescriptorAllocator = MakeUnique< DescriptorSetAllocator >( *this, 10u );
 }
 
 FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
@@ -737,7 +736,7 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 
   auto imageView = new ImageView( *this, image, imageViewCreateInfo );
 
-  VkAssert( mDevice.createImageView( &imageViewCreateInfo, nullptr, &imageView->mImageView ) );
+  VkAssert( mDevice.createImageView( &imageViewCreateInfo, &GetAllocator("ImageView"), &imageView->mImageView ) );
 
   auto refCountedImageView = RefCountedImageView( imageView );
 
@@ -1236,13 +1235,6 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
   return VkAssert( queue.mQueue.submit( submitInfos, fence ? fence->GetVkHandle() : vk::Fence{} ) );
 }
 
-std::vector< RefCountedDescriptorSet >
-Graphics::AllocateDescriptorSets( const std::vector< DescriptorSetLayoutSignature >& signatures,
-                                  const std::vector< vk::DescriptorSetLayout >& layouts )
-{
-  return mDescriptorAllocator->AllocateDescriptorSets( signatures, layouts );
-}
-
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
   return queue.mQueue.presentKHR( &presentInfo );
@@ -1334,8 +1326,12 @@ vk::Instance Graphics::GetInstance() const
   return mInstance;
 }
 
-const vk::AllocationCallbacks& Graphics::GetAllocator() const
+const vk::AllocationCallbacks& Graphics::GetAllocator( const char* tag )
 {
+  if( mAllocator )
+  {
+    mAllocator->setPUserData( CreateMemoryAllocationTag( tag ) );
+  }
   return *mAllocator;
 }
 
@@ -1459,12 +1455,6 @@ void Graphics::AddCommandPool( RefCountedCommandPool pool )
   mCommandPools[ std::this_thread::get_id() ] = std::move(pool);
 }
 
-void Graphics::AddDescriptorPool( DescriptorPool& pool )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddDescriptorPool( pool );
-}
-
 void Graphics::AddFramebuffer( Framebuffer& framebuffer )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
@@ -1511,12 +1501,6 @@ void Graphics::RemoveShader( Shader& shader )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mResourceRegister->RemoveShader( shader );
-}
-
-void Graphics::RemoveDescriptorPool( DescriptorPool& pool )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveDescriptorPool( pool );
 }
 
 void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
@@ -1605,7 +1589,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setPpEnabledExtensionNames( extensions.data() )
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
-
+#if 0
 #if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
@@ -1614,7 +1598,7 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
 #else
   info.setEnabledLayerCount(0);
 #endif
-
+#endif
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 }
 
