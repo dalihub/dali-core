@@ -1,3 +1,4 @@
+#if 0
 #ifndef DALI_GRAPHICS_VULKAN_DESCRIPTOR_SET
 #define DALI_GRAPHICS_VULKAN_DESCRIPTOR_SET
 
@@ -124,3 +125,4 @@ private:
 } // Namespace Dali
 
 #endif // DALI_GRAPHICS_VULKAN_DESCRIPTOR_SET
+#endif

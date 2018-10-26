@@ -1,3 +1,4 @@
+#if 0
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -21,6 +22,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-debug-allocator.h>
 
 namespace Dali
 {
@@ -47,7 +49,12 @@ DescriptorPool::~DescriptorPool() = default;
 
 bool DescriptorPool::Initialise()
 {
-  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator() ));
+  //PrintAllocationStatus();
+
+  mDescriptorPool = VkAssert( mGraphics->GetDevice().createDescriptorPool( mCreateInfo, mGraphics->GetAllocator( "DescriptorPool" ) ));
+
+  //PrintAllocationStatus();
+
   return true;
 }
 
@@ -181,3 +188,4 @@ bool DescriptorSet::OnDestroy()
 } // Namespace Graphics
 
 } // Namespace Dali
+#endif

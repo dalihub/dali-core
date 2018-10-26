@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 
 namespace Dali

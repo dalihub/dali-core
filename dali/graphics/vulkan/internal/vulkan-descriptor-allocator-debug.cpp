@@ -1,3 +1,4 @@
+#if 0
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -106,3 +107,4 @@ void PrintAllocationReport( DescriptorSetAllocator& allocator )
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
+#endif

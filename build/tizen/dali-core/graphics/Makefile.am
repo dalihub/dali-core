@@ -41,7 +41,8 @@ dali_core_includes = \
 
 
 gcc_flags = -Wno-return-local-addr -Wsuggest-final-types -Wsuggest-final-methods -Wsuggest-override \
-            -Wstack-usage=256 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast
+            -Wstack-usage=256 -Wunsafe-loop-optimizations -Wzero-as-null-pointer-constant -Wuseless-cast \
+            -fsanitize=address -fno-omit-frame-pointer
 
 # -Wfloat-equal causes issues with vulkan.hpp, removed for now
 cxx_more_warnings = -Wold-style-cast -Woverloaded-virtual -Wdouble-promotion -Wswitch-enum \

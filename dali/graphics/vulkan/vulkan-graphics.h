@@ -26,7 +26,6 @@
 #include <dali/integration-api/graphics/surface-factory.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-queue.h>
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-allocator.h>
 #include <dali/integration-api/graphics/graphics.h>
 
 #include <thread>
@@ -65,15 +64,11 @@ class Surface;
 
 class CommandPool;
 
-class DescriptorPool;
-
 class GpuMemoryManager;
 
 class ResourceRegister;
 
 class FramebufferAttachment;
-
-class DescriptorSetAllocator;
 
 class Memory
 {
@@ -235,10 +230,6 @@ public: // Actions
 
   vk::Result Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence );
 
-  std::vector< RefCountedDescriptorSet >
-  AllocateDescriptorSets( const std::vector< DescriptorSetLayoutSignature >& signatures,
-                          const std::vector< vk::DescriptorSetLayout >& layouts);
-
   vk::Result Present( Queue& queue, vk::PresentInfoKHR presentInfo );
 
   vk::Result QueueWaitIdle( Queue& queue );
@@ -260,7 +251,7 @@ public: // Getters
 
   vk::Instance GetInstance() const;
 
-  const vk::AllocationCallbacks& GetAllocator() const;
+  const vk::AllocationCallbacks& GetAllocator( const char* tag  = nullptr );
 
   const vk::PhysicalDeviceMemoryProperties& GetMemoryProperties() const;
 
@@ -296,8 +287,6 @@ public: //Cache management methods
 
   void AddCommandPool( RefCountedCommandPool pool );
 
-  void AddDescriptorPool( DescriptorPool& pool );
-
   void AddFramebuffer( Framebuffer& framebuffer );
 
   void AddSampler( Sampler& sampler );
@@ -313,8 +302,6 @@ public: //Cache management methods
   void RemoveImageView( ImageView& imageView );
 
   void RemoveShader( Shader& shader );
-
-  void RemoveDescriptorPool( DescriptorPool& pool );
 
   void RemoveFramebuffer( Framebuffer& framebuffer );
 
@@ -386,8 +373,6 @@ private: // Members
 
   // Command pool map using thread IDs as keys
   CommandPoolMap mCommandPools;
-
-  std::unique_ptr< DescriptorSetAllocator > mDescriptorAllocator;
 
   std::vector< std::function< void() > > mActionQueue[2u];
   std::vector< std::function< void() > > mDiscardQueue[2u];

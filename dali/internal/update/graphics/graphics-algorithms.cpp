@@ -456,7 +456,8 @@ void GraphicsAlgorithms::SubmitRenderItemList(
   Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
   Matrix                               viewProjection,
   RenderInstruction&                   instruction,
-  const RenderList&                    renderItemList )
+  const RenderList&                    renderItemList,
+  std::vector<Graphics::API::RenderCommand*>& commandList )
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -465,8 +466,6 @@ void GraphicsAlgorithms::SubmitRenderItemList(
 
   Matrix vulkanProjectionMatrix;
   Matrix::Multiply( vulkanProjectionMatrix, *projectionMatrix, CLIP_MATRIX );
-
-  std::vector<Graphics::API::RenderCommand*> commandList;
 
   for( auto i = 0u; i < numberOfRenderItems; ++i )
   {
@@ -554,13 +553,14 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     commandList.push_back(&cmd);
   }
 
-  graphics.SubmitCommands( std::move(commandList) );
+  //graphics.SubmitCommands( std::move(commandList) );
 }
 
 void GraphicsAlgorithms::SubmitInstruction(
   Graphics::API::Controller& graphics,
   BufferIndex                bufferIndex,
-  RenderInstruction&         instruction )
+  RenderInstruction&         instruction,
+  std::vector<Graphics::API::RenderCommand*>& commandList )
 {
   using namespace Graphics::API;
 
@@ -592,7 +592,8 @@ void GraphicsAlgorithms::SubmitInstruction(
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
     SubmitRenderItemList( graphics, bufferIndex, renderTargetBinding,
-                          viewProjection, instruction, *instruction.GetRenderList( i ) );
+                          viewProjection, instruction, *instruction.GetRenderList( i ),
+                          commandList );
   }
 }
 
@@ -992,12 +993,17 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   controller.BeginFrame();
 
+  std::vector<Graphics::API::RenderCommand*> commandList{};
+
   for( size_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 
-    SubmitInstruction( controller, bufferIndex, instruction );
+    SubmitInstruction( controller, bufferIndex, instruction, commandList );
   }
+
+  // Submit all render commands in one go
+  controller.SubmitCommands( std::move(commandList) );
 
   if( mUniformBlockAllocationBytes && mUniformBuffer[uboIndex] )
   {

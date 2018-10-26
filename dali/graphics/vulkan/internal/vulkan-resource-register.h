@@ -129,13 +129,6 @@ public:
   RefCountedShader FindShader( vk::ShaderModule shaderModule );
 
   /**
-   * Finds the DescriptorPool object using the specified Vulkan handle
-   * @param descriptorPool The Vulkan handle of the DescriptorPool object to be found
-   * @return A Handle to the DescriptorPool object if found. An empty Handle otherwise
-   */
-  RefCountedDescriptorPool FindDescriptorPool( vk::DescriptorPool descriptorPool );
-
-  /**
    * Finds the Framebuffer object using the specified Vulkan handle
    * @param framebuffer The Vulkan handle of the Framebuffer object to be found
    * @return A Handle to the Framebuffer object if found. An empty Handle otherwise
@@ -176,13 +169,6 @@ public:
    * @return A reference to the ResourceCache
    */
   ResourceRegister& RemoveShader( Shader& shader );
-
-  /**
-   * Removes the specified DescriptorPool from the cache
-   * @param descriptorPool The DescriptorPool to be removed
-   * @return A reference to the ResourceCache
-   */
-  ResourceRegister& RemoveDescriptorPool( DescriptorPool& descriptorPool );
 
   /**
    * Removes the specified Framebuffer from the cache
