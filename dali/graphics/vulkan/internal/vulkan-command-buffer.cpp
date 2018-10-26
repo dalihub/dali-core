@@ -138,25 +138,17 @@ void CommandBuffer::BindGraphicsPipeline( const vk::Pipeline& pipeline )
   mCommandBuffer.bindPipeline( vk::PipelineBindPoint::eGraphics, pipeline );
 }
 
-void CommandBuffer::BindDescriptorSets( std::vector< RefCountedDescriptorSet > descriptorSets,
-                                        const vk::PipelineLayout& pipelineLayut,
+void CommandBuffer::BindDescriptorSets( const std::vector< vk::DescriptorSet >& descriptorSets,
+                                        const vk::PipelineLayout& pipelineLayout,
                                         uint32_t firstSet,
                                         uint32_t descriptorSetCount )
 {
-  // update resources
-  std::vector< vk::DescriptorSet > vkSets;
-  vkSets.reserve( descriptorSets.size() );
-  for( auto&& set : descriptorSets )
-  {
-    vkSets.emplace_back( set->GetVkDescriptorSet() );
-  }
-
   // TODO: support dynamic offsets
   mCommandBuffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics,
-                                     pipelineLayut,
+                                     pipelineLayout,
                                      firstSet,
                                      descriptorSetCount,
-                                     vkSets.data(),
+                                     descriptorSets.data(),
                                      0,
                                      nullptr );
 }
