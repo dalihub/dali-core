@@ -655,6 +655,7 @@ public:
    * @return The actor's target size
    * @pre The actor has been initialized.
    * @note This return is the value that was set using SetSize or the target size of an animation.
+   *       It may not match the current value in some cases, i.e. when the animation is progressing or the maximum or minimum size is set.
    */
   Vector3 GetTargetSize() const;
 
