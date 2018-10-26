@@ -33,13 +33,14 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
 
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.h>
 
+#define logstream() bb.log() << "F:" << mController.GetFrameCount() << ": "
 
 namespace Dali
 {
@@ -50,42 +51,43 @@ using Vulkan::VkAssert;
 namespace VulkanAPI
 {
 
-RenderCommand::~RenderCommand() = default;
+struct RenderCommand::DescriptorSetData
+{
+  std::vector< Vulkan::DescriptorSetLayoutSignature > descriptorSetLayoutSignatures;
+  std::vector< vk::DescriptorSetLayout >              descriptorSetLayouts;
+  std::vector< DescriptorSetRequirements >            descriptorSetRequirements;
+  DescriptorSetList                                   vkDescriptorSets;
+};
 
-RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
-: mController( controller ),
-  mGraphics( graphics )
+RenderCommand::~RenderCommand()
 {
 }
 
+void RenderCommand::DiscardDescriptorSets()
+{
+  if( !mData->vkDescriptorSets.descriptorSets.empty() )
+  {
+    mController.FreeDescriptorSets( std::move( mData->vkDescriptorSets ) );
+  }
+}
 
-///@todo: needs pipeline factory rather than pipeline creation in place!!!
+RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
+: mController( controller ),
+  mGraphics( graphics ),
+  mData( new DescriptorSetData() )
+{
+  logstream() << "RenderCommand::Ctor" << bb.end();
+}
+
 void RenderCommand::PrepareResources()
 {
+  logstream() << "RenderCommand::PrepareResources()" << bb.end();
   if( mUpdateFlags )
   {
-    if( mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT )
-    {
-      auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
-      if( !pipeline )
-      {
-        return;
-      }
-      mVulkanPipeline = pipeline->GetVkPipeline();
-      mDescriptorSets.clear();
-      mDescriptorSets = mGraphics.AllocateDescriptorSets( pipeline->GetDescriptorSetLayoutSignatures(), pipeline->GetVkDescriptorSetLayouts() );
-
-      // rebind data in case descriptor sets changed
-      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
-      mUpdateFlags |= API::RENDER_COMMAND_UPDATE_TEXTURE_BIT;
-    }
-
     if( mUpdateFlags & (API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT ))
     {
-      mUBONeedsBinding = true;
+      BindUniformBuffers();
     }
-
-    BindUniformBuffers();
 
     if( mUpdateFlags & ( API::RENDER_COMMAND_UPDATE_TEXTURE_BIT|API::RENDER_COMMAND_UPDATE_SAMPLER_BIT) )
     {
@@ -96,13 +98,146 @@ void RenderCommand::PrepareResources()
   }
 }
 
-void RenderCommand::BindUniformBuffers()
+void RenderCommand::AllocateDescriptorSets( VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator )
 {
-  if( !mUniformBufferBindings || !mUBONeedsBinding )
+  // allocate descriptor
+  bb.push();
+  if( dsAllocator.AllocateDescriptorSets( mData->descriptorSetLayoutSignatures, mData->descriptorSetLayouts, mData->vkDescriptorSets ) )
+  {
+    logstream() << "New descriptors allocated, expecting to rebind" << bb.end();
+
+    mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
+    mUpdateFlags |= API::RENDER_COMMAND_UPDATE_TEXTURE_BIT;
+  }
+  else
+  {
+    logstream() << "No need to allocate descriptor sets" << bb.end();
+  }
+  bb.pop();
+}
+
+void RenderCommand::UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements )
+{
+  //@ todo: only when pipeline has changed!
+  BuildDescriptorSetRequirements();
+  if( mData->descriptorSetRequirements.empty() ) // shouldn't be empty
+  {
+    logstream() << "No descriptor sets found!" << bb.end();
+    return;
+  }
+  logstream() << "Updating requirements" << bb.end();
+
+  // If pipeline changed we need to free descriptor sets and allocate new ones.
+  // Destroying old descriptors must happen before allocating new ones
+  if( mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT )
+  {
+    logstream() << "Updating requirements: pipeline has changed" << bb.end();
+    auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
+    if( !pipeline )
+    {
+      return;
+    }
+    mVulkanPipeline = pipeline->GetVkPipeline();
+    mData->descriptorSetLayoutSignatures = pipeline->GetDescriptorSetLayoutSignatures();
+    mData->descriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
+
+    // free descriptor sets for that pool
+    if( !mData->vkDescriptorSets.descriptorSets.empty() )
+    {
+      logstream() << "Updating requirements: erasing descriptor sets" << bb.end();
+      mController.FreeDescriptorSets( std::move( mData->vkDescriptorSets ) );
+      mData->vkDescriptorSets = {};
+    }
+  }
+
+  for( auto& requirement : mData->descriptorSetRequirements )
+  {
+    auto it = std::find_if( requirements.begin(),
+                  requirements.end(),
+                  [&]( DescriptorSetRequirements& item )->bool {
+                    if( item.layoutSignature == requirement.layoutSignature )
+                    {
+                      for( auto i = 0u; i < uint32_t(Vulkan::DescriptorType::DESCRIPTOR_TYPE_COUNT); ++i )
+                      {
+                        item.requirements[i] += requirement.requirements[i];
+                      }
+                      item.maxSets += requirement.maxSets;
+                      return true;
+                    }
+                    return false;
+                  } );
+    if( it == requirements.end() )
+    {
+      requirements.emplace_back( requirement );
+      it = requirements.end()-1;
+    }
+
+    if( mData->vkDescriptorSets.descriptorSets.empty() )
+    {
+      (*it).unallocatedSets += uint32_t( mData->descriptorSetLayouts.size() );
+    }
+  }
+
+}
+
+void RenderCommand::BuildDescriptorSetRequirements()
+{
+  if( !(mUpdateFlags & API::RENDER_COMMAND_UPDATE_PIPELINE_BIT) )
+  {
+    logstream() << "Pipeline hasn't changed" << bb.end();
+  }
+  //@ todo: only when pipeline has changed!
+  // For new pipeline build descriptor set requirements array
+  auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
+  if( !pipeline )
   {
     return;
   }
 
+  mData->descriptorSetLayoutSignatures = pipeline->GetDescriptorSetLayoutSignatures();
+  mData->descriptorSetLayouts = pipeline->GetVkDescriptorSetLayouts();
+  mData->descriptorSetRequirements = {};
+
+  for( auto& signature : mData->descriptorSetLayoutSignatures )
+  {
+    // See whether we have this signature in
+    auto it = std::find_if( mData->descriptorSetRequirements.begin(),
+                            mData->descriptorSetRequirements.end(),
+                            [&]( auto& item )->bool { return item.layoutSignature == signature; } );
+
+    if( it == mData->descriptorSetRequirements.end() )
+    {
+      mData->descriptorSetRequirements.emplace_back();
+      it = mData->descriptorSetRequirements.end()-1;
+    }
+
+    it->layoutSignature = signature;
+    auto decoded = signature.Decode();
+    for( auto& descriptorSet : decoded )
+    {
+      auto requirementIndex = uint32_t(std::get<0>(descriptorSet));
+      auto descriptorCount = uint32_t(std::get<1>(descriptorSet));
+      it->requirements[ requirementIndex ] += descriptorCount;
+    }
+
+    // increments maximum number of sets
+    it->maxSets++;
+  }
+
+}
+
+void RenderCommand::UpdateDescriptorSets( bool force )
+{
+}
+
+void RenderCommand::BindUniformBuffers()
+{
+  if( !mUniformBufferBindings )
+  {
+    return;
+  }
+
+  logstream() << "Binding uniform buffers" << bb.end();
   for( auto i = 0u; i < mUniformBufferBindings->size(); ++i )
   {
     mController.mStats.uniformBufferBindings++;
@@ -117,19 +252,18 @@ void RenderCommand::BindUniformBuffers()
       vk::WriteDescriptorSet{}.setPBufferInfo( &bufferInfo )
                               .setDescriptorType( vk::DescriptorType::eUniformBuffer )
                               .setDescriptorCount( 1 )
-                              .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
+                              .setDstSet( mData->vkDescriptorSets.descriptorSets[0] )
                               .setDstBinding( binding.binding )
                               .setDstArrayElement( 0 ) );
   }
-
-  mUBONeedsBinding = false;
 }
 
 
-void RenderCommand::BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer ) const
+void RenderCommand::BindPipeline( Vulkan::RefCountedCommandBuffer& commandBuffer )
 {
   if( mPipeline )
   {
+    logstream() << "Binding pipeline"  << bb.end();
     auto pipeline = static_cast<const VulkanAPI::Pipeline *>( mPipeline );
     pipeline->Bind( commandBuffer );
   }
@@ -142,6 +276,7 @@ void RenderCommand::BindTexturesAndSamplers()
   {
     return;
   }
+  logstream() << "Binding textures" << bb.end();
   for( const auto& texture : *mTextureBindings )
   {
     auto image = static_cast<const VulkanAPI::Texture*>(texture.texture);
@@ -168,16 +303,31 @@ void RenderCommand::BindTexturesAndSamplers()
       vk::WriteDescriptorSet{}.setPImageInfo( &imageViewInfo )
                               .setDescriptorType( vk::DescriptorType::eCombinedImageSampler )
                               .setDescriptorCount( 1 )
-                              .setDstSet( mDescriptorSets[0]->GetVkDescriptorSet() )
+                              .setDstSet( mData->vkDescriptorSets.descriptorSets[0] )
                               .setDstBinding( texture.binding )
                               .setDstArrayElement( 0 ) );
   }
 }
 
+/*
 const std::vector< Vulkan::RefCountedDescriptorSet >& RenderCommand::GetDescriptorSets() const
 {
   return mDescriptorSets;
 }
+*/
+const std::vector< vk::DescriptorSet >& RenderCommand::GetDescriptorSets()
+{
+  logstream() << "Testing validty" << bb.end();
+  std::vector<bool> results;
+  if( !mController.TestDescriptorSetsValid( mData->vkDescriptorSets, results ) )
+  {
+    logstream() << "Invalid descriptor set = " << uintptr_t(static_cast<VkDescriptorSet>(mData->vkDescriptorSets.descriptorSets[0])) << bb.end();
+    logstream() << "Damn" << bb.end();
+    puts("What would Adeel say? Oh shit!");
+  }
+  return mData->vkDescriptorSets.descriptorSets;
+}
+
 
 const vk::Pipeline& RenderCommand::GetVulkanPipeline() const
 {

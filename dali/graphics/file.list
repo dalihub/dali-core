@@ -4,7 +4,6 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/internal/vulkan-command-pool.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-surface.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-fence.cpp \
-    $(graphics_src_dir)/vulkan/internal/vulkan-descriptor-set.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-framebuffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-queue.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-image.cpp \
@@ -12,13 +11,12 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/internal/vulkan-command-buffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-buffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-debug.cpp \
+    $(graphics_src_dir)/vulkan/internal/vulkan-debug-allocator.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-framebuffer.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-shader.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-swapchain.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-sampler.cpp \
     $(graphics_src_dir)/vulkan/internal/vulkan-resource-register.cpp \
-    $(graphics_src_dir)/vulkan/internal/vulkan-descriptor-allocator.cpp \
-    $(graphics_src_dir)/vulkan/internal/vulkan-descriptor-allocator-debug.cpp \
     $(graphics_src_dir)/vulkan/internal/spirv/vulkan-spirv.cpp \
     $(graphics_src_dir)/vulkan/vulkan-graphics.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-controller.cpp \
@@ -36,6 +34,8 @@ graphics_src_files = \
     $(graphics_src_dir)/vulkan/api/vulkan-api-pipeline.cpp \
     $(graphics_src_dir)/vulkan/api/vulkan-api-pipeline-factory.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-api-debug.cpp \
+    $(graphics_src_dir)/vulkan/api/internal/vulkan-api-descriptor-set-allocator.cpp \
+    $(graphics_src_dir)/vulkan/api/internal/vulkan-api-descriptor-set-requirements.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-pipeline-cache-debug.cpp \
     $(graphics_src_dir)/vulkan/api/internal/vulkan-api-pipeline-impl.cpp \

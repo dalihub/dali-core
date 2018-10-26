@@ -10,6 +10,7 @@ Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
+BuildRequires:  gdb
 BuildRequires:  gawk
 BuildRequires:  Vulkan-LoaderAndValidationLayers
 BuildRequires:  Vulkan-LoaderAndValidationLayers-devel
