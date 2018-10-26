@@ -63,11 +63,6 @@ void GraphicsBuffer::Flush()
 
 void GraphicsBuffer::Reserve(uint32_t size)
 {
-  if( size <= mSize )
-  {
-    return;
-  }
-
   if( mBuffer && mMappedPtr )
   {
     mBuffer->Unmap();
