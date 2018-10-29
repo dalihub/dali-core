@@ -371,18 +371,18 @@ struct FormatInfo
 
 enum class DescriptorType : size_t
 {
-  STORAGE_IMAGE,
-  SAMPLER,
-  SAMPLED_IMAGE,
-  COMBINED_IMAGE_SAMPLER,
-  UNIFORM_TEXEL_BUFFER,
-  STORAGE_TEXEL_BUFFER,
-  UNIFORM_BUFFER,
-  STORAGE_BUFFER,
-  DYNAMIC_UNIFORM_BUFFER,
-  DYNAMIC_STORAGE_BUFFER,
-  INPUT_ATTACHMENT,
-  DESCRIPTOR_TYPE_COUNT
+  STORAGE_IMAGE               = 0,
+  SAMPLER                     = 1,
+  SAMPLED_IMAGE               = 2,
+  COMBINED_IMAGE_SAMPLER      = 3,
+  UNIFORM_TEXEL_BUFFER        = 4,
+  STORAGE_TEXEL_BUFFER        = 5,
+  UNIFORM_BUFFER              = 6,
+  STORAGE_BUFFER              = 7,
+  DYNAMIC_UNIFORM_BUFFER      = 8,
+  DYNAMIC_STORAGE_BUFFER      = 9,
+  INPUT_ATTACHMENT            = 10,
+  DESCRIPTOR_TYPE_COUNT       = 11,
 };
 
 template< size_t valueSizeInBits, typename EnumT, size_t enumVariantCount >

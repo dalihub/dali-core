@@ -164,6 +164,14 @@ public:
    */
   virtual void RunGarbageCollector( size_t numberOfDiscardedRenderers ) = 0;
 
+  /**
+   * Tests whether discard queue associated with buffer index is empty
+   *
+   * @param[in] bufferIndex current update buffer index
+   * @return True if the discard queue is empty, false otherwise
+   */
+  virtual bool DiscardQueueEmpty( uint32_t bufferIndex ) = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;
