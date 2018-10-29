@@ -40,6 +40,7 @@ namespace VulkanAPI
 {
 class Controller;
 class UboManager;
+class DescriptorSetList;
 
 /**
  * Structure describes deferred memory transfer
@@ -188,6 +189,8 @@ public:
 
   void RunGarbageCollector( size_t numberOfDiscardedRenderers ) override;
 
+  bool DiscardQueueEmpty( uint32_t bufferIndex ) override;
+
   // VULKAN only
 
 public:
@@ -200,7 +203,17 @@ public:
 
   void PushDescriptorWrite( const vk::WriteDescriptorSet& write );
 
+  /**
+   * Pushes descriptorsets to be freed by the allocator.
+   * The descriptor sets must not be used any more by the renderer
+   * @param descriptorSets
+   */
+  void FreeDescriptorSets( VulkanAPI::DescriptorSetList&& descriptorSetList );
+
+  bool TestDescriptorSetsValid( VulkanAPI::DescriptorSetList& descriptorSetList, std::vector<bool>& results ) const;
+
   bool HasPendingResourceTransfers() const;
+
 public:
 
   API::TextureFactory& GetTextureFactory() const override;
@@ -249,6 +262,11 @@ public:
   void PrintStats();
 
   Stats mStats;
+
+  uint32_t GetFrameCount() const
+  {
+    return mStats.frame;
+  }
 };
 
 } // namespace VulkanAPI

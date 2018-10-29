@@ -164,6 +164,13 @@ public:
    */
   virtual void RunGarbageCollector( size_t numberOfDiscardedRenderers ) = 0;
 
+  /**
+   *
+   * @param bufferIndex
+   * @return
+   */
+  virtual bool DiscardQueueEmpty( uint32_t bufferIndex ) = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

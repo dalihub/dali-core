@@ -194,6 +194,7 @@ constexpr vk::FrontFace ConvertFrontFace( Dali::Graphics::API::FrontFace frontFa
   return vk::FrontFace{};
 }
 
+static int pipelineCount = 0;
 
 constexpr vk::StencilOp ConvertStencilOp( Dali::Graphics::API::StencilOp stencilOp )
 {
@@ -271,6 +272,8 @@ Pipeline::Pipeline( Vulkan::Graphics& graphics, Controller& controller, const Pi
   mPipelineCache = factory->mPipelineCache;
 }
 
+
+
 Pipeline::~Pipeline()
 {
   if( mVulkanPipelineState )
@@ -285,6 +288,8 @@ Pipeline::~Pipeline()
 
     // Discard unused descriptor set layouts
     mGraphics.DiscardResource( [ device, descriptorSetLayouts, pipeline, pipelineLayout, allocator ]() {
+
+      --pipelineCount;
 
       // Destroy pipeline
       device.destroyPipeline( pipeline, allocator );
@@ -417,7 +422,9 @@ bool Pipeline::Initialise()
           .setStageCount( Vulkan::U32( shaderStages.size() ) );
 
   mVulkanPipelineState->renderpass = pipelineInfo.renderPass;
-  mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo ) );
+  mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo, mGraphics.GetAllocator( "PIPELINE" ) ) );
+
+  ++pipelineCount;
   return true;
 }
 
@@ -670,7 +677,7 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
     .setPPushConstantRanges( nullptr )
     .setPushConstantRangeCount( 0 );
 
-  return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator() ) );
+  return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator("PIPELINELAYOUT") ) );
 }
 
 void Pipeline::GenerateDescriptorSetLayoutSignatures( const std::vector< vk::DescriptorSetLayoutBinding >& bindings )
