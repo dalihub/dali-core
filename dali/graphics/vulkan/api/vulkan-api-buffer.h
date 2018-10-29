@@ -63,6 +63,11 @@ public:
   void Flush() override;
 
   /**
+   * Destroys buffer immediately with
+   */
+  void DestroyNow() override;
+
+  /**
    * Writes into the buffer
    * @param src
    * @param srcSize
