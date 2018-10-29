@@ -102,8 +102,9 @@ public:
    * Reserves buffer memory
    *
    * @param size requested size
+   * @param discardOldBuffer If true discards old buffer without waiting for garbage collection
    */
-  void Reserve( uint32_t size );
+  void Reserve( uint32_t size, bool discardOldBuffer );
 
   /**
    * Maps buffer memory

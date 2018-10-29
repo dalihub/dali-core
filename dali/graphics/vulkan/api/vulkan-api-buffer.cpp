@@ -68,6 +68,11 @@ void Buffer::Flush()
   mBufferRef->GetMemory()->Flush();
 }
 
+void Buffer::DestroyNow()
+{
+  mBufferRef->DestroyNow();
+}
+
 void Buffer::Write( void* src, uint32_t srcSize, uint32_t dstOffset )
 {
   // depends whether the buffer is host visible or device local
