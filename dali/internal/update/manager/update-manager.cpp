@@ -738,6 +738,8 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   {
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
+
+    mImpl->renderers[i]->SetRenderCommandExpiredFlag( true );
   }
 }
 
@@ -763,8 +765,18 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
         if( renderItem.mRenderer )
         {
           renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
+          renderItem.mRenderer->SetRenderCommandExpiredFlag( false );
         }
       }
+    }
+  }
+
+  auto rendererCount = mImpl->renderers.Count();
+  for( auto i = 0u; i < rendererCount; ++i )
+  {
+    if( mImpl->renderers[i]->GetRenderCommandsExpiredFlag() )
+    {
+      mImpl->renderers[i]->DestroyAllRenderCommands();
     }
   }
 }
@@ -1001,6 +1013,12 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
   {
     keepUpdatingRequest |= KeepUpdating::DISCARD_RESOURCES;
   }
+
+  if( !mImpl->graphics.GetController().DiscardQueueEmpty( bufferIndex) )
+  {
+    keepUpdatingRequest |= KeepUpdating::STAGE_KEEP_RENDERING;
+  }
+
 
   return keepUpdatingRequest;
 }

@@ -17,13 +17,15 @@
  * limitations under the License.
  */
 #undef DEBUG_ENABLED
+#include <queue>
+#include <string>
+#include <sstream>
 #if defined(DEBUG_ENABLED)
 
 
 #include <iostream>
 #include <cstdarg>
 #include <string>
-
 
 extern const char* LOG_VULKAN;
 
@@ -64,6 +66,45 @@ const void* VkVoidCast( const K& o )
 {
   return static_cast<T>(o);
 }
+
+struct BlackBox
+{
+  std::queue<std::string> debugLog;
+
+  template<class T>
+  BlackBox& operator <<(const T& value )
+  {
+    stream << value;
+    return *this;
+  }
+
+  BlackBox& log()
+  {
+    stream.str(std::string());
+    return *this;
+  }
+
+  const std::string& end()
+  {
+    static const std::string terminator("");
+    debugLog.push( stream.str() );
+    if( debugLog.size() > 128 )
+    {
+      debugLog.pop();
+    }
+    return terminator;
+  }
+
+  void push();
+
+  static void pop();
+
+  static BlackBox& get();
+
+  std::stringstream stream;
+};
+
+
 
 } // Namespace Vulkan
 
