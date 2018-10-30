@@ -261,12 +261,20 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
       for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
       {
         auto texture = mTextureSet->GetTexture(i);
+        fprintf(stderr, "SceneGraphRenderer::PrepareRender() Binding index %d\n", i);
+
         if( texture )
         {
+          fprintf(stderr, "  Texture valid\n");
           auto sampler = mTextureSet->GetTextureSampler( i );
-
+          if( sampler)
+          {
+            fprintf(stderr, "  Sampler valid\n");
+          }
           if( sampler && sampler->mIsDirty )
           {
+            fprintf(stderr, "  Sampler dirty\n");
+
             // if default sampler
             if( sampler->mMagnificationFilter == FilterMode::DEFAULT && sampler->mMinificationFilter == FilterMode::DEFAULT &&
                 sampler->mSWrapMode == WrapMode::DEFAULT &&
@@ -291,6 +299,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
             .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
 
           mTextureBindings.emplace_back(binding);
+          fprintf(stderr, "SceneGraphRenderer::PrepareRender() Bound texture & sampler to index %d\n", i);
         }
       }
       renderCmd.BindTextures( mTextureBindings, updateBufferIndex );

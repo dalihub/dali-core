@@ -140,6 +140,7 @@ void RenderCommand::BindTexturesAndSamplers()
   // only if textures/samplers changed, rewrite
   if( !mTextureBindings )
   {
+    std::cout << "[RenderCommand] BindingTextureSampler: No textures" << std::endl;
     return;
   }
   for( const auto& texture : *mTextureBindings )
@@ -153,12 +154,12 @@ void RenderCommand::BindTexturesAndSamplers()
       continue;
     }
     mController.mStats.samplerTextureBindings++;
-    DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                     "[RenderCommand] BindingTextureSampler: binding = " << texture.binding );
+    //DALI_LOG_STREAM( gVulkanFilter, Debug::General,
+    std::cout << "[RenderCommand] BindingTextureSampler: binding = " << texture.binding << std::endl;
 
 
     auto imageViewInfo = vk::DescriptorImageInfo{}
-      .setImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal )
+      .setImageLayout( vk::ImageLayout::eGeneral )
       .setImageView( image->GetImageViewRef()->GetVkHandle() )
       .setSampler(!texture.sampler ?
                   image->GetSamplerRef()->GetVkHandle() :

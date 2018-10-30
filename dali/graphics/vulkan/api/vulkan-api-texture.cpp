@@ -940,7 +940,7 @@ bool Texture::Initialise()
   auto data = mTextureFactory.GetData();
   mLayout = vk::ImageLayout::eUndefined;
   NativeImageInterfacePtr nativeImage = mTextureFactory.GetNativeImage();
-  fprintf(stderr,"Texture::Initialise() GetNativeImage()############################################\n");
+  fprintf(stderr,"Texture::Initialise() GetNativeImage()############################################\n ImagePtr: %s\n", nativeImage ? "valid" : "null");
 
   if ( !gCreateSamplerYcbcrConversionKHR && !gGetPhysicalDeviceFormatProperties2KHR)
   {
@@ -1423,7 +1423,7 @@ bool Texture::InitialiseNativeImage()
   if (result == VK_SUCCESS)
       fprintf(stderr,"vkCreateImage's result is VK_SUCCESS, vkImage %llud\n", image);
   else
-      fprintf(stderr,"vkCreateImage's result is FAIL error %d\n",result); 
+      fprintf(stderr,"vkCreateImage's result is FAIL error %d\n",result);
 
   vk::Extent2D extent(mWidth, mHeight);
 

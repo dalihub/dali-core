@@ -75,7 +75,8 @@ if VULKAN_SDK_SET
     vulkan_flags = -DVULKAN_HPP_NO_EXCEPTIONS
 endif
 
-libdali_graphics_a_CXXFLAGS = $(cxx_flags) \
+libdali_graphics_a_CXXFLAGS = -DDALI_COMPILATION \
+                              $(cxx_flags) \
                               $(dali_core_includes) \
                               $(DALI_CFLAGS) \
                               $(vulkan_flags)

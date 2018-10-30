@@ -294,7 +294,9 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mHasAlpha( nativeImageInterface->RequiresBlending() ),
   mIsCompressed( false )
 {
+  fprintf(stderr,"### DS ### Initialized SC::Texture with native image:%s\n", nativeImageInterface?"valid":"null");
 }
+
 
 Texture::~Texture()
 {}
@@ -304,7 +306,8 @@ void Texture::Initialize( Integration::Graphics::Graphics& graphics )
   mGraphics = &graphics;
   if (mNativeImage)
   {
-      CreateTexture( Usage::SAMPLE );
+    fprintf(stderr,"### DS ### SC::Texture::Initialize - calling CreateTexture\n");
+    CreateTexture( Usage::SAMPLE );
   }
 }
 
@@ -390,6 +393,7 @@ void Texture::PrepareTexture()
 {
   if( mNativeImage )
   {
+    fprintf(stderr,"### DS ### SC::Texture::PrepareTexture() on native image (%s)\n", mNativeImage ? "valid":"null" );
     mNativeImage->PrepareTexture();
   }
 }

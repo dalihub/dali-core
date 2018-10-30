@@ -1,36 +1,7 @@
-#ifndef DALI_GRAPHICS_VULKAN_HPP_WRAPPER_H
-#define DALI_GRAPHICS_VULKAN_HPP_WRAPPER_H
+#ifndef VULKAN_EXTENSIONS_H
+#define VULKAN_EXTENSIONS_H
 
-/*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-// Vulkan without exceptions
-#ifndef VULKAN_HPP_NO_EXCEPTIONS
-#define VULKAN_HPP_NO_EXCEPTIONS
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-
-#include <vulkan/vulkan.hpp>
 #if 0
-#error
-
 #define VK_EXT_image_drm_format_modifier                                         (1)
 #define VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_SPEC_VERSION                            (1)
 #define VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME "VK_EXT_image_drm_format_modifier"
@@ -46,6 +17,7 @@
 #define VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT                                   (0x00000080)
 #define VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT                                   (0x00000100)
 #define VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT                                   (0x00000200)
+#endif
 
 typedef struct VkDrmFormatModifierPropertiesEXT
 {
@@ -77,7 +49,5 @@ typedef struct VkImageDrmFormatModifierExplicitCreateInfoEXT
     uint32_t drmFormatModifierPlaneCount;
     const VkSubresourceLayout *pPlaneLayouts;
 } VkImageDrmFormatModifierExplicitCreateInfoEXT;
-#endif
-#pragma GCC diagnostic pop
 
-#endif // DALI_GRAPHICS_VULKAN_HPP_WRAPPER_H
+#endif

@@ -22,6 +22,7 @@
 #include <dali/graphics-api/graphics-api-texture-factory.h>
 #include <dali/graphics-api/graphics-api-texture.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
+//#include <dali/graphics/vulkan/internal/vulkan-extensions.h>
 
 namespace Dali
 {

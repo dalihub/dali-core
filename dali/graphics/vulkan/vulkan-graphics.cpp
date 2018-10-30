@@ -963,7 +963,7 @@ vk::ImageMemoryBarrier Graphics::CreateImageMemoryBarrier( RefCountedImage image
     barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eHostRead;
     barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
     barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHR;
+    barrier.srcQueueFamilyIndex = 0;//VK_QUEUE_FAMILY_EXTERNAL_KHR;
     barrier.dstQueueFamilyIndex = 0;
 
     auto vkImageMemoryBarrier = reinterpret_cast<const VkImageMemoryBarrier*>( &barrier );
