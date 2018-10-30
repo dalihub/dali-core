@@ -79,12 +79,12 @@ bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
   return mImpl.GetColor( id, color );
 }
 
-bool UpdateProxy::SetColor( uint32_t id, const Vector4& color ) const
+bool UpdateProxy::SetColor( uint32_t id, const Vector4& color )
 {
   return mImpl.SetColor( id, color );
 }
 
-bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color ) const
+bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color )
 {
   return mImpl.BakeColor( id, color );
 }

@@ -245,12 +245,13 @@ struct UpdateManager::Impl
 
   /**
    * Lazy init for FrameCallbackProcessor.
+   * @param[in]  updateManager  A reference to the update-manager
    */
-  FrameCallbackProcessor& GetFrameCallbackProcessor()
+  FrameCallbackProcessor& GetFrameCallbackProcessor( UpdateManager& updateManager )
   {
     if( ! frameCallbackProcessor )
     {
-      frameCallbackProcessor = new FrameCallbackProcessor( transformManager );
+      frameCallbackProcessor = new FrameCallbackProcessor( updateManager, transformManager );
     }
     return *frameCallbackProcessor;
   }
@@ -849,6 +850,12 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       }
     }
 
+    // Call the frame-callback-processor if set
+    if( mImpl->frameCallbackProcessor )
+    {
+      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
+    }
+
     //Update node hierarchy, apply constraints and perform sorting / culling.
     //This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
@@ -859,12 +866,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
     //Update renderers and apply constraints
     UpdateRenderers( bufferIndex );
-
-    // Call the frame-callback-processor if set
-    if( mImpl->frameCallbackProcessor )
-    {
-      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
-    }
 
     //Update the transformations of all the nodes
     mImpl->transformManager.Update();
@@ -1076,12 +1077,12 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
 
 void UpdateManager::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {
-  mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
+  mImpl->GetFrameCallbackProcessor( *this ).AddFrameCallback( frameCallback, rootNode );
 }
 
 void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 {
-  mImpl->GetFrameCallbackProcessor().RemoveFrameCallback( frameCallback );
+  mImpl->GetFrameCallbackProcessor( *this ).RemoveFrameCallback( frameCallback );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< Render::Sampler >& sampler )

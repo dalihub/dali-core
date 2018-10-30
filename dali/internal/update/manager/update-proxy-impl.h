@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -35,6 +36,11 @@ namespace Dali
 namespace Internal
 {
 
+namespace SceneGraph
+{
+class UpdateManager;
+}
+
 /**
  * @brief The implementation of Dali::UpdateProxy.
  *
@@ -48,10 +54,11 @@ public:
 
   /**
    * @brief Constructor.
+   * @param[in]  updateManager      Ref to the UpdateManager in order to add property resetters
    * @param[in]  transformManager   Ref to the TransformManager in order to set/get transform properties of nodes
    * @param[in]  rootNode           The root node for this proxy
    */
-  UpdateProxy( SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode );
+  UpdateProxy( SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode );
 
   /**
    * @brief Destructor.
@@ -123,12 +130,12 @@ public:
   /**
    * @copydoc Dali::UpdateProxy::SetColor()
    */
-  bool SetColor( uint32_t id, const Vector4& color ) const;
+  bool SetColor( uint32_t id, const Vector4& color );
 
   /**
    * @copydoc Dali::UpdateProxy::BakeColor()
    */
-  bool BakeColor( uint32_t id, const Vector4& color ) const;
+  bool BakeColor( uint32_t id, const Vector4& color );
 
   /**
    * @brief Retrieves the root-node used by this class
@@ -163,6 +170,13 @@ private:
    */
   SceneGraph::Node* GetNodeWithId( uint32_t id ) const;
 
+  /**
+   * @brief Adds a property-resetter for non-transform properties so that they can be reset to their base value every frame.
+   * @param[in]  node          The node the property belongs to
+   * @param[in]  propertyBase  The property itself
+   */
+  void AddResetter( SceneGraph::Node& node, SceneGraph::PropertyBase& propertyBase );
+
 private:
 
   /**
@@ -174,12 +188,18 @@ private:
     SceneGraph::Node* node; ///< The node itself
   };
 
+  class PropertyModifier;
+  using PropertyModifierPtr = std::unique_ptr< PropertyModifier >;
+
   mutable std::vector< IdNodePair > mNodeContainer; ///< Used to store cached pointers to already searched for Nodes.
   mutable IdNodePair mLastCachedIdNodePair; ///< Used to cache the last retrieved id-node pair.
   BufferIndex mCurrentBufferIndex;
 
+  SceneGraph::UpdateManager& mUpdateManager; ///< Reference to the Update Manager.
   SceneGraph::TransformManager& mTransformManager; ///< Reference to the Transform Manager.
   SceneGraph::Node& mRootNode; ///< The root node of this update proxy.
+
+  PropertyModifierPtr mPropertyModifier; ///< To ensure non-transform property modifications reset to base values.
 };
 
 } // namespace Internal

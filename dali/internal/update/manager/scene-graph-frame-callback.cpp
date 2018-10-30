@@ -54,9 +54,9 @@ FrameCallback::~FrameCallback()
   }
 }
 
-void FrameCallback::ConnectToSceneGraph( TransformManager& transformManager, Node& rootNode )
+void FrameCallback::ConnectToSceneGraph( UpdateManager& updateManager, TransformManager& transformManager, Node& rootNode )
 {
-  mUpdateProxy = std::unique_ptr< UpdateProxy >( new UpdateProxy( transformManager, rootNode ) );
+  mUpdateProxy = std::unique_ptr< UpdateProxy >( new UpdateProxy( updateManager, transformManager, rootNode ) );
   rootNode.AddObserver( *this );
 }
 
