@@ -1073,7 +1073,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     case Property::EXTENTS:
     case Property::NONE:
     {
-      DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
+      DALI_ASSERT_ALWAYS( !"Property type is not animatable" );
       break;
     }
   }

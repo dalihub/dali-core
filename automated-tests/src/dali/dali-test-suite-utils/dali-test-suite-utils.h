@@ -344,6 +344,27 @@ inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
   tet_printf("Assertion %s failed at %s\n", e.condition, e.location );
 }
 
+/**
+ * Test that given piece of code triggers the right assertion
+ * Fails the test if the assert didn't occur.
+ * Turns off logging during the execution of the code to avoid excessive false positive log output from the assertions
+ * @param expressions code to execute
+ * @param assertstring the substring expected in the assert
+ */
+#define DALI_TEST_ASSERTION( expressions, assertstring ) \
+try \
+{ \
+  TestApplication::EnableLogging( false ); \
+  expressions; \
+  TestApplication::EnableLogging( true ); \
+  fprintf(stderr, "Test failed in %s, expected assert: '%s' didn't occur\n", __FILELINE__, assertstring ); \
+  tet_result(TET_FAIL); \
+  throw("TET_FAIL"); } \
+catch( Dali::DaliException& e ) \
+{ \
+  DALI_TEST_ASSERT( e, assertstring, TEST_LOCATION ); \
+}
+
 // Functor to test whether an Applied signal is emitted
 struct ConstraintAppliedCheck
 {

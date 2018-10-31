@@ -78,6 +78,10 @@ public:
   void ResetContext();
   bool GetRenderNeedsUpdate();
   uint32_t Wait( uint32_t durationToWait );
+  static void EnableLogging( bool enabled )
+  {
+    mLoggingEnabled = enabled;
+  }
 
 private:
   void DoUpdate( uint32_t intervalMilliseconds, const char* location=NULL );
@@ -101,6 +105,7 @@ protected:
   struct { uint32_t x; uint32_t y; } mDpi;
   uint32_t mLastVSyncTime;
   ResourcePolicy::DataRetention mDataRetentionPolicy;
+  static bool mLoggingEnabled;
 };
 
 } // Dali

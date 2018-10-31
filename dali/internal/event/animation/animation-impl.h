@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ANIMATION_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,17 +107,17 @@ public:
   /**
    * @copydoc Dali::Animation::SetLoopCount()
    */
-  void SetLoopCount(int count);
+  void SetLoopCount(int32_t count);
 
   /**
    * @copydoc Dali::Animation::GetLoopCount()
    */
-  int GetLoopCount();
+  int32_t GetLoopCount();
 
   /**
    * @copydoc Dali::Animation::GetCurrentLoop()
    */
-  int GetCurrentLoop();
+  int32_t GetCurrentLoop();
 
   /**
    * @copydoc Dali::Animation::IsLooping()
@@ -281,17 +281,6 @@ public:
    * @copydoc Dali::Animation::AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
    */
   void AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
-
-  /**
-   * Animate a property to a destination value.
-   * @param [in] targetObject The target object to animate.
-   * @param [in] targetPropertyIndex The index of the target property.
-   * @param [in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4
-   * @param [in] destinationValue The destination value.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] period The effect will occur during this time period.
-   */
-  void AnimateTo(Object& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
@@ -542,9 +531,9 @@ private:
 
   float mDurationSeconds;
   float mSpeedFactor;
-  int mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
-  int mLoopCount;
-  int mCurrentLoop;
+  int32_t mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
+  int32_t mLoopCount;
+  int32_t mCurrentLoop;
   EndAction mEndAction;
   EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
