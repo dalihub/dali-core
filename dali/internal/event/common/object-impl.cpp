@@ -1121,7 +1121,11 @@ void Object::RegisterAnimatableProperty( const TypeInfo& typeInfo,
   }
   else
   {
-    initialValue = typeInfo.GetPropertyDefaultValue( index );
+    initialValue = typeInfo.GetPropertyDefaultValue( index ); // recurses type hierarchy
+    if( Property::NONE == initialValue.GetType() )
+    {
+      initialValue = Property::Value( typeInfo.GetPropertyType( index ) ); // recurses type hierarchy
+    }
   }
   RegisterSceneGraphProperty( propertyName, Property::INVALID_KEY, index, initialValue );
   AddUniformMapping( index, propertyName );

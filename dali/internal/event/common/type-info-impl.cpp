@@ -941,10 +941,13 @@ Property::Value TypeInfo::GetPropertyDefaultValue( Property::Index index ) const
   {
     return iter->second;
   }
-  else
+  // we didn't have a value so ask base
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return Property::Value( GetPropertyType( index ) );
+    // call base type recursively
+    return mBaseType->GetPropertyDefaultValue( index );
   }
+  return Property::Value(); // return none
 }
 
 void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const
