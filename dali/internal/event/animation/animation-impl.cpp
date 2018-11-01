@@ -877,17 +877,13 @@ void Animation::EmitSignalProgressReached()
 
 bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
-  bool connected( true );
+  bool connected( false );
   Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == signalName.compare( SIGNAL_FINISHED ) )
   {
     animation->FinishedSignal().Connect( tracker, functor );
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
+    connected = true;
   }
 
   return connected;
@@ -1011,12 +1007,13 @@ void Animation::SetCurrentProgress(float progress)
 
 float Animation::GetCurrentProgress()
 {
-  if( mAnimation )
+  float progress = 0.f;
+  if( mAnimation ) // always exists in practice
   {
-    return mAnimation->GetCurrentProgress();
+    progress = mAnimation->GetCurrentProgress();
   }
 
-  return 0.0f;
+  return progress;
 }
 
 void Animation::ExtendDuration( const TimePeriod& timePeriod )
