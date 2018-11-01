@@ -81,9 +81,8 @@ public:
 
   /**
    * Construct a new Node.
-   * @param[in] id The unique ID of the node
    */
-  static Node* New( uint32_t id );
+  static Node* New();
 
   /**
    * Deletes a Node.
@@ -94,6 +93,11 @@ public:
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
    */
   void OnDestroy();
+
+  /**
+   * @return the unique ID of the node
+   */
+  uint32_t GetId() const;
 
   // Layer interface
 
@@ -799,9 +803,8 @@ protected:
 
   /**
    * Protected constructor; See also Node::New()
-   * @param[in] id The Unique ID of the actor creating the node
    */
-  Node( uint32_t id );
+  Node();
 
   /**
    * Protected virtual destructor; See also Node::Delete( Node* )
@@ -887,6 +890,8 @@ public: // Default properties
 
 protected:
 
+  static uint32_t                    mNodeCounter;            ///< count of total nodes, used for unique ids
+
   Node*                              mParent;                 ///< Pointer to parent node (a child is owned by its parent)
   RenderTask*                        mExclusiveRenderTask;    ///< Nodes can be marked as exclusive to a single RenderTask
 
@@ -910,6 +915,7 @@ protected:
   bool                               mIsRoot:1;               ///< True if the node cannot have a parent
   bool                               mIsLayer:1;              ///< True if the node is a layer
   bool                               mPositionUsesAnchorPoint:1; ///< True if the node should use the anchor-point when calculating the position
+
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };

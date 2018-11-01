@@ -227,8 +227,9 @@ private:
 
   /**
    * Constructor; see also CameraActor::New()
+   * @param node the scene graph node
    */
-  CameraActor();
+  CameraActor( const SceneGraph::Node& node );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

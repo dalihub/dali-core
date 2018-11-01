@@ -84,7 +84,11 @@ TypeAction a4( mType, ACTION_LOWER_TO_BOTTOM, &Layer::DoAction );
 
 LayerPtr Layer::New()
 {
-  LayerPtr layer( new Layer( Actor::LAYER ) );
+  // create node, nodes are owned by UpdateManager
+  SceneGraph::Layer* layerNode = SceneGraph::Layer::New();
+  OwnerPointer< SceneGraph::Node > transferOwnership( layerNode );
+  AddNodeMessage( Stage::GetCurrent()->GetUpdateManager(), transferOwnership );
+  LayerPtr layer( new Layer( Actor::LAYER, *layerNode ) );
 
   // Second-phase construction
   layer->Initialize();
@@ -94,13 +98,12 @@ LayerPtr Layer::New()
 
 LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager )
 {
-  LayerPtr root( new Layer( Actor::ROOT_LAYER ) );
-
-  // Second-phase construction, keep a raw pointer to the layer node.
-  SceneGraph::Layer* rootLayer = static_cast<SceneGraph::Layer*>( root->CreateNode() );
-  root->mNode = rootLayer;
+  // create node, nodes are owned by UpdateManager
+  SceneGraph::Layer* rootLayer = SceneGraph::Layer::New();
   OwnerPointer< SceneGraph::Layer > transferOwnership( rootLayer );
   InstallRootMessage( manager, transferOwnership );
+
+  LayerPtr root( new Layer( Actor::ROOT_LAYER, *rootLayer ) );
 
   // root actor is immediately considered to be on-stage
   root->mIsOnStage = true;
@@ -116,8 +119,8 @@ LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager )
   return root;
 }
 
-Layer::Layer( Actor::DerivedType type )
-: Actor( type ),
+Layer::Layer( Actor::DerivedType type, const SceneGraph::Layer& layer )
+: Actor( type, layer ),
   mLayerList( NULL ),
   mClippingBox( 0, 0, 0, 0 ),
   mSortFunction( Layer::ZValue ),
@@ -313,11 +316,6 @@ bool Layer::IsHoverConsumed() const
   return mHoverConsumed;
 }
 
-SceneGraph::Node* Layer::CreateNode() const
-{
-  return SceneGraph::Layer::New( mId );
-}
-
 void Layer::OnStageConnectionInternal()
 {
   if ( !mIsRoot )
@@ -350,8 +348,7 @@ void Layer::OnStageDisconnectionInternal()
 
 const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
 {
-  DALI_ASSERT_DEBUG( mNode != NULL );
-  return dynamic_cast< const SceneGraph::Layer& >( *mNode );
+  return dynamic_cast< const SceneGraph::Layer& >( mNode );
 }
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
