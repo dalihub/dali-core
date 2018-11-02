@@ -164,6 +164,20 @@ public:
    */
   virtual void RunGarbageCollector( size_t numberOfDiscardedRenderers ) = 0;
 
+  /**
+   * @brief Discards all the graphics resources by forcing full
+   * garbage collection.
+   */
+  virtual void DiscardUnusedResources() = 0;
+
+  /**
+   * @brief Tests whether the graphics discard queue doesn't contain any resources
+   * to be released.
+   *
+   * @return True if queue is empty
+   */
+  virtual bool IsDiscardQueueEmpty() = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

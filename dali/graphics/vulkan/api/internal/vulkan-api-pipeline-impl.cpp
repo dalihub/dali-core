@@ -417,7 +417,8 @@ bool Pipeline::Initialise()
           .setStageCount( Vulkan::U32( shaderStages.size() ) );
 
   mVulkanPipelineState->renderpass = pipelineInfo.renderPass;
-  mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo ) );
+  mVulkanPipelineState->pipeline = VkAssert( mGraphics.GetDevice().createGraphicsPipeline( mGraphics. GetVulkanPipelineCache(), pipelineInfo, mGraphics.GetAllocator( "PIPELINE" ) ) );
+
   return true;
 }
 
@@ -670,7 +671,7 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
     .setPPushConstantRanges( nullptr )
     .setPushConstantRangeCount( 0 );
 
-  return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator() ) );
+  return VkAssert( mGraphics.GetDevice().createPipelineLayout( pipelineLayoutCreateInfo, mGraphics.GetAllocator("PIPELINELAYOUT") ) );
 }
 
 void Pipeline::GenerateDescriptorSetLayoutSignatures( const std::vector< vk::DescriptorSetLayoutBinding >& bindings )
