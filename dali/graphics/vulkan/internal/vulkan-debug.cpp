@@ -15,7 +15,7 @@
  */
 
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
-
+#include <stack>
 #if defined(DEBUG_ENABLED)
 
 std::string ArgListToString( const char* format, va_list args )
@@ -47,3 +47,31 @@ std::string FormatToString( const char* format, ... )
 const char* LOG_VULKAN( getenv( "LOG_VULKAN" ) );
 
 #endif
+
+namespace Dali
+{
+namespace Graphics
+{
+namespace Vulkan
+{
+
+thread_local std::stack<BlackBox*> gBlackBoxStack;
+
+void BlackBox::push()
+{
+  gBlackBoxStack.push( this );
+}
+
+void BlackBox::pop()
+{
+  gBlackBoxStack.pop();
+}
+
+BlackBox& BlackBox::get()
+{
+  return *gBlackBoxStack.top();
+}
+
+}
+}
+}
