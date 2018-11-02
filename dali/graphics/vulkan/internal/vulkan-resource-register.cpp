@@ -21,7 +21,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-image.h>
 #include <dali/graphics/vulkan/internal/vulkan-image-view.h>
 #include <dali/graphics/vulkan/internal/vulkan-shader.h>
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
@@ -88,17 +87,6 @@ RefCountedShader ResourceRegister::FindShader( vk::ShaderModule shaderModule )
                                 } );
 
   return iterator == mShaders.end() ? RefCountedShader() : RefCountedShader( *iterator );
-}
-
-RefCountedDescriptorPool ResourceRegister::FindDescriptorPool( vk::DescriptorPool descriptorPool )
-{
-  auto iterator = std::find_if( mDescriptorPools.begin(),
-                                mDescriptorPools.end(),
-                                [ & ]( const DescriptorPool* entry ) {
-                                  return entry->GetVkHandle() == descriptorPool;
-                                } );
-
-  return iterator == mDescriptorPools.end() ? RefCountedDescriptorPool() : RefCountedDescriptorPool( *iterator );
 }
 
 RefCountedFramebuffer ResourceRegister::FindFramebuffer( vk::Framebuffer framebuffer )
@@ -210,22 +198,6 @@ ResourceRegister& ResourceRegister::RemoveShader( Shader& shader )
 
     std::iter_swap( iterator, std::prev( mShaders.end() ) );
     mShaders.pop_back();
-  }
-  return *this;
-}
-
-ResourceRegister& ResourceRegister::RemoveDescriptorPool( DescriptorPool& descriptorPool )
-{
-  if( !mDescriptorPools.empty() )
-  {
-    auto iterator = std::find_if( mDescriptorPools.begin(),
-                                  mDescriptorPools.end(),
-                                  [ & ]( const DescriptorPool* entry ) {
-                                    return entry->GetVkHandle() == descriptorPool.GetVkHandle();
-                                  } );
-
-    std::iter_swap( iterator, std::prev( mDescriptorPools.end() ) );
-    mDescriptorPools.pop_back();
   }
   return *this;
 }
