@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89e189c1_23852e34",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-02T18:31:28Z",
+      "side": 1,
+      "message": "Using a float constant on a uint32_t means it\u0027ll be set to zero...",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 48
+      },
+      "revId": "dca1ddecda5ff888136d1314a430b71e04e8c4bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
