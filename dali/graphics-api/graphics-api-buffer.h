@@ -51,7 +51,6 @@ public:
 
   virtual ~Buffer() = default;
 
-
   virtual void* Map() = 0;
 
   virtual void Unmap() = 0;
@@ -59,6 +58,12 @@ public:
   virtual void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) = 0;
 
   virtual void Flush() = 0;
+
+  /**
+   * @brief Destroying buffer immediately
+   * @note May be unsafe
+   */
+  virtual void DestroyNow() = 0;
 
 protected:
   // derived types should not be moved directly to prevent slicing
