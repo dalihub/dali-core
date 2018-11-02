@@ -31,7 +31,9 @@ bool RegisterType( const std::string& name, const std::type_info& baseType, CSha
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  return impl->Register( name, baseType, f );
+  impl->Register( name, baseType, f );
+
+  return true;
 }
 
 bool RegisterProperty( const std::string& objectName,

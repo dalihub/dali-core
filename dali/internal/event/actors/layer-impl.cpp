@@ -58,7 +58,7 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "clippingEnable",    BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
 DALI_PROPERTY( "clippingBox",       RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
 DALI_PROPERTY( "behavior",          STRING,     true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaultProperties )
 
 // Actions
 
@@ -72,7 +72,7 @@ BaseHandle Create()
   return Dali::Layer::New();
 }
 
-TypeRegistration mType( typeid( Dali::Layer ), typeid( Dali::Actor ), Create );
+TypeRegistration mType( typeid( Dali::Layer ), typeid( Dali::Actor ), Create, LayerDefaultProperties );
 
 TypeAction a1( mType, ACTION_RAISE, &Layer::DoAction );
 TypeAction a2( mType, ACTION_LOWER, &Layer::DoAction );
@@ -352,110 +352,6 @@ const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
 {
   DALI_ASSERT_DEBUG( mNode != NULL );
   return dynamic_cast< const SceneGraph::Layer& >( *mNode );
-}
-
-unsigned int Layer::GetDefaultPropertyCount() const
-{
-  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
-}
-
-void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
-  indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
-
-  int32_t index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-  for ( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
-  {
-    indices.PushBack( index );
-  }
-}
-
-bool Layer::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyWritable( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].writable;
-}
-
-bool Layer::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyAnimatable( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].animatable;
-}
-
-bool Layer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyAConstraintInput( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].constraintInput;
-}
-
-Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::GetDefaultPropertyType( index );
-  }
-
-  index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].type;
-  }
-
-  // index out-of-bounds
-  return Property::NONE;
-}
-
-const char* Layer::GetDefaultPropertyName( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::GetDefaultPropertyName( index );
-  }
-
-  index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].name;
-  }
-
-  return NULL;
-}
-
-Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in current class' default properties
-  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[i];
-    if( 0 == name.compare( property->name ) ) // dont want to convert rhs to string
-    {
-      index = i + DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-      break;
-    }
-  }
-  if( Property::INVALID_INDEX == index )
-  {
-    // If not found, check in base class
-    index = Actor::GetDefaultPropertyIndex( name );
-  }
-
-  return index;
 }
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )

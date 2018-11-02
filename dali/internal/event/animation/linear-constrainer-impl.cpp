@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/common/property-helper.h>
 
 
 namespace Dali
@@ -41,7 +42,14 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "value",        ARRAY,     true,    false,       false,        Dali::LinearConstrainer::Property::VALUE )
 DALI_PROPERTY( "progress",     ARRAY,     true,    false,       false,        Dali::LinearConstrainer::Property::PROGRESS )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, LinearConstrainerDefaultProperties )
+
+BaseHandle Create()
+{
+  return Dali::LinearConstrainer::New();
+}
+
+TypeRegistration mType( typeid( Dali::LinearConstrainer ), typeid( Dali::Handle ), Create, LinearConstrainerDefaultProperties );
 
 } //Unnamed namespace
 
@@ -57,60 +65,6 @@ LinearConstrainer::LinearConstrainer()
 
 LinearConstrainer::~LinearConstrainer()
 {
-}
-
-unsigned int LinearConstrainer::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void LinearConstrainer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  for ( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    indices.PushBack( i );
-  }
-}
-
-const char* LinearConstrainer::GetDefaultPropertyName(Property::Index index) const
-{
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].name;
-  }
-
-  // index out of range
-  return NULL;
-}
-
-Property::Index LinearConstrainer::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( Property::Index i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-    if( 0 == strcmp( name.c_str(), property->name ) )
-    {
-      index = i;
-      break;
-    }
-  }
-  return index;
-}
-
-Property::Type LinearConstrainer::GetDefaultPropertyType(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].type;
-  }
-
-  // index out of range
-  return Property::NONE;
 }
 
 Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) const
@@ -181,36 +135,6 @@ void LinearConstrainer::SetDefaultProperty( Property::Index index, const Propert
       }
     }
   }
-}
-
-bool LinearConstrainer::IsDefaultPropertyWritable(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].writable;
-  }
-
-  return false;
-}
-
-bool LinearConstrainer::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].animatable;
-  }
-
-  return false;
-}
-
-bool LinearConstrainer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].constraintInput;
-  }
-
-  return false;
 }
 
 void LinearConstrainer::Apply( Property target, Property source, const Vector2& range, const Vector2& wrap)

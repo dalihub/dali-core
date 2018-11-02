@@ -20,6 +20,7 @@
 namespace Dali
 {
 
+bool TestApplication::mLoggingEnabled = true;
 
 TestApplication::TestApplication( uint32_t surfaceWidth,
                                   uint32_t surfaceHeight,
@@ -77,30 +78,33 @@ void TestApplication::LogContext( bool start, const char* tag )
 {
   if( start )
   {
-    fprintf(stderr, "INFO: Trace Start: %s", tag);
+    fprintf(stderr, "INFO: Trace Start: %s\n", tag);
   }
   else
   {
-    fprintf(stderr, "INFO: Trace End: %s", tag);
+    fprintf(stderr, "INFO: Trace End: %s\n", tag);
   }
 }
 
 void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message)
 {
-  switch(level)
+  if( mLoggingEnabled )
   {
-    case Dali::Integration::Log::DebugInfo:
-      fprintf(stderr, "INFO: %s", message.c_str());
-      break;
-    case Dali::Integration::Log::DebugWarning:
-      fprintf(stderr, "WARN: %s", message.c_str());
-      break;
-    case Dali::Integration::Log::DebugError:
-      fprintf(stderr, "ERROR: %s", message.c_str());
-      break;
-    default:
-      fprintf(stderr, "DEFAULT: %s", message.c_str());
-      break;
+    switch(level)
+    {
+      case Dali::Integration::Log::DebugInfo:
+        fprintf(stderr, "INFO: %s", message.c_str());
+        break;
+      case Dali::Integration::Log::DebugWarning:
+        fprintf(stderr, "WARN: %s", message.c_str());
+        break;
+      case Dali::Integration::Log::DebugError:
+        fprintf(stderr, "ERROR: %s", message.c_str());
+        break;
+      default:
+        fprintf(stderr, "DEFAULT: %s", message.c_str());
+        break;
+    }
   }
 }
 

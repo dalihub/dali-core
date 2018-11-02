@@ -214,7 +214,7 @@ DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali:
 DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
 DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true, Dali::DevelActor::Property::CULLED )
-DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
 
@@ -240,7 +240,7 @@ BaseHandle CreateActor()
   return Dali::Actor::New();
 }
 
-TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor );
+TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
@@ -2492,90 +2492,6 @@ void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneG
   }
 }
 
-uint32_t Actor::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void Actor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    indices.PushBack( i );
-  }
-}
-
-const char* Actor::GetDefaultPropertyName( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].name;
-  }
-
-  return NULL;
-}
-
-Property::Index Actor::GetDefaultPropertyIndex( const std::string& name ) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( int32_t i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-    if( 0 == name.compare( property->name ) )
-    {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
-}
-
-bool Actor::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].writable;
-  }
-
-  return false;
-}
-
-bool Actor::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].animatable;
-  }
-
-  return false;
-}
-
-bool Actor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].constraintInput;
-  }
-
-  return false;
-}
-
-Property::Type Actor::GetDefaultPropertyType( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].type;
-  }
-
-  // index out of range...return Property::NONE
-  return Property::NONE;
-}
-
 void Actor::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
   switch( index )
@@ -3499,7 +3415,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
 
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
-    AnimatablePropertyMetadata* animatable = RegisterAnimatableProperty( index );
+    AnimatablePropertyMetadata* animatable = GetSceneAnimatableProperty( index, nullptr );
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
 
     property = animatable->GetSceneGraphProperty();
@@ -3613,7 +3529,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
 
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
-    AnimatablePropertyMetadata* animatable = RegisterAnimatableProperty( index );
+    AnimatablePropertyMetadata* animatable = GetSceneAnimatableProperty( index, nullptr );
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
 
     property = animatable->GetSceneGraphProperty();
@@ -3791,7 +3707,7 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
   if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // check whether the animatable property is registered already, if not then register one.
-    AnimatablePropertyMetadata* animatableProperty = RegisterAnimatableProperty(index);
+    AnimatablePropertyMetadata* animatableProperty = GetSceneAnimatableProperty( index, nullptr );
     if( animatableProperty )
     {
       componentIndex = animatableProperty->componentIndex;

@@ -82,7 +82,60 @@ const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::Bak
 const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::Linear );
 const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION( Dali::AlphaFunction::DEFAULT );
 
-} // anon namespace
+/**
+ * Helper to tell if a property is animatable (if we have animators for it)
+ *
+ * @param type type to check
+ * @return true if animatable
+ */
+inline bool IsAnimatable( Property::Type type )
+{
+  bool animatable = false;
+  switch( type )
+  {
+    case Property::BOOLEAN :
+    case Property::FLOAT :
+    case Property::INTEGER :
+    case Property::VECTOR2 :
+    case Property::VECTOR3 :
+    case Property::VECTOR4 :
+    case Property::ROTATION :
+    {
+      animatable = true;
+      break;
+    }
+    case Property::MATRIX : // matrix is allowed as a scene graph property but there's no animators for it
+    case Property::MATRIX3 : // matrix3 is allowed as a scene graph property but there's no animators for it
+    case Property::NONE :
+    case Property::RECTANGLE :
+    case Property::STRING :
+    case Property::ARRAY :
+    case Property::MAP :
+    case Property::EXTENTS :
+    {
+      break;
+    }
+  }
+  return animatable;
+}
+
+/**
+ * Helper to validate animation input values
+ *
+ * @param propertyType type of the property that is being animated
+ * @param destinationType type of the target
+ * @param period time period of the animation
+ */
+void ValidateParameters( Property::Type propertyType, Property::Type destinationType, const TimePeriod& period )
+{
+  // destination value has to be animatable
+  DALI_ASSERT_ALWAYS( IsAnimatable( propertyType ) && "Property type is not animatable" );
+  DALI_ASSERT_ALWAYS( IsAnimatable( destinationType ) && "Target value is not animatable" );
+  DALI_ASSERT_ALWAYS( propertyType == destinationType && "Property and target types don't match" );
+  DALI_ASSERT_ALWAYS( period.durationSeconds >= 0 && "Duration must be >=0" );
+}
+
+} // anonymous namespace
 
 
 AnimationPtr Animation::New(float durationSeconds)
@@ -215,7 +268,7 @@ void Animation::SetLooping(bool on)
   SetLoopCount( on ? 0 : 1 );
 }
 
-void Animation::SetLoopCount(int count)
+void Animation::SetLoopCount(int32_t count)
 {
   // Cache for public getters
   mLoopCount = count;
@@ -224,12 +277,12 @@ void Animation::SetLoopCount(int count)
   SetLoopingMessage( mEventThreadServices, *mAnimation, mLoopCount );
 }
 
-int Animation::GetLoopCount()
+int32_t Animation::GetLoopCount()
 {
   return mLoopCount;
 }
 
-int Animation::GetCurrentLoop()
+int32_t Animation::GetCurrentLoop()
 {
   return mCurrentLoop;
 }
@@ -364,35 +417,30 @@ void Animation::Clear()
   mPlaylist.OnClear( *this );
 }
 
-void Animation::AnimateBy(Property& target, Property::Value& relativeValue)
+void Animation::AnimateBy( Property& target, Property::Value& relativeValue )
 {
-  AnimateBy(target, relativeValue, mDefaultAlpha, TimePeriod(mDurationSeconds));
+  AnimateBy( target, relativeValue, mDefaultAlpha, TimePeriod(mDurationSeconds) );
 }
 
-void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha)
+void Animation::AnimateBy( Property& target, Property::Value& relativeValue, AlphaFunction alpha )
 {
-  AnimateBy(target, relativeValue, alpha, TimePeriod(mDurationSeconds));
+  AnimateBy( target, relativeValue, alpha, TimePeriod(mDurationSeconds) );
 }
 
-void Animation::AnimateBy(Property& target, Property::Value& relativeValue, TimePeriod period)
+void Animation::AnimateBy( Property& target, Property::Value& relativeValue, TimePeriod period )
 {
-  AnimateBy(target, relativeValue, mDefaultAlpha, period);
+  AnimateBy( target, relativeValue, mDefaultAlpha, period );
 }
 
-void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateBy( Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period )
 {
   Object& object = GetImplementation(target.object);
-  const Property::Type targetType = object.GetPropertyType(target.propertyIndex);
+  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
   const Property::Type destinationType = relativeValue.GetType();
 
-  if ( object.GetPropertyComponentIndex( target.propertyIndex ) != Property::INVALID_COMPONENT_INDEX )
-  {
-    DALI_ASSERT_ALWAYS(Property::FLOAT == destinationType && "Animated value and Property type don't match");
-  }
-  else
-  {
-    DALI_ASSERT_ALWAYS(targetType == destinationType && "Animated value and Property type don't match");
-  }
+  // validate animation parameters, if component index is set then use float as checked type
+  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                      destinationType, period );
 
   ExtendDuration(period);
 
@@ -404,7 +452,8 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
   connectorPair.animatorType = Animation::BY;
   mConnectorTargetValues.push_back( connectorPair );
 
-  switch ( targetType )
+  // using destination type so component animation gets correct type
+  switch ( destinationType )
   {
     case Property::BOOLEAN:
     {
@@ -419,12 +468,12 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::INTEGER:
     {
-      AddAnimatorConnector( AnimatorConnector<int>::New( object,
-                                                         target.propertyIndex,
-                                                         target.componentIndex,
-                                                         new AnimateByInteger(relativeValue.Get<int>()),
-                                                         alpha,
-                                                         period ) );
+      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
+                                                             target.propertyIndex,
+                                                             target.componentIndex,
+                                                             new AnimateByInteger(relativeValue.Get<int32_t>()),
+                                                             alpha,
+                                                             period ) );
       break;
     }
 
@@ -492,42 +541,30 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
   }
 }
 
-void Animation::AnimateTo(Property& target, Property::Value& destinationValue)
+void Animation::AnimateTo( Property& target, Property::Value& destinationValue )
 {
-  AnimateTo(target, destinationValue, mDefaultAlpha, TimePeriod(mDurationSeconds));
+  AnimateTo( target, destinationValue, mDefaultAlpha, TimePeriod(mDurationSeconds) );
 }
 
-void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha)
+void Animation::AnimateTo( Property& target, Property::Value& destinationValue, AlphaFunction alpha )
 {
-  AnimateTo(target, destinationValue, alpha, TimePeriod(mDurationSeconds));
+  AnimateTo( target, destinationValue, alpha, TimePeriod(mDurationSeconds));
 }
 
-void Animation::AnimateTo(Property& target, Property::Value& destinationValue, TimePeriod period)
+void Animation::AnimateTo( Property& target, Property::Value& destinationValue, TimePeriod period )
 {
-  AnimateTo(target, destinationValue, mDefaultAlpha, period);
+  AnimateTo( target, destinationValue, mDefaultAlpha, period );
 }
 
-void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateTo( Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period )
 {
-  Object& object = GetImplementation(target.object);
-
-  AnimateTo( object, target.propertyIndex, target.componentIndex, destinationValue, alpha, period );
-}
-
-void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
-{
-  Property::Type targetType = targetObject.GetPropertyType(targetPropertyIndex);
-  if( componentIndex != Property::INVALID_COMPONENT_INDEX )
-  {
-    if( ( targetType == Property::VECTOR2 ) ||
-        ( targetType == Property::VECTOR3 ) ||
-        ( targetType == Property::VECTOR4 ) )
-    {
-      targetType = Property::FLOAT;
-    }
-  }
+  Object& object = GetImplementation( target.object );
+  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
   const Property::Type destinationType = destinationValue.GetType();
-  DALI_ASSERT_ALWAYS( targetType == destinationType && "Animated value and Property type don't match" );
+
+  // validate animation parameters, if component index is set then use float as checked type
+  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                      destinationType, period );
 
   ExtendDuration( period );
 
@@ -539,13 +576,14 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   connectorPair.animatorType = Animation::TO;
   mConnectorTargetValues.push_back( connectorPair );
 
+  // using destination type so component animation gets correct type
   switch ( destinationType )
   {
     case Property::BOOLEAN:
     {
-      AddAnimatorConnector( AnimatorConnector<bool>::New( targetObject,
-                                                          targetPropertyIndex,
-                                                          componentIndex,
+      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
+                                                          target.propertyIndex,
+                                                          target.componentIndex,
                                                           new AnimateToBoolean( destinationValue.Get<bool>() ),
                                                           alpha,
                                                           period ) );
@@ -554,20 +592,20 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::INTEGER:
     {
-      AddAnimatorConnector( AnimatorConnector<int>::New( targetObject,
-                                                         targetPropertyIndex,
-                                                         componentIndex,
-                                                         new AnimateToInteger( destinationValue.Get<int>() ),
-                                                         alpha,
-                                                         period ) );
+      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
+                                                             target.propertyIndex,
+                                                             target.componentIndex,
+                                                             new AnimateToInteger( destinationValue.Get<int32_t>() ),
+                                                             alpha,
+                                                             period ) );
       break;
     }
 
     case Property::FLOAT:
     {
-      AddAnimatorConnector( AnimatorConnector<float>::New( targetObject,
-                                                           targetPropertyIndex,
-                                                           componentIndex,
+      AddAnimatorConnector( AnimatorConnector<float>::New( object,
+                                                           target.propertyIndex,
+                                                           target.componentIndex,
                                                            new AnimateToFloat( destinationValue.Get<float>() ),
                                                            alpha,
                                                            period ) );
@@ -576,9 +614,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR2:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( targetObject,
-                                                             targetPropertyIndex,
-                                                             componentIndex,
+      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
+                                                             target.propertyIndex,
+                                                             target.componentIndex,
                                                              new AnimateToVector2( destinationValue.Get<Vector2>() ),
                                                              alpha,
                                                              period ) );
@@ -587,9 +625,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR3:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( targetObject,
-                                                             targetPropertyIndex,
-                                                             componentIndex,
+      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
+                                                             target.propertyIndex,
+                                                             target.componentIndex,
                                                              new AnimateToVector3( destinationValue.Get<Vector3>() ),
                                                              alpha,
                                                              period ) );
@@ -598,9 +636,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR4:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( targetObject,
-                                                             targetPropertyIndex,
-                                                             componentIndex,
+      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
+                                                             target.propertyIndex,
+                                                             target.componentIndex,
                                                              new AnimateToVector4( destinationValue.Get<Vector4>() ),
                                                              alpha,
                                                              period ) );
@@ -609,9 +647,9 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::ROTATION:
     {
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( targetObject,
-                                                                targetPropertyIndex,
-                                                                componentIndex,
+      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
+                                                                target.propertyIndex,
+                                                                target.componentIndex,
                                                                 new RotateToQuaternion( destinationValue.Get<Quaternion>() ),
                                                                 alpha,
                                                                 period ) );
@@ -625,44 +663,50 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
   }
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames )
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
+  AnimateBetween( target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation )
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, Interpolation interpolation )
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation );
+  AnimateBetween( target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, TimePeriod period )
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION);
+  AnimateBetween( target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation )
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, period, interpolation);
+  AnimateBetween( target, keyFrames, mDefaultAlpha, period, interpolation );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha )
 {
-  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
+  AnimateBetween( target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation )
 {
-  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation);
+  AnimateBetween( target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period )
 {
-  AnimateBetween(target, keyFrames, alpha, period, DEFAULT_INTERPOLATION);
+  AnimateBetween( target, keyFrames, alpha, period, DEFAULT_INTERPOLATION );
 }
 
-void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
+void Animation::AnimateBetween( Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation )
 {
   Object& object = GetImplementation( target.object );
+  const Property::Type propertyType = object.GetPropertyType( target.propertyIndex );
+  const Property::Type destinationType = keyFrames.GetType();
+
+  // validate animation parameters, if component index is set then use float as checked type
+  ValidateParameters( (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
+                      destinationType, period );
 
   ExtendDuration( period );
 
@@ -674,7 +718,8 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
   connectorPair.animatorType = BETWEEN;
   mConnectorTargetValues.push_back( connectorPair );
 
-  switch(keyFrames.GetType())
+  // using destination type so component animation gets correct type
+  switch( destinationType )
   {
     case Dali::Property::BOOLEAN:
     {
@@ -695,7 +740,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameInteger* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameIntegerPtr kfCopy = KeyFrameInteger::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<int>::New( object,
+      AddAnimatorConnector( AnimatorConnector<int32_t>::New( object,
                                                          target.propertyIndex,
                                                          target.componentIndex,
                                                          new KeyFrameIntegerFunctor(kfCopy,interpolation),
@@ -784,7 +829,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 bool Animation::HasFinished()
 {
   bool hasFinished(false);
-  const int playedCount(mAnimation->GetPlayedCount());
+  const int32_t playedCount(mAnimation->GetPlayedCount());
 
   // If the play count has been incremented, then another notification is required
   mCurrentLoop = mAnimation->GetCurrentLoop();
@@ -832,17 +877,13 @@ void Animation::EmitSignalProgressReached()
 
 bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
-  bool connected( true );
+  bool connected( false );
   Animation* animation = static_cast< Animation* >(object); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == signalName.compare( SIGNAL_FINISHED ) )
   {
     animation->FinishedSignal().Connect( tracker, functor );
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
+    connected = true;
   }
 
   return connected;
@@ -966,12 +1007,13 @@ void Animation::SetCurrentProgress(float progress)
 
 float Animation::GetCurrentProgress()
 {
-  if( mAnimation )
+  float progress = 0.f;
+  if( mAnimation ) // always exists in practice
   {
-    return mAnimation->GetCurrentProgress();
+    progress = mAnimation->GetCurrentProgress();
   }
 
-  return 0.0f;
+  return progress;
 }
 
 void Animation::ExtendDuration( const TimePeriod& timePeriod )

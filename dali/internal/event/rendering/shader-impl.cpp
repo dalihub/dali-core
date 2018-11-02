@@ -40,9 +40,7 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "program",       MAP,     true,     false,     false,  Dali::Shader::Property::PROGRAM )
-DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
-
-const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS, DEFAULT_ACTOR_PROPERTY_START_INDEX };
+DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ShaderDefaultProperties )
 
 Dali::Scripting::StringEnum ShaderHintsTable[] =
   { { "NONE",                     Dali::Shader::Hint::NONE},
@@ -57,7 +55,7 @@ BaseHandle Create()
   return Dali::BaseHandle();
 }
 
-TypeRegistration mType( typeid( Dali::Shader ), typeid( Dali::Handle ), Create );
+TypeRegistration mType( typeid( Dali::Shader ), typeid( Dali::Handle ), Create, ShaderDefaultProperties );
 
 #define TOKEN_STRING(x) (#x)
 
@@ -114,46 +112,6 @@ SceneGraph::Shader* Shader::GetShaderSceneObject()
   return mSceneObject;
 }
 
-unsigned int Shader::GetDefaultPropertyCount() const
-{
-  return SHADER_IMPL.GetDefaultPropertyCount();
-}
-
-void Shader::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  SHADER_IMPL.GetDefaultPropertyIndices( indices );
-}
-
-const char* Shader::GetDefaultPropertyName(Property::Index index) const
-{
-  return SHADER_IMPL.GetDefaultPropertyName( index );
-}
-
-Property::Index Shader::GetDefaultPropertyIndex( const std::string& name ) const
-{
-  return SHADER_IMPL.GetDefaultPropertyIndex( name );
-}
-
-bool Shader::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  return SHADER_IMPL.IsDefaultPropertyWritable( index );
-}
-
-bool Shader::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  return SHADER_IMPL.IsDefaultPropertyAnimatable( index );
-}
-
-bool Shader::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return SHADER_IMPL.IsDefaultPropertyAConstraintInput( index );
-}
-
-Property::Type Shader::GetDefaultPropertyType( Property::Index index ) const
-{
-  return SHADER_IMPL.GetDefaultPropertyType( index );
-}
-
 void Shader::SetDefaultProperty( Property::Index index,
                                  const Property::Value& propertyValue )
 {
@@ -204,7 +162,7 @@ void Shader::SetSceneGraphProperty( Property::Index index,
                                     const PropertyMetadata& entry,
                                     const Property::Value& value )
 {
-  SHADER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  ObjectImplHelper::SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
   OnPropertySet(index, value);
 }
 
@@ -251,10 +209,10 @@ const SceneGraph::PropertyBase* Shader::GetSceneObjectAnimatableProperty( Proper
   DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
   const SceneGraph::PropertyBase* property = NULL;
 
-  property = SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                          &Shader::FindAnimatableProperty,
-                                                          &Shader::FindCustomProperty,
-                                                          index );
+  property = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
+                                                                &Shader::FindAnimatableProperty,
+                                                                &Shader::FindCustomProperty,
+                                                                index );
 
   if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
   {

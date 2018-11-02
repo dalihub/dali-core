@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/event/object/default-property-metadata.h>
 
 namespace Dali
 {
@@ -53,12 +54,12 @@ TypeRegistry TypeRegistry::Get()
 
 Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::string &uniqueTypeName )
 {
-  return GetImplementation(*this).GetTypeInfo( uniqueTypeName );
+  return Dali::TypeInfo( GetImplementation(*this).GetTypeInfo( uniqueTypeName ).Get() );
 }
 
 Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
 {
-  return GetImplementation(*this).GetTypeInfo( registerType );
+  return Dali::TypeInfo( GetImplementation(*this).GetTypeInfo( registerType ).Get() );
 }
 
 size_t TypeRegistry::GetTypeNameCount() const
@@ -82,10 +83,7 @@ TypeRegistration::TypeRegistration( const std::type_info& registerType, const st
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  if( impl->Register( registerType, baseType, f, false ) )
-  {
-    mName = impl->RegistrationName( registerType );
-  }
+  mName = impl->Register( registerType, baseType, f, false );
 }
 
 TypeRegistration::TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
@@ -94,10 +92,15 @@ TypeRegistration::TypeRegistration( const std::type_info& registerType, const st
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  if( impl->Register( registerType, baseType, f, callCreateOnInit ) )
-  {
-    mName = impl->RegistrationName( registerType );
-  }
+  mName = impl->Register( registerType, baseType, f, callCreateOnInit );
+}
+
+TypeRegistration::TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
+                                    TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties )
+{
+  Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
+
+  mName = impl->Register( registerType, baseType, f, false, defaultProperties.propertyTable, defaultProperties.propertyCount );
 }
 
 TypeRegistration::TypeRegistration( const std::string& name, const std::type_info& baseType,
@@ -106,10 +109,7 @@ TypeRegistration::TypeRegistration( const std::string& name, const std::type_inf
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  if( impl->Register( name, baseType, f, false ) )
-  {
-    mName = name;
-  }
+  mName = impl->Register( name, baseType, f, false );
 }
 
 

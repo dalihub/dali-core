@@ -381,6 +381,24 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
 
+  // Render for a couple more frames to ensure the values are reset properly (some values are double-buffered)
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), Vector3( actorSize ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::POSITION ).Get< Vector3 >(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >(), Vector3( actorSize ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::COLOR ).Get< Vector4 >(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty( Actor::Property::SCALE ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
+
   END_TEST;
 }
 

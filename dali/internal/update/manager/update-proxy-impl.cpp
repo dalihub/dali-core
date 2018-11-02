@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/update/manager/update-proxy-property-modifier.h>
+
 namespace Dali
 {
 
@@ -52,12 +55,14 @@ SceneGraph::Node* FindNodeInSceneGraph( uint32_t id, SceneGraph::Node& node )
 
 } // unnamed namespace
 
-UpdateProxy::UpdateProxy( SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode )
+UpdateProxy::UpdateProxy( SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraph::Node& rootNode )
 : mNodeContainer(),
   mLastCachedIdNodePair( { 0u, NULL } ),
   mCurrentBufferIndex( 0u ),
+  mUpdateManager( updateManager ),
   mTransformManager( transformManager ),
-  mRootNode( rootNode )
+  mRootNode( rootNode ),
+  mPropertyModifier( nullptr )
 {
 }
 
@@ -200,19 +205,21 @@ bool UpdateProxy::GetColor( uint32_t id, Vector4& color ) const
   return success;
 }
 
-bool UpdateProxy::SetColor( uint32_t id, const Vector4& color ) const
+bool UpdateProxy::SetColor( uint32_t id, const Vector4& color )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
   if( node )
   {
     node->mColor.Set( mCurrentBufferIndex, color );
+    node->SetDirtyFlag( SceneGraph::NodePropertyFlags::COLOR );
+    AddResetter( *node, node->mColor );
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color ) const
+bool UpdateProxy::BakeColor( uint32_t id, const Vector4& color )
 {
   bool success = false;
   SceneGraph::Node* node = GetNodeWithId( id );
@@ -228,6 +235,7 @@ void UpdateProxy::NodeHierarchyChanged()
 {
   mLastCachedIdNodePair = { 0u, NULL };
   mNodeContainer.clear();
+  mPropertyModifier.reset();
 }
 
 SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
@@ -265,6 +273,15 @@ SceneGraph::Node* UpdateProxy::GetNodeWithId( uint32_t id ) const
   }
 
   return node;
+}
+
+void UpdateProxy::AddResetter( SceneGraph::Node& node, SceneGraph::PropertyBase& propertyBase )
+{
+  if( ! mPropertyModifier )
+  {
+    mPropertyModifier = PropertyModifierPtr( new PropertyModifier( mUpdateManager ) );
+  }
+  mPropertyModifier->AddResetter( node, propertyBase );
 }
 
 } // namespace Internal

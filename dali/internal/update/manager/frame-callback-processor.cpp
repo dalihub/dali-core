@@ -34,8 +34,9 @@ namespace Internal
 namespace SceneGraph
 {
 
-FrameCallbackProcessor::FrameCallbackProcessor( TransformManager& transformManager )
+FrameCallbackProcessor::FrameCallbackProcessor( UpdateManager& updateManager, TransformManager& transformManager )
 : mFrameCallbacks(),
+  mUpdateManager( updateManager ),
   mTransformManager( transformManager ),
   mNodeHierarchyChanged( true )
 {
@@ -49,7 +50,7 @@ void FrameCallbackProcessor::AddFrameCallback( OwnerPointer< FrameCallback >& fr
 {
   Node& node = const_cast< Node& >( *rootNode ); // Was sent as const from event thread, we need to be able to use non-const version here.
 
-  frameCallback->ConnectToSceneGraph( mTransformManager, node );
+  frameCallback->ConnectToSceneGraph( mUpdateManager, mTransformManager, node );
 
   mFrameCallbacks.emplace_back( frameCallback );
 }

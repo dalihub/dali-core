@@ -89,7 +89,6 @@ void renderer_test_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 int UtcDaliRendererNew01(void)
 {
   TestApplication application;
@@ -161,6 +160,83 @@ int UtcDaliRendererDownCast02(void)
   Handle handle = Handle::New(); // Create a custom object
   Renderer renderer = Renderer::DownCast(handle);
   DALI_TEST_EQUALS( (bool)renderer, false, TEST_LOCATION );
+  END_TEST;
+}
+
+// using a template to auto deduce the parameter types
+template< typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+void TEST_RENDERER_PROPERTY( P1 renderer, P2 stringName, P3 type, P4 isWriteable, P5 isAnimateable, P6 isConstraintInput, P7 enumName, P8 LOCATION )
+{
+  DALI_TEST_EQUALS( renderer.GetPropertyName( enumName ), stringName, LOCATION );
+  DALI_TEST_EQUALS( renderer.GetPropertyIndex( stringName ), static_cast<Property::Index>(enumName), LOCATION );
+  DALI_TEST_EQUALS( renderer.GetPropertyType( enumName ), type, LOCATION );
+  DALI_TEST_EQUALS( renderer.IsPropertyWritable( enumName ), isWriteable, LOCATION );
+  DALI_TEST_EQUALS( renderer.IsPropertyAnimatable( enumName ), isAnimateable, LOCATION );
+  DALI_TEST_EQUALS( renderer.IsPropertyAConstraintInput( enumName ), isConstraintInput, LOCATION );
+}
+
+int UtcDaliRendererDefaultProperties(void)
+{
+  TestApplication application;
+/* from renderer-impl.cpp
+  DALI_PROPERTY( "depthIndex",                      INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_INDEX )
+  DALI_PROPERTY( "faceCullingMode",                 INTEGER,   true, false,  false, Dali::Renderer::Property::FACE_CULLING_MODE )
+  DALI_PROPERTY( "blendMode",                       INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_MODE )
+  DALI_PROPERTY( "blendEquationRgb",                INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_RGB )
+  DALI_PROPERTY( "blendEquationAlpha",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_ALPHA )
+  DALI_PROPERTY( "blendFactorSrcRgb",               INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB )
+  DALI_PROPERTY( "blendFactorDestRgb",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB )
+  DALI_PROPERTY( "blendFactorSrcAlpha",             INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA )
+  DALI_PROPERTY( "blendFactorDestAlpha",            INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA )
+  DALI_PROPERTY( "blendColor",                      VECTOR4,   true, false,  false, Dali::Renderer::Property::BLEND_COLOR )
+  DALI_PROPERTY( "blendPreMultipliedAlpha",         BOOLEAN,   true, false,  false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA )
+  DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_FIRST )
+  DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
+  DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
+  DALI_PROPERTY( "depthFunction",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_FUNCTION )
+  DALI_PROPERTY( "depthTestMode",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_TEST_MODE )
+  DALI_PROPERTY( "renderMode",                      INTEGER,   true, false,  false, Dali::Renderer::Property::RENDER_MODE )
+  DALI_PROPERTY( "stencilFunction",                 INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION )
+  DALI_PROPERTY( "stencilFunctionMask",             INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_MASK )
+  DALI_PROPERTY( "stencilFunctionReference",        INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE )
+  DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MASK )
+  DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
+  DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
+  DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
+  DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
+*/
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  DALI_TEST_EQUALS( renderer.GetPropertyCount(), 25, TEST_LOCATION );
+
+  TEST_RENDERER_PROPERTY( renderer, "depthIndex",              Property::INTEGER, true, false, false, Renderer::Property::DEPTH_INDEX, TEST_LOCATION );
+  TEST_RENDERER_PROPERTY( renderer, "faceCullingMode",         Property::INTEGER, true, false, false, Renderer::Property::FACE_CULLING_MODE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendMode",               Property::INTEGER, true, false, false, Renderer::Property::BLEND_MODE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendEquationRgb",        Property::INTEGER, true, false, false, Renderer::Property::BLEND_EQUATION_RGB, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendEquationAlpha",      Property::INTEGER, true, false, false, Renderer::Property::BLEND_EQUATION_ALPHA, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendFactorSrcRgb",       Property::INTEGER, true, false, false, Renderer::Property::BLEND_FACTOR_SRC_RGB, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendFactorDestRgb",      Property::INTEGER, true, false, false, Renderer::Property::BLEND_FACTOR_DEST_RGB, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendFactorSrcAlpha",     Property::INTEGER, true, false, false, Renderer::Property::BLEND_FACTOR_SRC_ALPHA, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendFactorDestAlpha",    Property::INTEGER, true, false, false, Renderer::Property::BLEND_FACTOR_DEST_ALPHA, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendColor",              Property::VECTOR4, true, false, false, Renderer::Property::BLEND_COLOR, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "blendPreMultipliedAlpha", Property::BOOLEAN, true, false, false, Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "indexRangeFirst",         Property::INTEGER, true, false, false, Renderer::Property::INDEX_RANGE_FIRST, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "indexRangeCount",         Property::INTEGER, true, false, false, Renderer::Property::INDEX_RANGE_COUNT, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "depthWriteMode",          Property::INTEGER, true, false, false, Renderer::Property::DEPTH_WRITE_MODE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "depthFunction",           Property::INTEGER, true, false, false, Renderer::Property::DEPTH_FUNCTION, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "depthTestMode",           Property::INTEGER, true, false, false, Renderer::Property::DEPTH_TEST_MODE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "renderMode",              Property::INTEGER, true, false, false, Renderer::Property::RENDER_MODE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilFunction",         Property::INTEGER, true, false, false, Renderer::Property::STENCIL_FUNCTION, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilFunctionMask",     Property::INTEGER, true, false, false, Renderer::Property::STENCIL_FUNCTION_MASK, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilFunctionReference",Property::INTEGER, true, false, false, Renderer::Property::STENCIL_FUNCTION_REFERENCE, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilMask",             Property::INTEGER, true, false, false, Renderer::Property::STENCIL_MASK, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilOperationOnFail",  Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_FAIL, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilOperationOnZFail", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "stencilOperationOnZPass", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "opacity",                 Property::FLOAT,   true, true,  true,  DevelRenderer::Property::OPACITY, TEST_LOCATION  );
+
   END_TEST;
 }
 

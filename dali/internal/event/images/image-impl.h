@@ -51,17 +51,6 @@ public:
   Dali::Image::ImageSignalType& UploadedSignal() { return mUploaded; }
 
   /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-   */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
-
-  /**
    * Get the width of the image.
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
