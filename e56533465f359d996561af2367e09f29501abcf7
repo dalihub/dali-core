@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a4f2ab0f_97ac826b",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 1424,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "The vulkan-graphics.cpp has already a function creating a new managed Vulkan image. Use it instead of calling CreateImageFromExternal(). Also, use C++ Vulkan calls not the C. Use Graphics::CreateImage().",
+      "revId": "e56533465f359d996561af2367e09f29501abcf7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a43c5fd1_41ba3fc1",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 1443,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "This image will never be released as it\u0027s not managed by refcounting. It will leak.",
+      "revId": "e56533465f359d996561af2367e09f29501abcf7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b98c9de_3c5e75a8",
+        "filename": "dali/graphics/vulkan/internal/vulkan-image.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "the image and its memory won\u0027t be deleted because VkImage has been created as external. It means such image lifecycle is managed externally, not by the reference counting. This code will never run for native image as long as it\u0027s external.",
+      "revId": "e56533465f359d996561af2367e09f29501abcf7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}

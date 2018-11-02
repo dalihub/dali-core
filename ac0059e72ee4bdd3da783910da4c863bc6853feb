@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf77fa49_6aade994",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "this is still image_to_image however if we want to go with TBM then rename it to TBM_SURFACE",
+      "revId": "ac0059e72ee4bdd3da783910da4c863bc6853feb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16611292_797ef30a",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "looks like we don\u0027t transfer anything, is the transfer request even needed?",
+      "revId": "ac0059e72ee4bdd3da783910da4c863bc6853feb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82d4359f_3a0f9f81",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2018-11-02T17:08:21Z",
+      "side": 1,
+      "message": "there is no data transfer",
+      "revId": "ac0059e72ee4bdd3da783910da4c863bc6853feb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
