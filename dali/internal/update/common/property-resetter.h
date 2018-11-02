@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLDUES
+#include <cstdint> // int8_t
+
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/animation/property-accessor.h>
@@ -66,8 +69,16 @@ public:
    */
   void ResetToBaseValue( BufferIndex updateBufferIndex )
   {
-    if( mPropertyOwner != nullptr && !mDisconnected )
+    if( mPropertyOwner != nullptr && mActive )
     {
+      // If property-owner has disconnected, start aging.
+      // We need to reset the property for two frames after disconnection to ensure both
+      // property values are set appropriately.
+      if( mDisconnected )
+      {
+        --mActive;
+      }
+
       mBaseProperty->ResetToBaseValue( updateBufferIndex );
     }
   };
@@ -83,6 +94,7 @@ public:
   virtual void PropertyOwnerConnected( PropertyOwner& owner ) override
   {
     mDisconnected = false;
+    mActive = ACTIVE;
   }
 
   /**
@@ -105,7 +117,8 @@ public:
     mPropertyOwner = nullptr;
 
     // Don't need to wait another frame as the property is being destroyed
-    mRunning = 0;
+    mActive = STOPPED;
+    mRunning = STOPPED;
   }
 
   /**
@@ -119,15 +132,22 @@ public:
    */
   virtual bool IsFinished()
   {
-    bool finished = mRunning <= 0;
-    if( mRunning == 1 )
+    bool finished = mRunning <= STOPPED;
+    if( mRunning == AGING )
     {
-      mRunning = 0;
+      mRunning = STOPPED;
     }
     return finished;
   }
 
 protected:
+
+  enum
+  {
+    STOPPED = 0,
+    AGING   = 1,
+    ACTIVE  = 2,
+  };
 
   /**
    * Constructor
@@ -139,14 +159,16 @@ protected:
                         PropertyBase* baseProperty )
   : mPropertyOwner( propertyOwner ),
     mBaseProperty( baseProperty ),
-    mRunning( 2 ),
+    mRunning( ACTIVE ),
+    mActive( ACTIVE ),
     mDisconnected( false )
   {
   }
 
   PropertyOwner* mPropertyOwner; ///< The property owner
   PropertyBase* mBaseProperty;   ///< The base property being animated or constrained
-  int mRunning;                  ///< 2 if running, 1 if aging, 0 if stopped
+  int8_t mRunning;                  ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
+  int8_t mActive;                   ///< 2 if active, 1 if aging, 0 if stopped
   bool mDisconnected;            ///< True if the property owner has been disconnected
 };
 
