@@ -165,8 +165,8 @@ public:
   std::string GetTraceString()
   {
     std::stringstream traceStream;
-    int functionCount = mCallStack.size();
-    for( int i = 0; i < functionCount; ++i )
+    std::size_t functionCount = mCallStack.size();
+    for( std::size_t i = 0; i < functionCount; ++i )
     {
       Dali::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
       traceStream << "StackTrace: Index:" << i << ",  Function:" << functionCall.method << ",  ParamList:" << functionCall.paramList << std::endl;

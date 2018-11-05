@@ -19,6 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
@@ -62,7 +65,7 @@ public:
    * @SINCE_1_0.0
    * @return The reference count
    */
-  int ReferenceCount();
+  uint32_t ReferenceCount();
 
 protected:
 
@@ -101,7 +104,7 @@ protected:
 
 private:
 
-  volatile int mCount; ///< Reference count
+  volatile uint32_t mCount; ///< Reference count
 };
 
 /**

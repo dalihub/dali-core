@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,14 @@ LongPressGestureDetector LongPressGestureDetector::New()
   return LongPressGestureDetector(internal.Get());
 }
 
-LongPressGestureDetector LongPressGestureDetector::New(unsigned int touchesRequired)
+LongPressGestureDetector LongPressGestureDetector::New(uint32_t touchesRequired)
 {
   Internal::LongPressGestureDetectorPtr internal = Internal::LongPressGestureDetector::New(touchesRequired);
 
   return LongPressGestureDetector(internal.Get());
 }
 
-LongPressGestureDetector LongPressGestureDetector::New(unsigned int minTouches, unsigned int maxTouches)
+LongPressGestureDetector LongPressGestureDetector::New(uint32_t minTouches, uint32_t maxTouches)
 {
   Internal::LongPressGestureDetectorPtr internal = Internal::LongPressGestureDetector::New(minTouches, maxTouches);
 
@@ -74,22 +74,22 @@ LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGes
   return *this;
 }
 
-void LongPressGestureDetector::SetTouchesRequired(unsigned int touches)
+void LongPressGestureDetector::SetTouchesRequired(uint32_t touches)
 {
   GetImplementation(*this).SetTouchesRequired(touches);
 }
 
-void LongPressGestureDetector::SetTouchesRequired(unsigned int minTouches, unsigned int maxTouches)
+void LongPressGestureDetector::SetTouchesRequired(uint32_t minTouches, uint32_t maxTouches)
 {
   GetImplementation(*this).SetTouchesRequired(minTouches, maxTouches);
 }
 
-unsigned int LongPressGestureDetector::GetMinimumTouchesRequired() const
+uint32_t LongPressGestureDetector::GetMinimumTouchesRequired() const
 {
   return GetImplementation(*this).GetMinimumTouchesRequired();
 }
 
-unsigned int LongPressGestureDetector::GetMaximumTouchesRequired() const
+uint32_t LongPressGestureDetector::GetMaximumTouchesRequired() const
 {
   return GetImplementation(*this).GetMaximumTouchesRequired();
 }

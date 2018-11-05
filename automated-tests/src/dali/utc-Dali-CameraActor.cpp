@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <cmath>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/actor-devel.h>
+
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
@@ -65,6 +67,16 @@ const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
   "  alpha = texture2D(sTexture, vec2(vTexCoord.x, vTexCoord.y)).a;\n"
   "  gl_FragColor = vec4(uShadowColor.rgb, uShadowColor.a * alpha);\n"
   "}\n";
+
+struct PropertyDetails
+{
+  std::string name;           ///< The name of the property.
+  Property::Type type;        ///< The property type.
+  bool writable;              ///< Whether the property is writable
+  bool animatable;            ///< Whether the property is animatable.
+  bool constraintInput;       ///< Whether the property can be used as an input to a constraint.
+  Property::Index enumIndex;  ///< Used to check the index is correct within a debug build.
+};
 
 } // Anonymous namespace
 
@@ -1262,6 +1274,124 @@ int UtcDaliCameraActorDefaultProperties(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS( actor.GetAspectRatio(), newAspect, TEST_LOCATION );
+  END_TEST;
+}
+
+template< typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+void TEST_CAMERA_PROPERTY( P1 camera, P2 stringName, P3 type, P4 isWriteable, P5 isAnimateable, P6 isConstraintInput, P7 enumName, P8 LOCATION )
+{
+  DALI_TEST_EQUALS( camera.GetPropertyName( enumName ), stringName, LOCATION );
+  DALI_TEST_EQUALS( camera.GetPropertyIndex( stringName ), static_cast<Property::Index>(enumName), LOCATION );
+  DALI_TEST_EQUALS( camera.GetPropertyType( enumName ), type, LOCATION );
+  DALI_TEST_EQUALS( camera.IsPropertyWritable( enumName ), isWriteable, LOCATION );
+  DALI_TEST_EQUALS( camera.IsPropertyAnimatable( enumName ), isAnimateable, LOCATION );
+  DALI_TEST_EQUALS( camera.IsPropertyAConstraintInput( enumName ), isConstraintInput, LOCATION );
+}
+int UtcDaliCameraActorDefaultPropertiesInherited(void)
+{
+  TestApplication application;
+
+  CameraActor actor = CameraActor::New();
+  Stage stage = Stage::GetCurrent();
+  stage.Add(actor);
+  stage.GetRenderTaskList().GetTask(0).SetCameraActor( actor );
+
+  Stage::GetCurrent().Add( actor );
+  application.Render( 0 );
+  application.SendNotification();
+
+  const PropertyDetails CAMERA_DEFAULT_PROPERTY[] =
+  {
+// actor
+    { "parentOrigin",           Property::VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN },
+    { "parentOriginX",          Property::FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_X },
+    { "parentOriginY",          Property::FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Y },
+    { "parentOriginZ",          Property::FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Z },
+    { "anchorPoint",            Property::VECTOR3,  true,  false, true,  Dali::Actor::Property::ANCHOR_POINT },
+    { "anchorPointX",           Property::FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_X },
+    { "anchorPointY",           Property::FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Y },
+    { "anchorPointZ",           Property::FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Z },
+    { "size",                   Property::VECTOR3,  true,  true,  true,  Dali::Actor::Property::SIZE },
+    { "sizeWidth",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_WIDTH },
+    { "sizeHeight",             Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_HEIGHT },
+    { "sizeDepth",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_DEPTH },
+    { "position",               Property::VECTOR3,  true,  true,  true,  Dali::Actor::Property::POSITION },
+    { "positionX",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_X },
+    { "positionY",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Y },
+    { "positionZ",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Z },
+    { "worldPosition",          Property::VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_POSITION },
+    { "worldPositionX",         Property::FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_X },
+    { "worldPositionY",         Property::FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Y },
+    { "worldPositionZ",         Property::FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Z },
+    { "orientation",            Property::ROTATION, true,  true,  true,  Dali::Actor::Property::ORIENTATION },
+    { "worldOrientation",       Property::ROTATION, false, false, true,  Dali::Actor::Property::WORLD_ORIENTATION },
+    { "scale",                  Property::VECTOR3,  true,  true,  true,  Dali::Actor::Property::SCALE },
+    { "scaleX",                 Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_X },
+    { "scaleY",                 Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Y },
+    { "scaleZ",                 Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Z },
+    { "worldScale",             Property::VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_SCALE },
+    { "visible",                Property::BOOLEAN,  true,  true,  true,  Dali::Actor::Property::VISIBLE },
+    { "color",                  Property::VECTOR4,  true,  true,  true,  Dali::Actor::Property::COLOR },
+    { "colorRed",               Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_RED },
+    { "colorGreen",             Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_GREEN },
+    { "colorBlue",              Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_BLUE },
+    { "colorAlpha",             Property::FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_ALPHA },
+    { "worldColor",             Property::VECTOR4,  false, false, true,  Dali::Actor::Property::WORLD_COLOR },
+    { "worldMatrix",            Property::MATRIX,   false, false, true,  Dali::Actor::Property::WORLD_MATRIX },
+    { "name",                   Property::STRING,   true,  false, false, Dali::Actor::Property::NAME },
+    { "sensitive",              Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::SENSITIVE },
+    { "leaveRequired",          Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED },
+    { "inheritOrientation",     Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION },
+    { "inheritScale",           Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE },
+    { "colorMode",              Property::STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE },
+    { "positionInheritance",    Property::STRING,   true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE },
+    { "drawMode",               Property::STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE },
+    { "sizeModeFactor",         Property::VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR },
+    { "widthResizePolicy",      Property::STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY },
+    { "heightResizePolicy",     Property::STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY },
+    { "sizeScalePolicy",        Property::STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY },
+    { "widthForHeight",         Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT },
+    { "heightForWidth",         Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH },
+    { "padding",                Property::VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING },
+    { "minimumSize",            Property::VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE },
+    { "maximumSize",            Property::VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE },
+    { "inheritPosition",        Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_POSITION },
+    { "clippingMode",           Property::STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE },
+    { "layoutDirection",        Property::STRING,   true,  false, false, Dali::Actor::Property::LAYOUT_DIRECTION },
+    { "inheritLayoutDirection", Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION },
+    { "siblingOrder",           Property::INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER },
+    { "opacity",                Property::FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY },
+    { "screenPosition",         Property::VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION },
+    { "positionUsesAnchorPoint",Property::BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT },
+    { "culled",                 Property::BOOLEAN,  false, false, true,  Dali::DevelActor::Property::CULLED },
+// camera own
+    { "type",                   Property::STRING,   true,    false,   true,   Dali::CameraActor::Property::TYPE                  },
+    { "projectionMode",         Property::STRING,   true,    false,   true,   Dali::CameraActor::Property::PROJECTION_MODE       },
+    { "fieldOfView",            Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FIELD_OF_VIEW         },
+    { "aspectRatio",            Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::ASPECT_RATIO          },
+    { "nearPlaneDistance",      Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NEAR_PLANE_DISTANCE   },
+    { "farPlaneDistance",       Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FAR_PLANE_DISTANCE    },
+    { "leftPlaneDistance",      Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::LEFT_PLANE_DISTANCE   },
+    { "rightPlaneDistance",     Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::RIGHT_PLANE_DISTANCE  },
+    { "topPlaneDistance",       Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::TOP_PLANE_DISTANCE    },
+    { "bottomPlaneDistance",    Property::FLOAT,    true,    false,   true,   Dali::CameraActor::Property::BOTTOM_PLANE_DISTANCE },
+    { "targetPosition",         Property::VECTOR3,  true,    false,   true,   Dali::CameraActor::Property::TARGET_POSITION       },
+    { "projectionMatrix",       Property::MATRIX,   false,   false,   true,   Dali::CameraActor::Property::PROJECTION_MATRIX     },
+    { "viewMatrix",             Property::MATRIX,   false,   false,   true,   Dali::CameraActor::Property::VIEW_MATRIX           },
+    { "invertYAxis",            Property::BOOLEAN,  true,    false,   true,   Dali::CameraActor::Property::INVERT_Y_AXIS         }
+  };
+
+  for( uint32_t index = 0; index < (sizeof(CAMERA_DEFAULT_PROPERTY)/sizeof(PropertyDetails)); ++index )
+  {
+    TEST_CAMERA_PROPERTY( actor,
+                          CAMERA_DEFAULT_PROPERTY[ index ].name,
+                          CAMERA_DEFAULT_PROPERTY[ index ].type,
+                          CAMERA_DEFAULT_PROPERTY[ index ].writable,
+                          CAMERA_DEFAULT_PROPERTY[ index ].animatable,
+                          CAMERA_DEFAULT_PROPERTY[ index ].constraintInput,
+                          CAMERA_DEFAULT_PROPERTY[ index ].enumIndex,
+                          TEST_LOCATION );
+  }
   END_TEST;
 }
 

@@ -196,7 +196,7 @@ void* FixedSizeMemoryPool::Allocate()
   }
 
   // Placement new the object in block memory
-  unsigned char* objectAddress = static_cast< unsigned char* >( mImpl->mCurrentBlock->blockMemory );
+  uint8_t* objectAddress = static_cast< uint8_t* >( mImpl->mCurrentBlock->blockMemory );
   objectAddress += mImpl->mCurrentBlockSize * mImpl->mFixedSize;
   mImpl->mCurrentBlockSize++;
 

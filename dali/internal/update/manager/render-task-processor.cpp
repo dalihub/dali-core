@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
 
   DALI_ASSERT_DEBUG( NULL != layer );
 
-  const unsigned int count = node.GetRendererCount();
+  const uint32_t count = node.GetRendererCount();
 
   // Update the clipping Id and depth for this node (if clipping is enabled).
   const Dali::ClippingMode::Type clippingMode = node.GetClippingMode();
@@ -164,7 +164,7 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
   // Set the information in the node.
   node.SetClippingInformation( currentClippingId, clippingDepth, scissorDepth );
 
-  for( unsigned int i = 0; i < count; ++i )
+  for( uint32_t i = 0; i < count; ++i )
   {
     SceneGraph::Renderer* renderer = node.GetRendererAt( i );
 
@@ -252,13 +252,13 @@ void ProcessTasks( BufferIndex updateBufferIndex,
       continue;
     }
 
-    const unsigned int currentNumberOfInstructions = instructions.Count( updateBufferIndex );
+    const uint32_t currentNumberOfInstructions = instructions.Count( updateBufferIndex );
 
     if( renderTask.IsRenderRequired() )
     {
-      for( size_t i = 0u, layerCount = sortedLayers.size(); i < layerCount; ++i )
+      for( auto&& sortedLayer : sortedLayers )
       {
-        sortedLayers[i]->ClearRenderables();
+        sortedLayer->ClearRenderables();
       }
 
       AddRenderablesForTask( updateBufferIndex,
@@ -282,7 +282,8 @@ void ProcessTasks( BufferIndex updateBufferIndex,
     if( !processOffscreen && isDefaultRenderTask && renderToFboEnabled && !isRenderingToFbo && hasFrameBuffer )
     {
       // Traverse the instructions of the default render task and mark them to be rendered into the frame buffer.
-      for( unsigned int index = currentNumberOfInstructions, count = instructions.Count( updateBufferIndex ); index < count; ++index )
+      const uint32_t count = instructions.Count( updateBufferIndex );
+      for( uint32_t index = currentNumberOfInstructions; index < count; ++index )
       {
         RenderInstruction& instruction = instructions.At( updateBufferIndex, index );
         instruction.mIgnoreRenderToFbo = true;

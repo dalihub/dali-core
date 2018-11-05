@@ -18,10 +18,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
+#include <dali/internal/update/manager/update-proxy-impl.h>
 
 namespace Dali
 {
@@ -31,25 +36,26 @@ class FrameCallbackInterface;
 namespace Internal
 {
 
-class UpdateProxy;
-
 namespace SceneGraph
 {
 
 class Node;
 class TransformManager;
+class UpdateManager;
 
 /**
  * This class processes all the registered frame-callbacks.
  */
-class FrameCallbackProcessor : public PropertyOwner::Observer
+class FrameCallbackProcessor
 {
 public:
 
   /**
    * Construct a new FrameCallbackProcessor.
+   * @param[in]  updateManager     A reference to the UpdateManager
+   * @param[in]  transformManager  A reference to the TransformManager
    */
-  FrameCallbackProcessor( TransformManager& transformManager, Node& rootNode );
+  FrameCallbackProcessor( UpdateManager& updateManager, TransformManager& transformManager );
 
   /**
    * Non-virtual Destructor.
@@ -65,10 +71,10 @@ public:
 
   /**
    * Adds an implementation of the FrameCallbackInterface.
-   * @param[in]  frameCallback  A pointer to the implementation of the FrameCallbackInterface
+   * @param[in]  frameCallback  An OwnerPointer to the SceneGraph FrameCallback object
    * @param[in]  rootNode       A pointer to the root node to apply the FrameCallback to
    */
-  void AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode );
+  void AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode );
 
   /**
    * Removes the specified implementation of FrameCallbackInterface.
@@ -83,39 +89,23 @@ public:
    */
   void Update( BufferIndex bufferIndex, float elapsedSeconds );
 
-private:
-
-  // From PropertyOwner::Observer
-
   /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
+   * Called by the UpdateManager when the node hierarchy changes.
    */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner ) { /* Nothing to do */ }
-
-  /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
-   */
-  virtual void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) { /* Nothing to do */ }
-
-  /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
-   *
-   * Will use this to disconnect the frame-callback if the accompanying node is destroyed
-   */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner );
-
-private:
-
-  struct FrameCallbackInfo
+  void NodeHierarchyChanged()
   {
-    FrameCallbackInterface* frameCallback;
-    UpdateProxy* updateProxyImpl;
-  };
+    mNodeHierarchyChanged = true;
+  }
 
-  std::vector< FrameCallbackInfo > mFrameCallbacks;
+private:
+
+  std::vector< OwnerPointer< FrameCallback > > mFrameCallbacks; ///< A container of all the frame-callbacks & accompanying update-proxies.
+
+  UpdateManager& mUpdateManager;
 
   TransformManager& mTransformManager;
-  Node& mRootNode;
+
+  bool mNodeHierarchyChanged; ///< Set to true if the node hierarchy changes
 };
 
 } // namespace SceneGraph

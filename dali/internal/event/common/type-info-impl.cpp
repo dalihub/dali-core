@@ -29,6 +29,12 @@
 
 using std::find_if;
 
+namespace Dali
+{
+
+namespace Internal
+{
+
 namespace
 {
 
@@ -80,7 +86,7 @@ private:
 template <typename T>
 struct PropertyComponentFinder
 {
-  PropertyComponentFinder( Dali::Property::Index basePropertyIndex, const int find )
+  PropertyComponentFinder( Property::Index basePropertyIndex, const int find )
   : mBasePropertyIndex( basePropertyIndex ),
     mFind( find )
   {
@@ -93,27 +99,78 @@ struct PropertyComponentFinder
 
 private:
 
-  Dali::Property::Index mBasePropertyIndex;
+  Property::Index mBasePropertyIndex;
   const int mFind;
 };
 
-} // namespace anon
-
-namespace Dali
+/**
+ * Helper function to find the right default property with given index and return the desired detail of it
+ */
+template< typename Parameter, typename Member >
+inline bool GetDefaultPropertyField( const Dali::PropertyDetails* propertyTable, Property::Index count, Property::Index index, Member member, Parameter& parameter )
 {
+  bool found = false;
+  // is index inside this table (bigger than first index but smaller than first + count)
+  if( ( index >= propertyTable->enumIndex ) && ( index < ( propertyTable->enumIndex + count ) ) )
+  {
+    // return the match. we're assuming here that there is no gaps between the indices in a table
+    parameter = propertyTable[ index - propertyTable->enumIndex ].*member;
+    found = true;
+  }
+  // should never really get here
+  return found;
+}
 
-namespace Internal
+// static pointer value to mark that a base class address has not been resolved
+// 0x01 is not a valid pointer but used here to differentiate from nullptr
+// unfortunately it cannot be constexpr as C++ does not allow them to be initialised with reinterpret_cast
+Internal::TypeInfo* const UNRESOLVED = reinterpret_cast<Internal::TypeInfo*>( 0x1 );
+
+/**
+ * Helper function to resolve and return the pointer to the base type info
+ * Not a member function to avoid having to #include additional headers and to make sure this gets inlined inside this cpp
+ * @param[in/out] baseType pointer to resolve and set
+ * @param[in] typeRegistry reference to the type registry
+ * @param[in] baseTypeName string name of the base type
+ * @return true is base type exists
+ */
+inline bool GetBaseType( Internal::TypeInfo*& baseType, TypeRegistry& typeRegistry, const std::string& baseTypeName )
 {
+  // if greater than unresolved means we have a base type, null means no base
+  bool baseExists = ( baseType > UNRESOLVED );
+  // base only needs to be resolved once
+  if( UNRESOLVED == baseType )
+  {
+    TypeRegistry::TypeInfoPointer base = typeRegistry.GetTypeInfo( baseTypeName );
+    if( base )
+    {
+      baseType = base.Get(); // dont pass ownership, just return raw pointer
+      baseExists = true;
+    }
+    else
+    {
+      // no type info found so assuming no base as all type registration is done in startup for now
+      baseType = nullptr;
+    }
+  }
+  return baseExists;
+}
 
-TypeInfo::TypeInfo(const std::string &name, const std::string &baseTypeName, Dali::TypeInfo::CreateFunction creator)
-  : mTypeName(name), mBaseTypeName(baseTypeName), mCSharpType(false), mCreate(creator)
+} // unnamed namespace
+
+TypeInfo::TypeInfo( const std::string &name, const std::string &baseTypeName, Dali::TypeInfo::CreateFunction creator,
+                    const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount )
+: mTypeRegistry( *TypeRegistry::Get() ), mBaseType( UNRESOLVED ),
+  mTypeName( name ), mBaseTypeName( baseTypeName ), mCreate( creator ), mDefaultProperties( defaultProperties ),
+  mDefaultPropertyCount( defaultPropertyCount ), mCSharpType( false )
 {
   DALI_ASSERT_ALWAYS(!name.empty() && "Type info construction must have a name");
   DALI_ASSERT_ALWAYS(!baseTypeName.empty() && "Type info construction must have a base type name");
 }
 
 TypeInfo::TypeInfo(const std::string &name, const std::string &baseTypeName, Dali::CSharpTypeInfo::CreateFunction creator)
-  : mTypeName(name), mBaseTypeName(baseTypeName), mCSharpType(true), mCSharpCreate(creator)
+: mTypeRegistry( *TypeRegistry::Get() ), mBaseType( UNRESOLVED ),
+  mTypeName( name ), mBaseTypeName( baseTypeName ), mCSharpCreate( creator ), mCSharpType( true )
 {
   DALI_ASSERT_ALWAYS(!name.empty() && "Type info construction must have a name");
   DALI_ASSERT_ALWAYS(!baseTypeName.empty() && "Type info construction must have a base type name");
@@ -154,7 +211,7 @@ BaseHandle TypeInfo::CreateInstance() const
   return ret;
 }
 
-  bool TypeInfo::DoActionTo(BaseObject *object, const std::string &actionName, const Property::Map &properties)
+bool TypeInfo::DoActionTo(BaseObject *object, const std::string &actionName, const Property::Map &properties)
 {
   bool done = false;
 
@@ -164,22 +221,13 @@ BaseHandle TypeInfo::CreateInstance() const
   {
     done = (iter->second)(object, actionName, properties);
   }
-  else
-  {
-    DALI_LOG_WARNING("Type '%s' cannot do action '%s'\n", mTypeName.c_str(), actionName.c_str());
-  }
 
-  if(!done)
+  if( !done )
   {
-    Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
-    while( base )
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
     {
-      done = GetImplementation(base).DoActionTo(object, actionName, properties);
-      if( done )
-      {
-        break;
-      }
-      base =  Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+      // call base type recursively
+      done = mBaseType->DoActionTo( object, actionName, properties );
     }
   }
 
@@ -196,6 +244,15 @@ bool TypeInfo::ConnectSignal( BaseObject* object, ConnectionTrackerInterface* co
   if( iter != mSignalConnectors.end() )
   {
     connected = (iter->second)( object, connectionTracker, signalName, functor );
+  }
+
+  if( !connected )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      connected = mBaseType->ConnectSignal( object, connectionTracker, signalName, functor );
+    }
   }
 
   return connected;
@@ -220,11 +277,10 @@ size_t TypeInfo::GetActionCount() const
 {
   size_t count = mActions.size();
 
-  Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
-  while( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    count += GetImplementation(base).mActions.size();
-    base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+    // call base type recursively
+    count += mBaseType->GetActionCount();
   }
 
   return count;
@@ -233,29 +289,18 @@ size_t TypeInfo::GetActionCount() const
 std::string TypeInfo::GetActionName(size_t index) const
 {
   std::string name;
+  const size_t count = mActions.size();
 
-  if( index < mActions.size() )
+  if( index < count )
   {
     name = mActions[index].first;
   }
   else
   {
-    size_t count = mActions.size();
-
-    Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
-    while( base )
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
     {
-      size_t baseCount = GetImplementation(base).mActions.size();
-
-      if( index < count + baseCount )
-      {
-        name = GetImplementation(base).mActions[ index - count ].first;
-        break;
-      }
-
-      count += baseCount;
-
-      base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+      // call base type recursively
+      return mBaseType->GetActionName( index - count );
     }
   }
 
@@ -266,11 +311,10 @@ size_t TypeInfo::GetSignalCount() const
 {
   size_t count = mSignalConnectors.size();
 
-  Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
-  while( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    count += GetImplementation(base).mSignalConnectors.size();
-    base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+    // call base type recursively
+    count += mBaseType->GetSignalCount();
   }
 
   return count;
@@ -279,29 +323,18 @@ size_t TypeInfo::GetSignalCount() const
 std::string TypeInfo::GetSignalName(size_t index) const
 {
   std::string name;
+  const size_t count = mSignalConnectors.size();
 
-  if( index < mSignalConnectors.size() )
+  if( index < count )
   {
     name = mSignalConnectors[index].first;
   }
   else
   {
-    size_t count = mSignalConnectors.size();
-
-    Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
-    while( base )
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
     {
-      size_t baseCount = GetImplementation(base).mSignalConnectors.size();
-
-      if( index < count + baseCount )
-      {
-        name = GetImplementation(base).mSignalConnectors[ index - count ].first;
-        break;
-      }
-
-      count += baseCount;
-
-      base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+      // call base type recursively
+      return mBaseType->GetSignalName( index - count );
     }
   }
 
@@ -310,11 +343,20 @@ std::string TypeInfo::GetSignalName(size_t index) const
 
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  // Default Properties
+  if( mDefaultProperties )
   {
-    const TypeInfo& baseImpl( GetImplementation( base ) );
-    baseImpl.GetPropertyIndices( indices );
+    indices.Reserve( indices.Size() + mDefaultPropertyCount );
+    for( Property::Index index = 0; index < mDefaultPropertyCount; ++index )
+    {
+      indices.PushBack( mDefaultProperties[ index ].enumIndex );
+    }
+  }
+
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+  {
+    // call base type recursively
+    mBaseType->GetPropertyIndices( indices );
   }
 
   AppendProperties( indices, mRegisteredProperties );
@@ -322,11 +364,10 @@ void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 
 void TypeInfo::GetChildPropertyIndices( Property::IndexContainer& indices ) const
 {
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    const TypeInfo& baseImpl( GetImplementation( base ) );
-    baseImpl.GetChildPropertyIndices( indices );
+    // call base type recursively
+    mBaseType->GetChildPropertyIndices( indices );
   }
 
   AppendProperties( indices, mRegisteredChildProperties );
@@ -349,23 +390,55 @@ void TypeInfo::AppendProperties( Dali::Property::IndexContainer& indices,
   }
 }
 
-const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
+const std::string& TypeInfo::GetRegisteredPropertyName( Property::Index index ) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                           PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
-
   if ( iter != mRegisteredProperties.end() )
   {
     return iter->second.name;
   }
-
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return GetImplementation(base).GetPropertyName( index );
+    // call base type recursively
+    return mBaseType->GetRegisteredPropertyName( index );
+  }
+  static std::string empty;
+  return empty;
+}
+
+std::string TypeInfo::GetPropertyName( Property::Index index ) const
+{
+  std::string propertyName;
+  // default or custom
+  if ( mDefaultProperties && ( index < DEFAULT_PROPERTY_MAX_COUNT ) )
+  {
+    const char* name = nullptr;
+    if( GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::name, name ) )
+    {
+      propertyName = name;
+    }
+  }
+  else
+  {
+    RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                            PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+    if ( iter != mRegisteredProperties.end() )
+    {
+      return iter->second.name;
+    }
+  }
+  // if not our property, go to parent
+  if( propertyName.empty() )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      return mBaseType->GetPropertyName( index );
+    }
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+  return propertyName;
 }
 
 void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
@@ -494,7 +567,7 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
   }
 }
 
-void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
+void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex )
 {
   Property::Type type = GetPropertyType( baseIndex );
   DALI_ASSERT_ALWAYS( ( type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4 ) && "Base property does not support component" );
@@ -534,16 +607,14 @@ void TypeInfo::AddChildProperty( const std::string& name, Property::Index index,
   }
 }
 
-size_t TypeInfo::GetPropertyCount() const
+uint32_t TypeInfo::GetPropertyCount() const
 {
-  size_t count( mRegisteredProperties.size() );
+  uint32_t count = mDefaultPropertyCount + static_cast<uint32_t>( mRegisteredProperties.size() );
 
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  while ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    const TypeInfo& baseImpl( GetImplementation(base) );
-    count += baseImpl.mRegisteredProperties.size();
-    base = TypeRegistry::Get()->GetTypeInfo( baseImpl.mBaseTypeName );
+    // call base type recursively
+    count += mBaseType->GetPropertyCount();
   }
 
   return count;
@@ -552,21 +623,34 @@ size_t TypeInfo::GetPropertyCount() const
 Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
 {
   Property::Index index = Property::INVALID_INDEX;
+  bool found = false;
 
-  // Slow but should not be done that often
-  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                          PropertyNameFinder< RegisteredPropertyPair >( name ) );
-
-  if ( iter != mRegisteredProperties.end() )
+  // check default properties
+  if( mDefaultProperties )
   {
-    index = iter->first;
-  }
-  else
-  {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
+    for( Property::Index tableIndex = 0; tableIndex < mDefaultPropertyCount; ++tableIndex )
     {
-      index = GetImplementation(base).GetPropertyIndex( name );
+      if( 0 == name.compare( mDefaultProperties[ tableIndex ].name ) )
+      {
+        index = mDefaultProperties[ tableIndex ].enumIndex;
+        found = true;
+        break;
+      }
+    }
+  }
+  if( !found )
+  {
+    // Slow but should not be done that often
+    RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                            PropertyNameFinder< RegisteredPropertyPair >( name ) );
+    if ( iter != mRegisteredProperties.end() )
+    {
+      index = iter->first;
+    }
+    else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      index = mBaseType->GetPropertyIndex( name );
     }
   }
 
@@ -584,13 +668,10 @@ Property::Index TypeInfo::GetBasePropertyIndex( Property::Index index ) const
   {
     basePropertyIndex = iter->second.basePropertyIndex;
   }
-  else
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      basePropertyIndex = GetImplementation(base).GetBasePropertyIndex( index );
-    }
+    // call base type recursively
+    basePropertyIndex = mBaseType->GetBasePropertyIndex( index );
   }
 
   return basePropertyIndex;
@@ -607,13 +688,10 @@ int TypeInfo::GetComponentIndex( Property::Index index ) const
   {
     componentIndex = iter->second.componentIndex;
   }
-  else
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      componentIndex = GetImplementation(base).GetComponentIndex( index );
-    }
+    // call base type recursively
+    componentIndex = mBaseType->GetComponentIndex( index );
   }
 
   return componentIndex;
@@ -631,13 +709,10 @@ Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const
   {
     index = iter->first;
   }
-  else
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      index = GetImplementation(base).GetChildPropertyIndex( name );
-    }
+    // call base type recursively
+    index = mBaseType->GetChildPropertyIndex( name );
   }
 
   return index;
@@ -653,16 +728,16 @@ const std::string& TypeInfo::GetChildPropertyName( Property::Index index ) const
     return iter->second.name;
   }
 
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return GetImplementation(base).GetChildPropertyName( index );
+    // call base type recursively
+    return mBaseType->GetChildPropertyName( index );
   }
 
-  DALI_LOG_WARNING("Cannot find property index");
+  DALI_LOG_ERROR( "Property index %d not found\n", index );
 
-  static std::string emptyString;
-  return emptyString;
+  static std::string empty;
+  return empty;
 }
 
 Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
@@ -676,17 +751,14 @@ Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
   {
     type = iter->second.type;
   }
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+  {
+    // call base type recursively
+    type = mBaseType->GetChildPropertyType( index );
+  }
   else
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      type = GetImplementation(base).GetChildPropertyType( index );
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
-    }
+    DALI_LOG_ERROR( "Property index %d not found\n", index );
   }
 
   return type;
@@ -694,67 +766,167 @@ Property::Type TypeInfo::GetChildPropertyType( Property::Index index ) const
 
 bool TypeInfo::IsPropertyWritable( Property::Index index ) const
 {
-  bool writable( false );
+  bool writable = false;
+  bool found = false;
 
-  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
-
-  if ( iter != mRegisteredProperties.end() )
+  // default property?
+  if ( ( index < DEFAULT_PROPERTY_MAX_COUNT ) && mDefaultProperties )
   {
-    if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
-    {
-      writable = true; // animatable property is writable
-    }
-    else
-    {
-      writable = iter->second.setFunc ? true : false;
-    }
+    found = GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::writable, writable );
+  }
+  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    writable = true; // animatable property is writable
+    found = true;
   }
   else
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
+    RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                            PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+    if ( iter != mRegisteredProperties.end() )
     {
-      writable = GetImplementation(base).IsPropertyWritable( index );
+      writable = iter->second.setFunc ? true : false;
+      found = true;
+    }
+  }
+
+  // if not found, continue to base
+  if( !found )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      writable = mBaseType->IsPropertyWritable( index );
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+      DALI_LOG_ERROR( "Property index %d not found\n", index );
     }
   }
 
   return writable;
 }
 
+bool TypeInfo::IsPropertyAnimatable( Property::Index index ) const
+{
+  bool animatable = false;
+  bool found = false;
+
+  // default property?
+  if ( ( index < DEFAULT_PROPERTY_MAX_COUNT ) && mDefaultProperties )
+  {
+    found = GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::animatable, animatable );
+  }
+  else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    // Type Registry event-thread only properties are not animatable.
+    animatable = false;
+    found = true;
+  }
+  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    animatable = true;
+    found = true;
+  }
+
+  // if not found, continue to base
+  if( !found )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      animatable = mBaseType->IsPropertyAnimatable( index );
+    }
+    else
+    {
+      DALI_LOG_ERROR( "Property index %d not found\n", index );
+    }
+  }
+
+  return animatable;
+}
+
+bool TypeInfo::IsPropertyAConstraintInput( Property::Index index ) const
+{
+  bool constraintInput = false;
+  bool found = false;
+
+  // default property?
+  if ( ( index < DEFAULT_PROPERTY_MAX_COUNT ) && mDefaultProperties )
+  {
+    found = GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::constraintInput, constraintInput );
+  }
+  else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    // Type Registry event-thread only properties cannot be used as constraint input
+    constraintInput = false;
+    found = true;
+  }
+  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    constraintInput = true;
+    found = true;
+  }
+
+  // if not found, continue to base
+  if( !found )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      constraintInput = mBaseType->IsPropertyAConstraintInput( index );
+    }
+    else
+    {
+      DALI_LOG_ERROR( "Property index %d not found\n", index );
+    }
+  }
+
+  return constraintInput;
+}
+
+
 Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
 {
   Property::Type type( Property::NONE );
+  bool found = false;
 
-  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
-
-  if ( iter != mRegisteredProperties.end() )
+  // default property?
+  if ( ( index < DEFAULT_PROPERTY_MAX_COUNT ) && mDefaultProperties )
   {
-    if( iter->second.componentIndex == Property::INVALID_COMPONENT_INDEX )
-    {
-      type = iter->second.type;
-    }
-    else
-    {
-      // If component index is set, then we should return FLOAT
-      type = Property::FLOAT;
-    }
+    found = GetDefaultPropertyField( mDefaultProperties, mDefaultPropertyCount,index, &Dali::PropertyDetails::type, type );
   }
   else
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
+    RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                            PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+    if ( iter != mRegisteredProperties.end() )
     {
-      type = GetImplementation(base).GetPropertyType( index );
+      if( iter->second.componentIndex == Property::INVALID_COMPONENT_INDEX )
+      {
+        type = iter->second.type;
+        found = true;
+      }
+      else
+      {
+        // If component index is set, then we should return FLOAT
+        type = Property::FLOAT;
+        found = true;
+      }
+    }
+  }
+
+  if( !found )
+  {
+    if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+    {
+      // call base type recursively
+      type = mBaseType->GetPropertyType( index );
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+      DALI_LOG_ERROR( "Property index %d not found\n", index );
     }
   }
 
@@ -765,14 +937,17 @@ Property::Value TypeInfo::GetPropertyDefaultValue( Property::Index index ) const
 {
   PropertyDefaultValueContainer::const_iterator iter = find_if( mPropertyDefaultValues.begin(), mPropertyDefaultValues.end(),
                                                     PairFinder< Property::Index, PropertyDefaultValuePair >( index ) );
-  if( iter !=  mPropertyDefaultValues.end() )
+  if( iter != mPropertyDefaultValues.end() )
   {
     return iter->second;
   }
-  else
+  // we didn't have a value so ask base
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return Property::Value( GetPropertyType( index ) );
+    // call base type recursively
+    return mBaseType->GetPropertyDefaultValue( index );
   }
+  return Property::Value(); // return none
 }
 
 void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const
@@ -796,17 +971,14 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
       }
     }
   }
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+  {
+    // call base type recursively
+    mBaseType->SetProperty( object, index, value );
+  }
   else
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      GetImplementation(base).SetProperty( object, index, value );
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
-    }
+    DALI_LOG_ERROR( "Property index %d not found\n", index );
   }
 }
 
@@ -828,17 +1000,14 @@ void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const P
       iter->second.setFunc( object, iter->first, value );
     }
   }
+  else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
+  {
+    // call base type recursively
+    mBaseType->SetProperty( object, name, value );
+  }
   else
   {
-    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-    if ( base )
-    {
-      GetImplementation(base).SetProperty( object, name, value );
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property name" );
-    }
+    DALI_LOG_ERROR( "Property %s not found", name.c_str() );
   }
 }
 
@@ -865,13 +1034,14 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
     }
   }
 
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return GetImplementation( base ).GetProperty( object, index );
+    // call base type recursively
+    return mBaseType->GetProperty( object, index );
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
+  DALI_LOG_ERROR( "Property index %d not found\n", index );
+  return Property::Value();
 }
 
 Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const
@@ -898,13 +1068,14 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::stri
     }
   }
 
-  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
-  if ( base )
+  if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
-    return GetImplementation( base ).GetProperty( object, name );
+    // call base type recursively
+    return mBaseType->GetProperty( object, name );
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property name" );
+  DALI_LOG_ERROR( "Property %s not found", name.c_str() );
+  return Property::Value();
 }
 
 } // namespace Internal

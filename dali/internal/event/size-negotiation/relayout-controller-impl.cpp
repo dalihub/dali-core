@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,8 +76,8 @@ void PrintChildren( Dali::Actor actor, int level )
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, output.str().c_str() );
 
   ++level;
-  unsigned int numChildren = actor.GetChildCount();
-  for( unsigned int i=0; i<numChildren; ++i )
+  uint32_t numChildren = actor.GetChildCount();
+  for( uint32_t i=0; i<numChildren; ++i )
   {
     PrintChildren( actor.GetChildAt(i), level );
   }
@@ -132,10 +132,10 @@ RelayoutController* RelayoutController::Get()
   return &ThreadLocalStorage::Get().GetRelayoutController();
 }
 
-void RelayoutController::SetStageSize( unsigned int width, unsigned int height )
+void RelayoutController::SetStageSize( uint32_t width, uint32_t height )
 {
-  mStageSize.width = width;
-  mStageSize.height = height;
+  mStageSize.width = static_cast<float>( width );
+  mStageSize.height = static_cast<float>( height );
 }
 
 void RelayoutController::QueueActor( Dali::Actor& actor, RelayoutContainer& actors, Vector2 size )
@@ -159,7 +159,7 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
   topOfSubTreeStack.push_back( actor );
 
   // Propagate on all dimensions
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -253,7 +253,7 @@ void RelayoutController::RequestRelayoutTree( Dali::Actor& actor )
   }
 
   // Propagate down to children
-  for( unsigned int i = 0; i < actor.GetChildCount(); ++i )
+  for( uint32_t i = 0; i < actor.GetChildCount(); ++i )
   {
     Dali::Actor child = actor.GetChildAt( i );
 
@@ -273,7 +273,7 @@ void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension::Type dimen
 
     // Check for dimension dependecy: width for height/height for width etc
     // Check each possible dimension and see if it is dependent on the input one
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
@@ -293,9 +293,9 @@ void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension::Type dimen
       {
         // Store the highest parent reached
         bool found = false;
-        for( unsigned int i = 0, count = topOfSubTreeStack.size(); i < count; ++i )
+        for( auto&& element : topOfSubTreeStack )
         {
-          if( topOfSubTreeStack[ i ] == parent )
+          if( element == parent )
           {
             found = true;
             break;
@@ -347,7 +347,7 @@ void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension::Type dim
 
     // Check for dimension dependecy: width for height/height for width etc
     // Check each possible dimension and see if it is dependent on the input one
-    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
       Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
@@ -370,7 +370,7 @@ void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension::Type dim
     }
 
     // Propagate down to children
-    for( unsigned int i = 0, childCount = actor.GetChildCount(); i < childCount; ++i )
+    for( uint32_t i = 0, childCount = actor.GetChildCount(); i < childCount; ++i )
     {
       Dali::Actor child = actor.GetChildAt( i );
       Actor& childImpl = GetImplementation( child );
@@ -389,9 +389,9 @@ void RelayoutController::AddRequest( Dali::Actor& actor )
 
   // Only add the rootActor if it is not already recorded
   bool found = false;
-  for( unsigned int i = 0, count = mDirtyLayoutSubTrees.Size(); i < count; ++i )
+  for( auto&& item : mDirtyLayoutSubTrees )
   {
-    if( mDirtyLayoutSubTrees[ i ] == actorPtr )
+    if( item == actorPtr )
     {
       found = true;
       break;

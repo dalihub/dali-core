@@ -24,6 +24,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/common/type-info-impl.h>
+#include <dali/internal/event/object/default-property-metadata.h>
 
 namespace Dali
 {
@@ -31,8 +32,7 @@ namespace Dali
 namespace Internal
 {
 
-////////////////////////////////////////////////////////////////////////////////
-class TypeRegistry;
+class PropertyDetails;
 
 /*
 * @copydoc Dali::TypeRegistry
@@ -40,64 +40,84 @@ class TypeRegistry;
 class TypeRegistry : public Dali::BaseObject
 {
 public:
+
+  // using intrusive pointer instead of handles internally as they are considerably cheaper
+  using TypeInfoPointer = IntrusivePtr<Dali::Internal::TypeInfo>;
+
   /**
    * Get the TypeRegistry
    */
   static TypeRegistry *Get();
 
-  /*
+  /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
    */
-  Dali::TypeInfo GetTypeInfo( const std::string &uniqueTypeName );
+  TypeInfoPointer GetTypeInfo( const std::string &uniqueTypeName );
 
-  /*
+  /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
    */
-  Dali::TypeInfo GetTypeInfo( const std::type_info& registerType );
+  TypeInfoPointer GetTypeInfo( const std::type_info& registerType );
 
-  /*
+  /**
    * @copydoc Dali::TypeRegistry::GetTypeNameCount
    */
   size_t GetTypeNameCount() const;
 
-  /*
+  /**
    * @copydoc Dali::TypeRegistry::GetTypeName
    */
   std::string GetTypeName(size_t index) const;
 
-  /*
-   * Register a creation function under a unique name.
+  /**
+   * Register a type
+   *
    * @param [in] theTypeInfo Type info for the type to be registered
    * @param [in] baseTypeInfo Type info for its base class
    * @param [in] createInstance Instance creation function
-   * @param [in] callCreateOnInit If true call createInstance on dali initialisation
-   * @return true if the name could be registered.
+   * @param [in] callCreateOnInit If true call createInstance on DALi initialisation
+   * @return the name of the registered type.
    */
-  bool Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
-                 Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit );
+  std::string Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
+                        Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit );
 
-  /*
-   * Register a creation function under a unique name.
-   * @param [in] name The name type to be registered (must be unique)
+  /**
+   * Register a type
+   *
+   * @param [in] theTypeInfo Type info for the type to be registered
    * @param [in] baseTypeInfo Type info for its base class
    * @param [in] createInstance Instance creation function
-   * @param [in] callCreateOnInit If true call createInstance on dali initialisation
-   * @return true if the name could be registered.
+   * @param [in] callCreateOnInit If true call createInstance on DALi initialisation
+   * @param [in] defaultProperties the table of default property metadata
+   * @param [in] defaultPropertyCount count of default properties
+   * @return the name of the registered type.
    */
-  bool Register( const std::string& name, const std::type_info& baseTypeInfo,
-                 Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit  );
+  std::string Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
+                        Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
+                        const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount );
 
-  /*
-   * Register a creation function under a unique name (used by C# Custom controls).
-   * @param [in] name The name type to be registered (must be unique)
+  /**
+   * Register a type
+   *
+   * @param [in] theTypeInfo Type info for the type to be registered
    * @param [in] baseTypeInfo Type info for its base class
    * @param [in] createInstance Instance creation function
-   * @return true if the name could be registered.
+   * @param [in] callCreateOnInit If true call createInstance on DALi initialisation
+   * @param [in] defaultProperties the table of default property metadata
+   * @param [in] defaultPropertyCount count of default properties
+   * @return the name of the registered type.
    */
-  bool Register( const std::string& name, const std::type_info& baseTypeInfo,
+  std::string Register( const std::string& name, const std::type_info& baseTypeInfo,
+                        Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
+                        const Dali::PropertyDetails* defaultProperties = nullptr, Property::Index defaultPropertyCount = 0 );
+
+  /**
+   * @copydoc CSharpTypeRegistry::TypeRegistration( const std::string&, const std::type_info&, TypeInfo::CreateFunction );
+   */
+  void Register( const std::string& name, const std::type_info& baseTypeInfo,
                  Dali::CSharpTypeInfo::CreateFunction createInstance );
 
-  /*
+  /**
    * Register a signal connector function to a type
    * @param [in] typeRegistration TypeRegistration object used to register the type
    * @param [in] name Signal name
@@ -105,14 +125,14 @@ public:
    */
   void RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func );
 
-  /*
+  /**
    * Register an action function to a type
    * @param [in] registered TypeRegistration object used to register the type
    * @param [in] name Action name
    * @param [in] f Action function
    * @return true if registered
    */
-  bool RegisterAction( TypeRegistration &registered, const std::string &name, Dali::TypeInfo::ActionFunction f);
+  bool RegisterAction( TypeRegistration& registered, const std::string& name, Dali::TypeInfo::ActionFunction f );
 
   /**
    * Register an event-thread only property with a type
@@ -190,7 +210,7 @@ public:
    */
   bool RegisterChildProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
 
-  /*
+  /**
    * @copydoc Dali::Internal::TypeInfo::DoActionTo
    * Walks all base types until it finds a doer.
    */
@@ -201,14 +221,14 @@ public:
    */
   bool ConnectSignal( BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor );
 
-  /*
+  /**
    * Return the type info for a given BaseObject pointer
    * @param [in] pBaseObject Pointer to a BaseObject
    * @return TypeInfo for the BaseObject.
    */
-  Dali::TypeInfo GetTypeInfo(const Dali::BaseObject * const pBaseObject);
+  TypeInfoPointer GetTypeInfo(const Dali::BaseObject * const pBaseObject);
 
-  /*
+  /**
    * Calls any type creation functions that have been flagged as initialization functions
    */
   void CallInitFunctions(void) const;
@@ -226,7 +246,7 @@ private:
   /*
    * Mapping from type name to TypeInfo
    */
-  std::vector< Dali::TypeInfo > mRegistryLut;
+  std::vector< TypeInfoPointer > mRegistryLut;
 
   std::vector< Dali::TypeInfo::CreateFunction > mInitFunctions;
 

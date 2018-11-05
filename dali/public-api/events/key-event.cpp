@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ namespace Dali
 
 namespace
 {
-const unsigned int MODIFIER_SHIFT = 0x1;
-const unsigned int MODIFIER_CTRL  = 0x2;
-const unsigned int MODIFIER_ALT   = 0x4;
-const int KEY_INVALID_CODE = -1;
+const uint32_t MODIFIER_SHIFT = 0x1;
+const uint32_t MODIFIER_CTRL  = 0x2;
+const uint32_t MODIFIER_ALT   = 0x4;
+const int32_t KEY_INVALID_CODE = -1;
 }
 
 KeyEvent::KeyEvent()
@@ -43,7 +43,7 @@ KeyEvent::KeyEvent()
   new Internal::KeyEventImpl( this );
 }
 
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,unsigned long timeStamp, const State& keyState)
+KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int32_t keyCode, int32_t keyModifier,unsigned long timeStamp, const State& keyState)
 : keyPressedName(keyName),
   keyPressed(keyString),
   keyCode(keyCode),

@@ -52,9 +52,9 @@ namespace SceneGraph
  * However if the property was only "Set" (and not "Baked"), then typically the base value and previous value will not match.
  * In this case the reset operation is equivalent to a "Bake", and the value is considered "dirty" for an additional frame.
  */
-static const unsigned int CLEAN_FLAG = 0x00; ///< Indicates that the value did not change in this, or the previous frame
-static const unsigned int BAKED_FLAG = 0x01; ///< Indicates that the value was Baked during the previous frame
-static const unsigned int SET_FLAG   = 0x02; ///< Indicates that the value was Set during the previous frame
+static const uint32_t CLEAN_FLAG = 0x00; ///< Indicates that the value did not change in this, or the previous frame
+static const uint32_t BAKED_FLAG = 0x01; ///< Indicates that the value was Baked during the previous frame
+static const uint32_t SET_FLAG   = 0x02; ///< Indicates that the value was Set during the previous frame
 
 template <class T>
 class AnimatableProperty;
@@ -118,7 +118,7 @@ public: // From PropertyBase
 
 protected: // so that ResetToBaseValue can set it directly
 
-  unsigned int mDirtyFlags; ///< Flag whether value changed during previous 2 frames
+  uint32_t mDirtyFlags; ///< Flag whether value changed during previous 2 frames
 
 };
 
@@ -214,7 +214,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  bool& Get(size_t bufferIndex)
+  bool& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -222,7 +222,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const bool& Get(size_t bufferIndex) const
+  const bool& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -232,7 +232,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  bool& operator[](size_t bufferIndex)
+  bool& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -242,7 +242,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const bool& operator[](size_t bufferIndex) const
+  const bool& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -378,7 +378,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  int& Get(size_t bufferIndex)
+  int& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -386,7 +386,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const int& Get(size_t bufferIndex) const
+  const int& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -396,7 +396,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  int& operator[](size_t bufferIndex)
+  int& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -406,7 +406,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const int& operator[](size_t bufferIndex) const
+  const int& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -559,7 +559,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  float& Get(size_t bufferIndex)
+  float& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -567,7 +567,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const float& Get(size_t bufferIndex) const
+  const float& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -577,7 +577,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  float& operator[](size_t bufferIndex)
+  float& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -587,7 +587,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const float& operator[](size_t bufferIndex) const
+  const float& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -791,7 +791,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector2& Get(size_t bufferIndex)
+  Vector2& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -799,7 +799,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector2& Get(size_t bufferIndex) const
+  const Vector2& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -809,7 +809,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector2& operator[](size_t bufferIndex)
+  Vector2& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -819,7 +819,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector2& operator[](size_t bufferIndex) const
+  const Vector2& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1088,7 +1088,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector3& Get(size_t bufferIndex)
+  Vector3& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1096,7 +1096,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector3& Get(size_t bufferIndex) const
+  const Vector3& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1106,7 +1106,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector3& operator[](size_t bufferIndex)
+  Vector3& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1116,7 +1116,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector3& operator[](size_t bufferIndex) const
+  const Vector3& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1439,7 +1439,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector4& Get(size_t bufferIndex)
+  Vector4& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1447,7 +1447,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector4& Get(size_t bufferIndex) const
+  const Vector4& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1457,7 +1457,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Vector4& operator[](size_t bufferIndex)
+  Vector4& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1467,7 +1467,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector4& operator[](size_t bufferIndex) const
+  const Vector4& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1724,7 +1724,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Quaternion& Get(size_t bufferIndex)
+  Quaternion& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1732,7 +1732,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Quaternion& Get(size_t bufferIndex) const
+  const Quaternion& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1742,7 +1742,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Quaternion& operator[](size_t bufferIndex)
+  Quaternion& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1752,7 +1752,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Quaternion& operator[](size_t bufferIndex) const
+  const Quaternion& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1885,7 +1885,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix& Get(size_t bufferIndex)
+  Matrix& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1893,7 +1893,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix& Get(size_t bufferIndex) const
+  const Matrix& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -1903,7 +1903,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Matrix& operator[](size_t bufferIndex)
+  Matrix& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -1913,7 +1913,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix& operator[](size_t bufferIndex) const
+  const Matrix& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -2046,7 +2046,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix3& Get(size_t bufferIndex)
+  Matrix3& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -2054,7 +2054,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix3& Get(size_t bufferIndex) const
+  const Matrix3& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -2064,7 +2064,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  Matrix3& operator[](size_t bufferIndex)
+  Matrix3& operator[]( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -2074,7 +2074,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix3& operator[](size_t bufferIndex) const
+  const Matrix3& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -2137,7 +2137,7 @@ void BakeMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, T > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2153,7 +2153,7 @@ void BakeRelativeMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, const T& > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2169,7 +2169,7 @@ void SetXComponentMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2185,7 +2185,7 @@ void SetYComponentMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2201,7 +2201,7 @@ void SetZComponentMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2217,7 +2217,7 @@ void SetWComponentMessage( EventThreadServices& eventThreadServices,
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,

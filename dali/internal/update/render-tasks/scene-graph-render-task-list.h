@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 namespace Dali
 {
@@ -46,15 +47,27 @@ public:
   typedef OwnerContainer< RenderTask* > RenderTaskContainer;
 
   /**
-   * Constructor
-   * @param renderMessageDispatcher to send messages
+   * Construct a new RenderTaskList.
+   * @return A new RenderTaskList
    */
-  RenderTaskList( RenderMessageDispatcher& renderMessageDispatcher );
+  static RenderTaskList* New();
 
   /**
    * Destructor
    */
   ~RenderTaskList();
+
+  /**
+   * Overriden delete operator
+   * Deletes the RenderTaskList from its global memory pool
+   */
+  void operator delete( void* ptr );
+
+  /**
+   * Set the renderMessageDispatcher to send message.
+   * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
+   */
+  void SetRenderMessageDispatcher( RenderMessageDispatcher* renderMessageDispatcher );
 
   /**
    * Add a new RenderTask to the list.
@@ -67,6 +80,12 @@ public:
    * @param[in] task The RenderTaskList will destroy this task.
    */
   void RemoveTask( RenderTask* task );
+
+  /**
+   * Retrieve the count of RenderTasks.
+   * @return The count.
+   */
+  uint32_t GetTaskCount();
 
   /**
    * Retrieve the container of RenderTasks.
@@ -91,6 +110,13 @@ public:
    */
   CompleteNotificationInterface* GetCompleteNotificationInterface();
 
+protected:
+
+  /**
+   * Protected constructor. See New()
+   */
+  RenderTaskList();
+
 private:
 
   // Undefined
@@ -102,7 +128,7 @@ private:
 private:
 
   CompleteNotificationInterface* mNotificationObject; ///< object to pass in to the complete notification
-  RenderMessageDispatcher& mRenderMessageDispatcher; ///< for sending messages to render thread
+  RenderMessageDispatcher* mRenderMessageDispatcher; ///< for sending messages to render thread
   RenderTaskContainer mRenderTasks; ///< A container of owned RenderTasks
 
 };
@@ -115,7 +141,7 @@ inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTask
   typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
@@ -129,7 +155,7 @@ inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderT
   typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::RemoveTask, &task );

@@ -18,9 +18,9 @@
  *
  */
 
-
 // EXTERNAL INCLUDES
 #include <typeinfo>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
@@ -37,6 +37,7 @@ namespace Internal DALI_INTERNAL
 {
 class TypeRegistry;
 }
+class DefaultPropertyMetadata;
 
 /**
  * @brief The TypeRegistry allows registration of type instance creation functions.
@@ -212,6 +213,17 @@ public:
                     TypeInfo::CreateFunction f, bool callCreateOnInit );
 
   /**
+   * @brief Constructor registers the type creation function.
+   *
+   * @param[in] registerType the type info for the type to be registered
+   * @param[in] baseType the base type info of registerType
+   * @param[in] f registerType instance creation function
+   * @param[in] defaultProperties the default property meta-data
+   */
+  TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
+                    TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties );
+
+  /**
    * @brief Constructor registers the type creation function for a named class or type.
    *
    * This allows types to be created dynamically from script. The name must be
@@ -378,7 +390,7 @@ public:
    * @param[in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property)
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex );
 };
 
 /**

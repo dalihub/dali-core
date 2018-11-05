@@ -494,7 +494,7 @@ private:
    * @param[in] callback The call back object
    * @return A valid index if the callback is connected
    */
-  int FindCallback( CallbackBase* callback );
+  int32_t FindCallback( CallbackBase* callback );
 
   /**
    * @brief Deletes a connection object from the list of connections.

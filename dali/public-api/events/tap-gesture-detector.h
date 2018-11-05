@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -100,7 +103,7 @@ public: // Creation & Destruction
    * @param[in] tapsRequired The minimum & maximum number of taps required
    * @return A handle to a newly allocated Dali resource
    */
-  static TapGestureDetector New( unsigned int tapsRequired );
+  static TapGestureDetector New( uint32_t tapsRequired );
 
   /**
    * @brief Downcasts a handle to TapGestureDetector handle.
@@ -149,7 +152,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetMinimumTapsRequired( unsigned int minimumTaps );
+  void SetMinimumTapsRequired( uint32_t minimumTaps );
 
   /**
    * @brief Sets the maximum number of taps required.
@@ -160,7 +163,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetMaximumTapsRequired( unsigned int maximumTaps );
+  void SetMaximumTapsRequired( uint32_t maximumTaps );
 
 public: // Getters
 
@@ -171,7 +174,7 @@ public: // Getters
    * @return The minimum taps required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMinimumTapsRequired() const;
+  uint32_t GetMinimumTapsRequired() const;
 
   /**
    * @brief Retrieves the maximum number of taps required.
@@ -180,7 +183,7 @@ public: // Getters
    * @return The maximum taps required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMaximumTapsRequired() const;
+  uint32_t GetMaximumTapsRequired() const;
 
 public: // Signals
 

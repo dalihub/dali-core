@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,21 +59,21 @@ DALI_PROPERTY( "viewportPosition",   VECTOR2,    true,    true,    true,    Dali
 DALI_PROPERTY( "viewportSize",       VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
 DALI_PROPERTY( "clearColor",         VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
 DALI_PROPERTY( "requiresSync",       BOOLEAN,    true,    false,   false,   Dali::RenderTask::Property::REQUIRES_SYNC     )
-DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX, RenderTaskDefaultProperties )
 
 // Signals
 
 const char* const SIGNAL_FINISHED = "finished";
 
-TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL );
+TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL, RenderTaskDefaultProperties );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal );
 
 } // Unnamed namespace
 
-RenderTask* RenderTask::New( bool isSystemLevel )
+RenderTask* RenderTask::New()
 {
-  RenderTask* task( new RenderTask( isSystemLevel ) );
+  RenderTask* task( new RenderTask() );
 
   return task;
 }
@@ -227,8 +227,8 @@ Vector2 RenderTask::GetCurrentViewportSize() const
 
 void RenderTask::SetViewport( const Viewport& viewport )
 {
-  SetViewportPosition(Vector2(viewport.x, viewport.y));
-  SetViewportSize(Vector2(viewport.width, viewport.height));
+  SetViewportPosition( Vector2( static_cast<float>( viewport.x ), static_cast<float>( viewport.y ) ) );
+  SetViewportSize( Vector2( static_cast<float>( viewport.width ), static_cast<float>( viewport.height ) ) );
 }
 
 void RenderTask::GetViewport( Viewport& viewPort ) const
@@ -250,8 +250,8 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
       {
         Vector2 size( stage->GetSize() );
         viewPort.x = viewPort.y = 0;
-        viewPort.width = size.width;
-        viewPort.height = size.height;
+        viewPort.width = static_cast<int32_t>( size.width ); // truncated
+        viewPort.height = static_cast<int32_t>( size.height ); // truncated
       }
     }
   }
@@ -259,10 +259,10 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
   {
     const Vector2& position = mSceneObject->GetViewportPosition(bufferIndex);
     const Vector2& size = mSceneObject->GetViewportSize(bufferIndex);
-    viewPort.x = position.x;
-    viewPort.y = position.y;
-    viewPort.width = size.width;
-    viewPort.height = size.height;
+    viewPort.x = static_cast<int32_t>( position.x ); // truncated
+    viewPort.y = static_cast<int32_t>( position.y ); // truncated
+    viewPort.width = static_cast<int32_t>( size.width ); // truncated
+    viewPort.height = static_cast<int32_t>( size.height ); // truncated
   }
 }
 
@@ -342,7 +342,7 @@ bool RenderTask::GetCullMode() const
   return mCullMode;
 }
 
-void RenderTask::SetRefreshRate( unsigned int refreshRate )
+void RenderTask::SetRefreshRate( uint32_t refreshRate )
 {
   DALI_LOG_TRACE_METHOD_FMT(gLogRender, "this:%p  rate:%d\n", this, refreshRate);
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::SetRefreshRate(this:%p, %d)\n", this, refreshRate);
@@ -358,7 +358,7 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
   }
 }
 
-unsigned int RenderTask::GetRefreshRate() const
+uint32_t RenderTask::GetRefreshRate() const
 {
   return mRefreshRate;
 }
@@ -407,8 +407,8 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
         Viewport viewport;
         Vector2 size( stage->GetSize() );
         viewport.x = viewport.y = 0;
-        viewport.width = size.width;
-        viewport.height = size.height;
+        viewport.width = static_cast<int32_t>( size.width ); // truncated
+        viewport.height = static_cast<int32_t>( size.height ); // truncated
 
         float localX, localY;
         inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
@@ -436,11 +436,6 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
   return inside;
 }
 
-bool RenderTask::IsSystemLevel() const
-{
-  return mIsSystemLevel;
-}
-
 bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const
 {
   CameraActor* cam = GetCameraActor();
@@ -456,10 +451,10 @@ bool RenderTask::WorldToViewport(const Vector3 &position, float& viewportX, floa
   bool ok = ProjectFull(pos,
                         cam->GetViewMatrix(),
                         cam->GetProjectionMatrix(),
-                        viewport.x,
-                        viewport.y,
-                        viewport.width,
-                        viewport.height,
+                        static_cast<float>( viewport.x ), // truncated
+                        static_cast<float>( viewport.y ), // truncated
+                        static_cast<float>( viewport.width ), // truncated
+                        static_cast<float>( viewport.height ), // truncated
                         viewportPosition);
   if(ok)
   {
@@ -510,76 +505,6 @@ void RenderTask::DiscardSceneObject()
 /********************************************************************************
  ********************************   PROPERTY METHODS   **************************
  ********************************************************************************/
-
-unsigned int RenderTask::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void RenderTask::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    indices.PushBack( i );
-  }
-}
-
-const char* RenderTask::GetDefaultPropertyName( Property::Index index ) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].name;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-Property::Index RenderTask::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    if( 0 == strcmp( name.c_str(), DEFAULT_PROPERTY_DETAILS[i].name ) ) // dont want to convert rhs to string
-    {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
-}
-
-bool RenderTask::IsDefaultPropertyWritable(Property::Index index) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].writable;
-}
-
-bool RenderTask::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].animatable;
-}
-
-bool RenderTask::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return DEFAULT_PROPERTY_DETAILS[ index ].constraintInput;
-}
-
-Property::Type RenderTask::GetDefaultPropertyType(Property::Index index) const
-{
-  if( index < DEFAULT_PROPERTY_COUNT )
-  {
-    return DEFAULT_PROPERTY_DETAILS[index].type;
-  }
-
-  // index out of range...return Property::NONE
-  return Property::NONE;
-}
 
 void RenderTask::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
@@ -820,7 +745,7 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty( Property::Inde
 bool RenderTask::HasFinished()
 {
   bool finished = false;
-  const unsigned int counter = mSceneObject->GetRenderedOnceCounter();
+  const uint32_t counter = mSceneObject->GetRenderedOnceCounter();
 
   if( mRefreshOnceCounter < counter )
   {
@@ -867,7 +792,7 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-RenderTask::RenderTask( bool isSystemLevel )
+RenderTask::RenderTask()
 : mSceneObject( NULL ),
   mSourceConnector( Connector::SOURCE_CONNECTOR, *this ),
   mCameraConnector( Connector::CAMERA_CONNECTOR, *this ),
@@ -882,7 +807,6 @@ RenderTask::RenderTask( bool isSystemLevel )
   mInputEnabled( Dali::RenderTask::DEFAULT_INPUT_ENABLED ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
   mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mIsSystemLevel( isSystemLevel ),
   mRequiresSync( false )
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);

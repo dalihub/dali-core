@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-
-#include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -56,9 +55,9 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
 
-void Geometry::SetIndexBuffer( const unsigned short* indices, size_t count )
+void Geometry::SetIndexBuffer( const uint16_t* indices, size_t count )
 {
-  Dali::Vector<unsigned short> indexData;
+  Dali::Vector<uint16_t> indexData;
   if( indices && count )
   {
     indexData.Resize( count );

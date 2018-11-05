@@ -129,7 +129,7 @@ public: // TEST FUNCTIONS
    * @brief Sets the value returned by GetClosestImageSize.
    * @param[in] size The size that should be returned.
    */
-  void SetClosestImageSize(const Vector2& size);
+  void SetClosestImageSize( const Vector2& size );
 
   /**
    * @brief Sets the result return by LoadFile.
@@ -177,7 +177,7 @@ private:
 
   mutable TraceCallStack        mTrace;
   bool                          mIsLoadingResult;
-  Vector2                       mClosestSize;
+  ImageDimensions               mClosestSize;
 
   LoadFileResult                mLoadFileResult;
   bool                          mSaveFileResult;

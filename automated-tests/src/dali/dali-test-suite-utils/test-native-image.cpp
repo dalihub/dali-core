@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@
 namespace Dali
 {
 
-TestNativeImagePointer TestNativeImage::New(int width, int height)
+TestNativeImagePointer TestNativeImage::New(uint32_t width, uint32_t height)
 {
   return new TestNativeImage(width, height);
 }
 
-TestNativeImage::TestNativeImage(int width, int height)
+TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
 : mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
 {
   mExtension = new TestNativeImageExtension();
@@ -39,12 +39,12 @@ TestNativeImage::~TestNativeImage()
 }
 
 
-TestNativeImageNoExtPointer TestNativeImageNoExt::New(int width, int height)
+TestNativeImageNoExtPointer TestNativeImageNoExt::New(uint32_t width, uint32_t height)
 {
   return new TestNativeImageNoExt(width, height);
 }
 
-TestNativeImageNoExt::TestNativeImageNoExt(int width, int height)
+TestNativeImageNoExt::TestNativeImageNoExt(uint32_t width, uint32_t height)
 : mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
 {
 }

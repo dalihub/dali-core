@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,10 +113,10 @@ struct RenderManager::Impl
 
   Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
-  unsigned int                              frameCount;              ///< The current frame count
+  uint32_t                                  frameCount;              ///< The current frame count
   BufferIndex                               renderBufferIndex;       ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                                 defaultSurfaceRect;      ///< Rectangle for the default surface we are rendering to
+  Rect<int32_t>                             defaultSurfaceRect;      ///< Rectangle for the default surface we are rendering to
 
   OwnerContainer< Render::Renderer* >       rendererContainer;       ///< List of owned renderers
   OwnerContainer< Render::Sampler* >        samplerContainer;        ///< List of owned samplers
@@ -212,7 +212,7 @@ void RenderManager::SetBackgroundColor( const Vector4& color )
   mImpl->backgroundColor = color;
 }
 
-void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
+void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
 }
@@ -272,13 +272,13 @@ void RenderManager::GenerateMipmaps( Render::Texture* texture )
   texture->GenerateMipmaps( mImpl->context );
 }
 
-void RenderManager::SetFilterMode( Render::Sampler* sampler, unsigned int minFilterMode, unsigned int magFilterMode )
+void RenderManager::SetFilterMode( Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode )
 {
   sampler->mMinificationFilter = static_cast<Dali::FilterMode::Type>(minFilterMode);
   sampler->mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode );
 }
 
-void RenderManager::SetWrapMode( Render::Sampler* sampler, unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode )
+void RenderManager::SetWrapMode( Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode )
 {
   sampler->mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
   sampler->mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
@@ -307,7 +307,7 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
   }
 }
 
-void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, unsigned int mipmapLevel, unsigned int layer )
+void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
   frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
@@ -327,12 +327,12 @@ void RenderManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuf
   propertyBuffer->SetFormat( format.Release() );
 }
 
-void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<char> >& data, size_t size )
+void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
 {
   propertyBuffer->SetData( data.Release(), size );
 }
 
-void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<unsigned short>& indices )
+void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uint16_t>& indices )
 {
   geometry->SetIndexBuffer( indices );
 }
@@ -377,7 +377,7 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Prop
   }
 }
 
-void RenderManager::SetGeometryType( Render::Geometry* geometry, unsigned int geometryType )
+void RenderManager::SetGeometryType( Render::Geometry* geometry, uint32_t geometryType )
 {
   geometry->SetType( Render::Geometry::Type(geometryType) );
 }
@@ -410,7 +410,7 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  const size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  const uint32_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
   const bool haveInstructions = count > 0u;
 
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
@@ -462,7 +462,7 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
     // this ensures we will set view and projection matrix once per program per camera
     mImpl->programController.ResetProgramMatrices();
 
-    for( size_t i = 0; i < count; ++i )
+    for( uint32_t i = 0; i < count; ++i )
     {
       RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
@@ -496,7 +496,7 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
 
 void RenderManager::DoRender( RenderInstruction& instruction )
 {
-  Rect<int> viewportRect;
+  Rect<int32_t> viewportRect;
   Vector4   clearColor;
 
   if ( instruction.mIsClearColorSet )
@@ -514,7 +514,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     if ( instruction.mIsViewportSet )
     {
       // For glViewport the lower-left corner is (0,0)
-      const int y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
+      const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
       viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
     }
     else
@@ -531,7 +531,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     if ( instruction.mIsViewportSet )
     {
       // For glViewport the lower-left corner is (0,0)
-      const int y = ( mImpl->defaultSurfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
+      const int32_t y = ( mImpl->defaultSurfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
       viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
     }
     else

@@ -35,8 +35,6 @@ namespace Internal
 namespace
 {
 
-TypeRegistration mType( typeid( Dali::EncodedBufferImage ), typeid( Dali::Image ), NULL );
-
 /** Raw bytes of a resource laid out exactly as it would be in a file, but in memory. */
 typedef Dali::RefCountedVector<uint8_t> RequestBuffer;
 /** Counting smart pointer for managing a buffer of raw bytes. */
@@ -86,7 +84,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
     image->mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
-    size_t bufferSize = bitmap->GetBufferSize();
+    uint32_t bufferSize = bitmap->GetBufferSize();
     PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
                                              static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
     image->mTexture->Upload( pixelData );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 namespace
 {
 
-using namespace Dali;
 using Dali::Property;
 using Dali::Internal::PropertyImplementationType;
 
@@ -67,9 +66,9 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type propertyType )
   return type;
 }
 
-size_t GetPropertyImplementationGlSize( Property::Type propertyType )
+Dali::GLint GetPropertyImplementationGlSize( Property::Type propertyType )
 {
-  size_t size = 1u;
+  Dali::GLint size = 1u;
 
   switch( propertyType )
   {
@@ -136,7 +135,7 @@ void PropertyBuffer::SetFormat( PropertyBuffer::Format* format )
   mDataChanged = true;
 }
 
-void PropertyBuffer::SetData( Dali::Vector<char>* data, size_t size )
+void PropertyBuffer::SetData( Dali::Vector<uint8_t>* data, uint32_t size )
 {
   mData = data;
   mSize = size;
@@ -178,14 +177,13 @@ void PropertyBuffer::BindBuffer(GpuBuffer::Target target)
   }
 }
 
-unsigned int PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, unsigned int locationBase )
+uint32_t PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase )
 {
-
-  unsigned int attributeCount = mFormat->components.size();
+  const uint32_t attributeCount = static_cast<uint32_t>( mFormat->components.size() );
 
   GLsizei elementSize = mFormat->size;
 
-  for( unsigned int i = 0; i < attributeCount; ++i )
+  for( uint32_t i = 0; i < attributeCount; ++i )
   {
     GLint attributeLocation = vAttributeLocation[i+locationBase];
     if( attributeLocation != -1 )
@@ -193,7 +191,7 @@ unsigned int PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GL
       context.EnableVertexAttributeArray( attributeLocation );
 
       const GLint attributeSize = mFormat->components[i].size;
-      size_t attributeOffset = mFormat->components[i].offset;
+      uint32_t attributeOffset = mFormat->components[i].offset;
       const Property::Type attributeType = mFormat->components[i].type;
 
       context.VertexAttribPointer( attributeLocation,
@@ -206,7 +204,6 @@ unsigned int PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GL
   }
 
   return attributeCount;
-
 }
 
 } //Render

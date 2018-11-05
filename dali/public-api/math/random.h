@@ -2,7 +2,7 @@
 #define __DALI_RANDOM_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,13 +54,13 @@ inline float Range(float f0, float f1)
   static bool initialized( false );
   if( !initialized )
   {
-    auto seed = time( NULL );
+    uint32_t seed = static_cast<uint32_t>( time( NULL ) );
     srand( seed );
     initialized = true;
   }
 
-  auto randValue = rand();
-  return (randValue & 0xfff) * (1.0f/4095.0f) * (max-min) + min;
+  int32_t randValue = rand();
+  return static_cast<float>(randValue & 0xfff) * (1.0f/4095.0f) * (max-min) + min;
 }
 
 /**

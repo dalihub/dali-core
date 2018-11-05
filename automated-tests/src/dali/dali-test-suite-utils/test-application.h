@@ -36,32 +36,25 @@ class DALI_CORE_API TestApplication : public ConnectionTracker
 public:
 
   // Default values derived from H2 device.
-  static const unsigned int DEFAULT_SURFACE_WIDTH = 480;
-  static const unsigned int DEFAULT_SURFACE_HEIGHT = 800;
+  static const uint32_t DEFAULT_SURFACE_WIDTH = 480;
+  static const uint32_t DEFAULT_SURFACE_HEIGHT = 800;
 
 #ifdef _CPP11
-  static constexpr float DEFAULT_HORIZONTAL_DPI = 220.0f;
-  static constexpr float DEFAULT_VERTICAL_DPI   = 217.0f;
+  static constexpr uint32_t DEFAULT_HORIZONTAL_DPI = 220;
+  static constexpr uint32_t DEFAULT_VERTICAL_DPI   = 217;
 #else
-  static const float DEFAULT_HORIZONTAL_DPI = 220.0f;
-  static const float DEFAULT_VERTICAL_DPI   = 217.0f;
+  static const uint32_t DEFAULT_HORIZONTAL_DPI = 220;
+  static const uint32_t DEFAULT_VERTICAL_DPI   = 217;
 #endif
 
-  static const unsigned int DEFAULT_RENDER_INTERVAL = 1;
+  static const uint32_t DEFAULT_RENDER_INTERVAL = 1;
 
-  static const unsigned int RENDER_FRAME_INTERVAL = 16;
+  static const uint32_t RENDER_FRAME_INTERVAL = 16;
 
-  TestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
-                   size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
-                   float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                   float  verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA);
-
-  TestApplication( bool   initialize,
-                   size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
-                   size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
-                   float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                   float  verticalDpi   = DEFAULT_VERTICAL_DPI,
+  TestApplication( uint32_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
+                   uint32_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
+                   uint32_t horizontalDpi = DEFAULT_HORIZONTAL_DPI,
+                   uint32_t verticalDpi   = DEFAULT_VERTICAL_DPI,
                    ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA);
 
   void Initialize();
@@ -76,18 +69,22 @@ public:
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
-  void SetSurfaceWidth( unsigned int width, unsigned height );
-  void SetTopMargin( unsigned int margin );
-  bool Render( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
-  unsigned int GetUpdateStatus();
-  bool UpdateOnly( unsigned int intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
+  void SetSurfaceWidth( uint32_t width, unsigned height );
+  void SetTopMargin( uint32_t margin );
+  bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
+  uint32_t GetUpdateStatus();
+  bool UpdateOnly( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
   bool RenderOnly( );
   void ResetContext();
   bool GetRenderNeedsUpdate();
-  unsigned int Wait( unsigned int durationToWait );
+  uint32_t Wait( uint32_t durationToWait );
+  static void EnableLogging( bool enabled )
+  {
+    mLoggingEnabled = enabled;
+  }
 
 private:
-  void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );
+  void DoUpdate( uint32_t intervalMilliseconds, const char* location=NULL );
 
 protected:
   TestPlatformAbstraction   mPlatformAbstraction;
@@ -101,13 +98,14 @@ protected:
 
   Integration::Core* mCore;
 
-  unsigned int mSurfaceWidth;
-  unsigned int mSurfaceHeight;
-  unsigned int mFrame;
+  uint32_t mSurfaceWidth;
+  uint32_t mSurfaceHeight;
+  uint32_t mFrame;
 
-  Vector2 mDpi;
-  unsigned int mLastVSyncTime;
+  struct { uint32_t x; uint32_t y; } mDpi;
+  uint32_t mLastVSyncTime;
   ResourcePolicy::DataRetention mDataRetentionPolicy;
+  static bool mLoggingEnabled;
 };
 
 } // Dali

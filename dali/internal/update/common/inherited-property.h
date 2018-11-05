@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Vector3& Get(size_t bufferIndex)
+  Vector3& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -167,7 +167,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Vector3& Get(size_t bufferIndex) const
+  const Vector3& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -177,7 +177,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector3& operator[](size_t bufferIndex) const
+  const Vector3& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -330,7 +330,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Vector4& Get(size_t bufferIndex)
+  Vector4& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -338,7 +338,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Vector4& Get(size_t bufferIndex) const
+  const Vector4& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -348,7 +348,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector4& operator[](size_t bufferIndex) const
+  const Vector4& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -479,7 +479,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Quaternion& Get(size_t bufferIndex)
+  Quaternion& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -487,7 +487,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Quaternion& Get(size_t bufferIndex) const
+  const Quaternion& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -497,7 +497,7 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Quaternion& operator[](size_t bufferIndex) const
+  const Quaternion& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -629,7 +629,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Matrix& Get(size_t bufferIndex)
+  Matrix& Get( BufferIndex bufferIndex )
   {
     return mValue[bufferIndex];
   }
@@ -637,7 +637,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Matrix& Get(size_t bufferIndex) const
+  const Matrix& Get( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
@@ -647,12 +647,12 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix& operator[](size_t bufferIndex) const
+  const Matrix& operator[]( BufferIndex bufferIndex ) const
   {
     return mValue[bufferIndex];
   }
 
-  void SetDirty(size_t bufferIndex)
+  void SetDirty( BufferIndex bufferIndex )
   {
     mReinheritedFlag = true;
 

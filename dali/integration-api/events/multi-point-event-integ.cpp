@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,21 +48,21 @@ void MultiPointEvent::AddPoint( const Point& point )
   points.push_back(point);
 }
 
-Point& MultiPointEvent::GetPoint( unsigned int point )
+Point& MultiPointEvent::GetPoint( uint32_t point )
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];
 }
 
-const Point& MultiPointEvent::GetPoint( unsigned int point ) const
+const Point& MultiPointEvent::GetPoint( uint32_t point ) const
 {
   DALI_ASSERT_ALWAYS(point < points.size() && "MultiPointEvent: Point index out of bounds");
   return points[point];
 }
 
-unsigned int MultiPointEvent::GetPointCount() const
+uint32_t MultiPointEvent::GetPointCount() const
 {
-  return points.size();
+  return static_cast<uint32_t>( points.size() ); // not going to overflow in practice
 }
 
 } // namespace Integration

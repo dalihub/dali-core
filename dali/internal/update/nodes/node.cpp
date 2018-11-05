@@ -32,7 +32,7 @@ namespace //Unnamed namespace
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
 #ifdef DEBUG_ENABLED
 // keep track of nodes created / deleted, to ensure we have 0 when the process exits or DALi library is unloaded
-int gNodeCount =0;
+int32_t gNodeCount =0;
 
 // Called when the process is about to exit, Node count should be zero at this point.
 void __attribute__ ((destructor)) ShutDown(void)
@@ -54,8 +54,7 @@ namespace SceneGraph
 const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
-
-Node* Node::New( unsigned int id )
+Node* Node::New( uint32_t id )
 {
   return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node( id );
 }
@@ -78,7 +77,7 @@ void Node::Delete( Node* node )
   }
 }
 
-Node::Node( unsigned int id )
+Node::Node( uint32_t id )
 : mTransformManager( NULL ),
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
@@ -103,8 +102,8 @@ Node::Node( unsigned int id )
   mClippingDepth( 0u ),
   mScissorDepth( 0u ),
   mDepthIndex( 0u ),
+  mDirtyFlags( NodePropertyFlags::ALL ),
   mRegenerateUniformMap( 0 ),
-  mDirtyFlags( AllFlags ),
   mDrawMode( DrawMode::NORMAL ),
   mColorMode( DEFAULT_COLOR_MODE ),
   mClippingMode( ClippingMode::DISABLED ),
@@ -184,14 +183,14 @@ void Node::RemoveUniformMapping( const std::string& uniformName )
 
 void Node::PrepareRender( BufferIndex bufferIndex )
 {
-  if(mRegenerateUniformMap != 0 )
+  if( mRegenerateUniformMap != 0 )
   {
     if( mRegenerateUniformMap == 2 )
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[ bufferIndex ];
       localMap.Resize(0);
 
-      for( unsigned int i=0, count=mUniformMaps.Count(); i<count; ++i )
+      for( UniformMap::SizeType i = 0, count=mUniformMaps.Count(); i<count; ++i )
       {
         localMap.PushBack( &mUniformMaps[i] );
       }
@@ -203,7 +202,7 @@ void Node::PrepareRender( BufferIndex bufferIndex )
 
       localMap.Resize( oldMap.Count() );
 
-      unsigned int index=0;
+      CollectedUniformMap::SizeType index = 0;
       for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
       {
         localMap[index] = *iter;
@@ -258,22 +257,23 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode )
 
 void Node::AddRenderer( Renderer* renderer )
 {
-  // Check that it has not been already added.
-  unsigned int rendererCount( mRenderer.Size() );
-  for( unsigned int i(0); i < rendererCount; ++i )
-  {
-    if( mRenderer[i] == renderer )
-    {
-      // Renderer is already in the list.
-      return;
-    }
-  }
-
   // If it is the first renderer added, make sure the world transform will be calculated
   // in the next update as world transform is not computed if node has no renderers.
-  if( rendererCount == 0 )
+  if( mRenderer.Empty() )
   {
-    mDirtyFlags |= TransformFlag;
+    mDirtyFlags |= NodePropertyFlags::TRANSFORM;
+  }
+  else
+  {
+    // Check that it has not been already added.
+    for( auto&& existingRenderer : mRenderer )
+    {
+      if( existingRenderer == renderer )
+      {
+        // Renderer is already in the list.
+        return;
+      }
+    }
   }
 
   mRenderer.PushBack( renderer );
@@ -281,8 +281,8 @@ void Node::AddRenderer( Renderer* renderer )
 
 void Node::RemoveRenderer( Renderer* renderer )
 {
-  unsigned int rendererCount( mRenderer.Size() );
-  for( unsigned int i(0); i<rendererCount; ++i )
+  RendererContainer::SizeType rendererCount( mRenderer.Size() );
+  for( RendererContainer::SizeType i = 0; i < rendererCount; ++i )
   {
     if( mRenderer[i] == renderer )
     {
@@ -292,29 +292,39 @@ void Node::RemoveRenderer( Renderer* renderer )
   }
 }
 
-int Node::GetDirtyFlags() const
+NodePropertyFlags Node::GetDirtyFlags() const
 {
   // get initial dirty flags, they are reset ResetDefaultProperties, but setters may have made the node dirty already
-  int flags = mDirtyFlags;
+  NodePropertyFlags flags = mDirtyFlags;
 
   // Check whether the visible property has changed
   if ( !mVisible.IsClean() )
   {
-    flags |= VisibleFlag;
+    flags |= NodePropertyFlags::VISIBLE;
   }
 
   // Check whether the color property has changed
   if ( !mColor.IsClean() )
   {
-    flags |= ColorFlag;
+    flags |= NodePropertyFlags::COLOR;
   }
 
   return flags;
 }
 
+NodePropertyFlags Node::GetInheritedDirtyFlags( NodePropertyFlags parentFlags ) const
+{
+  // Size is not inherited. VisibleFlag is inherited
+  static const NodePropertyFlags InheritedDirtyFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::VISIBLE | NodePropertyFlags::COLOR;
+  using UnderlyingType = typename std::underlying_type<NodePropertyFlags>::type;
+
+  return static_cast<NodePropertyFlags>( static_cast<UnderlyingType>( mDirtyFlags ) |
+                                         ( static_cast<UnderlyingType>( parentFlags ) & static_cast<UnderlyingType>( InheritedDirtyFlags ) ) );
+}
+
 void Node::ResetDirtyFlags( BufferIndex updateBufferIndex )
 {
-  mDirtyFlags = NothingFlag;
+  mDirtyFlags = NodePropertyFlags::NOTHING;
 }
 
 void Node::SetParent( Node& parentNode )

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_DOUBLE_BUFFERED_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,14 +56,14 @@ public:
   {
   }
 
-  inline T& operator[](const size_t i)
+  inline T& operator[](const BufferIndex i)
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
     return *(&mValue1+i);
   }
 
-  inline const T& operator[](const size_t i) const
+  inline const T& operator[](const BufferIndex i) const
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
@@ -118,7 +118,7 @@ public:
 
   private:
     Setter( DoubleBuffered& object,
-            size_t i,
+            BufferIndex i,
             T* value )
     : mObject( object ),
       mIndex( i ),
@@ -133,9 +133,9 @@ public:
     {
     }
 
-    DoubleBuffered& mObject; ///< Double-buffered object that will be changed
-    const size_t mIndex;                          ///< Buffer index that will be changed
-    T* mValue;                                    ///< Value of the pointer
+    DoubleBuffered& mObject;  ///< Double-buffered object that will be changed
+    const BufferIndex mIndex; ///< Buffer index that will be changed
+    T* mValue;                ///< Value of the pointer
 
     friend class DoubleBuffered;
   };
@@ -161,7 +161,7 @@ public:
     delete mValue1;
   }
 
-  void Set( size_t i, T* value )
+  void Set( BufferIndex i, T* value )
   {
     T*& current = *(&mValue1 + i);
     T*& previous = *(&mValue1 + 1u-i);
@@ -173,12 +173,12 @@ public:
     current = value;
   }
 
-  Setter operator[](size_t i)
+  Setter operator[]( BufferIndex i )
   {
     return Setter( *this, i, *(&mValue1+i) );
   }
 
-  const T* operator[](size_t i) const
+  const T* operator[]( BufferIndex i ) const
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 
@@ -189,7 +189,7 @@ public:
    * Auto-age the property: if it was set the previous frame,
    * then copy the value into the current frame's buffer.
    */
-  void CopyPrevious( size_t i )
+  void CopyPrevious( BufferIndex i )
   {
     DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
 

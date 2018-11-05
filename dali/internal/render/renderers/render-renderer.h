@@ -114,7 +114,7 @@ public:
    */
   static Renderer* New( SceneGraph::RenderDataProvider* dataProviders,
                         Render::Geometry* geometry,
-                        unsigned int blendingBitmask,
+                        uint32_t blendingBitmask,
                         const Vector4& blendColor,
                         FaceCullingMode::Type faceCullingMode,
                         bool preMultipliedAlphaEnabled,
@@ -138,7 +138,7 @@ public:
    */
   Renderer( SceneGraph::RenderDataProvider* dataProviders,
             Render::Geometry* geometry,
-            unsigned int blendingBitmask,
+            uint32_t blendingBitmask,
             const Vector4& blendColor,
             FaceCullingMode::Type faceCullingMode,
             bool preMultipliedAlphaEnabled,
@@ -175,7 +175,7 @@ public:
    * Set the bitmask for blending options
    * @param[in] bitmask A bitmask of blending options.
    */
-  void SetBlendingBitMask( unsigned int bitmask );
+  void SetBlendingBitMask( uint32_t bitmask );
 
   /**
    * Set the blend color for blending options
@@ -187,13 +187,13 @@ public:
    * Set the first element index to draw by the indexed draw
    * @param[in] firstElement index of first element to draw
    */
-  void SetIndexedDrawFirstElement( size_t firstElement );
+  void SetIndexedDrawFirstElement( uint32_t firstElement );
 
   /**
    * Set the number of elements to draw by the indexed draw
    * @param[in] elementsCount number of elements to draw
    */
-  void SetIndexedDrawElementsCount( size_t elementsCount );
+  void SetIndexedDrawElementsCount( uint32_t elementsCount );
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -414,7 +414,7 @@ private:
 
   struct UniformIndexMap
   {
-    unsigned int               uniformIndex;                ///< The index of the cached location in the Program
+    uint32_t                   uniformIndex;                ///< The index of the cached location in the Program
     const PropertyInputImpl*   propertyValue;
   };
 
@@ -426,8 +426,8 @@ private:
   StencilParameters            mStencilParameters;          ///< Struct containing all stencil related options
   BlendingOptions              mBlendingOptions;            ///< Blending options including blend color, blend func and blend equation
 
-  size_t                       mIndexedDrawFirstElement;    ///< Offset of first element to draw
-  size_t                       mIndexedDrawElementsCount;   ///< Number of elements to draw
+  uint32_t                     mIndexedDrawFirstElement;    ///< Offset of first element to draw
+  uint32_t                     mIndexedDrawElementsCount;   ///< Number of elements to draw
 
   DepthFunction::Type          mDepthFunction:4;            ///< The depth function
   FaceCullingMode::Type        mFaceCullingMode:3;          ///< The mode of face culling

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,7 +164,7 @@ void PanGesture::PredictionMode1(int eventsThisFrame, PanInfo& gestureOut, PanIn
       ++iter;
       continue;
     }
-    float previousValueWeight = ( static_cast< float >( MAX_GESTURE_AGE ) - (lastVSyncTime - lastTime) ) / static_cast< float >( MAX_GESTURE_AGE );
+    float previousValueWeight = ( static_cast<float>( MAX_GESTURE_AGE ) - static_cast<float>(lastVSyncTime - lastTime) ) / static_cast<float>( MAX_GESTURE_AGE );
     float velMag = currentGesture.screen.velocity.Length();
     float velDiff = velMag - screenVelocity.Length();
     float acceleration = 0.0f;
@@ -188,7 +188,7 @@ void PanGesture::PredictionMode1(int eventsThisFrame, PanInfo& gestureOut, PanIn
     }
     else
     {
-      newVelMag = velMag + (((acceleration * (1.0f - previousValueWeight)) + (previousAccel * previousValueWeight)) * currentInterpolation);
+      newVelMag = velMag + (((acceleration * (1.0f - previousValueWeight)) + (previousAccel * previousValueWeight)) * static_cast<float>( currentInterpolation ) );
     }
     float velMod = 1.0f;
     if( velMag > Math::MACHINE_EPSILON_1 )
@@ -197,8 +197,8 @@ void PanGesture::PredictionMode1(int eventsThisFrame, PanInfo& gestureOut, PanIn
     }
     gestureOut.screen.velocity = currentGesture.screen.velocity * velMod;
     gestureOut.local.velocity = currentGesture.local.velocity * velMod;
-    screenDisplacement = gestureOut.screen.displacement + (gestureOut.screen.velocity * interpolationTime);
-    localDisplacement = gestureOut.local.displacement + (gestureOut.local.velocity * interpolationTime);
+    screenDisplacement = gestureOut.screen.displacement + (gestureOut.screen.velocity * static_cast<float>( interpolationTime ) );
+    localDisplacement = gestureOut.local.displacement + (gestureOut.local.velocity * static_cast<float>( interpolationTime ) );
     screenVelocity = currentGesture.screen.velocity;
     localVelocity = currentGesture.local.velocity;
     previousAccel = acceleration;
@@ -222,7 +222,7 @@ void PanGesture::BlendPoints( PanInfo& gesture, PanInfo& lastGesture, float blen
   gesture.screen.displacement = gesture.screen.position - lastGesture.screen.position;
   gesture.local.displacement = gesture.local.position - lastGesture.local.position;
   // Calculate velocity relative to previous update-frame
-  float timeDifference( gesture.time - lastGesture.time );
+  float timeDifference = static_cast<float>( gesture.time - lastGesture.time );
   gesture.screen.velocity = gesture.screen.displacement / timeDifference;
   gesture.local.velocity = gesture.local.displacement / timeDifference;
 }
@@ -332,10 +332,11 @@ bool PanGesture::ReadAndResampleGestures( FrameGestureInfo& info, unsigned int c
 
     if( info.eventsThisFrame > 1 )
     {
-      info.frameGesture.screen.position /= info.eventsThisFrame;
-      info.frameGesture.local.position /= info.eventsThisFrame;
-      info.frameGesture.screen.velocity /= info.eventsThisFrame;
-      info.frameGesture.local.velocity /= info.eventsThisFrame;
+      const float eventsThisFrame = static_cast<float>( info.eventsThisFrame );
+      info.frameGesture.screen.position /= eventsThisFrame;
+      info.frameGesture.local.position /= eventsThisFrame;
+      info.frameGesture.screen.velocity /= eventsThisFrame;
+      info.frameGesture.local.velocity /= eventsThisFrame;
 
       info.frameGesture.screen.displacement = info.frameGesture.screen.position - mLastGesture.screen.position;
       info.frameGesture.local.displacement = info.frameGesture.local.position - mLastGesture.local.position;
@@ -430,7 +431,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
         // Ignore tiny velocity fluctuation to avoid unnecessary prediction amount change
         if( fabsf( frameInfo.acceleration ) > ACCELERATION_THRESHOLD )
         {
-          mCurrentPredictionAmount += mPredictionAmountAdjustment * ( frameInfo.acceleration > Math::MACHINE_EPSILON_0 ? 1.0f : -1.0f );
+          mCurrentPredictionAmount += static_cast<unsigned int>( static_cast<float>( mPredictionAmountAdjustment ) * ( frameInfo.acceleration > Math::MACHINE_EPSILON_0 ? 1.0f : -1.0f ) );
           if( mCurrentPredictionAmount > mMaxPredictionAmount + mPredictionAmountAdjustment ) // Guard against unsigned int overflow
           {
             mCurrentPredictionAmount = 0;
@@ -810,7 +811,7 @@ bool PanGesture::InputRateConversion( PanInfo& rateConvertedGesture, unsigned in
     // Some events were read this frame.
     if( eventsKeptThisFrame > 1 )
     {
-      float eventDivisor( eventsKeptThisFrame );
+      const float eventDivisor = static_cast<float>( eventsKeptThisFrame );
       rateConvertedGesture.screen.position /= eventDivisor;
       rateConvertedGesture.local.position /= eventDivisor;
       rateConvertedGesture.screen.velocity /= eventDivisor;
@@ -983,8 +984,8 @@ bool PanGesture::InterpolatePoint( PanInfoHistory& history, unsigned int current
     else
     {
       // If we just started, last velocity was 0. So difference of zero to current velocity over time gives acceleration of the first point.
-      newAcceleration.local = outPoint.local.velocity / outputTimeGranularity;
-      newAcceleration.screen = outPoint.screen.velocity / outputTimeGranularity;
+      newAcceleration.local = outPoint.local.velocity / static_cast<float>( outputTimeGranularity );
+      newAcceleration.screen = outPoint.screen.velocity / static_cast<float>( outputTimeGranularity );
     }
     pointGenerated = true;
   }
@@ -1037,7 +1038,7 @@ void PanGesture::PredictionMode2( PanInfo& startPoint, RelativeVectors& accelera
   else
   {
     // We are doing integration based prediction.
-    float predictionDelta( mCurrentPredictionAmount );
+    float predictionDelta = static_cast<float>( mCurrentPredictionAmount );
 
     predictedPoint.local.position = startPoint.local.position + ( startPoint.local.velocity * predictionDelta ) +
         ( accelerationToUse.local * ( predictionDelta * predictionDelta * 0.5f ) );
@@ -1137,7 +1138,7 @@ bool PanGesture::NewAlgorithm( unsigned int lastVSyncTime, unsigned int nextVSyn
     PanInfo targetPoint;
     float outputTimeGranularity( GetDivisibleTimeDifference( nextVSyncTime, lastVSyncTime, 1.0f, OUTPUT_TIME_DIFFERENCE ) );
     bool pointGenerated = InterpolatePoint( mPanHistory, nextVSyncTime, nextVSyncTime, mInterpolationTimeRange,
-        targetPoint, currentAcceleration, outputTimeGranularity, true );
+        targetPoint, currentAcceleration, static_cast<int>( outputTimeGranularity ), true ); // truncated
     if( pointGenerated )
     {
       mLastInitialAcceleration.local = currentAcceleration.local;
@@ -1178,7 +1179,7 @@ bool PanGesture::NewAlgorithm( unsigned int lastVSyncTime, unsigned int nextVSyn
       interpolatedAcceleration.local = mLastInterpolatedAcceleration.local;
       interpolatedAcceleration.screen = mLastInterpolatedAcceleration.screen;
       if( !InterpolatePoint( mPanHistory, nextVSyncTime, pastInterpolateTime, mTwoPointPastInterpolateTime,
-          outPoint, interpolatedAcceleration, outputTimeGranularity, false ) )
+          outPoint, interpolatedAcceleration, static_cast<int>( outputTimeGranularity ), false ) ) // truncated
       {
         if( justStarted )
         {
@@ -1232,7 +1233,7 @@ bool PanGesture::NewAlgorithm( unsigned int lastVSyncTime, unsigned int nextVSyn
         // Perform Multi-tap Smoothing.
         RelativeVectors blank;
         InterpolatePoint( mPredictionHistory, nextVSyncTime, nextVSyncTime, mMultiTapSmoothingRange,
-            targetPoint, blank, outputTimeGranularity, true );
+            targetPoint, blank, static_cast<int>( outputTimeGranularity ), true ); // truncated
       }
       else
       {

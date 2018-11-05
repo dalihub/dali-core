@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/key-frames.h>
@@ -267,7 +270,7 @@ public:
    * @SINCE_1_1.20
    * @param[in] count The number of times to loop
    */
-  void SetLoopCount(int count);
+  void SetLoopCount(int32_t  count);
 
   /**
    * @brief Gets the loop count.
@@ -278,7 +281,7 @@ public:
    * @SINCE_1_1.20
    * @return The number of times to loop
    */
-  int GetLoopCount();
+  int32_t  GetLoopCount();
 
   /**
    * @brief Gets the current loop count.
@@ -288,7 +291,7 @@ public:
    * @SINCE_1_1.20
    * @return The current number of loops that have occured
    */
-  int GetCurrentLoop();
+  int32_t  GetCurrentLoop();
 
   /**
    * @brief Queries whether the animation will loop.

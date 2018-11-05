@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
 #include <iosfwd>
 
 // INTERNAL INCLUDES
@@ -388,7 +389,7 @@ struct DALI_CORE_API Vector4
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  const float& operator[](const unsigned int index) const
+  const float& operator[](const uint32_t index) const
   {
     DALI_ASSERT_ALWAYS( index < 4 && "Vector element index out of bounds" );
 
@@ -403,7 +404,7 @@ struct DALI_CORE_API Vector4
    * @param[in] index Subscript index
    * @return The float at the given index
    */
-  float& operator[](const unsigned int index)
+  float& operator[](const uint32_t index)
   {
     DALI_ASSERT_ALWAYS( index < 4 && "Vector element index out of bounds" );
 

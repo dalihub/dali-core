@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
@@ -43,18 +44,23 @@ namespace Dali
 namespace Internal
 {
 
-RenderTaskList* RenderTaskList::New( EventThreadServices& eventServices, RenderTaskDefaults& defaults, bool systemLevel )
+RenderTaskListPtr RenderTaskList::New()
 {
-  RenderTaskList* taskList = new RenderTaskList( eventServices, defaults, systemLevel );
+  RenderTaskListPtr taskList = new RenderTaskList();
 
-  taskList->Initialize( eventServices.GetUpdateManager() );
+  taskList->Initialize();
 
   return taskList;
 }
 
 Dali::RenderTask RenderTaskList::CreateTask()
 {
-  RenderTask* taskImpl = RenderTask::New( mIsSystemLevel );
+  return CreateTask( &mDefaults.GetDefaultRootActor(), &mDefaults.GetDefaultCameraActor() );
+}
+
+Dali::RenderTask RenderTaskList::CreateTask( Actor* sourceActor, CameraActor* cameraActor)
+{
+  RenderTask* taskImpl = RenderTask::New();
 
   Dali::RenderTask newTask( taskImpl );
   mTasks.push_back( newTask );
@@ -68,8 +74,8 @@ Dali::RenderTask RenderTaskList::CreateTask()
   }
 
   // Set the default source & camera actors
-  taskImpl->SetSourceActor( &mDefaults.GetDefaultRootActor() );
-  taskImpl->SetCameraActor( &mDefaults.GetDefaultCameraActor() );
+  taskImpl->SetSourceActor( sourceActor );
+  taskImpl->SetCameraActor( cameraActor );
 
   return newTask;
 }
@@ -108,12 +114,12 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
   }
 }
 
-unsigned int RenderTaskList::GetTaskCount() const
+uint32_t RenderTaskList::GetTaskCount() const
 {
-  return mTasks.size();
+  return static_cast<uint32_t>( mTasks.size() ); // only 4,294,967,295 render tasks supported
 }
 
-Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
+Dali::RenderTask RenderTaskList::GetTask( uint32_t index ) const
 {
   DALI_ASSERT_ALWAYS( ( index < mTasks.size() ) && "RenderTask index out-of-range" );
 
@@ -149,27 +155,51 @@ void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
   }
 }
 
-RenderTaskList::RenderTaskList( EventThreadServices& eventThreadServices, RenderTaskDefaults& defaults, bool systemLevel )
-: mEventThreadServices( eventThreadServices ),
-  mDefaults( defaults ),
-  mIsSystemLevel( systemLevel ),
+RenderTaskList::RenderTaskList()
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mDefaults( *Stage::GetCurrent() ),
   mSceneObject( NULL )
 {
 }
 
 RenderTaskList::~RenderTaskList()
 {
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    DestroySceneObject();
+  }
 }
 
-void RenderTaskList::Initialize( UpdateManager& updateManager )
+void RenderTaskList::Initialize()
 {
   // This should only be called once, with no existing scene-object
   DALI_ASSERT_DEBUG( NULL == mSceneObject );
 
-  // Get raw-pointer to render task list
-  mSceneObject = updateManager.GetRenderTaskList( mIsSystemLevel );
+  CreateSceneObject();
+
   // set the callback to call us back when tasks are completed
   mSceneObject->SetCompleteNotificationInterface( this );
+}
+
+void RenderTaskList::CreateSceneObject()
+{
+  DALI_ASSERT_DEBUG( mSceneObject == NULL );
+
+  // Create a new render task list, Keep a const pointer to the render task list.
+  mSceneObject = SceneGraph::RenderTaskList::New();
+
+  OwnerPointer< SceneGraph::RenderTaskList > transferOwnership( const_cast< SceneGraph::RenderTaskList* >( mSceneObject ) );
+  AddRenderTaskListMessage( mEventThreadServices.GetUpdateManager(), transferOwnership );
+}
+
+void RenderTaskList::DestroySceneObject()
+{
+  if ( mSceneObject != NULL )
+  {
+    // Remove the render task list using a message to the update manager
+    RemoveRenderTaskListMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
+    mSceneObject = NULL;
+  }
 }
 
 void RenderTaskList::NotifyCompleted()

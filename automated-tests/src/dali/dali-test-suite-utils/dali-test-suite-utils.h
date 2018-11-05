@@ -64,9 +64,9 @@ constexpr int32_t basenameIndex( const char * const path, const int32_t index = 
 #define TET_FAIL 1
 #define TET_PASS 0
 
-extern int test_return_value;
+extern int32_t test_return_value;
 
-void tet_result(int value);
+void tet_result(int32_t value);
 
 #define END_TEST \
   return ((test_return_value>0)?1:0)
@@ -199,20 +199,20 @@ inline void DALI_TEST_EQUALS<TimePeriod>( TimePeriod value1, TimePeriod value2, 
 void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location );
 
 /**
- * Test whether a size_t value and an unsigned int are equal.
+ * Test whether a size_t value and an uint32_t are equal.
  * @param[in] value1 The first value
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const size_t value1, const unsigned int value2, const char* location );
+void DALI_TEST_EQUALS( const size_t value1, const uint32_t value2, const char* location );
 
 /**
- * Test whether an unsigned int and a size_t value and are equal.
+ * Test whether an uint32_t and a size_t value and are equal.
  * @param[in] value1 The first value
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_EQUALS( const unsigned int value1, const size_t value2, const char* location );
+void DALI_TEST_EQUALS( const uint32_t value1, const size_t value2, const char* location );
 
 /**
  * Test whether two Matrix3 objects are equal.
@@ -344,6 +344,27 @@ inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
   tet_printf("Assertion %s failed at %s\n", e.condition, e.location );
 }
 
+/**
+ * Test that given piece of code triggers the right assertion
+ * Fails the test if the assert didn't occur.
+ * Turns off logging during the execution of the code to avoid excessive false positive log output from the assertions
+ * @param expressions code to execute
+ * @param assertstring the substring expected in the assert
+ */
+#define DALI_TEST_ASSERTION( expressions, assertstring ) \
+try \
+{ \
+  TestApplication::EnableLogging( false ); \
+  expressions; \
+  TestApplication::EnableLogging( true ); \
+  fprintf(stderr, "Test failed in %s, expected assert: '%s' didn't occur\n", __FILELINE__, assertstring ); \
+  tet_result(TET_FAIL); \
+  throw("TET_FAIL"); } \
+catch( Dali::DaliException& e ) \
+{ \
+  DALI_TEST_ASSERT( e, assertstring, TEST_LOCATION ); \
+}
+
 // Functor to test whether an Applied signal is emitted
 struct ConstraintAppliedCheck
 {
@@ -374,11 +395,11 @@ struct DefaultFunctionCoverage
 
 // Helper to Create buffer image
 BufferImage CreateBufferImage();
-BufferImage CreateBufferImage(int width, int height, const Vector4& color);
+BufferImage CreateBufferImage(int32_t width, int32_t height, const Vector4& color);
 
 
 // Prepare a resource image to be loaded. Should be called before creating the ResourceImage
-void PrepareResourceImage( TestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat );
+void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat );
 
 // Test namespace to prevent pollution of Dali namespace, add Test helper functions here
 namespace Test

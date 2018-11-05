@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ bool Pixel::HasAlpha(Format pixelformat)
   return false;
 }
 
-unsigned int Pixel::GetBytesPerPixel(Format pixelFormat)
+uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
 {
   switch (pixelFormat)
   {

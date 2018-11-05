@@ -136,7 +136,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetId
    */
-  unsigned int GetId() const;
+  uint32_t GetId() const;
 
   // Containment
 
@@ -205,12 +205,12 @@ public:
    * Retrieve the number of children held by the actor.
    * @return The number of children
    */
-  unsigned int GetChildCount() const;
+  uint32_t GetChildCount() const;
 
   /**
    * @copydoc Dali::Actor::GetChildAt
    */
-  ActorPtr GetChildAt( unsigned int index ) const;
+  ActorPtr GetChildAt( uint32_t index ) const;
 
   /**
    * Retrieve a reference to Actor's children.
@@ -231,7 +231,7 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildById
    */
-  ActorPtr FindChildById( const unsigned int id );
+  ActorPtr FindChildById( const uint32_t id );
 
   /**
    * Retrieve the parent of an Actor.
@@ -750,11 +750,11 @@ public:
   /**
    * @copydoc Dali::Actor::GetHierarchyDepth()
    */
-  inline int GetHierarchyDepth() const
+  inline int32_t GetHierarchyDepth() const
   {
     if( mIsOnStage )
     {
-      return static_cast<int>(mDepth);
+      return mDepth;
     }
 
     return -1;
@@ -765,7 +765,7 @@ public:
    *
    * @return The depth used for hit-testing and renderer sorting
    */
-  unsigned int GetSortingDepth();
+  uint32_t GetSortingDepth();
 
 public:
 
@@ -1226,17 +1226,17 @@ public:
   /**
    * @copydoc Dali::Actor::AddRenderer()
    */
-  unsigned int AddRenderer( Renderer& renderer );
+  uint32_t AddRenderer( Renderer& renderer );
 
   /**
    * @copydoc Dali::Actor::GetRendererCount()
    */
-  unsigned int GetRendererCount() const;
+  uint32_t GetRendererCount() const;
 
   /**
    * @copydoc Dali::Actor::GetRendererAt()
    */
-  RendererPtr GetRendererAt( unsigned int index );
+  RendererPtr GetRendererAt( uint32_t index );
 
   /**
    * @copydoc Dali::Actor::RemoveRenderer()
@@ -1246,7 +1246,7 @@ public:
   /**
    * @copydoc Dali::Actor::RemoveRenderer()
    */
-  void RemoveRenderer( unsigned int index );
+  void RemoveRenderer( uint32_t index );
 
 public:
 
@@ -1560,7 +1560,7 @@ protected:
    * Called on a child during Add() when the parent actor is connected to the Stage.
    * @param[in] parentDepth The depth of the parent in the hierarchy.
    */
-  void ConnectToStage( unsigned int parentDepth );
+  void ConnectToStage( uint32_t parentDepth );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
@@ -1568,7 +1568,7 @@ protected:
    * @param[in]  depth The depth in the hierarchy of the actor
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth );
+  void RecursiveConnectToStage( ActorContainer& connectionList, uint32_t depth );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1617,56 +1617,17 @@ public:
   void RebuildDepthTree();
 
 protected:
+
   /**
    * Traverse the actor tree, inserting actors into the depth tree in sibling order.
    * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
    * @param[in,out] depthIndex The current depth index (traversal index)
    */
-  void DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int& depthIndex );
+  void DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex );
 
 public:
 
   // Default property extensions from Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
@@ -1926,13 +1887,13 @@ private:
    * @param[in] order The sibling order this Actor should be. It will place
    * the actor at this index in it's parent's child array.
    */
-  void SetSiblingOrder( unsigned int order);
+  void SetSiblingOrder( uint32_t order);
 
   /**
    * Get Sibling order
    * @return the order of this actor amongst it's siblings
    */
-  unsigned int GetSiblingOrder() const;
+  uint32_t GetSiblingOrder() const;
 
   /**
    * Request that the stage rebuilds the actor depth indices.
@@ -2008,11 +1969,9 @@ protected:
   Vector3         mTargetScale;       ///< Event-side storage for scale
 
   std::string     mName;      ///< Name of the actor
-  unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
-
+  uint32_t        mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
   uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
-  uint16_t mDepth;            ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
-
+  int16_t mDepth;             ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
@@ -2040,7 +1999,7 @@ protected:
 private:
 
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
-  static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
+  static uint32_t mActorCounter;        ///< A counter to track the actor instance creation
 };
 
 } // namespace Internal

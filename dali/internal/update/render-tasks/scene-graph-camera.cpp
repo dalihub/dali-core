@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@
 
 namespace // unnamed namespace
 {
-const unsigned int UPDATE_COUNT        = 2u;  // Update projection or view matrix this many frames after a change
-const unsigned int COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
+const uint32_t UPDATE_COUNT        = 2u;  // Update projection or view matrix this many frames after a change
+const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
 }
 
 namespace Dali
@@ -45,6 +45,12 @@ namespace SceneGraph
 namespace
 {
 
+template< typename T >
+T Sign( T value )
+{
+  return T( T(0) < value ) - T( value < T(0) );
+}
+
 void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vector3& up)
 {
   Vector3 vZ = target - eye;
@@ -58,7 +64,6 @@ void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vec
 
   result.SetInverseTransformComponents(vX, vY, vZ, eye);
 }
-
 
 void Frustum(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
 {
@@ -139,7 +144,7 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 const Dali::Camera::Type Camera::DEFAULT_TYPE( Dali::Camera::FREE_LOOK );
 const Dali::Camera::ProjectionMode Camera::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
 const bool  Camera::DEFAULT_INVERT_Y_AXIS( false );
-const float Camera::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
+const float Camera::DEFAULT_FIELD_OF_VIEW( 45.0f*(Math::PI/180.0f) );
 const float Camera::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
 const float Camera::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
 const float Camera::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
@@ -297,7 +302,7 @@ void Camera::Update( BufferIndex updateBufferIndex )
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
-  if( mNode->GetDirtyFlags() & VisibleFlag )
+  if( mNode->GetDirtyFlags() & NodePropertyFlags::VISIBLE )
   {
     // If the visibility changes, the projection matrix needs to be re-calculated.
     // It may happen the first time an actor is rendered it's rendered only once and becomes invisible,
@@ -307,8 +312,8 @@ void Camera::Update( BufferIndex updateBufferIndex )
   }
 
   // if either matrix changed, we need to recalculate the inverse matrix for hit testing to work
-  unsigned int viewUpdateCount = UpdateViewMatrix( updateBufferIndex );
-  unsigned int projectionUpdateCount = UpdateProjection( updateBufferIndex );
+  uint32_t viewUpdateCount = UpdateViewMatrix( updateBufferIndex );
+  uint32_t projectionUpdateCount = UpdateProjection( updateBufferIndex );
 
   // if model or view matrix changed we need to either recalculate the inverse VP or copy previous
   if( viewUpdateCount > COPY_PREVIOUS_MATRIX || projectionUpdateCount > COPY_PREVIOUS_MATRIX )
@@ -334,9 +339,9 @@ bool Camera::ViewMatrixUpdated()
   return 0u != mUpdateViewFlag;
 }
 
-unsigned int Camera::UpdateViewMatrix( BufferIndex updateBufferIndex )
+uint32_t Camera::UpdateViewMatrix( BufferIndex updateBufferIndex )
 {
-  unsigned int retval( mUpdateViewFlag );
+  uint32_t retval( mUpdateViewFlag );
   if( 0u != mUpdateViewFlag )
   {
     if( COPY_PREVIOUS_MATRIX == mUpdateViewFlag )
@@ -424,7 +429,7 @@ void Camera::UpdateFrustum( BufferIndex updateBufferIndex, bool normalize )
 
   if ( normalize )
   {
-    for ( unsigned int i = 0; i < 6; ++i )
+    for ( uint32_t i = 0; i < 6; ++i )
     {
       // Normalize planes to ensure correct bounding distance checking
       Plane& plane = planes.mPlanes[ i ];
@@ -437,7 +442,7 @@ void Camera::UpdateFrustum( BufferIndex updateBufferIndex, bool normalize )
   }
   else
   {
-    for ( unsigned int i = 0; i < 6; ++i )
+    for ( uint32_t i = 0; i < 6; ++i )
     {
       planes.mSign[i] = Vector3( Sign(planes.mPlanes[ i ].mNormal.x), Sign(planes.mPlanes[ i ].mNormal.y), Sign(planes.mPlanes[ i ].mNormal.z) );
     }
@@ -473,9 +478,9 @@ bool Camera::CheckAABBInFrustum( BufferIndex bufferIndex, const Vector3& origin,
   return true;
 }
 
-unsigned int Camera::UpdateProjection( BufferIndex updateBufferIndex )
+uint32_t Camera::UpdateProjection( BufferIndex updateBufferIndex )
 {
-  unsigned int retval( mUpdateProjectionFlag );
+  uint32_t retval( mUpdateProjectionFlag );
   // Early-exit if no update required
   if ( 0u != mUpdateProjectionFlag )
   {

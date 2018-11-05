@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
@@ -75,7 +76,7 @@ public:
    * Set the data for the index buffer to be used by the geometry
    * @param[in] indices A vector containing the indices
    */
-  void SetIndexBuffer( Dali::Vector<unsigned short>& indices );
+  void SetIndexBuffer( Dali::Vector<uint16_t>& indices );
 
   /**
    * Removes a PropertyBuffer from the geometry
@@ -97,7 +98,7 @@ public:
   void OnRenderFinished();
 
   /**
-   * Chack if the attributes for the geometry have changed
+   * Check if the attributes for the geometry have changed
    * @return True if vertex buffers have been added or removed since last frame, false otherwise
    */
   bool AttributesChanged() const
@@ -126,15 +127,15 @@ public:
   void UploadAndDraw(Context& context,
                      BufferIndex bufferIndex,
                      Vector<GLint>& attributeLocation,
-                     size_t elementBufferOffset,
-                     size_t elementBufferCount );
+                     uint32_t elementBufferOffset,
+                     uint32_t elementBufferCount );
 
 private:
 
   // PropertyBuffers
   Vector< Render::PropertyBuffer* > mVertexBuffers;
 
-  Dali::Vector< unsigned short> mIndices;
+  Dali::Vector< uint16_t > mIndices;
   OwnerPointer< GpuBuffer > mIndexBuffer;
   Type mGeometryType;
 

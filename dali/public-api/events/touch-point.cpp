@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 namespace Dali
 {
 
-TouchPoint::TouchPoint(int id, State state, float screenX, float screenY)
+TouchPoint::TouchPoint(int32_t id, State state, float screenX, float screenY)
 : deviceId(id),
   state(state),
   local(screenX, screenY),
@@ -29,7 +29,7 @@ TouchPoint::TouchPoint(int id, State state, float screenX, float screenY)
 {
 }
 
-TouchPoint::TouchPoint(int id, State state, float screenX, float screenY, float localX, float localY)
+TouchPoint::TouchPoint(int32_t id, State state, float screenX, float screenY, float localX, float localY)
 : deviceId(id),
   state(state),
   local(localX, localY),

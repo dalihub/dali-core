@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_LAYER_LIST_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -47,9 +50,8 @@ public:
   /**
    * Create a new list of layers.
    * @param[in] updateManager A reference to the update manager.
-   * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  static LayerList* New( SceneGraph::UpdateManager& updateManager, bool systemLevel );
+  static LayerList* New( SceneGraph::UpdateManager& updateManager );
 
   /**
    * Non-virtual destructor; not suitable as a base class.
@@ -60,7 +62,7 @@ public:
    * Query the number of layers.
    * @return The number of layers.
    */
-  unsigned int GetLayerCount() const;
+  uint32_t GetLayerCount() const;
 
   /**
    * Retrieve the layer at a specified depth.
@@ -68,13 +70,13 @@ public:
    * @param[in] depth The depth.
    * @return The layer found at the given depth.
    */
-  Layer* GetLayer( unsigned int depth ) const;
+  Layer* GetLayer( uint32_t depth ) const;
 
   /**
    * Gets the depth of a given layer
    * @param layer which depth to check
    */
-  unsigned int GetDepth( const Layer* layer ) const;
+  uint32_t GetDepth( const Layer* layer ) const;
 
   /**
    * Register a layer with the stage.
@@ -131,14 +133,20 @@ public:
    */
   void MoveLayerBelow( const Layer& layer, const Layer& target );
 
+  /**
+   * Sets the root layer that this layer list belongs to
+   * @pre the root layer is created
+   * @param rootLayer The root layer
+   */
+  void SetRootLayer(Layer* rootLayer);
+
 private:
 
   /**
    * Protected constructor; see also LayerList::New().
    * @param[in] updateManager to send messages.
-   * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel );
+  LayerList( SceneGraph::UpdateManager& updateManager );
 
   /**
    * A private helper method to set the depth for each layer.
@@ -151,7 +159,7 @@ private:
 
   SceneGraph::UpdateManager& mUpdateManager;
 
-  bool mIsSystemLevel; ///< True if the layers are added via the SystemOverlay API.
+  Layer* mRoot;        ///< The root layer that this ordered list of layers belong to
 
   typedef std::vector<Layer*> LayerContainer;
 

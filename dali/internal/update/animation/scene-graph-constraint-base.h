@@ -138,13 +138,13 @@ public:
    * Helper for internal test cases; only available for debug builds.
    * @return The current number of Constraint instances in existence.
    */
-  static unsigned int GetCurrentInstanceCount();
+  static uint32_t GetCurrentInstanceCount();
 
   /**
    * Helper for internal test cases; only available for debug builds.
    * @return The total number of Constraint instances created during the Dali core lifetime.
    */
-  static unsigned int GetTotalInstanceCount();
+  static uint32_t GetTotalInstanceCount();
 
 private:
 
@@ -242,8 +242,8 @@ private:
   LifecycleObserver* mLifecycleObserver; ///< Resetter observers this object
 
 #ifdef DEBUG_ENABLED
-  static unsigned int mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.
-  static unsigned int mTotalInstanceCount;    ///< The total number of Constraint instances created during the Dali core lifetime.
+  static uint32_t mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.
+  static uint32_t mTotalInstanceCount;    ///< The total number of Constraint instances created during the Dali core lifetime.
 #endif
 };
 
@@ -254,7 +254,7 @@ inline void  SetRemoveActionMessage( EventThreadServices& eventThreadServices, c
   typedef MessageValue1< ConstraintBase, Dali::Constraint::RemoveAction > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &constraint, &ConstraintBase::SetRemoveAction, removeAction );

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_QUEUE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public:
    * @param[in] size The message size with respect to the size of type "char".
    * @return A pointer to the first char allocated for the message.
    */
-  unsigned int* ReserveMessageSlot( BufferIndex updateBufferIndex, std::size_t size );
+  uint32_t* ReserveMessageSlot( BufferIndex updateBufferIndex, std::size_t size );
 
   /**
    * Process the batch of messages, which were queued in the previous update.

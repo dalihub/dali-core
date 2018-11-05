@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
@@ -113,7 +116,7 @@ public:
    * @SINCE_1_0.0
    * @return The number of render-tasks
    */
-  unsigned int GetTaskCount() const;
+  uint32_t GetTaskCount() const;
 
   /**
    * @brief Retrieves a render-task.
@@ -123,7 +126,7 @@ public:
    * @return A handle to the render-task
    * @pre index should be in range i.e. less than GetTaskCount().
    */
-  RenderTask GetTask( unsigned int index ) const;
+  RenderTask GetTask( uint32_t index ) const;
 
 public: // Not intended for application developers
 

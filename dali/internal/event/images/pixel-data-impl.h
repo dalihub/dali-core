@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,10 +46,10 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
-  static PixelDataPtr New( unsigned char* buffer,
-                           unsigned int bufferSize,
-                           unsigned int width,
-                           unsigned int height,
+  static PixelDataPtr New( uint8_t* buffer,
+                           uint32_t bufferSize,
+                           uint32_t width,
+                           uint32_t height,
                            Pixel::Format pixelFormat,
                            Dali::PixelData::ReleaseFunction releaseFunction);
 
@@ -63,10 +63,10 @@ public:
    * @param [in] pixelFormat      The pixel format
    * @param [in] releaseFunction  The function used to release the memory.
    */
-  PixelData( unsigned char* buffer,
-             unsigned int bufferSize,
-             unsigned int width,
-             unsigned int height,
+  PixelData( uint8_t* buffer,
+             uint32_t bufferSize,
+             uint32_t width,
+             uint32_t height,
              Pixel::Format pixelFormat,
              Dali::PixelData::ReleaseFunction releaseFunction );
 
@@ -85,13 +85,13 @@ public:
    * Get the width of the buffer in pixels.
    * @return The width of the buffer in pixels
    */
-  unsigned int GetWidth() const;
+  uint32_t GetWidth() const;
 
   /**
    * Get the height of the buffer in pixels
    * @return The height of the buffer in pixels
    */
-  unsigned int GetHeight() const;
+  uint32_t GetHeight() const;
 
   /**
    * Get the pixel format
@@ -103,13 +103,13 @@ public:
    * Get the pixel buffer if it's present.
    * @return The buffer if exists, or NULL if there is no pixel buffer.
    */
-  unsigned char* GetBuffer() const;
+  uint8_t* GetBuffer() const;
 
   /**
    * Get the size of the buffer in bytes
    * @return The size of the buffer
    */
-  unsigned int GetBufferSize() const;
+  uint32_t GetBufferSize() const;
 
   /**
    * Return the buffer pointer and reset the internal buffer to zero.
@@ -131,11 +131,11 @@ private:
 
 private:
 
-  unsigned char* mBuffer;           ///< The raw pixel data
-  unsigned int   mBufferSize;       ///< Buffer sized in bytes
-  unsigned int   mWidth;            ///< Buffer width in pixels
-  unsigned int   mHeight;           ///< Buffer height in pixels
-  Pixel::Format  mPixelFormat;      ///< Pixel format
+  uint8_t*   mBuffer;           ///< The raw pixel data
+  uint32_t   mBufferSize;       ///< Buffer sized in bytes
+  uint32_t   mWidth;            ///< Buffer width in pixels
+  uint32_t   mHeight;           ///< Buffer height in pixels
+  Pixel::Format  mPixelFormat;  ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction;  ///< Function for releasing memory
 };
 

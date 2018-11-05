@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -144,7 +147,7 @@ DALI_CORE_API bool HasAlpha(Format pixelformat);
  * @param[in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
-DALI_CORE_API unsigned int GetBytesPerPixel(Format pixelFormat);
+DALI_CORE_API uint32_t GetBytesPerPixel(Format pixelFormat);
 
 /**
  * @brief Returns the offset of the byte containing the alpha value from the start of the pixel data

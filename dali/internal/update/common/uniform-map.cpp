@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#include "uniform-map.h"
+// CLASS HEADER
+#include <dali/internal/update/common/uniform-map.h>
 
 namespace Dali
 {
@@ -150,12 +151,12 @@ const PropertyInputImpl* UniformMap::Find( const std::string& uniformName )
   return NULL;
 }
 
-unsigned int UniformMap::Count() const
+UniformMap::SizeType UniformMap::Count() const
 {
-  return mUniformMaps.Count();
+  return static_cast<UniformMap::SizeType>( mUniformMaps.Count() );
 }
 
-const UniformPropertyMapping& UniformMap::operator[]( unsigned int index ) const
+const UniformPropertyMapping& UniformMap::operator[]( UniformMap::SizeType index ) const
 {
   return *mUniformMaps[index];
 }

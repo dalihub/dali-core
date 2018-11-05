@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,16 +43,16 @@ public:
   NodeDataProvider() { }
 
   /**
-   * @param bufferId to use
+   * @param bufferIndex to use
    * @return a reference to the model matrix
    */
-  virtual const Matrix& GetModelMatrix( unsigned int bufferId ) const = 0;
+  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const = 0;
 
   /**
-   * @param bufferId to use
+   * @param bufferIndex to use
    * @return a reference to the color
    */
-  virtual const Vector4& GetRenderColor( unsigned int bufferId ) const = 0;
+  virtual const Vector4& GetRenderColor( BufferIndex bufferIndex ) const = 0;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()
