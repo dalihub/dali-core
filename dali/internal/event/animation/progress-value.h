@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROGRESS_VALUE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 
 namespace Dali
 {
@@ -82,14 +83,9 @@ inline void Interpolate (bool& result, bool a, bool b, float progress)
   result = progress < 0.5f ? a : b;
 }
 
-inline void Interpolate (int& result, int a, int b, float progress)
+inline void Interpolate (int32_t& result, int a, int b, float progress)
 {
   result = static_cast<int>(static_cast<float>( a ) + static_cast<float>(b - a) * progress + 0.5f);
-}
-
-inline void Interpolate (unsigned int& result, unsigned int a, unsigned int b, float progress)
-{
-  result = static_cast<unsigned int>( static_cast<float>( a ) + static_cast<float>(b - a) * progress + 0.5f);
 }
 
 inline void Interpolate (float& result, float a, float b, float progress)
@@ -119,22 +115,13 @@ inline void Interpolate (Vector4& result, const Vector4& a, const Vector4& b, fl
  * Restrictions: f(0)=p1   f(1)=p2   f'(0)=(p2-p0)*0.5   f'(1)=(p3-p1)*0.5
  */
 
-inline void CubicInterpolate( int& result, int p0, int p1, int p2, int p3, float progress )
+inline void CubicInterpolate( int32_t& result, int32_t p0, int32_t p1, int32_t p2, int32_t p3, float progress )
 {
   float a3 = static_cast<float>( p3 ) * 0.5f - static_cast<float>( p2 ) * 1.5f + static_cast<float>( p1 ) * 1.5f - static_cast<float>( p0 ) * 0.5f;
   float a2 = static_cast<float>( p0 ) - static_cast<float>( p1 ) * 2.5f + static_cast<float>( p2 ) * 2.0f - static_cast<float>( p3 ) * 0.5f;
   float a1 = static_cast<float>( p2 - p0 ) * 0.5f;
 
   result = static_cast<int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + static_cast<float>( p1 ) + 0.5f );
-}
-
-inline void CubicInterpolate( unsigned int& result, unsigned int p0, unsigned int p1, unsigned int p2, unsigned int p3, float progress )
-{
-  float a3 = static_cast<float>( p3 ) * 0.5f - static_cast<float>( p2 ) * 1.5f + static_cast<float>( p1 ) * 1.5f - static_cast<float>( p0 ) * 0.5f;
-  float a2 = static_cast<float>( p0 ) - static_cast<float>( p1 ) * 2.5f + static_cast<float>( p2 ) * 2.0f - static_cast<float>( p3 ) * 0.5f;
-  float a1 = static_cast<float>( p2 - p0 ) * 0.5f;
-
-  result = static_cast<unsigned int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + static_cast<float>( p1 ) + 0.5f );
 }
 
 inline void CubicInterpolate( float& result, float p0, float p1, float  p2, float  p3, float progress )

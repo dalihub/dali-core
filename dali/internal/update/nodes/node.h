@@ -30,7 +30,6 @@
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/property-vector3.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/inherited-property.h>
 #include <dali/internal/update/manager/transform-manager.h>
