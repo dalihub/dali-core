@@ -70,6 +70,7 @@ void GraphicsBuffer::Reserve(uint32_t size, bool discardOldBuffer )
 
     if( discardOldBuffer )
     {
+      mController->WaitIdle();
       mBuffer->DestroyNow();
     }
   }

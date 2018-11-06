@@ -433,6 +433,21 @@ public:
     return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
   }
 
+  void DestroyAllRenderCommands()
+  {
+    mRenderCommands = {};
+  }
+
+  void SetRenderCommandExpiredFlag( bool expired )
+  {
+    mInvalidateRenderCommandsFlag = expired;
+  }
+
+  bool GetRenderCommandsExpiredFlag()
+  {
+    return mInvalidateRenderCommandsFlag;
+  }
+
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -513,6 +528,7 @@ private:
   RenderCommandContainer       mRenderCommands;
   std::vector<Graphics::API::RenderCommand::TextureBinding> mTextureBindings;
 
+  bool                         mInvalidateRenderCommandsFlag:1;
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
