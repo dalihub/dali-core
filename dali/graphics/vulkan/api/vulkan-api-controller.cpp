@@ -21,7 +21,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-command-pool.h>
-#include <dali/graphics/vulkan/internal/vulkan-descriptor-set.h>
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/internal/vulkan-surface.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
@@ -45,6 +44,8 @@
 #include <dali/graphics/vulkan/api/vulkan-api-sampler-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-render-command.h>
 #include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
+#include <dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.h>
+
 #include <dali/graphics/thread-pool.h>
 
 namespace Dali
@@ -68,13 +69,12 @@ struct Controller::Impl
   {
     // only move semantics
     RenderPassData( vk::RenderPassBeginInfo _beginInfo,
-                      std::vector< vk::ClearValue >&& _clearColorValues,
-                      Vulkan::RefCountedFramebuffer _framebuffer,
-                      std::vector< Dali::Graphics::API::RenderCommand* > _renderCommands )
-            : beginInfo( _beginInfo ),
-              colorValues( std::move( _clearColorValues ) ),
-              framebuffer( std::move( _framebuffer ) ),
-              renderCommands( std::move( _renderCommands ) )
+                    std::vector< vk::ClearValue >&& _clearColorValues,
+                    Vulkan::RefCountedFramebuffer _framebuffer )
+      : beginInfo( _beginInfo ),
+        colorValues( std::move( _clearColorValues ) ),
+        framebuffer( std::move( _framebuffer ) ),
+        renderCommands()
     {
     }
 
@@ -110,6 +110,7 @@ struct Controller::Impl
     mSamplerFactory = MakeUnique< VulkanAPI::SamplerFactory >( mOwner );
 
     mDefaultPipelineCache = MakeUnique< VulkanAPI::PipelineCache >();
+    mDescriptorSetAllocator = MakeUnique< VulkanAPI::Internal::DescriptorSetAllocator>( mOwner );
 
     return mThreadPool.Initialize();
   }
@@ -227,6 +228,8 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
+
+    mDescriptorSetAllocator->SwapBuffers();
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -256,9 +259,9 @@ struct Controller::Impl
     return std::make_unique< VulkanAPI::RenderCommand >( mOwner, mGraphics );
   }
 
-  void UpdateRenderPass( std::vector< Dali::Graphics::API::RenderCommand*  >&& commands )
+  void UpdateRenderPass( const std::vector< Dali::Graphics::API::RenderCommand*  >& commands, uint32_t startIndex, uint32_t endIndex )
   {
-    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[0]);
+    auto firstCommand = static_cast<VulkanAPI::RenderCommand*>(commands[startIndex]);
     auto renderTargetBinding = firstCommand->GetRenderTargetBinding();
 
     Vulkan::RefCountedFramebuffer framebuffer{ nullptr };
@@ -295,14 +298,12 @@ struct Controller::Impl
                       .setClearValueCount( uint32_t( newColors.size() ) )
                       .setPClearValues( newColors.data() ),
               std::move( newColors ),
-              framebuffer,
-              commands );
+              framebuffer );
+
     }
-    else
-    {
-      auto& vector = mRenderPasses.back().renderCommands;
-      vector.insert( vector.end(), commands.begin(), commands.end() );
-    }
+
+    auto& vector = mRenderPasses.back().renderCommands;
+    vector.insert( vector.end(), commands.begin()+startIndex, commands.begin()+endIndex );
   }
 
   /**
@@ -311,6 +312,40 @@ struct Controller::Impl
    */
   void SubmitCommands( std::vector< Dali::Graphics::API::RenderCommand* > commands )
   {
+    /*
+     * analyze descriptorset needs pers signature
+     */
+    std::vector<DescriptorSetRequirements> dsRequirements {};
+    for( auto& command : commands )
+    {
+      auto vulkanCommand = static_cast<VulkanAPI::RenderCommand*>( command );
+      vulkanCommand->UpdateDescriptorSetAllocationRequirements( dsRequirements );
+    }
+
+    if( !mDescriptorSetsFreeList.empty() )
+    {
+      mDescriptorSetAllocator->FreeDescriptorSets( std::move( mDescriptorSetsFreeList ) );
+      mDescriptorSetsFreeList.clear();
+    }
+
+    /*
+     * Update descriptor pools based on the requirements
+     */
+    if( dsRequirements.size() )
+    {
+      mDescriptorSetAllocator->UpdateWithRequirements( dsRequirements, 0u );
+    }
+
+    /**
+     * Allocate descriptor sets for all signatures that requirements forced
+     * recreating pools
+     */
+    for( auto& command : commands )
+    {
+      auto vulkanCommand = static_cast<VulkanAPI::RenderCommand*>( command );
+      vulkanCommand->AllocateDescriptorSets( *mDescriptorSetAllocator );
+    }
+
     mMemoryTransferFutures.emplace_back( mThreadPool.SubmitTask(0, Task([this](uint32_t workerIndex){
       // if there are any scheduled writes
       if( !mBufferTransferRequests.empty() )
@@ -336,9 +371,24 @@ struct Controller::Impl
       return;
     }
 
-    // Begin render pass for render target
-    // clear color obtained from very first command in the batch
-    UpdateRenderPass( std::move( commands ) );
+    // Update render pass data per framebuffer
+    const Dali::Graphics::API::Framebuffer* currFramebuffer = nullptr;
+    uint32_t previousPassBeginIndex = 0u;
+    uint32_t index = 0u;
+    for( auto& command : commands )
+    {
+      if( command->mRenderTargetBinding.framebuffer != currFramebuffer )
+      {
+        if( index )
+        {
+          UpdateRenderPass( commands, previousPassBeginIndex, index );
+        }
+        previousPassBeginIndex = index;
+        currFramebuffer = command->mRenderTargetBinding.framebuffer;
+      }
+      ++index;
+    }
+    UpdateRenderPass( commands, previousPassBeginIndex, index );
   }
 
   // @todo: possibly optimise
@@ -666,7 +716,20 @@ struct Controller::Impl
     // @todo Decide what GC's to run.
   }
 
+  void DiscardUnusedResources()
+  {
+    mGraphics.GetGraphicsQueue(0).GetVkHandle().waitIdle();
+    mGraphics.CollectGarbage();
+    mGraphics.CollectGarbage();
+  }
+
+  bool IsDiscardQueueEmpty()
+  {
+    return mGraphics.GetDiscardQueue(0u).empty() && mGraphics.GetDiscardQueue(1u).empty();
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
+  std::unique_ptr< VulkanAPI::Internal::DescriptorSetAllocator > mDescriptorSetAllocator;
 
   Vulkan::Graphics& mGraphics;
   Controller& mOwner;
@@ -706,6 +769,8 @@ struct Controller::Impl
 
   DepthStencilFlags mDepthStencilBufferCurrentState { 0u };
   DepthStencilFlags mDepthStencilBufferRequestedState { 0u };
+
+  std::vector<DescriptorSetList> mDescriptorSetsFreeList;
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -776,6 +841,7 @@ void Controller::BeginFrame()
   //@ todo, not multithreaded yet
   mImpl->mDescriptorWrites.clear();
 
+  mStats.frame++;
   mImpl->BeginFrame();
 }
 
@@ -799,6 +865,20 @@ void Controller::PushDescriptorWrite( const vk::WriteDescriptorSet& write )
   mImpl->mDescriptorWrites.emplace_back( write );
   mImpl->mDescriptorWrites.back().pBufferInfo = pBufferInfo;
   mImpl->mDescriptorWrites.back().pImageInfo = pImageInfo;
+}
+
+void Controller::FreeDescriptorSets( DescriptorSetList&& descriptorSetList )
+{
+  if( descriptorSetList.descriptorSets.empty() )
+  {
+    return;
+  }
+  mImpl->mDescriptorSetsFreeList.emplace_back( std::move( descriptorSetList ) );
+}
+
+bool Controller::TestDescriptorSetsValid( VulkanAPI::DescriptorSetList& descriptorSetList, std::vector<bool>& results ) const
+{
+  return mImpl->mDescriptorSetAllocator->TestIfValid( descriptorSetList, results );
 }
 
 void Controller::EndFrame()
@@ -904,6 +984,22 @@ void Controller::RunGarbageCollector( size_t numberOfDiscardedRenderers )
 {
   mImpl->RunGarbageCollector( numberOfDiscardedRenderers );
 }
+
+void Controller::DiscardUnusedResources()
+{
+  mImpl->DiscardUnusedResources();
+}
+
+bool Controller::IsDiscardQueueEmpty()
+{
+  return mImpl->IsDiscardQueueEmpty();
+}
+
+void Controller::WaitIdle()
+{
+  mImpl->mGraphics.GetGraphicsQueue(0u).GetVkHandle().waitIdle();
+}
+
 
 } // namespace VulkanAPI
 } // namespace Graphics

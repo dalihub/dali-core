@@ -620,6 +620,18 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     mImpl->propertyResetters.EraseObject( elementPtr );
   }
 
+  // Clear root dirty flags
+  if( mImpl->root )
+  {
+    mImpl->root->ResetDirtyFlags( bufferIndex );
+  }
+
+  // Clear system level root dirty flags
+  if( mImpl->systemLevelRoot )
+  {
+    mImpl->systemLevelRoot->ResetDirtyFlags( bufferIndex );
+  }
+
   // Clear node dirty flags
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
@@ -738,6 +750,8 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   {
     //Apply constraints
     ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
+
+    mImpl->renderers[i]->SetRenderCommandExpiredFlag( true );
   }
 }
 
@@ -763,8 +777,18 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
         if( renderItem.mRenderer )
         {
           renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
+          renderItem.mRenderer->SetRenderCommandExpiredFlag( false );
         }
       }
+    }
+  }
+
+  auto rendererCount = mImpl->renderers.Count();
+  for( auto i = 0u; i < rendererCount; ++i )
+  {
+    if( mImpl->renderers[i]->GetRenderCommandsExpiredFlag() )
+    {
+      mImpl->renderers[i]->DestroyAllRenderCommands();
     }
   }
 }
@@ -808,7 +832,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       IsAnimationRunning()                            ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
       gestureUpdated;                                       // ..a gesture property was updated
-
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -918,6 +941,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }
   }
+  else
+  {
+    // Discard graphics resources
+    mImpl->graphics.GetController().DiscardUnusedResources();
+  }
 
   // check the countdown and notify (note, at the moment this is only done for normal tasks, not for systemlevel tasks)
   bool doRenderOnceNotify = false;
@@ -997,7 +1025,8 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
   }
 
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
-  if( ! mImpl->discardQueue.IsEmpty( bufferIndex ) )
+  if( !mImpl->discardQueue.IsEmpty( bufferIndex ) ||
+      !mImpl->graphics.GetController().IsDiscardQueueEmpty() )
   {
     keepUpdatingRequest |= KeepUpdating::DISCARD_RESOURCES;
   }
