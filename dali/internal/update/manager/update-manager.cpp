@@ -620,6 +620,18 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     mImpl->propertyResetters.EraseObject( elementPtr );
   }
 
+  // Clear root dirty flags
+  if( mImpl->root )
+  {
+    mImpl->root->ResetDirtyFlags( bufferIndex );
+  }
+
+  // Clear system level root dirty flags
+  if( mImpl->systemLevelRoot )
+  {
+    mImpl->systemLevelRoot->ResetDirtyFlags( bufferIndex );
+  }
+
   // Clear node dirty flags
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
