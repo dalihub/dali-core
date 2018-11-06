@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +56,10 @@ struct HitActor
   {
   }
 
-  Actor *actor;                         ///< The actor hit (if actor is hit, then this is initialised).
-  Vector2 hitPosition;                  ///< Position of hit (only valid if actor valid).
-  float distance;                       ///< Distance from ray origin to hit actor.
-  int depth;                            ///< Depth index of this actor.
+  Actor *actor;        ///< The actor hit (if actor is hit, then this is initialised).
+  Vector2 hitPosition; ///< Position of hit (only valid if actor valid).
+  float distance;      ///< Distance from ray origin to hit actor.
+  int32_t depth;       ///< Depth index of this actor.
 };
 
 /**
@@ -162,8 +162,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                              HitTestInterface& hitCheck,
                              bool& overlayHit,
                              bool layerIs3d,
-                             unsigned int clippingDepth,
-                             unsigned int clippingBitPlaneMask )
+                             uint32_t clippingDepth,
+                             uint32_t clippingBitPlaneMask )
 {
   HitActor hit;
 
@@ -176,7 +176,7 @@ HitActor HitTestWithinLayer( Actor& actor,
   // we increase the clipping depth if we have hit a clipping actor.
   // This is used later to ensure all nested clipped children have hit
   // all clipping actors also for them to be counted as hit.
-  unsigned int newClippingDepth = clippingDepth;
+  uint32_t newClippingDepth = clippingDepth;
   bool clippingActor = actor.GetClippingMode() != ClippingMode::DISABLED;
   if( clippingActor )
   {
@@ -234,7 +234,7 @@ HitActor HitTestWithinLayer( Actor& actor,
               // EG. a depth of 4 (10000 binary) = a mask of 1111 binary.
               // This allows us a fast way of comparing all bits are set up to this depth.
               // Note: If the current Actor has clipping, that is included in the depth mask too.
-              unsigned int clippingDepthMask = ( 1u << newClippingDepth ) - 1u;
+              uint32_t clippingDepthMask = ( 1u << newClippingDepth ) - 1u;
 
               // The two masks must be equal to be a hit, as we are already assuming a hit
               // (for non-clipping mode) then they must be not-equal to disqualify the hit.
@@ -255,7 +255,7 @@ HitActor HitTestWithinLayer( Actor& actor,
               {
                 //Get renderer with maximum depth
                 int rendererMaxDepth(actor.GetRendererAt( 0 ).Get()->GetDepthIndex());
-                for( unsigned int i(1); i < actor.GetRendererCount(); ++i )
+                for( uint32_t i(1); i < actor.GetRendererCount(); ++i )
                 {
                   int depth = actor.GetRendererAt( i ).Get()->GetDepthIndex();
                   if( depth > rendererMaxDepth )
@@ -277,7 +277,7 @@ HitActor HitTestWithinLayer( Actor& actor,
   if( actor.GetChildCount() > 0 )
   {
     childHit.distance = std::numeric_limits<float>::max();
-    childHit.depth = std::numeric_limits<int>::min();
+    childHit.depth = std::numeric_limits<int32_t>::min();
     ActorContainer& children = actor.GetChildrenInternal();
 
     // Hit test ALL children and calculate their distance.
@@ -362,10 +362,10 @@ inline bool IsActuallyHittable( Layer& layer, const Vector2& screenCoordinates, 
   {
     ClippingBox box = layer.GetClippingBox();
 
-    if( screenCoordinates.x < box.x ||
-        screenCoordinates.x > box.x + box.width ||
-        screenCoordinates.y < stageSize.y - (box.y + box.height) ||
-        screenCoordinates.y > stageSize.y - box.y)
+    if( screenCoordinates.x < static_cast<float>( box.x )||
+        screenCoordinates.x > static_cast<float>( box.x + box.width )||
+        screenCoordinates.y < stageSize.y - static_cast<float>( box.y + box.height ) ||
+        screenCoordinates.y > stageSize.y - static_cast<float>( box.y ) )
     {
       // Not touchable if clipping is enabled in the layer and the screen coordinate is outside the clip region.
       hittable = false;
@@ -416,10 +416,10 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
   {
     Viewport viewport;
     renderTask.GetViewport( viewport );
-    if( screenCoordinates.x < viewport.x ||
-        screenCoordinates.x > viewport.x + viewport.width ||
-        screenCoordinates.y < viewport.y ||
-        screenCoordinates.y > viewport.y + viewport.height )
+    if( screenCoordinates.x < static_cast<float>( viewport.x ) ||
+        screenCoordinates.x > static_cast<float>( viewport.x + viewport.width ) ||
+        screenCoordinates.y < static_cast<float>( viewport.y ) ||
+        screenCoordinates.y > static_cast<float>( viewport.y + viewport.height ) )
     {
       // The screen coordinate is outside the viewport of render task. The viewport clips all layers.
       return false;
@@ -435,7 +435,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
       Dali::Layer layer( sourceActor->GetLayer() );
       if( layer )
       {
-        const unsigned int sourceActorDepth( layer.GetDepth() );
+        const uint32_t sourceActorDepth( layer.GetDepth() );
 
         CameraActor* cameraActor = renderTask.GetCameraActor();
         bool pickingPossible = cameraActor->BuildPickingRay(
@@ -454,7 +454,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
         bool layerConsumesHit = false;
         const Vector2& stageSize = stage.GetSize();
 
-        for( int i = layers.GetLayerCount() - 1; i >= 0 && !( hit.actor ); --i )
+        for( int32_t i = layers.GetLayerCount() - 1; i >= 0 && !( hit.actor ); --i )
         {
           Layer* layer( layers.GetLayer( i ) );
           overlayHit = false;
@@ -463,7 +463,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
           if( IsActuallyHittable( *layer, screenCoordinates, stageSize, hitCheck ) )
           {
             // Always hit-test the source actor; otherwise test whether the layer is below the source actor in the hierarchy
-            if( sourceActorDepth == static_cast<unsigned int>( i ) )
+            if( sourceActorDepth == static_cast<uint32_t>( i ) )
             {
               // Recursively hit test the source actor & children, without crossing into other layers.
               hit = HitTestWithinLayer( *sourceActor,

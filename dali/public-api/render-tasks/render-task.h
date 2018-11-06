@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
@@ -171,12 +174,12 @@ public:
     REFRESH_ALWAYS = 1  ///< Process every frame. @SINCE_1_0.0
   };
 
-  static const bool         DEFAULT_EXCLUSIVE;     ///< false
-  static const bool         DEFAULT_INPUT_ENABLED; ///< true
-  static const Vector4      DEFAULT_CLEAR_COLOR;   ///< Color::BLACK
-  static const bool         DEFAULT_CLEAR_ENABLED; ///< false
-  static const bool         DEFAULT_CULL_MODE;     ///< true
-  static const unsigned int DEFAULT_REFRESH_RATE;  ///< REFRESH_ALWAYS
+  static const bool     DEFAULT_EXCLUSIVE;     ///< false
+  static const bool     DEFAULT_INPUT_ENABLED; ///< true
+  static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Color::BLACK
+  static const bool     DEFAULT_CLEAR_ENABLED; ///< false
+  static const bool     DEFAULT_CULL_MODE;     ///< true
+  static const uint32_t DEFAULT_REFRESH_RATE;  ///< REFRESH_ALWAYS
 
   /**
    * @brief Creates an empty RenderTask handle.
@@ -473,14 +476,14 @@ public:
    * @SINCE_1_0.0
    * @param[in] refreshRate The new refresh rate
    */
-  void SetRefreshRate( unsigned int refreshRate );
+  void SetRefreshRate( uint32_t refreshRate );
 
   /**
    * @brief Queries the refresh-rate of the RenderTask.
    * @SINCE_1_0.0
    * @return The refresh-rate
    */
-  unsigned int GetRefreshRate() const;
+  uint32_t GetRefreshRate() const;
 
   /**
    * @brief Gets viewport coordinates for given world position.

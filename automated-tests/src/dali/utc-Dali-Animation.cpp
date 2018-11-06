@@ -6696,19 +6696,15 @@ int UtcDaliAnimationAnimateToActorParentOriginP(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetParentOrigin(ParentOrigin::BOTTOM_RIGHT);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN), targetParentOrigin );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorParentOriginXP(void)
+int UtcDaliAnimationAnimateToActorParentOriginXN(void)
 {
   TestApplication application;
 
@@ -6723,19 +6719,15 @@ int UtcDaliAnimationAnimateToActorParentOriginXP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetX(1.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_X), targetX );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorParentOriginYP(void)
+int UtcDaliAnimationAnimateToActorParentOriginYN(void)
 {
   TestApplication application;
 
@@ -6750,19 +6742,15 @@ int UtcDaliAnimationAnimateToActorParentOriginYP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetY(1.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Y), targetY );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorParentOriginZP(void)
+int UtcDaliAnimationAnimateToActorParentOriginZN(void)
 {
   TestApplication application;
 
@@ -6777,19 +6765,15 @@ int UtcDaliAnimationAnimateToActorParentOriginZP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetZ(1.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Z), targetZ );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointP(void)
+int UtcDaliAnimationAnimateToActorAnchorPointN(void)
 {
   TestApplication application;
 
@@ -6802,19 +6786,15 @@ int UtcDaliAnimationAnimateToActorAnchorPointP(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetAnchorPoint(AnchorPoint::TOP_LEFT);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT), targetAnchorPoint);
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointXP(void)
+int UtcDaliAnimationAnimateToActorAnchorPointXN(void)
 {
   TestApplication application;
 
@@ -6829,19 +6809,15 @@ int UtcDaliAnimationAnimateToActorAnchorPointXP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetX(1.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_X), targetX );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointYP(void)
+int UtcDaliAnimationAnimateToActorAnchorPointYN(void)
 {
   TestApplication application;
 
@@ -6856,19 +6832,15 @@ int UtcDaliAnimationAnimateToActorAnchorPointYP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetY(0.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Y), targetY );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointZP(void)
+int UtcDaliAnimationAnimateToActorAnchorPointZN(void)
 {
   TestApplication application;
 
@@ -6883,15 +6855,11 @@ int UtcDaliAnimationAnimateToActorAnchorPointZP(void)
   Animation animation = Animation::New(durationSeconds);
   float targetZ(100.0f);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Z), targetZ );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
-  }
+  }, "IsPropertyAnimatable( index )" );
+
   END_TEST;
 }
 
@@ -8642,7 +8610,7 @@ int UtcDaliAnimationKeyFrames01P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames02P(void)
+int UtcDaliAnimationKeyFrames02N(void)
 {
   TestApplication application;
 
@@ -8658,19 +8626,15 @@ int UtcDaliAnimationKeyFrames02P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::FLOAT, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(1.9f, false);
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames03P(void)
+int UtcDaliAnimationKeyFrames03N(void)
 {
   TestApplication application;
 
@@ -8686,19 +8650,15 @@ int UtcDaliAnimationKeyFrames03P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::BOOLEAN, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(0.7f, Vector3(1.0f, 1.0f, 1.0f));
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames04P(void)
+int UtcDaliAnimationKeyFrames04N(void)
 {
   TestApplication application;
 
@@ -8714,19 +8674,15 @@ int UtcDaliAnimationKeyFrames04P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::VECTOR2, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(0.7f, Vector3(1.0f, 1.0f, 1.0f));
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames05P(void)
+int UtcDaliAnimationKeyFrames05N(void)
 {
   TestApplication application;
 
@@ -8742,19 +8698,15 @@ int UtcDaliAnimationKeyFrames05P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::VECTOR3, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(0.7f, 1.0f);
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames06P(void)
+int UtcDaliAnimationKeyFrames06N(void)
 {
   TestApplication application;
 
@@ -8770,19 +8722,15 @@ int UtcDaliAnimationKeyFrames06P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::VECTOR4, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(0.7f, Quaternion(Radian(1.717f), Vector3::XAXIS));
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames07P(void)
+int UtcDaliAnimationKeyFrames07N(void)
 {
   TestApplication application;
 
@@ -8798,15 +8746,11 @@ int UtcDaliAnimationKeyFrames07P(void)
 
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::ROTATION, TEST_LOCATION);
 
-  try
+  DALI_TEST_ASSERTION(
   {
     keyFrames.Add(0.7f, 1.1f);
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
-  }
+  }, "mType == value.GetType()" );
+
   END_TEST;
 }
 
@@ -10709,19 +10653,14 @@ int UtcDaliAnimationAnimateByNonAnimateableTypeN(void)
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
-  try
+  DALI_TEST_ASSERTION(
   {
     // Build the animation
     Animation animation = Animation::New( 2.0f );
     std::string relativeValue = "relative string";
     animation.AnimateBy( Property(actor, index), relativeValue );
     tet_result(TET_FAIL);
-  }
-  catch ( Dali::DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
-  }
-
+  }, "Target value is not animatable" );
 
   END_TEST;
 }
@@ -10739,19 +10678,13 @@ int UtcDaliAnimationAnimateToNonAnimateableTypeN(void)
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
-  try
+  DALI_TEST_ASSERTION(
   {
     // Build the animation
     Animation animation = Animation::New( 2.0f );
     std::string relativeValue = "relative string";
     animation.AnimateTo( Property(actor, index), relativeValue );
-
-    tet_result(TET_FAIL);
-  }
-  catch ( Dali::DaliException& e )
-  {
-   DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
-  }
+  }, "Target value is not animatable" );
 
   END_TEST;
 }
@@ -10768,20 +10701,14 @@ int UtcDaliAnimationAnimateBetweenNonAnimateableTypeN(void)
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
 
-  try
+  DALI_TEST_ASSERTION(
   {
     // Build the animation
     KeyFrames keyFrames = KeyFrames::New();
     keyFrames.Add( 0.0f, std::string("relative string1") );
     keyFrames.Add( 1.0f, std::string("relative string2") );
     // no need to really create the animation as keyframes do the check
-
-    tet_result(TET_FAIL);
-  }
-  catch ( Dali::DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "Type not animateable", TEST_LOCATION );
-  }
+  }, "Property type is not animatable" );
 
   END_TEST;
 }
@@ -13008,6 +12935,183 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
   DALI_TEST_EQUALS( 0.75f, animation.GetCurrentProgress(), TEST_LOCATION );
 
   progressCheck.CheckSignalNotReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByInvalidParameters(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Create the animation
+  Animation animation = Animation::New(1.0f);
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable property (STRING)
+    animation.AnimateBy( Property( actor, Actor::Property::LAYOUT_DIRECTION ), Property::Value( "new direction" ) );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable property (MATRIX)
+    Property::Index index = actor.RegisterProperty( "Foobar", Property::Value( Dali::Matrix() ), Property::ANIMATABLE );
+    animation.AnimateBy( Property( actor, index ), Property::Value( Property::MATRIX ) );
+  }, "Property type is not animatable" );
+
+  // AnimateBy
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (NONE)
+    animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Property::Value() );
+  }, "Target value is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (STRING)
+    animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Property::Value("foo") );
+  }, "Target value is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // not mathing properties (VECTOR3, FLOAT)
+    animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Property::Value( 10.f ) );
+  }, "Property and target types don't match" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // not mathing properties (VECTOR3.A, VECTOR2)
+    animation.AnimateBy( Property( actor, Actor::Property::COLOR_ALPHA ), Property::Value( Property::VECTOR2 ) );
+  }, "Property and target types don't match" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // negative duration
+    animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Property::Value( Vector3(1,2,3) ), TimePeriod(-1) );
+  }, "Duration must be >=0" );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToInvalidParameters(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Create the animation
+  Animation animation = Animation::New(1.0f);
+
+  // AnimateTo
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable property (MAP)
+    Property::Index index = actor.RegisterProperty( "Foobar", Property::Value( Property::MAP ), Property::ANIMATABLE );
+    animation.AnimateTo( Property( actor, index ), Property::Value( Property::MAP ) );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (NONE)
+    animation.AnimateTo( Property( actor, Actor::Property::CLIPPING_MODE ), Property::Value() );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (ARRAY)
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), Property::Value( Property::ARRAY ) );
+  }, "Target value is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (RECTANGLE)
+    animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Property::Value( Rect<int32_t>() ) );
+  }, "Target value is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // not mathing properties (FLOAT, INT)
+    animation.AnimateTo( Property( actor, Actor::Property::SCALE_Y ), Property::Value(10) );
+  }, "Property and target types don't match" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // not mathing properties (VECTOR3, VECTOR2)
+    animation.AnimateTo( Property( actor, Actor::Property::COLOR ), Property::Value( Property::VECTOR2 ) );
+  }, "Property and target types don't match" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // negative duration
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), Property::Value( Vector3(1,2,3) ), TimePeriod(-1) );
+  }, "Duration must be >=0" );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Create the animation
+  Animation animation = Animation::New(1.0f);
+
+  // AnimateBetween
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable property (ARRAY)
+    Property::Index index = actor.RegisterProperty( "Foobar", Property::Value( Property::ARRAY ), Property::ANIMATABLE );
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value( Property::ARRAY ) );
+    animation.AnimateBetween( Property( actor, index ), keyframes );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (NONE)
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value() );
+    animation.AnimateBetween( Property( actor, Actor::Property::CLIPPING_MODE ), keyframes );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (EXTENTS)
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value( Property::EXTENTS ) ); // throws
+    animation.AnimateBetween( Property( actor, Actor::Property::POSITION ), keyframes );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // non animateable target (RECTANGLE)
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value( Property::MAP ) ); // throws
+    animation.AnimateBetween( Property( actor, Actor::Property::POSITION ), keyframes );
+  }, "Property type is not animatable" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // not mathing properties (VECTOR2, VECTOR4)
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value( Vector4( 1, 2, 3, 4 ) ) );
+    animation.AnimateBetween( Property( actor, Actor::Property::MAXIMUM_SIZE ), keyframes );
+  }, "Property and target types don't match" );
+
+  DALI_TEST_ASSERTION(
+  {
+    // negative duration
+    KeyFrames keyframes = KeyFrames::New();
+    keyframes.Add( 0.5f, Property::Value(Vector3( 1, 2, 3 ) ) );
+    animation.AnimateBetween( Property( actor, Actor::Property::POSITION ), keyframes, TimePeriod(-1) );
+  }, "Duration must be >=0" );
 
   END_TEST;
 }

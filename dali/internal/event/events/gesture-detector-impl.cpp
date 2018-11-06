@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,45 +194,6 @@ void GestureDetector::ObjectDestroyed(Object& object)
       }
     }
   }
-}
-
-unsigned int GestureDetector::GetDefaultPropertyCount() const
-{
-  return 0;
-}
-
-void GestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& ) const
-{
-}
-
-const char* GestureDetector::GetDefaultPropertyName( Property::Index index ) const
-{
-  return NULL;
-}
-
-Property::Index GestureDetector::GetDefaultPropertyIndex(const std::string& name) const
-{
-  return Property::INVALID_INDEX;
-}
-
-bool GestureDetector::IsDefaultPropertyWritable(Property::Index index) const
-{
-  return false;
-}
-
-bool GestureDetector::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  return false;
-}
-
-bool GestureDetector::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return false;
-}
-
-Property::Type GestureDetector::GetDefaultPropertyType(Property::Index index) const
-{
-  return Property::NONE;
 }
 
 void GestureDetector::SetDefaultProperty( Property::Index index, const Property::Value& property )

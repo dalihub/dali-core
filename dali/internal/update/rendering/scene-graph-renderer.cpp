@@ -42,6 +42,13 @@
 #include <cstring>
 #include <dali/integration-api/debug.h>
 
+namespace Dali
+{
+namespace Internal
+{
+namespace SceneGraph
+{
+
 namespace // unnamed namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -49,23 +56,22 @@ Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_
 Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
 #endif
 
-
-const unsigned int UNIFORM_MAP_READY      = 0;
-const unsigned int COPY_UNIFORM_MAP       = 1;
-const unsigned int REGENERATE_UNIFORM_MAP = 2;
+const uint32_t UNIFORM_MAP_READY      = 0;
+const uint32_t COPY_UNIFORM_MAP       = 1;
+const uint32_t REGENERATE_UNIFORM_MAP = 2;
 
 //Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Renderer> gRendererMemoryPool;
+MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 
-void AddMappings( Dali::Internal::SceneGraph::CollectedUniformMap& localMap, const Dali::Internal::SceneGraph::UniformMap& uniformMap )
+void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 {
   // Iterate thru uniformMap.
   //   Any maps that aren't in localMap should be added in a single step
-  Dali::Internal::SceneGraph::CollectedUniformMap newUniformMappings;
+  CollectedUniformMap newUniformMappings;
 
-  for( unsigned int i=0, count = uniformMap.Count(); i<count; ++i )
+  for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
   {
-    Dali::Internal::SceneGraph::UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
+    UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
     bool found = false;
 
     for( auto map : localMap )
@@ -108,13 +114,6 @@ inline uint32_t GetUniformBufferDataAlignment( uint32_t dataSize )
 }
 
 } // Anonymous namespace
-
-namespace Dali
-{
-namespace Internal
-{
-namespace SceneGraph
-{
 
 Renderer* Renderer::New()
 {
@@ -202,7 +201,7 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
     localMap.Resize( oldMap.Count() );
 
-    unsigned int index=0;
+    uint32_t index=0;
     for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
     {
       localMap[index] = *iter;
@@ -438,7 +437,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
         {
           ubo.Write( &uniformMap->propertyPtr->GetFloat(updateBufferIndex),
                      sizeof(float),
-                     dst + sizeof(Vector4) * arrayIndex,
+                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
                      false );
           break;
         }
@@ -446,7 +445,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
         {
           ubo.Write( &uniformMap->propertyPtr->GetVector2(updateBufferIndex),
                      sizeof(Vector2),
-                     dst + sizeof(Vector4) * arrayIndex,
+                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
                      false );
           break;
         }
@@ -454,7 +453,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
         {
           ubo.Write( &uniformMap->propertyPtr->GetVector3(updateBufferIndex),
                      sizeof(Vector3),
-                     dst + sizeof(Vector4) * arrayIndex,
+                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
                      false );
           break;
         }
@@ -462,7 +461,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
         {
           ubo.Write( &uniformMap->propertyPtr->GetVector4(updateBufferIndex),
                      sizeof(Vector4),
-                     dst + sizeof(Vector4) * arrayIndex,
+                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
                      false );
           break;
         }
@@ -470,7 +469,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
         {
           ubo.Write( &uniformMap->propertyPtr->GetMatrix(updateBufferIndex),
                      sizeof(Matrix),
-                     dst + sizeof(Matrix) * arrayIndex,
+                     dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex,
                      false );
           break;
         }
@@ -481,7 +480,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
           {
             ubo.Write( &matrix.AsFloat()[i*3],
                        sizeof(float)*3,
-                       dst + (i * sizeof(Vector4)),
+                       dst + (i * static_cast<uint32_t>(sizeof(Vector4))),
                        false );
           }
 
@@ -579,7 +578,7 @@ void Renderer::SetBlendingOptions( const BlendingOptions& options )
   }
 }
 
-void Renderer::SetBlendingOptions( unsigned int options )
+void Renderer::SetBlendingOptions( uint32_t options )
 {
   if( options != mBlendOptions.GetBitmask() )
   {
@@ -620,22 +619,22 @@ const Vector4& Renderer::GetBlendColor() const
   return Color::TRANSPARENT;
 }
 
-void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+void Renderer::SetIndexedDrawFirstElement( uint32_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
 }
 
-size_t Renderer::GetIndexedDrawFirstElement() const
+uint32_t Renderer::GetIndexedDrawFirstElement() const
 {
   return mIndexedDrawFirstElement;
 }
 
-void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+void Renderer::SetIndexedDrawElementsCount( uint32_t elementsCount )
 {
   mIndexedDrawElementsCount = elementsCount;
 }
 
-size_t Renderer::GetIndexedDrawElementsCount() const
+uint32_t Renderer::GetIndexedDrawElementsCount() const
 {
   return mIndexedDrawElementsCount;
 }

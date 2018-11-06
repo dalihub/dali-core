@@ -220,7 +220,7 @@ public:
    * @param[in] index The property index
    * @return The name of the property at the given index
    * @exception DaliException If index is not valid.
-   *
+   * @note this method only works for custom registered properties
    */
   const std::string& GetPropertyName( Property::Index index ) const;
 

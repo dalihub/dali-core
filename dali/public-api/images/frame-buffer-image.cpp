@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,12 +51,12 @@ FrameBufferImage& FrameBufferImage::operator=( const FrameBufferImage& rhs )
   return *this;
 }
 
-FrameBufferImage FrameBufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, RenderBuffer::Format bufferformat )
+FrameBufferImage FrameBufferImage::New( uint32_t width, uint32_t height, Pixel::Format pixelformat, RenderBuffer::Format bufferformat )
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
-    (0 == width) ? stageSize.width : width,
-    (0 == height) ? stageSize.height : height,
+    (0 == width) ? static_cast<uint32_t>( stageSize.width ) : width,
+    (0 == height) ? static_cast<uint32_t>( stageSize.height ) : height,
     pixelformat,
     bufferformat);
 

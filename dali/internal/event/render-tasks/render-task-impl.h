@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,8 @@ public:
 
   /**
    * Creates a new RenderTask.
-   * @param[in] isSystemLevel Whether the render-task is on the system level task list.
    */
-  static RenderTask* New( bool isSystemLevel );
+  static RenderTask* New();
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
@@ -208,12 +207,12 @@ public:
   /**
    * @copydoc Dali::RenderTask::SetRefreshRate()
    */
-  void SetRefreshRate( unsigned int refreshRate );
+  void SetRefreshRate( uint32_t refreshRate );
 
   /**
    * @copydoc Dali::RenderTask::GetRefreshRate()
    */
-  unsigned int GetRefreshRate() const;
+  uint32_t GetRefreshRate() const;
 
   /**
    * Check if the render-task is hittable. If render task is offscreen, the screen coordinates may be translated.
@@ -228,12 +227,6 @@ public:
    * @return false if the conversion function decides the coordinates are not inside. returns true if there is no conversion function
    */
   bool TranslateCoordinates( Vector2& screenCoords ) const;
-
-  /**
-   * Query whether the RenderTask is on the system level render-task list.
-   * @return true, if on the system level task list, false otherwise.
-   */
-  bool IsSystemLevel() const;
 
   /**
    * @copydoc Dali::RenderTask::WorldToViewport()
@@ -266,46 +259,6 @@ public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   void DiscardSceneObject();
 
 public: // Implementation of Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
@@ -378,9 +331,8 @@ protected:
 
   /**
    * Construct a new RenderTask.
-   * @param[in] isSystemLevel Whether the RenderTask is on the system level task list.
    */
-  RenderTask( bool isSystemLevel );
+  RenderTask();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -470,9 +422,9 @@ private:
   Vector2 mViewportPosition; ///< The cached viewport position
   Vector2 mViewportSize;     ///< The cached viewport size
 
-  unsigned int mRefreshRate; ///< Determines how often the task is processed.
+  uint32_t mRefreshRate; ///< Determines how often the task is processed.
 
-  unsigned int mRefreshOnceCounter;
+  uint32_t mRefreshOnceCounter;
 
   FrameBufferImagePtr mFrameBufferImage;  ///< Optional off-screen render target.
   FrameBufferPtr  mFrameBuffer;
@@ -484,7 +436,6 @@ private:
   bool mInputEnabled  : 1; ///< True if the render-task should be considered for input handling.
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode      : 1; ///< True if the render-task's actors should be culled
-  bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
   bool mRequiresSync  : 1; ///< True if the GL sync is required to track the render of.
 
   //Signals

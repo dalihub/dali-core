@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/object/property-index-ranges.h>
@@ -168,7 +171,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default minimum is '1'.
    */
-  void SetMinimumTouchesRequired(unsigned int minimum);
+  void SetMinimumTouchesRequired(uint32_t minimum);
 
   /**
    * @brief This is the maximum number of touches required for the pan gesture to be detected.
@@ -178,7 +181,7 @@ public: // Setters
    * @pre The gesture detector has been initialized.
    * @note The default maximum is '1'.
    */
-  void SetMaximumTouchesRequired(unsigned int maximum);
+  void SetMaximumTouchesRequired(uint32_t maximum);
 
 public: // Getters
 
@@ -189,7 +192,7 @@ public: // Getters
    * @return The minimum touches required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMinimumTouchesRequired() const;
+  uint32_t GetMinimumTouchesRequired() const;
 
   /**
    * @brief Retrieves the maximum number of touches required for the pan gesture to be detected.
@@ -198,7 +201,7 @@ public: // Getters
    * @return The maximum touches required
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetMaximumTouchesRequired() const;
+  uint32_t GetMaximumTouchesRequired() const;
 
 public: // Directional Panning
 

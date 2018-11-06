@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,17 +79,17 @@ void Animation::SetLooping(bool looping)
   GetImplementation(*this).SetLooping(looping);
 }
 
-void Animation::SetLoopCount(int count)
+void Animation::SetLoopCount(int32_t count)
 {
   GetImplementation(*this).SetLoopCount(count);
 }
 
-int Animation::GetLoopCount()
+int32_t Animation::GetLoopCount()
 {
   return GetImplementation(*this).GetLoopCount();
 }
 
-int Animation::GetCurrentLoop()
+int32_t Animation::GetCurrentLoop()
 {
   return GetImplementation(*this).GetCurrentLoop();
 }

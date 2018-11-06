@@ -71,7 +71,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] integerValue An integer value
    */
-  Value( int integerValue );
+  Value( int32_t integerValue );
 
   /**
    * @brief Creates a float property value.
@@ -127,7 +127,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vectorValue A vector of 4 integer values
    */
-  Value( const Rect<int>& vectorValue );
+  Value( const Rect<int32_t>& vectorValue );
 
   /**
    * @brief Creates an orientation property value.
@@ -270,7 +270,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to int.
    */
-  bool Get( int& integerValue ) const;
+  bool Get( int32_t& integerValue ) const;
 
   /**
    * @brief Retrieves an integer rectangle.
@@ -280,7 +280,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Rect<int>.
    */
-  bool Get( Rect<int>& rect ) const;
+  bool Get( Rect<int32_t>& rect ) const;
 
   /**
    * @brief Retrieves a vector value.

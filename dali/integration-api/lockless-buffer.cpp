@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ namespace Dali
 namespace Integration
 {
 
-LocklessBuffer::LocklessBuffer( size_t size )
+LocklessBuffer::LocklessBuffer( uint32_t size )
 : mState( R0W1 ),
   mSize( size )
 {
   // allocate memory to speed up operation
-  mBuffer[0] = new unsigned char[size];
-  mBuffer[1] = new unsigned char[size];
+  mBuffer[0] = new uint8_t[size];
+  mBuffer[1] = new uint8_t[size];
 
   memset (mBuffer[0], 0, size );
   memset (mBuffer[1], 0, size );
@@ -45,7 +45,7 @@ LocklessBuffer::~LocklessBuffer()
   delete[] mBuffer[1];
 }
 
-void LocklessBuffer::Write( const unsigned char *src, size_t size )
+void LocklessBuffer::Write( const uint8_t *src, uint32_t size )
 {
   DALI_ASSERT_ALWAYS( size <= mSize );
 
@@ -66,7 +66,7 @@ void LocklessBuffer::Write( const unsigned char *src, size_t size )
   (void)checkState; // Avoid unused variable warning
 }
 
-const unsigned char* LocklessBuffer::Read()
+const uint8_t* LocklessBuffer::Read()
 {
   // current state (only to avoid multiple memory reads with volatile variable)
   BufferState currentState( mState );
@@ -90,7 +90,7 @@ const unsigned char* LocklessBuffer::Read()
   return mBuffer[!currentWriteBuf];
 }
 
-unsigned int LocklessBuffer::GetSize() const
+uint32_t LocklessBuffer::GetSize() const
 {
   return static_cast<unsigned int>(mSize);
 }

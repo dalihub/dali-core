@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
  */
 
 // CLASS HEADER
-#include "pixel-data.h"
-
-// EXTERNAL INLCUDES
-#include <stdlib.h>
+#include <dali/public-api/images/pixel-data.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/pixel-data-impl.h>
@@ -27,12 +24,12 @@
 namespace Dali
 {
 
-PixelData PixelData::New(unsigned char* buffer,
-                         unsigned int bufferSize,
-                         unsigned int width,
-                         unsigned int height,
-                         Pixel::Format pixelFormat,
-                         ReleaseFunction releaseFunction)
+PixelData PixelData::New( uint8_t* buffer,
+                          uint32_t bufferSize,
+                          uint32_t width,
+                          uint32_t height,
+                          Pixel::Format pixelFormat,
+                          ReleaseFunction releaseFunction )
 {
   IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New( buffer, bufferSize, width, height, pixelFormat, releaseFunction );
   return PixelData( internal.Get() );
@@ -62,12 +59,12 @@ PixelData& PixelData::operator=(const PixelData& rhs)
   return *this;
 }
 
-unsigned int PixelData::GetWidth() const
+uint32_t PixelData::GetWidth() const
 {
   return GetImplementation(*this).GetWidth();
 }
 
-unsigned int PixelData::GetHeight() const
+uint32_t PixelData::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
 }

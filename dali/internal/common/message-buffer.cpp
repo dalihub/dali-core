@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,16 +29,16 @@ namespace // unnamed namespace
 {
 
 // Increase capacity by 1.5 when buffer limit reached
-const unsigned int INCREMENT_NUMERATOR   = 3u;
-const unsigned int INCREMENT_DENOMINATOR = 2u;
+const uint32_t INCREMENT_NUMERATOR   = 3u;
+const uint32_t INCREMENT_DENOMINATOR = 2u;
 
-const unsigned int MESSAGE_SIZE_FIELD = 1u; // Size required to mark the message size
-const unsigned int MESSAGE_END_FIELD  = 1u; // Size required to mark the end of messages
+const uint32_t MESSAGE_SIZE_FIELD = 1u; // Size required to mark the message size
+const uint32_t MESSAGE_END_FIELD  = 1u; // Size required to mark the end of messages
 
-const unsigned int MESSAGE_SIZE_PLUS_END_FIELD = MESSAGE_SIZE_FIELD + MESSAGE_END_FIELD;
+const uint32_t MESSAGE_SIZE_PLUS_END_FIELD = MESSAGE_SIZE_FIELD + MESSAGE_END_FIELD;
 
-const unsigned int MAX_DIVISION_BY_WORD_REMAINDER = sizeof(Dali::Internal::MessageBuffer::WordType) - 1u; // For word alignment on ARM
-const unsigned int WORD_SIZE = sizeof(Dali::Internal::MessageBuffer::WordType);
+const std::size_t MAX_DIVISION_BY_WORD_REMAINDER = sizeof(Dali::Internal::MessageBuffer::WordType) - 1u; // For word alignment on ARM
+const std::size_t WORD_SIZE = sizeof(Dali::Internal::MessageBuffer::WordType);
 
 } // unnamed namespace
 
@@ -62,7 +62,7 @@ MessageBuffer::~MessageBuffer()
   free( mData );
 }
 
-unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
+uint32_t* MessageBuffer::ReserveMessageSlot( std::size_t size )
 {
   DALI_ASSERT_DEBUG( 0 != size );
 
@@ -97,7 +97,7 @@ unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
   // End marker
   *mNextSlot = 0;
 
-  return reinterpret_cast<unsigned int*>(slot);
+  return reinterpret_cast<uint32_t*>(slot);
 }
 
 std::size_t MessageBuffer::GetCapacity() const

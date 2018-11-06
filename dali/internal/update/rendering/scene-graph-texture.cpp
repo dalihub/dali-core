@@ -287,8 +287,8 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
   mNativeImage( nativeImageInterface ),
   mSampler(),
   mFormat( Pixel::RGBA8888 ),
-  mWidth( uint32_t(nativeImageInterface->GetWidth()) ),
-  mHeight( uint32_t(nativeImageInterface->GetHeight()) ),
+  mWidth( static_cast<uint16_t >( nativeImageInterface->GetWidth() ) ), // ignoring overflow, not happening in practice
+  mHeight( static_cast<uint16_t >( nativeImageInterface->GetHeight() ) ), // ignoring overflow, not happening in practice
   mMaxMipMapLevel( 0 ),
   mType( TextureType::TEXTURE_2D ),
   mHasAlpha( nativeImageInterface->RequiresBlending() ),

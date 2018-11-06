@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,13 +66,13 @@ void SystemOverlay::Remove( Actor& actor )
   }
 }
 
+void SystemOverlay::SetOverlayRenderTasks(RenderTaskList& taskList)
+{
+  mOverlayRenderTaskList = &taskList;
+}
+
 RenderTaskList& SystemOverlay::GetOverlayRenderTasks()
 {
-  if ( !mOverlayRenderTaskList )
-  {
-    mOverlayRenderTaskList = RenderTaskList::New( mEventThreadServices, *this, true/*system-overlay*/ );
-  }
-
   return *mOverlayRenderTaskList;
 }
 
@@ -119,7 +119,7 @@ SystemOverlay::SystemOverlay( EventThreadServices& eventThreadServices )
 void SystemOverlay::Initialize()
 {
   // Create the ordered list of layers
-  mLayerList = LayerList::New( mEventThreadServices.GetUpdateManager(), true/*system layers*/ );
+  mLayerList = LayerList::New( mEventThreadServices.GetUpdateManager() );
 }
 
 void SystemOverlay::CreateRootLayer()
@@ -127,7 +127,7 @@ void SystemOverlay::CreateRootLayer()
   // Lazy initialization; SystemOverlay may never be used
   if ( !mRootLayer )
   {
-    mRootLayer = Layer::NewRoot( *mLayerList, mEventThreadServices.GetUpdateManager(), true/*system layer*/ );
+    mRootLayer = Layer::NewRoot( *mLayerList, mEventThreadServices.GetUpdateManager() );
     mRootLayer->SetName("SystemOverlayRoot");
     mRootLayer->SetSize( mSize.width, mSize.height );
   }

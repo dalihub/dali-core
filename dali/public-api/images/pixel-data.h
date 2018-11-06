@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint8_t, uint32_t
+
+// INTERNAL INCLUDES
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/base-handle.h>
 
@@ -62,10 +66,10 @@ public:
    * @param[in] releaseFunction The function used to release the memory
    * @return A handle to the PixelData
    */
-  static PixelData New( unsigned char* buffer,
-                        unsigned int bufferSize,
-                        unsigned int width,
-                        unsigned int height,
+  static PixelData New( uint8_t* buffer,
+                        uint32_t bufferSize,
+                        uint32_t width,
+                        uint32_t height,
                         Pixel::Format pixelFormat,
                         ReleaseFunction releaseFunction);
 
@@ -107,7 +111,7 @@ public:
    * @SINCE_1_1.43
    * @return The width of the buffer in pixels
    */
-  unsigned int GetWidth() const;
+  uint32_t GetWidth() const;
 
   /**
    * @brief Gets the height of the buffer in pixels.
@@ -115,7 +119,7 @@ public:
    * @SINCE_1_1.43
    * @return The height of the buffer in pixels
    */
-  unsigned int GetHeight() const;
+  uint32_t GetHeight() const;
 
   /**
    * @brief Gets the pixel format.

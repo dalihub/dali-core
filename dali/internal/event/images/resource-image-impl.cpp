@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,26 +37,6 @@ namespace Dali
 
 namespace Internal
 {
-
-namespace
-{
-
-// Signals
-
-const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
-
-
-BaseHandle CreateImage()
-{
-  ImagePtr image = ResourceImage::New();
-  return Dali::Image(image.Get());
-}
-
-TypeRegistration mType( typeid( Dali::ResourceImage ), typeid( Dali::Image ), CreateImage );
-
-Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED, &ResourceImage::DoConnectSignal );
-
-}
 
 ResourceImage::ResourceImage()
 : Image(),
@@ -107,26 +87,6 @@ ResourceImage::~ResourceImage()
 {
 }
 
-bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  bool connected( true );
-  DALI_ASSERT_DEBUG( dynamic_cast<ResourceImage*>( object ) && "Failed to downcast from BaseObject to ResourceImage.\n" );
-  ResourceImage* image = static_cast<ResourceImage*>(object);
-
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_LOADING_FINISHED ) )
-  {
-    image->LoadingFinishedSignal().Connect( tracker, functor );
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
-  }
-
-  return connected;
-}
-
-
 const ImageAttributes& ResourceImage::GetAttributes() const
 {
   return mAttributes;
@@ -159,7 +119,7 @@ void ResourceImage::Reload()
     mTexture = Texture::New( Dali::TextureType::TEXTURE_2D, format, width, height );
 
     //Upload data to the texture
-    size_t bufferSize = bitmap->GetBufferSize();
+    uint32_t bufferSize = bitmap->GetBufferSize();
     PixelDataPtr pixelData = PixelData::New( bitmap->GetBufferOwnership(), bufferSize, width, height, format,
                                              static_cast< Dali::PixelData::ReleaseFunction >( bitmap->GetReleaseFunction() ) );
     mTexture->Upload( pixelData );
@@ -201,7 +161,7 @@ unsigned int ResourceImage::GetHeight() const
 
 Vector2 ResourceImage::GetNaturalSize() const
 {
-  return Vector2(mWidth, mHeight);
+  return Vector2( static_cast<float>( mWidth ), static_cast<float>( mHeight ) );
 }
 
 

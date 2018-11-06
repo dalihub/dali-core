@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -155,7 +156,7 @@ public:
    * @SINCE_1_0.0
    * @return The number of properties
    */
-  unsigned int GetPropertyCount() const;
+  uint32_t GetPropertyCount() const;
 
   /**
    * @brief Queries the name of a property.
@@ -390,7 +391,7 @@ public:
    * @param[in] tag The tag of the constraints which will be removed
    * @pre The Object has been initialized.
    */
-  void RemoveConstraints( unsigned int tag );
+  void RemoveConstraints( uint32_t tag );
 };
 
 /**

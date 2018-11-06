@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ struct AnimationFinishCheck
   {
   }
 
-  void operator()(Animation& animation)
+  void operator()()
   {
     mSignalReceived = true;
   }
@@ -366,15 +366,42 @@ int UtcDaliBaseHandleDoAction(void)
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
-  animation.FinishedSignal().Connect(&application, finishCheck);
+  // use the handle API to connect the signal
+  animation.ConnectSignal( &application, "finished", finishCheck );
+  // just for coverage connect to non-existant signal as well
+  animation.ConnectSignal( &application, "foo", finishCheck );
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
 
   application.SendNotification();
-  application.Render(static_cast<unsigned int>(newDurationSeconds * 1000.0f) + 1u/*just beyond the animation duration*/);
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) /* half of time */);
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  // pause
+  animationObject.DoAction("pause", attributes);
+  application.SendNotification();
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u/*just beyond the animation duration*/);
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
+
+  // continue
+  animationObject.DoAction("play", attributes);
+  application.SendNotification();
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) + 1u/*just beyond the animation duration*/);
 
   // We expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  // play again
+  signalReceived = false;
+  animationObject.DoAction("play", attributes);
+  DALI_TEST_EQUALS(animation.GetCurrentProgress(), 0.f, TEST_LOCATION);
+  application.SendNotification();
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 500.0f) /* half of time */);
+  animationObject.DoAction("stop", attributes);
+  application.SendNotification();
+  application.Render(static_cast<uint32_t>(newDurationSeconds * 1000.0f) /* full time */);
+  DALI_TEST_EQUALS( signalReceived, false, TEST_LOCATION );
 
   // Check the new animation duration is 2 seconds
   DALI_TEST_EQUALS(animation.GetDuration(), newDurationSeconds, TEST_LOCATION);

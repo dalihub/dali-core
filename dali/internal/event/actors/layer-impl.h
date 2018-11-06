@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,10 +70,9 @@ public:
    * Create a new root layer; this is typically owned by the stage.
    * @param[in] layerList The layer will be added to this ordered list.
    * @param[in] manager The update manager to install a root node with.
-   * @param[in] systemLevel True if using the SystemOverlay API; see Integration::GetSystemOverlay() for more details.
    * @return A smart-pointer to the newly allocated Actor.
    */
-  static LayerPtr NewRoot( LayerList& layerList, SceneGraph::UpdateManager& manager, bool systemLevel );
+  static LayerPtr NewRoot( LayerList& layerList, SceneGraph::UpdateManager& manager );
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
@@ -212,45 +211,6 @@ public:
   static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 public: // Default property extensions from Object
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()

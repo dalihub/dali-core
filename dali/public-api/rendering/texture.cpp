@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -26,7 +26,7 @@
 namespace Dali
 {
 
-Texture Texture::New( TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
+Texture Texture::New( TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height )
 {
   Internal::TexturePtr texture = Internal::Texture::New(type, format, width, height );
   return Texture( texture.Get() );
@@ -69,9 +69,9 @@ bool Texture::Upload( PixelData pixelData )
 }
 
 bool Texture::Upload( PixelData pixelData,
-               unsigned int layer, unsigned int mipmap,
-               unsigned int xOffset, unsigned int yOffset,
-               unsigned int width, unsigned int height )
+               uint32_t layer, uint32_t mipmap,
+               uint32_t xOffset, uint32_t yOffset,
+               uint32_t width, uint32_t height )
 {
   Internal::PixelData& internalPixelData = GetImplementation( pixelData );
   return GetImplementation(*this).Upload( &internalPixelData, layer, mipmap, xOffset, yOffset, width, height );
@@ -82,12 +82,12 @@ void Texture::GenerateMipmaps()
   return GetImplementation(*this).GenerateMipmaps();
 }
 
-unsigned int Texture::GetWidth() const
+uint32_t Texture::GetWidth() const
 {
   return GetImplementation(*this).GetWidth();
 }
 
-unsigned int Texture::GetHeight() const
+uint32_t Texture::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
 }

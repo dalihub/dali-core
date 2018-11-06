@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,27 +59,27 @@ public:
   /**
    * @copydoc Dali::TextureSet::SetTexture()
    */
-  void SetTexture( size_t index, TexturePtr texture );
+  void SetTexture( uint32_t index, TexturePtr texture );
 
   /**
    * @copydoc Dali::TextureSet::GetTexture()
    */
-  Texture* GetTexture( size_t index ) const;
+  Texture* GetTexture( uint32_t index ) const;
 
   /**
    * @copydoc Dali::TextureSet::SetSampler()
    */
-  void SetSampler( size_t index, SamplerPtr sampler );
+  void SetSampler( uint32_t index, SamplerPtr sampler );
 
   /**
    * @copydoc Dali::TextureSet::GetSampler()
    */
-  Sampler* GetSampler( size_t index ) const;
+  Sampler* GetSampler( uint32_t index ) const;
 
   /**
    * @copydoc Dali::TextureSet::GetTextureCount()
    */
-  size_t GetTextureCount() const;
+  uint32_t GetTextureCount() const;
 
  /**
    * @brief Get the TextureSet scene object

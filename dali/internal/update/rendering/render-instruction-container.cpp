@@ -39,7 +39,7 @@ RenderInstructionContainer::~RenderInstructionContainer()
 {
 }
 
-void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, size_t capacityRequired )
+void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired )
 {
   // Only re-allocate if necessary.
   if( mInstructions.size() < capacityRequired )
@@ -49,12 +49,12 @@ void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, size_
   mInstructions.clear();
 }
 
-size_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
+uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
 {
-  return mInstructions.size();
+  return static_cast<uint32_t>(mInstructions.size());
 }
 
-RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, size_t index )
+RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index )
 {
   DALI_ASSERT_DEBUG( index < mInstructions.size() );
 

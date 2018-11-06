@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 namespace
 {
 
-const int INVALID_CALLBACK_INDEX = -1;
+const int32_t INVALID_CALLBACK_INDEX = -1;
 
 } // unnamed namespace
 
@@ -120,7 +120,7 @@ void BaseSignal::OnConnect( CallbackBase* callback )
 {
   DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Connect()" );
 
-  int index = FindCallback( callback );
+  int32_t index = FindCallback( callback );
 
   // Don't double-connect the same callback
   if( INVALID_CALLBACK_INDEX == index )
@@ -141,7 +141,7 @@ void BaseSignal::OnDisconnect( CallbackBase* callback )
 {
   DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Disconnect()" );
 
-  int index = FindCallback( callback );
+  int32_t index = FindCallback( callback );
 
   if( index > INVALID_CALLBACK_INDEX )
   {
@@ -157,7 +157,7 @@ void BaseSignal::OnConnect( ConnectionTrackerInterface* tracker, CallbackBase* c
   DALI_ASSERT_ALWAYS( NULL != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Connect()" );
   DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Connect()" );
 
-  int index = FindCallback( callback );
+  int32_t index = FindCallback( callback );
 
   // Don't double-connect the same callback
   if( INVALID_CALLBACK_INDEX == index )
@@ -182,7 +182,7 @@ void BaseSignal::OnDisconnect( ConnectionTrackerInterface* tracker, CallbackBase
   DALI_ASSERT_ALWAYS( NULL != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()" );
   DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Disconnect()" );
 
-  int index = FindCallback( callback );
+  int32_t index = FindCallback( callback );
 
   if( index > INVALID_CALLBACK_INDEX )
   {
@@ -239,23 +239,22 @@ CallbackBase* BaseSignal::GetCallback( std::size_t connectionIndex ) const
   return callback;
 }
 
-int BaseSignal::FindCallback( CallbackBase* callback )
+int32_t BaseSignal::FindCallback( CallbackBase* callback )
 {
-  int index( INVALID_CALLBACK_INDEX );
+  int32_t index( INVALID_CALLBACK_INDEX );
 
   // A signal can have multiple slots connected to it.
   // We need to search for the slot which has the same call back function (if it's static)
   // Or the same object / member function (for non-static)
-  const std::size_t count( mSignalConnections.Count() );
-  for( std::size_t i=0; i < count; ++i )
+  const std::size_t count = mSignalConnections.Count();
+  for( std::size_t i = 0; i < count; ++i )
   {
     const CallbackBase* connectionCallback = GetCallback( i );
 
     // Note that values are set to NULL in DeleteConnection
-    if( connectionCallback &&
-        ( *connectionCallback == *callback ) )
+    if( connectionCallback && ( *connectionCallback == *callback ) )
     {
-      index = i;
+      index = static_cast<int>( i ); // only 2,147,483,647 connections supported, no error check
       break;
     }
   }
