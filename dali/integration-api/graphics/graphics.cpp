@@ -56,7 +56,6 @@ Surface::~Surface()
   }
 }
 
-
 using Dali::Integration::Graphics::SurfaceFactory;
 
 Graphics::Graphics( const GraphicsCreateInfo& info )
@@ -72,6 +71,10 @@ Graphics::Graphics( const GraphicsCreateInfo& info )
 
 Graphics::~Graphics() = default;
 
+
+void Graphics::Initialize( Internal::Adaptor::EnvironmentOptions& envOptions )
+{
+}
 
 void Graphics::Create()
 {
@@ -96,6 +99,10 @@ std::unique_ptr<Surface> Graphics::CreateSurface( SurfaceFactory& surfaceFactory
   return std::unique_ptr<Surface>( new Surface( mGraphicsImpl.get(), retval ) );
 }
 
+void Graphics::Destroy()
+{
+}
+
 void Graphics::Pause()
 {
   mGraphicsImpl->GetController().Pause();
@@ -106,27 +113,23 @@ void Graphics::Resume()
   mGraphicsImpl->GetController().Resume();
 }
 
-void Graphics::PreRender(Dali::Graphics::FBID framebufferId)
+void Graphics::PreRender()
 {
-  assert(framebufferId != 0 && "Invalid FBID!");
-  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
+  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( 0u );
   swapchain->AcquireNextFramebuffer();
+}
+
+void Graphics::PostRender()
+{
+  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( 0u );
+  swapchain->Present();
+
+  mGraphicsImpl->CollectGarbage();
 }
 
 Dali::Graphics::API::Controller& Graphics::GetController()
 {
   return mGraphicsImpl->GetController();
-}
-
-/*
- * Postrender
- */
-void Graphics::PostRender(Dali::Graphics::FBID framebufferId)
-{
-  auto swapchain = mGraphicsImpl->GetSwapchainForFBID( framebufferId );
-  swapchain->Present();
-
-  mGraphicsImpl->CollectGarbage();
 }
 
 void Graphics::SurfaceResized( unsigned int width, unsigned int height )
