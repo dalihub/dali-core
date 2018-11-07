@@ -52,7 +52,10 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   info.surfaceWidth = 480;
   info.surfaceHeight = 800;
   info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
-  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
+  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(
+    new Dali::Integration::Graphics::Graphics( info,
+                                               Integration::DepthBufferAvailable::FALSE,
+                                               Integration::StencilBufferAvailable::FALSE));
 
   Initialize();
 }
