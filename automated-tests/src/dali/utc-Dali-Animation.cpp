@@ -2073,7 +2073,7 @@ int UtcDaliAnimationPlayP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationPlayOffStageP(void)
+int UtcDaliAnimationPlayOffStageDiscardP(void)
 {
   // Test that an animation can be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
@@ -2084,7 +2084,7 @@ int UtcDaliAnimationPlayOffStageP(void)
   Actor actor = Actor::New();
   Vector3 basePosition(Vector3::ZERO);
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), basePosition, TEST_LOCATION );
-  // Not added to the stage!
+  // Not added to the stage yet!
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -2106,7 +2106,7 @@ int UtcDaliAnimationPlayOffStageP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO/*off-stage*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(20,20,20), TEST_LOCATION );
 
   // Add to the stage
   Stage::GetCurrent().Add(actor);
@@ -2117,8 +2117,7 @@ int UtcDaliAnimationPlayOffStageP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  Vector3 expectedPosition(basePosition + (targetPosition - basePosition)*0.4f);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), expectedPosition/*on-stage*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(40,40,40)/*on-stage*/, TEST_LOCATION );
 
   // Remove from the stage
   Stage::GetCurrent().Remove(actor);
@@ -2129,7 +2128,14 @@ int UtcDaliAnimationPlayOffStageP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO/*back to start position*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO/*back to start position as disconnect behaviour is discard*/, TEST_LOCATION );
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
 
   // Add to the stage
   Stage::GetCurrent().Add(actor);
@@ -2140,8 +2146,7 @@ int UtcDaliAnimationPlayOffStageP(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  expectedPosition = Vector3(basePosition + (targetPosition - basePosition)*0.8f);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), expectedPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(80,80,80), TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
@@ -2154,6 +2159,197 @@ int UtcDaliAnimationPlayOffStageP(void)
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
   DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+
+
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayOffStageBakeFinalP(void)
+{
+  // Test that an animation can be played, when the actor is off-stage.
+  // When the actor is added to the stage, it should appear at the current position
+  // i.e. where it would have been anyway, if on-stage from the beginning.
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector3 basePosition(Vector3::ZERO);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), basePosition, TEST_LOCATION );
+  // Not added to the stage!
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(20,20,20), TEST_LOCATION );
+
+  // Add to the stage
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 40% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(40,40,40)/*on-stage*/, TEST_LOCATION );
+
+  // Remove from the stage
+  Stage::GetCurrent().Remove(actor);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 60% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition /*bake final*/, TEST_LOCATION );
+
+  // Add to the stage
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition /*bake final removed the */, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayOffStageBakeP(void)
+{
+  // Test that an animation can be played, when the actor is off-stage.
+  // When the actor is added to the stage, it should appear at the current position
+  // i.e. where it would have been anyway, if on-stage from the beginning.
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector3 basePosition(Vector3::ZERO);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), basePosition, TEST_LOCATION );
+  // Not added to the stage!
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  animation.SetDisconnectAction( Animation::Bake );
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(20,20,20), TEST_LOCATION );
+
+  // Add to the stage
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 40% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(40,40,40)/*on-stage*/, TEST_LOCATION );
+
+  // Remove from the stage
+  Stage::GetCurrent().Remove(actor); // baked here
+
+  application.SendNotification();
+  // this render is a no-op in this case as animator is disabled while off stage
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 60% progress */);
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(40,40,40) /*baked value*/, TEST_LOCATION );
+
+  // Add back to the stage
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /* animation restarted at 40,40,40 + 80%*60 */, TEST_LOCATION );
+  application.Render(static_cast<unsigned int>(0.0f) );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /*baked value*/, TEST_LOCATION );
+  application.Render(static_cast<unsigned int>(0.0f) );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /*baked value*/, TEST_LOCATION );
+
+  // Remove from the stage
+  Stage::GetCurrent().Remove(actor); // baked here
+
+  application.SendNotification();
+  // this render is a no-op in this case as animator is disabled while off stage
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 100% progress */);
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /*baked value*/, TEST_LOCATION );
+  application.Render(static_cast<unsigned int>(0.0f) );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /*baked value*/, TEST_LOCATION );
+  application.Render(static_cast<unsigned int>(0.0f) );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) /*baked value*/, TEST_LOCATION );
+
+  // Add back to the stage
+  Stage::GetCurrent().Add(actor);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(88,88,88) , TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+
   application.Render(0);
   DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
   END_TEST;
@@ -6699,7 +6895,7 @@ int UtcDaliAnimationAnimateToActorParentOriginP(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN), targetParentOrigin );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6722,7 +6918,7 @@ int UtcDaliAnimationAnimateToActorParentOriginXN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_X), targetX );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6745,7 +6941,7 @@ int UtcDaliAnimationAnimateToActorParentOriginYN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Y), targetY );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6768,7 +6964,7 @@ int UtcDaliAnimationAnimateToActorParentOriginZN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Z), targetZ );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6789,7 +6985,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT), targetAnchorPoint);
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6812,7 +7008,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointXN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_X), targetX );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6835,7 +7031,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointYN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Y), targetY );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }
@@ -6858,7 +7054,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointZN(void)
   DALI_TEST_ASSERTION(
   {
     animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Z), targetZ );
-  }, "IsPropertyAnimatable( index )" );
+  }, "Property is not animatable" );
 
   END_TEST;
 }

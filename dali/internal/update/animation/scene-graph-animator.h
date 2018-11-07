@@ -94,7 +94,7 @@ public:
     mLoopCount(1),
     mAlphaFunction(AlphaFunction::DEFAULT),
     mDisconnectAction(Dali::Animation::BakeFinal),
-    mActive(false),
+    mAnimationPlaying(false),
     mEnabled(true),
     mConnectedToSceneGraph(false),
     mAutoReverseEnabled( false )
@@ -376,16 +376,7 @@ public:
    */
   void SetActive( bool active )
   {
-    mActive = active;
-  }
-
-  /**
-   * Retrieve whether the animator has been set to active or not.
-   * @return The active state.
-   */
-  bool GetActive() const
-  {
-    return mActive;
+    mAnimationPlaying = active;
   }
 
   /**
@@ -447,7 +438,7 @@ protected:
   AlphaFunction mAlphaFunction;
 
   Dali::Animation::EndAction mDisconnectAction;     ///< EndAction to apply when target object gets disconnected from the stage.
-  bool mActive:1;                                   ///< Animator is "active" while it's running.
+  bool mAnimationPlaying:1;                         ///< whether disconnect has been applied while it's running.
   bool mEnabled:1;                                  ///< Animator is "enabled" while its target object is valid and on the stage.
   bool mConnectedToSceneGraph:1;                    ///< True if ConnectToSceneGraph() has been called in update-thread.
   bool mAutoReverseEnabled:1;
@@ -525,13 +516,12 @@ public:
   virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
   {
     // If we are active, then bake the value if required
-    if ( mActive && mDisconnectAction != Dali::Animation::Discard )
+    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
       Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
     }
 
-    mActive = false;
     mEnabled = false;
   }
 
@@ -685,13 +675,12 @@ public:
   virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
   {
     // If we are active, then bake the value if required
-    if ( mActive && mDisconnectAction != Dali::Animation::Discard )
+    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
       Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
     }
 
-    mActive = false;
     mEnabled = false;
   }
 
@@ -840,7 +829,8 @@ struct AnimateByInteger : public AnimatorFunctionBase
   using AnimatorFunctionBase::operator();
   float operator()(float alpha, const int32_t& property)
   {
-    return truncf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha + 0.5f );
+    // integers need to be correctly rounded
+    return roundf(static_cast<float>( property ) + static_cast<float>( mRelative ) * alpha );
   }
 
   int32_t mRelative;
@@ -856,7 +846,8 @@ struct AnimateToInteger : public AnimatorFunctionBase
   using AnimatorFunctionBase::operator();
   float operator()(float alpha, const int32_t& property)
   {
-    return truncf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) + 0.5f);
+    // integers need to be correctly rounded
+    return roundf(static_cast<float>( property ) + (static_cast<float>(mTarget - property) * alpha) );
   }
 
   int32_t mTarget;

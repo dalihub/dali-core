@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PAN_GESTURE_DETECTOR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,11 +59,6 @@ public: // Creation
    * @return A smart-pointer to the newly allocated detector.
    */
   static PanGestureDetectorPtr New();
-
-  /**
-   * Construct a new PanGestureDetector.
-   */
-  PanGestureDetector();
 
 public:
 
@@ -144,12 +139,6 @@ public:
    */
   void EmitPanGestureSignal(Dali::Actor actor, const PanGesture& pan);
 
-  /**
-   * Called by the PanGestureProcessor to set the scene object.
-   * @param[in]  object  The scene object.
-   */
-  void SetSceneObject( const SceneGraph::PanGesture* object );
-
 public: // Signals
 
   /**
@@ -181,6 +170,12 @@ public: // Override Pan Gesture
 protected:
 
   /**
+   * Construct a new PanGestureDetector.
+   * @param sceneObject the scene object
+   */
+  PanGestureDetector( const SceneGraph::PanGesture& sceneObject );
+
+  /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~PanGestureDetector();
@@ -188,10 +183,14 @@ protected:
 private:
 
   // Undefined
-  PanGestureDetector(const PanGestureDetector&);
+  PanGestureDetector() = delete;
+  PanGestureDetector(const PanGestureDetector&) = delete;
+  PanGestureDetector& operator=(const PanGestureDetector& rhs) = delete;
 
-  // Undefined
-  PanGestureDetector& operator=(const PanGestureDetector& rhs);
+  /**
+   * @return the pan gesture scene object
+   */
+  const SceneGraph::PanGesture& GetPanGestureSceneObject() const;
 
   // From GestureDetector
 
@@ -229,16 +228,6 @@ private:
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
-
-  /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
@@ -251,8 +240,6 @@ private:
   unsigned int mMaximumTouches; ///< The maximum number of fingers required to be touching for pan.
 
   AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
-
-  const SceneGraph::PanGesture* mSceneObject; ///< Not owned
 
 };
 

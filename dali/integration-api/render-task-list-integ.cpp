@@ -40,7 +40,7 @@ Dali::RenderTaskList New()
 
 Dali::RenderTask CreateTask( Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor)
 {
-  return GetImplementation(taskList).CreateTask( &GetImplementation( sourceActor), &GetImplementation(cameraActor) );
+  return RenderTask( GetImplementation(taskList).CreateTask( &GetImplementation( sourceActor), &GetImplementation(cameraActor) ).Get() );
 }
 
 } // namespace RenderTaskList

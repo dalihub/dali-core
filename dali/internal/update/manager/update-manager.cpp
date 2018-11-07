@@ -105,22 +105,6 @@ namespace SceneGraph
 namespace
 {
 /**
- * Helper to reset animate-able objects to base values
- * @param container to iterate over
- * @param updateBufferIndex to use
- */
-template< class T >
-inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex updateBufferIndex )
-{
-  // Reset animatable properties to base values
-  // use reference to avoid extra copies of the iterator
-  for( auto&& iter : container )
-  {
-    iter->ResetToBaseValues( updateBufferIndex );
-  }
-}
-
-/**
  * Helper to Erase an object from OwnerContainer using discard queue
  * @param container to remove from
  * @param object to remove
@@ -433,10 +417,10 @@ void UpdateManager::AddCamera( OwnerPointer< Camera >& camera )
   mImpl->cameras.PushBack( camera.Release() ); // takes ownership
 }
 
-void UpdateManager::RemoveCamera( const Camera* camera )
+void UpdateManager::RemoveCamera( Camera* camera )
 {
   // Find the camera and destroy it
-  EraseUsingDiscardQueue( mImpl->cameras, const_cast<Camera*>( camera ), mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  EraseUsingDiscardQueue( mImpl->cameras, camera, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::AddObject( OwnerPointer<PropertyOwner>& object )

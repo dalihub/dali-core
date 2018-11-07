@@ -168,9 +168,9 @@ public: // Data
   /**
    * @brief The value of this property used to read/write by the event thread.
    *
-   * If a component index, then refers to the value in the PropertyMetatdata of the base property
+   * If this PropertyMetadata is for property component, then refers to the value in the PropertyMetadata of the base property
    * to ensure the components are kept in sync with the overall value on the event thread.
-   * Otherwise, this just refers to the storedValue.
+   * Otherwise, this refers to mStoredValue.
    */
   Property::Value& value;
 
@@ -181,7 +181,7 @@ public: // Data
 
 private:
 
-  Property::Value mStoredValue;                         ///< The stored property value used to read/write by the event thread
+  Property::Value mStoredValue;                         ///< The cached property value used to read/write by the event thread
   const SceneGraph::PropertyBase* mSceneGraphProperty;  ///< A pointer to a scene-graph property; should not be modified from actor-thread
   bool mWritable:1;                                     ///< Whether the property is writable
 };

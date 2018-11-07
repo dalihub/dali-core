@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/internal/event/events/long-press-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -129,10 +129,10 @@ private:
   LongPressGestureDetectorContainer mGestureDetectors;
 
   GestureDetectorContainer mCurrentEmitters;
-  Dali::RenderTask mCurrentRenderTask;
+  RenderTaskPtr mCurrentRenderTask;
 
-  unsigned int mMinTouchesRequired;
-  unsigned int mMaxTouchesRequired;
+  uint32_t mMinTouchesRequired;
+  uint32_t mMaxTouchesRequired;
 
   const Integration::LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
 };

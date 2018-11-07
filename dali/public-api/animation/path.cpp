@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,12 +82,12 @@ void Path::Sample( float progress, Vector3& position, Vector3& tangent ) const
 
 Vector3& Path::GetPoint( size_t index )
 {
-  return GetImplementation(*this).GetPoint(index);
+  return GetImplementation(*this).GetPoint( static_cast<uint32_t>( index ) );
 }
 
 Vector3& Path::GetControlPoint( size_t index )
 {
-  return GetImplementation(*this).GetControlPoint(index);
+  return GetImplementation(*this).GetControlPoint( static_cast<uint32_t>( index ) );
 }
 
 size_t Path::GetPointCount() const

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
 
     case Property::RECTANGLE:
     {
-      Rect<int> convertedValue;
+      Rect<int32_t> convertedValue;
       if( propertyValue.Get( convertedValue ) )
       {
         value = convertedValue;
@@ -126,7 +126,7 @@ void PropertyMetadata::SetPropertyValue( const Property::Value& propertyValue )
 
     case Property::INTEGER:
     {
-      int convertedValue;
+      int32_t convertedValue;
       if( propertyValue.Get( convertedValue ) )
       {
         value = convertedValue;
