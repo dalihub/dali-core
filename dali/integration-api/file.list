@@ -62,6 +62,7 @@ graphics_integration_src_files = \
 
 graphics_integration_header_files = \
   $(platform_abstraction_src_dir)/graphics/graphics.h \
+  $(platform_abstraction_src_dir)/graphics/graphics-interface.h \
   $(platform_abstraction_src_dir)/graphics/surface-factory.h
 
 graphics_vulkan_integration_header_files = \

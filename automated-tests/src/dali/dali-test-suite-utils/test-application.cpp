@@ -54,7 +54,11 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   info.surfaceWidth = 480;
   info.surfaceHeight = 800;
   info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
-  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
+  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(
+    new Dali::Integration::Graphics::Graphics( info,
+                                               Integration::DepthBufferAvailable::FALSE,
+                                               Integration::StencilBufferAvailable::FALSE));
+
   Initialize();
 }
 
@@ -69,8 +73,8 @@ void TestApplication::Initialize()
                                         mGestureManager,
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,
-                                        Integration::DepthBufferAvailable::TRUE,
-                                        Integration::StencilBufferAvailable::TRUE );
+                                        Integration::DepthBufferAvailable::FALSE,
+                                        Integration::StencilBufferAvailable::FALSE );
 
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
   mCore->SetDpi( mDpi.x, mDpi.y );
