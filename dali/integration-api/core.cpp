@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/core-impl.h>
 
@@ -33,7 +34,7 @@ namespace Integration
 
 Core* Core::New( RenderController& renderController,
                  PlatformAbstraction& platformAbstraction,
-                 Graphics::Graphics& graphics,
+                 Graphics::GraphicsInterface& graphics,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
                  RenderToFrameBuffer renderToFboEnabled,
@@ -43,7 +44,7 @@ Core* Core::New( RenderController& renderController,
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
                                         platformAbstraction,
-                                        graphics,
+                                        static_cast<Integration::Graphics::Graphics&>(graphics),
                                         gestureManager,
                                         policy,
                                         renderToFboEnabled,
@@ -93,7 +94,7 @@ uint32_t Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update( 
+void Core::Update(
   float elapsedSeconds,
   uint32_t lastVSyncTimeMilliseconds,
   uint32_t nextVSyncTimeMilliseconds,

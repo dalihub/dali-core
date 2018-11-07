@@ -18,6 +18,9 @@
  *
  */
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/graphics/graphics-interface.h>
+
 // EXTERNAL INCLUDES
 #include <memory>
 
@@ -97,16 +100,16 @@ struct GraphicsCreateInfo
 };
 
 /**
- *
- * Graphics class
- *
+ * Graphics implementation class
  */
-class EXPORT_API Graphics final
+class EXPORT_API Graphics final : public GraphicsInterface
 {
 public:
 
   Graphics( const GraphicsCreateInfo& info );
   ~Graphics();
+
+  void Initialize( Internal::Adaptor::EnvironmentOptions& envOptions ) override;
 
   /**
    *
@@ -121,27 +124,29 @@ public:
    *
    * @note This should be called from the render thread
    */
-  void Create();
+  void Create() override;
+
+  void Destroy() override;
 
   /**
    * Lifecycle event for pausing application
    */
-  void Pause();
+  void Pause() override;
 
   /**
    * Lifecycle event for resuming application
    */
-  void Resume();
+  void Resume() override;
 
   /**
    * Prerender
    */
-  void PreRender( Dali::Graphics::FBID framebufferId = 0u );
+  void PreRender() override;
 
   /*
    * Postrender
    */
-  void PostRender( Dali::Graphics::FBID framebufferId = 0u );
+  void PostRender() override;
 
   /**
    * Returns controller object
