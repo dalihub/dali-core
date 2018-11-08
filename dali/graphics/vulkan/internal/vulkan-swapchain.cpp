@@ -170,11 +170,14 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
     mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
-    if( mFrameCounter > mSwapchainBuffers.size() && shouldCollectGarbageNow )
-    {
-      mGraphics->ExecuteActions();
-      mGraphics->CollectGarbage();
-    }
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
+  }
+  else
+  {
+    mGraphics->DeviceWaitIdle();
+    mGraphics->ExecuteActions();
+    mGraphics->CollectGarbage();
   }
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "Resetting " << swapBuffer->commandBuffers.size() << " command buffers" );
