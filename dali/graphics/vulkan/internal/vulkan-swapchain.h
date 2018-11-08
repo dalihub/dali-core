@@ -116,6 +116,13 @@ public:
    */
   void SetDepthStencil( vk::Format depthStencilFormat );
 
+  /**
+   * Resets all existing command buffers for all swapchain images
+   * To run it safe it must be sure the GPU is not using any of the
+   * command buffers.
+   */
+  void ResetAllCommandBuffers();
+
 private:
 
   Swapchain( Graphics& graphics,

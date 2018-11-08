@@ -944,7 +944,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   else
   {
     // Discard graphics resources
-    mImpl->graphics.GetController().DiscardUnusedResources();
+    mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphics.GetController() );
   }
 
   // check the countdown and notify (note, at the moment this is only done for normal tasks, not for systemlevel tasks)

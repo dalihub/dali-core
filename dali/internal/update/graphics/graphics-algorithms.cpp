@@ -1017,6 +1017,21 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   mCurrentFrameIndex++;
 }
 
+void GraphicsAlgorithms::DiscardUnusedResources( Graphics::API::Controller& controller )
+{
+  // wait for queues to be idle
+  controller.WaitIdle();
+
+  // Destroy Uniform buffers
+  for( auto& ubo : mUniformBuffer )
+  {
+    ubo.reset( nullptr );
+  }
+
+  // Discard unused resources
+  controller.DiscardUnusedResources();
+}
+
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
