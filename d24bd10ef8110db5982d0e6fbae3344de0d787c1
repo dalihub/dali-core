@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39ad7bf3_be7e0cca",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-controller.cpp",
+        "patchSetId": 16
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1012900
+      },
+      "writtenOn": "2018-11-08T03:08:12Z",
+      "side": 1,
+      "message": "During building for target, type cast error is occurred.\nHow about adding as below?\n vector.insert( vector.end(), commands.begin()+int32_t(startIndex), commands.begin()+int32_t(endIndex) );",
+      "range": {
+        "startLine": 306,
+        "startChar": 50,
+        "endLine": 306,
+        "endChar": 60
+      },
+      "revId": "d24bd10ef8110db5982d0e6fbae3344de0d787c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
