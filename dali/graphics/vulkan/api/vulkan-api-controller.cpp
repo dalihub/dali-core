@@ -719,6 +719,9 @@ struct Controller::Impl
   void DiscardUnusedResources()
   {
     mGraphics.GetGraphicsQueue(0).GetVkHandle().waitIdle();
+
+    mGraphics.GetSwapchainForFBID(0)->ResetAllCommandBuffers();
+
     mGraphics.CollectGarbage();
     mGraphics.CollectGarbage();
   }
