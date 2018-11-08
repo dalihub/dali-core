@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5b8d0ff_09796228",
+        "filename": "dali/graphics/vulkan/internal/vulkan-debug.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "Wrap in #ifdef DEBUG_ENABLED",
+      "range": {
+        "startLine": 70,
+        "startChar": 7,
+        "endLine": 70,
+        "endChar": 15
+      },
+      "revId": "6a5babaa9aefa369bb54d4e26c6ad2db9a506b39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}

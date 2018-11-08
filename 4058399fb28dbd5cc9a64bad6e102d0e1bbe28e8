@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "767b6a8d_cb2cd146",
+        "filename": "dali/graphics-api/graphics-api-controller.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "Not sure this should be in the API.",
+      "range": {
+        "startLine": 185,
+        "startChar": 15,
+        "endLine": 185,
+        "endChar": 23
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d03e02d_a98acbec",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "Could use rbegin?",
+      "range": {
+        "startLine": 137,
+        "startChar": 11,
+        "endLine": 137,
+        "endChar": 27
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f29acf4e_d2aa7717",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "?!",
+      "range": {
+        "startLine": 240,
+        "startChar": 22,
+        "endLine": 240,
+        "endChar": 26
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "487819d0_90eaeaf4",
+        "filename": "dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "more comments!",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 5
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d66076b_0aedb450",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "I guess this should be called \u0027RecordRenderItemList\u0027, as it no longer submits",
+      "range": {
+        "startLine": 459,
+        "startChar": 25,
+        "endLine": 459,
+        "endChar": 45
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8295f557_e39ab416",
+        "filename": "dali/internal/update/graphics/graphics-algorithms.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "I guess this should now be called \u0027RecordInstruction\u0027",
+      "range": {
+        "startLine": 1004,
+        "startChar": 4,
+        "endLine": 1004,
+        "endChar": 21
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22c19205_a8bd46a2",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "If any 1 render command in the renderer is active, it\u0027ll keep all others alive as well, even if the other instruction isn\u0027t used.",
+      "range": {
+        "startLine": 780,
+        "startChar": 32,
+        "endLine": 780,
+        "endChar": 59
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ce9f9db_d57cae2b",
+        "filename": "dali/internal/update/rendering/scene-graph-renderer.h",
+        "patchSetId": 19
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-11-08T16:41:11Z",
+      "side": 1,
+      "message": "Should be with the other bools",
+      "range": {
+        "startLine": 531,
+        "startChar": 31,
+        "endLine": 531,
+        "endChar": 60
+      },
+      "revId": "4058399fb28dbd5cc9a64bad6e102d0e1bbe28e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
