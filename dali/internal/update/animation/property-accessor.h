@@ -217,7 +217,7 @@ private:
 };
 
 
-template <typename T, unsigned int COMPONENT>
+template <typename T, uint32_t COMPONENT>
 class TransformManagerPropertyComponentAccessor
 {
 public:

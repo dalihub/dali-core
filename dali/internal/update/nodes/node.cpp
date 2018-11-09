@@ -25,14 +25,14 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 
-namespace //Unnamed namespace
+namespace
 {
 //Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
 // or DALI library is unloaded
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
 #ifdef DEBUG_ENABLED
-// keep track of nodes created / deleted, to ensure we have 0 when the process exits or DALi library is unloaded
-int32_t gNodeCount =0;
+// keep track of nodes alive, to ensure we have 0 when the process exits or DALi library is unloaded
+int32_t gNodeCount = 0;
 
 // Called when the process is about to exit, Node count should be zero at this point.
 void __attribute__ ((destructor)) ShutDown(void)
@@ -40,7 +40,7 @@ void __attribute__ ((destructor)) ShutDown(void)
 DALI_ASSERT_DEBUG( (gNodeCount == 0) && "Node memory leak");
 }
 #endif
-}
+} // Unnamed namespace
 
 namespace Dali
 {
@@ -54,9 +54,11 @@ namespace SceneGraph
 const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
-Node* Node::New( uint32_t id )
+uint32_t Node::mNodeCounter = 0;        ///< A counter to provide unique node ids, up-to 4 billion
+
+Node* Node::New()
 {
-  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node( id );
+  return new ( gNodeMemoryPool.AllocateRawThreadSafe() ) Node;
 }
 
 void Node::Delete( Node* node )
@@ -77,7 +79,7 @@ void Node::Delete( Node* node )
   }
 }
 
-Node::Node( uint32_t id )
+Node::Node()
 : mTransformManager( NULL ),
   mTransformId( INVALID_TRANSFORM_ID ),
   mParentOrigin( TRANSFORM_PROPERTY_PARENT_ORIGIN ),
@@ -95,7 +97,7 @@ Node::Node( uint32_t id )
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
   mClippingSortModifier( 0u ),
-  mId( id ),
+  mId( ++mNodeCounter ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
   mChildren(),
@@ -136,6 +138,11 @@ void Node::OnDestroy()
 {
   // Animators, Constraints etc. should be disconnected from the child's properties.
   PropertyOwner::Destroy();
+}
+
+uint32_t Node::GetId() const
+{
+  return mId;
 }
 
 void Node::CreateTransform( SceneGraph::TransformManager* transformManager )

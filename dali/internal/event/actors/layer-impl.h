@@ -232,8 +232,9 @@ protected:
   /**
    * Construct a new layer.
    * @param[in] type Either Actor::LAYER or Actor::ROOT_LAYER if this is the root actor.
+   * @param[in] layer the scene graph layer
    */
-  Layer( Actor::DerivedType type );
+  Layer( Actor::DerivedType type, const SceneGraph::Layer& layer );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -241,12 +242,6 @@ protected:
   virtual ~Layer();
 
 private: // From Actor
-
-  /**
-   * From Actor; create a node to represent the layer in the scene-graph.
-   * @return A newly allocated layer node.
-   */
-  virtual SceneGraph::Node* CreateNode() const;
 
   /**
    * From Actor.

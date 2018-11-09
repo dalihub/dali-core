@@ -240,17 +240,17 @@ private:
   /**
    * Private constructor; see also CustomActor::New()
    */
-  CustomActor(CustomActorImpl& extension);
+  CustomActor( const SceneGraph::Node& node, CustomActorImpl& extension );
 
-  // Undefined
-  CustomActor(const CustomActor&);
-
-  // Undefined
-  CustomActor& operator=(const CustomActor& rhs);
+  // no default or copy constructor or assignment
+  CustomActor() = delete;
+  CustomActor( const CustomActor& ) = delete;
+  CustomActor& operator=( const CustomActor& rhs ) = delete;
 
 protected:
 
   CustomActorImplPtr mImpl;
+
 };
 
 } // namespace Internal
