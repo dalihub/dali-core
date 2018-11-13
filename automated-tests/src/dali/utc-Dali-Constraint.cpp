@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1237,3 +1237,124 @@ int UtcDaliConstraintTestPropertyTypesP(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+namespace
+{
+void SetHalfOpacity( Vector4& current, const PropertyInputContainer& inputs )
+{
+  current.a = 0.5f;
+}
+} // unnamed namespace
+
+int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
+{
+  // Ensure BOTH double-buffered values of our color property is reset when a constraint is applied to it.
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  // Check initial value is fully opaque
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Create a constraint whose value is discarded when it is removed
+  Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
+  constraint.SetRemoveAction( Constraint::RemoveAction::Discard );
+  constraint.Apply();
+
+  // Check value after one render, it should be constrained
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  // Render another frame, ensure the other value has also been updated
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  // Remove the actor from the stage and delete the constraint
+  actor.Unparent();
+  constraint.Remove();
+  constraint.Reset();
+
+  // Check value while off-stage, it should be fully opaque
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Add the actor back to the stage and check the value, it should be fully opaque again
+  Stage::GetCurrent().Add( actor );
+
+  // Check value when back on-stage, it should be fully opaque as the constraint is no longer applied to it.
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Render for another frame to ensure both buffers have the correct value
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliConstraintOnActorAddedAndRemoved(void)
+{
+  // Ensure adding and removing an actor from stage with a constraint still has it applied when it is re-added back to the stage
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  // Check initial value is fully opaque
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Create a constraint whose value is discarded when it is removed
+  Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
+  constraint.SetRemoveAction( Constraint::RemoveAction::Discard );
+  constraint.Apply();
+
+  // Check value after one render, it should be constrained
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  // Render another frame, ensure the other value has also been updated
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  // Remove the actor from the stage
+  actor.Unparent();
+
+  // Check value while off-stage, the constraint is no longer being applied as it's off-stage
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Check the other buffer, the constraint should not be applied to this either.
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+
+  // Add the actor back to the stage and check the value, the constraint should have been re-applied
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  // Render for another frame to ensure both buffers have the correct value
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////
