@@ -550,6 +550,20 @@ protected:
 
 };
 
+//@todo Move to a better place? (can't go in graphics-api-types, it's a cyclic dependency)
+struct TextureBindingState
+{
+  std::vector<RenderCommand::TextureBinding> textureBindings {};
+
+  Extension extension{ nullptr };
+
+  TextureBindingState& SetTextureBindings( const std::vector<RenderCommand::TextureBinding>& theTextureBindings )
+  {
+    textureBindings = theTextureBindings;
+    return *this;
+  }
+};
+
 } // namespace API
 } // namespace Graphics
 } // namespace Dali

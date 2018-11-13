@@ -15,21 +15,28 @@
  *
  */
 
-#include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
+// Class header
 #include <dali/graphics/vulkan/api/internal/vulkan-api-pipeline-impl.h>
-#include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
-#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
+
+// Internal headers
+#include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
-#include <dali/graphics/vulkan/internal/vulkan-shader.h>
-#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
-#include <dali/graphics/vulkan/vulkan-graphics.h>
-#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
-
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
 #include <dali/graphics/vulkan/api/vulkan-api-shader.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture.h>
+#include <dali/graphics/vulkan/internal/spirv/vulkan-spirv.h>
+#include <dali/graphics/vulkan/internal/vulkan-command-buffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/internal/vulkan-sampler.h>
+#include <dali/graphics/vulkan/internal/vulkan-shader.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
+#include <dali/graphics/vulkan/vulkan-graphics.h>
 
+// external headers
 #include <array>
+#include <algorithm>
 #include <dali/graphics/vulkan/api/vulkan-api-framebuffer.h>
 
 namespace Dali
@@ -619,6 +626,7 @@ const vk::PipelineTessellationStateCreateInfo* Pipeline::PrepareTesselationState
   return nullptr;
 }
 
+using ConstVoidPtr = const void*;
 const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 {
   // descriptor set layout
@@ -636,6 +644,29 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 
   std::vector< vk::DescriptorSetLayout > dsLayouts;
 
+  Vulkan::RefCountedSampler sampler;
+  auto& textureBindings = mCreateInfo->info.textureBindingState.textureBindings;
+  for( const auto& textureBinding : textureBindings )
+  {
+    auto texture = static_cast<const VulkanAPI::Texture*>(textureBinding.texture);
+    if( texture && texture->IsSamplerImmutable() )
+    {
+      sampler = texture->GetSamplerRef();
+      break;
+    }
+  }
+
+  // Generate list of immutable samplers in texture binding order - any 'empty' slots or non-native textures
+  // will be set to null handle.
+  std::vector<vk::Sampler> immutableSamplers;
+  std::transform( textureBindings.begin(), textureBindings.end(), std::back_inserter( immutableSamplers ),
+                  [&](auto& textureBinding ) {
+                    auto texture = static_cast<const VulkanAPI::Texture*>(textureBinding.texture);
+                    return (texture && texture->IsSamplerImmutable()) ?
+                           texture->GetSamplerRef()->GetVkHandle() :
+                           vk::Sampler{}; }
+                  );
+
   for( auto i = 0u; i < layouts.size(); ++i )
   {
     std::vector< vk::DescriptorSetLayoutBinding > dsBindings;
@@ -646,6 +677,7 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
       dsBindings.insert(
               dsBindings.end(), vshDsLayouts[i].pBindings, vshDsLayouts[i].pBindings + vshDsLayouts[i].bindingCount );
     }
+
     if( !fshDsLayouts.empty() && fshDsLayouts[i].bindingCount )
     {
       dsBindings.insert(
@@ -654,6 +686,23 @@ const vk::PipelineLayout Pipeline::PreparePipelineLayout()
 
     GenerateDescriptorSetLayoutSignatures( dsBindings );
 
+    // Ensure bindings are sorted by binding index
+    std::sort( dsBindings.begin(), dsBindings.end(),
+               []( auto&a, auto&b ) { return a.binding < b.binding; } );
+
+    // Iterate over bindings - if any are samplers, copy ptrs from immutable samplers list above
+    uint32_t immutableSamplerIndex=0u;
+    uint32_t bindingIndex=0;
+    for(auto& binding : dsBindings )
+    {
+      if(binding.descriptorType == vk::DescriptorType::eCombinedImageSampler) // all samplers should have this type
+      {
+        binding.pImmutableSamplers = &immutableSamplers[immutableSamplerIndex++];
+        fprintf(stderr, "Bound immutable sampler %p to binding point %u", ConstVoidPtr(binding.pImmutableSamplers),
+                bindingIndex);
+      }
+      ++bindingIndex;
+    }
     layouts[i].pBindings = dsBindings.data();
     layouts[i].bindingCount = Vulkan::U32( dsBindings.size() );
 
@@ -824,4 +873,3 @@ bool Pipeline::HasStencilEnabled() const
 } // VulkanAPI
 } // Graphics
 } // Dal
-
