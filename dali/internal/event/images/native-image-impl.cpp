@@ -33,6 +33,11 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+TypeRegistration mType( typeid(Dali::NativeImage), typeid(Dali::Image), NULL );
+}
+
 NativeImage::NativeImage( NativeImageInterface& resourceData )
 : Image()
 {
