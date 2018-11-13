@@ -20,6 +20,7 @@
 
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
 
 namespace Dali
 {
@@ -27,6 +28,7 @@ namespace Graphics
 {
 namespace API
 {
+
 class PipelineCache;
 
 /**
@@ -62,6 +64,8 @@ public:
 
   virtual PipelineFactory& SetDynamicStateMask( const PipelineDynamicStateMask mask ) = 0;
 
+  virtual PipelineFactory& SetTextureBindings( const TextureBindingState& state ) = 0;
+
   virtual PipelineFactory& SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline ) = 0;
 
   virtual std::unique_ptr<Pipeline> Create() = 0;
@@ -79,4 +83,3 @@ protected:
 } // namespace Dali
 
 #endif // DALI_GRAPHICS_API_PIPELINE_FACTORY_H
-
