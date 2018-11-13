@@ -34,6 +34,11 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+TypeRegistration mType( typeid( Dali::BufferImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
+
 BufferImagePtr BufferImage::New( unsigned int width,
                                  unsigned int height,
                                  Pixel::Format pixelformat )
