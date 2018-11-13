@@ -15,14 +15,20 @@
  *
  */
 
+// Class header
 #include <dali/graphics/vulkan/api/vulkan-api-pipeline-factory.h>
-#include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
-#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
+
+// Internal headers
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
-#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
-#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
-#include <dali/graphics/vulkan/vulkan-graphics.h>
 #include <dali/graphics/vulkan/api/vulkan-api-framebuffer.h>
+#include <dali/graphics/vulkan/api/vulkan-api-pipeline.h>
+#include <dali/graphics/vulkan/api/vulkan-api-sampler.h>
+#include <dali/graphics/vulkan/api/vulkan-api-texture.h>
+#include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
+#include <dali/graphics/vulkan/api/internal/vulkan-pipeline-cache.h>
+#include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
+#include <dali/graphics/vulkan/internal/vulkan-types.h>
+#include <dali/graphics/vulkan/vulkan-graphics.h>
 
 namespace Dali
 {
@@ -33,6 +39,20 @@ namespace VulkanAPI
 
 namespace
 {
+
+Vulkan::RefCountedSampler GetFirstSampler( const API::TextureBindingState& state )
+{
+  for( const auto& textureBinding : state.textureBindings )
+  {
+    auto texture = static_cast<const Texture*>(textureBinding.texture);
+    if( texture && texture->IsSamplerImmutable() )
+    {
+      return texture->GetSamplerRef();
+    }
+  }
+  return Vulkan::RefCountedSampler();
+}
+
 /**
  * Hashing binary data, it may not be the best algorithm
  * @return
@@ -55,8 +75,9 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory& factory )
   const VulkanAPI::PipelineFactory::Info& info = factory.mInfo;
 
   // Obtain renderpass as it is a part of the hashed value
-  const auto renderPass = info.framebufferState.framebuffer ? static_cast<const VulkanAPI::Framebuffer*>(info.framebufferState.framebuffer)->GetFramebufferRef()->GetRenderPass() :
-                    factory.mGraphics.GetSwapchainForFBID( 0u )->GetCurrentFramebuffer()->GetRenderPass();
+  const auto renderPass = info.framebufferState.framebuffer ?
+    static_cast<const VulkanAPI::Framebuffer*>(info.framebufferState.framebuffer)->GetFramebufferRef()->GetRenderPass() :
+    factory.mGraphics.GetSwapchainForFBID( 0u )->GetCurrentFramebuffer()->GetRenderPass();
 
   uint32_t dsHash = HashBinary( &info.depthStencilState, sizeof( info.depthStencilState ) );
   uint32_t cbHash = HashBinary( &info.colorBlendState, sizeof( info.colorBlendState ) );
@@ -72,9 +93,19 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory& factory )
   uint32_t viStateAttributesHash = HashBinary( info.vertexInputState.attributes.data(), uint32_t(
           sizeof( API::VertexInputState::Attribute ) * info.vertexInputState.attributes.size() ) );
 
+  // Use immutable sampler as a key if present, rather than the whole of textureBindingState
+  // @todo Change to pass sampler from DALi side.
+  uint32_t samplerHash = 0u;
+  auto sampler = GetFirstSampler(info.textureBindingState);
+  if( sampler )
+  {
+    samplerHash = uint32_t( uintptr_t( static_cast<VkSampler>(sampler->GetVkHandle())));
+  }
+
   // rehash all
-  std::array< uint32_t, 11 > allHashes = {
-          dsHash, cbHash, shHash, vpHash, fbHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash, info.dynamicStateMask,
+  std::array< uint32_t, 12 > allHashes = {
+          dsHash, cbHash, shHash, vpHash, fbHash, rsHash, iaHash, viStateBindingsHash, viStateAttributesHash,
+          info.dynamicStateMask, samplerHash,
           uint32_t( uintptr_t( static_cast<const VkRenderPass>(renderPass) ) )
   };
 
@@ -84,9 +115,11 @@ uint32_t HashPipeline( const VulkanAPI::PipelineFactory& factory )
 }
 
 PipelineFactory::PipelineFactory( Controller& controller )
-        : mController( controller ),
-          mGraphics( controller.GetGraphics() ),
-          mHashCode( 0u )
+: mController( controller ),
+  mGraphics( controller.GetGraphics() ),
+  mPipelineCache( nullptr ),
+  mBasePipeline( nullptr ),
+  mHashCode( 0u )
 {
 }
 
@@ -168,6 +201,12 @@ API::PipelineFactory& PipelineFactory::SetDynamicStateMask( const API::PipelineD
   return *this;
 }
 
+API::PipelineFactory& PipelineFactory::SetTextureBindings( const API::TextureBindingState& state )
+{
+  mInfo.textureBindingState = state;
+  return *this;
+}
+
 API::PipelineFactory& PipelineFactory::SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline )
 {
   mOldPipeline = std::move( oldPipeline );
@@ -208,6 +247,7 @@ void PipelineFactory::Reset()
   mInfo.vertexInputState = {};
   mInfo.inputAssemblyState = {};
   mInfo.dynamicStateMask = 0u;
+  mInfo.textureBindingState = {};
   mPipelineCache = nullptr;
   mBasePipeline = nullptr;
   mHashCode = 0;

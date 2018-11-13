@@ -69,6 +69,8 @@ public:
 
   API::PipelineFactory& SetDynamicStateMask( const API::PipelineDynamicStateMask mask ) override;
 
+  API::PipelineFactory& SetTextureBindings( const API::TextureBindingState& state ) override;
+
   API::PipelineFactory& SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline ) override;
 
   // To be called when getting new factory
@@ -89,6 +91,7 @@ public:
     API::VertexInputState vertexInputState;
     API::InputAssemblyState inputAssemblyState;
     API::PipelineDynamicStateMask dynamicStateMask;
+    API::TextureBindingState textureBindingState;
   };
 
   const Info& GetCreateInfo() const
@@ -104,6 +107,7 @@ public:
   VulkanAPI::PipelineCache* mPipelineCache;
   VulkanAPI::Pipeline* mBasePipeline;
   mutable uint32_t mHashCode;
+
   std::unique_ptr<API::Pipeline> mOldPipeline { nullptr };
 };
 
@@ -112,4 +116,3 @@ public:
 } // namespace Dali
 
 #endif // DALI_GRAPHICS_VULKAN_API_PIPELINE_FACTORY_H
-

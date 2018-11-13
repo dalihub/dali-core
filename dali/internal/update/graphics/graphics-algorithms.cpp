@@ -851,8 +851,15 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
     }
   }
 
+  auto textureBindings = cmd.GetTextureBindings();
+  TextureBindingState textureBindingState{};
+  if ( textureBindings )
+  {
+    textureBindingState.SetTextureBindings( *textureBindings );
+  }
+
   // create pipeline
-  auto pipeline = controller.CreatePipeline( controller.GetPipelineFactory()
+  auto pipeline = controller.CreatePipeline(controller.GetPipelineFactory()
             .SetOldPipeline( renderer->ReleaseGraphicsPipeline( bufferIndex, &instruction) ) // set old pipeline
 
             // vertex input
@@ -888,6 +895,9 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 
             // dynamic state mask
             .SetDynamicStateMask( dynamicStateMask )
+
+            // TextureBindings for native texture immutable samplers
+            .SetTextureBindings( textureBindingState )
   );
 
 

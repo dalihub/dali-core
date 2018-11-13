@@ -878,6 +878,7 @@ Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
     mImage(),
     mImageView(),
     mSampler(),
+    mSamplerIsImmutable( false ),
     mWidth( 0u ),
     mHeight( 0u ),
     mFormat( vk::Format::eUndefined ),
@@ -1155,6 +1156,11 @@ Vulkan::RefCountedImageView Texture::GetImageViewRef() const
 Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
   return mSampler;
+}
+
+bool Texture::IsSamplerImmutable() const
+{
+  return mSamplerIsImmutable;
 }
 
 } // namespace VulkanAPI

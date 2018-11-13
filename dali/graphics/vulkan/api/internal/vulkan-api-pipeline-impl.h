@@ -18,6 +18,7 @@
  *
  */
 
+#include <dali/graphics-api/graphics-api-types.h>
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 #include <atomic>
 
@@ -39,12 +40,13 @@ class Controller;
 class PipelineFactory;
 
 class PipelineCache;
+
 namespace Internal
 {
+
 class Pipeline
 {
 public:
-
   Pipeline( Vulkan::Graphics& graphics, Controller& controller, const PipelineFactory* factory );
 
   ~Pipeline();
@@ -104,7 +106,7 @@ private:
 
   std::atomic_int mRefCounter{ 0u };
 
-  // wrapper for copy of cSreate data
+  // wrapper for copy of create data
   struct PipelineCreateInfo;
   std::unique_ptr< PipelineCreateInfo > mCreateInfo;
 
