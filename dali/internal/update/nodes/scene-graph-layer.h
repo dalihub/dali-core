@@ -77,10 +77,9 @@ public:
 
   /**
    * Construct a new Layer.
-   * @param[in] id The Unique ID of the actor creating the node
    * @return A smart-pointer to a newly allocated Node
    */
-  static SceneGraph::Layer* New( uint32_t id );
+  static SceneGraph::Layer* New();
 
   /**
    * Virtual destructor
@@ -211,10 +210,9 @@ private:
 
   /**
    * Private constructor.
-   * @param[in] id The Unique ID of the actor creating the node
    * See also Layer::New()
    */
-  Layer( uint32_t id );
+  Layer();
 
   // Undefined
   Layer(const Layer&);
