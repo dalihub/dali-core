@@ -54,9 +54,9 @@ inline vk::ComponentMapping GetVkComponentMapping( API::Format format )
     {
       return vk::ComponentMapping{
         vk::ComponentSwizzle::eR,
-        vk::ComponentSwizzle::eG,
-        vk::ComponentSwizzle::eB,
-        vk::ComponentSwizzle::eA
+        vk::ComponentSwizzle::eR,
+        vk::ComponentSwizzle::eR,
+        vk::ComponentSwizzle::eOne
       };
     }
     case API::Format::L8A8:
