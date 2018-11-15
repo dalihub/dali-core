@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f6c801c_d7366057",
+        "filename": "dali/integration-api/core.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "Why do you need to repeat the word Graphics?",
+      "range": {
+        "startLine": 253,
+        "startChar": 30,
+        "endLine": 253,
+        "endChar": 38
+      },
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ec90d81a_e3b8d3fd",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "Adaptor in Core??? Seems wrong!",
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ea2d2cd_19366d19",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "Remove commented out code.",
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aef03486_5570a653",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "const",
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4a9173c_66897a57",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "const",
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34c540b3_30012ed9",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-11-15T17:40:13Z",
+      "side": 1,
+      "message": "Should these variables be const?  Do we really support changing them after initialisation?\n\nThe probably ought to be private anyway as we have methods to return whether they are required.",
+      "revId": "44bf7d008c4fe310a373f1feb13283e5e6a466a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
