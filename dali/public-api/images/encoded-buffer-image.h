@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <stdint.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>

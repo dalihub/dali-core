@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef> // std::size_t
+#include <cstdint> // uint16_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h> // Dali::Handle
@@ -144,7 +145,7 @@ public:
    * @param[in] indices Array of indices
    * @param[in] count Number of indices in the array
    */
-  void SetIndexBuffer( const unsigned short* indices, size_t count );
+  void SetIndexBuffer( const uint16_t* indices, size_t count );
 
   /**
    * @brief Sets the type of primitives this geometry contains.

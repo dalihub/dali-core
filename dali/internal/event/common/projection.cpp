@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ bool ProjectFull( const Vector4& position,
 
   if( !EqualsZero( p.w ) )
   {
-    float div = 1.0 / p.w;
+    float div = 1.0f / p.w;
 
     windowPos = Vector4( (1 + p.x * div) * viewportWidth  / 2 + viewportX,
                          (1 - p.y * div) * viewportHeight / 2 + viewportY,

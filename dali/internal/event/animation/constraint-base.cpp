@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,12 +146,12 @@ ConstraintBase::RemoveAction ConstraintBase::GetRemoveAction() const
   return mRemoveAction;
 }
 
-void ConstraintBase::SetTag(const unsigned int tag)
+void ConstraintBase::SetTag( uint32_t tag )
 {
   mTag = tag;
 }
 
-unsigned int ConstraintBase::GetTag() const
+uint32_t ConstraintBase::GetTag() const
 {
   return mTag;
 }

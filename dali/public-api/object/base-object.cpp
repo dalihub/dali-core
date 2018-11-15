@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,10 +73,10 @@ const std::string& BaseObject::GetTypeName() const
 
   if( registry )
   {
-    Dali::TypeInfo typeInfo = registry->GetTypeInfo(this);
+    Internal::TypeRegistry::TypeInfoPointer typeInfo = registry->GetTypeInfo(this);
     if( typeInfo )
     {
-      return typeInfo.GetName();
+      return typeInfo->GetName();
     }
   }
 
@@ -90,10 +90,10 @@ bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
-  Dali::TypeInfo info = registry->GetTypeInfo(this);
+  Internal::TypeRegistry::TypeInfoPointer info = registry->GetTypeInfo(this);
   if(info)
   {
-    typeInfo = info;
+    typeInfo = Dali::TypeInfo( info.Get() );
     return true;
   }
   else

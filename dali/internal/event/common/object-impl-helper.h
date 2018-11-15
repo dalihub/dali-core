@@ -23,9 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h> // Dali::Property
-#include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/internal/event/common/property-helper.h> // Dali::Internal::PropertyDetails
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -45,129 +43,22 @@ namespace SceneGraph
 class PropertyBase;
 class PropertyOwner;
 
-
 } // namespace SceneGraph
 
-// Typedefs to allow object methods to be passed via parameter
-typedef AnimatablePropertyMetadata* (Object::*FindAnimatablePropertyMethod)( Property::Index index ) const;
-typedef CustomPropertyMetadata* (Object::*FindCustomPropertyMethod)( Property::Index index ) const;
-
+// methods needed as parameters
+using FindAnimatablePropertyMethod = AnimatablePropertyMetadata* (Object::*)(Property::Index index) const;
+using FindCustomPropertyMethod = CustomPropertyMetadata* (Object::*)(Property::Index index) const;
 
 /**
- * Helper template class to be used by class that implement Object
- *
- * Example:
- *<pre>
- * typename ObjectImplHelper<DEFAULT_PROPERTY_COUNT, DEFAULT_PROPERTY_DETAILS> MyObjectImpl;
- *
- * MyObjectImpl::GetDefaultPropertyCount();
- * </pre>
+ * Helper utilities to be used by class that implement Object
  */
-template<int DEFAULT_PROPERTY_COUNT>
-struct ObjectImplHelper
+namespace ObjectImplHelper
 {
-  const PropertyDetails* DEFAULT_PROPERTY_DETAILS;
-  const int DEFAULT_PROPERTY_START_INDEX;
-
-  unsigned int GetDefaultPropertyCount() const
-  {
-    return DEFAULT_PROPERTY_COUNT;
-  }
-
-  void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-  {
-    indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-    for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-    {
-      indices.PushBack( DEFAULT_PROPERTY_START_INDEX + i );
-    }
-  }
-
-  const char* GetDefaultPropertyName( Property::Index index ) const
-  {
-    const char* name = NULL;
-
-    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      name = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].name;
-    }
-
-    return name;
-  }
-
-  Property::Index GetDefaultPropertyIndex( const std::string& name ) const
-  {
-    Property::Index index = Property::INVALID_INDEX;
-
-    // Look for name in default properties
-    for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-    {
-      const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-      if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
-      {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
-  }
-
-  bool IsDefaultPropertyWritable( Property::Index index ) const
-  {
-    bool isWritable = false;
-
-    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      isWritable = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].writable;
-    }
-
-    return isWritable;
-  }
-
-  bool IsDefaultPropertyAnimatable( Property::Index index ) const
-  {
-    bool isAnimatable = false;
-
-    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      isAnimatable =  DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].animatable;
-    }
-
-    return isAnimatable;
-  }
-
-  bool IsDefaultPropertyAConstraintInput( Property::Index index ) const
-  {
-    bool isConstraintInput = false;
-
-    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      isConstraintInput = DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].constraintInput;
-    }
-
-    return isConstraintInput;
-  }
-
-  Property::Type GetDefaultPropertyType( Property::Index index ) const
-  {
-    Property::Type type = Property::NONE;
-
-    if( index >= DEFAULT_PROPERTY_START_INDEX && index < DEFAULT_PROPERTY_START_INDEX + DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      type =  DEFAULT_PROPERTY_DETAILS[index - DEFAULT_PROPERTY_START_INDEX].type;
-    }
-
-    return type;
-  }
-
   // Get the (animatable) scene graph property. (All registered scene graph properties are animatable)
-  const SceneGraph::PropertyBase* GetRegisteredSceneGraphProperty(
-    const Object* object,
-    FindAnimatablePropertyMethod findAnimatablePropertyMethod,
-    FindCustomPropertyMethod findCustomPropertyMethod,
-    Property::Index index ) const
+  inline const SceneGraph::PropertyBase* GetRegisteredSceneGraphProperty( const Object* object,
+                                                                          FindAnimatablePropertyMethod findAnimatablePropertyMethod,
+                                                                          FindCustomPropertyMethod findCustomPropertyMethod,
+                                                                          Property::Index index )
   {
     const SceneGraph::PropertyBase* property = NULL;
     if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
@@ -186,11 +77,11 @@ struct ObjectImplHelper
     return property;
   }
 
-  void SetSceneGraphProperty( EventThreadServices& eventThreadServices,
-                              const Object* object,
-                              Property::Index index,
-                              const PropertyMetadata& entry,
-                              const Property::Value& value ) const
+  inline void SetSceneGraphProperty( EventThreadServices& eventThreadServices,
+                                     const Object* object,
+                                     Property::Index index,
+                                     const PropertyMetadata& entry,
+                                     const Property::Value& value )
   {
     const SceneGraph::PropertyOwner* sceneObject = object->GetSceneObject();
 

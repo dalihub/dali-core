@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RESOURCE_IMAGE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,17 +69,6 @@ public:
    * @copydoc Dali::ResourceImage::LoadingFinishedSignal()
    */
   Dali::ResourceImage::ResourceImageSignal& LoadingFinishedSignal() { return mLoadingFinished; }
-
-  /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-   */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
    * Get the attributes of the image.

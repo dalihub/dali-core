@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public:
                     typename ParameterType< P >::PassingType value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) NodePropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
@@ -168,7 +168,7 @@ public:
                     float value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyComponentMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) NodePropertyComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
@@ -247,7 +247,7 @@ public:
                     const P& value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformPropertyMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformPropertyMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) NodeTransformPropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
@@ -326,7 +326,7 @@ public:
                     float value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformComponentMessage ) );
+    uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodeTransformComponentMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new (slot) NodeTransformComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );

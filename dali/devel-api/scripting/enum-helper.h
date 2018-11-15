@@ -2,7 +2,7 @@
 #define DALI_ENUM_HELPER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ namespace Dali
  */
 #define DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( type, t ) const type t##_TABLE[] = {
 #define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( Dali::Scripting::StringEnum, t )
-#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##_TABLE_COUNT = sizeof( t##_TABLE ) / sizeof( t##_TABLE[0] );
+#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const uint32_t t##_TABLE_COUNT = static_cast<uint32_t>( sizeof( t##_TABLE ) / sizeof( t##_TABLE[0] ) );
 #define DALI_ENUM_TO_STRING( s ) { #s, s },
 
 /**

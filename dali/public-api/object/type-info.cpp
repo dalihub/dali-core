@@ -98,7 +98,7 @@ void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 
 const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
 {
-  return GetImplementation(*this).GetPropertyName( index );
+  return GetImplementation(*this).GetRegisteredPropertyName( index );
 }
 
 Property::Index TypeInfo::GetChildPropertyIndex( const std::string& name ) const

@@ -72,7 +72,7 @@ DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
-DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties )
 
 // Property string to enumeration tables:
 
@@ -166,14 +166,12 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT_WRAP )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT_WRAP )
 DALI_ENUM_TO_STRING_TABLE_END( STENCIL_OPERATION )
 
-const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS, DEFAULT_RENDERER_PROPERTY_START_INDEX };
-
 BaseHandle Create()
 {
   return Dali::BaseHandle();
 }
 
-TypeRegistration mType( typeid( Dali::Renderer ), typeid( Dali::Handle ), Create );
+TypeRegistration mType( typeid( Dali::Renderer ), typeid( Dali::Handle ), Create, RendererDefaultProperties );
 
 } // unnamed namespace
 
@@ -299,7 +297,7 @@ void Renderer::GetBlendEquation( BlendEquation::Type& equationRgb,
   equationAlpha = mBlendingOptions.GetBlendEquationAlpha();
 }
 
-void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
+void Renderer::SetIndexedDrawFirstElement( uint32_t firstElement )
 {
   if( firstElement != mIndexedDrawFirstElement )
   {
@@ -308,7 +306,7 @@ void Renderer::SetIndexedDrawFirstElement( size_t firstElement )
   }
 }
 
-void Renderer::SetIndexedDrawElementsCount( size_t elementsCount )
+void Renderer::SetIndexedDrawElementsCount( uint32_t elementsCount )
 {
   if( elementsCount != mIndexedDrawElementCount )
   {
@@ -343,46 +341,6 @@ bool Renderer::IsPreMultipliedAlphaEnabled() const
 SceneGraph::Renderer* Renderer::GetRendererSceneObject()
 {
   return mSceneObject;
-}
-
-unsigned int Renderer::GetDefaultPropertyCount() const
-{
-  return RENDERER_IMPL.GetDefaultPropertyCount();
-}
-
-void Renderer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  RENDERER_IMPL.GetDefaultPropertyIndices( indices );
-}
-
-const char* Renderer::GetDefaultPropertyName(Property::Index index) const
-{
-  return RENDERER_IMPL.GetDefaultPropertyName( index );
-}
-
-Property::Index Renderer::GetDefaultPropertyIndex( const std::string& name ) const
-{
-  return RENDERER_IMPL.GetDefaultPropertyIndex( name );
-}
-
-bool Renderer::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  return RENDERER_IMPL.IsDefaultPropertyWritable( index );
-}
-
-bool Renderer::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  return RENDERER_IMPL.IsDefaultPropertyAnimatable( index );
-}
-
-bool Renderer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  return RENDERER_IMPL.IsDefaultPropertyAConstraintInput( index );
-}
-
-Property::Type Renderer::GetDefaultPropertyType( Property::Index index ) const
-{
-  return RENDERER_IMPL.GetDefaultPropertyType( index );
 }
 
 void Renderer::SetDefaultProperty( Property::Index index,
@@ -657,7 +615,7 @@ void Renderer::SetSceneGraphProperty( Property::Index index,
                                       const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
-  RENDERER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  ObjectImplHelper::SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
   OnPropertySet(index, value);
 }
 
@@ -735,11 +693,10 @@ const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Prop
   DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
   const SceneGraph::PropertyBase* property = NULL;
 
-  property = RENDERER_IMPL.GetRegisteredSceneGraphProperty(
-    this,
-    &Renderer::FindAnimatableProperty,
-    &Renderer::FindCustomProperty,
-    index );
+  property = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
+                                                                &Renderer::FindAnimatableProperty,
+                                                                &Renderer::FindCustomProperty,
+                                                                index );
 
   if( !property )
   {
@@ -756,11 +713,10 @@ const PropertyInputImpl* Renderer::GetSceneObjectInputProperty( Property::Index 
 {
   const PropertyInputImpl* property = NULL;
 
-  const SceneGraph::PropertyBase* baseProperty =
-    RENDERER_IMPL.GetRegisteredSceneGraphProperty( this,
-                                                   &Renderer::FindAnimatableProperty,
-                                                   &Renderer::FindCustomProperty,
-                                                   index );
+  const SceneGraph::PropertyBase* baseProperty = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
+                                                                                                    &Renderer::FindAnimatableProperty,
+                                                                                                    &Renderer::FindCustomProperty,
+                                                                                                    index );
   property = static_cast<const PropertyInputImpl*>( baseProperty );
 
   return property;
@@ -851,12 +807,12 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendEquationRgb() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendEquationAlpha() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
@@ -866,7 +822,7 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       BlendFactor::Type srcFactorAlpha;
       BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      value = static_cast<int>( srcFactorRgb );
+      value = static_cast<int32_t>( srcFactorRgb );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
@@ -876,7 +832,7 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       BlendFactor::Type srcFactorAlpha;
       BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      value = static_cast<int>( destFactorRgb );
+      value = static_cast<int32_t>( destFactorRgb );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
@@ -886,7 +842,7 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       BlendFactor::Type srcFactorAlpha;
       BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      value = static_cast<int>( srcFactorAlpha );
+      value = static_cast<int32_t>( srcFactorAlpha );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
@@ -896,7 +852,7 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       BlendFactor::Type srcFactorAlpha;
       BlendFactor::Type destFactorAlpha;
       GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-      value = static_cast<int>( destFactorAlpha );
+      value = static_cast<int32_t>( destFactorAlpha );
       break;
     }
     case Dali::Renderer::Property::BLEND_COLOR:
@@ -911,12 +867,12 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
     }
     case Dali::Renderer::Property::INDEX_RANGE_FIRST:
     {
-      value = static_cast<int>( mIndexedDrawFirstElement );
+      value = static_cast<int32_t>( mIndexedDrawFirstElement );
       break;
     }
     case Dali::Renderer::Property::INDEX_RANGE_COUNT:
     {
-      value = static_cast<int>( mIndexedDrawElementCount );
+      value = static_cast<int32_t>( mIndexedDrawElementCount );
       break;
     }
     case Dali::Renderer::Property::DEPTH_WRITE_MODE:
@@ -1013,32 +969,32 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendEquationRgb() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendEquationAlpha() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendEquationAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendSrcFactorRgb() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendSrcFactorRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendDestFactorRgb() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendDestFactorRgb() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendSrcFactorAlpha() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendSrcFactorAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA:
     {
-      value = static_cast<int>( mBlendingOptions.GetBlendDestFactorAlpha() );
+      value = static_cast<int32_t>( mBlendingOptions.GetBlendDestFactorAlpha() );
       break;
     }
     case Dali::Renderer::Property::BLEND_COLOR:

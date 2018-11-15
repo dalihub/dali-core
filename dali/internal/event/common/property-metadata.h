@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROPERTY_METADATA_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ protected:
    * @param[in] baseValueRef            A reference to the metadata of the base animatable property
    * @param[in] propertyComponentIndex  The component index of the property
    */
-  PropertyMetadata( const SceneGraph::PropertyBase* sceneGraphProperty, bool writable, Property::Value& baseValueRef, int propertyComponentIndex )
+  PropertyMetadata( const SceneGraph::PropertyBase* sceneGraphProperty, bool writable, Property::Value& baseValueRef, int32_t propertyComponentIndex )
   : value( baseValueRef ),
     componentIndex( propertyComponentIndex ),
     mStoredValue(),
@@ -177,7 +177,7 @@ public: // Data
   /**
    * @brief The index of the property component.
    */
-  int componentIndex;
+  int32_t componentIndex;
 
 private:
 

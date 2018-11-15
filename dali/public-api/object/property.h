@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <utility>
+#include <cstdint> // int32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -45,11 +46,11 @@ struct DALI_CORE_API Property
    * @brief A valid property index is zero or greater.
    * @SINCE_1_0.0
    */
-  typedef int Index;
+  typedef int32_t Index;
 
-  static const int INVALID_INDEX; ///< -1 is not a valid property index
-  static const int INVALID_KEY;   ///< -1 is not a valid property key
-  static const int INVALID_COMPONENT_INDEX; ///< -1 is not a valid property index
+  static const int32_t INVALID_INDEX; ///< -1 is not a valid property index
+  static const int32_t INVALID_KEY;   ///< -1 is not a valid property key
+  static const int32_t INVALID_COMPONENT_INDEX; ///< -1 is not a valid property index
 
   typedef Dali::Vector< Index > IndexContainer; ///< A vector of property indices @SINCE_1_0.0
 
@@ -128,7 +129,7 @@ struct DALI_CORE_API Property
    * @param[in] propertyIndex The index of a property.
    * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
    */
-  Property( Handle& object, Property::Index propertyIndex, int componentIndex );
+  Property( Handle& object, Property::Index propertyIndex, int32_t componentIndex );
 
   /**
    * @brief Creates a Property instance.
@@ -151,7 +152,7 @@ struct DALI_CORE_API Property
    * @note This performs a property index query and is therefore slower than
    * constructing a Property directly with the index.
    */
-  Property( Handle& object, const std::string& propertyName, int componentIndex );
+  Property( Handle& object, const std::string& propertyName, int32_t componentIndex );
 
   /**
    * @brief Non-virtual destructor; Property is not intended as a base class.
@@ -163,7 +164,7 @@ struct DALI_CORE_API Property
 
   Index propertyIndex; ///< The index of a property provided by object.
 
-  int componentIndex; ///< Index of a property sub component, for use with Vector2, Vector3 and Vector4, -1 if using main property
+  int32_t componentIndex; ///< Index of a property sub component, for use with Vector2, Vector3 and Vector4, -1 if using main property
 };
 
 /**

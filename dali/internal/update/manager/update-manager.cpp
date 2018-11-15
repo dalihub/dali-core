@@ -49,6 +49,7 @@
 #include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
@@ -70,13 +71,16 @@
 
 #if ( defined( DEBUG_ENABLED ) && defined( NODE_TREE_LOGGING ) )
 #define SNAPSHOT_NODE_LOGGING \
-const int FRAME_COUNT_TRIGGER = 16;\
+const uint32_t FRAME_COUNT_TRIGGER = 16;\
 if( mImpl->frameCounter >= FRAME_COUNT_TRIGGER )\
   {\
-    if ( NULL != mImpl->root )\
+    for( auto root : mImpl->roots )
     {\
-      mImpl->frameCounter = 0;\
-      PrintNodeTree( *mImpl->root, mSceneGraphBuffers.GetUpdateBufferIndex(), "" );\
+      if ( NULL != root )\
+      {\
+        mImpl->frameCounter = 0;\
+        PrintNodeTree( *root, mSceneGraphBuffers.GetUpdateBufferIndex(), "" );\
+      }\
     }\
   }\
 mImpl->frameCounter++;
@@ -188,10 +192,6 @@ struct UpdateManager::Impl
     renderTaskProcessor( renderTaskProcessor ),
     graphics( graphics ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
-    taskList( /*renderMessageDispatcher*/ ),
-    systemLevelTaskList( /*renderMessageDispatcher*/ ),
-    root( NULL ),
-    systemLevelRoot( NULL ),
     renderers(),
     textureSets(),
     shaders(),
@@ -199,7 +199,7 @@ struct UpdateManager::Impl
     messageQueue( renderController, sceneGraphBuffers ),
     frameCallbackProcessor( NULL ),
     keepRenderingSeconds( 0.0f ),
-    nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
+    nodeDirtyFlags( NodePropertyFlags::TRANSFORM ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
     renderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
     animationFinishedDuringUpdate( false ),
@@ -218,16 +218,13 @@ struct UpdateManager::Impl
   ~Impl()
   {
     // Disconnect render tasks from nodes, before destroying the nodes
-    RenderTaskList::RenderTaskContainer& tasks = taskList.GetTasks();
-    for ( auto&& iter : tasks )
+    for( auto taskList : taskLists )
     {
-      iter->SetSourceNode( NULL );
-    }
-    // ..repeat for system level RenderTasks
-    RenderTaskList::RenderTaskContainer& systemLevelTasks = systemLevelTaskList.GetTasks();
-    for ( auto&& iter : systemLevelTasks )
-    {
-      iter->SetSourceNode( NULL );
+      RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
+      for ( auto&& task : tasks )
+      {
+        task->SetSourceNode( NULL );
+      }
     }
 
     // UpdateManager owns the Nodes. Although Nodes are pool allocated they contain heap allocated parts
@@ -240,21 +237,9 @@ struct UpdateManager::Impl
       Node::Delete(*iter);
     }
 
-    // If there is root, reset it, otherwise do nothing as rendering was never started
-    if( root )
+    for( auto root : roots )
     {
       root->OnDestroy();
-
-      Node::Delete( root );
-      root = NULL;
-    }
-
-    if( systemLevelRoot )
-    {
-      systemLevelRoot->OnDestroy();
-
-      Node::Delete( systemLevelRoot );
-      systemLevelRoot = NULL;
     }
 
     delete sceneController;
@@ -262,12 +247,13 @@ struct UpdateManager::Impl
 
   /**
    * Lazy init for FrameCallbackProcessor.
+   * @param[in]  updateManager  A reference to the update-manager
    */
-  FrameCallbackProcessor& GetFrameCallbackProcessor()
+  FrameCallbackProcessor& GetFrameCallbackProcessor( UpdateManager& updateManager )
   {
     if( ! frameCallbackProcessor )
     {
-      frameCallbackProcessor = new FrameCallbackProcessor( transformManager, *root );
+      frameCallbackProcessor = new FrameCallbackProcessor( updateManager, transformManager );
     }
     return *frameCallbackProcessor;
   }
@@ -289,16 +275,13 @@ struct UpdateManager::Impl
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
-  RenderTaskList                       taskList;                      ///< The list of scene graph render-tasks
-  RenderTaskList                       systemLevelTaskList;           ///< Separate render-tasks for system-level content
+  OwnerContainer<RenderTaskList*>      taskLists;                     ///< A container of scene graph render task lists
 
-  Layer*                               root;                          ///< The root node (root is a layer)
-  Layer*                               systemLevelRoot;               ///< A separate root-node for system-level content
+  OwnerContainer<Layer*>               roots;                         ///< A container of root nodes (root is a layer). The layers are not stored in the node memory pool.
 
   Vector<Node*>                        nodes;                         ///< A container of all instantiated nodes
 
-  SortedLayerPointers                  sortedLayers;                  ///< A container of Layer pointers sorted by depth
-  SortedLayerPointers                  systemLevelSortedLayers;       ///< A separate container of system-level Layers
+  std::vector<SortedLayerPointers>     sortedLayerLists;              ///< A container of lists of Layer pointers sorted by depth (one list of sorted layers per root)
 
   OwnerContainer< Camera* >            cameras;                       ///< A container of cameras
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
@@ -322,8 +305,8 @@ struct UpdateManager::Impl
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor;        ///< Owned FrameCallbackProcessor, only created if required.
 
   float                                keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
-  int                                  nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
-  int                                  frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+  NodePropertyFlags                    nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
+  uint32_t                             frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
 
   DevelStage::Rendering                renderingBehavior;             ///< Set via DevelStage::SetRenderingBehavior
 
@@ -364,25 +347,18 @@ UpdateManager::~UpdateManager()
 }
 
 
-void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel )
+void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer )
 {
   DALI_ASSERT_DEBUG( layer->IsLayer() );
   DALI_ASSERT_DEBUG( layer->GetParent() == NULL);
 
-  if ( !systemLevel )
-  {
-    DALI_ASSERT_DEBUG( mImpl->root == NULL && "Root Node already installed" );
-    mImpl->root = layer.Release();
-    mImpl->root->CreateTransform( &mImpl->transformManager );
-    mImpl->root->SetRoot(true);
-  }
-  else
-  {
-    DALI_ASSERT_DEBUG( mImpl->systemLevelRoot == NULL && "System-level Root Node already installed" );
-    mImpl->systemLevelRoot = layer.Release();
-    mImpl->systemLevelRoot->CreateTransform( &mImpl->transformManager );
-    mImpl->systemLevelRoot->SetRoot(true);
-  }
+  Layer* rootLayer = layer.Release();
+
+  DALI_ASSERT_DEBUG( std::find( mImpl->roots.begin(), mImpl->roots.end(), rootLayer ) == mImpl->roots.end() && "Root Node already installed" );
+
+  rootLayer->CreateTransform( &mImpl->transformManager );
+  rootLayer->SetRoot(true);
+  mImpl->roots.PushBack( rootLayer );
 }
 
 void UpdateManager::AddNode( OwnerPointer<Node>& node )
@@ -410,15 +386,27 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
 
   parent->ConnectChild( node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DisconnectNode( Node* node )
 {
   Node* parent = node->GetParent();
   DALI_ASSERT_ALWAYS( NULL != parent );
-  parent->SetDirtyFlag( ChildDeletedFlag ); // make parent dirty so that render items dont get reused
+  parent->SetDirtyFlag( NodePropertyFlags::CHILD_DELETED ); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild( mSceneGraphBuffers.GetUpdateBufferIndex(), *node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DestroyNode( Node* node )
@@ -462,6 +450,17 @@ void UpdateManager::AddObject( OwnerPointer<PropertyOwner>& object )
 void UpdateManager::RemoveObject( PropertyOwner* object )
 {
   mImpl->customObjects.EraseObject( object );
+}
+
+void UpdateManager::AddRenderTaskList( OwnerPointer<RenderTaskList>& taskList )
+{
+  RenderTaskList* taskListPointer = taskList.Release();
+  mImpl->taskLists.PushBack( taskListPointer );
+}
+
+void UpdateManager::RemoveRenderTaskList( RenderTaskList* taskList )
+{
+  mImpl->taskLists.EraseObject( taskList );
 }
 
 void UpdateManager::AddAnimation( OwnerPointer< SceneGraph::Animation >& animation )
@@ -569,21 +568,7 @@ void UpdateManager::RemoveTextureSet( TextureSet* textureSet )
   mImpl->textureSets.EraseObject( textureSet );
 }
 
-RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
-{
-  if ( !systemLevel )
-  {
-    // copy the list, this is only likely to happen once in application life cycle
-    return &(mImpl->taskList);
-  }
-  else
-  {
-    // copy the list, this is only likely to happen once in application life cycle
-    return &(mImpl->systemLevelTaskList);
-  }
-}
-
-unsigned int* UpdateManager::ReserveMessageSlot( std::size_t size, bool updateScene )
+uint32_t* UpdateManager::ReserveMessageSlot( uint32_t size, bool updateScene )
 {
   return mImpl->messageQueue.ReserveMessageSlot( size, updateScene );
 }
@@ -629,7 +614,7 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
   }
 }
 
-bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
+bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds )
 {
   bool gestureUpdated( false );
 
@@ -695,18 +680,14 @@ void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
 
 void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
 {
-  // Constrain system-level render-tasks
-  const RenderTaskList::RenderTaskContainer& systemLevelTasks = mImpl->systemLevelTaskList.GetTasks();
-  for ( auto&& task : systemLevelTasks )
-  {
-    ConstrainPropertyOwner( *task, bufferIndex );
-  }
-
   // Constrain render-tasks
-  const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
-  for ( auto&& task : tasks )
+  for( auto taskList : mImpl->taskLists )
   {
-    ConstrainPropertyOwner( *task, bufferIndex );
+    RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
+    for ( auto&& task : tasks )
+    {
+      ConstrainPropertyOwner( *task, bufferIndex );
+    }
   }
 }
 
@@ -733,11 +714,11 @@ void UpdateManager::ProcessPropertyNotifications( BufferIndex bufferIndex )
 
 void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
 {
-  auto rendererCount = mImpl->renderers.Count();
-  for( auto i = 0u; i < rendererCount; ++i )
+  for( auto&& renderer : mImpl->renderers )
   {
     //Apply constraints
-    ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
+    ConstrainPropertyOwner( *renderer, bufferIndex );
+
   }
 }
 
@@ -771,28 +752,21 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
 
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
-  mImpl->nodeDirtyFlags = NothingFlag;
+  mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
-  if ( !mImpl->root )
+  for( auto&& rootLayer : mImpl->roots )
   {
-    return;
-  }
-
-  // Prepare resources, update shaders, for each node
-  // And add the renderers to the sorted layers. Start from root, which is also a layer
-  mImpl->nodeDirtyFlags = UpdateNodeTree( *( mImpl->root ), bufferIndex );
-
-  if ( mImpl->systemLevelRoot )
-  {
-    mImpl->nodeDirtyFlags |= UpdateNodeTree( *( mImpl->systemLevelRoot ), bufferIndex );
+    // Prepare resources, update shaders, for each node
+    // And add the renderers to the sorted layers. Start from root, which is also a layer
+    mImpl->nodeDirtyFlags |= UpdateNodeTree( *rootLayer, bufferIndex );
   }
 }
 
-unsigned int UpdateManager::Update( float elapsedSeconds,
-                                    unsigned int lastVSyncTimeMilliseconds,
-                                    unsigned int nextVSyncTimeMilliseconds,
-                                    bool renderToFboEnabled,
-                                    bool isRenderingToFbo )
+uint32_t UpdateManager::Update( float elapsedSeconds,
+                                uint32_t lastVSyncTimeMilliseconds,
+                                uint32_t nextVSyncTimeMilliseconds,
+                                bool renderToFboEnabled,
+                                bool isRenderingToFbo )
 {
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
@@ -836,14 +810,18 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     ConstrainCustomObjects( bufferIndex );
 
     //Clear the lists of renderers from the previous update
-    for( size_t i(0); i<mImpl->sortedLayers.size(); ++i )
+    for( auto sortedLayers : mImpl->sortedLayerLists )
     {
-      mImpl->sortedLayers[i]->ClearRenderables();
+      for( auto&& layer : sortedLayers )
+      {
+        layer->ClearRenderables();
+      }
     }
 
-    for( size_t i(0); i<mImpl->systemLevelSortedLayers.size(); ++i )
+    // Call the frame-callback-processor if set
+    if( mImpl->frameCallbackProcessor )
     {
-      mImpl->systemLevelSortedLayers[i]->ClearRenderables();
+      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
     }
 
     //Update node hierarchy, apply constraints and perform sorting / culling.
@@ -860,12 +838,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //Update the transformations of all the nodes
     mImpl->transformManager.Update();
 
-    // Call the frame-callback-processor if set
-    if( mImpl->frameCallbackProcessor )
-    {
-      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
-    }
-
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
 
@@ -879,27 +851,26 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     //reset the update buffer index and make sure there is enough room in the instruction container
     if( mImpl->renderersAdded )
     {
-      mImpl->renderInstructions.ResetAndReserve(bufferIndex,
-                                                mImpl->taskList.GetTasks().Count() +
-                                                    mImpl->systemLevelTaskList.GetTasks().Count());
+      // Calculate how many render tasks we have in total
+      VectorBase::SizeType numberOfRenderTasks = 0;
 
-      if ( NULL != mImpl->root )
+      const VectorBase::SizeType taskListCount = mImpl->taskLists.Count();
+      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
       {
-        mImpl->renderTaskProcessor.Process( bufferIndex,
-                                            mImpl->taskList,
-                                            *mImpl->root,
-                                            mImpl->sortedLayers,
-                                            mImpl->renderInstructions,
-                                            renderToFboEnabled,
-                                            isRenderingToFbo );
+        numberOfRenderTasks += mImpl->taskLists[index]->GetTasks().Count();
+      }
 
-        // Process the system-level RenderTasks last
-        if ( NULL != mImpl->systemLevelRoot )
+      mImpl->renderInstructions.ResetAndReserve( bufferIndex,
+                                                 static_cast<uint32_t>( numberOfRenderTasks ) );
+
+      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
+      {
+        if ( NULL != mImpl->roots[index] )
         {
           mImpl->renderTaskProcessor.Process( bufferIndex,
-                                              mImpl->systemLevelTaskList,
-                                              *mImpl->systemLevelRoot,
-                                              mImpl->systemLevelSortedLayers,
+                                              *mImpl->taskLists[index],
+                                              *mImpl->roots[index],
+                                              mImpl->sortedLayerLists[index],
                                               mImpl->renderInstructions,
                                               renderToFboEnabled,
                                               isRenderingToFbo );
@@ -919,29 +890,34 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     }
   }
 
-  // check the countdown and notify (note, at the moment this is only done for normal tasks, not for systemlevel tasks)
-  bool doRenderOnceNotify = false;
-  mImpl->renderTaskWaiting = false;
-  for ( auto&& renderTask : mImpl->taskList.GetTasks() )
+  for( auto taskList : mImpl->taskLists )
   {
-    renderTask->UpdateState();
+    RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
 
-    if( renderTask->IsWaitingToRender() &&
-        renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+    // check the countdown and notify
+    bool doRenderOnceNotify = false;
+    mImpl->renderTaskWaiting = false;
+    for ( auto&& renderTask : tasks )
     {
-      mImpl->renderTaskWaiting = true; // keep update/render threads alive
+      renderTask->UpdateState();
+
+      if( renderTask->IsWaitingToRender() &&
+          renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+      {
+        mImpl->renderTaskWaiting = true; // keep update/render threads alive
+      }
+
+      if( renderTask->HasRendered() )
+      {
+        doRenderOnceNotify = true;
+      }
     }
 
-    if( renderTask->HasRendered() )
+    if( doRenderOnceNotify )
     {
-      doRenderOnceNotify = true;
+      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
+      mImpl->notificationManager.QueueCompleteNotification( taskList->GetCompleteNotificationInterface() );
     }
-  }
-
-  if( doRenderOnceNotify )
-  {
-    DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
-    mImpl->notificationManager.QueueCompleteNotification( mImpl->taskList.GetCompleteNotificationInterface() );
   }
 
   // Macro is undefined in release build.
@@ -951,7 +927,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   mImpl->previousUpdateScene = updateScene;
 
   // Check whether further updates are required
-  unsigned int keepUpdating = KeepUpdatingCheck( elapsedSeconds );
+  uint32_t keepUpdating = KeepUpdatingCheck( elapsedSeconds );
 
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
@@ -962,7 +938,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   return keepUpdating;
 }
 
-unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
+uint32_t UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 {
   // Update the duration set via Stage::KeepRendering()
   if ( mImpl->keepRenderingSeconds > 0.0f )
@@ -970,7 +946,7 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
     mImpl->keepRenderingSeconds -= elapsedSeconds;
   }
 
-  unsigned int keepUpdatingRequest = KeepUpdating::NOT_REQUESTED;
+  uint32_t keepUpdatingRequest = KeepUpdating::NOT_REQUESTED;
 
   // If the rendering behavior is set to continuously render, then continue to render.
   // If Stage::KeepRendering() has been called, then continue until the duration has elapsed.
@@ -1007,12 +983,13 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
 void UpdateManager::SetBackgroundColor( const Vector4& color )
 {
-  mImpl->taskList.GetTasks()[0]->SetClearEnabled( true );
-  mImpl->taskList.GetTasks()[0]->SetClearColor( 0, color );
-  mImpl->taskList.GetTasks()[0]->SetClearColor( 1, color );
+  auto taskList = mImpl->taskLists[0];
+  taskList->GetTasks()[0]->SetClearEnabled( true );
+  taskList->GetTasks()[0]->SetClearColor( 0, color );
+  taskList->GetTasks()[0]->SetClearColor( 1, color );
 }
 
-void UpdateManager::SetDefaultSurfaceRect( const Rect<int>& rect )
+void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
 {
   mImpl->surfaceRectChanged = true;
 
@@ -1029,16 +1006,22 @@ void UpdateManager::SetRenderingBehavior( DevelStage::Rendering renderingBehavio
   mImpl->renderingBehavior = renderingBehavior;
 }
 
-void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool systemLevel )
+void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, const Layer* rootLayer )
 {
-  if ( !systemLevel )
+  const VectorBase::SizeType rootCount = mImpl->roots.Count();
+
+  // Make sure we reserve the correct size for the container so that
+  // we can save the sorted layers in the same order as the root layer
+  mImpl->sortedLayerLists.resize( rootCount );
+
+  for ( VectorBase::SizeType rootIndex = 0u; rootIndex < rootCount; rootIndex++ )
   {
-    // just copy the vector of pointers
-    mImpl->sortedLayers = layers;
-  }
-  else
-  {
-    mImpl->systemLevelSortedLayers = layers;
+    Layer* root = mImpl->roots[rootIndex];
+    if ( root == rootLayer )
+    {
+      mImpl->sortedLayerLists[rootIndex] = layers;
+      break;
+    }
   }
 }
 
@@ -1051,8 +1034,11 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
     iter.node->SetDepthIndex( iter.sortedDepth );
   }
 
-  // Go through node hierarchy and rearrange siblings according to depth-index
-  SortSiblingNodesRecursively( *( mImpl->root ) );
+  for( auto root : mImpl->roots )
+  {
+    // Go through node hierarchy and rearrange siblings according to depth-index
+    SortSiblingNodesRecursively( *root );
+  }
 }
 
 bool UpdateManager::IsDefaultSurfaceRectChanged()
@@ -1065,14 +1051,14 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
   return surfaceRectChanged;
 }
 
-void UpdateManager::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+void UpdateManager::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {
-  mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
+  mImpl->GetFrameCallbackProcessor( *this ).AddFrameCallback( frameCallback, rootNode );
 }
 
 void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 {
-  mImpl->GetFrameCallbackProcessor().RemoveFrameCallback( frameCallback );
+  mImpl->GetFrameCallbackProcessor( *this ).RemoveFrameCallback( frameCallback );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )

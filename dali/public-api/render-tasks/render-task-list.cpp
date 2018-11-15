@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,12 @@ void RenderTaskList::RemoveTask( RenderTask task )
   GetImplementation(*this).RemoveTask( task );
 }
 
-unsigned int RenderTaskList::GetTaskCount() const
+uint32_t RenderTaskList::GetTaskCount() const
 {
   return GetImplementation(*this).GetTaskCount();
 }
 
-RenderTask RenderTaskList::GetTask( unsigned int index ) const
+RenderTask RenderTaskList::GetTask( uint32_t index ) const
 {
   return GetImplementation(*this).GetTask( index );
 }

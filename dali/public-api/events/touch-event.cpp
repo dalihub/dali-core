@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,12 @@ TouchEvent::~TouchEvent()
 {
 }
 
-unsigned int TouchEvent::GetPointCount() const
+uint32_t TouchEvent::GetPointCount() const
 {
-  return points.size();
+  return static_cast<uint32_t>( points.size() );
 }
 
-const TouchPoint& TouchEvent::GetPoint(unsigned int point) const
+const TouchPoint& TouchEvent::GetPoint( uint32_t point ) const
 {
   DALI_ASSERT_ALWAYS( point < points.size() && "No point at index" );
   return points[point];

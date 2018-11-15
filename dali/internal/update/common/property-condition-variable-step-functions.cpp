@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ namespace SceneGraph
 namespace
 {
 
-const int ARGINDEX_STEP_INDEX = 0;
-const int ARGINDEX_LIST_SIZE = 1;
-const int ARGINDEX_LIST_START = 2;
+const int32_t ARGINDEX_STEP_INDEX = 0;
+const int32_t ARGINDEX_LIST_SIZE = 1;
+const int32_t ARGINDEX_LIST_START = 2;
 
 }
 
@@ -83,12 +83,12 @@ ConditionFunction VariableStep::GetFunction( Property::Type valueType )
 
 bool VariableStep::Evaluate( const float propertyValue, PropertyNotification::RawArgumentContainer& arg )
 {
-  const int currentIndex = arg[ARGINDEX_STEP_INDEX];
-  const int numSteps = arg[ARGINDEX_LIST_SIZE];
+  const int32_t currentIndex = static_cast<int32_t>( arg[ARGINDEX_STEP_INDEX] ); // truncated
+  const int32_t numSteps = static_cast<int32_t>( arg[ARGINDEX_LIST_SIZE] ); // truncated
   const float first = arg[ARGINDEX_LIST_START];
   const float last = arg[ARGINDEX_LIST_START + (numSteps - 1)];
   const bool ascending = (last > first) ? true : false;
-  int newIndex = currentIndex;
+  int32_t newIndex = currentIndex;
 
   // avoid loop if property currently not within any of the range values
   if( ascending )
@@ -114,7 +114,7 @@ bool VariableStep::Evaluate( const float propertyValue, PropertyNotification::Ra
       newIndex = numSteps - 1;
     }
   }
-  int i = 0;
+  int32_t i = 0;
   for( i = 0 ; i < numSteps - 1 ; ++i )
   {
     const float arg1 = arg[ARGINDEX_LIST_START + i];

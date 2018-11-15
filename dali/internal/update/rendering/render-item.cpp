@@ -102,12 +102,15 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB( const int viewportWidth, con
 
   // Return the AABB in screen-space pixels (x, y, width, height).
   // Note: This is a algebraic simplification of: ( viewport.x - aabb.width ) / 2 - ( ( aabb.width / 2 ) + aabb.x ) per axis.
-  Vector4 aabbInScreen( ( viewportWidth / 2 ) - aabb.z, ( viewportHeight / 2 ) - aabb.w, ( viewportWidth / 2 ) - aabb.x, ( viewportHeight / 2 ) - aabb.y );
+  Vector4 aabbInScreen( static_cast<float>( viewportWidth )  * 0.5f - aabb.z,
+                        static_cast<float>( viewportHeight ) * 0.5f - aabb.w,
+                        static_cast<float>( viewportWidth )  * 0.5f - aabb.x,
+                        static_cast<float>( viewportHeight ) * 0.5f - aabb.y );
 
-  int x = static_cast< int >( round( aabbInScreen.x ) );
-  int y = static_cast< int >( round( aabbInScreen.y ) );
-  int z = static_cast< int >( round( aabbInScreen.z ) );
-  int w = static_cast< int >( round( aabbInScreen.w ) );
+  int x = static_cast< int >( roundf( aabbInScreen.x ) );
+  int y = static_cast< int >( roundf( aabbInScreen.y ) );
+  int z = static_cast< int >( roundf( aabbInScreen.z ) );
+  int w = static_cast< int >( roundf( aabbInScreen.w ) );
 
   return ClippingBox( x, y, z - x, w - y );
 }

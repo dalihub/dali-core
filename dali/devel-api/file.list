@@ -20,6 +20,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
   $(devel_api_src_dir)/threading/mutex.cpp \
   $(devel_api_src_dir)/threading/thread.cpp \
+  $(devel_api_src_dir)/update/frame-callback-interface.cpp \
   $(devel_api_src_dir)/update/update-proxy.cpp
 
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
@@ -35,6 +36,7 @@ devel_api_core_animation_header_files = \
   $(devel_api_src_dir)/animation/animation-devel.h
 
 devel_api_core_common_header_files = \
+  $(devel_api_src_dir)/common/bitwise-enum.h \
   $(devel_api_src_dir)/common/circular-queue.h \
   $(devel_api_src_dir)/common/hash.h \
   $(devel_api_src_dir)/common/map-wrapper.h \

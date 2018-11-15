@@ -72,13 +72,13 @@ struct DALI_CORE_API TapGesture : public Gesture
   /**
    * @brief The number of taps in this tap gesture.
    */
-  unsigned int numberOfTaps;
+  uint32_t numberOfTaps;
 
   /**
    * @brief The number of touch points in this tap gesture, i.e. the number of fingers the user had on the
    * screen to generate the tap gesture.
    */
-  unsigned int numberOfTouches;
+  uint32_t numberOfTouches;
 
   /**
    * @brief This is the point, in screen coordinates, where the tap occurred.

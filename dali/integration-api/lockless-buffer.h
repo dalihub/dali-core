@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // uint32_t, uint8_t
 
 // INTERNAL INCLUDES
 #include <cstring>
@@ -52,7 +53,7 @@ public:
    * Constructor.
    * @param[in] size The size of buffers in bytes.
    */
-  LocklessBuffer( size_t size );
+  LocklessBuffer( uint32_t size );
 
   /**
    * Destructor.
@@ -64,19 +65,19 @@ public:
    * @param[in] src data source
    * @param[in] size size of data in bytes
    */
-  void Write( const unsigned char *src, size_t size );
+  void Write( const uint8_t *src, uint32_t size );
 
   /**
    * Try to swap buffers and read data.
    * @note returned value only valid until Read() is called again or object is destroyed
    * @return current read buffer contents
    */
-  const unsigned char* Read();
+  const uint8_t* Read();
 
   /**
    * @return the buffer size in bytes
    */
-  unsigned int GetSize() const;
+  uint32_t GetSize() const;
 
 private:
   /**
@@ -101,9 +102,9 @@ private:
   LocklessBuffer& operator=( const LocklessBuffer& ); ///< undefined assignment operator
 
 private:
-  unsigned char* mBuffer[2];     ///< bitmap buffers
-  BufferState volatile mState;   ///< readbuffer number and whether we're currently writing into writebuffer or not
-  size_t mSize;                  ///< size of buffers
+  uint8_t* mBuffer[2];         ///< bitmap buffers
+  BufferState volatile mState; ///< readbuffer number and whether we're currently writing into writebuffer or not
+  uint32_t mSize;              ///< size of buffers
 };
 
 } // Internal

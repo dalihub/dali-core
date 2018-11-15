@@ -43,16 +43,16 @@ public:
   NodeDataProvider() { }
 
   /**
-   * @param bufferId to use
+   * @param bufferIndex to use
    * @return a reference to the model matrix
    */
-  virtual const Matrix& GetModelMatrix( unsigned int bufferId ) const = 0;
+  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const = 0;
 
   /**
-   * @param bufferId to use
+   * @param bufferIndex to use
    * @return a reference to the color
    */
-  virtual const Vector4& GetRenderColor( unsigned int bufferId ) const = 0;
+  virtual const Vector4& GetRenderColor( BufferIndex bufferIndex ) const = 0;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()

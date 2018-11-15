@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-#include "event-thread-services.h"
+// CLASS HEADER
+#include <dali/internal/event/common/event-thread-services.h>
 
+// INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali

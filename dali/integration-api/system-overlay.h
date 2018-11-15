@@ -25,6 +25,7 @@ namespace Dali
 {
 
 class Actor;
+class CameraActor;
 class RenderTaskList;
 
 namespace Internal
@@ -65,11 +66,30 @@ public:
   void Remove( Actor actor );
 
   /**
+   * Set the list of render-tasks for system-level overlays.
+   * This is a separate list, processed after the render-tasks provided by Stage::GetRenderTaskList().
+   * @param[in] taskList  The list of overlay render-tasks.
+   */
+  void SetOverlayRenderTasks(RenderTaskList& taskList);
+
+  /**
    * Retrieve the list of render-tasks for system-level overlays.
-   * This is a seperate list, processed after the render-tasks provided by Stage::GetRenderTaskList().
+   * This is a separate list, processed after the render-tasks provided by Stage::GetRenderTaskList().
    * @return The list of overlay render-tasks.
    */
   RenderTaskList GetOverlayRenderTasks();
+
+  /**
+   * Retrieve the default SystemOverlay root actor.
+   * @note This is different to the root actor provided by Dali::Stage.
+   */
+  Actor GetDefaultRootActor();
+
+  /**
+   * Retrieve the default SystemOverlay camera actor.
+   * @note This is different to the default camera actor provided by Dali::Stage.
+   */
+  CameraActor GetDefaultCameraActor();
 
   /**
    * Create the SystemOverlay entrance.

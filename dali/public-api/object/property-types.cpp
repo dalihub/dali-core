@@ -41,7 +41,7 @@ const char* const PROPERTY_TYPE_NAMES[] =
   "MAP",
   "EXTENTS",
 };
-const unsigned int PROPERTY_TYPE_NAMES_COUNT = sizeof( PROPERTY_TYPE_NAMES ) / sizeof( const char* );
+const uint32_t PROPERTY_TYPE_NAMES_COUNT = static_cast<uint32_t>( sizeof( PROPERTY_TYPE_NAMES ) / sizeof( const char* ) );
 }
 
 namespace PropertyTypes

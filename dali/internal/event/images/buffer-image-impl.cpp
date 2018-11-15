@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,6 @@ namespace Dali
 {
 namespace Internal
 {
-
-namespace
-{
-TypeRegistration mType( typeid( Dali::BufferImage ), typeid( Dali::Image ), NULL );
-} // unnamed namespace
 
 BufferImagePtr BufferImage::New( unsigned int width,
                                  unsigned int height,
@@ -139,8 +134,8 @@ void BufferImage::UploadArea( const RectArea& area )
 
   mBufferWidth = area.width ? area.width : mWidth;
   uint32_t bufferHeight = area.height ? area.height : mHeight;
-  size_t bufferSize = mBytesPerPixel * mBufferWidth * bufferHeight;
-  unsigned char* buffer = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
+  uint32_t bufferSize = mBytesPerPixel * mBufferWidth * bufferHeight;
+  Dali::Integration::PixelBuffer* buffer = reinterpret_cast< Dali::Integration::PixelBuffer* >( malloc( bufferSize ) );
   DALI_ASSERT_DEBUG(buffer != 0);
 
   // Are we uploading from an external or internal buffer ?

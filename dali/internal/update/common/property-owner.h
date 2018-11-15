@@ -18,8 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/devel-api/common/owner-container.h>

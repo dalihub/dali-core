@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ PropertyBuffer& PropertyBuffer::operator=( const PropertyBuffer& handle )
 
 void PropertyBuffer::SetData( const void* data, std::size_t size )
 {
-  GetImplementation(*this).SetData( data, size );
+  GetImplementation(*this).SetData( data, static_cast<uint32_t>( size ) ); // only support 4,294,967,295 bytes
 }
 
 std::size_t PropertyBuffer::GetSize() const

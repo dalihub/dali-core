@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PATH_CONSTRAINER_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,46 +134,6 @@ protected:
   virtual ~PathConstrainer();
 
 private:
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()

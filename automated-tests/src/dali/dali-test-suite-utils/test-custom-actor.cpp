@@ -200,7 +200,7 @@ bool TestCustomActor::TestRelayoutDependentOnChildrenBase( Dimension::Type dimen
   return GetImpl().TestRelayoutDependentOnChildrenBase( dimension );
 }
 
-unsigned int TestCustomActor::GetDepth()
+uint32_t TestCustomActor::GetDepth()
 {
   return GetImpl().mDepth;
 }

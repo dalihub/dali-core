@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -499,7 +502,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] tag An integer to identify the constraint
    */
-  void SetTag( const unsigned int tag );
+  void SetTag( uint32_t tag );
 
   /**
    * @brief Gets the tag.
@@ -507,7 +510,7 @@ public:
    * @SINCE_1_0.0
    * @return The tag
    */
-  unsigned int GetTag() const;
+  uint32_t GetTag() const;
 
 public: // Not intended for use by Application developers
 
