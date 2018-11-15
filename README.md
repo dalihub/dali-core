@@ -18,9 +18,17 @@
 
 ## 1. Building for Ubuntu desktop
 
-### Minimum Requirements
+### Requirements
 
  - Ubuntu 14.04 or later
+ - GCC version 6
+
+DALi requires a compiler supporting C++11 features.
+Ubuntu 16.04 is the first version to offer this by default (GCC v5.4.0).
+
+GCC version 6 is recommended since it has fixes for issues in version 5
+e.g. it avoids spurious 'defined but not used' warnings in header files.
+
 
 ### Creating a DALi Environment
 
