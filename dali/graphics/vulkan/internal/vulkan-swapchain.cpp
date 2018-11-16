@@ -391,6 +391,16 @@ void Swapchain::SetDepthStencil(vk::Format depthStencilFormat)
   mFramebuffers = std::move( framebuffers );
 }
 
+void Swapchain::ResetAllCommandBuffers()
+{
+  for( auto& swapbuffer : mSwapchainBuffers )
+  {
+    for( auto& cmdbuffer : swapbuffer->commandBuffers )
+    {
+      cmdbuffer->Reset();
+    }
+  }
+}
 
 void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
 {

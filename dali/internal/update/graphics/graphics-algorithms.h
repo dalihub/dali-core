@@ -58,6 +58,8 @@ public:
                                 SceneGraph::RenderInstructionContainer &renderInstructions,
                                 BufferIndex bufferIndex );
 
+  void DiscardUnusedResources( Graphics::API::Controller& controller );
+
 private:
 
   bool SetupScissorClipping( const RenderItem& item );
