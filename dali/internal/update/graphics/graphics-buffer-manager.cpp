@@ -44,7 +44,7 @@ GraphicsBuffer::GraphicsBuffer(
 {
   if( sizeInBytes )
   {
-    Reserve( sizeInBytes );
+    Reserve( sizeInBytes, false );
   }
 }
 
@@ -61,17 +61,17 @@ void GraphicsBuffer::Flush()
   mBuffer->Flush();
 }
 
-void GraphicsBuffer::Reserve(uint32_t size)
+void GraphicsBuffer::Reserve(uint32_t size, bool discardOldBuffer )
 {
-  if( size <= mSize )
-  {
-    return;
-  }
-
   if( mBuffer && mMappedPtr )
   {
     mBuffer->Unmap();
     mMappedPtr = nullptr;
+
+    if( discardOldBuffer )
+    {
+      mBuffer->DestroyNow();
+    }
   }
 
   mSize = size;
