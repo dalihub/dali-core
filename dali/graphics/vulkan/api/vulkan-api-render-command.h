@@ -107,7 +107,7 @@ public:
    *
    * @param[out] requirements A list of requirements to write to
    */
-  void UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements );
+  void UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements, VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator  );
 
   /**
    * Allocates descriptor sets
@@ -129,6 +129,14 @@ private:
    * Discards existing descriptor sets
    */
   void DiscardDescriptorSets();
+
+  /**
+   * Tests whether the descriptor pool used by the render command is
+   * still valid or new descriptors have to be allocated
+   * @param[in] dsAllocator descriptor set allocator
+   * @return True if pool is still valid
+   */
+  bool IsDescriptorPoolValid( VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator );
 
 private:
 

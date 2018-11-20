@@ -228,8 +228,6 @@ struct Controller::Impl
     mMemoryTransferFutures.clear();
 
     swapchain->Present();
-
-    mDescriptorSetAllocator->SwapBuffers();
   }
 
   API::TextureFactory& GetTextureFactory() const
@@ -319,7 +317,7 @@ struct Controller::Impl
     for( auto& command : commands )
     {
       auto vulkanCommand = static_cast<VulkanAPI::RenderCommand*>( command );
-      vulkanCommand->UpdateDescriptorSetAllocationRequirements( dsRequirements );
+      vulkanCommand->UpdateDescriptorSetAllocationRequirements( dsRequirements, *mDescriptorSetAllocator.get() );
     }
 
     if( !mDescriptorSetsFreeList.empty() )
@@ -724,11 +722,19 @@ struct Controller::Impl
 
     mGraphics.CollectGarbage();
     mGraphics.CollectGarbage();
+
+    mDescriptorSetAllocator->InvalidateAllDescriptorSets();
   }
 
   bool IsDiscardQueueEmpty()
   {
     return mGraphics.GetDiscardQueue(0u).empty() && mGraphics.GetDiscardQueue(1u).empty();
+  }
+
+  void SwapBuffers()
+  {
+    mBufferIndex = (mBufferIndex+1)%1;
+    mDescriptorSetAllocator->SwapBuffers();
   }
 
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
@@ -774,6 +780,8 @@ struct Controller::Impl
   DepthStencilFlags mDepthStencilBufferRequestedState { 0u };
 
   std::vector<DescriptorSetList> mDescriptorSetsFreeList;
+
+  uint32_t mBufferIndex{0u};
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -1001,6 +1009,11 @@ bool Controller::IsDiscardQueueEmpty()
 void Controller::WaitIdle()
 {
   mImpl->mGraphics.GetGraphicsQueue(0u).GetVkHandle().waitIdle();
+}
+
+void Controller::SwapBuffers()
+{
+  mImpl->SwapBuffers();
 }
 
 

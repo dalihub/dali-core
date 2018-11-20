@@ -195,6 +195,8 @@ public:
 
   void WaitIdle() override;
 
+  void SwapBuffers() override;
+
   // VULKAN only
 
 public:
