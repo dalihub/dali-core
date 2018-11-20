@@ -46,8 +46,6 @@ std::string FormatToString( const char* format, ... )
 
 const char* LOG_VULKAN( getenv( "LOG_VULKAN" ) );
 
-#endif
-
 namespace Dali
 {
 namespace Graphics
@@ -75,3 +73,6 @@ BlackBox& BlackBox::get()
 }
 }
 }
+
+#endif
+

@@ -70,6 +70,16 @@ void RenderCommand::DiscardDescriptorSets()
   }
 }
 
+bool RenderCommand::IsDescriptorPoolValid( VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator )
+{
+  bool valid = false;
+  if( !mData->vkDescriptorSets.descriptorSets.empty() )
+  {
+    valid = dsAllocator.ValidateDescriptorSetList( mData->vkDescriptorSets );
+  }
+  return valid;
+}
+
 RenderCommand::RenderCommand( VulkanAPI::Controller& controller, Vulkan::Graphics& graphics )
 : mController( controller ),
   mGraphics( graphics ),
@@ -98,14 +108,16 @@ void RenderCommand::PrepareResources()
 void RenderCommand::AllocateDescriptorSets( VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator )
 {
   // allocate descriptor
-  if( dsAllocator.AllocateDescriptorSets( mData->descriptorSetLayoutSignatures, mData->descriptorSetLayouts, mData->vkDescriptorSets ) )
+  if( !IsDescriptorPoolValid( dsAllocator ) )
   {
+    mData->vkDescriptorSets.descriptorSets.clear();
+    dsAllocator.AllocateDescriptorSets( mData->descriptorSetLayoutSignatures, mData->descriptorSetLayouts, mData->vkDescriptorSets );
     mUpdateFlags |= API::RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT;
     mUpdateFlags |= API::RENDER_COMMAND_UPDATE_TEXTURE_BIT;
   }
 }
 
-void RenderCommand::UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements )
+void RenderCommand::UpdateDescriptorSetAllocationRequirements( std::vector<DescriptorSetRequirements>& requirements, VulkanAPI::Internal::DescriptorSetAllocator& dsAllocator  )
 {
   //@ todo: only when pipeline has changed!
   BuildDescriptorSetRequirements();
@@ -134,6 +146,12 @@ void RenderCommand::UpdateDescriptorSetAllocationRequirements( std::vector<Descr
     }
   }
 
+  // remove expired descriptor sets before building new requirements
+  if(!IsDescriptorPoolValid( dsAllocator ))
+  {
+    mData->vkDescriptorSets.descriptorSets.clear();
+  }
+
   for( auto& requirement : mData->descriptorSetRequirements )
   {
     auto it = std::find_if( requirements.begin(),
@@ -154,11 +172,6 @@ void RenderCommand::UpdateDescriptorSetAllocationRequirements( std::vector<Descr
     {
       requirements.emplace_back( requirement );
       it = requirements.end()-1;
-    }
-
-    if( mData->vkDescriptorSets.descriptorSets.empty() )
-    {
-      (*it).notAllocatedSets += uint32_t( mData->descriptorSetLayouts.size() );
     }
   }
 

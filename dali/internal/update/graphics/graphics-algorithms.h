@@ -74,18 +74,18 @@ private:
 
   bool SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState );
 
-  void SubmitRenderItemList( Graphics::API::Controller&           graphics,
-                             BufferIndex                          bufferIndex,
-                             Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
-                             Matrix                               viewProjection,
-                             RenderInstruction&                   instruction,
-                             const RenderList&                    renderItemList,
-                             std::vector<Graphics::API::RenderCommand*>& commandList );
+  void RecordRenderItemList(Graphics::API::Controller& graphics,
+                            BufferIndex bufferIndex,
+                            Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
+                            Matrix viewProjection,
+                            RenderInstruction& instruction,
+                            const RenderList& renderItemList,
+                            std::vector<Graphics::API::RenderCommand*>& commandList);
 
-  void SubmitInstruction( Graphics::API::Controller& graphics,
-                          BufferIndex                bufferIndex,
-                          RenderInstruction&         instruction,
-                          std::vector<Graphics::API::RenderCommand*>& commandList );
+  void RecordInstruction(Graphics::API::Controller& graphics,
+                         BufferIndex bufferIndex,
+                         RenderInstruction& instruction,
+                         std::vector<Graphics::API::RenderCommand*>& commandList);
 
   bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
                                 RenderInstruction& instruction,

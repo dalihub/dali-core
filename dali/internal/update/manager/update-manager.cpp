@@ -749,9 +749,8 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   for( auto i = 0u; i < rendererCount; ++i )
   {
     //Apply constraints
-    ConstrainPropertyOwner( *mImpl->renderers[i], bufferIndex );
-
-    mImpl->renderers[i]->SetRenderCommandExpiredFlag( true );
+    auto renderer = mImpl->renderers[i];
+    ConstrainPropertyOwner( *renderer, bufferIndex );
   }
 }
 
@@ -761,7 +760,6 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   // command. There may be more than one render item per renderer if
   // the actor containing the renderer is in more than one render
   // task. The renderer owns the render commands.
-
   const auto renderInstructionCount = mImpl->renderInstructions.Count( bufferIndex );
   for( auto i=0u; i < renderInstructionCount; ++i )
   {
@@ -777,18 +775,8 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
         if( renderItem.mRenderer )
         {
           renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
-          renderItem.mRenderer->SetRenderCommandExpiredFlag( false );
         }
       }
-    }
-  }
-
-  auto rendererCount = mImpl->renderers.Count();
-  for( auto i = 0u; i < rendererCount; ++i )
-  {
-    if( mImpl->renderers[i]->GetRenderCommandsExpiredFlag() )
-    {
-      mImpl->renderers[i]->DestroyAllRenderCommands();
     }
   }
 }
@@ -981,12 +969,19 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Check whether further updates are required
   unsigned int keepUpdating = KeepUpdatingCheck( elapsedSeconds );
 
+  // we need new flag to rerun update on idle and execute potential idle code
+  if( updateScene )
+  {
+    keepUpdating |= KeepUpdating::DISCARD_RESOURCES;
+  }
+
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
 
+  mImpl->graphics.GetController().SwapBuffers();
   return keepUpdating;
 }
 

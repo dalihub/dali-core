@@ -172,7 +172,6 @@ struct AllocationTracker
   {
     if( !ptr )
     {
-      //printf("[MEMORY] Warning! Freeing NULL pointer!\n");
       return;
     }
     std::lock_guard<std::recursive_mutex> lock( allocMutex );
@@ -314,7 +313,6 @@ struct AllocationTracker
              int(dspool->totalSuballocationCount) );
     }
 
-    //printf("      COMMAND_POOL = %lu\n", 0);
     printf("  Commands: count = %d, size = %d\n", int(commandCount), int(commandMemory) );
 
     puts("");

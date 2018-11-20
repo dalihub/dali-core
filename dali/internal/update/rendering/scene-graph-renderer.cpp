@@ -337,6 +337,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
                                         .SetVertexCount(vb->GetElementCount())
                                         .SetInstanceCount(1u)));
   }
+
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
@@ -366,13 +367,13 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
   auto gfxShader = mShader->GetGfxObject();
 
   RenderCommand* renderCommand;
-  if( !mRenderCommands.Find( &instruction, renderCommand ) )
+  if( !mRenderCommands.Find( &instruction, renderCommand, updateBufferIndex ) )
   {
     DALI_ASSERT_DEBUG( 0 && "Can't find render command for this instruction" );
     return false;
   }
 
-  auto& currentUboBindings = renderCommand->mUboBindings[updateBufferIndex];
+  auto& currentUboBindings = renderCommand->mUboBindings;
 
 
   if(currentUboBindings.size() != uboCount )

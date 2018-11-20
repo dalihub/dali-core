@@ -35,8 +35,8 @@ namespace SceneGraph
 struct RenderCommand
 {
   RenderCommand()
-  : mGfxRenderCommand{ nullptr, nullptr },
-    mGfxPipeline{ nullptr, nullptr },
+  : mGfxRenderCommand{ nullptr },
+    mGfxPipeline{ nullptr },
     mUboBindings{ {}, {} }
   {
   }
@@ -44,53 +44,50 @@ struct RenderCommand
   Graphics::API::RenderCommand& AllocateGfxRenderCommand( Graphics::API::Controller& controller,
                                                           BufferIndex updateBufferIndex )
   {
-    if (!mGfxRenderCommand[updateBufferIndex])
+    if (!mGfxRenderCommand)
     {
-      mGfxRenderCommand[updateBufferIndex] = controller.AllocateRenderCommand();
+      mGfxRenderCommand = controller.AllocateRenderCommand();
     }
-    return *mGfxRenderCommand[updateBufferIndex].get();
+    return *mGfxRenderCommand.get();
   }
 
   Graphics::API::RenderCommand& GetGfxRenderCommand( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_ALWAYS( mGfxRenderCommand[bufferIndex] != nullptr );
-    return *mGfxRenderCommand[bufferIndex].get();
+    DALI_ASSERT_ALWAYS( mGfxRenderCommand != nullptr );
+    return *mGfxRenderCommand.get();
   }
 
   void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex )
   {
-    mGfxPipeline[updateBufferIndex] = std::move(pipeline);
-    mGfxRenderCommand[updateBufferIndex]->BindPipeline( mGfxPipeline[updateBufferIndex].get() );
+    mGfxPipeline = std::move(pipeline);
+    mGfxRenderCommand->BindPipeline( mGfxPipeline.get() );
   }
 
   std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
   {
-    return std::move( mGfxPipeline[updateBufferIndex] );
+    return std::move( mGfxPipeline );
   }
 
   void BindTextures( std::vector<Graphics::API::RenderCommand::TextureBinding>& textureBindings,
                      BufferIndex updateBufferIndex )
   {
-    if( !mGfxRenderCommand[updateBufferIndex]->GetTextureBindings() )
+    if( !mGfxRenderCommand->GetTextureBindings() )
     {
-      mGfxRenderCommand[updateBufferIndex]->BindTextures( &textureBindings );
+      mGfxRenderCommand->BindTextures( &textureBindings );
     }
   }
 
   void BindTextures( std::vector<Graphics::API::RenderCommand::TextureBinding>& textureBindings )
   {
-    for( auto& cmd : mGfxRenderCommand ) // For both buffers
+    if( mGfxRenderCommand )
     {
-      if( cmd )
-      {
-        cmd->BindTextures( &textureBindings );
-      }
+      mGfxRenderCommand->BindTextures( &textureBindings );
     }
   }
 
-  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
-  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
-  std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings[ MAX_GRAPHICS_DATA_BUFFER_COUNT ];
+  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
+  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
+  std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings;
 };
 
 } // namespace SceneGraph

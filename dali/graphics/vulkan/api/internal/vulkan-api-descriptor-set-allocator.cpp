@@ -28,6 +28,7 @@ namespace VulkanAPI
 {
 namespace Internal
 {
+static const uint32_t DESCRIPTOR_SET_MAX_MULTIPLIER ( 3u );
 
 DescriptorSetAllocator::DescriptorSetAllocator( VulkanAPI::Controller& controller )
 : mController( controller )
@@ -39,11 +40,13 @@ DescriptorSetAllocator::~DescriptorSetAllocator()
   // destroy all pools
   std::for_each( mPoolSet.begin(), mPoolSet.end(),[&]( auto& poolset )
   {
-    std::for_each( poolset.begin(), poolset.end(), [&]( auto& pool )
+    std::for_each( poolset.begin(), poolset.end(), [&]( Pool& pool )
     {
       if( pool.vkPool )
       {
         auto& graphics = mController.GetGraphics();
+
+        graphics.GetDevice().freeDescriptorSets( pool.vkPool, pool.vkDescriptorSets );
 
         // destroy each pool
         graphics.GetDevice().destroyDescriptorPool( pool.vkPool, &graphics.GetAllocator() );
@@ -73,6 +76,9 @@ void DescriptorSetAllocator::ResolveFreeDescriptorSets()
         if( item != *freeIt )
         {
           newList.emplace_back( item );
+        }
+        else
+        {
           ++freeIt;
         }
       });
@@ -85,6 +91,18 @@ void DescriptorSetAllocator::ResolveFreeDescriptorSets()
       pool.vkDescriptorSetsToBeFreed.clear();
     }
   }
+}
+
+bool DescriptorSetAllocator::ValidateDescriptorSetList( const DescriptorSetList& list )
+{
+  for( auto& pool : mPoolSet[list.reserved->bufferIndex] )
+  {
+    if( list.reserved->poolUID == pool.uid )
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool DescriptorSetAllocator::TestIfValid( const DescriptorSetList& list, std::vector<bool>& results ) const
@@ -136,26 +154,35 @@ void DescriptorSetAllocator::UpdateWithRequirements(
       poolset.emplace_back( requirement.layoutSignature );
       it = poolset.end()-1;
       (*it).signature = requirement.layoutSignature;
+      (*it).shouldReallocate = true;
+      (*it).available = 0;
+      (*it).uid = ++mPoolUID;
+      (*it).maxSets = 0;
+      requirement.resultDirty = true;
+    }
+    else
+    {
+      (*it).shouldReallocate = false;
+      requirement.resultDirty = false;
     }
 
     auto& pool = *it;
-    if( !requirement.notAllocatedSets )
-    {
-      pool.shouldReallocate = false;
-      requirement.resultDirty = false;
-      continue;
-    }
 
     pool.requiredDescriptorCount = requirement;
     pool.requiredSets = requirement.maxSets;
 
-    if( requirement.notAllocatedSets >= pool.available )
+    if( pool.available < pool.requiredSets )//requirement.notAllocatedSets && requirement.notAllocatedSets > pool.available )
     {
       pool.shouldReallocate = true;
     }
     else
     {
       pool.shouldReallocate = false;
+    }
+
+    if( !requirement.resultDirty && !pool.shouldReallocate )
+    {
+      continue;
     }
 
     requirement.resultDirty = pool.shouldReallocate;
@@ -186,12 +213,12 @@ void DescriptorSetAllocator::UpdateWithRequirements(
       {
         if( pool.requiredDescriptorCount.requirements[i] )
         {
-          sizes.emplace_back( VK_DESCRIPTOR_TYPE[i], pool.requiredDescriptorCount.requirements[i]);
+          sizes.emplace_back( VK_DESCRIPTOR_TYPE[i], pool.requiredDescriptorCount.requirements[i] * DESCRIPTOR_SET_MAX_MULTIPLIER );
         }
       }
 
       vk::DescriptorPoolCreateInfo createInfo;
-      createInfo.setMaxSets( pool.requiredSets );
+      createInfo.setMaxSets( pool.requiredSets * DESCRIPTOR_SET_MAX_MULTIPLIER );
       createInfo.setPPoolSizes( sizes.data() );
       createInfo.setPoolSizeCount( uint32_t(sizes.size()) );
       createInfo.setFlags( vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet );
@@ -202,7 +229,7 @@ void DescriptorSetAllocator::UpdateWithRequirements(
 
       // Update current pool
       pool.maxDescriptorCount = std::move( pool.requiredDescriptorCount );
-      pool.maxSets = pool.requiredSets;
+      pool.maxSets = pool.requiredSets * DESCRIPTOR_SET_MAX_MULTIPLIER;
 
       auto device = graphics.GetDevice();
       auto pGraphics = &graphics;
@@ -210,14 +237,26 @@ void DescriptorSetAllocator::UpdateWithRequirements(
 
       if( oldPool )
       {
+        if( !pool.vkDescriptorSets.empty() )
+        {
+          graphics.GetDevice().freeDescriptorSets( pool.vkPool, pool.vkDescriptorSets );
+        }
+
+        // clear the free list
+        pool.vkDescriptorSetsToBeFreed.clear();
+
         device.destroyDescriptorPool( oldPool, pGraphics->GetAllocator( "DESCRIPTORPOOL" ) );
       }
+
+      ++mPoolUID;
 
       // replace pool
       pool.vkPool = newPool;
       pool.dirty = true;
       pool.vkDescriptorSets = {};
       pool.available = pool.maxSets;
+
+      pool.uid = mPoolUID;
     }
   }
 }
@@ -228,21 +267,25 @@ bool DescriptorSetAllocator::AllocateDescriptorSets(
   const std::vector<vk::DescriptorSetLayout>& layouts,
   DescriptorSetList& descriptorSets )
 {
+  // access correct pool
   auto& poolset = mPoolSet[mBufferIndex];
 
   auto& retval = descriptorSets.descriptorSets;
+
+  // For each signature look for the right pool
   for( auto& signature : signatures )
   {
     auto it = std::find_if( poolset.begin(), poolset.end(), [&]( auto& item ){
       return item.signature == signature;
     });
 
-    // something went vewy wong
-    if( it == poolset.end() )
-    {
-      continue;
-    }
+    // Assert if pool hasn't been found. It should never happen if
+    // pools have been updated with correct requirements before allocation requests.
+    assert( (it != poolset.end()) && "No pool found for signature. Did UpdateWithRequirements() run with correct requirements?" );
 
+    // Check if descriptor sets are already allocated and if pool is dirty.
+    // Continue to the next signature if pool hasn't changed and there are already
+    // existing sets allocated for the render command
     if( !(*it).dirty && !descriptorSets.descriptorSets.empty() )
     {
       continue;
@@ -254,30 +297,31 @@ bool DescriptorSetAllocator::AllocateDescriptorSets(
     allocateInfo.setPSetLayouts( layouts.data() );
 
     auto& graphics = mController.GetGraphics();
-    auto result = graphics.GetDevice().allocateDescriptorSets( allocateInfo );
-    if( result.result != vk::Result::eSuccess )
-    {
-      // dammit! shouldn't happen :(
-      return { false };
-    }
+    std::vector<vk::DescriptorSet> result;
+    result.resize( allocateInfo.descriptorSetCount );
+
+    auto err = graphics.GetDevice().allocateDescriptorSets( &allocateInfo, result.data() );
+
+    assert( (err == vk::Result::eSuccess) && "Can't allocate descriptor sets!" );
 
     // reset book-keeping data
-    (*it).available -= uint32_t( result.value.size() );
+    (*it).available -= uint32_t( result.size() );
     descriptorSets.reserved.reset( new DescriptorSetList::Internal() );
     descriptorSets.reserved->pool = (*it).vkPool;
     descriptorSets.reserved->bufferIndex = mBufferIndex;
     descriptorSets.reserved->signature = (*it).signature;
+    descriptorSets.reserved->poolUID = (*it).uid;
 
     // track descriptor sets
-    if( result.value.size() > 1 )
+    if( result.size() > 1 )
     {
-      (*it).vkDescriptorSets.insert( (*it).vkDescriptorSets.end(), result.value.begin(), result.value.end() );
+      (*it).vkDescriptorSets.insert( (*it).vkDescriptorSets.end(), result.begin(), result.end() );
     }
     else
     {
-      (*it).vkDescriptorSets.emplace_back( result.value[0] );
+      (*it).vkDescriptorSets.emplace_back( result[0] );
     }
-    retval = std::move( result.value );
+    retval = std::move( result );
 
     // sort for faster lookup
     std::sort( (*it).vkDescriptorSets.begin(), (*it).vkDescriptorSets.end() );
@@ -302,24 +346,21 @@ int32_t DescriptorSetAllocator::GetPoolIndexBySignature( Vulkan::DescriptorSetLa
   return -1;
 }
 
-
 void DescriptorSetAllocator::FreeDescriptorSets( std::vector<DescriptorSetList>&& descriptorSets )
 {
   // build free lists
   for( auto& list : descriptorSets )
   {
-    int32_t poolIndex = -1;
-    if( (poolIndex = GetPoolIndexBySignature( list.reserved->signature, list.reserved->bufferIndex )) >= 0 )
+    auto bufferIndex = list.reserved->bufferIndex;
+    std::find_if( mPoolSet[bufferIndex].begin(), mPoolSet[bufferIndex].end(), [&]( Pool& pool )
     {
-      auto& pool = mPoolSet[list.reserved->bufferIndex][uint32_t( poolIndex )];
-
-      // if pool is gone, all descriptors are already invalid, no need to free them
-      if( pool.vkPool == list.reserved->pool )
+      if( pool.uid == list.reserved->poolUID )
       {
-        // collect descriptor sets to free
         pool.vkDescriptorSetsToBeFreed.insert( pool.vkDescriptorSetsToBeFreed.end(), list.descriptorSets.begin(), list.descriptorSets.end() );
+        return true;
       }
-    }
+      return false;
+    });
   }
 }
 
@@ -334,6 +375,22 @@ void DescriptorSetAllocator::SwapBuffers()
     }
   }
   mBufferIndex = (mBufferIndex+1) & 1;
+}
+
+void DescriptorSetAllocator::InvalidateAllDescriptorSets()
+{
+  auto& graphics = mController.GetGraphics();
+  graphics.DeviceWaitIdle();
+  for( auto& set : mPoolSet )
+  {
+    for( auto& pool : set )
+    {
+      graphics.GetDevice().destroyDescriptorPool(
+        pool.vkPool,
+        &mController.GetGraphics().GetAllocator("DESCRIPTORPOOL") );
+    }
+    set.clear();
+  }
 }
 
 } // Namespace Internal

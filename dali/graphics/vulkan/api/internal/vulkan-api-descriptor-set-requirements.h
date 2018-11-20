@@ -73,6 +73,7 @@ private:
     vk::DescriptorPool                   pool {};
     uint32_t                             bufferIndex {};
     Vulkan::DescriptorSetLayoutSignature signature {};
+    uint32_t                             poolUID{ 0u }; // used to identify pools, always incrementing
   };
 
   std::unique_ptr<Internal> reserved; // reserved for internal book-keeping
