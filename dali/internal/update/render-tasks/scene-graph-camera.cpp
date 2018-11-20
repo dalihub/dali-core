@@ -154,6 +154,7 @@ const Vector3 Camera::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
 Camera::Camera()
 : mUpdateViewFlag( UPDATE_COUNT ),
   mUpdateProjectionFlag( UPDATE_COUNT ),
+  mProjectionRotation( 0 ),
   mNode( NULL ),
   mType( DEFAULT_TYPE ),
   mProjectionMode( DEFAULT_MODE ),
@@ -170,7 +171,8 @@ Camera::Camera()
   mTargetPosition( DEFAULT_TARGET_POSITION ),
   mViewMatrix(),
   mProjectionMatrix(),
-  mInverseViewProjection( Matrix::IDENTITY )
+  mInverseViewProjection( Matrix::IDENTITY ),
+  mFinalProjection( Matrix::IDENTITY )
 {
 }
 
@@ -265,6 +267,12 @@ void Camera::SetTargetPosition( const Vector3& targetPosition )
   mUpdateViewFlag = UPDATE_COUNT;
 }
 
+void Camera::RotateProjection( int rotationAngle )
+{
+  mProjectionRotation = rotationAngle;
+  mUpdateViewFlag = UPDATE_COUNT;
+}
+
 const Matrix& Camera::GetProjectionMatrix( BufferIndex bufferIndex ) const
 {
   return mProjectionMatrix[ bufferIndex ];
@@ -278,6 +286,11 @@ const Matrix& Camera::GetViewMatrix( BufferIndex bufferIndex ) const
 const Matrix& Camera::GetInverseViewProjectionMatrix( BufferIndex bufferIndex ) const
 {
   return mInverseViewProjection[ bufferIndex ];
+}
+
+const Matrix& Camera::GetFinalProjectionMatrix( BufferIndex bufferIndex ) const
+{
+  return mFinalProjection[ bufferIndex ];
 }
 
 const PropertyInputImpl* Camera::GetProjectionMatrix() const
@@ -513,6 +526,38 @@ unsigned int Camera::UpdateProjection( BufferIndex updateBufferIndex )
       }
 
       mProjectionMatrix.SetDirty( updateBufferIndex );
+
+      Matrix &finalProjection = mFinalProjection[ updateBufferIndex ];
+      finalProjection.SetIdentity();
+
+      Quaternion rotationAngle;
+      switch( mProjectionRotation )
+      {
+        case 90:
+        {
+          rotationAngle = Quaternion( Dali::ANGLE_90, Vector3::ZAXIS );
+          break;
+        }
+        case 180:
+        {
+          rotationAngle = Quaternion( Dali::ANGLE_180, Vector3::ZAXIS );
+          break;
+        }
+        case 270:
+        {
+          rotationAngle = Quaternion( Dali::ANGLE_270, Vector3::ZAXIS );
+          break;
+        }
+        default:
+          rotationAngle = Quaternion( Dali::ANGLE_0, Vector3::ZAXIS );
+          break;
+      }
+
+      Matrix rotation;
+      rotation.SetIdentity();
+      rotation.SetTransformComponents( Vector3( 1.0f, 1.0f, 1.0f ), rotationAngle, Vector3( 0.0f, 0.0f, 0.0f ) );
+
+      Matrix::Multiply( finalProjection, mProjectionMatrix.Get( updateBufferIndex ), rotation );
     }
     --mUpdateProjectionFlag;
   }

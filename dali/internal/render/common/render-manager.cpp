@@ -73,7 +73,8 @@ struct RenderManager::Impl
     lastFrameWasRendered( false ),
     programController( glAbstraction ),
     depthBufferAvailable( depthBufferAvailableParam ),
-    stencilBufferAvailable( stencilBufferAvailableParam )
+    stencilBufferAvailable( stencilBufferAvailableParam ),
+    defaultSurfaceOrientation( 0 )
   {
   }
 
@@ -133,6 +134,8 @@ struct RenderManager::Impl
 
   Integration::DepthBufferAvailable         depthBufferAvailable;     ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable       stencilBufferAvailable;   ///< Whether the stencil buffer is available
+
+  int                                       defaultSurfaceOrientation; ///< defaultSurfaceOrientation for the default surface we are rendering to
 
 };
 
@@ -215,6 +218,11 @@ void RenderManager::SetBackgroundColor( const Vector4& color )
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
+}
+
+void RenderManager::SetDefaultSurfaceOrientation( int orientation )
+{
+  mImpl->defaultSurfaceOrientation = orientation;
 }
 
 void RenderManager::AddRenderer( OwnerPointer< Render::Renderer >& renderer )
@@ -537,6 +545,13 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     else
     {
       viewportRect = mImpl->defaultSurfaceRect;
+    }
+
+    if ( mImpl->defaultSurfaceOrientation == 90 || mImpl->defaultSurfaceOrientation == 270 )
+    {
+      int temp = viewportRect.width;
+      viewportRect.width = viewportRect.height;
+      viewportRect.height = temp;
     }
   }
 

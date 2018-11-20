@@ -73,7 +73,7 @@ void TestApplication::Initialize()
                                         Integration::StencilBufferAvailable::TRUE );
 
   mCore->ContextCreated();
-  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
+  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight, 0, false );
   mCore->SetDpi( mDpi.x, mDpi.y );
 
   Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
@@ -153,7 +153,7 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
   mSurfaceWidth = width;
   mSurfaceHeight = height;
 
-  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
+  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight, 0, false );
 }
 
 void TestApplication::SetTopMargin( unsigned int margin )

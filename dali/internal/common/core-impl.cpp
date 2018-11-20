@@ -187,18 +187,9 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized( unsigned int width, unsigned int height )
+void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation, bool forceUpdate )
 {
-  mStage->SurfaceResized( width, height );
-
-  // The stage-size may be less than surface-size (reduced by top-margin)
-  Vector2 size = mStage->GetSize();
-  mRelayoutController->SetStageSize( size.width, size.height );
-}
-
-void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation )
-{
-  mStage->SurfaceResized( width, height, orientation );
+  mStage->SurfaceResized( width, height, orientation, forceUpdate );
 
   // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 size = mStage->GetSize();

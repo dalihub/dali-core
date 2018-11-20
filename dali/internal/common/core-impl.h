@@ -111,14 +111,9 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int)
+   * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int, int orientation, bool forceUpdate )
    */
-  void SurfaceResized(unsigned int width, unsigned int height);
-
-  /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(unsigned int, unsigned int, int orientation)
-   */
-  void SurfaceResized( unsigned int width, unsigned int height, int orientation );
+  void SurfaceResized( unsigned int width, unsigned int height, int orientation, bool forceUpdate );
 
   /**
    * @copydoc Dali::Integration::Core::SetTopMargin( unsigned int margin )

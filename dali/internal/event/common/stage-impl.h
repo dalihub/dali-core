@@ -143,19 +143,13 @@ public:
   void Remove( Actor& actor );
 
   /**
-   * Used to calculate the size of the stage and indirectly, the root actor.
-   * @param [in] width  The new surface width.
-   * @param [in] height The new surface height.
-   */
-  void SurfaceResized( float width, float height );
-
-  /**
    * Used to calculate the size and orientation of the stage and indirectly, the root actor.
    * @param [in] width  The new surface width.
    * @param [in] height The new surface height.
    * @param [in] orientation The new surface orientation.
+   * @param [in] forceUpdate The flag to update force.
    */
-  void SurfaceResized( float width, float height, int orientation );
+  void SurfaceResized( float width, float height, int orientation, bool forceUpdate );
 
   /**
    * Sets the top margin size.
@@ -528,6 +522,8 @@ private:
   ViewMode mViewMode;
   float mStereoBase;
 
+  int mOrientation;
+
   unsigned int mTopMargin;
   Vector2 mDpi;
 
@@ -568,9 +564,6 @@ private:
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
   bool mForceNextUpdate:1; ///< True if the next rendering is really required.
   bool mRenderToFbo:1;     ///< Whether to render to a Frame Buffer Object.
-
-  bool mNeedToRotation:1;
-  int mCurrentOrientation;
 };
 
 } // namespace Internal

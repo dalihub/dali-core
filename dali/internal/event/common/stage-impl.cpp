@@ -120,10 +120,6 @@ void Stage::Initialize( bool renderToFbo )
 
   // Create the default render-task
   Dali::RenderTask defaultRenderTask = mRenderTaskList->CreateTask();
-
-  // init current default camera orientation
-  mNeedToRotation = false;
-  mCurrentOrientation = 0;
 }
 
 void Stage::Uninitialize()
@@ -204,15 +200,14 @@ void Stage::Remove( Actor& actor )
   mRootLayer->Remove( actor );
 }
 
-void Stage::SurfaceResized( float width, float height )
+void Stage::SurfaceResized( float width, float height, int orientation, bool forceUpdate )
 {
   if( ( fabs( width - mSurfaceSize.width ) > Math::MACHINE_EPSILON_1000 ) || ( fabs( height - mSurfaceSize.height ) > Math::MACHINE_EPSILON_1000 )
-      || mNeedToRotation )
+         || ( orientation != mOrientation ) || ( forceUpdate ) )
   {
-    mNeedToRotation = false;
-
     mSurfaceSize.width = width;
     mSurfaceSize.height = height;
+    mOrientation = orientation;
 
     // Internally we want to report the actual size of the stage.
     mSize.width = width;
@@ -220,6 +215,12 @@ void Stage::SurfaceResized( float width, float height )
 
     // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
     mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
+    mDefaultCamera->RotateProjection( orientation );
+
+    if( mSystemOverlay )
+    {
+      mSystemOverlay->GetImpl()->GetDefaultCameraActor().RotateProjection( orientation );
+    }
 
     // Adjust the camera height to allow for top-margin
     SetDefaultCameraPosition();
@@ -234,14 +235,8 @@ void Stage::SurfaceResized( float width, float height )
       mSystemOverlay->GetImpl()->SetSize( width, height );
     }
 
-    if( mCurrentOrientation == 90 || mCurrentOrientation == 270)
-    {
-      SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, height, width ) );
-    }
-    else
-    {
-      SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
-    }
+    SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int>( 0, 0, width, height ) );
+    SetDefaultSurfaceOrientationMessage( mUpdateManager, orientation );
 
     // if single render task to screen then set its viewport parameters
     if( 1 == mRenderTaskList->GetTaskCount() )
@@ -250,14 +245,7 @@ void Stage::SurfaceResized( float width, float height )
 
       if(!defaultRenderTask.GetTargetFrameBuffer())
       {
-        if( mCurrentOrientation == 90 || mCurrentOrientation == 270)
-        {
-          defaultRenderTask.SetViewport( Viewport(0, 0, height, width) );
-        }
-        else
-        {
-          defaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
-        }
+        defaultRenderTask.SetViewport( Viewport(0, 0, width, height) );
       }
     }
 
@@ -269,66 +257,6 @@ void Stage::SurfaceResized( float width, float height )
 
       Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
       defaultRenderTask.SetFrameBuffer( frameBuffer );
-    }
-  }
-}
-
-void Stage::SurfaceResized( float width, float height, int orientation )
-{
-  // Calculates the angle of rotation.
-  int rotDelta = ( 360 + orientation - mCurrentOrientation ) % 360;
-  Quaternion rotateAngle;
-
-  switch( rotDelta )
-  {
-    case 90:
-    {
-      rotateAngle = Quaternion( Dali::ANGLE_270, Vector3::ZAXIS );
-      break;
-    }
-    case 270:
-    {
-      rotateAngle = Quaternion( Dali::ANGLE_90, Vector3::ZAXIS );
-      break;
-    }
-    case 180:
-    {
-      rotateAngle = Quaternion( Dali::ANGLE_180, Vector3::ZAXIS );
-      break;
-    }
-    default:
-      rotateAngle = Quaternion( Dali::ANGLE_0, Vector3::ZAXIS );
-      break;
-  }
-
-  // set current orientation
-  mCurrentOrientation = orientation;
-  if( rotDelta )
-  {
-    mNeedToRotation = true;
-  }
-
-  // do surface resized
-  SurfaceResized( width, height );
-
-  // If we need to rotate, rotate the camera.
-  if( rotDelta )
-  {
-    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position depending on the orientation
-    if( mCurrentOrientation == 90 || mCurrentOrientation == 270 )
-    {
-      mDefaultCamera->SetPerspectiveProjection( Vector2( height, width ) );
-      if( mSystemOverlay )
-      {
-        mSystemOverlay->GetImpl()->GetDefaultCameraActor().SetPerspectiveProjection( Vector2( height, width ) );
-      }
-    }
-
-    mDefaultCamera->RotateBy( rotateAngle );
-
-    if( mSystemOverlay )
-    {
-      mSystemOverlay->GetImpl()->GetDefaultCameraActor().RotateBy( rotateAngle );
     }
   }
 }
@@ -818,14 +746,13 @@ Stage::Stage( AnimationPlaylist& playlist,
   mBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
+  mOrientation( 0 ),
   mTopMargin( 0 ),
   mSystemOverlay( NULL ),
   mRenderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
   mDepthTreeDirty( false ),
   mForceNextUpdate( false ),
-  mRenderToFbo( false ),
-  mNeedToRotation( false ),
-  mCurrentOrientation( 0 )
+  mRenderToFbo( false )
 {
 }
 

@@ -509,6 +509,12 @@ const SceneGraph::Camera* CameraActor::GetCamera() const
   return mSceneObject;
 }
 
+void CameraActor::RotateProjection( int rotationAngle )
+{
+  // sceneObject is being used in a separate thread; queue a message to set
+  RotateProjectionMessage( GetEventThreadServices(), *mSceneObject, rotationAngle );
+}
+
 unsigned int CameraActor::GetDefaultPropertyCount() const
 {
   return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;

@@ -452,7 +452,6 @@ void RenderTask::SetSyncRequired( bool requiresSync )
   mRequiresSync = requiresSync;
 }
 
-
 RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),
   mViewportSize( Vector2::ZERO),

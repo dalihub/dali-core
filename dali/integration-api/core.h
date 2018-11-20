@@ -280,17 +280,6 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * Notify the Core that the GL surface has been resized.
-   * This should be done at least once i.e. after the first call to ContextCreated().
-   * The Core will use the surface size for camera calculations, and to set the GL viewport.
-   * Multi-threading note: this method should be called from the main thread
-   * @param[in] width The new surface width.
-   * @param[in] height The new surface height.
-   */
-  void SurfaceResized(unsigned int width, unsigned int height);
-
-
-  /**
    * Notify the Core that the GL surface has been resized and rotated.
    * This should be done at least once i.e. after the first call to ContextCreated().
    * The Core will use the surface size or orientation for camera calculations, and to set the GL viewport.
@@ -298,8 +287,9 @@ public:
    * @param[in] width The new surface width.
    * @param[in] height The new surface height.
    * @param[in] orientation The new surface orientation.
+   * @param[in] forceUpdate The flag to update force.
    */
-  void SurfaceResized( unsigned int width, unsigned int height, int orientation );
+  void SurfaceResized( unsigned int width, unsigned int height, int orientation, bool forceUpdate );
 
   /**
    * Notify the Core about the top margin size.

@@ -79,14 +79,9 @@ void Core::RecoverFromContextLoss()
   mImpl->RecoverFromContextLoss();
 }
 
-void Core::SurfaceResized(unsigned int width, unsigned int height)
+void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation, bool forceUpdate )
 {
-  mImpl->SurfaceResized(width, height);
-}
-
-void Core::SurfaceResized( unsigned int width, unsigned int height, int orientation )
-{
-  mImpl->SurfaceResized(width, height, orientation);
+  mImpl->SurfaceResized(width, height, orientation, forceUpdate );
 }
 
 void Core::SetTopMargin( unsigned int margin )

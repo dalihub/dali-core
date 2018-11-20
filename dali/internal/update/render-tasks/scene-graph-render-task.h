@@ -364,6 +364,7 @@ private:
   unsigned int mFrameCounter;       ///< counter for rendering every N frames
 
   unsigned int mRenderedOnceCounter;  ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
+
   bool mRequiresSync;              ///< Whether sync is needed to track the render
 
 };
