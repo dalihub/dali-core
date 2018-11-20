@@ -49,6 +49,18 @@ public:
   KeyEventImpl& operator=( const KeyEventImpl& rhs );
 
   /**
+   * @brief Get the key symbol string.
+   * @return The key symbol
+   */
+  std::string GetLogicalKey() const;
+
+  /**
+   * @brief Set the key symbol string to the KeyEvent.
+   * @param[in] key The key symbol to set
+   */
+  void SetLogicalKey( const std::string& logicalKey );
+
+  /**
    * @brief Get the compose string.
    *
    * @return The compose string.
@@ -116,6 +128,7 @@ private:
 
 private:
 
+  std::string mLogicalKey;
   std::string mCompose;
   std::string mDeviceName;
   Device::Class::Type mDeviceClass;
