@@ -44,7 +44,8 @@ namespace Internal
 {
 
 KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
-: mCompose( "" ),
+: mKey( "" ),
+  mCompose( "" ),
   mDeviceName( "" ),
   mDeviceClass( Device::Class::NONE ),
   mDeviceSubclass( Device::Subclass::NONE )
@@ -68,6 +69,7 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
 {
   if( this != &rhs )
   {
+    mKey = rhs.mKey;
     mCompose = rhs.mCompose;
     mDeviceName = rhs.mDeviceName;
     mDeviceClass = rhs.mDeviceClass;
@@ -75,6 +77,16 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
   }
 
   return *this;
+}
+
+std::string KeyEventImpl::GetKey() const
+{
+  return mKey;
+}
+
+void KeyEventImpl::SetKey( const std::string& key )
+{
+  mKey = key;
 }
 
 std::string KeyEventImpl::GetCompose() const
