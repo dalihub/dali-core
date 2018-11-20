@@ -456,14 +456,14 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportStat
   return scissorEnabled;
 }
 
-void GraphicsAlgorithms::SubmitRenderItemList(
-  Graphics::API::Controller&           graphics,
-  BufferIndex                          bufferIndex,
-  Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
-  Matrix                               viewProjection,
-  RenderInstruction&                   instruction,
-  const RenderList&                    renderItemList,
-  std::vector<Graphics::API::RenderCommand*>& commandList )
+void GraphicsAlgorithms::RecordRenderItemList(
+  Graphics::API::Controller &graphics,
+  BufferIndex bufferIndex,
+  Graphics::API::RenderCommand::RenderTargetBinding &renderTargetBinding,
+  Matrix viewProjection,
+  RenderInstruction &instruction,
+  const RenderList &renderItemList,
+  std::vector<Graphics::API::RenderCommand *> &commandList)
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -560,11 +560,11 @@ void GraphicsAlgorithms::SubmitRenderItemList(
   }
 }
 
-void GraphicsAlgorithms::SubmitInstruction(
+void GraphicsAlgorithms::RecordInstruction(
   Graphics::API::Controller& graphics,
-  BufferIndex                bufferIndex,
-  RenderInstruction&         instruction,
-  std::vector<Graphics::API::RenderCommand*>& commandList )
+  BufferIndex bufferIndex,
+  RenderInstruction& instruction,
+  std::vector<Graphics::API::RenderCommand*>& commandList)
 {
   using namespace Graphics::API;
 
@@ -595,8 +595,8 @@ void GraphicsAlgorithms::SubmitInstruction(
   auto numberOfRenderLists = instruction.RenderListCount();
   for( auto i = 0u; i < numberOfRenderLists; ++i )
   {
-    SubmitRenderItemList( graphics, bufferIndex, renderTargetBinding,
-                          viewProjection, instruction, *instruction.GetRenderList( i ),
+    RecordRenderItemList( graphics, bufferIndex, renderTargetBinding,
+                          viewProjection, instruction, *instruction.GetRenderList(i),
                           commandList );
   }
 }
@@ -968,8 +968,6 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
-  auto uboIndex = bufferIndex;
-
   // Prepare uniform buffers
   if( !mGraphicsBufferManager )
   {
@@ -980,15 +978,15 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
-  if( mUniformBlockAllocationBytes && !mUniformBuffer[uboIndex] )
+  if( mUniformBlockAllocationBytes && !mUniformBuffer[bufferIndex] )
   {
-    mUniformBuffer[uboIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
+    mUniformBuffer[bufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
   else if( mUniformBlockAllocationBytes && (
-    mUniformBuffer[uboIndex]->GetSize() < pagedAllocation ||
-    (pagedAllocation < uint32_t(float(mUniformBuffer[uboIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
+    mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
+    (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
   {
-    mUniformBuffer[uboIndex]->Reserve( pagedAllocation, true );
+    mUniformBuffer[bufferIndex]->Reserve( pagedAllocation, true );
   }
 
   mUboOffset = 0u;
@@ -1001,15 +999,15 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 
-    SubmitInstruction( controller, bufferIndex, instruction, commandList );
+    RecordInstruction(controller, bufferIndex, instruction, commandList);
   }
 
   // Submit all render commands in one go
   controller.SubmitCommands( std::move(commandList) );
 
-  if( mUniformBlockAllocationBytes && mUniformBuffer[uboIndex] )
+  if( mUniformBlockAllocationBytes && mUniformBuffer[bufferIndex] )
   {
-    mUniformBuffer[uboIndex]->Flush();
+    mUniformBuffer[bufferIndex]->Flush();
   }
 
   controller.EndFrame();

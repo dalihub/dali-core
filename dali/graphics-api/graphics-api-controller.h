@@ -184,6 +184,11 @@ public:
    */
   virtual void WaitIdle() = 0;
 
+  /**
+   * @brief Swaps graphics buffers
+   */
+  virtual void SwapBuffers() = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;
