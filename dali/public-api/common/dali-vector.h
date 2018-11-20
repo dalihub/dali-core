@@ -182,7 +182,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size to erase
    * @pre Last element cannot be erased as there is nothing to move.
    */
-  void Erase( uint8_t* address, SizeType elementSize );
+  void Erase( char* address, SizeType elementSize );
 
   /**
    * @brief Erases a range of elements.
@@ -194,7 +194,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size of one of the elements to be erased
    * @return Address pointing to the next element of the last one
    */
-  uint8_t* Erase( uint8_t* first, uint8_t* last, SizeType elementSize );
+  char* Erase( char* first, char* last, SizeType elementSize );
 
   /**
    * @brief Copies a number of bytes from \e source to \e destination.
@@ -206,11 +206,11 @@ protected: // for Derived classes
    * @param[in] source Pointer to the source address
    * @param[in] numberOfBytes The number of bytes to be copied
    */
-  void CopyMemory( uint8_t* destination, const uint8_t* source, size_t numberOfBytes );
+  void CopyMemory( char* destination, const char* source, size_t numberOfBytes );
 
 private:
 
-  // not copiable as it does not know the size of elements
+  // not copyable as it does not know the size of elements
   VectorBase( const VectorBase& ); ///< Undefined @SINCE_1_0.0
   VectorBase& operator=( const VectorBase& ); ///< Undefined @SINCE_1_0.0
 
@@ -323,7 +323,7 @@ protected: // API for deriving classes
    */
   void Erase( uint8_t* address, SizeType elementSize )
   {
-    VectorBase::Erase( address, elementSize );
+    VectorBase::Erase( reinterpret_cast< char* >( address ), elementSize );
   }
 
   /**
@@ -337,7 +337,7 @@ protected: // API for deriving classes
    */
   uint8_t* Erase( uint8_t* first, uint8_t* last, SizeType elementSize )
   {
-    return VectorBase::Erase( first, last, elementSize );
+    return reinterpret_cast< uint8_t* >( VectorBase::Erase( reinterpret_cast< char* >( first ), reinterpret_cast< char *>( last ), elementSize ) );
   }
 
   /**
@@ -370,12 +370,12 @@ protected: // API for deriving classes
     SetCount( newCount );
 
     // Move current items to a new position inside the vector.
-    CopyMemory( at + size,
-                at,
+    CopyMemory( reinterpret_cast< char* >( at + size ),
+                reinterpret_cast< const char* >( at ),
                 ( reinterpret_cast<uint8_t*>( mData ) + count * elementSize ) - at );
 
     // Copy the given items.
-    CopyMemory( at, from, size );
+    CopyMemory( reinterpret_cast< char* >( at ), reinterpret_cast< const char* >( from ), size );
   }
 };
 
