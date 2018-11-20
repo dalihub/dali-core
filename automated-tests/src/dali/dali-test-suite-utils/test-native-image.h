@@ -36,35 +36,35 @@ public:
   inline const char* GetCustomFragmentPreFix(){return "#extension GL_OES_EGL_image_external:require\n";}
   inline const char* GetCustomSamplerTypename(){return "samplerExternalOES";}
 
-  inline int GetEglImageTextureTarget(){return GL_TEXTURE_EXTERNAL_OES;}
+  inline int32_t GetEglImageTextureTarget(){return GL_TEXTURE_EXTERNAL_OES;}
 
 };
 
 class DALI_CORE_API TestNativeImage : public Dali::NativeImageInterface
 {
 public:
-  static TestNativeImagePointer New(int width, int height);
+  static TestNativeImagePointer New(uint32_t width, uint32_t height);
 
   inline void SetGlExtensionCreateResult(bool result){ createResult = result;}
   inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return createResult;};
   inline virtual void GlExtensionDestroy() { ++mExtensionDestroyCalls; };
   inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return 0;};
   inline virtual void PrepareTexture() {};
-  inline virtual unsigned int GetWidth() const {return mWidth;};
-  inline virtual unsigned int GetHeight() const {return mHeight;};
+  inline virtual uint32_t GetWidth() const {return mWidth;};
+  inline virtual uint32_t GetHeight() const {return mHeight;};
   inline virtual bool RequiresBlending() const {return true;};
   inline virtual Dali::NativeImageInterface::Extension* GetExtension() {return mExtension;}
 
 private:
-  TestNativeImage(int width, int height);
+  TestNativeImage(uint32_t width, uint32_t height);
   virtual ~TestNativeImage();
 
-  int mWidth;
-  int mHeight;
+  uint32_t mWidth;
+  uint32_t mHeight;
 public:
-  int mExtensionCreateCalls;
-  int mExtensionDestroyCalls;
-  int mTargetTextureCalls;
+  int32_t mExtensionCreateCalls;
+  int32_t mExtensionDestroyCalls;
+  int32_t mTargetTextureCalls;
 
   bool createResult;
   TestNativeImageExtension* mExtension;
@@ -74,27 +74,27 @@ public:
 class DALI_CORE_API TestNativeImageNoExt : public Dali::NativeImageInterface
 {
 public:
-  static TestNativeImageNoExtPointer New(int width, int height);
+  static TestNativeImageNoExtPointer New(uint32_t width, uint32_t height);
 
   inline void SetGlExtensionCreateResult(bool result){ createResult = result;}
   inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return createResult;};
   inline virtual void GlExtensionDestroy() { ++mExtensionDestroyCalls; };
   inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return 1;};
   inline virtual void PrepareTexture() {};
-  inline virtual unsigned int GetWidth() const {return mWidth;};
-  inline virtual unsigned int GetHeight() const {return mHeight;};
+  inline virtual uint32_t GetWidth() const {return mWidth;};
+  inline virtual uint32_t GetHeight() const {return mHeight;};
   inline virtual bool RequiresBlending() const {return true;};
 
 private:
-  TestNativeImageNoExt(int width, int height);
+  TestNativeImageNoExt(uint32_t width, uint32_t height);
   virtual ~TestNativeImageNoExt();
 
-  int mWidth;
-  int mHeight;
+  uint32_t mWidth;
+  uint32_t mHeight;
 public:
-  int mExtensionCreateCalls;
-  int mExtensionDestroyCalls;
-  int mTargetTextureCalls;
+  int32_t mExtensionCreateCalls;
+  int32_t mExtensionDestroyCalls;
+  int32_t mTargetTextureCalls;
   bool createResult;
 };
 

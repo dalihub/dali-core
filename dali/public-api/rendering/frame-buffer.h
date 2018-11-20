@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/rendering/texture.h>
@@ -72,7 +75,7 @@ public:
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd)
    * @return A handle to a newly allocated FrameBuffer
    */
-  static FrameBuffer New( unsigned int width, unsigned int height, unsigned int attachments );
+  static FrameBuffer New( uint32_t width, uint32_t height, uint32_t attachments );
 
   /**
    * @brief Default constructor, creates an empty handle.
@@ -133,7 +136,7 @@ public:
    * @note The specified texture mipmap has to have the same size than the FrameBuffer
    * otherwise it won't be attached.
    */
-  void AttachColorTexture( Texture& texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
    * @brief Gets the color texture used as output in the FrameBuffer.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ void* FixedSizeMemoryPool::Allocate()
   }
 
   // Placement new the object in block memory
-  unsigned char* objectAddress = static_cast< unsigned char* >( mImpl->mCurrentBlock->blockMemory );
+  uint8_t* objectAddress = static_cast< uint8_t* >( mImpl->mCurrentBlock->blockMemory );
   objectAddress += mImpl->mCurrentBlockSize * mImpl->mFixedSize;
   mImpl->mCurrentBlockSize++;
 

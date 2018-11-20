@@ -136,8 +136,8 @@ bool Matrix3::Invert()
   // In the case where the determinant is exactly zero, the matrix is non-invertible
   if( ! EqualsZero( det ) )
   {
-    det = 1.0 / det;
-    for (int i = 0; i < 9; i++)
+    det = 1.0f / det;
+    for( int32_t i = 0; i < 9; i++ )
     {
       mElements[i] = cof[i] * det;
     }
@@ -237,11 +237,11 @@ void Matrix3::Multiply( Matrix3& result, const Matrix3& lhs, const Matrix3& rhs 
   const float* rhsPtr  = rhs.AsFloat();
   const float* lhsPtr = lhs.AsFloat();
 
-  for( int i=0; i < 3; i++ )
+  for( int32_t i=0; i < 3; i++ )
   {
-    int loc = i * 3;
-    int loc1 = loc + 1;
-    int loc2 = loc + 2;
+    int32_t loc = i * 3;
+    int32_t loc1 = loc + 1;
+    int32_t loc2 = loc + 2;
 
     float value0 = lhsPtr[loc];
     float value1 = lhsPtr[loc1];

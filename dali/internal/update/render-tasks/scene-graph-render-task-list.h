@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 namespace Dali
 {
@@ -46,15 +47,21 @@ public:
   typedef OwnerContainer< RenderTask* > RenderTaskContainer;
 
   /**
-   * Constructor
-   * @param renderMessageDispatcher to send messages
+   * Construct a new RenderTaskList.
+   * @return A new RenderTaskList
    */
-  RenderTaskList( /*RenderMessageDispatcher& renderMessageDispatcher*/ );
+  static RenderTaskList* New();
 
   /**
    * Destructor
    */
   ~RenderTaskList();
+
+  /**
+   * Overriden delete operator
+   * Deletes the RenderTaskList from its global memory pool
+   */
+  void operator delete( void* ptr );
 
   /**
    * Add a new RenderTask to the list.
@@ -67,6 +74,12 @@ public:
    * @param[in] task The RenderTaskList will destroy this task.
    */
   void RemoveTask( RenderTask* task );
+
+  /**
+   * Retrieve the count of RenderTasks.
+   * @return The count.
+   */
+  uint32_t GetTaskCount();
 
   /**
    * Retrieve the container of RenderTasks.
@@ -91,6 +104,13 @@ public:
    */
   CompleteNotificationInterface* GetCompleteNotificationInterface();
 
+protected:
+
+  /**
+   * Protected constructor. See New()
+   */
+  RenderTaskList();
+
 private:
 
   // Undefined
@@ -113,7 +133,7 @@ inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTask
   typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
@@ -127,7 +147,7 @@ inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderT
   typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::RemoveTask, &task );

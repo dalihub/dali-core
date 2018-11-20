@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,41 +199,6 @@ public:
 public: // properties
 
   /**
-   * copydoc Dali::Internal::Object
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * copydoc Dali::Internal::Object
-   */
-  virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * copydoc Dali::Internal::Object
-   */
-  virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
-
-  /**
-   * copydoc Dali::Internal::Object
-   */
-  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
    * copydoc Dali::Internal::Object::SetDefaultProperty()
    */
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
@@ -247,11 +212,6 @@ public: // properties
    * copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
-
-  /**
-   * copydoc Dali::Internal::Object
-   */
-  virtual bool IsDefaultPropertyWritable( Property::Index index ) const ;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,22 +68,22 @@ PanGestureDetector& PanGestureDetector::operator=(const PanGestureDetector& rhs)
   return *this;
 }
 
-void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
+void PanGestureDetector::SetMinimumTouchesRequired(uint32_t minimum)
 {
   GetImplementation(*this).SetMinimumTouchesRequired(minimum);
 }
 
-void PanGestureDetector::SetMaximumTouchesRequired(unsigned int maximum)
+void PanGestureDetector::SetMaximumTouchesRequired(uint32_t maximum)
 {
   GetImplementation(*this).SetMaximumTouchesRequired(maximum);
 }
 
-unsigned int PanGestureDetector::GetMinimumTouchesRequired() const
+uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 {
   return GetImplementation(*this).GetMinimumTouchesRequired();
 }
 
-unsigned int PanGestureDetector::GetMaximumTouchesRequired() const
+uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
 {
   return GetImplementation(*this).GetMaximumTouchesRequired();
 }

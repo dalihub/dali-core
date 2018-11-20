@@ -178,7 +178,7 @@ public:
    * Set the blending options. This should only be called from the update thread.
    * @param[in] options A bitmask of blending options.
    */
-  void SetBlendingOptions( unsigned int options );
+  void SetBlendingOptions( uint32_t options );
 
   /**
    * Set the blending options. This should only be called from the update thread.
@@ -207,25 +207,25 @@ public:
    * Set the index of first element for indexed draw
    * @param[in] firstElement index of first element to draw
    */
-  void SetIndexedDrawFirstElement( size_t firstElement );
+  void SetIndexedDrawFirstElement( uint32_t firstElement );
 
   /**
    * Get the index of first element for indexed draw
    * @return The index of first element for indexed draw
    */
-  size_t GetIndexedDrawFirstElement() const;
+  uint32_t GetIndexedDrawFirstElement() const;
 
   /**
    * Set the number of elements to draw by indexed draw
    * @param[in] elementsCount number of elements to draw
    */
-  void SetIndexedDrawElementsCount( size_t elementsCount );
+  void SetIndexedDrawElementsCount( uint32_t elementsCount );
 
   /**
    * Get the number of elements to draw by indexed draw
    * @return The number of elements to draw by indexed draw
    */
-  size_t GetIndexedDrawElementsCount() const;
+  uint32_t GetIndexedDrawElementsCount() const;
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -507,11 +507,11 @@ private:
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
 
-  size_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
-  size_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
+  uint32_t                       mIndexedDrawFirstElement;          ///< first element index to be drawn using indexed draw
+  uint32_t                       mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
 
-  unsigned int                 mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
-  unsigned int                 mResendFlag;                       ///< Indicate whether data should be resent to the renderer
+  uint32_t                     mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
+  uint32_t                     mResendFlag;                       ///< Indicate whether data should be resent to the renderer
 
   BlendingOptions              mBlendOptions;                     ///< The blending options
 
@@ -541,7 +541,7 @@ inline void SetTexturesMessage( EventThreadServices& eventThreadServices, const 
   typedef MessageValue1< Renderer, TextureSet* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &renderer, &Renderer::SetTextures, const_cast<TextureSet*>(&textureSet) );
@@ -552,7 +552,7 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
   typedef MessageValue1< Renderer, SceneGraph::Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<SceneGraph::Geometry*>(&geometry) );
@@ -563,7 +563,7 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Re
   typedef MessageValue1< Renderer, Shader* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &renderer, &Renderer::SetShader, &shader );
@@ -574,7 +574,7 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
   typedef MessageValue1< Renderer, int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &renderer, &Renderer::SetDepthIndex, depthIndex );
@@ -585,7 +585,7 @@ inline void SetFaceCullingModeMessage( EventThreadServices& eventThreadServices,
   typedef MessageValue1< Renderer, FaceCullingMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetFaceCullingMode, faceCullingMode );
 }
@@ -595,17 +595,17 @@ inline void SetBlendModeMessage( EventThreadServices& eventThreadServices, const
   typedef MessageValue1< Renderer, BlendMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetBlendMode, blendingMode );
 }
 
-inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, unsigned int options )
+inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t options )
 {
-  typedef MessageValue1< Renderer, unsigned int > LocalType;
+  typedef MessageValue1< Renderer, uint32_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetBlendingOptions, options );
 }
@@ -615,27 +615,27 @@ inline void SetBlendColorMessage( EventThreadServices& eventThreadServices, cons
   typedef MessageValue1< Renderer, Vector4 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetBlendColor, blendColor );
 }
 
-inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t firstElement )
+inline void SetIndexedDrawFirstElementMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t firstElement )
 {
-  typedef MessageValue1< Renderer, size_t > LocalType;
+  typedef MessageValue1< Renderer, uint32_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawFirstElement, firstElement );
 }
 
-inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, size_t elementsCount )
+inline void SetIndexedDrawElementsCountMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t elementsCount )
 {
-  typedef MessageValue1< Renderer, size_t > LocalType;
+  typedef MessageValue1< Renderer, uint32_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetIndexedDrawElementsCount, elementsCount );
 }
@@ -645,7 +645,7 @@ inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThread
   typedef MessageValue1< Renderer, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::EnablePreMultipliedAlpha, preMultiplied );
 }
@@ -655,7 +655,7 @@ inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, 
   typedef MessageValue1< Renderer, DepthWriteMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetDepthWriteMode, depthWriteMode );
 }
@@ -665,7 +665,7 @@ inline void SetDepthTestModeMessage( EventThreadServices& eventThreadServices, c
   typedef MessageValue1< Renderer, DepthTestMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetDepthTestMode, depthTestMode );
 }
@@ -675,7 +675,7 @@ inline void SetDepthFunctionMessage( EventThreadServices& eventThreadServices, c
   typedef MessageValue1< Renderer, DepthFunction::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetDepthFunction, depthFunction );
 }
@@ -685,7 +685,7 @@ inline void SetRenderModeMessage( EventThreadServices& eventThreadServices, cons
   typedef MessageValue1< Renderer, RenderMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetRenderMode, mode );
 }
@@ -695,7 +695,7 @@ inline void SetStencilFunctionMessage( EventThreadServices& eventThreadServices,
   typedef MessageValue1< Renderer, StencilFunction::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilFunction, stencilFunction );
 }
@@ -705,7 +705,7 @@ inline void SetStencilFunctionMaskMessage( EventThreadServices& eventThreadServi
   typedef MessageValue1< Renderer, int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilFunctionMask, mask );
 }
@@ -715,7 +715,7 @@ inline void SetStencilFunctionReferenceMessage( EventThreadServices& eventThread
   typedef MessageValue1< Renderer, int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilFunctionReference, stencilFunctionReference );
 }
@@ -725,7 +725,7 @@ inline void SetStencilMaskMessage( EventThreadServices& eventThreadServices, con
   typedef MessageValue1< Renderer, int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilMask, stencilMask );
 }
@@ -735,7 +735,7 @@ inline void SetStencilOperationOnFailMessage( EventThreadServices& eventThreadSe
   typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnFail, stencilOperation );
 }
@@ -745,7 +745,7 @@ inline void SetStencilOperationOnZFailMessage( EventThreadServices& eventThreadS
   typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZFail, stencilOperation );
 }
@@ -755,7 +755,7 @@ inline void SetStencilOperationOnZPassMessage( EventThreadServices& eventThreadS
   typedef MessageValue1< Renderer, StencilOperation::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::SetStencilOperationOnZPass, stencilOperation );
 }
@@ -765,7 +765,7 @@ inline void BakeOpacityMessage( EventThreadServices& eventThreadServices, const 
   typedef MessageDoubleBuffered1< Renderer, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::BakeOpacity, opacity );
 }

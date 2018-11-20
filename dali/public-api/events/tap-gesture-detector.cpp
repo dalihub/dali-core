@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ TapGestureDetector TapGestureDetector::New()
   return TapGestureDetector(internal.Get());
 }
 
-TapGestureDetector TapGestureDetector::New(unsigned int tapsRequired )
+TapGestureDetector TapGestureDetector::New(uint32_t tapsRequired )
 {
   Internal::TapGestureDetectorPtr internal = Internal::TapGestureDetector::New( tapsRequired );
 
@@ -66,22 +66,22 @@ TapGestureDetector& TapGestureDetector::operator=(const TapGestureDetector& rhs)
   return *this;
 }
 
-void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
+void TapGestureDetector::SetMinimumTapsRequired(uint32_t taps)
 {
   GetImplementation(*this).SetMinimumTapsRequired(taps);
 }
 
-void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
+void TapGestureDetector::SetMaximumTapsRequired(uint32_t taps)
 {
   GetImplementation(*this).SetMaximumTapsRequired(taps);
 }
 
-unsigned int TapGestureDetector::GetMinimumTapsRequired() const
+uint32_t TapGestureDetector::GetMinimumTapsRequired() const
 {
   return GetImplementation(*this).GetMinimumTapsRequired();
 }
 
-unsigned int TapGestureDetector::GetMaximumTapsRequired() const
+uint32_t TapGestureDetector::GetMaximumTapsRequired() const
 {
   return GetImplementation(*this).GetMaximumTapsRequired();
 }

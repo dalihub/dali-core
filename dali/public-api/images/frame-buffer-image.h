@@ -91,7 +91,7 @@ public:
    * @return A handle to a new instance of a FrameBufferImage
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if pixelFormat is not supported on the hardware platform.
    */
-  static FrameBufferImage New(unsigned int width = 0, unsigned int height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
+  static FrameBufferImage New(uint32_t width = 0, uint32_t height = 0, Pixel::Format pixelFormat = Pixel::RGBA8888,
                               RenderBuffer::Format bufferFormat = RenderBuffer::COLOR) DALI_DEPRECATED_API;
 
   /**

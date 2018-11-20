@@ -1,9 +1,8 @@
-
 #ifndef FREE_LIST_H_
 #define FREE_LIST_H_
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +18,10 @@
  *
  */
 
-//INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
@@ -58,18 +60,18 @@ struct FreeList
    * @param[in] value The value to add
    * @return The index where the value has been added
    */
-  unsigned int Add( unsigned int value )
+  uint32_t Add( uint32_t value )
   {
-    if( mData.Empty() || mFirstFreeIndex == mData.Size() )
+    const uint32_t size = static_cast<uint32_t>( mData.Size() ); // 4,294,967,295 entries is enough
+    if( mData.Empty() || mFirstFreeIndex == size )
     {
       //Make room for another item
-      size_t size = mData.Size();
-      mData.PushBack( size+1 );
+      mData.PushBack( size + 1 );
       mFirstFreeIndex = size;
     }
 
     //Update first free index
-    unsigned int index = mFirstFreeIndex;
+    uint32_t index = mFirstFreeIndex;
     mFirstFreeIndex = mData[mFirstFreeIndex];
 
     mData[index] = value;
@@ -82,7 +84,7 @@ struct FreeList
    *
    * @param[in] index The index of the element to remove
    */
-  void Remove( unsigned int index )
+  void Remove( uint32_t index )
   {
     mData[index] = mFirstFreeIndex;
     mFirstFreeIndex = index;
@@ -94,7 +96,7 @@ struct FreeList
    * @param[in]  index Index of the element.
    * @return Reference to the element for given index.
    */
-  unsigned int& operator[]( unsigned int index )
+  uint32_t& operator[]( uint32_t index )
   {
     return mData[index];
   }
@@ -105,14 +107,14 @@ struct FreeList
    * @param[in]  index Index of the element.
    * @return Reference to the element for given index.
    */
-  unsigned int operator[]( unsigned int index ) const
+  uint32_t operator[]( uint32_t index ) const
   {
     return mData[index];
   }
 
 private:
-  Dali::Vector<unsigned int> mData; ///< data
-  unsigned int mFirstFreeIndex;     ///< Index where a new element will be added
+  Dali::Vector< uint32_t > mData; ///< data
+  uint32_t mFirstFreeIndex;     ///< Index where a new element will be added
 };
 
 }

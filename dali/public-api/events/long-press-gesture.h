@@ -79,7 +79,7 @@ struct DALI_CORE_API LongPressGesture : public Gesture
    * @brief The number of touch points in this long press gesture, i.e. the number of fingers the user had
    * on the screen to generate the long press gesture.
    */
-  unsigned int numberOfTouches;
+  uint32_t numberOfTouches;
 
   /**
    * @brief This is the point, in screen coordinates, where the long press occurred.

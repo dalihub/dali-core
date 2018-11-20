@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ DALI_PROPERTY( "localPosition",       VECTOR2, false, false, true,   Dali::PanGe
 DALI_PROPERTY( "localDisplacement",   VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT  )
 DALI_PROPERTY( "localVelocity",       VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_VELOCITY      )
 DALI_PROPERTY( "panning",             BOOLEAN, false, false, true,   Dali::PanGestureDetector::Property::PANNING             )
-DALI_PROPERTY_TABLE_END( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, PanGestureDetectorDefaultProperties )
 
 // Signals
 
@@ -64,7 +64,7 @@ BaseHandle Create()
   return Dali::PanGestureDetector::New();
 }
 
-TypeRegistration mType( typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create );
+TypeRegistration mType( typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create, PanGestureDetectorDefaultProperties );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal );
 
@@ -324,82 +324,6 @@ void PanGestureDetector::OnActorDetach(Actor& actor)
 void PanGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
-}
-
-unsigned int PanGestureDetector::GetDefaultPropertyCount() const
-{
-  return DEFAULT_PROPERTY_COUNT;
-}
-
-void PanGestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  indices.Reserve( DEFAULT_PROPERTY_COUNT );
-
-  int index = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX;
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
-  {
-    indices.PushBack( index );
-  }
-}
-
-const char* PanGestureDetector::GetDefaultPropertyName( Property::Index index ) const
-{
-  index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX;
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].name;
-  }
-
-  return NULL;
-}
-
-Property::Index PanGestureDetector::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
-    {
-      index = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX + i;
-      break;
-    }
-  }
-  return index;
-}
-
-bool PanGestureDetector::IsDefaultPropertyWritable(Property::Index index) const
-{
-  // None of our properties should be writable through the Public API
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ].writable;
-}
-
-bool PanGestureDetector::IsDefaultPropertyAnimatable(Property::Index index) const
-{
-  // None of our properties are animatable
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ].animatable;
-}
-
-bool PanGestureDetector::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  // All our properties can be used as an input to a constraint.
-  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ].constraintInput;
-}
-
-Property::Type PanGestureDetector::GetDefaultPropertyType(Property::Index index) const
-{
-  index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX;
-  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-  {
-    return DEFAULT_PROPERTY_DETAILS[ index ].type;
-  }
-  else
-  {
-    // Index out-of-range
-    return Property::NONE;
-  }
 }
 
 void PanGestureDetector::SetDefaultProperty( Property::Index index, const Property::Value& property )

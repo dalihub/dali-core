@@ -211,8 +211,8 @@ public:
     const Framebuffer*                    framebuffer { nullptr };
     std::vector<Framebuffer::ClearColor>  clearColors {};
     Framebuffer::DepthStencilClearColor   depthStencilClearColor {};
-    float framebufferWidth; // Store the framebuffer size in case we need to set viewport
-    float framebufferHeight;
+    uint32_t framebufferWidth; // Store the framebuffer size in case we need to set viewport
+    uint32_t framebufferHeight;
 
     void*    pNext{ nullptr };
     RenderTargetBinding() = default;

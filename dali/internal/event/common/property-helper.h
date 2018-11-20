@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h>
 #include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/internal/event/object/default-property-metadata.h>
 
 namespace Dali
 {
@@ -29,28 +33,14 @@ namespace Internal
 {
 
 /**
- * @brief Structure for setting up default properties and their details.
- */
-struct PropertyDetails
-{
-  const char* name;             ///< The name of the property.
-  Property::Type type;          ///< The property type.
-  bool writable:1;              ///< Whether the property is writable
-  bool animatable:1;            ///< Whether the property is animatable.
-  bool constraintInput:1;       ///< Whether the property can be used as an input to a constraint.
-#ifdef DEBUG_ENABLED
-  Property::Index enumIndex;    ///< Used to check the index is correct within a debug build.
-#endif
-};
-
-/**
- * These macros are used to define a table of property details per Actor object.
+ * These macros are used to define a table of property details per object.
  * The index property is only compiled in for DEBUG_ENABLED builds and allows checking the table index VS the property enum index.
  * DALI_PROPERTY_TABLE_END Forces a run-time check that will happen once.
+ * the macros define an instance of PropertyMetadata with the name that is passed to DALI_PROPERTY_TABLE_END
  */
-#define DALI_PROPERTY_TABLE_BEGIN const Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
+#define DALI_PROPERTY_TABLE_BEGIN const Dali::PropertyDetails DEFAULT_PROPERTY_DETAILS[] = {
 #ifdef DEBUG_ENABLED
-#define DALI_PROPERTY_TABLE_END( startIndex )   }; const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails ); \
+#define DALI_PROPERTY_TABLE_END( startIndex, constantName )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Dali::PropertyDetails ) ); \
   struct PROPERTY_CHECK \
   { \
     PROPERTY_CHECK() \
@@ -66,15 +56,13 @@ struct PropertyDetails
       } \
     } \
   }; \
+  constexpr Dali::DefaultPropertyMetadata constantName{ DEFAULT_PROPERTY_DETAILS, DEFAULT_PROPERTY_COUNT }; \
   static PROPERTY_CHECK PROPERTY_CHECK_INSTANCE;
 #else
-#define DALI_PROPERTY_TABLE_END( startIndex )   }; const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails );
+#define DALI_PROPERTY_TABLE_END( startIndex, constantName )   }; const Property::Index DEFAULT_PROPERTY_COUNT = static_cast<Property::Index>( sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Dali::PropertyDetails ) );\
+  constexpr Dali::DefaultPropertyMetadata constantName{ DEFAULT_PROPERTY_DETAILS, DEFAULT_PROPERTY_COUNT };
 #endif
-#ifdef DEBUG_ENABLED
-#define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, Dali::Property::type, writable, animatable, constraint, index },
-#else
-#define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, Dali::Property::type, writable, animatable, constraint },
-#endif
+#define DALI_PROPERTY( text, type, writable, animatable, constraint, index ) { text, index, Dali::Property::type, writable, animatable, constraint },
 
 /**
  * @brief Case insensitive string comparison.
@@ -88,7 +76,7 @@ struct PropertyDetails
  *
  * @return true if strings are the same
  */
-bool CompareTokens( const char * first, const char * second, size_t& size );
+bool CompareTokens( const char * first, const char * second, uint32_t& size );
 
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2698,7 +2698,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
 int UtcDaliRenderTaskWorldToViewport(void)
 {
-  TestApplication application( static_cast<size_t>(400), static_cast<size_t>(400) ); // square surface
+  TestApplication application( 400u, 400u ); // square surface
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 

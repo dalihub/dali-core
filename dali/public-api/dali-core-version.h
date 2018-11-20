@@ -18,14 +18,17 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
-DALI_CORE_API extern const unsigned int CORE_MAJOR_VERSION; ///< The major version number of the Core library.
-DALI_CORE_API extern const unsigned int CORE_MINOR_VERSION; ///< The minor version number of the Core library.
-DALI_CORE_API extern const unsigned int CORE_MICRO_VERSION; ///< The micro version number of the Core library.
+DALI_CORE_API extern const uint32_t CORE_MAJOR_VERSION; ///< The major version number of the Core library.
+DALI_CORE_API extern const uint32_t CORE_MINOR_VERSION; ///< The minor version number of the Core library.
+DALI_CORE_API extern const uint32_t CORE_MICRO_VERSION; ///< The micro version number of the Core library.
 DALI_CORE_API extern const char * const CORE_BUILD_DATE;    ///< The date/time the Core library was built.
 } // namespace Dali
 

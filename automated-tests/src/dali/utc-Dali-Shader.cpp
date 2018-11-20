@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,25 @@ int UtcDaliShaderDownCast02(void)
   Handle handle = Handle::New(); // Create a custom object
   Shader shader = Shader::DownCast(handle);
   DALI_TEST_EQUALS( (bool)shader, false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliShaderDefaultProperties(void)
+{
+  TestApplication application;
+// from shader-impl.cpp
+// DALI_PROPERTY( "program",       MAP,     true,     false,     false,  Dali::Shader::Property::PROGRAM )
+
+  Shader shader = Shader::New(VertexSource, FragmentSource);
+  DALI_TEST_EQUALS( shader.GetPropertyCount(), 1, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( shader.GetPropertyName( Shader::Property::PROGRAM ), "program", TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetPropertyIndex( "program" ), (Property::Index)Shader::Property::PROGRAM, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.GetPropertyType( Shader::Property::PROGRAM ), Property::MAP, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.IsPropertyWritable( Shader::Property::PROGRAM ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.IsPropertyAnimatable( Shader::Property::PROGRAM ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( shader.IsPropertyAConstraintInput( Shader::Property::PROGRAM ), false, TEST_LOCATION );
+
   END_TEST;
 }
 

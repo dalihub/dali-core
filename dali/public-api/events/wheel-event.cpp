@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ namespace Dali
 
 namespace
 {
-const unsigned int MODIFIER_SHIFT = 0x1;
-const unsigned int MODIFIER_CTRL  = 0x2;
-const unsigned int MODIFIER_ALT   = 0x4;
+const uint32_t MODIFIER_SHIFT = 0x1;
+const uint32_t MODIFIER_CTRL  = 0x2;
+const uint32_t MODIFIER_ALT   = 0x4;
 
 }
 
@@ -39,7 +39,7 @@ WheelEvent::WheelEvent()
 {
 }
 
-WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp )
+WheelEvent::WheelEvent( Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t z, uint32_t timeStamp )
 : type( type ),
   direction( direction ),
   modifiers( modifiers ),

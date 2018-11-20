@@ -57,7 +57,7 @@ void PropertyBuffer::SetFormat( OwnerPointer< PropertyBuffer::Format >& format )
   mDataChanged = true;
 }
 
-void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<char> >& data, size_t size )
+void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint32_t size )
 {
   mData.Swap( data );
   mSize = size;

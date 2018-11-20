@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ const BufferImage BufferImage::WHITE()
   return BufferImage(internal);
 }
 
-BufferImage BufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat)
+BufferImage BufferImage::New(uint32_t width, uint32_t height, Pixel::Format pixelformat)
 {
   DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BufferImage width requested" );
   DALI_ASSERT_ALWAYS( 0u != height && "Invalid BufferImage height requested" );
@@ -75,7 +75,7 @@ BufferImage BufferImage::New(unsigned int width, unsigned int height, Pixel::For
   return BufferImage(internal.Get());
 }
 
-BufferImage BufferImage::New(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride)
+BufferImage BufferImage::New(PixelBuffer* pixBuf, uint32_t width, uint32_t height, Pixel::Format pixelformat, uint32_t stride)
 {
   DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BufferImage width requested" );
   DALI_ASSERT_ALWAYS( 0u != height && "Invalid BufferImage height requested" );
@@ -89,12 +89,12 @@ PixelBuffer* BufferImage::GetBuffer()
   return GetImplementation(*this).GetBuffer();
 }
 
-unsigned int BufferImage::GetBufferSize() const
+uint32_t BufferImage::GetBufferSize() const
 {
   return GetImplementation(*this).GetBufferSize();
 }
 
-unsigned int BufferImage::GetBufferStride() const
+uint32_t BufferImage::GetBufferStride() const
 {
   return GetImplementation(*this).GetBufferStride();
 }

@@ -55,12 +55,12 @@ namespace CubeMapLayer
    * These constants should be used as the "layer" parameter when uploading a cube-map with Texture::Upload.
    * @SINCE_1_1.43
    */
-  const unsigned int POSITIVE_X = 0u; ///< CubeMap image for +x @SINCE_1_1.43
-  const unsigned int NEGATIVE_X = 1u; ///< CubeMap image for -x @SINCE_1_1.43
-  const unsigned int POSITIVE_Y = 2u; ///< CubeMap image for +y @SINCE_1_1.43
-  const unsigned int NEGATIVE_Y = 3u; ///< CubeMap image for -y @SINCE_1_1.43
-  const unsigned int POSITIVE_Z = 4u; ///< CubeMap image for +z @SINCE_1_1.43
-  const unsigned int NEGATIVE_Z = 5u; ///< CubeMap image for -z @SINCE_1_1.43
+  const uint32_t POSITIVE_X = 0u; ///< CubeMap image for +x @SINCE_1_1.43
+  const uint32_t NEGATIVE_X = 1u; ///< CubeMap image for -x @SINCE_1_1.43
+  const uint32_t POSITIVE_Y = 2u; ///< CubeMap image for +y @SINCE_1_1.43
+  const uint32_t NEGATIVE_Y = 3u; ///< CubeMap image for -y @SINCE_1_1.43
+  const uint32_t POSITIVE_Z = 4u; ///< CubeMap image for +z @SINCE_1_1.43
+  const uint32_t NEGATIVE_Z = 5u; ///< CubeMap image for -z @SINCE_1_1.43
 
 } // namespace CubeMapLayer
 
@@ -83,7 +83,7 @@ public:
    * @param[in] height The height of the texture
    * @return A handle to a newly allocated Texture
    */
-  static Texture New( TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height );
+  static Texture New( TextureType::Type type, Pixel::Format format, uint32_t width, uint32_t height );
 
   /**
    * @brief Creates a new Texture object from a native image.
@@ -161,9 +161,9 @@ public:
    * @return True if the PixelData object has compatible pixel format and fits in the rectangle specified, false otherwise
    */
   bool Upload( PixelData pixelData,
-               unsigned int layer, unsigned int mipmap,
-               unsigned int xOffset, unsigned int yOffset,
-               unsigned int width, unsigned int height );
+               uint32_t layer, uint32_t mipmap,
+               uint32_t xOffset, uint32_t yOffset,
+               uint32_t width, uint32_t height );
 
   /**
    * @brief Generates mipmaps for the texture.
@@ -179,7 +179,7 @@ public:
    * @SINCE_1_1.43
    * @return The width, in pixels, of the texture
    */
-  unsigned int GetWidth() const;
+  uint32_t GetWidth() const;
 
   /**
    * @brief Returns the height of the texture.
@@ -187,7 +187,7 @@ public:
    * @SINCE_1_1.43
    * @return The height, in pixels, of the texture
    */
-  unsigned int GetHeight() const;
+  uint32_t GetHeight() const;
 
 public:
 

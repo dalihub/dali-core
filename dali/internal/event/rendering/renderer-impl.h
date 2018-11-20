@@ -139,12 +139,12 @@ public:
    /**
     * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
     */
-   void SetIndexedDrawFirstElement( size_t firstElement );
+   void SetIndexedDrawFirstElement( uint32_t firstElement );
 
    /**
     * @copydoc Dali::Renderer::SetIndexedDrawElementsCount
     */
-   void SetIndexedDrawElementsCount( size_t elementsCount );
+   void SetIndexedDrawElementsCount( uint32_t elementsCount );
 
    /**
     * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -168,46 +168,6 @@ public:
    SceneGraph::Renderer* GetRendererSceneObject();
 
 public: // Default property extensions from Object
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
-   */
-  virtual unsigned int GetDefaultPropertyCount() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
-   */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
-   */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
-   */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
-   */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
-   */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
@@ -317,8 +277,8 @@ private: // data
 
   int                                 mDepthIndex;
 
-  size_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
-  size_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
+  uint32_t                              mIndexedDrawFirstElement;      ///< Offset of first element to draw from bound index buffer
+  uint32_t                              mIndexedDrawElementCount;      ///< Number of elements to draw
 
   SceneGraph::StencilParameters       mStencilParameters;            ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;              ///< Local copy of blending options bitmask

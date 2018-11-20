@@ -53,7 +53,7 @@ Point::~Point()
 {
 }
 
-void Point::SetDeviceId( int deviceId )
+void Point::SetDeviceId( int32_t deviceId )
 {
   mTouchPoint.deviceId = deviceId;
 }

@@ -75,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Geometry::SetIndexBuffer()
    */
-  void SetIndexBuffer( const unsigned short* indices, size_t count );
+  void SetIndexBuffer( const uint16_t* indices, size_t count );
 
   /**
    * @copydoc Dali::Geometry::SetType()

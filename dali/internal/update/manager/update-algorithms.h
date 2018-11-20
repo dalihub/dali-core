@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 
 namespace Dali
 {
@@ -31,7 +32,6 @@ namespace SceneGraph
 {
 
 class Layer;
-class Node;
 class PropertyOwner;
 
 /**
@@ -49,7 +49,7 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
  * @param[in] renderQueue Used to query messages for the next Render.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
-int UpdateNodeTree( Layer& rootNode, BufferIndex updateBufferIndex );
+NodePropertyFlags UpdateNodeTree( Layer& rootNode, BufferIndex updateBufferIndex );
 
 } // namespace SceneGraph
 

@@ -155,7 +155,7 @@ public:
    * initial size is zero before it is assigned
    * @param[in] margin margin size
    */
-  void SetTopMargin( unsigned int margin );
+  void SetTopMargin( uint32_t margin );
 
   /**
    * Returns the size of the Stage in pixels as a Vector.
@@ -197,12 +197,12 @@ public:
   /**
    * @copydoc Dali::Stage::GetLayerCount()
    */
-  unsigned int GetLayerCount() const;
+  uint32_t GetLayerCount() const;
 
   /**
    * @copydoc Dali::Stage::GetLayer()
    */
-  Dali::Layer GetLayer( unsigned int depth ) const;
+  Dali::Layer GetLayer( uint32_t depth ) const;
 
   /**
    * @copydoc Dali::Stage::GetRootLayer()
@@ -443,7 +443,7 @@ public: // Implementation of EventThreadServices
   /**
    * @copydoc EventThreadServices::ReserveMessageSlot
    */
-  virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene );
+  virtual uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene );
 
   /**
    * @copydoc EventThreadServices::GetEventBufferIndex
@@ -517,7 +517,7 @@ private:
   ViewMode mViewMode;
   float mStereoBase;
 
-  unsigned int mTopMargin;
+  uint32_t mTopMargin;
   Vector2 mDpi;
 
   // The object registry

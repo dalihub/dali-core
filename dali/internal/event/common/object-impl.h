@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -122,106 +125,106 @@ public:
    * Add an observer to the object.
    * @param[in] observer The observer to add.
    */
-  virtual void AddObserver( Observer& observer );
+  void AddObserver( Observer& observer );
 
   /**
    * Remove an observer from the object
    * @pre The observer has already been added.
    * @param[in] observer The observer to remove.
    */
-  virtual void RemoveObserver( Observer& observer );
+  void RemoveObserver( Observer& observer );
 
   /**
    * @copydoc Dali::Handle::Supports()
    */
-  virtual bool Supports( Capability capability ) const;
+  bool Supports( Capability capability ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyCount()
    */
-  virtual unsigned int GetPropertyCount() const;
+  uint32_t GetPropertyCount() const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyName()
    */
-  virtual std::string GetPropertyName( Property::Index index ) const;
+  std::string GetPropertyName( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
    */
-  virtual Property::Index GetPropertyIndex( const std::string& name ) const;
+  Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
    */
-  virtual Property::Index GetPropertyIndex( Property::Index key ) const;
+  Property::Index GetPropertyIndex( Property::Index key ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
    */
-  virtual Property::Index GetPropertyIndex( Property::Key key ) const;
+  Property::Index GetPropertyIndex( Property::Key key ) const;
 
   /**
    * @copydoc Dali::Handle::IsPropertyWritable()
    */
-  virtual bool IsPropertyWritable( Property::Index index ) const;
+  bool IsPropertyWritable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::IsPropertyAnimatable()
    */
-  virtual bool IsPropertyAnimatable( Property::Index index ) const;
+  bool IsPropertyAnimatable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::IsPropertyAConstraintInput()
    */
-  virtual bool IsPropertyAConstraintInput( Property::Index index ) const;
+  bool IsPropertyAConstraintInput( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyType()
    */
-  virtual Property::Type GetPropertyType( Property::Index index ) const;
+  Property::Type GetPropertyType( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::SetProperty()
    */
-  virtual void SetProperty( Property::Index index, const Property::Value& propertyValue );
+  void SetProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Handle::GetProperty()
    */
-  virtual Property::Value GetProperty( Property::Index index ) const;
+  Property::Value GetProperty( Property::Index index ) const;
 
   /**
    * @brief Retrieves the latest value of the property on the scene-graph.
    * @param[in]  index  The index of the property required.
    * @return The latest value of the property on the scene-graph.
    */
-  virtual Property::Value GetCurrentProperty( Property::Index index ) const;
+  Property::Value GetCurrentProperty( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndices()
    */
-  virtual void GetPropertyIndices( Property::IndexContainer& indices ) const;
+  void GetPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
+  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  virtual Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
+  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
    * @brief Implementing method for this override
    */
-  virtual Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
+  Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
    * @brief returns true if the custom property exists on this object.
@@ -239,19 +242,19 @@ public:
   /**
    * @copydoc Dali::Handle::AddPropertyNotification()
    */
-  virtual Dali::PropertyNotification AddPropertyNotification( Property::Index index,
-                                                              int componentIndex,
-                                                              const Dali::PropertyCondition& condition );
+  Dali::PropertyNotification AddPropertyNotification( Property::Index index,
+                                                      int32_t componentIndex,
+                                                      const Dali::PropertyCondition& condition );
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotification()
    */
-  virtual void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
+  void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotifications()
    */
-  virtual void RemovePropertyNotifications();
+  void RemovePropertyNotifications();
 
   /**
    * Notifies that a property is being animated.
@@ -294,9 +297,9 @@ public:
   void RemoveConstraints();
 
   /**
-   * Remove all constraints from a Object with a matching tag
+   * @copydoc Dali::Handle::RemoveConstraints( uint32_t )
    */
-  void RemoveConstraints( unsigned int tag );
+  void RemoveConstraints( uint32_t tag );
 
   /**
    * Called by TypeInfo to set the type-info that this object-impl is created by.
@@ -307,7 +310,7 @@ public:
   /**
    * @return the index from which custom properties start
    */
-  unsigned int CustomPropertyStartIndex()
+  uint32_t CustomPropertyStartIndex()
   {
     return PROPERTY_CUSTOM_START_INDEX;
   }
@@ -342,7 +345,7 @@ public:
    * @param[in] index The index of the property.
    * @return The index or Property::INVALID_COMPONENT_INDEX.
    */
-  virtual int GetPropertyComponentIndex( Property::Index index ) const;
+  virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::PropertySetSignal()
@@ -415,11 +418,20 @@ protected:
   Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const;
 
   /**
-   * Check whether the animatable property is registered already, if not then register one.
-   * @param [in] index The index of the property
-   * @return pointer to the property.
+   * Registers animatable scene property
+   * @param typeInfo to check the default value
+   * @param index of the property to register
+   * @param value initial value or nullptr
    */
-  AnimatablePropertyMetadata* RegisterAnimatableProperty(Property::Index index) const;
+  void RegisterAnimatableProperty( const TypeInfo& typeInfo, Property::Index index, const Property::Value* value ) const;
+
+  /**
+   * Check whether the animatable property is registered already, if not then register on.
+   * @param [in] index The index of the property
+   * @param [in] value optional value for the property
+   * @return pointer to the property metadata
+   */
+  AnimatablePropertyMetadata* GetSceneAnimatableProperty( Property::Index index, const Property::Value* value ) const;
 
   /**
    * Resolve the index and name of child properties if any.
@@ -427,62 +439,6 @@ protected:
   void ResolveChildProperties();
 
 private: // Default property extensions for derived classes
-
-  /**
-   * Query how many default properties the derived class supports.
-   * @return The number of default properties.
-   */
-  virtual unsigned int GetDefaultPropertyCount() const = 0;
-
-  /**
-   * Retrieve all the indices that are associated with the default properties supported by the derived class.
-   * @return A container of default property indices.
-   * @note The deriving class must not modify the existing elements in the container.
-   */
-  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const = 0;
-
-  /**
-   * Query how many default properties the derived class supports.
-   * @return The number of default properties.
-   */
-  virtual const char* GetDefaultPropertyName( Property::Index index ) const = 0;
-
-  /**
-   * Query the index of a default property.
-   * @param [in] name The name of the property.
-   * @return The index of the property, or Property::INVALID_INDEX if no default property exists with the given name.
-   */
-  virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const = 0;
-
-  /**
-   * Query whether a default property is writable.
-   * @param [in] index The index of the property.
-   * @return True if the property is animatable.
-   */
-  virtual bool IsDefaultPropertyWritable( Property::Index index ) const = 0;
-
-  /**
-   * Query whether a default property is animatable.
-   * This determines whether the property can be the target of an animation or constraint.
-   * @param [in] index The index of the property.
-   * @return True if the property is animatable.
-   */
-  virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const = 0;
-
-  /**
-   * @brief Query whether a default property can be used as an input to a constraint.
-   *
-   * @param [in] index The index of the property.
-   * @return True if the property can be used as an input to a constraint.
-   */
-  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const = 0;
-
-  /**
-   * Query the type of a default property.
-   * @param [in] index The index of the property.
-   * @return The type of the property.
-   */
-  virtual Property::Type GetDefaultPropertyType( Property::Index index ) const = 0;
 
   /**
    * Set the value of a default property.
@@ -527,23 +483,10 @@ private: // Default property extensions for derived classes
     return GetSceneObject();
   }
 
-  /**
-   * Notify derived class of installation of a new scene-object property.
-   * This method is called after the message is to sent to install the property
-   * @param [in] newProperty A newly allocated scene-object property. Ownership is obviously not passed.
-   * @param [in] name The name allocated to this custom property.
-   * @param [in] index The index allocated to this custom property.
-   */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
-  { }
-
 private:
 
-  // Not implemented
-  Object(const Object& rhs);
-
-  // Not implemented
-  Object& operator=(const Object& rhs);
+  Object(const Object& rhs) = delete;
+  Object& operator=(const Object& rhs) = delete;
 
   /**
    * Enable property notifications in scene graph
@@ -560,7 +503,7 @@ private:
    * @param[in] entry An entry from the property lookup container.
    * @return The latest value of the property.
    */
-  Property::Value GetCurrentPropertyValue( const PropertyMetadata* entry ) const;
+  Property::Value GetCurrentPropertyValue( const PropertyMetadata& entry ) const;
 
   /**
    * Set the value of scene graph property.
@@ -598,25 +541,23 @@ protected:
   }
 
 private:
+
   EventThreadServices& mEventThreadServices;
 
 private:
 
-  typedef OwnerContainer<PropertyMetadata*> PropertyMetadataLookup;
-  mutable PropertyMetadataLookup mCustomProperties; ///< Used for accessing custom Node properties
-  mutable PropertyMetadataLookup mAnimatableProperties; ///< Used for accessing animatable Node properties
-  mutable TypeInfo const *  mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
-
   Dali::Vector<Observer*> mObservers;
+  mutable OwnerContainer<PropertyMetadata*> mCustomProperties; ///< Used for accessing custom Node properties
+  mutable OwnerContainer<PropertyMetadata*> mAnimatableProperties; ///< Used for accessing animatable Node properties
+  mutable TypeInfo const * mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   ConstraintContainer* mConstraints;               ///< Container of owned -constraints.
 
-  typedef std::vector< Dali::PropertyNotification >     PropertyNotificationContainer;
-  typedef PropertyNotificationContainer::iterator       PropertyNotificationContainerIter;
-  typedef PropertyNotificationContainer::const_iterator PropertyNotificationContainerConstIter;
+  using PropertyNotificationContainer = std::vector< Dali::PropertyNotification >;
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
   DevelHandle::PropertySetSignalType mPropertySetSignal;
 };
+
 } // namespace Internal
 
 // Helpers for public-api forwarding methods

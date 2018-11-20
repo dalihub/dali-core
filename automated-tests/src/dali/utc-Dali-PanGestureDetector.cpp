@@ -23,6 +23,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/render-task-list-integ.h>
 #include <dali/integration-api/profiling.h>
 #include <dali/integration-api/input-options.h>
 #include <dali-test-suite-utils.h>
@@ -1608,7 +1609,12 @@ int UtcDaliPanGestureSystemOverlay(void)
   TestApplication application;
   Dali::Integration::Core& core = application.GetCore();
   Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  Dali::RenderTaskList overlayRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+  Integration::RenderTaskList::CreateTask( overlayRenderTaskList, overlayRootActor, overlayCameraActor );
+  systemOverlay.SetOverlayRenderTasks( overlayRenderTaskList );
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1641,7 +1647,12 @@ int UtcDaliPanGestureBehindTouchableSystemOverlay(void)
   TestApplication application;
   Dali::Integration::Core& core = application.GetCore();
   Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  Dali::RenderTaskList overlayRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+  Integration::RenderTaskList::CreateTask( overlayRenderTaskList, overlayRootActor, overlayCameraActor );
+  systemOverlay.SetOverlayRenderTasks( overlayRenderTaskList );
 
   // SystemOverlay actor
   Actor systemOverlayActor = Actor::New();
@@ -1698,7 +1709,12 @@ int UtcDaliPanGestureTouchBehindGesturedSystemOverlay(void)
   TestApplication application;
   Dali::Integration::Core& core = application.GetCore();
   Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  Dali::RenderTaskList overlayRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+  Integration::RenderTaskList::CreateTask( overlayRenderTaskList, overlayRootActor, overlayCameraActor );
+  systemOverlay.SetOverlayRenderTasks( overlayRenderTaskList );
 
   // SystemOverlay actor
   Actor systemOverlayActor = Actor::New();

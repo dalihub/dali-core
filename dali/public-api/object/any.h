@@ -41,7 +41,7 @@ namespace Dali
  * Any floatVariable( 4.5f );
  * Any strVariable( std::string( "Hello world" ) );
  * uintVariable = 1u;
- * unsigned int variable = AnyCast< unsigned int >( uintVariable );
+ * uint32_t variable = AnyCast< uint32_t >( uintVariable );
  * if ( typeid( int ) == uintVariable.GetType() )
  * \endcode
  * @SINCE_1_0.0

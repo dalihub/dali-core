@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_MESSAGE_BUFFER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef>
+#include <cstddef> // size_t
+#include <cstdint> // uint32_t
 
 namespace Dali
 {
@@ -53,7 +54,7 @@ public:
    * @param[in] size The message size with respect to the size of type "char".
    * @return A pointer to the address allocated for the message, aligned to a word boundary
    */
-  unsigned int* ReserveMessageSlot( std::size_t size );
+  uint32_t* ReserveMessageSlot( std::size_t size );
 
   /**
    * Query the capacity of the message buffer.

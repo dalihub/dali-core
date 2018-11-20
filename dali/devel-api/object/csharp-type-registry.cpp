@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,9 @@ bool RegisterType( const std::string& name, const std::type_info& baseType, CSha
 {
   Internal::TypeRegistry *impl = Internal::TypeRegistry::Get();
 
-  return impl->Register( name, baseType, f );
+  impl->Register( name, baseType, f );
+
+  return true;
 }
 
 bool RegisterProperty( const std::string& objectName,

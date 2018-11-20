@@ -44,9 +44,9 @@ public:
   static TextureSet* New();
 
   /**
-   * Destructor
+   * Destructor. Not virtual as not a base class and not inheriting anything
    */
-  virtual ~TextureSet();
+  ~TextureSet();
 
   /**
    * Overriden delete operator
@@ -59,14 +59,14 @@ public:
    * @param[in] index The index of the texture
    * @param[in] sampler The sampler to be used by the texture
    */
-  void SetSampler( size_t index, SceneGraph::Sampler* sampler );
+  void SetSampler( uint32_t index, SceneGraph::Sampler* sampler );
 
   /**
    * Set the texture at position "index"
    * @param[in] index The index of the texture
    * @param[in] texture The texture
    */
-  void SetTexture( size_t index, SceneGraph::Texture* texture );
+  void SetTexture( uint32_t index, SceneGraph::Texture* texture );
 
   /**
    * Return whether any texture in the texture set has an alpha channel
@@ -94,7 +94,7 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the sampler used by the texture
    */
-  SceneGraph::Sampler* GetTextureSampler( size_t index )
+  SceneGraph::Sampler* GetTextureSampler( uint32_t index )
   {
     return mSamplers[index];
   }
@@ -103,9 +103,9 @@ public:
    * Get the number of Textures in the texture set
    * @return The number of Textures
    */
-  size_t GetTextureCount()
+  uint32_t GetTextureCount()
   {
-    return mTextures.Size();
+    return static_cast<uint32_t>( mTextures.Size() );
   }
 
   /**
@@ -113,7 +113,7 @@ public:
    * @param[in] index The index of the texture in the textures array
    * @return the pointer to the Texture in that position
    */
-  SceneGraph::Texture* GetTexture( size_t index )
+  SceneGraph::Texture* GetTexture( uint32_t index )
   {
     return mTextures[index];
   }
@@ -139,23 +139,23 @@ private: // Data
   bool                            mHasAlpha;  ///< if any of the textures has an alpha channel
 };
 
-inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, SceneGraph::Texture* texture )
+inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, SceneGraph::Texture* texture )
 {
-  typedef MessageValue2< TextureSet, size_t, SceneGraph::Texture* > LocalType;
+  typedef MessageValue2< TextureSet, uint32_t, SceneGraph::Texture* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &textureSet, &TextureSet::SetTexture, index, texture );
 }
 
-inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, size_t index, SceneGraph::Sampler* sampler )
+inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, SceneGraph::Sampler* sampler )
 {
-  typedef MessageValue2< TextureSet, size_t, SceneGraph::Sampler* > LocalType;
+  typedef MessageValue2< TextureSet, uint32_t, SceneGraph::Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &textureSet, &TextureSet::SetSampler, index, sampler );

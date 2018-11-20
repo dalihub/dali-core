@@ -90,7 +90,7 @@ struct DALI_CORE_API TouchEvent
    * @SINCE_1_0.0
    * @return Total number of Points
    */
-  unsigned int GetPointCount() const DALI_DEPRECATED_API;
+  uint32_t GetPointCount() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.37
@@ -104,7 +104,7 @@ struct DALI_CORE_API TouchEvent
    * @note "point" should be less than the value returned by GetPointCount().
    *       If out of range, then program asserts.
    */
-  const TouchPoint& GetPoint(unsigned int point) const DALI_DEPRECATED_API;
+  const TouchPoint& GetPoint( uint32_t point ) const DALI_DEPRECATED_API;
 };
 
 /**

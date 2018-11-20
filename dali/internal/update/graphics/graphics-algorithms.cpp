@@ -444,7 +444,7 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportStat
     ClippingBox useScissorBox( mScissorStack.back() );
     outViewportState.SetScissorTestEnable( true  );
     outViewportState.SetScissor( { useScissorBox.x,
-                                int32_t(outViewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
+                                int32_t(outViewportState.viewport.height - float(useScissorBox.y + useScissorBox.height) ),
                                 uint32_t(useScissorBox.width),
                                 uint32_t(useScissorBox.height) } );
   }
@@ -494,15 +494,15 @@ void GraphicsAlgorithms::SubmitRenderItemList(
     }
     cmd.BindRenderTarget( renderTargetBinding );
 
-    float width = instruction.mViewport.width;
-    float height = instruction.mViewport.height;
+    auto width = float(instruction.mViewport.width);
+    auto height = float(instruction.mViewport.height);
 
     // If the viewport hasn't been set, and we're rendering to a framebuffer, then
     // set the size of the viewport to that of the framebuffer.
     if( !instruction.mIsViewportSet && renderTargetBinding.framebuffer != nullptr )
     {
-      width = renderTargetBinding.framebufferWidth;
-      height = renderTargetBinding.framebufferHeight;
+      width = float(renderTargetBinding.framebufferWidth);
+      height = float(renderTargetBinding.framebufferHeight);
     }
     cmd.mDrawCommand.SetViewport( { float( instruction.mViewport.x ),
                                     float( instruction.mViewport.y ),
@@ -966,7 +966,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
   }
 
-  auto numberOfInstructions = renderInstructions.Count( bufferIndex );
+  auto numberOfInstructions = static_cast<uint32_t>(renderInstructions.Count( bufferIndex ));
 
   auto uboIndex = bufferIndex;
 
@@ -997,7 +997,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   std::vector<Graphics::API::RenderCommand*> commandList{};
 
-  for( size_t i = 0; i < numberOfInstructions; ++i )
+  for( uint32_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 

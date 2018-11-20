@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
@@ -72,7 +75,7 @@ struct DALI_CORE_API WheelEvent
    * @param[in] z         The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
    * @param[in] timeStamp The time the wheel is being rolled
    */
-  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp );
+  WheelEvent( Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t z, uint32_t timeStamp );
 
   /**
    * @brief Destructor.
@@ -118,12 +121,12 @@ struct DALI_CORE_API WheelEvent
    *
    * 0 means the default vertical wheel, and 1 means horizontal wheel.
    */
-  int direction;
+  int32_t direction;
 
   /**
    * @brief Modifier keys pressed during the event (such as shift, alt and control).
    */
-  unsigned int modifiers;
+  uint32_t modifiers;
 
   /**
    * @brief The co-ordinates of the cursor relative to the top-left of the screen
@@ -135,12 +138,12 @@ struct DALI_CORE_API WheelEvent
    * @brief The offset of the wheel rolling, where positive value means rolling down or clockwise
    * and negative value means rolling up or counter-clockwise.
    */
-  int z;
+  int32_t z;
 
   /**
    * @brief The time when the wheel is being rolled.
    */
-  unsigned int timeStamp;
+  uint32_t timeStamp;
 
 };
 
