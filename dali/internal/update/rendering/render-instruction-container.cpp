@@ -42,33 +42,33 @@ RenderInstructionContainer::~RenderInstructionContainer()
 void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, size_t capacityRequired )
 {
   // Only re-allocate if necessary.
-  if( mInstructions.size() < capacityRequired )
+  if( mInstructions[bufferIndex].size() < capacityRequired )
   {
-    mInstructions.reserve( capacityRequired );
+    mInstructions[bufferIndex].reserve( capacityRequired );
   }
-  mInstructions.clear();
+  mInstructions[bufferIndex].clear();
 }
 
 size_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
 {
-  return mInstructions.size();
+  return mInstructions[bufferIndex].size();
 }
 
 RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, size_t index )
 {
-  DALI_ASSERT_DEBUG( index < mInstructions.size() );
+  DALI_ASSERT_DEBUG( index < mInstructions[bufferIndex].size() );
 
-  return *mInstructions[ index ];
+  return *mInstructions[bufferIndex][ index ];
 }
 
 void RenderInstructionContainer::PushBack( BufferIndex index, RenderInstruction* renderInstruction )
 {
-  mInstructions.push_back( renderInstruction );
+  mInstructions[index].push_back( renderInstruction );
 }
 
 void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex updateBufferIndex )
 {
-  mInstructions.pop_back();
+  mInstructions[updateBufferIndex].pop_back();
 }
 
 

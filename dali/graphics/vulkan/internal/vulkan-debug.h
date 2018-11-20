@@ -67,6 +67,7 @@ const void* VkVoidCast( const K& o )
   return static_cast<T>(o);
 }
 
+#ifdef DEBUG_ENABLED
 struct BlackBox
 {
   std::queue<std::string> debugLog;
@@ -103,7 +104,7 @@ struct BlackBox
 
   std::stringstream stream;
 };
-
+#endif
 
 
 } // Namespace Vulkan

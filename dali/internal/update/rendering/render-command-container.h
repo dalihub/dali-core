@@ -31,12 +31,14 @@ struct IndexedRenderCommand
 {
   IndexedRenderCommand()
   : renderInstruction(nullptr),
-    mRenderCommand{new RenderCommand()}
+    mRenderCommand{new RenderCommand()},
+    updateBufferIndex(0)
   {
   }
 
   const RenderInstruction* renderInstruction; // Key
   std::unique_ptr<RenderCommand> mRenderCommand;
+  BufferIndex updateBufferIndex;
 };
 
 class RenderCommandContainer
@@ -48,11 +50,13 @@ public:
                                      BufferIndex updateBufferIndex )
   {
     RenderCommand* renderCommand;
-    if( !Find( renderInstruction, renderCommand ) )
+    if( !Find( renderInstruction, renderCommand, updateBufferIndex ) )
     {
       IndexedRenderCommand indexedRenderCommand;
       indexedRenderCommand.renderInstruction = renderInstruction;
       indexedRenderCommand.mRenderCommand = std::make_unique< RenderCommand >();
+      indexedRenderCommand.updateBufferIndex = updateBufferIndex;
+
       mRenderCommands.emplace_back( std::move( indexedRenderCommand ) );
       renderCommand = mRenderCommands.back().mRenderCommand.get();
     }
@@ -65,7 +69,7 @@ public:
                                    BufferIndex updateBufferIndex )
   {
     RenderCommand* renderCommand;
-    if( !Find( renderInstruction, renderCommand ) )
+    if( !Find( renderInstruction, renderCommand, updateBufferIndex ) )
     {
       DALI_ASSERT_DEBUG( 0 && "Can't find render command for render instruction" );
     }
@@ -85,8 +89,7 @@ public:
   {
     for( auto& elem : mRenderCommands )
     {
-      elem.mRenderCommand->mUboBindings[0].clear();
-      elem.mRenderCommand->mUboBindings[1].clear();
+      elem.mRenderCommand->mUboBindings.clear();
     }
   }
 
@@ -107,11 +110,11 @@ public:
    * @param[in] renderInstruction
    * @return An iterator to the requested render command, or the end() of the vector
    */
-  bool Find( RenderInstruction* renderInstruction, RenderCommand*& renderCommand )
+  bool Find( RenderInstruction* renderInstruction, RenderCommand*& renderCommand, BufferIndex updateBufferIndex )
   {
     for( auto& element : mRenderCommands )
     {
-      if( element.renderInstruction == renderInstruction )
+      if( element.renderInstruction == renderInstruction && element.updateBufferIndex == updateBufferIndex )
       {
         renderCommand = element.mRenderCommand.get();
         return true;

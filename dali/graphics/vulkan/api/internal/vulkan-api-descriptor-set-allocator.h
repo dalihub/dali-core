@@ -38,6 +38,30 @@ namespace Internal
 {
 using DescriptorSetAllocationFlags = uint32_t;
 
+/**
+ * Descriptor pools allocator
+ *
+ * The class provides resizeable descriptor pools per swapchain image.
+ * The allocator must be updated with set of requirements in order to compute
+ * how much memory should be allocated for the descriptor pool. If current
+ * requirements fit pool size then pool stays unchanged. Otherwise, it will
+ * be resized. There is always one pool for each descriptor set layout signature
+ * per swapchain image.
+ *
+ * Descriptor set layout signature is similar to the descriptor set layout but
+ * it doesn't store bindings. The descriptor set layout must be provided
+ * in order to successfully allocate sets for the render command.
+ *
+ * Resizing involves creating new pool and immediately destroying old one.
+ *
+ * Descriptor sets allocated by render commands may become invalid due to
+ * pool reallocation. The allocator allows to test whether descriptor sets
+ * are still valid or new sets must be allocated.
+ *
+ * Update of the allocator is done for whole frame. It means all renderable data
+ * must update the requirements before calling UpdateWithRequirements(). Update
+ * must not run more than once per frame.
+ */
 class DescriptorSetAllocator
 {
 public:
@@ -88,6 +112,12 @@ public:
   void SwapBuffers();
 
   /**
+   * Invalidates and releases all descriptor sets forcing recreating pools. This may happen
+   * due to DALi staying in idle state.
+   */
+  void InvalidateAllDescriptorSets();
+
+  /**
    * Tests whether DescriptorSetList object is still valid ( for example, the pool
    * it was allocated from still exists ).
    *
@@ -96,6 +126,14 @@ public:
    * @return True if all valid, false otherwise
    */
   bool TestIfValid( const DescriptorSetList& list, std::vector<bool>& results ) const;
+
+  /**
+   * Validates whether pools used by the list is still valid
+   * This function is faster than TestIfValid()
+   * @param list List of descriptor sets
+   * @return True if pool is still valid
+   */
+  bool ValidateDescriptorSetList( const DescriptorSetList& list );
 
 private:
 
@@ -140,6 +178,7 @@ private:
     std::vector<vk::DescriptorSet>                       vkDescriptorSetsToBeFreed {};
 
     bool                                                 dirty { false };
+    uint32_t                                             uid { 0u };
   };
 
   VulkanAPI::Controller& mController;
@@ -147,7 +186,9 @@ private:
   using PoolSet = std::vector<Pool>;
   std::array<PoolSet, 2u> mPoolSet;
 
-  uint32_t mBufferIndex { 0u };
+  uint32_t mBufferIndex { 1u }; // Starts with 1 to match index of update thread in DALi
+
+  uint32_t mPoolUID { 0u };
 };
 
 } // Namespace Internal

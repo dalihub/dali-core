@@ -86,7 +86,7 @@ public:
 
 
 private:
-  std::vector<RenderInstruction*> mInstructions;
+  std::vector<RenderInstruction*> mInstructions[2u];
 };
 
 } // namespace SceneGraph
