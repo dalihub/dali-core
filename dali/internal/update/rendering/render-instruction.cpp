@@ -49,15 +49,7 @@ RenderInstruction::RenderInstruction()
 RenderInstruction::~RenderInstruction()
 {
   // Ensure renderers remove this from the list of owned render commands
-  for( auto renderList : mRenderLists )
-  {
-    const auto renderItemCount = renderList->Count();
-    for( auto renderItemIndex=0u; renderItemIndex < renderItemCount; ++renderItemIndex )
-    {
-      auto& renderItem = renderList->GetItem( renderItemIndex );
-      renderItem.mRenderer->FreeRenderCommand( this );
-    }
-  }
+  FreeRenderCommands( false );
 
   // pointer container releases the renderlists
 }
@@ -138,6 +130,30 @@ void RenderInstruction::Reset( Camera*                  camera,
     // as it ends up releasing and later reallocating loads of vectors
     // reset the renderlist
     (*iter)->Reset();
+  }
+}
+
+void RenderInstruction::FreeRenderCommands( bool shuttingDown )
+{
+  // Ensure renderers remove this from the list of owned render commands
+  for( auto renderList : mRenderLists )
+  {
+    const auto renderItemCount = renderList->Count();
+    for( auto renderItemIndex=0u; renderItemIndex < renderItemCount; ++renderItemIndex )
+    {
+      auto& renderItem = renderList->GetItem( renderItemIndex );
+      if( renderItem.mRenderer )
+      {
+        renderItem.mRenderer->FreeRenderCommand( this );
+
+        // When shutting down, clear up the pointer to the renderer to make sure
+        // it's never going to be used again
+        if( shuttingDown )
+        {
+          renderItem.mRenderer = nullptr;
+        }
+      }
+    }
   }
 }
 
