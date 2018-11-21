@@ -222,12 +222,24 @@ struct UpdateManager::Impl
     for ( auto&& iter : tasks )
     {
       iter->SetSourceNode( NULL );
+
+      // RenderTasks have ownership over RenderInstructions and RenderCommands
+      // It's necessary to discard render commands before Renderers are gone
+      // When shutting down, perform tearing down for both buffers.
+      iter->GetRenderInstruction( 0u ).FreeRenderCommands( true );
+      iter->GetRenderInstruction( 1u ).FreeRenderCommands( true );
     }
+
     // ..repeat for system level RenderTasks
     RenderTaskList::RenderTaskContainer& systemLevelTasks = systemLevelTaskList.GetTasks();
     for ( auto&& iter : systemLevelTasks )
     {
       iter->SetSourceNode( NULL );
+      // RenderTasks have ownership over RenderInstructions and RenderCommands
+      // It's necessary to discard render commands before Renderers are gone
+      // When shutting down, perform tearing down for both buffers.
+      iter->GetRenderInstruction( 0u ).FreeRenderCommands( true );
+      iter->GetRenderInstruction( 1u ).FreeRenderCommands( true );
     }
 
     // UpdateManager owns the Nodes. Although Nodes are pool allocated they contain heap allocated parts
