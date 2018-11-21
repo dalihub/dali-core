@@ -258,6 +258,20 @@ struct UpdateManager::Impl
     }
 
     delete sceneController;
+
+    RenderTaskList::RenderTaskContainer& delTasks = taskList.GetTasks();
+
+    for ( auto&& iter : delTasks )
+    {
+      taskList.RemoveTask(iter);
+    }
+
+    // ..repeat for system level RenderTasks
+    RenderTaskList::RenderTaskContainer& delSystemLevelTasks = systemLevelTaskList.GetTasks();
+    for ( auto&& iter : delSystemLevelTasks )
+    {
+      systemLevelTaskList.RemoveTask(iter);
+    }
   }
 
   /**
