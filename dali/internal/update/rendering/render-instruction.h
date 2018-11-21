@@ -117,6 +117,13 @@ public:
     return &mCamera->GetProjectionMatrix( index );
   }
 
+  /**
+   * Frees render commands associated with this render instruction.
+   * @param[in] shuttingDown flag indicating whether we shutting DALi down and pointer to the renderer
+   * can be invalidated
+   */
+  void FreeRenderCommands( bool shuttingDown );
+
 private:
 
   // Undefined
