@@ -20,6 +20,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
   $(devel_api_src_dir)/threading/mutex.cpp \
   $(devel_api_src_dir)/threading/thread.cpp \
+  $(devel_api_src_dir)/update/frame-callback-interface.cpp \
   $(devel_api_src_dir)/update/update-proxy.cpp
 
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit

@@ -74,6 +74,7 @@ DALI_CORE_API Rendering GetRenderingBehavior( Dali::Stage stage );
  * @param[in] frameCallback An implementation of the FrameCallbackInterface
  * @param[in] rootActor The root-actor in the scene that the callback applies to
  *
+ * @note The frameCallback cannot be added more than once. This will assert if that is attempted.
  * @note Only the rootActor and it's children will be parsed by the UpdateProxy.
  * @note If the rootActor is destroyed, then the callback is automatically removed
  * @see FrameCallbackInterface
@@ -85,6 +86,9 @@ DALI_IMPORT_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface
  *
  * @param[in] stage The stage to clear the FrameCallbackInterface on
  * @param[in] frameCallback The FrameCallbackInterface implementation to remove
+ *
+ * @note This function will block if the FrameCallbackInterface::Update method is being processed in the update-thread.
+ * @note If the callback implementation has already been removed, then this is a no-op.
  */
 DALI_IMPORT_API void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback );
 
