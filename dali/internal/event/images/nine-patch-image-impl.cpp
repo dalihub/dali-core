@@ -167,11 +167,6 @@ namespace Dali
 namespace Internal
 {
 
-namespace
-{
-TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
-} // unnamed namespace
-
 NinePatchImagePtr NinePatchImage::New( const std::string& filename )
 {
   Internal::NinePatchImagePtr internal( new NinePatchImage( filename ) );
