@@ -49,6 +49,7 @@
 #include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
@@ -274,12 +275,13 @@ struct UpdateManager::Impl
 
   /**
    * Lazy init for FrameCallbackProcessor.
+   * @param[in]  updateManager  A reference to the update-manager
    */
-  FrameCallbackProcessor& GetFrameCallbackProcessor()
+  FrameCallbackProcessor& GetFrameCallbackProcessor( UpdateManager& updateManager )
   {
     if( ! frameCallbackProcessor )
     {
-      frameCallbackProcessor = new FrameCallbackProcessor( transformManager, *root );
+      frameCallbackProcessor = new FrameCallbackProcessor( updateManager, transformManager );
     }
     return *frameCallbackProcessor;
   }
@@ -422,6 +424,12 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
 
   parent->ConnectChild( node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DisconnectNode( Node* node )
@@ -431,6 +439,12 @@ void UpdateManager::DisconnectNode( Node* node )
   parent->SetDirtyFlag( ChildDeletedFlag ); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild( mSceneGraphBuffers.GetUpdateBufferIndex(), *node );
+
+  // Inform the frame-callback-processor, if set, about the node-hierarchy changing
+  if( mImpl->frameCallbackProcessor )
+  {
+    mImpl->frameCallbackProcessor->NodeHierarchyChanged();
+  }
 }
 
 void UpdateManager::DestroyNode( Node* node )
@@ -869,6 +883,12 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       mImpl->systemLevelSortedLayers[i]->ClearRenderables();
     }
 
+    // Call the frame-callback-processor if set
+    if( mImpl->frameCallbackProcessor )
+    {
+      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
+    }
+
     //Update node hierarchy, apply constraints and perform sorting / culling.
     //This will populate each Layer with a list of renderers which are ready.
     UpdateNodes( bufferIndex );
@@ -882,12 +902,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     //Update the transformations of all the nodes
     mImpl->transformManager.Update();
-
-    // Call the frame-callback-processor if set
-    if( mImpl->frameCallbackProcessor )
-    {
-      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
-    }
 
     //Process Property Notifications
     ProcessPropertyNotifications( bufferIndex );
@@ -1101,14 +1115,14 @@ bool UpdateManager::IsDefaultSurfaceRectChanged()
   return surfaceRectChanged;
 }
 
-void UpdateManager::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+void UpdateManager::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {
-  mImpl->GetFrameCallbackProcessor().AddFrameCallback( frameCallback, rootNode );
+  mImpl->GetFrameCallbackProcessor( *this ).AddFrameCallback( frameCallback, rootNode );
 }
 
 void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 {
-  mImpl->GetFrameCallbackProcessor().RemoveFrameCallback( frameCallback );
+  mImpl->GetFrameCallbackProcessor( *this ).RemoveFrameCallback( frameCallback );
 }
 
 void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )

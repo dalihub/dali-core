@@ -32,7 +32,9 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/update/frame-callback-interface-impl.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
@@ -658,11 +660,17 @@ Dali::DevelStage::KeyEventGeneratedSignalType& Stage::KeyEventGeneratedSignal()
 
 void Stage::AddFrameCallback( FrameCallbackInterface& frameCallback, Actor& rootActor )
 {
-  AddFrameCallbackMessage( mUpdateManager, frameCallback, rootActor.GetNode() );
+  DALI_ASSERT_ALWAYS( ( ! FrameCallbackInterface::Impl::Get( frameCallback ).IsConnectedToSceneGraph() )
+                      && "FrameCallbackInterface implementation already added" );
+
+  // Create scene-graph object and transfer to UpdateManager
+  OwnerPointer< SceneGraph::FrameCallback > transferOwnership( SceneGraph::FrameCallback::New( frameCallback ) );
+  AddFrameCallbackMessage( mUpdateManager, transferOwnership, rootActor.GetNode() );
 }
 
 void Stage::RemoveFrameCallback( FrameCallbackInterface& frameCallback )
 {
+  FrameCallbackInterface::Impl::Get( frameCallback ).Invalidate();
   RemoveFrameCallbackMessage( mUpdateManager, frameCallback );
 }
 
