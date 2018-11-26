@@ -95,9 +95,9 @@ public:
    */
   void CreateAnimator()
   {
-    DALI_ASSERT_DEBUG( mAnimator == NULL );
-    DALI_ASSERT_DEBUG( mAnimatorFunction != NULL );
-    DALI_ASSERT_DEBUG( mParent != NULL );
+    DALI_ASSERT_DEBUG( mAnimator == nullptr );
+    DALI_ASSERT_DEBUG( mAnimatorFunction != nullptr );
+    DALI_ASSERT_DEBUG( mParent != nullptr );
 
     //Get the PropertyOwner the animator is going to animate
     const SceneGraph::PropertyOwner& propertyOwner = mObject->GetSceneObject();
@@ -116,11 +116,11 @@ public:
     // call the type specific method to create the concrete animator
     bool resetterRequired = DoCreateAnimator( propertyOwner, *baseProperty );
 
-    DALI_ASSERT_DEBUG( mAnimator != NULL );
+    DALI_ASSERT_DEBUG( mAnimator != nullptr );
 
     // Add the new SceneGraph::Animator to its correspondent SceneGraph::Animation via message
     const SceneGraph::Animation* animation = mParent->GetSceneObject();
-    DALI_ASSERT_DEBUG( NULL != animation );
+    DALI_ASSERT_DEBUG( nullptr != animation );
     AddAnimatorMessage( mParent->GetEventThreadServices(), *animation, *mAnimator );
 
     // Add the new SceneGraph::PropertyResetter to the update manager via message
@@ -143,7 +143,7 @@ public:
    */
   void SetParent( Animation& parent )
   {
-    DALI_ASSERT_ALWAYS( mParent == NULL && "AnimationConnector already has a parent" );
+    DALI_ASSERT_ALWAYS( mParent == nullptr && "AnimationConnector already has a parent" );
     mParent = &parent;
 
     if( mObject )
@@ -154,7 +154,7 @@ public:
 
   /**
    * Retrieve the parent of the AnimatorConnector.
-   * @return The parent object, or NULL.
+   * @return The parent object, or nullptr.
    */
   Animation* GetParent() const
   {

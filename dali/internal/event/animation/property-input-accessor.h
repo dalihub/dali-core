@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_INPUT_ACCESSOR_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public:
    * Create the PropertyInputAccessor.
    */
   PropertyInputAccessor()
-  : mInput( NULL ),
+  : mInput( nullptr ),
     mComponentIndex( -1 )
   {
   }
@@ -44,7 +44,7 @@ public:
   /**
    * Create the PropertyInputAccessor.
    */
-  PropertyInputAccessor( const PropertyInputImpl* input, int componentIndex )
+  PropertyInputAccessor( const PropertyInputImpl* input, int32_t componentIndex )
   : mInput( input ),
     mComponentIndex( componentIndex )
   {
@@ -75,7 +75,7 @@ public:
   /**
    * Set the property input.
    */
-  void SetInput( const PropertyInputImpl& input, int componentIndex )
+  void SetInput( const PropertyInputImpl& input, int32_t componentIndex )
   {
     mInput = &input;
     mComponentIndex = componentIndex;
@@ -220,7 +220,8 @@ public:
 public:
 
   const PropertyInputImpl* mInput;
-  int mComponentIndex;
+  int32_t mComponentIndex;
+
 };
 
 } // namespace Internal

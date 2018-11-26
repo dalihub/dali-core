@@ -24,7 +24,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 
@@ -35,6 +34,24 @@ namespace Dali
 
 namespace Internal
 {
+
+namespace
+{
+/**
+ * Helper to add only unique entries to the propertyOwner container
+ * @param propertyOwners to add the entries to
+ * @param object to add
+ */
+inline void AddUnique( SceneGraph::PropertyOwnerContainer& propertyOwners, SceneGraph::PropertyOwner* object )
+{
+  const SceneGraph::PropertyOwnerIter iter = std::find( propertyOwners.Begin(), propertyOwners.End(), object );
+  if( iter == propertyOwners.End() )
+  {
+    // each owner should only be added once
+    propertyOwners.PushBack( object );
+  }
+}
+} // unnamed namespace
 
 ConstraintBase::ConstraintBase( Object& object, Property::Index targetPropertyIndex, SourceContainer& sources )
 : mEventThreadServices( *Stage::GetCurrent() ),
@@ -49,6 +66,17 @@ ConstraintBase::ConstraintBase( Object& object, Property::Index targetPropertyIn
   mSourceDestroyed( false )
 {
   ObserveObject( object );
+}
+
+ConstraintBase* ConstraintBase::Clone( Object& object )
+{
+  DALI_ASSERT_ALWAYS( !mSourceDestroyed && "An input source object has been destroyed" );
+
+  // create the type specific object
+  ConstraintBase* clone = DoClone( object );
+  clone->SetRemoveAction( mRemoveAction );
+  clone->SetTag( mTag );
+  return clone;
 }
 
 ConstraintBase::~ConstraintBase()
@@ -224,6 +252,58 @@ void ConstraintBase::StopObservation()
 
   mObservedObjects.Clear();
 }
+
+PropertyInputImpl* ConstraintBase::AddInputProperty( Source& source, SceneGraph::PropertyOwnerContainer& propertyOwners, int32_t& componentIndex )
+{
+  PropertyInputImpl* inputProperty = nullptr;
+
+  if ( OBJECT_PROPERTY == source.sourceType )
+  {
+    DALI_ASSERT_ALWAYS( source.object->IsPropertyAConstraintInput( source.propertyIndex ) );
+
+    SceneGraph::PropertyOwner& owner = const_cast< SceneGraph::PropertyOwner& >( source.object->GetSceneObject() );
+
+    AddUnique( propertyOwners, &owner );
+    inputProperty = const_cast< PropertyInputImpl* >( source.object->GetSceneObjectInputProperty( source.propertyIndex ) );
+    componentIndex = source.object->GetPropertyComponentIndex( source.propertyIndex );
+
+    // The scene-object property should exist, when the property owner exists
+    DALI_ASSERT_ALWAYS( inputProperty && "Constraint source property does not exist" );
+  }
+  else if ( LOCAL_PROPERTY == source.sourceType )
+  {
+    DALI_ASSERT_ALWAYS( mTargetObject->IsPropertyAConstraintInput( source.propertyIndex ) );
+
+    inputProperty = const_cast< PropertyInputImpl* >( mTargetObject->GetSceneObjectInputProperty( source.propertyIndex ) );
+    componentIndex = mTargetObject->GetPropertyComponentIndex( source.propertyIndex );
+
+    // The target scene-object should provide this property
+    DALI_ASSERT_ALWAYS( inputProperty && "Constraint source property does not exist" );
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( PARENT_PROPERTY == source.sourceType && "Constraint source property type is invalid" );
+
+    Object* objectParent = dynamic_cast< Actor& >( *mTargetObject ).GetParent();
+
+    // This will not exist, if the target object is off-stage
+    if ( objectParent )
+    {
+      DALI_ASSERT_ALWAYS( objectParent->IsPropertyAConstraintInput( source.propertyIndex ) );
+
+      SceneGraph::PropertyOwner& owner = const_cast< SceneGraph::PropertyOwner& >( objectParent->GetSceneObject() );
+
+      AddUnique( propertyOwners, &owner );
+      inputProperty = const_cast< PropertyInputImpl* >( objectParent->GetSceneObjectInputProperty( source.propertyIndex ) );
+      componentIndex = objectParent->GetPropertyComponentIndex( source.propertyIndex );
+
+      // The scene-object property should exist, when the property owner exists
+      DALI_ASSERT_ALWAYS( inputProperty && "Constraint source property does not exist" );
+    }
+  }
+  return inputProperty;
+}
+
 
 } // namespace Internal
 

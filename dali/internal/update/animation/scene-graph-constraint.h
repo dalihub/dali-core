@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class Constraint : public ConstraintBase
 {
 public:
 
-  typedef typename PropertyConstraintPtr< PropertyType >::Type ConstraintFunctionPtr;
+  using ConstraintFunctionPtr = typename PropertyConstraintPtr< PropertyType >::Type;
 
   /**
    * Create a new scene-graph constraint.
@@ -81,31 +81,29 @@ public:
    */
   virtual void Apply( BufferIndex updateBufferIndex )
   {
-    if ( mDisconnected )
+    if ( !mDisconnected )
     {
-      return; // Early-out when property owners have been disconnected
-    }
-
-    if ( mFunc->InputsInitialized() )
-    {
-      PropertyType current = mTargetProperty.Get( updateBufferIndex );
-      mFunc->Apply( updateBufferIndex, current );
-
-      // Optionally bake the final value
-      if ( Dali::Constraint::Bake == mRemoveAction )
+      if ( mFunc->InputsInitialized() )
       {
-        mTargetProperty.Bake( updateBufferIndex, current );
+        PropertyType current = mTargetProperty.Get( updateBufferIndex );
+        mFunc->Apply( updateBufferIndex, current );
+
+        // Optionally bake the final value
+        if ( Dali::Constraint::Bake == mRemoveAction )
+        {
+          mTargetProperty.Bake( updateBufferIndex, current );
+        }
+        else
+        {
+          mTargetProperty.Set( updateBufferIndex, current );
+        }
+
+        INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);
       }
       else
       {
-        mTargetProperty.Set( updateBufferIndex, current );
+        INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_SKIPPED);
       }
-
-      INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);
-    }
-    else
-    {
-      INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_SKIPPED);
     }
   }
 
@@ -125,10 +123,9 @@ private:
   }
 
   // Undefined
-  Constraint( const Constraint& constraint );
-
-  // Undefined
-  Constraint& operator=( const Constraint& rhs );
+  Constraint() = delete;
+  Constraint( const Constraint& constraint ) = delete;
+  Constraint& operator=( const Constraint& rhs ) = delete;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::OnDisconnect()
@@ -137,7 +134,7 @@ private:
   {
     // Discard target object/property pointers
     mTargetProperty.Reset();
-    mFunc = NULL;
+    mFunc = nullptr;
   }
 
 protected:
@@ -145,6 +142,7 @@ protected:
   PropertyAccessorType mTargetProperty; ///< Raw-pointer to the target property. Not owned.
 
   ConstraintFunctionPtr mFunc;
+
 };
 
 } // namespace SceneGraph

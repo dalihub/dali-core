@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTIVE_CONSTRAINT_BASE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/constraint-source-impl.h>
+#include <dali/internal/update/animation/scene-graph-constraint-base.h>
 
 namespace Dali
 {
@@ -67,7 +68,7 @@ public:
    * @param[in]  object  The object to clone this constraint for
    * @return A new constraint.
    */
-  virtual ConstraintBase* Clone( Object& object ) = 0;
+  ConstraintBase* Clone( Object& object );
 
   /**
    * Virtual destructor.
@@ -166,11 +167,28 @@ private:
   // To be implemented in derived classes
 
   /**
-   * Create and connect a constraint for a scene-object.
+   * Clone the actual constraint
+   *
+   * @param object to clone to
+   * @return pointer to the clone
+   */
+  virtual ConstraintBase* DoClone( Object& object ) = 0;
+
+  /**
+   * Connect the constraint
    */
   virtual void ConnectConstraint() = 0;
 
 protected:
+
+  /**
+   * Helper to Add an input property to the container of property owners
+   * @param source constraint[in] source used to determine the type and locate the property on the object
+   * @param propertyOwners[out] reference to the container to add
+   * @param componentIndex[out] component index
+   * @return pointer to input property if it was found, nullptr otherwise
+   */
+  PropertyInputImpl* AddInputProperty( Source& source, SceneGraph::PropertyOwnerContainer& propertyOwners, int32_t& componentIndex );
 
   /**
    * Get the event thread services object - used for sending messages to the scene graph
