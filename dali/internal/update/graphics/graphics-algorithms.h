@@ -106,7 +106,10 @@ private:
   ScissorStackType                        mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
 
   std::unique_ptr<GraphicsBufferManager> mGraphicsBufferManager;
-  std::unique_ptr<GraphicsBuffer>        mUniformBuffer[2u];
+
+  using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
+  UniformBufferList           mUniformBuffer;
+  uint32_t                    mUniformBufferIndex{0u};
 
   uint32_t mUniformBlockAllocationCount;
   uint32_t mUniformBlockAllocationBytes;

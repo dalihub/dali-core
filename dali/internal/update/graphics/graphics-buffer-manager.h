@@ -117,6 +117,14 @@ public:
    */
   void Unmap();
 
+  /**
+   * Fills the buffer with given data ( single 8bit value )
+   * @param data char type data
+   * @param offset start offset
+   * @param size size to write, 0 if whole size
+   */
+  void Fill( char data, uint32_t offset, uint32_t size );
+
 private:
 
   std::unique_ptr<Dali::Graphics::API::Buffer> mBuffer;

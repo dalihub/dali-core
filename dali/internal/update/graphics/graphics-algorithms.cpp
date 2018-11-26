@@ -515,7 +515,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     // pass shared UBO and offset, return new offset for next item to be used
     // don't process bindings if there are no uniform buffers allocated
     auto shader = renderer->GetShader().GetGfxObject();
-    auto ubo = mUniformBuffer[bufferIndex].get();
+    auto ubo = mUniformBuffer[mUniformBufferIndex].get();
     if( ubo && shader )
     {
       std::vector<Graphics::API::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
@@ -956,6 +956,8 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   bool usesDepth = false;
   bool usesStencil = false;
 
+  mUniformBufferIndex = bufferIndex;
+
   PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
 
   // If state of depth/stencil has changed between frames then the pipelines must be
@@ -978,16 +980,19 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
-  if( mUniformBlockAllocationBytes && !mUniformBuffer[bufferIndex] )
+  if( mUniformBlockAllocationBytes && !mUniformBuffer[mUniformBufferIndex] )
   {
-    mUniformBuffer[bufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
+    mUniformBuffer[mUniformBufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
   else if( mUniformBlockAllocationBytes && (
-    mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
-    (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
+    mUniformBuffer[mUniformBufferIndex]->GetSize() < pagedAllocation ||
+    (pagedAllocation < uint32_t(float(mUniformBuffer[mUniformBufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
   {
-    mUniformBuffer[bufferIndex]->Reserve( pagedAllocation, true );
+    mUniformBuffer[mUniformBufferIndex]->Reserve( pagedAllocation, true );
   }
+
+  // Clear UBO
+  mUniformBuffer[mUniformBufferIndex]->Fill( 0, 0u, 0u );
 
   mUboOffset = 0u;
 
@@ -1005,9 +1010,9 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   // Submit all render commands in one go
   controller.SubmitCommands( std::move(commandList) );
 
-  if( mUniformBlockAllocationBytes && mUniformBuffer[bufferIndex] )
+  if( mUniformBlockAllocationBytes && mUniformBuffer[mUniformBufferIndex] )
   {
-    mUniformBuffer[bufferIndex]->Flush();
+    mUniformBuffer[mUniformBufferIndex]->Flush();
   }
 
   controller.EndFrame();
@@ -1025,6 +1030,8 @@ void GraphicsAlgorithms::DiscardUnusedResources( Graphics::API::Controller& cont
   {
     ubo.reset( nullptr );
   }
+
+  mUniformBufferIndex = 0u;
 
   // Discard unused resources
   controller.DiscardUnusedResources();
