@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
@@ -106,7 +109,7 @@ public:
    * @endcode
    * @param[in] depth The depth in the hierarchy for the actor
    */
-  virtual void OnStageConnection( int depth ) = 0;
+  virtual void OnStageConnection( int32_t depth ) = 0;
 
   /**
    * @brief Called after the actor has been disconnected from Stage.
@@ -337,7 +340,7 @@ protected: // For derived classes
     LAST_ACTOR_FLAG                             ///< Special marker for last actor flag @SINCE_1_0.0
   };
 
-  static const int ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
+  static const int32_t ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
 
   /**
    * @brief Creates a CustomActorImpl.

@@ -18,10 +18,12 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/frame-callback-processor.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
-#include <dali/internal/update/manager/update-proxy-impl.h>
 
 namespace Dali
 {
@@ -32,35 +34,11 @@ namespace Internal
 namespace SceneGraph
 {
 
-namespace
-{
-
-template< typename FrameCallbackInfoT >
-class MatchRootNode
-{
-public:
-
-  MatchRootNode( PropertyOwner& rootNode )
-  : mRootNode( rootNode )
-  {
-  }
-
-  bool operator() ( const FrameCallbackInfoT& info )
-  {
-    return &info.updateProxyImpl->GetRootNode() == &mRootNode;
-  }
-
-private:
-
-  PropertyOwner& mRootNode;
-};
-
-} // unnamed namespace
-
-FrameCallbackProcessor::FrameCallbackProcessor( TransformManager& transformManager, Node& rootNode )
+FrameCallbackProcessor::FrameCallbackProcessor( UpdateManager& updateManager, TransformManager& transformManager )
 : mFrameCallbacks(),
+  mUpdateManager( updateManager ),
   mTransformManager( transformManager ),
-  mRootNode( rootNode )
+  mNodeHierarchyChanged( true )
 {
 }
 
@@ -68,52 +46,35 @@ FrameCallbackProcessor::~FrameCallbackProcessor()
 {
 }
 
-void FrameCallbackProcessor::AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode )
+void FrameCallbackProcessor::AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode )
 {
   Node& node = const_cast< Node& >( *rootNode ); // Was sent as const from event thread, we need to be able to use non-const version here.
 
-  FrameCallbackInfo info;
-  info.frameCallback = frameCallback;
-  info.updateProxyImpl = new UpdateProxy( mTransformManager, node );
+  frameCallback->ConnectToSceneGraph( mUpdateManager, mTransformManager, node );
 
-  // We want to be notified when the node is destroyed (if we're not observing it already)
-  auto iter = std::find_if( mFrameCallbacks.begin(), mFrameCallbacks.end(), MatchRootNode< FrameCallbackInfo >( node ) );
-  if( iter == mFrameCallbacks.end() )
-  {
-    node.AddObserver( *this );
-  }
-
-  mFrameCallbacks.push_back( info );
+  mFrameCallbacks.emplace_back( frameCallback );
 }
 
 void FrameCallbackProcessor::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 {
-  auto iter = std::remove_if( mFrameCallbacks.begin(), mFrameCallbacks.end(),
-                              [ this, frameCallback ]
-                                ( const FrameCallbackInfo& info )
-                                {
-                                  info.updateProxyImpl->GetRootNode().RemoveObserver( *this );
-                                  delete info.updateProxyImpl;
-                                  return info.frameCallback == frameCallback;
-                                } );
+  // Find and remove all frame-callbacks that use the given frame-callback-interface
+  auto iter = std::remove( mFrameCallbacks.begin(), mFrameCallbacks.end(), frameCallback );
   mFrameCallbacks.erase( iter, mFrameCallbacks.end() );
 }
 
 void FrameCallbackProcessor::Update( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  for( auto&& iter : mFrameCallbacks )
-  {
-    UpdateProxy& updateProxyImpl = *iter.updateProxyImpl;
-    updateProxyImpl.SetCurrentBufferIndex( bufferIndex );
-    Dali::UpdateProxy updateProxy( updateProxyImpl );
-    iter.frameCallback->Update( updateProxy, elapsedSeconds );
-  }
-}
-
-void FrameCallbackProcessor::PropertyOwnerDestroyed( PropertyOwner& owner )
-{
-  auto iter = std::remove_if( mFrameCallbacks.begin(), mFrameCallbacks.end(), MatchRootNode< FrameCallbackInfo >( owner )  );
+  // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
+  auto iter = std::remove_if(
+    mFrameCallbacks.begin(), mFrameCallbacks.end(),
+    [ & ]( OwnerPointer< FrameCallback >& frameCallback )
+    {
+      return ! frameCallback->Update( bufferIndex, elapsedSeconds, mNodeHierarchyChanged );
+    }
+  );
   mFrameCallbacks.erase( iter, mFrameCallbacks.end() );
+
+  mNodeHierarchyChanged = false;
 }
 
 } // namespace SceneGraph

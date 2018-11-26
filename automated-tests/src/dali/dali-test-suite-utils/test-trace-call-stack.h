@@ -2,7 +2,7 @@
 #define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,8 +165,8 @@ public:
   std::string GetTraceString()
   {
     std::stringstream traceStream;
-    int functionCount = mCallStack.size();
-    for( int i = 0; i < functionCount; ++i )
+    std::size_t functionCount = mCallStack.size();
+    for( std::size_t i = 0; i < functionCount; ++i )
     {
       Dali::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
       traceStream << "StackTrace: Index:" << i << ",  Function:" << functionCall.method << ",  ParamList:" << functionCall.paramList << std::endl;

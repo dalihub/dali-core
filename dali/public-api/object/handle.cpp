@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ bool Handle::Supports( Capability capability ) const
   return GetImplementation(*this).Supports( capability );
 }
 
-unsigned int Handle::GetPropertyCount() const
+uint32_t Handle::GetPropertyCount() const
 {
   return GetImplementation(*this).GetPropertyCount();
 }
@@ -168,7 +168,7 @@ void Handle::RemoveConstraints()
   GetImplementation(*this).RemoveConstraints();
 }
 
-void Handle::RemoveConstraints( unsigned int tag )
+void Handle::RemoveConstraints( uint32_t tag )
 {
   GetImplementation(*this).RemoveConstraints( tag );
 }

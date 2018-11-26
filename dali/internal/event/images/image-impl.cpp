@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,38 +37,6 @@ namespace Dali
 namespace Internal
 {
 
-namespace
-{
-
-// Signals
-
-const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
-
-TypeRegistration mType( typeid( Dali::Image ), typeid( Dali::BaseHandle ), NULL );
-
-Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_UPLOADED, &Image::DoConnectSignal );
-
-}
-
-bool Image::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  bool connected( true );
-  DALI_ASSERT_DEBUG( dynamic_cast<Image*>( object ) && "Failed to downcast from BaseObject to Image.\n" );
-  Image* image = static_cast<Image*>(object);
-
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_UPLOADED ) )
-  {
-    image->UploadedSignal().Connect( tracker, functor );
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
-  }
-
-  return connected;
-}
-
 unsigned int Image::GetWidth() const
 {
   return mWidth;
@@ -81,7 +49,7 @@ unsigned int Image::GetHeight() const
 
 Vector2 Image::GetNaturalSize() const
 {
-  return Vector2( mWidth, mHeight );
+  return Vector2( static_cast<float>( mWidth ), static_cast<float>( mHeight ) );
 }
 
 Image::Image()

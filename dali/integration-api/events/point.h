@@ -60,7 +60,7 @@ struct DALI_CORE_API Point
    *
    * @param[in]  deviceId  The Unique Device ID.
    */
-  void SetDeviceId( int deviceId );
+  void SetDeviceId( int32_t deviceId );
 
   /**
    * @brief Set the state of the point.

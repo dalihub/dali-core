@@ -158,8 +158,8 @@ public:
    * @brief Returns the type info for the Handle.
    *
    * @SINCE_1_0.0
-   * @param[in] info The type information
-   * @return The type info
+   * @param[out] info The type information
+   * @return true if the type info exists
    */
   bool GetTypeInfo(Dali::TypeInfo& info) const;
 

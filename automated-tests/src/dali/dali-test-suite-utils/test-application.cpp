@@ -35,17 +35,18 @@ public:
 }
 }
 
+bool TestApplication::mLoggingEnabled = true;
 
-TestApplication::TestApplication( size_t surfaceWidth,
-                                  size_t surfaceHeight,
-                                  float  horizontalDpi,
-                                  float  verticalDpi,
+TestApplication::TestApplication( uint32_t surfaceWidth,
+                                  uint32_t surfaceHeight,
+                                  uint32_t  horizontalDpi,
+                                  uint32_t  verticalDpi,
                                   ResourcePolicy::DataRetention policy)
 : mCore( NULL ),
   mSurfaceWidth( surfaceWidth ),
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
-  mDpi( horizontalDpi, verticalDpi ),
+  mDpi{ horizontalDpi, verticalDpi },
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
@@ -54,33 +55,7 @@ TestApplication::TestApplication( size_t surfaceWidth,
   info.surfaceHeight = 800;
   info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
   mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
-
   Initialize();
-}
-
-TestApplication::TestApplication( bool   initialize,
-                                  size_t surfaceWidth,
-                                  size_t surfaceHeight,
-                                  float  horizontalDpi,
-                                  float  verticalDpi,
-                                  ResourcePolicy::DataRetention policy)
-: mCore( NULL ),
-  mSurfaceWidth( surfaceWidth ),
-  mSurfaceHeight( surfaceHeight ),
-  mFrame( 0u ),
-  mDpi( horizontalDpi, verticalDpi ),
-  mLastVSyncTime(0u),
-  mDataRetentionPolicy( policy )
-{
-  Integration::Graphics::GraphicsCreateInfo info;
-  info.surfaceWidth = 480;
-  info.surfaceHeight = 800;
-  info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
-  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(new Dali::Integration::Graphics::Graphics( info ));
-  if ( initialize )
-  {
-    Initialize();
-  }
 }
 
 void TestApplication::Initialize()
@@ -121,30 +96,33 @@ void TestApplication::LogContext( bool start, const char* tag )
 {
   if( start )
   {
-    fprintf(stderr, "INFO: Trace Start: %s", tag);
+    fprintf(stderr, "INFO: Trace Start: %s\n", tag);
   }
   else
   {
-    fprintf(stderr, "INFO: Trace End: %s", tag);
+    fprintf(stderr, "INFO: Trace End: %s\n", tag);
   }
 }
 
 void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message)
 {
-  switch(level)
+  if( mLoggingEnabled )
   {
-    case Dali::Integration::Log::DebugInfo:
-      fprintf(stderr, "INFO: %s", message.c_str());
-      break;
-    case Dali::Integration::Log::DebugWarning:
-      fprintf(stderr, "WARN: %s", message.c_str());
-      break;
-    case Dali::Integration::Log::DebugError:
-      fprintf(stderr, "ERROR: %s", message.c_str());
-      break;
-    default:
-      fprintf(stderr, "DEFAULT: %s", message.c_str());
-      break;
+    switch(level)
+    {
+      case Dali::Integration::Log::DebugInfo:
+        fprintf(stderr, "INFO: %s", message.c_str());
+        break;
+      case Dali::Integration::Log::DebugWarning:
+        fprintf(stderr, "WARN: %s", message.c_str());
+        break;
+      case Dali::Integration::Log::DebugError:
+        fprintf(stderr, "ERROR: %s", message.c_str());
+        break;
+      default:
+        fprintf(stderr, "DEFAULT: %s", message.c_str());
+        break;
+    }
   }
 }
 
@@ -179,7 +157,7 @@ void TestApplication::SendNotification()
   mCore->ProcessEvents();
 }
 
-void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
+void TestApplication::SetSurfaceWidth( uint32_t width, uint32_t height )
 {
   mSurfaceWidth = width;
   mSurfaceHeight = height;
@@ -187,12 +165,12 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
 }
 
-void TestApplication::SetTopMargin( unsigned int margin )
+void TestApplication::SetTopMargin( uint32_t margin )
 {
   mCore->SetTopMargin( margin );
 }
 
-void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* location )
+void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* location )
 {
   if( GetUpdateStatus() == 0 &&
       mRenderStatus.NeedsUpdate() == false &&
@@ -201,8 +179,8 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
     fprintf(stderr, "WARNING - Update not required :%s\n", location==NULL?"NULL":location);
   }
 
-  unsigned int nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
-  float elapsedSeconds = intervalMilliseconds / 1e3f;
+  uint32_t nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
+  float elapsedSeconds = static_cast<float>( intervalMilliseconds ) * 0.001f;
 
   mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus, false, false );
 
@@ -211,7 +189,7 @@ void TestApplication::DoUpdate( unsigned int intervalMilliseconds, const char* l
   mLastVSyncTime = nextVSyncTime;
 }
 
-bool TestApplication::Render( unsigned int intervalMilliseconds, const char* location )
+bool TestApplication::Render( uint32_t intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
   mCore->Render( mRenderStatus, false );
@@ -221,12 +199,12 @@ bool TestApplication::Render( unsigned int intervalMilliseconds, const char* loc
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
 }
 
-unsigned int TestApplication::GetUpdateStatus()
+uint32_t TestApplication::GetUpdateStatus()
 {
   return mStatus.KeepUpdating();
 }
 
-bool TestApplication::UpdateOnly( unsigned int intervalMilliseconds  )
+bool TestApplication::UpdateOnly( uint32_t intervalMilliseconds  )
 {
   DoUpdate( intervalMilliseconds );
   return mStatus.KeepUpdating();
@@ -247,11 +225,11 @@ bool TestApplication::RenderOnly( )
   return mRenderStatus.NeedsUpdate();
 }
 
-unsigned int TestApplication::Wait( unsigned int durationToWait )
+uint32_t TestApplication::Wait( uint32_t durationToWait )
 {
   int time = 0;
 
-  for(unsigned int i = 0; i <= ( durationToWait / RENDER_FRAME_INTERVAL); i++)
+  for(uint32_t i = 0; i <= ( durationToWait / RENDER_FRAME_INTERVAL); i++)
   {
     SendNotification();
     Render(RENDER_FRAME_INTERVAL);

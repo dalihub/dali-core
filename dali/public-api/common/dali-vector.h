@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 #include <algorithm>
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -181,7 +182,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size to erase
    * @pre Last element cannot be erased as there is nothing to move.
    */
-  void Erase( char* address, SizeType elementSize );
+  void Erase( uint8_t* address, SizeType elementSize );
 
   /**
    * @brief Erases a range of elements.
@@ -193,7 +194,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size of one of the elements to be erased
    * @return Address pointing to the next element of the last one
    */
-  char* Erase( char* first, char* last, SizeType elementSize );
+  uint8_t* Erase( uint8_t* first, uint8_t* last, SizeType elementSize );
 
   /**
    * @brief Copies a number of bytes from \e source to \e destination.
@@ -205,7 +206,7 @@ protected: // for Derived classes
    * @param[in] source Pointer to the source address
    * @param[in] numberOfBytes The number of bytes to be copied
    */
-  void CopyMemory( char* destination, const char* source, size_t numberOfBytes );
+  void CopyMemory( uint8_t* destination, const uint8_t* source, size_t numberOfBytes );
 
 private:
 
@@ -320,7 +321,7 @@ protected: // API for deriving classes
    * @param[in] address Address to erase from
    * @param[in] elementSize Size to erase
    */
-  void Erase( char* address, SizeType elementSize )
+  void Erase( uint8_t* address, SizeType elementSize )
   {
     VectorBase::Erase( address, elementSize );
   }
@@ -334,7 +335,7 @@ protected: // API for deriving classes
    * @param[in] elementSize Size of one of the elements to be erased
    * @return Address pointing to the next element of the last one
    */
-  char* Erase( char* first, char* last, SizeType elementSize )
+  uint8_t* Erase( uint8_t* first, uint8_t* last, SizeType elementSize )
   {
     return VectorBase::Erase( first, last, elementSize );
   }
@@ -348,7 +349,7 @@ protected: // API for deriving classes
    * @param[in] to Address to the last element to be inserted
    * @param[in] elementSize Size of one of the elements to be inserted
    */
-  void Insert( char* at, char* from, char* to, SizeType elementSize )
+  void Insert( uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize )
   {
     const SizeType size = to - from;
     const SizeType count = Count();
@@ -357,13 +358,13 @@ protected: // API for deriving classes
     if( newCount > Capacity() )
     {
       // Calculate the at offset as the pointer is invalid after the Reserve() call.
-      std::size_t offset = at - reinterpret_cast<char*>( mData );
+      std::size_t offset = at - reinterpret_cast<uint8_t*>( mData );
 
       // need more space
-      Reserve( NextPowerOfTwo( newCount ), elementSize ); // reserve enough space to store at least the next power of two elements of the new required size.
+      Reserve( NextPowerOfTwo( static_cast<uint32_t>( newCount ) ), elementSize ); // reserve enough space to store at least the next power of two elements of the new required size.
 
       // Set the new at pointer.
-      at = reinterpret_cast<char*>( mData ) + offset;
+      at = reinterpret_cast<uint8_t*>( mData ) + offset;
     }
     // set new count first as otherwise the debug assert will hit us
     SetCount( newCount );
@@ -371,7 +372,7 @@ protected: // API for deriving classes
     // Move current items to a new position inside the vector.
     CopyMemory( at + size,
                 at,
-                ( reinterpret_cast<char*>( mData ) + count * elementSize ) - at );
+                ( reinterpret_cast<uint8_t*>( mData ) + count * elementSize ) - at );
 
     // Copy the given items.
     CopyMemory( at, from, size );
@@ -584,8 +585,8 @@ public: // API
   {
     DALI_ASSERT_VECTOR( ( at <= End() ) && ( at >= Begin() ) && "Iterator not inside vector" );
     const SizeType size = sizeof( ItemType );
-    char* address = const_cast<char*>( reinterpret_cast<const char*>( &element ) );
-    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< char* >( at ),
+    uint8_t* address = const_cast<uint8_t*>( reinterpret_cast<const uint8_t*>( &element ) );
+    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< uint8_t* >( at ),
                                         address,
                                         address + size,
                                         size );
@@ -620,9 +621,9 @@ public: // API
       return;
     }
 
-    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< char* >( at ),
-                                        reinterpret_cast< char* >( from ),
-                                        reinterpret_cast< char* >( to ),
+    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< uint8_t* >( at ),
+                                        reinterpret_cast< uint8_t* >( from ),
+                                        reinterpret_cast< uint8_t* >( to ),
                                         sizeof( ItemType ) );
   }
 
@@ -693,7 +694,7 @@ public: // API
     DALI_ASSERT_VECTOR( (iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector" );
     if( iterator < ( End() - 1u ) )
     {
-      VectorAlgorithms<BaseType>::Erase( reinterpret_cast< char* >( iterator ), sizeof( ItemType ) );
+      VectorAlgorithms<BaseType>::Erase( reinterpret_cast< uint8_t* >( iterator ), sizeof( ItemType ) );
     }
     else
     {
@@ -734,8 +735,8 @@ public: // API
     }
     else
     {
-      nextElement = reinterpret_cast<Iterator>( VectorAlgorithms<BaseType>::Erase( reinterpret_cast< char* >( first ),
-                                                                                   reinterpret_cast< char* >( last ),
+      nextElement = reinterpret_cast<Iterator>( VectorAlgorithms<BaseType>::Erase( reinterpret_cast< uint8_t* >( first ),
+                                                                                   reinterpret_cast< uint8_t* >( last ),
                                                                                    sizeof( ItemType ) ) );
     }
 

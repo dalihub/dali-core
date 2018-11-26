@@ -25,10 +25,11 @@ namespace Dali
 
 namespace
 {
-constexpr unsigned int BitMaskOfN( unsigned int bits )
+constexpr uint32_t BitMaskOfN( uint32_t bits )
 {
   return ( 1 << bits ) - 1;
 }
+
 } // unnamed namespace
 
 AlphaFunction::AlphaFunction()

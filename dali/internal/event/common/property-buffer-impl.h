@@ -51,12 +51,12 @@ public:
   /**
    * @copydoc PropertBuffer::SetData()
    */
-  void SetData( const void* data, std::size_t size );
+  void SetData( const void* data, uint32_t size );
 
   /**
    * @copydoc PropertBuffer::GetSize()
    */
-  std::size_t GetSize() const;
+  uint32_t GetSize() const;
 
 public: // Default property extensions from Object
 
@@ -91,8 +91,8 @@ private: // unimplemented methods
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
   SceneGraph::PropertyBuffer* mRenderObject;        ///<Render side object
-  unsigned int mBufferFormatSize;
-  unsigned int mSize; ///< Number of elements in the buffer
+  uint32_t mBufferFormatSize;
+  uint32_t mSize; ///< Number of elements in the buffer
 };
 
 /**
@@ -113,7 +113,7 @@ template<> struct PropertyImplementationType< Property::MATRIX > { typedef Matri
 template<> struct PropertyImplementationType< Property::RECTANGLE > { typedef Rect<int> Type; };
 template<> struct PropertyImplementationType< Property::ROTATION > { typedef Quaternion Type; };
 
-unsigned int GetPropertyImplementationSize( Property::Type& propertyType );
+uint32_t GetPropertyImplementationSize( Property::Type& propertyType );
 
 } // namespace Internal
 

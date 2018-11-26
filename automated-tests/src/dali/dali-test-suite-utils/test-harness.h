@@ -2,7 +2,7 @@
 #define TEST_HARNESS_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <testcase.h>
+#include <cstdint>
 
 namespace TestHarness
 {
@@ -34,11 +35,11 @@ enum ExitStatus
   EXIT_STATUS_TESTCASE_NOT_FOUND    // 6
 };
 
-const int MAX_NUM_CHILDREN(16);
+const int32_t MAX_NUM_CHILDREN(16);
 
 struct TestCase
 {
-  int testCase;
+  int32_t testCase;
   const char* testCaseName;
 
   TestCase()
@@ -47,7 +48,7 @@ struct TestCase
   {
   }
 
-  TestCase(int tc, const char* name)
+  TestCase(int32_t tc, const char* name)
   : testCase(tc),
     testCaseName(name)
   {
@@ -70,7 +71,7 @@ struct TestCase
  * Run a test case
  * @param[in] testCase The Testkit-lite test case to run
  */
-int RunTestCase( struct testcase_s& testCase );
+int32_t RunTestCase( struct testcase_s& testCase );
 
 /**
  * Run all test cases in parallel
@@ -79,7 +80,7 @@ int RunTestCase( struct testcase_s& testCase );
  * @param[in] reRunFailed True if failed test cases should be re-run
  * @return 0 on success
  */
-int RunAllInParallel(const char* processName, testcase tc_array[], bool reRunFailed);
+int32_t RunAllInParallel(const char* processName, testcase tc_array[], bool reRunFailed);
 
 /**
  * Run all test cases in serial
@@ -87,7 +88,7 @@ int RunAllInParallel(const char* processName, testcase tc_array[], bool reRunFai
  * @param[in] tc_array The array of auto-generated testkit-lite test cases
  * @return 0 on success
  */
-int RunAll( const char* processName, testcase tc_array[] );
+int32_t RunAll( const char* processName, testcase tc_array[] );
 
 /**
  * Find the named test case in the given array, and run it
@@ -95,7 +96,7 @@ int RunAll( const char* processName, testcase tc_array[] );
  * @param[in] testCaseName the name of the test case to run
  * @return 0 on success
  */
-int FindAndRunTestCase(::testcase tc_array[], const char* testCaseName);
+int32_t FindAndRunTestCase(::testcase tc_array[], const char* testCaseName);
 
 /**
  * Display usage instructions for this program

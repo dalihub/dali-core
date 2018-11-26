@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ void TransformManager::RemoveTransform(TransformId id)
 {
   //Move the last element to the gap
   mComponentCount--;
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   mTxComponentAnimatable[index] = mTxComponentAnimatable[mComponentCount];
   mTxComponentStatic[index] = mTxComponentStatic[mComponentCount];
   mInheritanceMode[index] = mInheritanceMode[mComponentCount];
@@ -158,7 +158,7 @@ void TransformManager::RemoveTransform(TransformId id)
 void TransformManager::SetParent( TransformId id, TransformId parentId )
 {
   DALI_ASSERT_ALWAYS( id != parentId );
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   mParent[ index ] = parentId;
   mComponentDirty[ index ] = true;
   mReorder = true;
@@ -176,7 +176,7 @@ Matrix& TransformManager::GetWorldMatrix( TransformId id )
 
 void TransformManager::SetInheritPosition( TransformId id, bool inherit )
 {
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   if( inherit )
   {
     mInheritanceMode[ index ] |= INHERIT_POSITION;
@@ -191,7 +191,7 @@ void TransformManager::SetInheritPosition( TransformId id, bool inherit )
 
 void TransformManager::SetInheritScale( TransformId id, bool inherit )
 {
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   if( inherit )
   {
     mInheritanceMode[ index ] |= INHERIT_SCALE;
@@ -206,7 +206,7 @@ void TransformManager::SetInheritScale( TransformId id, bool inherit )
 
 void TransformManager::SetInheritOrientation( TransformId id, bool inherit )
 {
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   if( inherit )
   {
     mInheritanceMode[ index ] |= INHERIT_ORIENTATION;
@@ -248,7 +248,7 @@ void TransformManager::Update()
   {
     if( DALI_LIKELY( mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID ) )
     {
-      const unsigned int& parentIndex = mIds[mParent[i] ];
+      const TransformId& parentIndex = mIds[mParent[i] ];
       if( DALI_LIKELY( mInheritanceMode[i] == INHERIT_ALL ) )
       {
         if( mComponentDirty[i] || mLocalMatrixDirty[parentIndex])
@@ -350,7 +350,7 @@ void TransformManager::ReorderComponents()
   mOrderedComponents.Resize(mComponentCount);
 
   TransformId parentId;
-  for( size_t i(0); i<mComponentCount; ++i )
+  for( TransformId i = 0; i<mComponentCount; ++i )
   {
     mOrderedComponents[i].id = mComponentId[i];
     mOrderedComponents[i].level = 0u;
@@ -364,8 +364,8 @@ void TransformManager::ReorderComponents()
   }
 
   std::stable_sort( mOrderedComponents.Begin(), mOrderedComponents.End());
-  unsigned int previousIndex = 0;
-  for( size_t newIndex(0); newIndex<mComponentCount-1; ++newIndex )
+  TransformId previousIndex = 0;
+  for( TransformId newIndex = 0; newIndex < mComponentCount-1; ++newIndex )
   {
     previousIndex = mIds[mOrderedComponents[newIndex].id];
     if( previousIndex != newIndex )
@@ -381,31 +381,31 @@ Vector3& TransformManager::GetVector3PropertyValue( TransformId id, TransformMan
   {
     case TRANSFORM_PROPERTY_POSITION:
     {
-      unsigned int index( mIds[id] );
+      TransformId index( mIds[id] );
       mComponentDirty[ index ] = true;
       return mTxComponentAnimatable[ index ].mPosition;
     }
     case TRANSFORM_PROPERTY_SCALE:
     {
-      unsigned int index( mIds[id] );
+      TransformId index( mIds[id] );
       mComponentDirty[ index ] = true;
       return mTxComponentAnimatable[ index ].mScale;
     }
     case TRANSFORM_PROPERTY_PARENT_ORIGIN:
     {
-      unsigned int index( mIds[id] );
+      TransformId index( mIds[id] );
       mComponentDirty[ index ] = true;
       return mTxComponentStatic[ index ].mParentOrigin;
     }
     case TRANSFORM_PROPERTY_ANCHOR_POINT:
     {
-      unsigned int index( mIds[id] );
+      TransformId index( mIds[id] );
       mComponentDirty[ index ] = true;
       return mTxComponentStatic[ index ].mAnchorPoint;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
-      unsigned int index( mIds[id] );
+      TransformId index( mIds[id] );
       mComponentDirty[ index ] = true;
       return mSize[ index ];
     }
@@ -483,7 +483,7 @@ const float& TransformManager::GetVector3PropertyComponentValue(TransformId id, 
 
 void TransformManager::SetVector3PropertyValue( TransformId id, TransformManagerProperty property, const Vector3& value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -522,7 +522,7 @@ void TransformManager::SetVector3PropertyValue( TransformId id, TransformManager
 
 void TransformManager::SetVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, unsigned int component )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -561,7 +561,7 @@ void TransformManager::SetVector3PropertyComponentValue( TransformId id, Transfo
 
 void TransformManager::BakeVector3PropertyValue( TransformId id, TransformManagerProperty property, const Vector3& value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -600,7 +600,7 @@ void TransformManager::BakeVector3PropertyValue( TransformId id, TransformManage
 
 void TransformManager::BakeRelativeVector3PropertyValue( TransformId id, TransformManagerProperty property, const Vector3& value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -639,7 +639,7 @@ void TransformManager::BakeRelativeVector3PropertyValue( TransformId id, Transfo
 
 void TransformManager::BakeMultiplyVector3PropertyValue( TransformId id, TransformManagerProperty property, const Vector3& value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -678,7 +678,7 @@ void TransformManager::BakeMultiplyVector3PropertyValue( TransformId id, Transfo
 
 void TransformManager::BakeVector3PropertyComponentValue( TransformId id, TransformManagerProperty property, float value, unsigned int component )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -717,7 +717,7 @@ void TransformManager::BakeVector3PropertyComponentValue( TransformId id, Transf
 
 void TransformManager::BakeXVector3PropertyValue( TransformId id, TransformManagerProperty property, float value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -756,7 +756,7 @@ void TransformManager::BakeXVector3PropertyValue( TransformId id, TransformManag
 
 void TransformManager::BakeYVector3PropertyValue( TransformId id, TransformManagerProperty property, float value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -795,7 +795,7 @@ void TransformManager::BakeYVector3PropertyValue( TransformId id, TransformManag
 
 void TransformManager::BakeZVector3PropertyValue( TransformId id, TransformManagerProperty property, float value )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
 
   switch( property )
@@ -834,7 +834,7 @@ void TransformManager::BakeZVector3PropertyValue( TransformId id, TransformManag
 
 Quaternion& TransformManager::GetQuaternionPropertyValue( TransformId id )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mComponentDirty[ index ] = true;
   return mTxComponentAnimatable[ index ].mOrientation;
 }
@@ -846,21 +846,21 @@ const Quaternion& TransformManager::GetQuaternionPropertyValue( TransformId id )
 
 void TransformManager::SetQuaternionPropertyValue( TransformId id, const Quaternion& q )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mTxComponentAnimatable[ index ].mOrientation = q;
   mComponentDirty[ index ] = true;
 }
 
 void TransformManager::BakeQuaternionPropertyValue( TransformId id, const Quaternion& q )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mTxComponentAnimatable[ index ].mOrientation = mTxComponentAnimatableBaseValue[index].mOrientation = q;
   mComponentDirty[ index ] = true;
 }
 
 void TransformManager::BakeRelativeQuaternionPropertyValue( TransformId id, const Quaternion& q )
 {
-  unsigned int index( mIds[id] );
+  TransformId index( mIds[id] );
   mTxComponentAnimatable[ index ].mOrientation = mTxComponentAnimatableBaseValue[index].mOrientation = mTxComponentAnimatable[ index ].mOrientation * q;
   mComponentDirty[ index ] = true;
 }
@@ -872,14 +872,14 @@ const Vector4& TransformManager::GetBoundingSphere( TransformId id ) const
 
 void TransformManager::GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const
 {
-  unsigned int index = mIds[id];
+  TransformId index = mIds[id];
   worldMatrix = mWorld[index];
   size = mSize[index];
 }
 
 void TransformManager::SetPositionUsesAnchorPoint( TransformId id, bool value )
 {
-  unsigned int index( mIds[ id ] );
+  TransformId index( mIds[ id ] );
   mComponentDirty[ index ] = true;
   mTxComponentStatic[ index ].mPositionUsesAnchorPoint = value;
 }

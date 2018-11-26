@@ -1074,7 +1074,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   typeInfo.GetPropertyIndices( indices );
 
   size_t typePropertyCount = typeInfo.GetPropertyCount();
-  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), Actor::New().GetPropertyCount() + 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( indices.Size(), typePropertyCount, TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by two
@@ -1164,7 +1164,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   // Check property count of type-info is 1
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), customActor.GetPropertyCount(), TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
@@ -1267,10 +1267,10 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   // Check the animatable property type
   DALI_TEST_EQUALS( customActor.GetPropertyType( animatablePropertyIndex ), Property::FLOAT, TEST_LOCATION );
 
-  // Check property count of type-info is 1
+  // Check property count of type-info
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), customActor.GetPropertyCount(), TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
@@ -1376,10 +1376,10 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   // Check the animatable property type
   DALI_TEST_EQUALS( customActor.GetPropertyType( animatablePropertyIndex ), animatablePropertyType, TEST_LOCATION );
 
-  // Check property count of type-info is 1
+  // Check property count of type-info
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), customActor.GetPropertyCount(), TEST_LOCATION );
 
   // Register animatable property components
   std::string animatablePropertyComponentName1( "animatableProp1X" );
@@ -2057,24 +2057,14 @@ int UtcDaliPropertyRegistrationPropertyWritableP(void)
 
 int UtcDaliPropertyRegistrationPropertyWritableN(void)
 {
-  // Currently Actors don't register properties with the type registry
-
   TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
   Internal::TypeInfo& typeInfoImpl = GetImplementation( typeInfo );
 
-  try
-  {
-    typeInfoImpl.IsPropertyWritable( Actor::Property::COLOR);
-    tet_result( TET_FAIL );
+  DALI_TEST_EQUALS( typeInfoImpl.IsPropertyWritable( Actor::Property::COLOR), true, TEST_LOCATION );
 
-  }
-  catch ( DaliException& e )
-  {
-     DALI_TEST_ASSERT( e, "Cannot find property index", TEST_LOCATION );
-  }
   END_TEST;
-
 }
+
 int UtcDaliPropertyRegistrationPropertyAnimatable(void)
 {
   TestApplication application;
@@ -2111,7 +2101,7 @@ int UtcDaliPropertyRegistrationPropertyAnimatable(void)
   END_TEST;
 }
 
-int UtcDaliPropertyRegistrationInvalidGetAndSet(void)
+int UtcDaliPropertyRegistrationUnregisteredGetAndSet(void)
 {
   TestApplication application;
   int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 2000;
@@ -2125,47 +2115,14 @@ int UtcDaliPropertyRegistrationInvalidGetAndSet(void)
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
 
-  // Try to set an index that hasn't been added
-  try
-  {
-    customActor.SetProperty( propertyIndex, true );
-    tet_result( TET_FAIL );
-  }
-  catch ( DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
-  }
+  // Try to set an index that hasn't been registered, this is a no-op for now, to be fixed in future
+  customActor.SetProperty( propertyIndex, true );
+//  DALI_TEST_EQUALS( true, customActor.GetProperty( propertyIndex ).Get<bool>(), TEST_LOCATION);
 
-  try
-  {
-    customActor.SetProperty( animatablePropertyIndex, true );
-    tet_result( TET_FAIL );
-  }
-  catch ( DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
-  }
+  // Try to set an index that hasn't been registered
+  customActor.SetProperty( animatablePropertyIndex, true );
+  DALI_TEST_EQUALS( true, customActor.GetProperty( animatablePropertyIndex ).Get<bool>(), TEST_LOCATION);
 
-  // Try to get an index that hasn't been added
-  try
-  {
-    (void) customActor.GetProperty< bool >( propertyIndex );
-    tet_result( TET_FAIL );
-  }
-  catch ( DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
-  }
-
-  try
-  {
-    (void) customActor.GetProperty< bool >( animatablePropertyIndex );
-    tet_result( TET_FAIL );
-  }
-  catch ( DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
-  }
   END_TEST;
 }
 
@@ -2490,7 +2447,7 @@ int UtcDaliTypeInfoGetPropertyCountP1(void)
   DALI_TEST_CHECK( typeInfo );
   size_t actorPropertyCount = typeInfo.GetPropertyCount();
 
-  DALI_TEST_EQUALS( actorPropertyCount == 0 , true, TEST_LOCATION ); // No event only props
+  DALI_TEST_EQUALS( actorPropertyCount, Actor::New().GetPropertyCount(), TEST_LOCATION ); // No event only props
   END_TEST;
 }
 
@@ -2506,7 +2463,7 @@ int UtcDaliTypeInfoGetPropertyCountP2(void)
   typeInfo.GetPropertyIndices( indices );
 
   DALI_TEST_EQUALS( propertyCount > 0 && propertyCount <= indices.Size(), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( propertyCount == 2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( propertyCount, Actor::New().GetPropertyCount() + 2, TEST_LOCATION );
 
   END_TEST;
 }

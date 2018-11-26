@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ DALI_PROPERTY( "targetPosition",         VECTOR3,  true,    false,   true,   Dal
 DALI_PROPERTY( "projectionMatrix",       MATRIX,   false,   false,   true,   Dali::CameraActor::Property::PROJECTION_MATRIX     )
 DALI_PROPERTY( "viewMatrix",             MATRIX,   false,   false,   true,   Dali::CameraActor::Property::VIEW_MATRIX           )
 DALI_PROPERTY( "invertYAxis",            BOOLEAN,  true,    false,   true,   Dali::CameraActor::Property::INVERT_Y_AXIS         )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, CameraDefaultProperties )
 
 // calculate the far plane distance for a 16bit depth buffer with 4 bits per unit precision
 void CalculateClippingAndZ( float width, float height, float& nearClippingPlane, float& farClippingPlane, float& cameraZ )
@@ -79,7 +79,7 @@ BaseHandle Create()
   return Dali::CameraActor::New();
 }
 
-TypeRegistration mType( typeid( Dali::CameraActor ), typeid( Dali::Actor ), Create );
+TypeRegistration mType( typeid( Dali::CameraActor ), typeid( Dali::Actor ), Create, CameraDefaultProperties );
 
 /**
  * Builds the picking ray in the world reference system from an orthographic camera
@@ -112,8 +112,10 @@ void BuildOrthoPickingRay( const Matrix& viewMatrix,
     DALI_ASSERT_DEBUG( false );
   }
 
-  Vector4 near( screenX - viewport.x, viewport.height - (screenY - viewport.y), 0.f, 1.f );
-  if( !Unproject( near, invViewProjection, viewport.width, viewport.height, rayOrigin ) )
+  Vector4 near( screenX - static_cast<float>( viewport.x ),
+                static_cast<float>( viewport.height ) - (screenY - static_cast<float>( viewport.y ) ),
+                0.f, 1.f );
+  if( !Unproject( near, invViewProjection, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), rayOrigin ) )
   {
     DALI_ASSERT_DEBUG( false );
   }
@@ -455,9 +457,11 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
-    Vector4 near( screenCoordinates.x - viewport.x, viewport.height - (screenCoordinates.y - viewport.y), 0.f, 1.f );
+    Vector4 near( screenCoordinates.x - static_cast<float>(viewport.x),
+                  static_cast<float>( viewport.height ) - (screenCoordinates.y - static_cast<float>( viewport.y ) ),
+                  0.f, 1.f );
     const Matrix& inverseViewProjection = mSceneObject->GetInverseViewProjectionMatrix( GetEventThreadServices().GetEventBufferIndex() );
-    success = Unproject( near, inverseViewProjection, viewport.width, viewport.height, near );
+    success = Unproject( near, inverseViewProjection, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), near );
 
     // Compute the ray's director vector.
     rayDirection.x = near.x - rayOrigin.x;
@@ -507,117 +511,6 @@ const Matrix& CameraActor::GetProjectionMatrix() const
 const SceneGraph::Camera* CameraActor::GetCamera() const
 {
   return mSceneObject;
-}
-
-unsigned int CameraActor::GetDefaultPropertyCount() const
-{
-  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
-}
-
-void CameraActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
-{
-  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
-
-  indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
-
-  int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
-  {
-    indices.PushBack( index );
-  }
-}
-
-bool CameraActor::IsDefaultPropertyWritable( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyWritable( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].writable;
-}
-
-bool CameraActor::IsDefaultPropertyAnimatable( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyAnimatable( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].animatable;
-}
-
-bool CameraActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::IsDefaultPropertyAConstraintInput( index );
-  }
-
-  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].constraintInput;
-}
-
-Property::Type CameraActor::GetDefaultPropertyType( Property::Index index ) const
-{
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    return Actor::GetDefaultPropertyType( index );
-  }
-  else
-  {
-    index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-
-    if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-    {
-      return DEFAULT_PROPERTY_DETAILS[index].type;
-    }
-    else
-    {
-      // index out-of-bounds
-      return Property::NONE;
-    }
-  }
-}
-
-const char* CameraActor::GetDefaultPropertyName( Property::Index index ) const
-{
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
-  {
-    return Actor::GetDefaultPropertyName(index);
-  }
-  else
-  {
-    index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-
-    if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
-    {
-      return DEFAULT_PROPERTY_DETAILS[index].name;
-    }
-    return NULL;
-  }
-}
-
-Property::Index CameraActor::GetDefaultPropertyIndex(const std::string& name) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  // Look for name in current class' default properties
-  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-  {
-    if( 0 == strcmp( name.c_str(), DEFAULT_PROPERTY_DETAILS[i].name ) ) // dont want to convert rhs to string
-    {
-      index = i + DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
-      break;
-    }
-  }
-
-  // If not found, check in base class
-  if( Property::INVALID_INDEX == index )
-  {
-    index = Actor::GetDefaultPropertyIndex( name );
-  }
-
-  return index;
 }
 
 void CameraActor::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )

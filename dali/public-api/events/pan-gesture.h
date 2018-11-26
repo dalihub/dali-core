@@ -140,7 +140,7 @@ struct DALI_CORE_API PanGesture: public Gesture
   /**
    * @brief The total number of fingers touching the screen in a pan gesture.
    */
-  unsigned int numberOfTouches;
+  uint32_t numberOfTouches;
 
   // Convenience Methods
 

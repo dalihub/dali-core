@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ BitmapCompressed::~BitmapCompressed()
 }
 
 void BitmapCompressed::Initialize( Pixel::Format pixelFormat,
-                          const unsigned int width,
-                          const unsigned int height,
-                          const size_t bufferSize )
+                                   const uint32_t width,
+                                   const uint32_t height,
+                                   const uint32_t bufferSize )
 {
   Dali::Integration::Bitmap::Initialize( pixelFormat, width, height );
   mBufferSize  = bufferSize;
@@ -54,9 +54,9 @@ void BitmapCompressed::Initialize( Pixel::Format pixelFormat,
 }
 
 Dali::Integration::PixelBuffer* BitmapCompressed::ReserveBufferOfSize( Pixel::Format pixelFormat,
-                                    const unsigned int  width,
-                                    const unsigned int  height,
-                                    const size_t        bufferSize )
+                                                                       const uint32_t  width,
+                                                                       const uint32_t  height,
+                                                                       const uint32_t  bufferSize )
 {
   // Sanity check that a not-outrageous amount of data is being passed in (indicating a client error):
   DALI_ASSERT_DEBUG(bufferSize < (1U << 27U) && "That is far too much compressed data."); // 128MB of compressed data == unreasonable.

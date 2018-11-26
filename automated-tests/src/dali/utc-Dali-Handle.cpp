@@ -540,7 +540,7 @@ int UtcDaliHandleNonAnimatableProperties(void)
   }
   catch ( Dali::DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "Animated value and Property type don't match", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "Property type is not animatable", TEST_LOCATION );
   }
 
   DALI_TEST_EQUALS( "yes", actor.GetProperty( nonAnimStringIndex ).Get<std::string>(), TEST_LOCATION );

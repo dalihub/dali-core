@@ -63,30 +63,9 @@ class Renderer;
 using RendererContainer = Dali::Vector<Renderer*>;
 
 
-/**
- * Flag whether property has changed, during the Update phase.
- */
-enum NodePropertyFlags
-{
-  NothingFlag          = 0x000,
-  TransformFlag        = 0x001,
-  VisibleFlag          = 0x002,
-  ColorFlag            = 0x004,
-  SizeFlag             = 0x008,
-  OverlayFlag          = 0x010,
-  SortModifierFlag     = 0x020,
-  ChildDeletedFlag     = 0x040,
-};
-
-static const int AllFlags = ( ChildDeletedFlag << 1 ) - 1; // all the flags
-
-/**
- * Size is not inherited. VisibleFlag is inherited
- */
-static const int InheritedDirtyFlags = TransformFlag | VisibleFlag | ColorFlag | OverlayFlag;
 
 // Flags which require the scene renderable lists to be updated
-static const int RenderableUpdateFlags = TransformFlag | SortModifierFlag | ChildDeletedFlag;
+static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::CHILD_DELETED;
 
 /**
  * Node is the base class for all nodes in the Scene Graph.
@@ -110,7 +89,7 @@ public:
    * Construct a new Node.
    * @param[in] id The unique ID of the node
    */
-  static Node* New( unsigned int id );
+  static Node* New( uint32_t id );
 
   /**
    * Deletes a Node.
@@ -236,7 +215,7 @@ public:
    * Get the renderer at the given index
    * @param[in] index
    */
-  Renderer* GetRendererAt( unsigned int index ) const
+  Renderer* GetRendererAt( uint32_t index ) const
   {
     return mRenderer[index];
   }
@@ -244,9 +223,9 @@ public:
   /**
    * Retrieve the number of renderers for the node
    */
-  unsigned int GetRendererCount()
+  uint32_t GetRendererCount() const
   {
-    return mRenderer.Size();
+    return static_cast<uint32_t>( mRenderer.Size() );
   }
 
   // Containment methods
@@ -329,7 +308,7 @@ public:
    * Flag that one of the node values has changed in the current frame.
    * @param[in] flag The flag to set.
    */
-  void SetDirtyFlag(NodePropertyFlags flag)
+  void SetDirtyFlag( NodePropertyFlags flag )
   {
     mDirtyFlags |= flag;
   }
@@ -339,14 +318,22 @@ public:
    */
   void SetAllDirtyFlags()
   {
-    mDirtyFlags = AllFlags;
+    mDirtyFlags = NodePropertyFlags::ALL;
   }
 
   /**
    * Query whether a node is dirty.
    * @return The dirty flags
    */
-  int GetDirtyFlags() const;
+  NodePropertyFlags GetDirtyFlags() const;
+
+  /**
+   * Query inherited dirty flags.
+   *
+   * @param The parentFlags to or with
+   * @return The inherited dirty flags
+   */
+  NodePropertyFlags GetInheritedDirtyFlags( NodePropertyFlags parentFlags ) const;
 
   /**
    * Retrieve the parent-origin of the node.
@@ -592,11 +579,11 @@ public:
    * or inherits its parent color.
    * @param[in] colorMode The new color mode.
    */
-  void SetColorMode(ColorMode colorMode)
+  void SetColorMode( ColorMode colorMode )
   {
     mColorMode = colorMode;
 
-    SetDirtyFlag(ColorFlag);
+    SetDirtyFlag( NodePropertyFlags::COLOR );
   }
 
   /**
@@ -728,13 +715,19 @@ public:
    * @brief Sets the sibling order of the node
    * @param[in] order The new order
    */
-  void SetDepthIndex( unsigned int depthIndex ){ mDepthIndex = depthIndex; }
+  void SetDepthIndex( uint32_t depthIndex )
+  {
+    mDepthIndex = depthIndex;
+  }
 
   /**
    * @brief Get the depth index of the node
    * @return Current depth index
    */
-  unsigned int GetDepthIndex(){ return mDepthIndex; }
+  uint32_t GetDepthIndex() const
+  {
+    return mDepthIndex;
+  }
 
   /**
    * @brief Sets the boolean which states whether the position should use the anchor-point.
@@ -819,7 +812,7 @@ protected:
    * Protected constructor; See also Node::New()
    * @param[in] id The Unique ID of the actor creating the node
    */
-  Node( unsigned int id );
+  Node( uint32_t id );
 
   /**
    * Protected virtual destructor; See also Node::Delete( Node* )
@@ -832,9 +825,9 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetModelMatrix
    */
-  virtual const Matrix& GetModelMatrix( unsigned int bufferId ) const
+  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const
   {
-    return GetWorldMatrix( bufferId );
+    return GetWorldMatrix( bufferIndex );
   }
 
   /**
@@ -864,8 +857,8 @@ public: // Default properties
 
   TransformManager*                  mTransformManager;
   TransformId                        mTransformId;
-  TransformManagerPropertyVector3    mParentOrigin;           ///< Local transform; the position is relative to this. Sets the TransformFlag dirty when changed
-  TransformManagerPropertyVector3    mAnchorPoint;            ///< Local transform; local center of rotation. Sets the TransformFlag dirty when changed
+  TransformManagerPropertyVector3    mParentOrigin;           ///< Local transform; the position is relative to this. Sets the Transform flag dirty when changed
+  TransformManagerPropertyVector3    mAnchorPoint;            ///< Local transform; local center of rotation. Sets the Transform flag dirty when changed
   TransformManagerPropertyVector3    mSize;                   ///< Size is provided for layouting
   TransformManagerPropertyVector3    mPosition;               ///< Local transform; distance between parent-origin & anchor-point
   TransformManagerPropertyQuaternion mOrientation;            ///< Local transform; rotation relative to parent node
@@ -884,7 +877,7 @@ public: // Default properties
   InheritedColor                     mWorldColor;             ///< Full inherited color
 
   uint32_t                           mClippingSortModifier;   ///< Contains bit-packed clipping information for quick access when sorting
-  const unsigned int                 mId;                     ///< The Unique ID of the node.
+  const uint32_t                     mId;                     ///< The Unique ID of the node.
 
 protected:
 
@@ -902,8 +895,8 @@ protected:
   uint32_t                           mDepthIndex;             ///< Depth index of the node
 
   // flags, compressed to bitfield
-  unsigned int                       mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
-  int                                mDirtyFlags:8;           ///< A composite set of flags for each of the Node properties
+  NodePropertyFlags                  mDirtyFlags;             ///< Dirty flags for each of the Node properties
+  uint32_t                           mRegenerateUniformMap:2; ///< Indicate if the uniform map has to be regenerated this frame
   DrawMode::Type                     mDrawMode:3;             ///< How the Node and its children should be drawn
   ColorMode                          mColorMode:3;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
   ClippingMode::Type                 mClippingMode:3;         ///< The clipping mode of this node
@@ -921,7 +914,7 @@ inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServic
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
@@ -932,7 +925,7 @@ inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, co
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetParentOrigin, origin );
@@ -943,7 +936,7 @@ inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, con
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetAnchorPoint, anchor );
@@ -954,7 +947,7 @@ inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices,
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritPosition, inherit );
@@ -965,7 +958,7 @@ inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, co
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritScale, inherit );
@@ -976,7 +969,7 @@ inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const
   typedef MessageValue1< Node, ColorMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetColorMode, colorMode );
@@ -987,7 +980,7 @@ inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const 
   typedef MessageValue1< Node, DrawMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetDrawMode, drawMode );
@@ -998,7 +991,7 @@ inline void AddRendererMessage( EventThreadServices& eventThreadServices, const 
   typedef MessageValue1< Node, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::AddRenderer, renderer );
@@ -1009,18 +1002,18 @@ inline void RemoveRendererMessage( EventThreadServices& eventThreadServices, con
   typedef MessageValue1< Node, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::RemoveRenderer, renderer );
 }
 
-inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, unsigned int depthIndex )
+inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex )
 {
-  typedef MessageValue1< Node, unsigned int > LocalType;
+  typedef MessageValue1< Node, uint32_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetDepthIndex, depthIndex );
@@ -1031,7 +1024,7 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
   typedef MessageValue1< Node, ClippingMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetClippingMode, clippingMode );
@@ -1042,7 +1035,7 @@ inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadS
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint );

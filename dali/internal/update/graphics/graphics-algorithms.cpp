@@ -444,7 +444,7 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportStat
     ClippingBox useScissorBox( mScissorStack.back() );
     outViewportState.SetScissorTestEnable( true  );
     outViewportState.SetScissor( { useScissorBox.x,
-                                int32_t(outViewportState.viewport.height - (useScissorBox.y + useScissorBox.height) ),
+                                int32_t(outViewportState.viewport.height - float(useScissorBox.y + useScissorBox.height) ),
                                 uint32_t(useScissorBox.width),
                                 uint32_t(useScissorBox.height) } );
   }
@@ -494,8 +494,8 @@ void GraphicsAlgorithms::RecordRenderItemList(
     }
     cmd.BindRenderTarget( renderTargetBinding );
 
-    float width = instruction.mViewport.width;
-    float height = instruction.mViewport.height;
+    auto width = float(instruction.mViewport.width);
+    auto height = float(instruction.mViewport.height);
 
     // If the viewport hasn't been set, and we're rendering to a framebuffer, then
     // set the size of the viewport to that of the framebuffer.
@@ -587,8 +587,8 @@ void GraphicsAlgorithms::RecordInstruction(
     {
       renderTargetBinding.SetFramebuffer( instruction.mFrameBuffer->GetGfxObject());
       // Store the size of the framebuffer in case the viewport isn't set.
-      renderTargetBinding.framebufferWidth = instruction.mFrameBuffer->GetWidth();
-      renderTargetBinding.framebufferHeight = instruction.mFrameBuffer->GetHeight();
+      renderTargetBinding.framebufferWidth = float(instruction.mFrameBuffer->GetWidth());
+      renderTargetBinding.framebufferHeight = float(instruction.mFrameBuffer->GetHeight());
     }
   }
 
@@ -995,7 +995,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   std::vector<Graphics::API::RenderCommand*> commandList{};
 
-  for( size_t i = 0; i < numberOfInstructions; ++i )
+  for( uint32_t i = 0; i < numberOfInstructions; ++i )
   {
     RenderInstruction& instruction = renderInstructions.At( bufferIndex, i );
 

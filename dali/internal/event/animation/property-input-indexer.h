@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_INPUT_INDEXER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ public:
 
 public:
 
-  unsigned int mBufferIndex;
+  BufferIndex mBufferIndex;
   const AccessorType* mInput;
 };
 

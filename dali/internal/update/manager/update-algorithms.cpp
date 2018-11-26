@@ -70,9 +70,9 @@ void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBuf
  ************************** Update node hierarchy *****************************
  ******************************************************************************/
 
-inline void UpdateRootNodeOpacity( Layer& rootNode, int nodeDirtyFlags, BufferIndex updateBufferIndex )
+inline void UpdateRootNodeOpacity( Layer& rootNode, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex )
 {
-  if ( nodeDirtyFlags & ColorFlag )
+  if ( nodeDirtyFlags & NodePropertyFlags::COLOR )
   {
     rootNode.SetWorldColor( rootNode.GetColor( updateBufferIndex ), updateBufferIndex );
   }
@@ -83,10 +83,10 @@ inline void UpdateRootNodeOpacity( Layer& rootNode, int nodeDirtyFlags, BufferIn
   }
 }
 
-inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updateBufferIndex )
+inline void UpdateNodeOpacity( Node& node, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex )
 {
   // If opacity needs to be recalculated
-  if ( nodeDirtyFlags & ColorFlag )
+  if ( nodeDirtyFlags & NodePropertyFlags::COLOR )
   {
     node.InheritWorldColor( updateBufferIndex );
   }
@@ -100,11 +100,11 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
 /**
  * This is called recursively for all children of the root Node
  */
-inline int UpdateNodes( Node& node,
-                        int parentFlags,
-                        BufferIndex updateBufferIndex,
-                        Layer& currentLayer,
-                        int inheritedDrawMode )
+inline NodePropertyFlags UpdateNodes( Node& node,
+                                      NodePropertyFlags parentFlags,
+                                      BufferIndex updateBufferIndex,
+                                      Layer& currentLayer,
+                                      uint32_t inheritedDrawMode )
 {
   // Apply constraints to the node
   ConstrainPropertyOwner( node, updateBufferIndex );
@@ -112,7 +112,7 @@ inline int UpdateNodes( Node& node,
   // Short-circuit for invisible nodes
   if ( !node.IsVisible( updateBufferIndex ) )
   {
-    return 0;
+    return NodePropertyFlags::NOTHING;
   }
 
   // If the node was not previously visible
@@ -124,9 +124,9 @@ inline int UpdateNodes( Node& node,
   }
 
   // Some dirty flags are inherited from parent
-  int nodeDirtyFlags( node.GetDirtyFlags() | ( parentFlags & InheritedDirtyFlags ) );
+  NodePropertyFlags nodeDirtyFlags = node.GetInheritedDirtyFlags( parentFlags );
 
-  int cumulativeDirtyFlags = nodeDirtyFlags;
+  NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
   Layer* layer = &currentLayer;
   Layer* nodeIsLayer( node.GetLayer() );
@@ -176,7 +176,7 @@ inline int UpdateNodes( Node& node,
 /**
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
-int UpdateNodeTree( Layer& rootNode,
+NodePropertyFlags UpdateNodeTree( Layer& rootNode,
                     BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
@@ -184,7 +184,7 @@ int UpdateNodeTree( Layer& rootNode,
   // Short-circuit for invisible nodes
   if ( DALI_UNLIKELY( !rootNode.IsVisible( updateBufferIndex ) ) ) // almost never ever true
   {
-    return 0;
+    return NodePropertyFlags::NOTHING;
   }
 
   // If the root node was not previously visible
@@ -195,9 +195,9 @@ int UpdateNodeTree( Layer& rootNode,
     rootNode.SetAllDirtyFlags();
   }
 
-  int nodeDirtyFlags( rootNode.GetDirtyFlags() );
+  NodePropertyFlags nodeDirtyFlags( rootNode.GetDirtyFlags() );
 
-  int cumulativeDirtyFlags = nodeDirtyFlags;
+  NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
   UpdateRootNodeOpacity( rootNode, nodeDirtyFlags, updateBufferIndex );
 

@@ -43,8 +43,8 @@ namespace Scripting
  */
 struct StringEnum
 {
-  const char* string; ///< The string representation
-  const int value;    ///< The enumeration value wrapped in int
+  const char* string;  ///< The string representation
+  const int32_t value; ///< The enumeration value wrapped in int
 };
 
 /**
@@ -55,7 +55,7 @@ struct StringEnum
  * @param[in]  tableCount  Number of items in the array.
  * @return     The index of the enumeration. If enumeration is not found, logs an error and returns tableCount.
  */
-DALI_CORE_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
+DALI_CORE_API uint32_t FindEnumIndex( const char* value, const StringEnum* table, uint32_t tableCount );
 
 /**
  * @brief Find the enum as an integer from the table
@@ -68,7 +68,7 @@ DALI_CORE_API unsigned int FindEnumIndex( const char* value, const StringEnum* t
  * @param[out] integerEnum The value of the enum.
  * @return     true if one or more enums in value.
  */
-DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, unsigned int tableCount, int& integerEnum );
+DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnum* const table, uint32_t tableCount, int& integerEnum );
 
 /**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
@@ -81,7 +81,7 @@ DALI_CORE_API bool EnumStringToInteger( const char* const value, const StringEnu
  * @return     True if the value was found from the table
  */
 template< typename T >
-bool GetEnumeration( const char* value, const StringEnum* table, unsigned int tableCount, T& result )
+bool GetEnumeration( const char* value, const StringEnum* table, uint32_t tableCount, T& result )
 {
   bool retVal( false );
   if( table )
@@ -108,7 +108,7 @@ bool GetEnumeration( const char* value, const StringEnum* table, unsigned int ta
  * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
  */
 template< typename T >
-bool GetEnumerationProperty( const Property::Value& propertyValue, const StringEnum* table, unsigned int tableCount, T& result )
+bool GetEnumerationProperty( const Property::Value& propertyValue, const StringEnum* table, uint32_t tableCount, T& result )
 {
   int newValue;
   bool set = false;
@@ -156,7 +156,7 @@ bool GetEnumerationProperty( const Property::Value& propertyValue, const StringE
  * @return     True if the value was found successfully AND the value has changed. This is to allow the caller to do nothing if there is no change.
  */
 template< typename T >
-bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const Scripting::StringEnum* table, unsigned int tableCount, T& result )
+bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const Scripting::StringEnum* table, uint32_t tableCount, T& result )
 {
   bool returnValue = true;
 
@@ -215,11 +215,11 @@ bool GetBitmaskEnumerationProperty( const Property::Value& propertyValue, const 
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
 template< typename T >
-const char* GetEnumerationName( T value, const StringEnum* table, unsigned int tableCount )
+const char* GetEnumerationName( T value, const StringEnum* table, uint32_t tableCount )
 {
   if( table )
   {
-    for ( unsigned int i = 0; i < tableCount; ++i )
+    for ( uint32_t i = 0; i < tableCount; ++i )
     {
       if ( value == T(table[ i ].value) )
       {
@@ -243,7 +243,7 @@ const char* GetEnumerationName( T value, const StringEnum* table, unsigned int t
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
 template< typename T >
-const char * GetLinearEnumerationName( T value, const StringEnum* table, unsigned int tableCount )
+const char * GetLinearEnumerationName( T value, const StringEnum* table, uint32_t tableCount )
 {
   if ( table && ( value > 0 || value <= static_cast<int>( tableCount ) ) )
   {

@@ -2,7 +2,7 @@
 #define __DALI_VIEWPORT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // int32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 
@@ -32,7 +35,7 @@ namespace Dali
  * @brief Typedef for a viewport ( a rectangle representing a screen area ).
  * @SINCE_1_0.0
  */
-typedef Rect<int> Viewport;
+typedef Rect<int32_t> Viewport;
 
 /**
  * @}

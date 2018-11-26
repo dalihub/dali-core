@@ -56,21 +56,21 @@ public:
    * @param bufferIndex to reset
    * @param capacityRequired in the container
    */
-  void ResetAndReserve( BufferIndex bufferIndex, size_t capacityRequired );
+  void ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired );
 
   /**
    * Return the count of instructions in the container
    * @param bufferIndex to use
    * @return the count of elements
    */
-  size_t Count( BufferIndex bufferIndex );
+  uint32_t Count( BufferIndex bufferIndex );
 
   /**
    * Get a reference to the instruction at index
    * @param bufferIndex to use
    * @param index to use
    */
-  RenderInstruction& At( BufferIndex bufferIndex, size_t index );
+  RenderInstruction& At( BufferIndex bufferIndex, uint32_t index );
 
   /**
    * Add an instruction to the end of the container

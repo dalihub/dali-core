@@ -177,7 +177,6 @@ If you are adding test cases to existing files, then all you need to do is creat
       END_TEST;
     }
 
-
 Note that **there must be no extra whitespace in the method signature** (i.e., it must violate our coding convention and follow __exactly__ this pattern: `int UtcDaliMyTestcaseName(void)`), as it's parsed by an awk script to auto-generate the testcase arrays in the main header file.
 
 You can contine to use the TET api, e.g. `tet_infoline`, `tet_result` and our test check methods `DALI_TEST_CHECK`, `DALI_TEST_EQUALS`, etc.
@@ -186,6 +185,41 @@ If you need any non-test methods or variables, ensure they are wrapped in an ano
 
 If you are adding new test files, then you need to add the filename to the SET(TC_SOURCES...
 section of CMakeLists.txt (this is also parsed by an awk script prior to building)
+
+Good Practices
+--------------
+Use DALI_TEST_EQUALS to test actual value against expected value, like this:
+
+    DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), 0.9f, TEST_LOCATION );
+
+This will speed up debugging in case the test some day fails. There is also a variant to test that value is greater than expected:
+
+    DALI_TEST_GREATER( textureBindIndex[1], textureBindIndex[2], TEST_LOCATION );
+
+When doing negative tests where your code uses DALI_ASSERT_ALWAYS, use the DALI_TEST_ASSERTION macro, like below:
+
+    DALI_TEST_ASSERTION(
+    {
+        animation.AnimateTo( Property( actor, Actor::Property::PARENT_ORIGIN ), targetParentOrigin );
+    }, "IsPropertyAnimatable( index )" );
+
+This macro will catch the DALi Exception and check that the correct assert message was included. It will also fail the test in case the assert did not occur. It also reduces the amount of false positive error logging whilst the  is being thrown making it easier to see the real errors.
+
+Note, DALI_ASSERT_DEBUG cannot be tested as tests execute against release version of the code.
+
+Use additional scope to control the life of stack allocated objects, such as DALi handles
+
+    // try reparenting an orphaned child
+    {
+        Actor temporaryParent = Actor::New();
+        temporaryParent.Add( child );
+        DALI_TEST_EQUALS( parent2.GetChildCount(), 0u, TEST_LOCATION );
+    }
+    // temporaryParent has now died, reparent the orphaned child
+    parent2.Add( child );
+    DALI_TEST_EQUALS( parent2.GetChildCount(), 1u, TEST_LOCATION );
+
+Always test the output of your test by making your code fail!!!
 
 Debugging
 =========

@@ -38,10 +38,10 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/scene-graph-frame-callback.h> // for OwnerPointer< FrameCallback >
 #include <dali/internal/update/manager/node-depths.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/update/rendering/scene-graph-property-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
@@ -49,6 +49,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
@@ -132,10 +133,9 @@ public:
    * @pre The layer is of derived Node type Layer.
    * @pre The layer does not have a parent.
    * @param[in] layer The new root node.
-   * @param[in] systemLevel True if using the system-level overlay.
    * @post The node is owned by UpdateManager.
    */
-  void InstallRoot( OwnerPointer<Layer>& layer, bool systemLevel );
+  void InstallRoot( OwnerPointer<Layer>& layer );
 
   /**
    * Add a Node; UpdateManager takes ownership.
@@ -194,6 +194,19 @@ public:
    * @param[in] object The object to remove.
    */
   void RemoveObject( PropertyOwner* object );
+
+  /**
+   * Add a newly created render task list.
+   * @param[in] taskList The render task list to add.
+   * @post The render task list is owned by UpdateManager.
+   */
+  void AddRenderTaskList( OwnerPointer<RenderTaskList>& taskList );
+
+  /**
+   * Remove a render task list.
+   * @param[in] taskList The render task list to remove.
+   */
+  void RemoveRenderTaskList( RenderTaskList* taskList );
 
   // Animations
 
@@ -329,7 +342,7 @@ public:
    * @note the default value of updateScene should match that in EventThreadServices::ReserveMessageSlot.
    * @return A pointer to the first char allocated for the message.
    */
-  unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene = true );
+  uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene = true );
 
   /**
    * @return the current event-buffer index.
@@ -431,11 +444,11 @@ public:
    * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
    * @return True if further updates are required e.g. during animations.
    */
-  unsigned int Update( float elapsedSeconds,
-                       unsigned int lastVSyncTimeMilliseconds,
-                       unsigned int nextVSyncTimeMilliseconds,
-                       bool renderToFboEnabled,
-                       bool isRenderingToFbo );
+  uint32_t Update( float elapsedSeconds,
+                   uint32_t lastVSyncTimeMilliseconds,
+                   uint32_t nextVSyncTimeMilliseconds,
+                   bool renderToFboEnabled,
+                   bool isRenderingToFbo );
 
   /**
    * Set the background color i.e. the glClear color used at the beginning of each frame.
@@ -462,9 +475,9 @@ public:
   /**
    * Sets the depths of all layers.
    * @param layers The layers in depth order.
-   * @param[in] systemLevel True if using the system-level overlay.
+   * @param[in] rootLayer The root layer of the sorted layers.
    */
-  void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
+  void SetLayerDepths( const std::vector< Layer* >& layers, const Layer* rootLayer );
 
   /**
    * Set the depth indices of all nodes (in LayerUI's)
@@ -480,10 +493,10 @@ public:
 
   /**
    * Adds an implementation of the FrameCallbackInterface.
-   * @param[in] frameCallback A pointer to the implementation of the FrameCallbackInterface
+   * @param[in] frameCallback An OwnerPointer to the SceneGraph FrameCallback object
    * @param[in] rootNode A pointer to the root node to apply the FrameCallback to
    */
-  void AddFrameCallback( FrameCallbackInterface* frameCallback, const Node* rootNode );
+  void AddFrameCallback( OwnerPointer< FrameCallback >& frameCallback, const Node* rootNode );
 
   /**
    * Removes the specified implementation of FrameCallbackInterface.
@@ -504,7 +517,7 @@ private:
    * @param[in] elapsedSeconds The time in seconds since the previous update.
    * @return True if the update-thread should keep going.
    */
-  unsigned int KeepUpdatingCheck( float elapsedSeconds ) const;
+  uint32_t KeepUpdatingCheck( float elapsedSeconds ) const;
 
   /**
    * Helper to reset all Node properties
@@ -519,7 +532,7 @@ private:
    * @param[in] nextVSyncTime  The estimated time of the next VSync in milliseconds.
    * @return true, if any properties were updated.
    */
-  bool ProcessGestures( BufferIndex bufferIndex, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds );
+  bool ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds );
 
   /**
    * Perform animation updates
@@ -586,16 +599,16 @@ private:
 
 // Messages for UpdateManager
 
-inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root, bool systemLevel )
+inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& root )
 {
   // Message has ownership of Layer while in transit from event -> update
-  typedef MessageValue2< UpdateManager, OwnerPointer<Layer>, bool > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer<Layer> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root, systemLevel );
+  new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root );
 }
 
 inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
@@ -604,7 +617,7 @@ inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
   typedef MessageValue1< UpdateManager, OwnerPointer<Node> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddNode, node );
@@ -619,7 +632,7 @@ inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent,
   typedef MessageValue2< UpdateManager, Node*, Node* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::ConnectNode, &parent, &child );
@@ -633,7 +646,7 @@ inline void DisconnectNodeMessage( UpdateManager& manager, const Node& constNode
   typedef MessageValue1< UpdateManager, Node* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::DisconnectNode, &node );
@@ -647,7 +660,7 @@ inline void DestroyNodeMessage( UpdateManager& manager, const Node& constNode )
   typedef MessageValue1< UpdateManager, Node* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::DestroyNode, &node );
@@ -659,7 +672,7 @@ inline void AddCameraMessage( UpdateManager& manager, OwnerPointer< Camera >& ca
   typedef MessageValue1< UpdateManager, OwnerPointer< Camera > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddCamera, camera );
@@ -670,7 +683,7 @@ inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
   typedef MessageValue1< UpdateManager, const Camera* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveCamera, camera );
@@ -682,7 +695,7 @@ inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner
   typedef MessageValue1< UpdateManager, OwnerPointer<PropertyOwner> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddObject, object );
@@ -693,7 +706,7 @@ inline void RemoveObjectMessage( UpdateManager& manager, PropertyOwner* object )
   typedef MessageValue1< UpdateManager, PropertyOwner* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveObject, object );
@@ -704,7 +717,7 @@ inline void AddAnimationMessage( UpdateManager& manager, OwnerPointer< SceneGrap
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Animation > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddAnimation, animation );
@@ -718,7 +731,7 @@ inline void StopAnimationMessage( UpdateManager& manager, const Animation& const
   typedef MessageValue1< UpdateManager, Animation* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::StopAnimation, &animation );
@@ -732,10 +745,35 @@ inline void RemoveAnimationMessage( UpdateManager& manager, const Animation& con
   typedef MessageValue1< UpdateManager, Animation* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveAnimation, &animation );
+}
+
+inline void AddRenderTaskListMessage( UpdateManager& manager, OwnerPointer< SceneGraph::RenderTaskList >& taskList )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::RenderTaskList > > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddRenderTaskList, taskList );
+}
+
+inline void RemoveRenderTaskListMessage( UpdateManager& manager, const RenderTaskList& constTaskList )
+{
+  // The scene-graph thread owns this object so it can safely edit it.
+  RenderTaskList& taskList = const_cast< RenderTaskList& >( constTaskList );
+
+  typedef MessageValue1< UpdateManager, RenderTaskList* > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderTaskList, &taskList );
 }
 
 inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer< PropertyNotification >& propertyNotification )
@@ -744,7 +782,7 @@ inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer
   typedef MessageValue1< UpdateManager, OwnerPointer< PropertyNotification > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyNotification, propertyNotification );
@@ -758,7 +796,7 @@ inline void RemovePropertyNotificationMessage( UpdateManager& manager, const Pro
   typedef MessageValue1< UpdateManager, PropertyNotification* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemovePropertyNotification, &propertyNotification );
@@ -774,7 +812,7 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   typedef MessageValue2< UpdateManager, PropertyNotification*, PropertyNotification::NotifyMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
@@ -785,7 +823,7 @@ inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& sh
   typedef MessageValue1< UpdateManager, OwnerPointer< Shader > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddShader, shader );
@@ -796,7 +834,7 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
   typedef MessageValue1< UpdateManager, Shader* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveShader, &shader );
@@ -807,18 +845,18 @@ inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& co
   typedef MessageValue1< UpdateManager, Vector4 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetBackgroundColor, color );
 }
 
-inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int>& rect  )
+inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int32_t>& rect  )
 {
-  typedef MessageValue1< UpdateManager, Rect<int> > LocalType;
+  typedef MessageValue1< UpdateManager, Rect<int32_t> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceRect, rect );
@@ -829,7 +867,7 @@ inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds 
   typedef MessageValue1< UpdateManager, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::KeepRendering, durationSeconds );
@@ -840,7 +878,7 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
   typedef MessageValue1< UpdateManager, DevelStage::Rendering > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetRenderingBehavior, renderingBehavior );
@@ -850,17 +888,17 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
  * Create a message for setting the depth of a layer
  * @param[in] manager The update manager
  * @param[in] layers list of layers
- * @param[in] systemLevel True if the layers are added via the SystemOverlay API
+ * @param[in] rootLayer True if the layers are added via the SystemOverlay API
  */
-inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, bool systemLevel )
+inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, const Layer* rootLayer )
 {
-  typedef MessageValue2< UpdateManager, std::vector< Layer* >, bool > LocalType;
+  typedef MessageValue2< UpdateManager, std::vector< Layer* >, const Layer* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
+  new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, rootLayer );
 }
 
 inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >& object )
@@ -868,7 +906,7 @@ inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >
   typedef MessageValue1< UpdateManager, OwnerPointer< Renderer > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddRenderer, object );
 }
@@ -878,7 +916,7 @@ inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
   typedef MessageValue1< UpdateManager, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveRenderer, &object );
 }
@@ -889,7 +927,7 @@ inline void AddTextureSetMessage( UpdateManager& manager, OwnerPointer< TextureS
   typedef MessageValue1< UpdateManager, OwnerPointer< TextureSet > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddTextureSet, textureSet );
@@ -900,7 +938,7 @@ inline void RemoveTextureSetMessage( UpdateManager& manager, TextureSet& texture
   typedef MessageValue1< UpdateManager, TextureSet* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveTextureSet, &textureSet );
@@ -912,7 +950,7 @@ inline void AddSamplerMessage( UpdateManager& manager, OwnerPointer< SceneGraph:
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Sampler > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddSampler, sampler );
@@ -923,7 +961,7 @@ inline void RemoveSamplerMessage( UpdateManager& manager, SceneGraph::Sampler& s
   typedef MessageValue1< UpdateManager, SceneGraph::Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveSampler, &sampler );
@@ -935,7 +973,7 @@ inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< SceneGraph:
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::PropertyBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, propertyBuffer );
@@ -946,7 +984,7 @@ inline void RemovePropertyBuffer( UpdateManager& manager, SceneGraph::PropertyBu
   typedef MessageValue1< UpdateManager, SceneGraph::PropertyBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
@@ -958,7 +996,7 @@ inline void AddGeometryMessage( UpdateManager& manager, OwnerPointer< SceneGraph
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Geometry > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddGeometry, geometry );
@@ -969,7 +1007,7 @@ inline void RemoveGeometryMessage( UpdateManager& manager, SceneGraph::Geometry&
   typedef MessageValue1< UpdateManager, SceneGraph::Geometry*  > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
@@ -981,7 +1019,7 @@ inline void AddTextureMessage( UpdateManager& manager, OwnerPointer< SceneGraph:
   typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Texture > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddTexture, texture );
@@ -992,7 +1030,7 @@ inline void RemoveTextureMessage( UpdateManager& manager, SceneGraph::Texture& t
   typedef MessageValue1< UpdateManager, SceneGraph::Texture*  > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveTexture, &texture );
@@ -1003,7 +1041,7 @@ inline void AddFrameBufferMessage( UpdateManager& manager, OwnerPointer<SceneGra
   typedef MessageValue1< UpdateManager, OwnerPointer<SceneGraph::FrameBuffer> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, frameBuffer );
@@ -1014,7 +1052,7 @@ inline void RemoveFrameBufferMessage( UpdateManager& manager, SceneGraph::FrameB
   typedef MessageValue1< UpdateManager, SceneGraph::FrameBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer );
@@ -1025,7 +1063,7 @@ inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDe
   typedef MessageValue1< UpdateManager, OwnerPointer< NodeDepths > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDepthIndices, nodeDepths );
@@ -1036,20 +1074,20 @@ inline void AddResetterMessage( UpdateManager& manager, OwnerPointer<PropertyRes
   typedef MessageValue1< UpdateManager, OwnerPointer<PropertyResetterBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AddPropertyResetter, resetter );
 }
 
-inline void AddFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback, const Node& rootNode )
+inline void AddFrameCallbackMessage( UpdateManager& manager, OwnerPointer< FrameCallback >& frameCallback, const Node& rootNode )
 {
-  typedef MessageValue2< UpdateManager, FrameCallbackInterface*, const Node* > LocalType;
+  typedef MessageValue2< UpdateManager, OwnerPointer< FrameCallback >, const Node* > LocalType;
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddFrameCallback, &frameCallback, &rootNode );
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameCallback, frameCallback, &rootNode );
 }
 
 inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInterface& frameCallback )
@@ -1057,7 +1095,7 @@ inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInt
   typedef MessageValue1< UpdateManager, FrameCallbackInterface* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameCallback, &frameCallback );

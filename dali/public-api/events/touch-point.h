@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
@@ -69,7 +72,7 @@ struct DALI_CORE_API TouchPoint
    * @param[in] screenX The X co-ordinate relative to the screen's origin
    * @param[in] screenY The Y co-ordinate relative to the screen's origin
    */
-  TouchPoint(int id, State state, float screenX, float screenY);
+  TouchPoint(int32_t id, State state, float screenX, float screenY);
 
   /**
    * @brief Constructor.
@@ -82,7 +85,7 @@ struct DALI_CORE_API TouchPoint
    * @param[in] localX  The X co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
    * @param[in] localY  The Y co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
    */
-  TouchPoint(int id, State state, float screenX, float screenY, float localX, float localY);
+  TouchPoint(int32_t id, State state, float screenX, float screenY, float localX, float localY);
 
   /**
    * @brief Destructor.
@@ -95,7 +98,7 @@ struct DALI_CORE_API TouchPoint
   /**
    * @brief Each touch point has a unique device ID which specifies the touch device for that point.
    */
-  int deviceId;
+  int32_t deviceId;
 
   /**
    * @brief State of the point.
