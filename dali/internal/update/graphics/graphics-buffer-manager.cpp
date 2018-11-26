@@ -88,6 +88,18 @@ void GraphicsBuffer::Reserve(uint32_t size, bool discardOldBuffer )
   }
 }
 
+
+void GraphicsBuffer::Fill( char data, uint32_t offset, uint32_t size )
+{
+  auto begin = (reinterpret_cast<char*>( mMappedPtr ) + offset);
+  if( size == 0 )
+  {
+    size = mSize - offset;
+  }
+  auto end = begin + size;
+  std::fill( begin, end, data );
+}
+
 void GraphicsBuffer::Write( const void* data, uint32_t size, uint32_t dstOffset, bool cachedWrite )
 {
   bool locallyMapped = ( mMappedPtr == nullptr );
