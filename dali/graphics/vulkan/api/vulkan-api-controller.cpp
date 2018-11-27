@@ -737,6 +737,11 @@ struct Controller::Impl
     mDescriptorSetAllocator->SwapBuffers();
   }
 
+  uint32_t GetSwapchainBufferCount()
+  {
+    return mGraphics.GetSwapchainForFBID(0u)->GetImageCount();
+  }
+
   std::unique_ptr< PipelineCache > mDefaultPipelineCache;
   std::unique_ptr< VulkanAPI::Internal::DescriptorSetAllocator > mDescriptorSetAllocator;
 
@@ -1014,6 +1019,11 @@ void Controller::WaitIdle()
 void Controller::SwapBuffers()
 {
   mImpl->SwapBuffers();
+}
+
+uint32_t Controller::GetSwapchainBufferCount()
+{
+  return mImpl->GetSwapchainBufferCount();
 }
 
 

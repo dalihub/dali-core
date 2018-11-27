@@ -189,6 +189,12 @@ public:
    */
   virtual void SwapBuffers() = 0;
 
+  /**
+   * Returns number of buffers allocated by the swapchain
+   * @return
+   */
+  virtual uint32_t GetSwapchainBufferCount() = 0;
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;
