@@ -1031,8 +1031,6 @@ void GraphicsAlgorithms::DiscardUnusedResources( Graphics::API::Controller& cont
     ubo.reset( nullptr );
   }
 
-  mUniformBufferIndex = 0u;
-
   // Discard unused resources
   controller.DiscardUnusedResources();
 }

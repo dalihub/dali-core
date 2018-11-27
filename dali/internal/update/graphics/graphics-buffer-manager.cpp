@@ -94,7 +94,7 @@ void GraphicsBuffer::Fill( char data, uint32_t offset, uint32_t size )
   auto begin = (reinterpret_cast<char*>( mMappedPtr ) + offset);
   if( size == 0 )
   {
-    size = mSize - offset;
+    size = mSize - offset-1;
   }
   auto end = begin + size;
   std::fill( begin, end, data );

@@ -35,7 +35,10 @@ namespace Graphics
 {
 namespace Vulkan
 {
-
+namespace
+{
+const auto MAX_SWAPCHAIN_RESOURCE_BUFFERS = 2u;
+}
 /**
  * SwapchainBuffer stores all per-buffer data
  */
@@ -265,7 +268,7 @@ void Swapchain::Present()
   }
 
   mFrameCounter++;
-  mBufferIndex = uint32_t( (mBufferIndex+1) % mSwapchainBuffers.size() );
+  mBufferIndex = uint32_t( (mBufferIndex+1) % MAX_SWAPCHAIN_RESOURCE_BUFFERS );
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
