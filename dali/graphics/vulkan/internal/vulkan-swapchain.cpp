@@ -431,6 +431,11 @@ std::vector<RefCountedCommandBuffer>& Swapchain::GetCommandBuffers() const
   return mSwapchainBuffers[mBufferIndex]->commandBuffers;
 }
 
+uint32_t Swapchain::GetImageCount() const
+{
+  return uint32_t(mFramebuffers.size());
+}
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali

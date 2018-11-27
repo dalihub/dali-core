@@ -197,6 +197,8 @@ public:
 
   void SwapBuffers() override;
 
+  uint32_t GetSwapchainBufferCount() override;
+
   // VULKAN only
 
 public:

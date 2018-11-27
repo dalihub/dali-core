@@ -123,6 +123,12 @@ public:
    */
   void ResetAllCommandBuffers();
 
+  /**
+   * Returns number of allocated swapchain images
+   * @return Number of swapchain images
+   */
+  uint32_t GetImageCount() const;
+
 private:
 
   Swapchain( Graphics& graphics,
