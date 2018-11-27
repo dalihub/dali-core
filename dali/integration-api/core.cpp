@@ -17,9 +17,12 @@
 
 // CLASS HEADER
 #include <dali/integration-api/core.h>
+#include <dali/integration-api/render-surface.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
@@ -60,6 +63,11 @@ Core::~Core()
   delete mImpl;
 }
 
+void Core::Initialize()
+{
+  mImpl->Initialize();
+}
+
 ContextNotifierInterface* Core::GetContextNotifier()
 {
   return mImpl->GetContextNotifier();
@@ -80,19 +88,9 @@ void Core::RecoverFromContextLoss()
   mImpl->RecoverFromContextLoss();
 }
 
-void Core::SurfaceResized(uint32_t width, uint32_t height)
+void Core::SurfaceResized( Integration::RenderSurface* surface )
 {
-  mImpl->SurfaceResized(width, height);
-}
-
-void Core::SetTopMargin( uint32_t margin )
-{
-  mImpl->SetTopMargin(margin);
-}
-
-void Core::SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical)
-{
-  mImpl->SetDpi(dpiHorizontal, dpiVertical);
+  mImpl->SurfaceResized(surface);
 }
 
 void Core::SceneCreated()

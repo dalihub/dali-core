@@ -8,6 +8,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/input-options.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render-task-list-integ.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/scene.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hover-event-integ.cpp
@@ -41,6 +42,7 @@ SET(INTEGRATION_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/platform-abstraction.h
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-task-list-integ.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/scene.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/events/event.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-event.h
