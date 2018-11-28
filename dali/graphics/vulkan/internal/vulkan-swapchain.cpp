@@ -133,9 +133,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   // if not created yet
   if( mSwapchainBuffers.empty() )
   {
-    const auto MAX_SWAPCHAIN_BUFFERS { mFramebuffers.size() };
-
-    mSwapchainBuffers.resize( MAX_SWAPCHAIN_BUFFERS );
+    mSwapchainBuffers.resize( MAX_SWAPCHAIN_RESOURCE_BUFFERS );
     for( auto& buffer : mSwapchainBuffers )
     {
       buffer.reset( new SwapchainBuffer( *mGraphics ) );
@@ -145,7 +143,7 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Swapchain Image Index ( BEFORE Acquire ) = %d", int(mSwapchainImageIndex) );
                  auto result = device.acquireNextImageKHR( mSwapchainKHR,
                                             std::numeric_limits<uint64_t>::max(),
-                                            mSwapchainBuffers[mBufferIndex]->acquireNextImageSemaphore,
+                                            mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->acquireNextImageSemaphore,
                                             nullptr, &mSwapchainImageIndex );
 
   DALI_LOG_INFO( gVulkanFilter, Debug::General, "Swapchain Image Index ( AFTER Acquire ) = %d", int(mSwapchainImageIndex) );
@@ -165,21 +163,19 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
     }
   }
 
-  auto& swapBuffer = mSwapchainBuffers[mBufferIndex];
+  auto& swapBuffer = mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()];
 
   // First frames don't need waiting as they haven't been submitted
   // yet. Note, that waiting on the fence without resetting it may
   // cause a stall ( nvidia, ubuntu )
   if( mFrameCounter >= mSwapchainBuffers.size() )
   {
-    mGraphics->WaitForFence( mSwapchainBuffers[mBufferIndex]->endOfFrameFence );
-    mGraphics->ExecuteActions();
+    mGraphics->WaitForFence( mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->endOfFrameFence );
     mGraphics->CollectGarbage();
   }
   else
   {
     mGraphics->DeviceWaitIdle();
-    mGraphics->ExecuteActions();
     mGraphics->CollectGarbage();
   }
 
@@ -203,7 +199,7 @@ void Swapchain::Present()
     return;
   }
 
-  auto& swapBuffer = mSwapchainBuffers[mBufferIndex];
+  auto& swapBuffer = mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()];
 
   // End any render pass command buffers
   size_t count = swapBuffer->commandBuffers.size();
@@ -268,7 +264,6 @@ void Swapchain::Present()
   }
 
   mFrameCounter++;
-  mBufferIndex = uint32_t( (mBufferIndex+1) % MAX_SWAPCHAIN_RESOURCE_BUFFERS );
 }
 
 void Swapchain::Present( std::vector< vk::Semaphore > waitSemaphores )
@@ -407,7 +402,7 @@ void Swapchain::ResetAllCommandBuffers()
 
 void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
 {
-  size_t commandBuffersCount = mSwapchainBuffers[mBufferIndex]->commandBuffers.size();
+  size_t commandBuffersCount = mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.size();
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General, "AllocateCommandBuffers: cbCount:" << commandBuffersCount
                                                   << " renderPassCount: " << renderPassCount );
@@ -419,19 +414,19 @@ void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
       // Create primary buffer for each render pass & begin recording
       auto commandBuffer = mGraphics->CreateCommandBuffer(true);
       commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
-      mSwapchainBuffers[mBufferIndex]->commandBuffers.emplace_back( commandBuffer );
+      mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.emplace_back( commandBuffer );
     }
   }
 }
 
 RefCountedCommandBuffer Swapchain::GetLastCommandBuffer() const
 {
-  return mSwapchainBuffers[mBufferIndex]->commandBuffers.back();
+  return mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.back();
 }
 
 std::vector<RefCountedCommandBuffer>& Swapchain::GetCommandBuffers() const
 {
-  return mSwapchainBuffers[mBufferIndex]->commandBuffers;
+  return mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers;
 }
 
 uint32_t Swapchain::GetImageCount() const

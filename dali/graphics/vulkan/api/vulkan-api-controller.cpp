@@ -721,7 +721,6 @@ struct Controller::Impl
     mGraphics.GetSwapchainForFBID(0)->ResetAllCommandBuffers();
 
     mGraphics.CollectGarbage();
-    mGraphics.CollectGarbage();
 
     mDescriptorSetAllocator->InvalidateAllDescriptorSets();
   }
@@ -733,8 +732,7 @@ struct Controller::Impl
 
   void SwapBuffers()
   {
-    mBufferIndex = (mBufferIndex+1)%1;
-    mDescriptorSetAllocator->SwapBuffers();
+    mGraphics.SwapBuffers();
   }
 
   uint32_t GetSwapchainBufferCount()
@@ -1026,6 +1024,10 @@ uint32_t Controller::GetSwapchainBufferCount()
   return mImpl->GetSwapchainBufferCount();
 }
 
+uint32_t Controller::GetCurrentBufferIndex()
+{
+  return mImpl->mGraphics.GetCurrentBufferIndex();
+}
 
 } // namespace VulkanAPI
 } // namespace Graphics
