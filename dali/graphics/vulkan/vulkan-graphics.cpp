@@ -37,6 +37,7 @@
 
 #include <dali/graphics-api/graphics-api-controller.h>
 
+
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
 #endif
@@ -1497,8 +1498,13 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
     info.setEnabledLayerCount( 0 );
   }
 
-
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
+
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+  char * sLogLevel = std::getenv( "VALIDATION_LOG_LEVEL" );
+  int logLevel = sLogLevel ? std::atoi(sLogLevel) : 0;
+  CreateDebugReportCallback( mInstance, logLevel );
+#endif
 }
 
 void Graphics::DestroyInstance()

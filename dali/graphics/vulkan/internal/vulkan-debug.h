@@ -17,15 +17,20 @@
  * limitations under the License.
  */
 #undef DEBUG_ENABLED
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <map>
 #include <queue>
-#include <string>
 #include <sstream>
+#include <stack>
+#include <string>
+#include <vector>
+
 #if defined(DEBUG_ENABLED)
 
-
-#include <iostream>
-#include <cstdarg>
-#include <string>
 
 extern const char* LOG_VULKAN;
 
@@ -50,6 +55,94 @@ std::string FormatToString( const char* format, ... );
 #define DALI_LOG_STREAM( filter, level, stream )
 #define DALI_LOG_INFO( filter, level, format, ... )
 #endif
+
+
+namespace Dali
+{
+namespace Graphics
+{
+namespace Vulkan
+{
+
+struct Config
+{
+  std::vector<std::string> split( const std::string& str, char separator )
+  {
+    std::vector<std::string> strings;
+    std::istringstream f(str);
+    std::string s;
+    while (getline(f, s, separator ))
+      {
+        strings.push_back(s);
+      }
+    return std::move(strings);
+  }
+
+  Config()
+  {
+    auto fin = fopen("/home/owner/dali.conf", "rb");
+    if( fin )
+      {
+        char tag[256];
+        auto value = fgets( tag, 256, fin );
+        if( value )
+          {
+            tag[strlen (tag) - 1] = 0;
+            auto result = split (tag, '=');
+            if (result.size () == 2)
+              {
+                config[result[0]] = result[1];
+              }
+          }
+      }
+    fclose( fin );
+  }
+
+  std::string Get( const std::string& tag )
+  {
+    auto it = config.find( tag );
+    if( it != config.end() )
+      {
+        return it->second;
+      }
+    return {};
+  }
+
+  int GetNumber( const std::string& tag )
+  {
+    auto it = config.find( tag );
+    if( it != config.end() )
+      {
+        return atoi(it->second.c_str());
+      }
+    return {};
+  }
+
+  std::vector<std::string> GetStringArray(const std::string& tag)
+  {
+    auto it = config.find( tag );
+    if( it != config.end() )
+      {
+        return split( it->second, ',');
+      }
+    return {};
+  }
+
+  void PrintConfig()
+  {
+    for( auto& keyValue : config )
+      {
+        std::cout << keyValue.first << " = '" << keyValue.second << "'" << std::endl;
+      }
+  }
+
+  std::map<std::string, std::string> config;
+};
+
+}
+}
+}
+
 
 namespace Dali
 {
@@ -113,5 +206,16 @@ struct BlackBox
 
 } // Namespace Dali
 
+
+#define DEBUG_REPORT_CALLBACK_ENABLED
+
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+namespace vk
+{
+class Instance;
+}
+
+void CreateDebugReportCallback( vk::Instance& instance, int logLevel );
+#endif
 
 #endif // DALI_GRAPHICS_VULKAN_DEBUG_H

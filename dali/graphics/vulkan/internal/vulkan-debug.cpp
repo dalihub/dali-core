@@ -15,7 +15,12 @@
  */
 
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
+#include <dali/graphics/vulkan/internal/vulkan-hpp-wrapper.h>
+#include <dali/integration-api/debug.h>
 #include <stack>
+#include <cstdlib>
+#include <cstdio>
+
 #if defined(DEBUG_ENABLED)
 
 std::string ArgListToString( const char* format, va_list args )
@@ -44,7 +49,7 @@ std::string FormatToString( const char* format, ... )
 }
 
 
-const char* LOG_VULKAN( getenv( "LOG_VULKAN" ) );
+const char* LOG_VULKAN( std::getenv( "LOG_VULKAN" ) );
 
 namespace Dali
 {
@@ -76,3 +81,76 @@ BlackBox& BlackBox::get()
 
 #endif
 
+
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+
+#undef LOG_TAG
+#define LOG_TAG "VALIDATION"
+
+VkBool32 VulkanReportCallback(
+  VkDebugReportFlagsEXT                       flags,
+  VkDebugReportObjectTypeEXT                  objectType,
+  uint64_t                                    object,
+  size_t                                      location,
+  int32_t                                     messageCode,
+  const char*                                 pLayerPrefix,
+  const char*                                 pMessage,
+  void*                                       pUserData)
+{
+  //LOGE("VALIDATION: %s", pMessage );
+  printf("VALIDATION: %s", pMessage );
+  return VK_FALSE;
+}
+
+void CreateDebugReportCallback( vk::Instance& instance, int logLevel )
+{
+  VkDebugReportCallbackCreateInfoEXT reportInfo;
+  reportInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+  reportInfo.pfnCallback = VulkanReportCallback;
+  reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT;
+
+  if ( logLevel == 1 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT %d\n", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT;
+  }
+  else if ( logLevel == 2 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT %d\n", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+  }
+  else if ( logLevel == 3 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT %d\n", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_INFORMATION_BIT_EXT;
+  }
+  else if ( logLevel == 4 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | \
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT %d\n", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+  }
+  else if ( logLevel == 5 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | \
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT \
+                    %d\n", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                      VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+  }
+  else
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT %d\n", logLevel);
+  }
+
+  reportInfo.pUserData = 0u;
+
+
+  VkDebugReportCallbackEXT vkCallback;
+  PFN_vkCreateDebugReportCallbackEXT func = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>( instance.getProcAddr( "vkCreateDebugReportCallbackEXT" ));
+  func( static_cast<VkInstance>(instance), &reportInfo, nullptr, &vkCallback );
+}
+#endif
