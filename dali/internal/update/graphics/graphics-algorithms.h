@@ -109,7 +109,6 @@ private:
 
   using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
   UniformBufferList           mUniformBuffer;
-  uint32_t                    mUniformBufferIndex{0u};
 
   uint32_t mUniformBlockAllocationCount;
   uint32_t mUniformBlockAllocationBytes;

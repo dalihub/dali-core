@@ -214,15 +214,12 @@ Graphics::~Graphics()
   // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
   mResourceRegister->Clear();
 
-  // Execute any outstanding actions...
-  ExecuteActions();
-  ExecuteActions();
-
   // Kill pipeline cache
   mDevice.destroyPipelineCache( mVulkanPipelineCache, mAllocator.get() );
 
   // Collect the garbage ( for each buffer index ) and shut down gracefully...
   CollectGarbage();
+  SwapBuffers();
   CollectGarbage();
 
   // We are done with all resources (technically... . If not we will get a ton of validation layer errors)
@@ -1520,64 +1517,33 @@ void Graphics::RemoveSampler( Sampler& sampler )
 void Graphics::CollectGarbage()
 {
   std::lock_guard< std::mutex > lock{ mMutex };
+  auto bufferIndex = (mCurrentBufferIndex+1)&1;
+
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Beginning graphics garbage collection---------------------------------------" )
-  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[mCurrentGarbageBufferIndex].size() )
+                   "Beginning graphics garbage collection---------------------------------------" );
+  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Discard queue size: %ld\n", mDiscardQueue[bufferIndex].size() );
 
   // swap buffer
-  mCurrentGarbageBufferIndex = ((mCurrentGarbageBufferIndex+1)&1);
-
-  if( mDiscardQueue[mCurrentGarbageBufferIndex].empty() )
+  if( mDiscardQueue[bufferIndex].empty() )
   {
     return;
   }
 
-  for( const auto& deleter : mDiscardQueue[mCurrentGarbageBufferIndex] )
+  for( const auto& deleter : mDiscardQueue[bufferIndex] )
   {
     deleter();
   }
   // collect what's in the queue
-  mDiscardQueue[mCurrentGarbageBufferIndex].clear();
+  mDiscardQueue[bufferIndex].clear();
 
   DALI_LOG_STREAM( gVulkanFilter, Debug::General,
                    "Graphics garbage collection complete---------------------------------------" )
 }
 
-void Graphics::ExecuteActions()
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Beginning graphics action execution---------------------------------------" )
-  DALI_LOG_INFO( gVulkanFilter, Debug::General, "Action queue size: %ld\n", mActionQueue.size() )
-
-  mCurrentActionBufferIndex = ((mCurrentActionBufferIndex+1)&1);
-
-  if( mActionQueue[mCurrentActionBufferIndex].empty() )
-  {
-    return;
-  }
-
-  // swap buffer
-  for( const auto& action : mActionQueue[mCurrentActionBufferIndex] )
-  {
-    action();
-  }
-
-  mActionQueue[mCurrentActionBufferIndex].clear();
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General,
-                   "Graphics action execution complete---------------------------------------" )
-}
-
 void Graphics::DiscardResource( std::function< void() > deleter )
 {
   std::lock_guard< std::mutex > lock( mMutex );
-  mDiscardQueue[mCurrentGarbageBufferIndex].push_back( std::move( deleter ) );
-}
-
-void Graphics::EnqueueAction( std::function< void() > action )
-{
-  std::lock_guard< std::mutex > lock( mMutex );
-  mActionQueue[mCurrentActionBufferIndex].push_back( std::move( action ) );
+  mDiscardQueue[mCurrentBufferIndex].push_back( std::move( deleter ) );
 }
 
 const DiscardQueue& Graphics::GetDiscardQueue( uint32_t bufferIndex ) const
@@ -1586,7 +1552,32 @@ const DiscardQueue& Graphics::GetDiscardQueue( uint32_t bufferIndex ) const
 }
 
 // --------------------------------------------------------------------------------------------------------------
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+VkBool32 VulkanReportCallback(
+  VkDebugReportFlagsEXT                       flags,
+  VkDebugReportObjectTypeEXT                  objectType,
+  uint64_t                                    object,
+  size_t                                      location,
+  int32_t                                     messageCode,
+  const char*                                 pLayerPrefix,
+  const char*                                 pMessage,
+  void*                                       pUserData)
+{
+  DALIEXT_ERRLOG( "ADAM: %s", pMessage );
+  return VK_FALSE;
+}
+#endif
 
+uint32_t Graphics::SwapBuffers()
+{
+  mCurrentBufferIndex = (mCurrentBufferIndex+1)&1;
+  return mCurrentBufferIndex;
+}
+
+uint32_t Graphics::GetCurrentBufferIndex()
+{
+  return mCurrentBufferIndex;
+}
 
 void Graphics::CreateInstance( const std::vector< const char* >& extensions,
                                const std::vector< const char* >& validationLayers )
@@ -1608,6 +1599,20 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
 #endif
 
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
+
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+  VkDebugReportCallbackCreateInfoEXT reportInfo;
+  reportInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+  reportInfo.pfnCallback = VulkanReportCallback;
+  reportInfo.flags = VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                     VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT;
+  reportInfo.pUserData = 0u;
+
+
+  VkDebugReportCallbackEXT vkCallback;
+  PFN_vkCreateDebugReportCallbackEXT func = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(mInstance.getProcAddr( "vkCreateDebugReportCallbackEXT" ));
+  func( static_cast<VkInstance>(mInstance), &reportInfo, nullptr, &vkCallback );
+#endif
 }
 
 void Graphics::DestroyInstance()
