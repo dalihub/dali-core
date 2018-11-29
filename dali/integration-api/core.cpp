@@ -129,6 +129,26 @@ SystemOverlay& Core::GetSystemOverlay()
   return mImpl->GetSystemOverlay();
 }
 
+void Core::SetViewMode( ViewMode viewMode )
+{
+  mImpl->SetViewMode( viewMode );
+}
+
+ViewMode Core::GetViewMode() const
+{
+  return mImpl->GetViewMode();
+}
+
+void Core::SetStereoBase( float stereoBase )
+{
+  mImpl->SetStereoBase( stereoBase );
+}
+
+float Core::GetStereoBase() const
+{
+  return mImpl->GetStereoBase();
+}
+
 void Core::RegisterProcessor( Processor& processor )
 {
   mImpl->RegisterProcessor( processor );

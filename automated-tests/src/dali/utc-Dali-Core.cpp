@@ -44,3 +44,29 @@ int UtcDaliCoreGetMaximumUpdateCount(void)
   END_TEST;
 }
 
+int UtcDaliCoreSetStereoBase(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::GetMaximumUpdateCount");
+
+  application.GetCore().SetViewMode( STEREO_HORIZONTAL );
+  DALI_TEST_EQUALS( application.GetCore().GetViewMode(), STEREO_HORIZONTAL, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  application.GetCore().SetViewMode( STEREO_VERTICAL );
+  DALI_TEST_EQUALS( application.GetCore().GetViewMode(), STEREO_VERTICAL, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  application.GetCore().SetViewMode( MONO );
+  DALI_TEST_EQUALS( application.GetCore().GetViewMode(), MONO, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+

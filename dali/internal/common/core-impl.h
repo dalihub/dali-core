@@ -26,6 +26,7 @@
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
+#include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/resource-policies.h>
 
 namespace Dali
@@ -165,6 +166,29 @@ public:
    * @copydoc Dali::Integration::Core::GetSystemOverlay()
    */
   Integration::SystemOverlay& GetSystemOverlay();
+
+  // Stereoscopy
+
+  /**
+   * @copydoc Dali::Integration::Core::SetViewMode()
+   */
+  void SetViewMode( ViewMode viewMode );
+
+  /**
+   * @copydoc Dali::Integration::Core::GetViewMode()
+   */
+  ViewMode GetViewMode() const;
+
+  /**
+   * @copydoc Dali::Integration::Core::SetStereoBase()
+   */
+  void SetStereoBase( float stereoBase );
+
+  /**
+   * @copydoc Dali::Integration::Core::GetStereoBase()
+   */
+  float GetStereoBase() const;
+
 
   /**
    * @copydoc Dali::Integration::Core::RegisterProcessor
