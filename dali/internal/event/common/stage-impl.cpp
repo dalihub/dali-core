@@ -61,8 +61,6 @@ namespace Internal
 namespace
 {
 
-const float DEFAULT_STEREO_BASE( 65.0f );
-
 // Signals
 
 const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
