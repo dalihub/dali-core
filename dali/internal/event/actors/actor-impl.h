@@ -122,6 +122,12 @@ public:
   static ActorPtr New();
 
   /**
+   * Helper to create node for derived classes who don't have their own node type
+   * @return pointer to newly created unique node
+   */
+  static const SceneGraph::Node* CreateNode();
+
+  /**
    * Retrieve the name of the actor.
    * @return The name.
    */
@@ -1543,8 +1549,9 @@ protected:
    * Protected Constructor.  See Actor::New().
    * The second-phase construction Initialize() member should be called immediately after this.
    * @param[in] derivedType The derived type of actor (if any).
+   * @param[in] reference to the node
    */
-  Actor( DerivedType derivedType );
+  Actor( DerivedType derivedType, const SceneGraph::Node& node );
 
   /**
    * Second-phase constructor. Must be called immediately after creating a new Actor;
@@ -1685,7 +1692,7 @@ public:
    */
   const SceneGraph::Node& GetNode() const
   {
-    return *mNode;
+    return mNode;
   }
 
   /**
@@ -1730,24 +1737,15 @@ private:
   };
 
   // Remove default constructor and copy constructor
-  Actor()=delete;
-  Actor( const Actor& )=delete;
-
-  // Undefined
-  Actor& operator=( const Actor& rhs );
+  Actor() = delete;
+  Actor( const Actor& ) = delete;
+  Actor& operator=( const Actor& rhs ) = delete;
 
   /**
    * Set the actors parent.
    * @param[in] parent The new parent.
    */
   void SetParent( Actor* parent );
-
-  /**
-   * Helper to create a Node for this Actor.
-   * To be overriden in derived classes.
-   * @return A newly allocated node.
-   */
-  virtual SceneGraph::Node* CreateNode() const;
 
   /**
    * For use in derived classes, called after Initialize()
@@ -1939,7 +1937,7 @@ protected:
   ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized
   RendererContainer* mRenderers;   ///< Renderer container
 
-  const SceneGraph::Node* mNode;  ///< Not owned
+  const SceneGraph::Node& mNode;  ///< Not owned
   Vector3* mParentOrigin;         ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
@@ -1968,10 +1966,9 @@ protected:
   Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3         mTargetScale;       ///< Event-side storage for scale
 
-  std::string     mName;      ///< Name of the actor
-  uint32_t        mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
-  uint32_t mSortedDepth;      ///< The sorted depth index. A combination of tree traversal and sibling order.
-  int16_t mDepth;             ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  std::string     mName;              ///< Name of the actor
+  uint32_t        mSortedDepth;       ///< The sorted depth index. A combination of tree traversal and sibling order.
+  int16_t         mDepth;             ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
@@ -1999,7 +1996,7 @@ protected:
 private:
 
   static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
-  static uint32_t mActorCounter;        ///< A counter to track the actor instance creation
+
 };
 
 } // namespace Internal

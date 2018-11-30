@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_MESSAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,7 @@ public:
     object( const_cast< T* >( obj ) ),
     memberFunction( member )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -99,7 +100,6 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)();
   }
 
@@ -139,6 +139,7 @@ public:
     memberFunction( member ),
     param1( p1 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -153,7 +154,6 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1 );
   }
 
@@ -200,6 +200,7 @@ public:
     param1( p1 ),
     param2( p2 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -214,7 +215,6 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1, param2 );
   }
 
@@ -265,6 +265,7 @@ public:
     param2( p2 ),
     param3( p3 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -279,7 +280,6 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1, param2, param3 );
   }
 
@@ -335,6 +335,7 @@ public:
     param3( p3 ),
     param4( p4 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -349,7 +350,6 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1, param2, param3, param4 );
   }
 
@@ -410,6 +410,7 @@ public:
     param4( p4 ),
     param5( p5 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -424,9 +425,7 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1, param2, param3, param4, param5 );
-
   }
 
 private:
@@ -491,6 +490,7 @@ public:
     param5( p5 ),
     param6( p6 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -505,9 +505,7 @@ public:
    */
   virtual void Process( BufferIndex /*bufferIndex*/ )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
-
   }
 
 private:
@@ -546,6 +544,7 @@ public:
     object( const_cast< T* >( obj ) ),
     memberFunction( member )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -560,7 +559,6 @@ public:
    */
   virtual void Process( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( bufferIndex );
   }
 
@@ -603,6 +601,7 @@ public:
     memberFunction( member ),
     param( p )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -617,7 +616,6 @@ public:
    */
   virtual void Process( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( bufferIndex,  param );
   }
 
@@ -664,6 +662,7 @@ public:
     param2( p2 ),
     param3( p3 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -678,9 +677,7 @@ public:
    */
   virtual void Process( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
-    (object->*memberFunction)(
-        bufferIndex, param2, param3 );
+    (object->*memberFunction)( bufferIndex, param2, param3 );
   }
 
 private:
@@ -732,6 +729,7 @@ public:
     param3( p3 ),
     param4( p4 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -746,7 +744,6 @@ public:
    */
   virtual void Process( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( bufferIndex, param2, param3, param4 );
   }
 
@@ -803,6 +800,7 @@ public:
     param4( p4 ),
     param5( p5 )
   {
+    DALI_ASSERT_DEBUG( object && "nullptr passed into message as object" );
   }
 
   /**
@@ -817,7 +815,6 @@ public:
    */
   virtual void Process( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
     (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
   }
 

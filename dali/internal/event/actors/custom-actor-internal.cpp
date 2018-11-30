@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Internal
 
 CustomActorPtr CustomActor::New(CustomActorImpl& extension)
 {
-  CustomActorPtr actor(new CustomActor(extension));
+  CustomActorPtr actor(new CustomActor( *CreateNode(), extension));
 
   // Second-phase construction
   extension.Initialize(*actor);
@@ -36,8 +36,8 @@ CustomActorPtr CustomActor::New(CustomActorImpl& extension)
   return actor;
 }
 
-CustomActor::CustomActor(CustomActorImpl& extension)
-: Actor( Actor::BASIC ),
+CustomActor::CustomActor( const SceneGraph::Node& node, CustomActorImpl& extension)
+: Actor( Actor::BASIC, node ),
   mImpl( &extension )
 {
   mDerivedRequiresTouch = extension.RequiresTouchEvents();

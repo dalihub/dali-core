@@ -2,7 +2,7 @@
 #define __DALI_CORE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/common/view-mode.h>
 
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>

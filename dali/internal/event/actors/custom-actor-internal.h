@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_CUSTOM_ACTOR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -240,17 +240,17 @@ private:
   /**
    * Private constructor; see also CustomActor::New()
    */
-  CustomActor(CustomActorImpl& extension);
+  CustomActor( const SceneGraph::Node& node, CustomActorImpl& extension );
 
-  // Undefined
-  CustomActor(const CustomActor&);
-
-  // Undefined
-  CustomActor& operator=(const CustomActor& rhs);
+  // no default or copy constructor or assignment
+  CustomActor() = delete;
+  CustomActor( const CustomActor& ) = delete;
+  CustomActor& operator=( const CustomActor& rhs ) = delete;
 
 protected:
 
   CustomActorImplPtr mImpl;
+
 };
 
 } // namespace Internal

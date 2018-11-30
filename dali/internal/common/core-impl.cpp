@@ -287,21 +287,6 @@ Integration::SystemOverlay& Core::GetSystemOverlay()
   return mStage->GetSystemOverlay();
 }
 
-void Core::SetViewMode( ViewMode viewMode )
-{
-  mStage->SetViewMode( viewMode );
-}
-
-ViewMode Core::GetViewMode() const
-{
-  return mStage->GetViewMode();
-}
-
-void Core::SetStereoBase( float stereoBase )
-{
-  mStage->SetStereoBase( stereoBase );
-}
-
 void Core::RegisterProcessor( Integration::Processor& processor )
 {
   mProcessors.PushBack(&processor);
@@ -328,11 +313,6 @@ void Core::RunProcessors()
       processor->Process();
     }
   }
-}
-
-float Core::GetStereoBase() const
-{
-  return mStage->GetStereoBase();
 }
 
 StagePtr Core::GetCurrentStage()

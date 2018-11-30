@@ -140,7 +140,7 @@ void BuildOrthoPickingRay( const Matrix& viewMatrix,
 
 CameraActorPtr CameraActor::New( const Size& size )
 {
-  CameraActorPtr actor( new CameraActor() );
+  CameraActorPtr actor( new CameraActor( *CreateNode() ) );
 
   // Second-phase construction
   actor->Initialize();
@@ -155,8 +155,8 @@ CameraActorPtr CameraActor::New( const Size& size )
   return actor;
 }
 
-CameraActor::CameraActor()
-: Actor( Actor::BASIC ),
+CameraActor::CameraActor( const SceneGraph::Node& node )
+: Actor( Actor::BASIC, node ),
   mSceneObject( NULL ),
   mTarget( SceneGraph::Camera::DEFAULT_TARGET_POSITION ),
   mType( SceneGraph::Camera::DEFAULT_TYPE ),
@@ -188,7 +188,7 @@ void CameraActor::OnInitialize()
   SceneGraph::Camera* sceneGraphCamera = SceneGraph::Camera::New();
 
   // Store a pointer to this camera node inside the scene-graph camera.
-  sceneGraphCamera->SetNode( mNode );
+  sceneGraphCamera->SetNode( &mNode );
 
   mSceneObject = sceneGraphCamera;
   OwnerPointer< SceneGraph::Camera > sceneGraphCameraOwner( sceneGraphCamera );
@@ -409,13 +409,12 @@ void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& ste
 
   const float aspectRatio = width / height;
 
+  // sceneObject is being used in a separate thread; queue a message to set
   SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
   SetFieldOfView( fieldOfView );
   SetNearClippingPlane( nearClippingPlane );
   SetFarClippingPlane( farClippingPlane );
   SetAspectRatio( aspectRatio );
-  // sceneObject is being used in a separate thread; queue a message to set
-  SetStereoBiasMessage( GetEventThreadServices(), *mSceneObject, stereoBias );
   SetZ( cameraZ );
 }
 
@@ -453,7 +452,7 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
   {
     // Build a picking ray in the world reference system.
     // ray starts from the camera world position
-    rayOrigin = mNode->GetWorldMatrix(0).GetTranslation();
+    rayOrigin = mNode.GetWorldMatrix(0).GetTranslation();
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.

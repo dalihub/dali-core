@@ -802,11 +802,6 @@ struct AnimatorFunctionBase
     return static_cast<float>( property );
   }
 
-  virtual float operator()(float progress, const uint32_t& property)
-  {
-    return static_cast<float>( property );
-  }
-
   virtual float operator()(float progress, const float& property)
   {
     return property;

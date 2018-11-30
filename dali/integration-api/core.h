@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
 
@@ -361,31 +360,6 @@ public:
    * @return The SystemOverlay.
    */
   SystemOverlay& GetSystemOverlay();
-
-  /**
-   * Set the stereoscopic 3D view mode
-   * @param[in] viewMode The new view mode
-   */
-  void SetViewMode( ViewMode viewMode );
-
-  /**
-   * Get the current view mode
-   * @return The current view mode
-   * @see SetViewMode.
-   */
-  ViewMode GetViewMode() const;
-
-  /**
-   * Set the stereo base (eye seperation) for stereoscopic 3D
-   * @param[in] stereoBase The stereo base (eye seperation) for stereoscopic 3D (mm)
-   */
-  void SetStereoBase( float stereoBase );
-
-  /**
-   * Get the stereo base (eye seperation) for stereoscopic 3D
-   * @return The stereo base (eye seperation) for stereoscopic 3D (mm)
-   */
-  float GetStereoBase() const;
 
   /**
    * @brief Register a processor
