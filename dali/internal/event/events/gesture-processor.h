@@ -76,12 +76,12 @@ protected:
 
   /**
    * Hit test the screen coordinates, and place the results in hitTestResults.
-   * @param[in] stage Stage.
+   * @param[in] scene Scene.
    * @param[in] screenCoordinates The screen coordinates to test.
    * @param[out] hitTestResults Structure to write results into.
    * @return false if the system overlay was hit or no actor was hit.
    */
-  virtual bool HitTest(Stage& stage, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults);
+  virtual bool HitTest( Scene& scene, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults);
 
   /**
    * Sets the mCurrentGesturedActor and connects to the required signals.

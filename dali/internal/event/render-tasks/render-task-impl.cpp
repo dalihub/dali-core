@@ -477,6 +477,11 @@ const SceneGraph::RenderTask& RenderTask::GetRenderTaskSceneObject() const
   return *static_cast<const SceneGraph::RenderTask*>( mUpdateObject );
 }
 
+RenderTaskList& RenderTask::GetRenderTaskList() const
+{
+  return mRenderTaskList;
+}
+
 /********************************************************************************
  ********************************   PROPERTY METHODS   **************************
  ********************************************************************************/

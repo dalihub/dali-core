@@ -36,6 +36,7 @@ struct TapGestureEvent;
 namespace Internal
 {
 
+class Scene;
 class Stage;
 class Actor;
 
@@ -52,10 +53,9 @@ public:
 
   /**
    * Create a tap gesture processor.
-   * @param[in] stage The stage.
    * @param[in] gestureManager The gesture manager.
    */
-  TapGestureProcessor(Stage& stage, Integration::GestureManager& gestureManager);
+  TapGestureProcessor( Integration::GestureManager& gestureManager );
 
   /**
    * Non-virtual destructor; TapGestureProcessor is not a base class
@@ -66,9 +66,10 @@ public: // To be called by GestureEventProcessor
 
   /**
    * This method is called whenever a tap gesture event occurs.
+   * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
    */
-  void Process(const Integration::TapGestureEvent& tapEvent);
+  void Process( Scene& scene, const Integration::TapGestureEvent& tapEvent);
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -125,7 +126,6 @@ private:
 
 private:
 
-  Stage& mStage;
   Integration::GestureManager& mGestureManager;
   TapGestureDetectorContainer mGestureDetectors;
 

@@ -20,6 +20,7 @@
 
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/integration-api/scene.h>
 
 
 namespace Dali

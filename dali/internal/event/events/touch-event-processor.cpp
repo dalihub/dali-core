@@ -30,7 +30,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/internal/event/events/touch-data-impl.h>
@@ -149,8 +149,8 @@ Dali::Actor EmitTouchSignals( Actor* actor, RenderTask& renderTask, const TouchE
 
 } // unnamed namespace
 
-TouchEventProcessor::TouchEventProcessor( Stage& stage )
-: mStage( stage ),
+TouchEventProcessor::TouchEventProcessor( Scene& scene )
+: mScene( scene ),
   mLastPrimaryHitActor( MakeCallback( this, &TouchEventProcessor::OnObservedActorDisconnected ) ),
   mLastConsumedActor(),
   mTouchDownConsumedActor(),
@@ -167,10 +167,7 @@ TouchEventProcessor::~TouchEventProcessor()
 void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
-
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty TouchEvent sent from Integration\n" );
-
-  Stage& stage = mStage;
 
   PRINT_HIERARCHY(gLogFilter);
 
@@ -229,8 +226,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     touchEvent.points.push_back( currentPoint.GetTouchPoint() );
     touchData->AddPoint( currentPoint );
 
-    mStage.EmitTouchedSignal( touchEvent, touchDataHandle );
-
+    mScene.EmitTouchedSignal( touchEvent, touchDataHandle );
     return; // No need for hit testing
   }
 
@@ -247,7 +243,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   for ( Integration::PointContainerConstIterator iter = event.points.begin(), beginIter = event.points.begin(), endIter = event.points.end(); iter != endIter; ++iter )
   {
     HitTestAlgorithm::Results hitTestResults;
-    HitTestAlgorithm::HitTest( stage, iter->GetScreenPosition(), hitTestResults );
+    HitTestAlgorithm::HitTest( mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), iter->GetScreenPosition(), hitTestResults );
 
     Integration::Point newPoint( *iter );
     newPoint.SetHitActor( hitTestResults.actor );
@@ -299,7 +295,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   Actor* lastConsumedActor( mLastConsumedActor.GetActor() );
   if( ( primaryPointState == PointState::MOTION ) || ( primaryPointState == PointState::UP ) || ( primaryPointState == PointState::STATIONARY ) )
   {
-    if ( mLastRenderTask )
+    if( mLastRenderTask )
     {
       Dali::Actor leaveEventConsumer;
       RenderTask& lastRenderTaskImpl = *mLastRenderTask.Get();
@@ -419,7 +415,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 
       case PointState::DOWN:
       {
-        mStage.EmitTouchedSignal( touchEvent, touchDataHandle );
+        mScene.EmitTouchedSignal( touchEvent, touchDataHandle );
         break;
       }
 

@@ -28,7 +28,7 @@
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -146,12 +146,8 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
 
 } // unnamed namespace
 
-HoverEventProcessor::HoverEventProcessor( Stage& stage )
-: mStage( stage ),
-  mLastPrimaryHitActor(),
-  mLastConsumedActor(),
-  mHoverStartConsumedActor(),
-  mLastRenderTask()
+HoverEventProcessor::HoverEventProcessor( Scene& scene )
+: mScene( scene )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
@@ -164,10 +160,8 @@ HoverEventProcessor::~HoverEventProcessor()
 void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& event )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
-
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty HoverEvent sent from Integration\n" );
 
-  Stage& stage = mStage;
   TouchPoint::State state = static_cast< TouchPoint::State >( event.points[0].GetState() );
 
   PRINT_HIERARCHY(gLogFilter);
@@ -235,7 +229,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   {
     HitTestAlgorithm::Results hitTestResults;
     ActorHoverableCheck actorHoverableCheck;
-    HitTestAlgorithm::HitTest( stage, iter->GetScreenPosition(), hitTestResults, actorHoverableCheck );
+    HitTestAlgorithm::HitTest( mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), iter->GetScreenPosition(), hitTestResults, actorHoverableCheck );
 
     TouchPoint newPoint( iter->GetTouchPoint() );
     newPoint.hitActor = hitTestResults.actor;

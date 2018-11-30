@@ -55,12 +55,13 @@ static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CA
 
 } // unnamed namespace
 
-EventProcessor::EventProcessor(Stage& stage, NotificationManager& /* notificationManager */, GestureEventProcessor& gestureEventProcessor)
-: mTouchEventProcessor(stage),
-  mHoverEventProcessor(stage),
-  mGestureEventProcessor(gestureEventProcessor),
-  mKeyEventProcessor(stage),
-  mWheelEventProcessor(stage),
+EventProcessor::EventProcessor( Scene& scene, GestureEventProcessor& gestureEventProcessor )
+: mScene( scene ),
+  mTouchEventProcessor( scene ),
+  mHoverEventProcessor( scene ),
+  mGestureEventProcessor( gestureEventProcessor ),
+  mKeyEventProcessor( scene ),
+  mWheelEventProcessor( scene ),
   mEventQueue0( INITIAL_BUFFER_SIZE ),
   mEventQueue1( INITIAL_BUFFER_SIZE ),
   mCurrentEventQueue( &mEventQueue0 )
@@ -212,7 +213,7 @@ void EventProcessor::ProcessEvents()
   MessageBuffer* queueToProcess = mCurrentEventQueue;
 
   // Switch current queue; events can be added safely while iterating through the other queue.
-  mCurrentEventQueue = (&mEventQueue0 == mCurrentEventQueue) ? &mEventQueue1 : &mEventQueue0;
+  mCurrentEventQueue = ( &mEventQueue0 == mCurrentEventQueue ) ? &mEventQueue1 : &mEventQueue0;
 
   for( MessageBuffer::Iterator iter = queueToProcess->Begin(); iter.IsValid(); iter.Next() )
   {
@@ -246,7 +247,7 @@ void EventProcessor::ProcessEvents()
 
       case Event::Gesture:
       {
-        mGestureEventProcessor.ProcessGestureEvent( static_cast<const Integration::GestureEvent&>(*event) );
+        mGestureEventProcessor.ProcessGestureEvent( mScene, static_cast<const Integration::GestureEvent&>(*event) );
         break;
       }
 
