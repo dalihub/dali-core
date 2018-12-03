@@ -409,13 +409,12 @@ void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& ste
 
   const float aspectRatio = width / height;
 
+  // sceneObject is being used in a separate thread; queue a message to set
   SetProjectionMode(Dali::Camera::PERSPECTIVE_PROJECTION);
   SetFieldOfView( fieldOfView );
   SetNearClippingPlane( nearClippingPlane );
   SetFarClippingPlane( farClippingPlane );
   SetAspectRatio( aspectRatio );
-  // sceneObject is being used in a separate thread; queue a message to set
-  SetStereoBiasMessage( GetEventThreadServices(), *mSceneObject, stereoBias );
   SetZ( cameraZ );
 }
 

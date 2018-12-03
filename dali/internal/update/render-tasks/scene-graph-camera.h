@@ -124,11 +124,6 @@ public:
    */
   void SetAspectRatio( float aspectRatio );
 
-  /**
-   * @copydoc Dali::Internal::CameraActor::SetStereoBias
-   */
-  void SetStereoBias(const Vector2& stereoBias);
-
    /**
    * @copydoc Dali::Internal::CameraActor::SetLeftClippingPlane
    */
@@ -287,7 +282,6 @@ public:  // PROPERTIES
   float                         mBottomClippingPlane;
   float                         mNearClippingPlane;
   float                         mFarClippingPlane;
-  Vector2                       mStereoBias;
   Vector3                       mTargetPosition;
 
   InheritedMatrix mViewMatrix;           ///< The viewMatrix; this is double buffered for input handling.
@@ -342,17 +336,6 @@ inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &camera, &Camera::SetAspectRatio, parameter );
-}
-
-inline void SetStereoBiasMessage( EventThreadServices& eventThreadServices, const Camera& camera, const Vector2& parameter )
-{
-  typedef MessageValue1< Camera, Vector2 > LocalType;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &camera, &Camera::SetStereoBias, parameter );
 }
 
 inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadServices, const Camera& camera, float parameter )
