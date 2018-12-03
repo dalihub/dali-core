@@ -38,26 +38,6 @@ namespace Dali
 namespace Internal
 {
 
-namespace
-{
-
-// Signals
-
-const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
-
-
-BaseHandle CreateImage()
-{
-  ImagePtr image = ResourceImage::New();
-  return Dali::Image(image.Get());
-}
-
-TypeRegistration mType( typeid( Dali::ResourceImage ), typeid( Dali::Image ), CreateImage );
-
-Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED, &ResourceImage::DoConnectSignal );
-
-}
-
 ResourceImage::ResourceImage()
 : Image(),
   mLoadingFinished(),
@@ -106,26 +86,6 @@ ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttribut
 ResourceImage::~ResourceImage()
 {
 }
-
-bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  bool connected( true );
-  DALI_ASSERT_DEBUG( dynamic_cast<ResourceImage*>( object ) && "Failed to downcast from BaseObject to ResourceImage.\n" );
-  ResourceImage* image = static_cast<ResourceImage*>(object);
-
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_LOADING_FINISHED ) )
-  {
-    image->LoadingFinishedSignal().Connect( tracker, functor );
-  }
-  else
-  {
-    // signalName does not match any signal
-    connected = false;
-  }
-
-  return connected;
-}
-
 
 const ImageAttributes& ResourceImage::GetAttributes() const
 {
