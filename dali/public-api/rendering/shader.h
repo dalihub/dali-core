@@ -105,7 +105,7 @@ public:
       /**
        * @brief Name: "program", Type: MAP.
        * @note The default value is empty.
-       * @note Format: {"vertex":"","fragment":"",hints:"","vertexPrefix":"","fragmentPrefix":""}
+       * @note Format: {"vertex":"","fragment":"",hints:""}
        * @SINCE_1_1.43
        */
       PROGRAM = DEFAULT_OBJECT_PROPERTY_START_INDEX
