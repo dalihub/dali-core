@@ -66,6 +66,7 @@ vk::Buffer Buffer::GetVkHandle() const
 
 void Buffer::DestroyNow()
 {
+  mGraphics->RemoveBuffer( *this );
   DestroyVulkanResources( mGraphics->GetDevice(), mBuffer, mDeviceMemory->ReleaseVkObject(), &mGraphics->GetAllocator() );
   mBuffer = nullptr;
   mDeviceMemory = nullptr;
@@ -73,10 +74,10 @@ void Buffer::DestroyNow()
 
 bool Buffer::OnDestroy()
 {
-  mGraphics->RemoveBuffer( *this );
-
   if( mBuffer )
   {
+    mGraphics->RemoveBuffer( *this );
+
     auto device = mGraphics->GetDevice();
     auto buffer = mBuffer;
     auto allocator = &mGraphics->GetAllocator();
