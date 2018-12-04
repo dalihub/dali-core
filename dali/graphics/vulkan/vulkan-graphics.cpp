@@ -1841,6 +1841,26 @@ RefCountedCommandPool Graphics::GetCommandPool( std::thread::id threadId )
   return commandPool;
 }
 
+//#define DEBUG_REPORT_CALLBACK_ENABLED
+#undef LOG_TAG
+#define LOG_TAG "VALIDATION"
+// -----------------------------------------------------------------------------------------------
+#if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+VkBool32 VulkanReportCallback(
+  VkDebugReportFlagsEXT                       flags,
+  VkDebugReportObjectTypeEXT                  objectType,
+  uint64_t                                    object,
+  size_t                                      location,
+  int32_t                                     messageCode,
+  const char*                                 pLayerPrefix,
+  const char*                                 pMessage,
+  void*                                       pUserData)
+{
+  LOGE("VALIDATION: %s", pMessage );
+  return VK_FALSE;
+}
+#endif
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
