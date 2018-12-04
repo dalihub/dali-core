@@ -215,7 +215,7 @@ struct Controller::Impl
         .setRenderPass(swapchain->GetCurrentFramebuffer()->GetRenderPass() )
         .setRenderArea( { {0, 0}, { swapchain->GetCurrentFramebuffer()->GetWidth(), swapchain->GetCurrentFramebuffer()->GetHeight() } } )
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
-        .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eSecondaryCommandBuffers );
+        .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eInline );
       primaryCommandBuffer->EndRenderPass();
     }
 
