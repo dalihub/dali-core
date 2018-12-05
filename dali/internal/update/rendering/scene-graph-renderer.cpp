@@ -216,6 +216,7 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
 void Renderer::FreeRenderCommand( RenderInstruction* renderInstruction )
 {
+
   mRenderCommands.DestroyRenderCommand( renderInstruction );
 }
 
@@ -251,7 +252,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   /**
    * Prepare textures
    */
-  auto samplers        = shader.GetSamplers();
+  auto samplers = shader.GetSamplers();
   if(mTextureSet)
   {
     if (!samplers.empty())
@@ -517,6 +518,7 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet->AddObserver( this );
 
   // Rebind textures to make sure old data won't be used
+  // Note, why are we binding textures for render commands on all buffer indexes?
   mRenderCommands.BindTextures( mTextureBindings );
 
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
@@ -819,6 +821,11 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
   {
     mShader = NULL;
   }
+}
+
+void Renderer::DestroyGraphicsObjects()
+{
+  mRenderCommands.DestroyAll();
 }
 
 } // namespace SceneGraph

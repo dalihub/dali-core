@@ -401,6 +401,10 @@ void Texture::GenerateMipmaps()
   //@todo Implement with GraphicsAPI
 }
 
+void Texture::DestroyGraphicsObjects()
+{
+  mGraphicsTexture.reset();
+}
 
 } // namespace SceneGraph
 } // namespace Internal

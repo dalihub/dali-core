@@ -101,6 +101,11 @@ public:
   Graphics::API::Shader* GetGfxObject();
 
   /**
+   * Destroy any graphics objects owned by this scene graph object
+   */
+  void DestroyGraphicsObjects();
+
+  /**
    * Retrieves uniform data.
    * The lookup tries to minimise string comparisons. Ideally, when the hashedName is known
    * and there are no hash collisions in the reflection it's the most optimal case.

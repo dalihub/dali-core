@@ -133,6 +133,7 @@ Core::Core( RenderController& renderController,
 
 Core::~Core()
 {
+  DALI_LOG_ERROR("Core destructor\n");
   /*
    * The order of destructing these singletons is important!!!
    */
@@ -155,6 +156,8 @@ Core::~Core()
 
   // remove (last?) reference to stage
   mStage.Reset();
+
+  DALI_LOG_ERROR("Core destruction complete\n");
 }
 
 void Core::SurfaceResized( uint32_t width, uint32_t height )
@@ -210,6 +213,12 @@ void Core::Render( RenderStatus& status, bool forceClear )
 {
   DALI_LOG_ERROR("Render()!\n");
   (void)status;
+}
+
+void Core::GraphicsShutdown()
+{
+  DALI_LOG_ERROR("Render thread is closing down - kill off graphics objects\n");
+  mUpdateManager->DestroyGraphicsObjects();
 }
 
 void Core::SceneCreated()

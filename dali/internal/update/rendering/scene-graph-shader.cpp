@@ -95,6 +95,11 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
   }
 }
 
+void Shader::DestroyGraphicsObjects()
+{
+  mGraphicsShader = nullptr;
+}
+
 void Shader::BuildReflection()
 {
   if( mGraphicsShader )

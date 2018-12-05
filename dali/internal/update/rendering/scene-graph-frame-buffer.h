@@ -96,6 +96,10 @@ public:
    */
   const Graphics::API::Framebuffer* GetGfxObject() const;
 
+  /**
+   * Destroy any graphics objects owned by this scene graph object
+   */
+  void DestroyGraphicsObjects();
 
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object

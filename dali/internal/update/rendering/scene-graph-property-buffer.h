@@ -172,6 +172,11 @@ public:
     return mGraphicsBuffer.get();
   }
 
+  inline void DestroyGraphicsObjects()
+  {
+    mGraphicsBuffer.reset();
+  }
+
 private:
   Integration::Graphics::Graphics*        mGraphics;  ///< Graphics interface object
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer

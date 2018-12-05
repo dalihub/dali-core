@@ -68,6 +68,11 @@ struct ShaderCache
     const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
     const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh );
 
+  /**
+   * Destroy any graphics objects owned by this scene graph object
+   */
+  void DestroyGraphicsObjects();
+
 private:
   std::vector<Item> mItems;
   Dali::Graphics::API::Controller& mController;

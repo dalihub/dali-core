@@ -433,6 +433,13 @@ public:
     return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
   }
 
+  void CheckRenderCommandCount(BufferIndex bufferIndex);
+
+  /**
+   * Destroy all graphics objects
+   */
+  void DestroyGraphicsObjects();
+
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -479,7 +486,6 @@ private:
    * Protected constructor; See also Renderer::New()
    */
   Renderer();
-
 
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
