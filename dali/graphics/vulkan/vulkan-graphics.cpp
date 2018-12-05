@@ -36,6 +36,7 @@
 #include <dali/graphics/vulkan/internal/vulkan-debug-allocator.h>
 
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/integration-api/debug.h>
 
 #ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
@@ -179,7 +180,7 @@ const auto VALIDATION_LAYERS = std::vector< const char* >{
         //"VK_LAYER_LUNARG_object_tracker",      // objects
         //"VK_LAYER_LUNARG_core_validation",     // core
         //"VK_LAYER_GOOGLE_unique_objects",      // unique objects
-        //"VK_LAYER_LUNARG_standard_validation", // standard
+        "VK_LAYER_LUNARG_standard_validation", // standard
 };
 
 Graphics::Graphics()
@@ -1487,23 +1488,62 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
 
-#if defined(DEBUG_ENABLED)
   if( !getenv( "LOG_VULKAN" ) )
   {
     info.setEnabledLayerCount( 0 );
   }
-#else
-  info.setEnabledLayerCount(0);
-#endif
 
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 
 #if defined(DEBUG_REPORT_CALLBACK_ENABLED)
+  char * sLogLevel = getenv( "VALIDATION_LOG_LEVEL" );
+  int logLevel = 0;
+
+  if (sLogLevel)
+    logLevel = atoi(sLogLevel);
+
   VkDebugReportCallbackCreateInfoEXT reportInfo;
   reportInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
   reportInfo.pfnCallback = VulkanReportCallback;
-  reportInfo.flags = VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
-                     VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT;
+  reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT;
+
+  if ( logLevel == 1 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT %d", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT;
+  }
+  else if ( logLevel == 2 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT %d", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+  }
+  else if ( logLevel == 3 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT %d", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_INFORMATION_BIT_EXT;
+  }
+  else if ( logLevel == 4 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | \
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT %d", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+  }
+  else if ( logLevel == 5 )
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | \
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT \
+                    %d", logLevel);
+    reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                      VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                      VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+  }
+  else
+  {
+    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT %d", logLevel);
+  }
+
   reportInfo.pUserData = 0u;
 
 
