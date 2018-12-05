@@ -35,13 +35,15 @@ class FrameBuffer
 {
 public:
 
+  using Mask = Dali::FrameBuffer::Attachment::Mask;
+
   /**
    * Constructor
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( uint32_t width, uint32_t height, uint32_t attachments );
+  FrameBuffer( uint32_t width, uint32_t height, Mask attachments );
 
   /**
    * Destructor

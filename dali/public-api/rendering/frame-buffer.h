@@ -43,7 +43,7 @@ public:
 
   /**
    * @brief The initial attachments to create the FrameBuffer with.
-   * @note The color attachment is created on calling AttachColorTexture(). If a color attachment is not required, omit this call.
+   * @note The color attachment can also be created on calling AttachColorTexture().
    * @note With "NONE", no attachments are created initially. However color attachments can still be added as described above.
    *
    * @SINCE_1_1.45
@@ -51,25 +51,53 @@ public:
   struct Attachment
   {
     /**
-     * @brief Enumeration for the bit-mask value.
+     * @brief Enumeration for the attachments and/or textures to be created by default
      * @SINCE_1_1.45
      */
     enum Mask
     {
-      NONE          = 0,               ///< No attachments are created initially                            @SINCE_1_1.45
-
-      DEPTH         = 1 << 0,          ///< Depth buffer bit-mask value                                     @SINCE_1_1.45
-      STENCIL       = 1 << 1,          ///< Stencil buffer bit-mask value                                   @SINCE_1_1.45
-
-      // Preset bit-mask combinations:
-      DEPTH_STENCIL = DEPTH | STENCIL  ///< The Framebuffer will be created with depth and stencil buffer   @SINCE_1_1.45
+      NONE          = 0,                          ///< No attachments are created initially             @SINCE_1_1.45
+      DEPTH         = 1 << 0,                     ///< Depth buffer is created                          @SINCE_1_1.45
+      STENCIL       = 1 << 1,                     ///< Stencil buffer is created                        @SINCE_1_1.45
+      DEPTH_STENCIL = DEPTH | STENCIL,            ///< Depth and stencil buffer will be created         @SINCE_1_1.45
+      COLOR         = 1 << 2,                     ///< Color texture will be created                    @SINCE_1_3.54
+      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer will be created   @SINCE_1_3.54
+      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer will be created @SINCE_1_3.54
+      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer will be created  @SINCE_1_3.54
     };
   };
 
   /**
+   * @brief Creates a new FrameBuffer with only COLOR texture attached on it
+   *
+   * @SINCE_1_3.54
+   *
+   * @note Call GetColorTexture() to get the COLOR texture
+   *
+   * @param[in] width The width of the FrameBuffer and the color texture
+   * @param[in] height The height of the FrameBuffer and the color texture
+   * @return A handle to a newly allocated FrameBuffer
+   */
+  static FrameBuffer New( uint32_t width, uint32_t height );
+
+  /**
+   * @brief Creates a new FrameBuffer with the specified attachments
+   *
+   * @SINCE_1_3.54
+   *
+   * @param[in] width The width of the FrameBuffer and the attachments
+   * @param[in] height The height of the FrameBuffer and the attachments
+   * @param[in] attachments Enumeration of the attachments to create
+   * @return A handle to a newly allocated FrameBuffer
+   */
+  static FrameBuffer New( uint32_t width, uint32_t height, Attachment::Mask attachments );
+
+  /**
+   * @DEPRECATED_1_3.54 use New( uint32_t width, uint32_t height ) or New( uint32_t width, uint32_t height, Attachment::Mask attachments ) instead
    * @brief Creates a new FrameBuffer object.
    *
    * @SINCE_1_1.43
+   *
    * @param[in] width The width of the FrameBuffer
    * @param[in] height The height of the FrameBuffer
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd)
