@@ -81,10 +81,7 @@ Handle< Shader > Shader::New( Graphics& graphics, const vk::ShaderModuleCreateIn
   auto shader = Handle< Shader >( new Shader( graphics, info ) ); // can't use make unique because of permissions
   if( shader )
   {
-    if( shader->mImpl->Initialise() == vk::Result::eSuccess )
-    {
-      graphics.AddShader( *shader );
-    }
+    shader->mImpl->Initialise();
   }
   return shader;
 }
@@ -110,8 +107,6 @@ vk::ShaderModule Shader::GetVkHandle() const
 
 bool Shader::OnDestroy()
 {
-  mImpl->mGraphics.RemoveShader( *this );
-
   auto device = mImpl->mGraphics.GetDevice();
   auto shaderModule = mImpl->mShaderModule;
   auto allocator = &mImpl->mGraphics.GetAllocator();

@@ -66,8 +66,6 @@ class CommandPool;
 
 class GpuMemoryManager;
 
-class ResourceRegister;
-
 class FramebufferAttachment;
 
 class Memory
@@ -279,35 +277,7 @@ public: // Getters
 
 public: //Cache management methods
 
-  void AddBuffer( Buffer& buffer );
-
-  void AddImage( Image& image );
-
-  void AddImageView( ImageView& imageView );
-
-  void AddShader( Shader& shader );
-
   void AddCommandPool( RefCountedCommandPool pool );
-
-  void AddFramebuffer( Framebuffer& framebuffer );
-
-  void AddSampler( Sampler& sampler );
-
-  RefCountedShader FindShader( vk::ShaderModule shaderModule );
-
-  RefCountedImage FindImage( vk::Image image );
-
-  void RemoveBuffer( Buffer& buffer );
-
-  void RemoveImage( Image& image );
-
-  void RemoveImageView( ImageView& imageView );
-
-  void RemoveShader( Shader& shader );
-
-  void RemoveFramebuffer( Framebuffer& framebuffer );
-
-  void RemoveSampler( Sampler& sampler );
 
   void CollectGarbage();
 
@@ -363,8 +333,6 @@ private: // Members
   std::vector< std::unique_ptr< Queue > > mTransferQueues;
   std::vector< std::unique_ptr< Queue > > mComputeQueues;
   //std::unique_ptr< Queue > mPresentQueue;
-
-  std::unique_ptr< ResourceRegister > mResourceRegister;
 
   std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
   FBID mBaseFBID{ 0u };
