@@ -66,29 +66,42 @@ void DescriptorSetAllocator::ResolveFreeDescriptorSets()
     {
       // free unused descriptor sets
       std::vector<vk::DescriptorSet> existingDSToFree;
-      auto freeIt = pool.vkDescriptorSetsToBeFreed.begin();
+
       std::vector<vk::DescriptorSet> newList{};
-      std::for_each( pool.vkDescriptorSets.begin(), pool.vkDescriptorSets.end(), [&]( auto& item )
+      auto freeIt = pool.vkDescriptorSetsToBeFreed.begin();
+      auto freeEnd = pool.vkDescriptorSetsToBeFreed.end();
+      std::for_each(pool.vkDescriptorSets.begin(), pool.vkDescriptorSets.end(), [&](auto &item)
       {
-        if( static_cast<VkDescriptorSet>(item) <= static_cast<VkDescriptorSet>(*freeIt) )
+        if( freeIt == pool.vkDescriptorSetsToBeFreed.end()) // no more items to free, just write remaining items
         {
-          if( item != *freeIt )
+          newList.emplace_back(item);
+        }
+        else
+        {
+          auto leftItem = static_cast<VkDescriptorSet>(*freeIt);
+          auto rightItem = static_cast<VkDescriptorSet>(item);
+          while( freeIt < freeEnd && leftItem < rightItem )
           {
-            newList.emplace_back( item );
-          }
-          else
-          {
-            existingDSToFree.emplace_back( *freeIt );
             ++freeIt;
           }
-        }
-        else if( freeIt != pool.vkDescriptorSetsToBeFreed.end() )
-        {
-          ++freeIt;
+
+          // not reached end yet
+          if( freeIt < freeEnd )
+          {
+            if( leftItem == rightItem )
+            {
+              existingDSToFree.emplace_back(item);
+              ++freeIt;
+            }
+            else
+            {
+              newList.emplace_back(item);
+            }
+          }
         }
       });
 
-      if( !existingDSToFree.empty() )
+      if( !existingDSToFree.empty())
       {
         graphics.GetDevice().freeDescriptorSets( pool.vkPool, existingDSToFree );
       }
