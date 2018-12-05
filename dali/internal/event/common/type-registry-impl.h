@@ -62,12 +62,12 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeNameCount
    */
-  size_t GetTypeNameCount() const;
+  uint32_t GetTypeNameCount() const;
 
   /**
    * @copydoc Dali::TypeRegistry::GetTypeName
    */
-  std::string GetTypeName(size_t index) const;
+  std::string GetTypeName( uint32_t index ) const;
 
   /**
    * Register a type

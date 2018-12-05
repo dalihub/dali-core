@@ -75,12 +75,12 @@ public:
   /**
    * @copydoc Dali::PanGestureDetector::GetMinimumTouchesRequired() const
    */
-  unsigned int GetMinimumTouchesRequired() const;
+  uint32_t GetMinimumTouchesRequired() const;
 
   /**
    * @copydoc Dali::PanGestureDetector::GetMaximumTouchesRequired() const
    */
-  unsigned int GetMaximumTouchesRequired() const;
+  uint32_t GetMaximumTouchesRequired() const;
 
   /**
    * @copydoc Dali::PanGestureDetector::AddAngle()
@@ -95,12 +95,12 @@ public:
   /**
    * @copydoc Dali::PanGestureDetector::GetAngleCount()
    */
-  size_t GetAngleCount() const;
+  uint32_t GetAngleCount() const;
 
   /**
    * @copydoc Dali::PanGestureDetector::GetAngle()
    */
-  AngleThresholdPair GetAngle(size_t index) const;
+  AngleThresholdPair GetAngle(uint32_t index) const;
 
   /**
    * @copydoc Dali::PanGestureDetector::ClearAngles()

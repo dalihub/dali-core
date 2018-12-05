@@ -273,9 +273,9 @@ Dali::TypeInfo::CreateFunction TypeInfo::GetCreator() const
   return mCreate;
 }
 
-size_t TypeInfo::GetActionCount() const
+uint32_t TypeInfo::GetActionCount() const
 {
-  size_t count = mActions.size();
+  uint32_t count = static_cast<uint32_t>( mActions.size() );
 
   if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
@@ -286,10 +286,10 @@ size_t TypeInfo::GetActionCount() const
   return count;
 }
 
-std::string TypeInfo::GetActionName(size_t index) const
+std::string TypeInfo::GetActionName( uint32_t index ) const
 {
   std::string name;
-  const size_t count = mActions.size();
+  const uint32_t count = static_cast<uint32_t>( mActions.size() );
 
   if( index < count )
   {
@@ -307,9 +307,9 @@ std::string TypeInfo::GetActionName(size_t index) const
   return name;
 }
 
-size_t TypeInfo::GetSignalCount() const
+uint32_t TypeInfo::GetSignalCount() const
 {
-  size_t count = mSignalConnectors.size();
+  uint32_t count = static_cast<uint32_t>( mSignalConnectors.size() );
 
   if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
@@ -320,10 +320,10 @@ size_t TypeInfo::GetSignalCount() const
   return count;
 }
 
-std::string TypeInfo::GetSignalName(size_t index) const
+std::string TypeInfo::GetSignalName( uint32_t index ) const
 {
   std::string name;
-  const size_t count = mSignalConnectors.size();
+  const uint32_t count = static_cast<uint32_t>( mSignalConnectors.size() );
 
   if( index < count )
   {

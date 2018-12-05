@@ -74,7 +74,7 @@ public:
    * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
    * @return A pointer to the first char allocated for the message
    */
-  uint32_t* ReserveMessageSlot( std::size_t size, bool updateScene );
+  uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene );
 
   /**
    * Flushes the message queue
@@ -114,8 +114,9 @@ private:
 private:
 
   // Not copyable:
-  MessageQueue ( const MessageQueue& rhs );
-  MessageQueue& operator=( const MessageQueue& rhs );
+  MessageQueue() = delete;
+  MessageQueue ( const MessageQueue& rhs ) = delete;
+  MessageQueue& operator=( const MessageQueue& rhs ) = delete;
 
 private:
 
