@@ -109,6 +109,11 @@ public:
    */
   const Graphics::API::Texture* GetGfxObject() const;
 
+  /**
+   * Destroy any graphics objects owned by this scene graph object
+   */
+  void DestroyGraphicsObjects();
+
 public: // From messages
   /**
    * Uploads data to Graphics
@@ -131,7 +136,6 @@ public: // From messages
    * Called when the texture is about to be used for drawing.
    */
   void PrepareTexture();
-
 
 public:
   /**

@@ -129,12 +129,10 @@ public:
     return mIndexBufferElementCount;
   }
 
-  /*
-  const Dali::Vector< unsigned short>& GetIndices() const
+  void DestroyGraphicsObjects()
   {
-    return mIndices;
+    mIndexBuffer.reset();
   }
-   */
 
 private:
   Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object

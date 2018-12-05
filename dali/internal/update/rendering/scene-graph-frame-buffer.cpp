@@ -148,6 +148,11 @@ const Graphics::API::Framebuffer* FrameBuffer::GetGfxObject() const
   return mGraphicsFramebuffer.get();
 }
 
+void FrameBuffer::DestroyGraphicsObjects()
+{
+  mGraphicsFramebuffer.reset();
+}
+
 } //Render
 
 } //Internal

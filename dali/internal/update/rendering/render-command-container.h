@@ -125,6 +125,11 @@ public:
     return false;
   }
 
+  void DestroyAll()
+  {
+    mRenderCommands.clear();
+  }
+
 private:
   std::vector<IndexedRenderCommand> mRenderCommands;
 };

@@ -118,11 +118,15 @@ public:
   }
 
   /**
-   * Frees render commands associated with this render instruction.
-   * @param[in] shuttingDown flag indicating whether we shutting DALi down and pointer to the renderer
-   * can be invalidated
+   * Frees render commands associated with this render instruction. Only call if the system
+   * is not being shutdown (e.g. if the render task is disabled/removed by app)
    */
-  void FreeRenderCommands( bool shuttingDown );
+  void FreeRenderCommands();
+
+  /**
+   * Signls that the system is being shutdown
+   */
+  void Shutdown();
 
 private:
 
@@ -138,6 +142,7 @@ public: // Data
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
   bool     mIsClearColorSet:1;          ///< Flag to determine whether the clearColor is set
   bool     mIgnoreRenderToFbo:1;        ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
+  bool     mShuttingDown:1;             ///< True if the system is being shutdown
 
   SceneGraph::FrameBuffer* mFrameBuffer;
 

@@ -18,6 +18,8 @@
 // CLASS HEADER
 #include <dali/internal/update/rendering/render-instruction-container.h>
 
+// EXTERNAL INCLUDES
+
 // INTERNAL INCLUDES
 #include <dali/internal/update/rendering/render-instruction.h>
 
@@ -72,6 +74,17 @@ void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex updateBu
   mInstructions[updateBufferIndex].pop_back();
 }
 
+void RenderInstructionContainer::Shutdown()
+{
+  for( auto instructionPtr : mInstructions[0] )
+  {
+    instructionPtr->Shutdown();
+  }
+  for( auto instructionPtr : mInstructions[1] )
+  {
+    instructionPtr->Shutdown();
+  }
+}
 
 } // namespace SceneGraph
 

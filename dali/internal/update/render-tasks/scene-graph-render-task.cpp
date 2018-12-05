@@ -18,6 +18,7 @@
 // CLASS HEADER
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 

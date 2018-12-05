@@ -54,6 +54,11 @@ Dali::Graphics::API::Shader& ShaderCache::GetShader(
   return *retval;
 }
 
+void ShaderCache::DestroyGraphicsObjects()
+{
+  mItems.clear();
+}
+
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali

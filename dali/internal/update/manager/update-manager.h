@@ -504,6 +504,12 @@ public:
    */
   void RemoveFrameCallback( FrameCallbackInterface* frameCallback );
 
+  /**
+   * The graphics implementation is about to die. Before we cleanup
+   * core, destroy all graphics objects whilst we still have a chance.
+   */
+  void DestroyGraphicsObjects();
+
 private:
 
   // Undefined
