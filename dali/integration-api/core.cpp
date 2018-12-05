@@ -111,6 +111,11 @@ void Core::Render( RenderStatus& status, bool forceClear )
   DALI_LOG_ERROR("Core::Render() called in error\n");
 }
 
+void Core::GraphicsEnding()
+{
+  mImpl->GraphicsEnding();
+}
+
 SystemOverlay& Core::GetSystemOverlay()
 {
   return mImpl->GetSystemOverlay();

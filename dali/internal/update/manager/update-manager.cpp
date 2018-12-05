@@ -740,6 +740,7 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   // command. There may be more than one render item per renderer if
   // the actor containing the renderer is in more than one render
   // task. The renderer owns the render commands.
+
   const auto renderInstructionCount = mImpl->renderInstructions.Count( bufferIndex );
   for( auto i=0u; i < renderInstructionCount; ++i )
   {
@@ -1160,6 +1161,55 @@ void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
   }
 }
 
+void UpdateManager::DestroyGraphicsObjects()
+{
+  // Wait for the current frame to finish drawing
+  mImpl->graphics.GetController().WaitIdle();
+
+  DALI_LOG_ERROR("Destroying graphics objects\n");
+
+  // There will be no further Update after this point. Destroy everything!
+  for( auto& renderer : mImpl->renderers )
+  {
+    renderer->DestroyGraphicsObjects();
+  }
+
+  for( auto& geometry : mImpl->geometryContainer )
+  {
+    geometry->DestroyGraphicsObjects();
+  }
+
+  for( auto& propertyBuffer : mImpl->propertyBufferContainer )
+  {
+    propertyBuffer->DestroyGraphicsObjects();
+  }
+
+  for( auto& texture : mImpl->textureContainer )
+  {
+    texture->DestroyGraphicsObjects();
+  }
+
+  for( auto& sampler : mImpl->samplerContainer )
+  {
+    sampler->DestroyGraphicsObjects();
+  }
+
+  for( auto& frameBuffer : mImpl->frameBufferContainer )
+  {
+    frameBuffer->DestroyGraphicsObjects();
+  }
+
+  for( auto& shader : mImpl->shaders )
+  {
+    shader->DestroyGraphicsObjects();
+  }
+
+  mImpl->shaderCache.DestroyGraphicsObjects();
+
+  // Ensure resources are discarded
+  mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphics.GetController() );
+  DALI_LOG_ERROR("Destruction complete\n");
+}
 
 } // namespace SceneGraph
 

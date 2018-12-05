@@ -112,6 +112,11 @@ struct Sampler
     return mGfxSampler.get();
   }
 
+  void DestroyGraphicsObjects()
+  {
+    mGfxSampler.reset();
+  }
+
   inline Graphics::API::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
   {
     switch(mode)

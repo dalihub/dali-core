@@ -238,7 +238,7 @@ public:
    * This object is used for integration with the native windowing system.
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
-   * @param[in] graphicsInterface The interface providing graphics services
+   * @param[in] graphics The interface providing graphics services
    * @param[in] gestureManager The interface providing gesture manager services.
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
@@ -353,6 +353,13 @@ public:
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
   void Render( RenderStatus& status, bool forceClear );
+
+  /**
+   * Notify the Core that that Graphics interface is about to be destroyed.
+   * The Core will free any previously allocated Graphics resources.
+   * Multi-threading note: this method should be called from the update thread only
+   */
+  void GraphicsEnding();
 
   // System-level overlay
 

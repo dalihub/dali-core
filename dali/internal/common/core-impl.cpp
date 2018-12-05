@@ -212,6 +212,11 @@ void Core::Render( RenderStatus& status, bool forceClear )
   (void)status;
 }
 
+void Core::GraphicsEnding()
+{
+  mUpdateManager->DestroyGraphicsObjects();
+}
+
 void Core::SceneCreated()
 {
   mStage->EmitSceneCreatedSignal();

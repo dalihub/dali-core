@@ -97,6 +97,7 @@ bool PropertyBuffer::Update( Dali::Graphics::API::Controller& controller )
   return true;
 }
 
+
 } //Render
 } //Internal
 } //Dali
