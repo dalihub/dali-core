@@ -30,7 +30,6 @@
 #include <dali/graphics/vulkan/internal/vulkan-framebuffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/internal/vulkan-sampler.h>
-#include <dali/graphics/vulkan/internal/vulkan-resource-register.h>
 #include <dali/graphics/vulkan/internal/vulkan-debug.h>
 #include <dali/graphics/vulkan/internal/vulkan-fence.h>
 #include <dali/graphics/vulkan/internal/vulkan-swapchain.h>
@@ -206,13 +205,7 @@ Graphics::~Graphics()
 
   mCommandPools.clear();
 
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" )
-  mResourceRegister->PrintReferenceCountReport();
-
-  // Clear the last references of resources in the cache.
-  // This should ensure that all resources have been queued for garbage collection
-  // This call assumes that the cash only holds the last reference of every resource in the program. (As it should)
-  mResourceRegister->Clear();
+  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "DESTROYING GRAPHICS CONTEXT--------------------------------\n" );
 
   // Kill pipeline cache
   mDevice.destroyPipelineCache( mVulkanPipelineCache, mAllocator.get() );
@@ -328,8 +321,6 @@ void Graphics::CreateDevice()
       // todo: present queue
     }
   }
-
-  mResourceRegister = std::unique_ptr< ResourceRegister >( new ResourceRegister );
 }
 
 FBID Graphics::CreateSurface( SurfaceFactory& surfaceFactory,
@@ -485,7 +476,6 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, vk::BufferUsageFlags usage
   VkAssert( mDevice.createBuffer( &info, mAllocator.get(), &buffer->mBuffer ) );
 
   auto refCountedBuffer = RefCountedBuffer( buffer );
-  AddBuffer( *buffer );
 
   return refCountedBuffer;
 }
@@ -497,8 +487,6 @@ RefCountedBuffer Graphics::CreateBuffer( const vk::BufferCreateInfo& bufferCreat
   VkAssert( mDevice.createBuffer( &bufferCreateInfo, mAllocator.get(), &buffer->mBuffer ) );
 
   auto refCountedBuffer = RefCountedBuffer( buffer );
-
-  AddBuffer( *buffer );
 
   return refCountedBuffer;
 }
@@ -694,7 +682,6 @@ RefCountedImage Graphics::CreateImage( const vk::ImageCreateInfo& imageCreateInf
   VkAssert( mDevice.createImage( &imageCreateInfo, &GetAllocator("IMAGE"), &image->mImage ) );
 
   auto refCountedImage = RefCountedImage( image );
-  AddImage( *image );
 
   return refCountedImage;
 }
@@ -739,8 +726,6 @@ RefCountedImageView Graphics::CreateImageView( const vk::ImageViewCreateFlags& f
 
   auto refCountedImageView = RefCountedImageView( imageView );
 
-  AddImageView( *imageView );
-
   return refCountedImageView;
 }
 
@@ -776,8 +761,6 @@ RefCountedSampler Graphics::CreateSampler( const vk::SamplerCreateInfo& samplerC
   VkAssert( mDevice.createSampler( &samplerCreateInfo, &GetAllocator("SAMPLER"), &sampler->mSampler ) );
 
   auto refCountedSampler = RefCountedSampler( sampler );
-
-  AddSampler( *sampler );
 
   return refCountedSampler;
 
@@ -1423,95 +1406,10 @@ const vk::PipelineCache& Graphics::GetVulkanPipelineCache()
   return mVulkanPipelineCache;
 }
 
-// Cache manipulation methods -----------------------------------------------------------------------------------
-void Graphics::AddBuffer( Buffer& buffer )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddBuffer( buffer );
-}
-
-void Graphics::AddImage( Image& image )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddImage( image );
-}
-
-void Graphics::AddImageView( ImageView& imageView )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddImageView( imageView );
-}
-
-void Graphics::AddShader( Shader& shader )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddShader( shader );
-}
-
 void Graphics::AddCommandPool( RefCountedCommandPool pool )
 {
   std::lock_guard< std::mutex > lock{ mMutex };
   mCommandPools[ std::this_thread::get_id() ] = std::move(pool);
-}
-
-void Graphics::AddFramebuffer( Framebuffer& framebuffer )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddFramebuffer( framebuffer );
-}
-
-void Graphics::AddSampler( Sampler& sampler )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->AddSampler( sampler );
-}
-
-RefCountedShader Graphics::FindShader( vk::ShaderModule shaderModule )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  return mResourceRegister->FindShader( shaderModule );
-}
-
-RefCountedImage Graphics::FindImage( vk::Image image )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  return mResourceRegister->FindImage( image );
-}
-
-void Graphics::RemoveBuffer( Buffer& buffer )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveBuffer( buffer );
-}
-
-void Graphics::RemoveImage( Image& image )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveImage( image );
-}
-
-void Graphics::RemoveImageView( ImageView& imageView )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveImageView( imageView );
-}
-
-void Graphics::RemoveShader( Shader& shader )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveShader( shader );
-}
-
-void Graphics::RemoveFramebuffer( Framebuffer& framebuffer )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveFramebuffer( framebuffer );
-}
-
-void Graphics::RemoveSampler( Sampler& sampler )
-{
-  std::lock_guard< std::mutex > lock{ mMutex };
-  mResourceRegister->RemoveSampler( sampler );
 }
 
 void Graphics::CollectGarbage()

@@ -75,8 +75,6 @@ ImageView& ImageView::Ref()
 
 bool ImageView::OnDestroy()
 {
-  mGraphics->RemoveImageView( *this );
-
   auto device = mGraphics->GetDevice();
   auto imageView = mImageView;
   auto allocator = &mGraphics->GetAllocator();

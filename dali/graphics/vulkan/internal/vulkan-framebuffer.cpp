@@ -253,8 +253,6 @@ std::vector< vk::ClearValue > Framebuffer::GetClearValues() const
 
 bool Framebuffer::OnDestroy()
 {
-  mGraphics->RemoveFramebuffer( *this );
-
   auto device = mGraphics->GetDevice();
   auto frameBuffer = mFramebuffer;
 
