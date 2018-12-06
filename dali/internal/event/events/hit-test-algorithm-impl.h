@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
-#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -38,11 +39,11 @@ namespace HitTestAlgorithm
 
 struct Results
 {
-  Dali::RenderTask renderTask;       ///< The render-task displaying the actor.
-  Dali::Actor      actor;            ///< The hit actor.
-  Vector2          actorCoordinates; ///< The actor coordinates.
-  Vector4          rayOrigin;        ///< The point of origin of the ray.
-  Vector4          rayDirection;     ///< The direction vector of the ray.
+  RenderTaskPtr renderTask;       ///< The render-task displaying the actor.
+  Dali::Actor   actor;            ///< The hit actor.
+  Vector2       actorCoordinates; ///< The actor coordinates.
+  Vector4       rayOrigin;        ///< The point of origin of the ray.
+  Vector4       rayDirection;     ///< The direction vector of the ray.
 };
 
 /**

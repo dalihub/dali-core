@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,14 +106,11 @@ void ConstraintBase::RemoveInternal()
     // Guard against constraint sending messages during core destruction
     if( Stage::IsInstalled() )
     {
-      const SceneGraph::PropertyOwner* propertyOwner = mTargetObject ? mTargetObject->GetSceneObject() : NULL;
-
-      if ( propertyOwner &&
-           mSceneGraphConstraint )
+      if( mTargetObject && mSceneGraphConstraint )
       {
+        const SceneGraph::PropertyOwner& propertyOwner =  mTargetObject->GetSceneObject();
         // Remove from scene-graph
-        RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
-
+        RemoveConstraintMessage( GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint) );
         // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
         mSceneGraphConstraint = NULL;
       }
@@ -173,12 +170,11 @@ void ConstraintBase::SceneObjectRemoved( Object& object )
     // An input property owning source has been deleted, need to tell the scene-graph-constraint owner to remove it
     if ( &object != mTargetObject )
     {
-      const SceneGraph::PropertyOwner* propertyOwner = mTargetObject ? mTargetObject->GetSceneObject() : NULL;
-
-      if( propertyOwner )
+      if( mTargetObject )
       {
+        const SceneGraph::PropertyOwner& propertyOwner = mTargetObject->GetSceneObject();
         // Remove from scene-graph
-        RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
+        RemoveConstraintMessage( GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint) );
       }
     }
 

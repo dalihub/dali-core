@@ -50,12 +50,15 @@ RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs)
 
 RenderTask RenderTaskList::CreateTask()
 {
-  return GetImplementation(*this).CreateTask();
+  return RenderTask( GetImplementation(*this).CreateTask().Get() );
 }
 
 void RenderTaskList::RemoveTask( RenderTask task )
 {
-  GetImplementation(*this).RemoveTask( task );
+  if( task ) // don't crash if called with empty task handle
+  {
+    GetImplementation(*this).RemoveTask( GetImplementation( task ) );
+  }
 }
 
 uint32_t RenderTaskList::GetTaskCount() const
@@ -65,7 +68,7 @@ uint32_t RenderTaskList::GetTaskCount() const
 
 RenderTask RenderTaskList::GetTask( uint32_t index ) const
 {
-  return GetImplementation(*this).GetTask( index );
+  return RenderTask( GetImplementation(*this).GetTask( index ).Get() );
 }
 
 RenderTaskList::RenderTaskList( Internal::RenderTaskList* internal )

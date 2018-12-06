@@ -61,8 +61,6 @@ namespace Internal
 namespace
 {
 
-const float DEFAULT_STEREO_BASE( 65.0f );
-
 // Signals
 
 const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
@@ -239,11 +237,11 @@ void Stage::SurfaceResized( float width, float height )
     // if single render task to screen then set its viewport parameters
     if( 1 == mRenderTaskList->GetTaskCount() )
     {
-      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
+      RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
 
-      if(!defaultRenderTask.GetTargetFrameBuffer())
+      if(!defaultRenderTask->GetTargetFrameBuffer())
       {
-        defaultRenderTask.SetViewport( Viewport( 0, 0, static_cast<int32_t>( width ), static_cast<int32_t>( height ) ) ); // truncated
+        defaultRenderTask->SetViewport( Viewport( 0, 0, static_cast<int32_t>( width ), static_cast<int32_t>( height ) ) ); // truncated
       }
     }
 
@@ -253,8 +251,8 @@ void Stage::SurfaceResized( float width, float height )
       Dali::Texture texture = Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGB888, static_cast<uint32_t>( width ), static_cast<uint32_t>( height ) );
       frameBuffer.AttachColorTexture( texture );
 
-      Dali::RenderTask defaultRenderTask = mRenderTaskList->GetTask( 0u );
-      defaultRenderTask.SetFrameBuffer( frameBuffer );
+      RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
+      defaultRenderTask->SetFrameBuffer( &GetImplementation( frameBuffer ) );
     }
   }
 }

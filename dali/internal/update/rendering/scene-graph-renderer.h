@@ -463,7 +463,7 @@ private:
 public:
 
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
-  int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
+  int32_t                      mDepthIndex;                       ///< Used only in PrepareRenderInstructions
 
 };
 
@@ -491,7 +491,7 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(&geometry) );
 }
 
-inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Shader& shader )
+inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Shader& shader )
 {
   typedef MessageValue1< Renderer, Shader* > LocalType;
 
@@ -499,7 +499,7 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Re
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetShader, &shader );
+  new (slot) LocalType( &renderer, &Renderer::SetShader, const_cast<Shader*>( &shader ) );
 }
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int depthIndex )

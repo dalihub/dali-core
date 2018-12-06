@@ -101,7 +101,7 @@ public:
     DALI_ASSERT_ALWAYS( mParent == NULL && "AnimationConnector already has a parent" );
     mParent = &parent;
 
-    if( mObject && mObject->GetSceneObject() )
+    if( mObject )
     {
       CreateAnimator();
     }
@@ -156,15 +156,16 @@ private:
     DALI_ASSERT_DEBUG( mParent != NULL );
 
     //Get the PropertyOwner the animator is going to animate
-    const SceneGraph::PropertyOwner* propertyOwner = mObject->GetSceneObject();
+    const SceneGraph::PropertyOwner& propertyOwner = mObject->GetSceneObject();
 
     // Get SceneGraph::BaseProperty
     const SceneGraph::PropertyBase* baseProperty = mObject->GetSceneObjectAnimatableProperty( mPropertyIndex );
+    DALI_ASSERT_ALWAYS( baseProperty && "Property is not animatable" );
 
     OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
 
     // Check if property is a component of another property
-    const int componentIndex = mObject->GetPropertyComponentIndex( mPropertyIndex );
+    const int32_t componentIndex = mObject->GetPropertyComponentIndex( mPropertyIndex );
     if( componentIndex != Property::INVALID_COMPONENT_INDEX )
     {
       mComponentIndex = componentIndex;
@@ -181,7 +182,7 @@ private:
       {
         if( baseProperty->IsTransformManagerProperty() )
         {
-          mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+          mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
           // Don't reset transform manager properties - TransformManager will do it more efficiently
         }
         else
@@ -193,9 +194,9 @@ private:
       else
       {
         // Create the animator and resetter
-        mAnimator = AnimatorType::New( *propertyOwner, *animatableProperty, mAnimatorFunction,
+        mAnimator = AnimatorType::New( propertyOwner, *animatableProperty, mAnimatorFunction,
                                        mAlphaFunction, mTimePeriod );
-        resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+        resetter = SceneGraph::AnimatorResetter::New( propertyOwner, *baseProperty, *mAnimator );
       }
     }
     else
@@ -214,7 +215,7 @@ private:
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -223,7 +224,7 @@ private:
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -238,7 +239,7 @@ private:
 
           if( mAnimator != nullptr )
           {
-            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+            resetter = SceneGraph::AnimatorResetter::New( propertyOwner, *baseProperty, *mAnimator );
           }
         }
 
@@ -254,15 +255,15 @@ private:
             {
               if( mComponentIndex == 0 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,0> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,0> >::New( propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
               else if( mComponentIndex == 1 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,1> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,1> >::New( propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
               else if( mComponentIndex == 2 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,2> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,2> >::New( propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
             }
             else
@@ -280,7 +281,7 @@ private:
             {
               case 0:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -289,7 +290,7 @@ private:
               }
               case 1:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -298,7 +299,7 @@ private:
               }
               case 2:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -313,7 +314,7 @@ private:
 
             if( mAnimator != nullptr )
             {
-              resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+              resetter = SceneGraph::AnimatorResetter::New( propertyOwner, *baseProperty, *mAnimator );
             }
           }
         }
@@ -331,7 +332,7 @@ private:
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -340,7 +341,7 @@ private:
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -349,7 +350,7 @@ private:
             }
             case 2:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -358,7 +359,7 @@ private:
             }
             case 3:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -373,7 +374,7 @@ private:
           }
           if( mAnimator != nullptr )
           {
-            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+            resetter = SceneGraph::AnimatorResetter::New( propertyOwner, *baseProperty, *mAnimator );
           }
         }
       }

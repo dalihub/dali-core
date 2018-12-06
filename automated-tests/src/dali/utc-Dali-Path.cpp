@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -472,3 +472,32 @@ int UtcDaliPathPropertyControlPoints(void)
 
   END_TEST;
 }
+
+int UtcDaliPathRegisterProperty(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+
+  Property::Index index = path.RegisterProperty( "sceneProperty", 0.f );
+  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( path.GetProperty< float >( index ), 0.f, TEST_LOCATION );
+
+  path.SetProperty( index, -1 );
+  DALI_TEST_EQUALS( path.GetProperty< float >( index ), -1.f, TEST_LOCATION );
+
+  using Dali::Animation;
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( path, index ), 100.f );
+
+  DALI_TEST_EQUALS( path.GetProperty< float >( index ), -1.f, TEST_LOCATION );
+  // Start the animation
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 /* 100% progress */);
+  DALI_TEST_EQUALS( path.GetProperty< float >( index ), 100.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+

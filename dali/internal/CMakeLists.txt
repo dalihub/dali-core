@@ -74,7 +74,6 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/event/images/resource-image-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/images/native-image-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/images/pixel-data-impl.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/event/object/custom-object-internal.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/render-tasks/render-task-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/render-tasks/render-task-list-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/rendering/frame-buffer-impl.cpp

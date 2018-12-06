@@ -64,8 +64,7 @@ void Renderer::SetGeometry( Geometry& geometry )
 
 Geometry Renderer::GetGeometry() const
 {
-  Internal::Geometry* geometryPtr( GetImplementation(*this).GetGeometry() );
-  return Dali::Geometry( geometryPtr );
+  return Dali::Geometry( GetImplementation(*this).GetGeometry().Get() );
 }
 
 void Renderer::SetTextures( TextureSet& textureSet )
@@ -76,8 +75,7 @@ void Renderer::SetTextures( TextureSet& textureSet )
 
 TextureSet Renderer::GetTextures() const
 {
-  Internal::TextureSet* textureSet( GetImplementation(*this).GetTextures() );
-  return Dali::TextureSet( textureSet );
+  return Dali::TextureSet( GetImplementation(*this).GetTextures().Get() );
 }
 
 void Renderer::SetShader( Shader& shader )
@@ -88,8 +86,7 @@ void Renderer::SetShader( Shader& shader )
 
 Shader Renderer::GetShader() const
 {
-  Internal::Shader* shaderPtr( GetImplementation(*this).GetShader() );
-  return Dali::Shader( shaderPtr );
+  return Dali::Shader( GetImplementation(*this).GetShader().Get() );
 }
 
 Renderer::Renderer( Internal::Renderer* pointer )

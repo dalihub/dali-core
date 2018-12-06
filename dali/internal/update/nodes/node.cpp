@@ -286,7 +286,7 @@ void Node::AddRenderer( Renderer* renderer )
   mRenderer.PushBack( renderer );
 }
 
-void Node::RemoveRenderer( Renderer* renderer )
+void Node::RemoveRenderer( const Renderer* renderer )
 {
   RendererContainer::SizeType rendererCount( mRenderer.Size() );
   for( RendererContainer::SizeType i = 0; i < rendererCount; ++i )

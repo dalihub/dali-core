@@ -677,7 +677,7 @@ Property::Index TypeInfo::GetBasePropertyIndex( Property::Index index ) const
   return basePropertyIndex;
 }
 
-int TypeInfo::GetComponentIndex( Property::Index index ) const
+int32_t TypeInfo::GetComponentIndex( Property::Index index ) const
 {
   int componentIndex = Property::INVALID_COMPONENT_INDEX;
 
