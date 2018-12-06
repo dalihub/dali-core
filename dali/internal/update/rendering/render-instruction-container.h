@@ -84,6 +84,10 @@ public:
    */
   void DiscardCurrentInstruction( BufferIndex updateBufferIndex );
 
+  /**
+   * System is shutting down. Don't need to force destroy unowned resources
+   */
+  void Shutdown();
 
 private:
   std::vector<RenderInstruction*> mInstructions[2u];

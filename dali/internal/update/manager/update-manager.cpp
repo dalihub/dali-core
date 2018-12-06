@@ -206,6 +206,7 @@ struct UpdateManager::Impl
     renderTaskWaiting( false ),
     renderersAdded( false ),
     surfaceRectChanged( false ),
+    graphicsShutdown( false ),
     shaderCache( graphics.GetController() )
   {
     sceneController = new SceneControllerImpl( discardQueue );
@@ -223,12 +224,6 @@ struct UpdateManager::Impl
       for ( auto&& task : tasks )
       {
         task->SetSourceNode( NULL );
-
-        // RenderTasks have ownership over RenderInstructions and RenderCommands
-        // It's necessary to discard render commands before Renderers are gone
-        // When shutting down, perform tearing down for both buffers.
-        task->GetRenderInstruction( 0u ).FreeRenderCommands( true );
-        task->GetRenderInstruction( 1u ).FreeRenderCommands( true );
       }
     }
 
@@ -320,8 +315,9 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
-  ShaderCache                          shaderCache;
+  bool                                 graphicsShutdown;              ///< True if the graphics subsystem has shutdown
 
+  ShaderCache                          shaderCache;
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -1169,6 +1165,9 @@ void UpdateManager::DestroyGraphicsObjects()
   DALI_LOG_ERROR("Destroying graphics objects\n");
 
   // There will be no further Update after this point. Destroy everything!
+
+  mImpl->renderInstructions.Shutdown(); //Prevent further access of dangling renderer ptrs
+
   for( auto& renderer : mImpl->renderers )
   {
     renderer->DestroyGraphicsObjects();
@@ -1208,6 +1207,9 @@ void UpdateManager::DestroyGraphicsObjects()
 
   // Ensure resources are discarded
   mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphics.GetController() );
+
+  mImpl->graphicsShutdown = true;
+
   DALI_LOG_ERROR("Destruction complete\n");
 }
 

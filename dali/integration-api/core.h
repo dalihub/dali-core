@@ -359,7 +359,7 @@ public:
    * The Core will free any previously allocated Graphics resources.
    * Multi-threading note: this method should be called from the update thread only
    */
-  void GraphicsEnding();
+  void GraphicsShutdown();
 
   // System-level overlay
 

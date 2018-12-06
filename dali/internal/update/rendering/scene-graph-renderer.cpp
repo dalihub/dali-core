@@ -216,6 +216,7 @@ void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 
 void Renderer::FreeRenderCommand( RenderInstruction* renderInstruction )
 {
+
   mRenderCommands.DestroyRenderCommand( renderInstruction );
 }
 

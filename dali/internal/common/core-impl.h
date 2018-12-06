@@ -124,9 +124,9 @@ public:
   void Render( Integration::RenderStatus& status, bool forceClear );
 
   /**
-   * @copydoc Dali::Integration::Core::GraphicsEnding()
+   * @copydoc Dali::Integration::Core::GraphicsShutdown()
    */
-  void GraphicsEnding();
+  void GraphicsShutdown();
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()
