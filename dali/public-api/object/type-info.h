@@ -18,6 +18,8 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
@@ -48,9 +50,10 @@ namespace Internal DALI_INTERNAL
 class DALI_CORE_API TypeInfo : public BaseHandle
 {
 public:
-  typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0
 
-  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
+  using CreateFunction = BaseHandle (*)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0
+
+  using ActionFunction = bool (*)(BaseObject*, const std::string&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
 
   /**
    * @brief Connects a callback function with the object's signals.
@@ -63,7 +66,7 @@ public:
    * @return True if the signal was connected
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  typedef bool (*SignalConnectorFunction)(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  using SignalConnectorFunction = bool (*)(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   /**
    * @brief Callback to set an event-thread only property.
@@ -74,7 +77,7 @@ public:
    * @param[in] value The new value of the property for the object specified
    * @see PropertyRegistration.
    */
-  typedef void (*SetPropertyFunction)( BaseObject* object, Property::Index index, const Property::Value& value );
+  using SetPropertyFunction = void (*)( BaseObject* object, Property::Index index, const Property::Value& value );
 
   /**
    * @brief Callback to get the value of an event-thread only property.
@@ -85,7 +88,7 @@ public:
    * @return The current value of the property for the object specified
    * @see PropertyRegistration.
    */
-  typedef Property::Value (*GetPropertyFunction)( BaseObject* object, Property::Index index );
+  using GetPropertyFunction = Property::Value (*)( BaseObject* object, Property::Index index );
 
   /**
    * @brief Allows the creation of an empty TypeInfo handle.
@@ -187,7 +190,6 @@ public:
   /**
    * @brief Retrieves the number of event side type registered properties for this type.
    *
-   * This count does not include all properties.
    * @SINCE_1_0.0
    * @return The count
    */

@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,23 +40,19 @@ class PropertyConstraint
 {
 public:
 
-  typedef std::vector < PropertyInputAccessor > InputContainer;
-  typedef typename InputContainer::iterator InputContainerIter;
-  typedef typename InputContainer::const_iterator InputContainerConstIter;
-
-  typedef std::vector< PropertyInputIndexer< PropertyInputAccessor > > InputIndexerContainer;
-
-  typedef Dali::Constraint::Function< PropertyType > ConstraintFunction;
+  using ConstraintFunction = Dali::Constraint::Function< PropertyType >;
+  using InputContainer = std::vector < PropertyInputAccessor >;
+  using InputIndexerContainer = std::vector< PropertyInputIndexer< PropertyInputAccessor > >;
 
   /**
    * Create a property constraint.
    *
    * @param[in]  func  A constraint function. Ownership of this callback-function is passed to this object.
    */
-  PropertyConstraint( Dali::Constraint::Function< PropertyType >* func )
-  : mInputsInitialized( false ),
-    mFunction( func ),
-    mInputs()
+  PropertyConstraint( ConstraintFunction* func )
+  : mFunction( func ),
+    mInputs(),
+    mInputsInitialized( false )
   {
   }
 
@@ -65,11 +61,11 @@ public:
    * @param [in]  func    A constraint function. Ownership of this callback-function is passed to this object.
    * @param [in]  inputs  Property inputs.
    */
-  PropertyConstraint( Dali::Constraint::Function< PropertyType >* func,
+  PropertyConstraint( ConstraintFunction* func,
                       const InputContainer& inputs )
-  : mInputsInitialized( false ),
-    mFunction( func ),
-    mInputs( inputs )
+  : mFunction( func ),
+    mInputs( inputs ),
+    mInputsInitialized( false )
   {
   }
 
@@ -95,32 +91,27 @@ public:
 
   /**
    * Set the input for one of the property constraint parameters.
-   * @param [in] index The parameter index.
    * @param [in] input The interface for receiving a property value.
+   * @param [in] componentIndex Component index.
    */
-  void SetInput( std::size_t index, int componentIndex, const PropertyInputImpl& input )
+  void AddInput( const PropertyInputImpl* input, int32_t componentIndex )
   {
-    if ( index >= mInputs.size() )
-    {
-      mInputs.push_back( PropertyInputAccessor() );
-    }
-
-    mInputs[ index ].SetInput( input, componentIndex );
+    mInputs.push_back( PropertyInputAccessor{ input, componentIndex } );
   }
 
   /**
    * Retrieve the input for one of the property constraint parameters.
    * @param [in] index The parameter index.
-   * @return The property input, or NULL if no input exists with this index.
+   * @return The property input, or nullptr if no input exists with this index.
    */
-  const PropertyInputImpl* GetInput( unsigned int index ) const
+  const PropertyInputImpl* GetInput( uint32_t index ) const
   {
     if ( index < mInputs.size() )
     {
       return mInputs[ index ].GetInput();
     }
 
-    return NULL;
+    return nullptr;
   }
 
   /**
@@ -132,9 +123,9 @@ public:
     if ( !mInputsInitialized )
     {
       // Check whether the inputs are initialized yet
-      unsigned int index( 0u );
+      uint32_t index( 0u );
       for ( const PropertyInputImpl* input = GetInput( index );
-            NULL != input;
+            nullptr != input;
             input = GetInput( ++index ) )
       {
         if ( !input->InputInitialized() )
@@ -156,9 +147,9 @@ public:
    */
   bool InputsChanged()
   {
-    unsigned int index( 0u );
+    uint32_t index( 0u );
     for ( const PropertyInputImpl* input = GetInput( index );
-          NULL != input;
+          nullptr != input;
           input = GetInput( ++index ) )
     {
       if ( input->InputChanged() )
@@ -178,40 +169,38 @@ public:
    */
   void Apply( BufferIndex bufferIndex, PropertyType& current )
   {
-    InputIndexerContainer mInputIndices;
-    PropertyInputContainer mIndices;
-    const std::size_t noOfInputs = mInputs.size();
+    InputIndexerContainer inputIndices;
+    PropertyInputContainer indices;
+    const uint32_t noOfInputs = static_cast<uint32_t>( mInputs.size() );
 
-    mInputIndices.reserve( noOfInputs );
-    mIndices.Reserve( noOfInputs );
+    inputIndices.reserve( noOfInputs );
+    indices.Reserve( noOfInputs );
 
-    const InputContainerConstIter endIter = mInputs.end();
-    unsigned int index = 0;
-    for ( InputContainerConstIter iter = mInputs.begin(); iter != endIter; ++iter, ++index )
+    const auto&& endIter = mInputs.end();
+    uint32_t index = 0;
+    for ( auto&& iter = mInputs.begin(); iter != endIter; ++iter, ++index )
     {
-      DALI_ASSERT_DEBUG( NULL != iter->GetInput() );
-      mInputIndices.push_back( PropertyInputIndexer< PropertyInputAccessor >( bufferIndex, &*iter ) );
-      mIndices.PushBack( &mInputIndices[ index ] );
+      DALI_ASSERT_DEBUG( nullptr != iter->GetInput() );
+      inputIndices.push_back( PropertyInputIndexer< PropertyInputAccessor >( bufferIndex, &*iter ) );
+      indices.PushBack( &inputIndices[ index ] );
     }
 
-    CallbackBase::Execute< PropertyType&, const PropertyInputContainer& >( *mFunction, current, mIndices );
+    CallbackBase::Execute< PropertyType&, const PropertyInputContainer& >( *mFunction, current, indices );
   }
 
 private:
 
   // Undefined
-  PropertyConstraint( const PropertyConstraint& );
-
-  // Undefined
-  PropertyConstraint& operator=( const PropertyConstraint& rhs );
+  PropertyConstraint() = delete;
+  PropertyConstraint( const PropertyConstraint& ) = delete;
+  PropertyConstraint& operator=( const PropertyConstraint& rhs ) = delete;
 
 private:
 
+  ConstraintFunction* mFunction;
+  InputContainer mInputs;
   bool mInputsInitialized;
 
-  ConstraintFunction* mFunction;
-
-  InputContainer mInputs;
 };
 
 } // namespace Internal

@@ -122,9 +122,9 @@ void Animation::SetDisconnectAction(Dali::Animation::EndAction action)
   {
     mDisconnectAction = action;
 
-    for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+    for ( auto&& item : mAnimators )
     {
-      (*iter)->SetDisconnectAction( action );
+      item->SetDisconnectAction( action );
     }
   }
 }
@@ -224,9 +224,9 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive( bool active )
 {
-  for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+  for ( auto&& item : mAnimators )
   {
-    (*iter)->SetActive( active );
+    item->SetActive( active );
   }
 }
 
@@ -283,13 +283,12 @@ void Animation::SetLoopingMode( bool loopingMode )
 {
   mAutoReverseEnabled = loopingMode;
 
-  for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+  for ( auto&& item : mAnimators )
   {
     // Send some variables together to figure out the Animation status
-    (*iter)->SetSpeedFactor( mSpeedFactor );
-    (*iter)->SetLoopCount( mLoopCount );
-
-    (*iter)->SetLoopingMode( loopingMode );
+    item->SetSpeedFactor( mSpeedFactor );
+    item->SetLoopCount( mLoopCount );
+    item->SetLoopingMode( loopingMode );
   }
 }
 
@@ -301,7 +300,7 @@ void Animation::AddAnimator( OwnerPointer<AnimatorBase>& animator )
   mAnimators.PushBack( animator.Release() );
 }
 
-void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached )
+void Animation::Update( BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached )
 {
   looped = false;
   finished = false;
@@ -430,7 +429,7 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
 
   //Loop through all animators
   bool applied(true);
-  for ( AnimatorIter iter = mAnimators.Begin(); iter != mAnimators.End(); )
+  for ( auto&& iter = mAnimators.Begin(); iter != mAnimators.End(); )
   {
     AnimatorBase *animator = *iter;
 

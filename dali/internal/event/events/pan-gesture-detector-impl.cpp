@@ -136,12 +136,12 @@ void PanGestureDetector::SetMaximumTouchesRequired(unsigned int maximum)
   }
 }
 
-unsigned int PanGestureDetector::GetMinimumTouchesRequired() const
+uint32_t PanGestureDetector::GetMinimumTouchesRequired() const
 {
   return mMinimumTouches;
 }
 
-unsigned int PanGestureDetector::GetMaximumTouchesRequired() const
+uint32_t PanGestureDetector::GetMaximumTouchesRequired() const
 {
   return mMaximumTouches;
 }
@@ -176,12 +176,12 @@ void PanGestureDetector::AddDirection( Radian direction, Radian threshold )
   AddAngle( direction, threshold );
 }
 
-size_t PanGestureDetector::GetAngleCount() const
+uint32_t PanGestureDetector::GetAngleCount() const
 {
-  return mAngleContainer.size();
+  return static_cast<uint32_t>( mAngleContainer.size() );
 }
 
-PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
+PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(uint32_t index) const
 {
   PanGestureDetector::AngleThresholdPair ret( Radian(0),Radian(0) );
 
