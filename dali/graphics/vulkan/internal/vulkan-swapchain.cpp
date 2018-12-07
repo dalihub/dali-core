@@ -404,6 +404,10 @@ void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
       mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.emplace_back( commandBuffer );
     }
   }
+  else if( renderPassCount < commandBuffersCount )
+  {
+    mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.resize( renderPassCount );
+  }
 }
 
 RefCountedCommandBuffer Swapchain::GetLastCommandBuffer()
