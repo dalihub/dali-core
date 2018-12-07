@@ -227,11 +227,9 @@ Graphics::~Graphics()
 // Create methods -----------------------------------------------------------------------------------------------
 void Graphics::Create()
 {
-  const char* enable_extmem = std::getenv("DALI_VULKAN_EXTENSION");
+  const char* enable_extmem = std::getenv("DALI_VULKAN_EXTERNAL_MEMORY_EXTENSION");
 
-  // if the parameter exists convert it to an integer, else return the default value
   int intValue = enable_extmem ? std::atoi(enable_extmem) : 1;
-
   if ( intValue )
   {
     mDisableNativeImage = false;
@@ -1513,7 +1511,9 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
       .setEnabledLayerCount( U32( validationLayers.size() ) )
       .setPpEnabledLayerNames( validationLayers.data() );
 
-  if( !getenv( "LOG_VULKAN" ) )
+  const char* log_level = std::getenv( "LOG_VULKAN" );
+  int intValue = log_level ? std::atoi(log_level) : 0;
+  if ( !intValue )
   {
     info.setEnabledLayerCount( 0 );
   }
@@ -1521,11 +1521,10 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
   mInstance = VkAssert( vk::createInstance( info, *mAllocator ) );
 
 #if defined(DEBUG_REPORT_CALLBACK_ENABLED)
-  char * sLogLevel = getenv( "VALIDATION_LOG_LEVEL" );
   int logLevel = 0;
+  const char* sLogLevel = std::getenv( "VALIDATION_LOG_LEVEL" );
 
-  if (sLogLevel)
-    logLevel = atoi(sLogLevel);
+  logLevel = sLogLevel ? std::atoi(sLogLevel) : 0;
 
   VkDebugReportCallbackCreateInfoEXT reportInfo;
   reportInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
@@ -1563,10 +1562,6 @@ void Graphics::CreateInstance( const std::vector< const char* >& extensions,
     reportInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
                       VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
                       VK_DEBUG_REPORT_DEBUG_BIT_EXT;
-  }
-  else
-  {
-    DALI_LOG_ERROR("LOG_LEVEL VK_DEBUG_REPORT_ERROR_BIT_EXT %d", logLevel);
   }
 
   reportInfo.pUserData = 0u;
