@@ -356,6 +356,8 @@ private: // Members
   bool mSurfaceResized { false };
 
   uint32_t mCurrentBufferIndex{ 0u };
+
+  bool mDisableNativeImage { false };
 };
 
 } // namespace Vulkan

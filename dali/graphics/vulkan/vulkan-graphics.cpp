@@ -227,6 +227,20 @@ Graphics::~Graphics()
 // Create methods -----------------------------------------------------------------------------------------------
 void Graphics::Create()
 {
+  const char* enable_extmem = std::getenv("DALI_VULKAN_EXTENSION");
+
+  // if the parameter exists convert it to an integer, else return the default value
+  int intValue = enable_extmem ? std::atoi(enable_extmem) : 1;
+
+  if ( intValue )
+  {
+    mDisableNativeImage = false;
+  }
+  else
+  {
+    mDisableNativeImage = true;
+  }
+
   auto extensions = PrepareDefaultInstanceExtensions();
 
   auto layers = vk::enumerateInstanceLayerProperties();
@@ -266,6 +280,17 @@ void Graphics::CreateDevice()
     }
 
     std::vector< const char* > extensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+    /**
+     * @todo Check these exist before using them for native image:
+     * VK_KHR_SWAPCHAIN_EXTENSION_NAME
+     * VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME
+     * VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME
+     * VK_KHR_BIND_MEMORY_2_EXTENSION_NAME
+     * VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME
+     * VK_KHR_MAINTENANCE1_EXTENSION_NAME
+     * VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME
+     */
 
     vk::PhysicalDeviceFeatures featuresToEnable{};
 
@@ -1727,6 +1752,10 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     else if( platform == Platform::WAYLAND && waylandAvailable )
     {
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      /* For native image, check these exist first:
+       *  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+       *  VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME
+       */
     }
   }
   else // try to determine the platform based on available extensions
@@ -1745,6 +1774,10 @@ std::vector< const char* > Graphics::PrepareDefaultInstanceExtensions()
     {
       mPlatform = Platform::WAYLAND;
       retval.push_back( VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME );
+      /* For native image, check these exist first:
+       *  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+       *  VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME
+       */
     }
     else
     {
