@@ -24,8 +24,6 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
-#include <dali/internal/update/common/property-resetter.h>
-#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -34,19 +32,19 @@ namespace Internal
 {
 
 /**
- * AnimatorConnector is used to connect SceneGraph::Animators and
- * PropertyResetters for newly created scene-graph objects.
+ * AnimatorConnector is used to connect SceneGraph::Animators.
  *
  * SceneGraph::Animators weakly reference scene objects, and are automatically deleted when orphaned.
  * Therefore the AnimatorConnector is NOT responsible for disconnecting animators.
+ * This is the common template for non float properties, there's a specialization for float properties as they can be component properties
  */
 template < typename PropertyType >
 class AnimatorConnector : public AnimatorConnectorBase
 {
 public:
 
-  typedef SceneGraph::Animator< PropertyType, PropertyAccessor<PropertyType> > AnimatorType;
-  typedef SceneGraph::AnimatableProperty< PropertyType > PropertyInterfaceType;
+  using AnimatorType = SceneGraph::Animator< PropertyType, PropertyAccessor<PropertyType> >;
+  using PropertyInterfaceType = SceneGraph::AnimatableProperty< PropertyType >;
 
   /**
    * Construct a new animator connector.
@@ -60,17 +58,17 @@ public:
    */
   static AnimatorConnectorBase* New( Object& object,
                                      Property::Index propertyIndex,
-                                     int componentIndex,
+                                     int32_t componentIndex,
                                      AnimatorFunctionBase* animatorFunction,
                                      AlphaFunction alpha,
                                      const TimePeriod& period )
   {
-    return new AnimatorConnector< PropertyType >( object,
-                                                  propertyIndex,
-                                                  componentIndex,
-                                                  animatorFunction,
-                                                  alpha,
-                                                  period );
+    return new AnimatorConnector( object,
+                                  propertyIndex,
+                                  componentIndex,
+                                  animatorFunction,
+                                  alpha,
+                                  period );
   }
 
   /**
@@ -78,33 +76,6 @@ public:
    */
   virtual ~AnimatorConnector()
   {
-    if( mObject )
-    {
-      mObject->RemoveObserver( *this );
-    }
-
-    // If there is not a SceneGraph::Animator, the AnimatorConnector is responsible for deleting the mAnimatorFunction
-    // otherwise, the animator function ownership is transferred to the SceneGraph::Animator
-    if( !mAnimator )
-    {
-      delete mAnimatorFunction;
-      mAnimatorFunction = 0;
-    }
-  }
-
-  /**
-   * From AnimatorConnectorBase.
-   * This is only expected to be called once, when added to an Animation.
-   */
-  void SetParent( Animation& parent )
-  {
-    DALI_ASSERT_ALWAYS( mParent == NULL && "AnimationConnector already has a parent" );
-    mParent = &parent;
-
-    if( mObject && mObject->GetSceneObject() )
-    {
-      CreateAnimator();
-    }
   }
 
 private:
@@ -114,107 +85,168 @@ private:
    */
   AnimatorConnector( Object& object,
                      Property::Index propertyIndex,
-                     int componentIndex,
+                     int32_t componentIndex,
                      Internal::AnimatorFunctionBase* animatorFunction,
                      AlphaFunction alpha,
                      const TimePeriod& period )
-  : AnimatorConnectorBase( object, propertyIndex, componentIndex, alpha, period ),
-    mAnimator(0),
-    mAnimatorFunction( animatorFunction )
+  : AnimatorConnectorBase( object, propertyIndex, componentIndex, animatorFunction, alpha, period )
   {
   }
 
   // Undefined
-  AnimatorConnector( const AnimatorConnector& );
-
-  // Undefined
-  AnimatorConnector& operator=( const AnimatorConnector& rhs );
+  AnimatorConnector() = delete;
+  AnimatorConnector( const AnimatorConnector& ) = delete;
+  AnimatorConnector& operator=( const AnimatorConnector& rhs ) = delete;
 
   /**
-   * From Object::Observer
+   * @copydoc AnimatorConnectorBase::DoCreateAnimator()
    */
-  virtual void SceneObjectAdded( Object& object )
+  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) override final
   {
-    //If the animator has not been created yet, create it now.
-    if( !mAnimator && mObject )
+    bool resetterRequired = false;
+    // components only supported for float property type
+    DALI_ASSERT_DEBUG( mComponentIndex == Property::INVALID_COMPONENT_INDEX );
+    // Animating the whole property
+
+    // Cast to AnimatableProperty
+    const PropertyInterfaceType* animatableProperty = dynamic_cast< const PropertyInterfaceType* >( &baseProperty );
+
+    if( animatableProperty == nullptr )
     {
-      CreateAnimator();
+      if( baseProperty.IsTransformManagerProperty() )
+      {
+        mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+        // Don't reset transform manager properties - TransformManager will do it more efficiently
+      }
+      else
+      {
+        DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
+      }
     }
+    else
+    {
+      // Create the animator and resetter
+      mAnimator = AnimatorType::New( propertyOwner, *animatableProperty, mAnimatorFunction,
+                                     mAlphaFunction, mTimePeriod );
+      resetterRequired = true;
+    }
+    return resetterRequired;
+  }
+};
+
+/**
+ * Specialization for float as that type supports component properties
+ */
+template <>
+class AnimatorConnector< float > : public AnimatorConnectorBase
+{
+public:
+
+  using AnimatorType = SceneGraph::Animator< float, PropertyAccessor<float> >;
+  using PropertyInterfaceType = SceneGraph::AnimatableProperty< float >;
+
+  /**
+   * Construct a new animator connector.
+   * @param[in] object The object for a scene-graph object to animate.
+   * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4 (INVALID_PROPERTY_COMPONENTINDEX to use the whole property)
+   * @param[in] animatorFunction A function used to animate the property.
+   * @param[in] alpha The alpha function to apply.
+   * @param[in] period The time period of the animator.
+   * @return A pointer to a newly allocated animator connector.
+   */
+  static AnimatorConnectorBase* New( Object& object,
+                                     Property::Index propertyIndex,
+                                     int32_t componentIndex,
+                                     AnimatorFunctionBase* animatorFunction,
+                                     AlphaFunction alpha,
+                                     const TimePeriod& period )
+  {
+    return new AnimatorConnector( object,
+                                  propertyIndex,
+                                  componentIndex,
+                                  animatorFunction,
+                                  alpha,
+                                  period );
   }
 
-   /**
-   * Helper function to create a Scenegraph::Animator and PropertyResetter and add it to its correspondent
-   * SceneGraph::Animation.
-   *
-   * @note This function will only be called the first time the object is added to the scene or at creation time if
-   * the object was already in the scene
+  /**
+   * Virtual destructor.
    */
-  void CreateAnimator()
+  virtual ~AnimatorConnector()
   {
-    DALI_ASSERT_DEBUG( mAnimator == NULL );
-    DALI_ASSERT_DEBUG( mAnimatorFunction != NULL );
-    DALI_ASSERT_DEBUG( mParent != NULL );
+  }
 
-    //Get the PropertyOwner the animator is going to animate
-    const SceneGraph::PropertyOwner* propertyOwner = mObject->GetSceneObject();
+private:
 
-    // Get SceneGraph::BaseProperty
-    const SceneGraph::PropertyBase* baseProperty = mObject->GetSceneObjectAnimatableProperty( mPropertyIndex );
+  /**
+   * Private constructor; see also AnimatorConnector::New().
+   */
+  AnimatorConnector( Object& object,
+                     Property::Index propertyIndex,
+                     int32_t componentIndex,
+                     Internal::AnimatorFunctionBase* animatorFunction,
+                     AlphaFunction alpha,
+                     const TimePeriod& period )
+  : AnimatorConnectorBase( object, propertyIndex, componentIndex, animatorFunction, alpha, period )
+  {
+  }
 
-    OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
+  // Undefined
+  AnimatorConnector() = delete;
+  AnimatorConnector( const AnimatorConnector& ) = delete;
+  AnimatorConnector& operator=( const AnimatorConnector& rhs ) = delete;
 
-    // Check if property is a component of another property
-    const int componentIndex = mObject->GetPropertyComponentIndex( mPropertyIndex );
-    if( componentIndex != Property::INVALID_COMPONENT_INDEX )
-    {
-      mComponentIndex = componentIndex;
-    }
-
+  /**
+   * @copydoc AnimatorConnectorBase::DoCreateAnimator()
+   */
+  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) override final
+  {
+    bool resetterRequired = false;
     if( mComponentIndex == Property::INVALID_COMPONENT_INDEX )
     {
       // Animating the whole property
 
       // Cast to AnimatableProperty
-      const PropertyInterfaceType* animatableProperty = dynamic_cast< const PropertyInterfaceType* >( baseProperty );
+      const PropertyInterfaceType* animatableProperty = dynamic_cast< const PropertyInterfaceType* >( &baseProperty );
 
-      if( animatableProperty == NULL )
+      if( animatableProperty == nullptr )
       {
-        if( baseProperty->IsTransformManagerProperty() )
+        if( baseProperty.IsTransformManagerProperty() )
         {
-          mAnimator = SceneGraph::AnimatorTransformProperty< PropertyType,TransformManagerPropertyAccessor<PropertyType> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+          mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyAccessor<float> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
           // Don't reset transform manager properties - TransformManager will do it more efficiently
         }
         else
         {
-          DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+          DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
         }
-
       }
       else
       {
         // Create the animator and resetter
-        mAnimator = AnimatorType::New( *propertyOwner, *animatableProperty, mAnimatorFunction,
+        mAnimator = AnimatorType::New( propertyOwner, *animatableProperty, mAnimatorFunction,
                                        mAlphaFunction, mTimePeriod );
-        resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
+        resetterRequired = true;
       }
     }
     else
     {
       {
         // Animating a component of the property
-        if ( PropertyTypes::Get< Vector2 >() == baseProperty->GetType() )
+        if ( PropertyTypes::Get< Vector2 >() == baseProperty.GetType() )
         {
           // Animate float component of Vector2 property
 
           // Cast to AnimatableProperty of type Vector2
-          const SceneGraph::AnimatableProperty<Vector2>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector2>* >( baseProperty );
-          DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+          const SceneGraph::AnimatableProperty<Vector2>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector2>* >( &baseProperty );
+          DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
 
           switch( mComponentIndex )
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -223,7 +255,7 @@ private:
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -236,51 +268,48 @@ private:
             }
           }
 
-          if( mAnimator != nullptr )
-          {
-            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
-          }
+          resetterRequired = ( mAnimator != nullptr );
         }
 
-        else if ( PropertyTypes::Get< Vector3 >() == baseProperty->GetType() )
+        else if ( PropertyTypes::Get< Vector3 >() == baseProperty.GetType() )
         {
           // Animate float component of Vector3 property
           // Cast to AnimatableProperty of type Vector3
-          const SceneGraph::AnimatableProperty<Vector3>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector3>* >( baseProperty );
+          const SceneGraph::AnimatableProperty<Vector3>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector3>* >( &baseProperty );
 
-          if( animatableProperty == NULL )
+          if( animatableProperty == nullptr )
           {
-            if( baseProperty->IsTransformManagerProperty() )
+            if( baseProperty.IsTransformManagerProperty() )
             {
               if( mComponentIndex == 0 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,0> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,0> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
               else if( mComponentIndex == 1 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,1> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,1> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
               else if( mComponentIndex == 2 )
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,2> >::New( *propertyOwner, *baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
+                mAnimator = SceneGraph::AnimatorTransformProperty< float,TransformManagerPropertyComponentAccessor<Vector3,2> >::New( propertyOwner, baseProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
               }
             }
             else
             {
-              DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+              DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
             }
             // Don't manually reset transform property - TransformManager will do it more efficiently
           }
           else
           {
             // Dynamic cast will fail if BaseProperty is not a Vector3 AnimatableProperty
-            DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+            DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
 
             switch( mComponentIndex )
             {
               case 0:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -289,7 +318,7 @@ private:
               }
               case 1:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -298,7 +327,7 @@ private:
               }
               case 2:
               {
-                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> >::New( *propertyOwner,
+                mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> >::New( propertyOwner,
                                                                                                      *animatableProperty,
                                                                                                      mAnimatorFunction,
                                                                                                      mAlphaFunction,
@@ -311,27 +340,24 @@ private:
               }
             }
 
-            if( mAnimator != nullptr )
-            {
-              resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
-            }
+            resetterRequired = ( mAnimator != nullptr );
           }
         }
-        else if ( PropertyTypes::Get< Vector4 >() == baseProperty->GetType() )
+        else if ( PropertyTypes::Get< Vector4 >() == baseProperty.GetType() )
         {
           // Animate float component of Vector4 property
 
           // Cast to AnimatableProperty of type Vector4
-          const SceneGraph::AnimatableProperty<Vector4>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector4>* >( baseProperty );
+          const SceneGraph::AnimatableProperty<Vector4>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector4>* >( &baseProperty );
 
           //Dynamic cast will fail if BaseProperty is not a Vector4 AnimatableProperty
-          DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+          DALI_ASSERT_DEBUG( animatableProperty && "Animating non-animatable property" );
 
           switch( mComponentIndex )
           {
             case 0:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -340,7 +366,7 @@ private:
             }
             case 1:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -349,7 +375,7 @@ private:
             }
             case 2:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -358,7 +384,7 @@ private:
             }
             case 3:
             {
-              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> >::New( *propertyOwner,
+              mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> >::New( propertyOwner,
                                                                                                    *animatableProperty,
                                                                                                    mAnimatorFunction,
                                                                                                    mAlphaFunction,
@@ -371,35 +397,13 @@ private:
               break;
             }
           }
-          if( mAnimator != nullptr )
-          {
-            resetter = SceneGraph::AnimatorResetter::New( *propertyOwner, *baseProperty, *mAnimator );
-          }
+          resetterRequired = ( mAnimator != nullptr );
         }
       }
     }
-
-    DALI_ASSERT_DEBUG( mAnimator != NULL );
-
-    // Add the new SceneGraph::Animator to its correspondent SceneGraph::Animation via message
-    const SceneGraph::Animation* animation = mParent->GetSceneObject();
-    DALI_ASSERT_DEBUG( NULL != animation );
-    AddAnimatorMessage( mParent->GetEventThreadServices(), *animation, *mAnimator );
-
-    // Add the new SceneGraph::PropertyResetter to the update manager via message
-    if( resetter != nullptr )
-    {
-      AddResetterMessage( mParent->GetEventThreadServices().GetUpdateManager(), resetter );
-    }
+    return resetterRequired;
   }
-
-protected:
-
-  SceneGraph::AnimatorBase* mAnimator;
-
-  Internal::AnimatorFunctionBase* mAnimatorFunction;  ///< Owned by the animator connector until an Scenegraph::Animator is created
 };
-
 
 } // namespace Internal
 

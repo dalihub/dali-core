@@ -467,3 +467,31 @@ int UtcDaliGestureDetectorProperties(void)
 
   END_TEST;
 }
+
+int UtcDaliGestureDetectorRegisterProperty(void)
+{
+  TestApplication application;
+
+  GestureDetector detector = PinchGestureDetector::New();
+
+  Property::Index index = detector.RegisterProperty( "sceneProperty", 0 );
+  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 0, TEST_LOCATION );
+
+  detector.SetProperty( index, -123 );
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+
+  using Dali::Animation;
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( detector, index ), 99 );
+
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+  // Start the animation
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 /* 100% progress */);
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 99, TEST_LOCATION );
+
+  END_TEST;
+}

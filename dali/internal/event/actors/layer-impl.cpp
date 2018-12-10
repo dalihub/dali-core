@@ -348,7 +348,7 @@ void Layer::OnStageDisconnectionInternal()
 
 const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
 {
-  return dynamic_cast< const SceneGraph::Layer& >( mNode );
+  return static_cast< const SceneGraph::Layer& >( GetNode() ); // we know our node is a layer node
 }
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )

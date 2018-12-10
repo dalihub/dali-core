@@ -105,22 +105,6 @@ namespace SceneGraph
 namespace
 {
 /**
- * Helper to reset animate-able objects to base values
- * @param container to iterate over
- * @param updateBufferIndex to use
- */
-template< class T >
-inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex updateBufferIndex )
-{
-  // Reset animatable properties to base values
-  // use reference to avoid extra copies of the iterator
-  for( auto&& iter : container )
-  {
-    iter->ResetToBaseValues( updateBufferIndex );
-  }
-}
-
-/**
  * Helper to Erase an object from OwnerContainer using discard queue
  * @param container to remove from
  * @param object to remove
@@ -285,7 +269,7 @@ struct UpdateManager::Impl
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
 
   OwnerContainer< PropertyResetterBase* > propertyResetters;          ///< A container of property resetters
-  AnimationContainer                   animations;                    ///< A container of owned animations
+  OwnerContainer< Animation* >         animations;                    ///< A container of owned animations
   PropertyNotificationContainer        propertyNotifications;         ///< A container of owner property notifications.
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
@@ -433,10 +417,10 @@ void UpdateManager::AddCamera( OwnerPointer< Camera >& camera )
   mImpl->cameras.PushBack( camera.Release() ); // takes ownership
 }
 
-void UpdateManager::RemoveCamera( const Camera* camera )
+void UpdateManager::RemoveCamera( Camera* camera )
 {
   // Find the camera and destroy it
-  EraseUsingDiscardQueue( mImpl->cameras, const_cast<Camera*>( camera ), mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  EraseUsingDiscardQueue( mImpl->cameras, camera, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::AddObject( OwnerPointer<PropertyOwner>& object )
@@ -660,11 +644,10 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSync
 
 void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  AnimationContainer &animations = mImpl->animations;
-  AnimationIter iter = animations.Begin();
+  auto&& iter = mImpl->animations.Begin();
   bool animationLooped = false;
 
-  while ( iter != animations.End() )
+  while ( iter != mImpl->animations.End() )
   {
     Animation* animation = *iter;
     bool finished = false;
@@ -683,7 +666,7 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // Remove animations that had been destroyed but were still waiting for an update
     if (animation->GetState() == Animation::Destroyed)
     {
-      iter = animations.Erase(iter);
+      iter = mImpl->animations.Erase(iter);
     }
     else
     {

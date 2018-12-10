@@ -35,19 +35,19 @@ GeometryPtr Geometry::New()
   return geometry;
 }
 
-std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
+uint32_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   mVertexBuffers.push_back( &vertexBuffer );
   SceneGraph::AttachVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
-  return mVertexBuffers.size() - 1u;
+  return static_cast<uint32_t>( mVertexBuffers.size() - 1u );
 }
 
-std::size_t Geometry::GetNumberOfVertexBuffers() const
+uint32_t Geometry::GetNumberOfVertexBuffers() const
 {
-  return mVertexBuffers.size();
+  return static_cast<uint32_t>( mVertexBuffers.size() );
 }
 
-void Geometry::RemoveVertexBuffer( std::size_t index )
+void Geometry::RemoveVertexBuffer( uint32_t index )
 {
   const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
   SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderPropertyBuffer );
@@ -55,7 +55,7 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
 
-void Geometry::SetIndexBuffer( const uint16_t* indices, size_t count )
+void Geometry::SetIndexBuffer( const uint16_t* indices, uint32_t count )
 {
   Dali::Vector<uint16_t> indexData;
   if( indices && count )
@@ -109,6 +109,6 @@ Geometry::~Geometry()
   }
 }
 
-
 } // namespace Internal
+
 } // namespace Dali

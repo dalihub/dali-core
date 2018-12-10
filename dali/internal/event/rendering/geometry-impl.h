@@ -60,22 +60,22 @@ public:
   /**
    * @copydoc Dali::Geometry::AddVertexBuffer()
    */
-  std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
+  uint32_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
 
   /**
    * @copydoc Dali::Geometry::GetNumberOfVertexBuffers()
    */
-  std::size_t GetNumberOfVertexBuffers() const;
+  uint32_t GetNumberOfVertexBuffers() const;
 
   /**
    * @copydoc Dali::Geometry::RemoveVertexBuffer()
    */
-  void RemoveVertexBuffer( std::size_t index );
+  void RemoveVertexBuffer( uint32_t index );
 
   /**
    * @copydoc Dali::Geometry::SetIndexBuffer()
    */
-  void SetIndexBuffer( const uint16_t* indices, size_t count );
+  void SetIndexBuffer( const uint16_t* indices, uint32_t count );
 
   /**
    * @copydoc Dali::Geometry::SetType()

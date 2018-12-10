@@ -42,13 +42,17 @@ RenderTask* RenderTask::New()
 
 RenderTask::~RenderTask()
 {
-  // Remove exclusive flag from source node
-  if( mExclusive )
+  if ( mSourceNode )
   {
-    if( mSourceNode && (this == mSourceNode->GetExclusiveRenderTask() ) )
+    mSourceNode->RemoveObserver( *this );
+    if( mExclusive )
     {
-      mSourceNode->SetExclusiveRenderTask( NULL );
+      mSourceNode->SetExclusiveRenderTask( nullptr );
     }
+  }
+  if ( mCameraNode )
+  {
+    mCameraNode->RemoveObserver( *this );
   }
   if( mRenderSyncTracker )
   {
@@ -63,19 +67,27 @@ void RenderTask::Initialize( RenderMessageDispatcher& renderMessageDispatcher )
 
 void RenderTask::SetSourceNode( Node* node )
 {
-  // Remove exclusive flag from the old node, if necessary
-  if ( mSourceNode &&
-       this == mSourceNode->GetExclusiveRenderTask() )
+  // Stop observing the old node (if we were)
+  if ( mSourceNode )
   {
-    mSourceNode->SetExclusiveRenderTask( NULL );
+    mSourceNode->RemoveObserver( *this );
+    if( this == mSourceNode->GetExclusiveRenderTask() )
+    {
+      mSourceNode->SetExclusiveRenderTask( nullptr );
+    }
   }
 
   mSourceNode = node;
 
-  if ( mSourceNode && mExclusive )
+  if ( mSourceNode )
   {
-    mSourceNode->SetExclusiveRenderTask( this );
+    mSourceNode->AddObserver( *this );
+    if( mExclusive )
+    {
+      mSourceNode->SetExclusiveRenderTask( this );
+    }
   }
+  SetActiveStatus();
 }
 
 Node* RenderTask::GetSourceNode() const
@@ -95,7 +107,7 @@ void RenderTask::SetExclusive( bool exclusive )
     }
     else if ( this == mSourceNode->GetExclusiveRenderTask() )
     {
-      mSourceNode->SetExclusiveRenderTask( NULL );
+      mSourceNode->SetExclusiveRenderTask( nullptr );
     }
   }
 }
@@ -107,8 +119,19 @@ bool RenderTask::IsExclusive() const
 
 void RenderTask::SetCamera( Node* cameraNode, Camera* camera )
 {
+  if ( mCameraNode )
+  {
+    mCameraNode->RemoveObserver( *this );
+  }
+
   mCameraNode = cameraNode;
   mCamera = camera;
+
+  if ( mCameraNode )
+  {
+    mCameraNode->AddObserver( *this );
+  }
+  SetActiveStatus();
 }
 
 void RenderTask::SetFrameBuffer( Render::FrameBuffer* frameBuffer )
@@ -198,30 +221,7 @@ uint32_t RenderTask::GetRefreshRate() const
 
 bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
 {
-  // If the source node of the render task is invisible we should still render
-  // We want the render task to complete and possible clear colors to happen
-
-  // Check the source node.
-  if( NULL == mSourceNode ||
-      ( !mSourceNode->IsRoot() && NULL == mSourceNode->GetParent() ) )
-  {
-    TASK_LOG_FMT( Debug::General, " Source actor not on stage.  Frame counter: %d\n", mFrameCounter );
-
-    // The source node is missing or disconnected.
-    return false;
-  }
-
-  // Check camera node
-  if( NULL == mCameraNode ||
-      NULL == mCameraNode->GetParent() ||
-      NULL == mCamera )
-  {
-    // The camera node is missing or disconnected.
-    TASK_LOG_FMT(Debug::General, " =F  No Camera  FC:%d\n", mFrameCounter );
-    return false;
-  }
-
-  return true;
+  return mActive;
 }
 
 bool RenderTask::IsRenderRequired()
@@ -341,30 +341,29 @@ uint32_t RenderTask::GetRenderedOnceCounter() const
   return mRenderedOnceCounter;
 }
 
-
 const Matrix& RenderTask::GetViewMatrix( BufferIndex bufferIndex ) const
 {
-  DALI_ASSERT_DEBUG( NULL != mCamera );
+  DALI_ASSERT_DEBUG( nullptr != mCamera );
 
   return mCamera->GetViewMatrix( bufferIndex );
 }
 
 SceneGraph::Camera& RenderTask::GetCamera() const
 {
-  DALI_ASSERT_DEBUG( NULL != mCamera );
+  DALI_ASSERT_DEBUG( nullptr != mCamera );
   return *mCamera;
 }
 
 const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
 {
-  DALI_ASSERT_DEBUG( NULL != mCamera );
+  DALI_ASSERT_DEBUG( nullptr != mCamera );
 
   return mCamera->GetProjectionMatrix( bufferIndex );
 }
 
 void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
 {
-  DALI_ASSERT_DEBUG( NULL != mCamera );
+  DALI_ASSERT_DEBUG( nullptr != mCamera );
 
   TASK_LOG(Debug::General);
 
@@ -373,8 +372,8 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
 
   instruction.Reset( mCamera,
                      GetFrameBuffer(),
-                     viewportSet ? &viewport : NULL,
-                     mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
+                     viewportSet ? &viewport : nullptr,
+                     mClearEnabled ? &GetClearColor( updateBufferIndex ) : nullptr );
 
   if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
@@ -390,7 +389,7 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
   else
   {
     // no sync needed, texture FBOs are "ready" the same frame they are rendered to
-    instruction.mRenderTracker = NULL;
+    instruction.mRenderTracker = nullptr;
   }
 }
 
@@ -452,30 +451,62 @@ void RenderTask::SetSyncRequired( bool requiresSync )
   mRequiresSync = requiresSync;
 }
 
+void RenderTask::PropertyOwnerConnected( PropertyOwner& owner )
+{
+  // check if we've gone from inactive to active
+  SetActiveStatus();
+}
+
+void RenderTask::PropertyOwnerDisconnected( BufferIndex /*updateBufferIndex*/, PropertyOwner& owner )
+{
+  mActive = false; // if either source or camera disconnected, we're no longer active
+}
+
+void RenderTask::PropertyOwnerDestroyed( PropertyOwner& owner )
+{
+  if( static_cast<PropertyOwner*>( mSourceNode ) == &owner )
+  {
+    mSourceNode = nullptr;
+  }
+  else if( static_cast<PropertyOwner*>( mCameraNode ) == &owner )
+  {
+    mCameraNode = nullptr;
+  }
+}
 
 RenderTask::RenderTask()
 : mViewportPosition( Vector2::ZERO),
   mViewportSize( Vector2::ZERO),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
-  mRenderMessageDispatcher( NULL ),
-  mRenderSyncTracker( NULL ),
-  mSourceNode( NULL ),
-  mCameraNode( NULL ),
-  mCamera( NULL ),
+  mRenderMessageDispatcher( nullptr ),
+  mRenderSyncTracker( nullptr ),
+  mSourceNode( nullptr ),
+  mCameraNode( nullptr ),
+  mCamera( nullptr ),
   mFrameBuffer(0),
+  mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
+  mFrameCounter( 0u ),
+  mRenderedOnceCounter( 0u ),
+  mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
+          ? RENDER_CONTINUOUSLY
+          : RENDER_ONCE_WAITING_FOR_RESOURCES ),
+  mRequiresSync( false ),
+  mActive( false ),
   mWaitingToRender( false ),
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
-  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
-          ? RENDER_CONTINUOUSLY
-          : RENDER_ONCE_WAITING_FOR_RESOURCES ),
-  mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
-  mFrameCounter( 0u ),
-  mRenderedOnceCounter( 0u ),
-  mRequiresSync( false )
+  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE )
 {
+}
+
+void RenderTask::SetActiveStatus()
+{
+  // must have a source and camera both connected to scene
+  mActive = ( mSourceNode && mSourceNode->ConnectedToScene() &&
+              mCameraNode && mCameraNode->ConnectedToScene() && mCamera );
+  TASK_LOG_FMT( Debug::General, " Source node(%x) active %d.  Frame counter: %d\n", mSourceNode, mSourceNode && mSourceNode->ConnectedToScene(), mFrameCounter );
+  TASK_LOG_FMT( Debug::General, " Camera node(%x) active %d\n", mCameraNode, mCameraNode && mCameraNode->ConnectedToScene() );
 }
 
 } // namespace SceneGraph

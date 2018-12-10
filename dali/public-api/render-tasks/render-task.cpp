@@ -164,19 +164,12 @@ RenderTask::ScreenToFrameBufferFunction RenderTask::GetScreenToFrameBufferFuncti
 
 void RenderTask::SetScreenToFrameBufferMappingActor( Dali::Actor mappingActor )
 {
-  // NULL handle is allowed
-  Internal::Actor* actorImpl( NULL );
-  if ( mappingActor )
-  {
-    actorImpl = &GetImplementation( mappingActor );
-  }
-
-  GetImplementation(*this).SetScreenToFrameBufferMappingActor( actorImpl );
+  GetImplementation(*this).SetScreenToFrameBufferMappingActor( mappingActor );
 }
 
 Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const
 {
-  return Dali::Actor(GetImplementation(*this).GetScreenToFrameBufferMappingActor());
+  return GetImplementation(*this).GetScreenToFrameBufferMappingActor();
 }
 
 void RenderTask::SetViewportPosition( Vector2 position )

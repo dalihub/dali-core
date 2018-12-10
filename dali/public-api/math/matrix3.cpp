@@ -19,7 +19,8 @@
 #include <dali/public-api/math/matrix3.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for memcpy
+#include <cstdint> // uint32_t
+#include <cstring> // memcpy
 #include <ostream>
 
 // INTERNAL INCLUDES
@@ -43,8 +44,8 @@
 
 namespace
 {
-const size_t NUM_BYTES_IN_ROW    = 3*sizeof(float);
-const size_t NUM_BYTES_IN_MATRIX = 9*sizeof(float);
+const uint32_t NUM_BYTES_IN_ROW    = 3*sizeof(float);
+const uint32_t NUM_BYTES_IN_MATRIX = 9*sizeof(float);
 }
 
 namespace Dali
@@ -179,7 +180,7 @@ bool Matrix3::ScaledInverseTranspose()
   {
     // Use average rather than determinant to remove rounding to zero errors in further multiplication
     float sum=0;
-    for(size_t i=0;i<9;i++)
+    for(uint32_t i=0;i<9;i++)
     {
       sum+=fabsf(cof[i]);
     }
@@ -223,7 +224,7 @@ void Matrix3::Scale(float scale)
 float Matrix3::Magnitude() const
 {
   float avg=0;
-  for(size_t i=0;i<9;i++)
+  for(uint32_t i=0;i<9;i++)
   {
     avg+=fabsf(mElements[i]);
   }

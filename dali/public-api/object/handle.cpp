@@ -24,7 +24,6 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/object/custom-object-internal.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -42,7 +41,7 @@ Handle::Handle()
 
 Handle Handle::New()
 {
-  return Handle( Internal::CustomObject::New() );
+  return Handle( Internal::Object::New().Get() );
 }
 
 Handle::~Handle()
@@ -132,7 +131,7 @@ Property::Value Handle::GetProperty( Property::Index index ) const
 
 Property::Value Handle::GetCurrentProperty( Property::Index index ) const
 {
-  return GetImplementation( *this ).GetCurrentProperty( index );
+  return GetImplementation(*this).GetCurrentProperty( index );
 }
 
 void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const

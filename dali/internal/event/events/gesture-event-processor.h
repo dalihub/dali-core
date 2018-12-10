@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,28 +133,28 @@ public: // Called by Core
    *
    * @param[in] mode The prediction mode to use
    */
-  void SetPanGesturePredictionMode( int mode );
+  void SetPanGesturePredictionMode( int32_t mode );
 
   /**
    * @brief Sets the prediction amount of the pan gesture
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGesturePredictionAmount( unsigned int amount );
+  void SetPanGesturePredictionAmount( uint32_t amount );
 
   /**
    * @brief Sets the upper bound of the prediction amount for clamping
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGestureMaximumPredictionAmount( unsigned int amount );
+  void SetPanGestureMaximumPredictionAmount( uint32_t amount );
 
   /**
    * @brief Sets the lower bound of the prediction amount for clamping
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGestureMinimumPredictionAmount( unsigned int amount );
+  void SetPanGestureMinimumPredictionAmount( uint32_t amount );
 
   /**
    * @brief Sets the prediction amount to adjust when the pan velocity is changed.
@@ -165,14 +165,14 @@ public: // Called by Core
    *
    * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGesturePredictionAmountAdjustment( unsigned int amount );
+  void SetPanGesturePredictionAmountAdjustment( uint32_t amount );
 
   /**
    * @brief Called to set how pan gestures smooth input
    *
    * @param[in] mode The smoothing mode to use
    */
-  void SetPanGestureSmoothingMode( int mode );
+  void SetPanGestureSmoothingMode( int32_t mode );
 
   /**
    * @brief Sets the prediction amount of the pan gesture
@@ -193,7 +193,7 @@ public: // Called by Core
    *
    * @param[in] value Time range in ms
    */
-  void SetPanGestureInterpolationTimeRange( int value );
+  void SetPanGestureInterpolationTimeRange( int32_t value );
 
   /**
    * @brief Sets whether to use scalar only prediction, which when enabled, ignores acceleration.
@@ -214,7 +214,7 @@ public: // Called by Core
    *
    * @param[in] value Time in past in ms
    */
-  void SetPanGestureTwoPointInterpolatePastTime( int value );
+  void SetPanGestureTwoPointInterpolatePastTime( int32_t value );
 
   /**
    * @brief Sets the two point velocity bias. This is the ratio of first and second points to use for velocity.
@@ -235,7 +235,14 @@ public: // Called by Core
    *
    * @param[in] value Time in past in ms
    */
-  void SetPanGestureMultitapSmoothingRange( int value );
+  void SetPanGestureMultitapSmoothingRange( int32_t value );
+
+public: // needed for PanGesture
+
+  /**
+   * @return the pan gesture processor
+   */
+  const PanGestureProcessor& GetPanGestureProcessor();
 
 private:
 

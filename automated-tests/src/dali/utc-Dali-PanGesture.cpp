@@ -145,3 +145,55 @@ int UtcDaliPanGestureDynamicAllocation(void)
 
   END_TEST;
 }
+
+int UtcDaliPanGestureDetectorRegisterProperty(void)
+{
+  TestApplication application;
+
+  GestureDetector detector = PanGestureDetector::New();
+
+  Property::Index index = detector.RegisterProperty( "sceneProperty", 0 );
+  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 0, TEST_LOCATION );
+  detector.SetProperty( index, -99 );
+
+  using Dali::Animation;
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( detector, index ), 99 );
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), -99, TEST_LOCATION );
+
+  // create another pan gesture
+  GestureDetector detector2 = PanGestureDetector::New();
+  DALI_TEST_EQUALS( detector2.GetProperty< int32_t >( index ), 0, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+  application.SendNotification();
+  application.Render( 500 /* 50% progress */);
+  DALI_TEST_EQUALS( detector.GetCurrentProperty< int32_t >( index ), 0 /*half way*/, TEST_LOCATION );
+
+  // register another pan gesture value
+  Property::Index index2 = detector2.RegisterProperty( "sceneProperty2", 12 );
+  DALI_TEST_EQUALS( index2, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector2.GetProperty< int32_t >( index2 ), 12, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector2.GetCurrentProperty< int32_t >( index2 ), 12, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 99 /*target*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetCurrentProperty< int32_t >( index ), 0, TEST_LOCATION );
+
+  Animation animation2 = Animation::New( 1.0f );
+  animation2.AnimateTo( Property( detector2, index2 ), -99 );
+  // Start the animation
+  animation2.Play();
+  application.SendNotification();
+  application.Render( 1000 /* 100% more progress */);
+
+  DALI_TEST_EQUALS( detector2.GetProperty< int32_t >( index2 ), -99, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector2.GetCurrentProperty< int32_t >( index2 ), -99, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 99, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetCurrentProperty< int32_t >( index ), 99, TEST_LOCATION );
+
+  END_TEST;
+}
+
