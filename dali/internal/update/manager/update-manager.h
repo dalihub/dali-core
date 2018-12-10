@@ -589,7 +589,14 @@ private:
   void UpdateRenderers( BufferIndex bufferIndex );
 
   /**
+   * Ensure all nodes inform renderers of any changes to uniform maps
+   * @param[in] bufferIndex to use
+   */
+  void PrepareNodes( BufferIndex bufferIndex );
+
+  /**
    * Prepare renderer graphics
+   * @param[in] bufferIndex to use
    */
   void PrepareRenderers( BufferIndex bufferIndex );
 

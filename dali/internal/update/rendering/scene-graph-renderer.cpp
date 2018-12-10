@@ -174,12 +174,12 @@ void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
 
 void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 {
-  // Called every frame.
+  // Called every frame. Well, it is now...
   CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
 
   // See if we need to update the collected map:
   if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP || // renderer or shader's uniform map has changed
-      node.GetUniformMapChanged( updateBufferIndex ) ) // node's uniform map has change
+      node.GetUniformMapChanged( updateBufferIndex ) )   // node's uniform map has change
   {
     localMap.Resize(0);
 
@@ -362,6 +362,13 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
                                      BufferIndex updateBufferIndex )
 {
   int updates( 0u );
+
+  const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+  const auto& collectedMap = mCollectedUniformMap[updateBufferIndex];
+  if( collectedMap.Count() < rendererUniformMap.Count() )
+  {
+    DALI_LOG_ERROR("%p, i:%u - FAILED TO REGENERATE UNIFORM MAP", this, updateBufferIndex );
+  }
 
   auto uboCount = mShader->GetGfxObject()->GetUniformBlockCount();
   auto gfxShader = mShader->GetGfxObject();

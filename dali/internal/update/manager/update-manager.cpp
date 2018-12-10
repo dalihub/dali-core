@@ -730,6 +730,17 @@ void UpdateManager::UpdateRenderers( BufferIndex bufferIndex )
   }
 }
 
+void UpdateManager::PrepareNodes( BufferIndex updateBufferIndex )
+{
+  for( auto node : mImpl->nodes )
+  {
+    if(node)
+    {
+      node->PrepareRender( updateBufferIndex );
+    }
+  }
+}
+
 void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
 {
   // Prepare renderers. Each render item maps to a render
@@ -893,6 +904,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       }
 
       // generate graphics objects
+      PrepareNodes( bufferIndex );
       PrepareRenderers( bufferIndex );
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
     }

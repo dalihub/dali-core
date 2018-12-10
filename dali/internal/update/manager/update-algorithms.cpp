@@ -148,8 +148,6 @@ inline NodePropertyFlags UpdateNodes( Node& node,
   // Draw mode inheritance is treated as or-ing the modes together (as they are a bit-mask).
   inheritedDrawMode |= node.GetDrawMode();
 
-  node.PrepareRender( updateBufferIndex );
-
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items
   if( nodeDirtyFlags & RenderableUpdateFlags )
