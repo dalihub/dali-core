@@ -2041,7 +2041,7 @@ int UtcDaliTouchDataGetMouseButtonPositive(void)
   application.ProcessEvent( touchEvent );
 
   TouchData data = handleData.touchData;
-  DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::SECONDARY, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelTouchData::GetMouseButton( data, 0 ), MouseButton::SECONDARY, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2070,8 +2070,8 @@ int UtcDaliTouchDataGetMouseButtonNagative(void)
   application.ProcessEvent( touchEvent );
 
   TouchData data = handleData.touchData;
-  DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::TERTIARY, TEST_LOCATION );
-  DALI_TEST_EQUALS( data.GetMouseButton( 3 ), MouseButton::INVALID, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelTouchData::GetMouseButton( data, 0 ), MouseButton::TERTIARY, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelTouchData::GetMouseButton( data, 3 ), MouseButton::INVALID, TEST_LOCATION );
 
   END_TEST;
 }

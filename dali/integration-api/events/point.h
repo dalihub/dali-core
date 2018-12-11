@@ -24,7 +24,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/events/device.h>
-#include <dali/public-api/events/mouse-button.h>
+#include <dali/devel-api/events/mouse-button.h>
 
 namespace Dali
 {

@@ -27,7 +27,7 @@
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/math/degree.h>
-#include <dali/public-api/events/mouse-button.h>
+#include <dali/devel-api/events/mouse-button.h>
 
 namespace Dali
 {
@@ -241,16 +241,6 @@ public:
    * @return The type of the device subclass
    */
   Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
-
-
-  /**
-   * @brief Get mouse device's button value (ex: right/left button)
-   *
-   * @SINCE_1_3.31
-   * @param[in] point The point required
-   * @return The mouse button value
-   */
-  MouseButton::Type GetMouseButton( std::size_t point ) const;
 
 
 public: // Not intended for application developers

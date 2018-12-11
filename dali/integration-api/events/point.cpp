@@ -17,7 +17,6 @@
 
 // CLASS HEADER
 #include <dali/integration-api/events/point.h>
-#include <dali/public-api/events/mouse-button.h>
 
 namespace Dali
 {

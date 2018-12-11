@@ -112,11 +112,6 @@ Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
   return GetImplementation( *this ).GetDeviceSubclass( point );
 }
 
-MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
-{
-  return GetImplementation( *this ).GetMouseButton( point );
-}
-
 TouchData::TouchData( Internal::TouchData* internal )
 : BaseHandle( internal )
 {

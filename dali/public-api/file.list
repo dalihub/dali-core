@@ -151,8 +151,7 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/tap-gesture-detector.h \
   $(public_api_src_dir)/events/touch-point.h \
   $(public_api_src_dir)/events/touch-event.h \
-  $(public_api_src_dir)/events/touch-data.h \
-  $(public_api_src_dir)/events/mouse-button.h
+  $(public_api_src_dir)/events/touch-data.h
 
 public_api_core_images_header_files = \
   $(public_api_src_dir)/images/buffer-image.h \
