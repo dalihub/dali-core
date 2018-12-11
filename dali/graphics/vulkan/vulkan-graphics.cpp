@@ -166,9 +166,7 @@ vk::DeviceMemory Memory::GetVkHandle() const
 
 
 /********************************************************/
-
-const auto VALIDATION_LAYERS = std::vector< const char* >{
-
+auto reqLayers = std::vector< const char* >{
         //"VK_LAYER_LUNARG_screenshot",           // screenshot
         //"VK_LAYER_RENDERDOC_Capture",
         //"VK_LAYER_LUNARG_parameter_validation", // parameter
@@ -242,8 +240,18 @@ void Graphics::Create()
   auto extensions = PrepareDefaultInstanceExtensions();
 
   auto layers = vk::enumerateInstanceLayerProperties();
+
+  const char* envRenderdoc = std::getenv( "ENABLE_VULKAN_RENDERDOC_CAPTURE" );
+  int enableRDC = envRenderdoc ? std::atoi(envRenderdoc) : 0;
+
+  if ( enableRDC )
+  {
+    reqLayers.clear();
+    reqLayers.push_back( "VK_LAYER_RENDERDOC_Capture" );
+  }
+
   std::vector< const char* > validationLayers;
-  for( auto&& reqLayer : VALIDATION_LAYERS )
+  for( auto&& reqLayer : reqLayers )
   {
     for( auto&& prop : layers.value )
     {
