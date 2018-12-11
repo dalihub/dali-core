@@ -67,8 +67,6 @@ Graphics::Graphics( const GraphicsCreateInfo& info,
   // create device
   auto impl = Dali::Graphics::MakeUnique<Dali::Graphics::GraphicsImpl>();
 
-  impl->Create();
-
   mGraphicsImpl = std::move(impl);
 }
 
@@ -81,6 +79,8 @@ void Graphics::Initialize()
 
 void Graphics::Create()
 {
+  mGraphicsImpl->Create();
+
   // create device
   mGraphicsImpl->CreateDevice();
 
