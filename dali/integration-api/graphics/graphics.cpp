@@ -64,12 +64,10 @@ Graphics::Graphics( const GraphicsCreateInfo& info,
 : GraphicsInterface( depthBufferAvailable, stencilBufferRequired ),
   mCreateInfo( info )
 {
-  // create device
   auto impl = Dali::Graphics::MakeUnique<Dali::Graphics::GraphicsImpl>();
 
-  impl->Create();
-
   mGraphicsImpl = std::move(impl);
+  // Defer creation of vulkan until render thread startup
 }
 
 Graphics::~Graphics() = default;
@@ -81,6 +79,8 @@ void Graphics::Initialize()
 
 void Graphics::Create()
 {
+  mGraphicsImpl->Create();
+
   // create device
   mGraphicsImpl->CreateDevice();
 

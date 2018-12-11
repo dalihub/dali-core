@@ -115,17 +115,14 @@ public:
   void Initialize() override;
 
   /**
-   *
    * @param surfaceFactory
    * @return
+   * @note This should be called from the render thread before the surface is created
    */
   std::unique_ptr<Surface> CreateSurface( SurfaceFactory& surfaceFactory );
 
   /**
-   * When creating Graphics at least one surfaceFactory must be supplied ( no headless mode )
-   * @param surfaceFactory the surface factory.
-   *
-   * @note This should be called from the render thread
+   * Create the VkInstance, Device & Controller
    */
   void Create() override;
 
