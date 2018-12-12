@@ -199,7 +199,6 @@ struct Controller::Impl
       // Ensure there are enough command buffers for each render pass,
       swapchain->AllocateCommandBuffers( mRenderPasses.size() );
       std::vector<Vulkan::RefCountedCommandBuffer>& renderPassBuffers = swapchain->GetCommandBuffers();
-
       uint32_t index = 0;
       for( auto& renderPassData : mRenderPasses )
       {
@@ -210,6 +209,7 @@ struct Controller::Impl
     else
     {
       auto primaryCommandBuffer = swapchain->GetLastCommandBuffer();
+      primaryCommandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
       primaryCommandBuffer->BeginRenderPass( vk::RenderPassBeginInfo{}
         .setFramebuffer( swapchain->GetCurrentFramebuffer()->GetVkHandle() )
         .setRenderPass(swapchain->GetCurrentFramebuffer()->GetRenderPass() )
@@ -217,6 +217,7 @@ struct Controller::Impl
         .setPClearValues( swapchain->GetCurrentFramebuffer()->GetClearValues().data() )
         .setClearValueCount( uint32_t(swapchain->GetCurrentFramebuffer()->GetClearValues().size()) ), vk::SubpassContents::eInline );
       primaryCommandBuffer->EndRenderPass();
+      primaryCommandBuffer->End();
     }
 
     for( auto& future : mMemoryTransferFutures )
@@ -594,6 +595,7 @@ struct Controller::Impl
 
   void ProcessRenderPassData( Vulkan::RefCountedCommandBuffer commandBuffer, const RenderPassData& renderPassData )
   {
+    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
     commandBuffer->BeginRenderPass( renderPassData.beginInfo, vk::SubpassContents::eInline );
 
     // update descriptor sets
@@ -695,6 +697,7 @@ struct Controller::Impl
     }
 
     commandBuffer->EndRenderPass();
+    commandBuffer->End();
   }
 
   bool EnableDepthStencilBuffer( bool enableDepth, bool enableStencil )
