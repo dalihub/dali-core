@@ -77,7 +77,7 @@ public:
   /**
    * Return the primary command buffer associated with the swapchain
    */
-  RefCountedCommandBuffer GetLastCommandBuffer() const;
+  RefCountedCommandBuffer GetLastCommandBuffer();
 
   /**
    * Returns the primary command buffers associated with each render pass

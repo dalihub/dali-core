@@ -163,8 +163,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
     }
   }
 
-  auto& swapBuffer = mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()];
-
   // First frames don't need waiting as they haven't been submitted
   // yet. Note, that waiting on the fence without resetting it may
   // cause a stall ( nvidia, ubuntu )
@@ -177,14 +175,6 @@ RefCountedFramebuffer Swapchain::AcquireNextFramebuffer( bool shouldCollectGarba
   {
     mGraphics->DeviceWaitIdle();
     mGraphics->CollectGarbage();
-  }
-
-  DALI_LOG_STREAM( gVulkanFilter, Debug::General, "Resetting " << swapBuffer->commandBuffers.size() << " command buffers" );
-
-  for( auto& commandBuffer : swapBuffer->commandBuffers )
-  {
-    commandBuffer->Reset();
-    commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
   }
 
   return mFramebuffers[mSwapchainImageIndex];
@@ -206,8 +196,6 @@ void Swapchain::Present()
   size_t index = 0;
   for( auto& commandBuffer : swapBuffer->commandBuffers )
   {
-    commandBuffer->End();
-
     // @todo Add semaphores between each render pass
     if( index < count-1 )
     {
@@ -413,14 +401,17 @@ void Swapchain::AllocateCommandBuffers( size_t renderPassCount )
     {
       // Create primary buffer for each render pass & begin recording
       auto commandBuffer = mGraphics->CreateCommandBuffer(true);
-      commandBuffer->Begin( vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr );
       mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.emplace_back( commandBuffer );
     }
   }
 }
 
-RefCountedCommandBuffer Swapchain::GetLastCommandBuffer() const
+RefCountedCommandBuffer Swapchain::GetLastCommandBuffer()
 {
+  if( mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.empty() )
+  {
+    AllocateCommandBuffers( 1 );
+  }
   return mSwapchainBuffers[mGraphics->GetCurrentBufferIndex()]->commandBuffers.back();
 }
 
