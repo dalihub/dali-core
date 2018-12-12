@@ -329,10 +329,10 @@ private: // Members
   std::vector< vk::QueueFamilyProperties > mQueueFamilyProperties;
 
   // Sets of queues
-  std::vector< std::unique_ptr< Queue > > mGraphicsQueues;
-  std::vector< std::unique_ptr< Queue > > mTransferQueues;
-  std::vector< std::unique_ptr< Queue > > mComputeQueues;
-  //std::unique_ptr< Queue > mPresentQueue;
+  std::vector< std::unique_ptr< Queue > > mAllQueues;
+  std::vector< Queue* > mGraphicsQueues;
+  std::vector< Queue* > mTransferQueues;
+  std::vector< Queue* > mComputeQueues;
 
   std::unordered_map< FBID, SwapchainSurfacePair > mSurfaceFBIDMap;
   FBID mBaseFBID{ 0u };

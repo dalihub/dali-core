@@ -21,6 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/graphics/vulkan/internal/vulkan-types.h>
 
+#include <mutex>
+
 namespace Dali
 {
 namespace Graphics
@@ -65,6 +67,8 @@ public:
 
   vk::Queue GetVkHandle();
 
+  std::unique_ptr<std::lock_guard<std::recursive_mutex>> Lock();
+
 private:
   Queue( Graphics& graphics,
          vk::Queue queue,
@@ -78,6 +82,8 @@ private:
   vk::QueueFlags mFlags;
   uint32_t mQueueFamilyIndex;
   uint32_t mQueueIndex;
+
+  std::recursive_mutex mMutex;
 };
 
 } // namespace Vulkan

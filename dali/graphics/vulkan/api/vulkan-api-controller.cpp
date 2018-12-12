@@ -559,7 +559,6 @@ struct Controller::Impl
         commandBuffer->End();
 
         // submit to the queue
-        auto transferQueue = mGraphics.GetTransferQueue( 0u );
         mGraphics.Submit( mGraphics.GetTransferQueue(0u), { Vulkan::SubmissionData{ {}, {}, { commandBuffer }, {} } }, fence );
         mGraphics.WaitForFence( fence );
         mGraphics.ResetFence( fence );

@@ -74,7 +74,8 @@ Queue::Queue( Graphics& graphics,
           mQueue( queue ),
           mFlags( queueFlags ),
           mQueueFamilyIndex( queueFamilyIndex ),
-          mQueueIndex( queueIndex )
+          mQueueIndex( queueIndex ),
+          mMutex()
 {
 }
 
@@ -83,6 +84,11 @@ Queue::~Queue() = default; // queues are non-destructible
 vk::Queue Queue::GetVkHandle()
 {
   return mQueue;
+}
+
+std::unique_ptr<std::lock_guard<std::recursive_mutex>> Queue::Lock()
+{
+  return std::unique_ptr<std::lock_guard<std::recursive_mutex>>( new std::lock_guard<std::recursive_mutex>( mMutex ) );
 }
 
 } // namespace Vulkan

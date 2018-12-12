@@ -333,23 +333,21 @@ void Graphics::CreateDevice()
       auto queue = mDevice.getQueue( queueInfo.queueFamilyIndex, i );
 
       // based on family push queue instance into right array
-      auto flags = mQueueFamilyProperties[queueInfo.queueFamilyIndex].queueFlags;
+      auto flags = mQueueFamilyProperties[queueInfo.queueFamilyIndex].queueFlags;\
+      auto queueWrapper = std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) );
       if( flags & vk::QueueFlagBits::eGraphics )
       {
-        mGraphicsQueues.emplace_back(
-                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+        mGraphicsQueues.emplace_back( queueWrapper.get() );
       }
       if( flags & vk::QueueFlagBits::eTransfer )
       {
-        mTransferQueues.emplace_back(
-                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+        mTransferQueues.emplace_back( queueWrapper.get() );
       }
       if( flags & vk::QueueFlagBits::eCompute )
       {
-        mComputeQueues.emplace_back(
-                std::unique_ptr< Queue >( new Queue( *this, queue, queueInfo.queueFamilyIndex, i, flags ) ) );
+        mComputeQueues.emplace_back( queueWrapper.get() );
       }
-
+      mAllQueues.emplace_back( std::move( queueWrapper ));
       // todo: present queue
     }
   }
@@ -1088,18 +1086,6 @@ vk::Result Graphics::WaitForFence( RefCountedFence fence, uint32_t timeout )
   return mDevice.waitForFences( 1, &fence->mFence, VK_TRUE, timeout );
 }
 
-vk::Result Graphics::WaitForFences( const std::vector< RefCountedFence >& fences, bool waitAll, uint32_t timeout )
-{
-  std::vector< vk::Fence > vkFenceHandles{};
-  std::transform( fences.begin(),
-                  fences.end(),
-                  std::back_inserter( vkFenceHandles ),
-                  []( RefCountedFence entry ) { return entry->mFence; } );
-
-
-  return mDevice.waitForFences( vkFenceHandles, vk::Bool32( waitAll ), timeout );
-}
-
 vk::Result Graphics::ResetFence( RefCountedFence fence )
 {
   return mDevice.resetFences( 1, &fence->mFence );
@@ -1208,7 +1194,7 @@ std::unique_ptr<Memory> Graphics::AllocateMemory( RefCountedImage image, vk::Mem
 
 vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& submissionData, RefCountedFence fence )
 {
-
+  auto lock( queue.Lock() );
 
   auto submitInfos = std::vector< vk::SubmitInfo >{};
   submitInfos.reserve( submissionData.size() );
@@ -1251,11 +1237,13 @@ vk::Result Graphics::Submit( Queue& queue, const std::vector< SubmissionData >& 
 
 vk::Result Graphics::Present( Queue& queue, vk::PresentInfoKHR presentInfo )
 {
+  auto lock( queue.Lock() );
   return queue.mQueue.presentKHR( &presentInfo );
 }
 
 vk::Result Graphics::QueueWaitIdle( Queue& queue )
 {
+  auto lock( queue.Lock() );
   return queue.mQueue.waitIdle();
 }
 
