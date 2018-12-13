@@ -614,67 +614,70 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index inde
   return value;
 }
 
-void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
+void RenderTask::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted )
 {
-  switch( animationType )
+  if( animationStarted )
   {
-    case Animation::TO:
-    case Animation::BETWEEN:
+    switch( animationType )
     {
-      switch ( index )
+      case Animation::TO:
+      case Animation::BETWEEN:
       {
-        case Dali::RenderTask::Property::VIEWPORT_POSITION:
+        switch ( index )
         {
-          value.Get( mViewportPosition );
-          break;
+          case Dali::RenderTask::Property::VIEWPORT_POSITION:
+          {
+            value.Get( mViewportPosition );
+            break;
+          }
+          case Dali::RenderTask::Property::VIEWPORT_SIZE:
+          {
+            value.Get( mViewportSize );
+            break;
+          }
+          case Dali::RenderTask::Property::CLEAR_COLOR:
+          {
+            value.Get( mClearColor );
+            break;
+          }
+          case Dali::RenderTask::Property::REQUIRES_SYNC:
+          default:
+          {
+            // Nothing to do as not animatable
+            break;
+          }
         }
-        case Dali::RenderTask::Property::VIEWPORT_SIZE:
-        {
-          value.Get( mViewportSize );
-          break;
-        }
-        case Dali::RenderTask::Property::CLEAR_COLOR:
-        {
-          value.Get( mClearColor );
-          break;
-        }
-        case Dali::RenderTask::Property::REQUIRES_SYNC:
-        default:
-        {
-          // Nothing to do as not animatable
-          break;
-        }
+        break;
       }
-      break;
-    }
 
-    case Animation::BY:
-    {
-      switch ( index )
+      case Animation::BY:
       {
-        case Dali::RenderTask::Property::VIEWPORT_POSITION:
+        switch ( index )
         {
-          AdjustValue< Vector2 >( mViewportPosition, value );
-          break;
+          case Dali::RenderTask::Property::VIEWPORT_POSITION:
+          {
+            AdjustValue< Vector2 >( mViewportPosition, value );
+            break;
+          }
+          case Dali::RenderTask::Property::VIEWPORT_SIZE:
+          {
+            AdjustValue< Vector2 >( mViewportSize, value );
+            break;
+          }
+          case Dali::RenderTask::Property::CLEAR_COLOR:
+          {
+            AdjustValue< Vector4 >( mClearColor, value );
+            break;
+          }
+          case Dali::RenderTask::Property::REQUIRES_SYNC:
+          default:
+          {
+            // Nothing to do as not animatable
+            break;
+          }
         }
-        case Dali::RenderTask::Property::VIEWPORT_SIZE:
-        {
-          AdjustValue< Vector2 >( mViewportSize, value );
-          break;
-        }
-        case Dali::RenderTask::Property::CLEAR_COLOR:
-        {
-          AdjustValue< Vector4 >( mClearColor, value );
-          break;
-        }
-        case Dali::RenderTask::Property::REQUIRES_SYNC:
-        default:
-        {
-          // Nothing to do as not animatable
-          break;
-        }
+        break;
       }
-      break;
     }
   }
 }

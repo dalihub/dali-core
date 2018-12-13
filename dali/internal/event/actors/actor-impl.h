@@ -1659,7 +1659,7 @@ public:
   /**
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted );
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()
@@ -1724,6 +1724,12 @@ public:
    * @copydoc Dali::DevelActor::LowerBelow()
    */
   void LowerBelow( Internal::Actor& target );
+
+  /**
+   * @brief Checks if the size or position is currently animating.
+   * @return true if the actor position or size are currently animating.
+   */
+  bool IsPositionOrSizeCurrentlyAnimating();
 
 private:
 
@@ -1969,6 +1975,7 @@ protected:
   std::string     mName;              ///< Name of the actor
   uint32_t        mSortedDepth;       ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t         mDepth;             ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  int32_t         mPositionOrSizeAnimatingCount;    ///< The current count of ongoing animations
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer

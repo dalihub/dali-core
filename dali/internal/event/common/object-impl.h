@@ -262,8 +262,9 @@ public:
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
    * @param[in] animationType Whether the property value given is the target or a relative value.
+   * @param[in] animationStarted Whether the animation is started.
    */
-  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+  void NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted );
 
   /******************************** Uniform Mappings ********************************/
 
@@ -468,8 +469,9 @@ private: // Default property extensions for derived classes
    * @param[in] index The index of the property.
    * @param[in] value The value of the property after the animation.
    * @param[in] animationType Whether the property value given is the target or a relative value.
+   * @param[in] animationStarted Whether the animation is started.
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType )
+  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType, bool animationStarted )
   { }
 
   /**

@@ -726,44 +726,47 @@ void Object::RemovePropertyNotifications()
   }
 }
 
-void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
+void Object::NotifyPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted )
 {
-  if ( index < DEFAULT_PROPERTY_MAX_COUNT )
+  if( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    OnNotifyDefaultPropertyAnimation( animation, index, value, animationType );
+    OnNotifyDefaultPropertyAnimation( animation, index, value, animationType, animationStarted );
   }
   else
   {
-    PropertyMetadata* propertyMetadata = NULL;
-    if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+    if( animationStarted )
     {
-      propertyMetadata = FindAnimatableProperty( index );
-    }
-    else
-    {
-      CustomPropertyMetadata* custom = FindCustomProperty( index );
-      if( custom && custom->IsAnimatable() )
+      PropertyMetadata* propertyMetadata = NULL;
+      if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
       {
-        propertyMetadata = custom;
+        propertyMetadata = FindAnimatableProperty( index );
       }
-    }
-
-    if( propertyMetadata )
-    {
-      switch( animationType )
+      else
       {
-        case Animation::TO:
-        case Animation::BETWEEN:
+        CustomPropertyMetadata* custom = FindCustomProperty( index );
+        if( custom && custom->IsAnimatable() )
         {
-          // Update the cached property value
-          propertyMetadata->SetPropertyValue( value );
-          break;
+          propertyMetadata = custom;
         }
-        case Animation::BY:
+      }
+
+      if( propertyMetadata )
+      {
+        switch( animationType )
         {
-          // Adjust the cached property value
-          propertyMetadata->AdjustPropertyValueBy( value );
-          break;
+          case Animation::TO:
+          case Animation::BETWEEN:
+          {
+            // Update the cached property value
+            propertyMetadata->SetPropertyValue( value );
+            break;
+          }
+          case Animation::BY:
+          {
+            // Adjust the cached property value
+            propertyMetadata->AdjustPropertyValueBy( value );
+            break;
+          }
         }
       }
     }

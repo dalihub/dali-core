@@ -45,7 +45,10 @@ ChildOrderChangedSignalType& ChildOrderChangedSignal( Actor actor )
   return GetImplementation( actor ).ChildOrderChangedSignal();
 }
 
-
+bool IsPositionOrSizeCurrentlyAnimating( Actor actor )
+{
+  return GetImplementation( actor ).IsPositionOrSizeCurrentlyAnimating();
+}
 
 } // namespace DevelActor
 

@@ -13115,3 +13115,47 @@ int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationIsPositionOrSizeCurrentlyAnimating(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  DALI_TEST_EQUALS(animation.GetDuration(), durationSeconds, TEST_LOCATION);
+
+  // Start the animation
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animation.Play();
+
+  DALI_TEST_EQUALS( true, DevelActor::IsPositionOrSizeCurrentlyAnimating( actor ), TEST_LOCATION);
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) - 1u/*just less than the animation duration*/);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  DALI_TEST_EQUALS( true, DevelActor::IsPositionOrSizeCurrentlyAnimating( actor ), TEST_LOCATION);
+
+  application.Render(2u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS( false, DevelActor::IsPositionOrSizeCurrentlyAnimating( actor ), TEST_LOCATION);
+  DALI_TEST_EQUALS( targetPosition, actor.GetCurrentPosition(), TEST_LOCATION );
+
+  END_TEST;
+}

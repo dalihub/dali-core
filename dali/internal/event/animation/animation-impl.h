@@ -502,8 +502,9 @@ private:
 
   /**
    * Notifies all the objects whose properties are being animated.
+   * @param[in] animationStarted The animation is started
    */
-  void NotifyObjects();
+  void NotifyObjects( bool animationStarted );
 
   /**
    * Sends message to SceneGraph with final progress value

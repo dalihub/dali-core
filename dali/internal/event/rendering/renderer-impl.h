@@ -192,7 +192,7 @@ public: // Default property extensions from Object
    /**
     * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
     */
-   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted );
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyOwner()

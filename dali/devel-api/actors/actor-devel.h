@@ -219,6 +219,11 @@ typedef Signal< void (Actor) > ChildOrderChangedSignalType; ///< Used when the a
  */
 DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal( Actor actor );
 
+/**
+ * @brief Returns weather the actor position or size are being animated
+ * @return The actor position or size are currently animating
+ */
+DALI_CORE_API bool IsPositionOrSizeCurrentlyAnimating( Actor actor );
 
 
 } // namespace DevelActor

@@ -2053,6 +2053,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mName(),
   mSortedDepth( 0u ),
   mDepth( 0u ),
+  mPositionOrSizeAnimatingCount( 0 ),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
@@ -2936,8 +2937,29 @@ Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) c
   return value;
 }
 
-void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
+void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted )
 {
+  switch ( index )
+  {
+    case Dali::Actor::Property::SIZE:
+    case Dali::Actor::Property::SIZE_WIDTH:
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    case Dali::Actor::Property::SIZE_DEPTH:
+    case Dali::Actor::Property::POSITION:
+    case Dali::Actor::Property::POSITION_X:
+    case Dali::Actor::Property::POSITION_Y:
+    case Dali::Actor::Property::POSITION_Z:
+    {
+      mPositionOrSizeAnimatingCount += ( animationStarted ? 1 : -1 );
+    }
+    break;
+  }
+
+  if( !animationStarted )
+  {
+    return;
+  }
+
   switch( animationType )
   {
     case Animation::TO:
@@ -5149,6 +5171,11 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirec
       }
     }
   }
+}
+
+bool Actor::IsPositionOrSizeCurrentlyAnimating()
+{
+  return mPositionOrSizeAnimatingCount != 0;
 }
 
 } // namespace Internal

@@ -329,7 +329,7 @@ void Animation::Play()
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects();
+  NotifyObjects( true );
 
   SendFinalProgressNotificationMessage();
 
@@ -346,7 +346,7 @@ void Animation::PlayFrom( float progress )
 
     mState = Dali::Animation::PLAYING;
 
-    NotifyObjects();
+    NotifyObjects( true );
 
     SendFinalProgressNotificationMessage();
 
@@ -367,7 +367,7 @@ void Animation::PlayAfter( float delaySeconds )
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects();
+  NotifyObjects( true );
 
   SendFinalProgressNotificationMessage();
 
@@ -859,6 +859,11 @@ Dali::Animation::AnimationSignalType& Animation::ProgressReachedSignal()
 
 void Animation::EmitSignalFinish()
 {
+  if ( !mConnectors.Empty() )
+  {
+    NotifyObjects( false );
+  }
+
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Animation handle( this );
@@ -1083,7 +1088,7 @@ bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues
   return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
 }
 
-void Animation::NotifyObjects()
+void Animation::NotifyObjects( bool animationStarted )
 {
   if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
   {
@@ -1100,7 +1105,7 @@ void Animation::NotifyObjects()
       Object* object = connector->GetObject();
       if( object )
       {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
+        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType, animationStarted );
       }
     }
   }

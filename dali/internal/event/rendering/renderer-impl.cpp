@@ -637,35 +637,38 @@ Property::Value Renderer::GetDefaultPropertyCurrentValue( Property::Index index 
   return value;
 }
 
-void Renderer::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
+void Renderer::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType, bool animationStarted )
 {
-  switch( animationType )
+  if( animationStarted )
   {
-    case Animation::TO:
-    case Animation::BETWEEN:
+    switch( animationType )
     {
-      switch( index )
+      case Animation::TO:
+      case Animation::BETWEEN:
       {
-        case Dali::DevelRenderer::Property::OPACITY:
+        switch( index )
         {
-          value.Get( mOpacity );
-          break;
+          case Dali::DevelRenderer::Property::OPACITY:
+          {
+            value.Get( mOpacity );
+            break;
+          }
         }
+        break;
       }
-      break;
-    }
 
-    case Animation::BY:
-    {
-      switch( index )
+      case Animation::BY:
       {
-        case Dali::DevelRenderer::Property::OPACITY:
+        switch( index )
         {
-          AdjustValue< float >( mOpacity, value );
-          break;
+          case Dali::DevelRenderer::Property::OPACITY:
+          {
+            AdjustValue< float >( mOpacity, value );
+            break;
+          }
         }
+        break;
       }
-      break;
     }
   }
 }
