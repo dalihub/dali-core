@@ -269,7 +269,7 @@ struct UpdateManager::Impl
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
 
   OwnerContainer< PropertyResetterBase* > propertyResetters;          ///< A container of property resetters
-  AnimationContainer                   animations;                    ///< A container of owned animations
+  OwnerContainer< Animation* >         animations;                    ///< A container of owned animations
   PropertyNotificationContainer        propertyNotifications;         ///< A container of owner property notifications.
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
@@ -644,11 +644,10 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSync
 
 void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  AnimationContainer &animations = mImpl->animations;
-  AnimationIter iter = animations.Begin();
+  auto&& iter = mImpl->animations.Begin();
   bool animationLooped = false;
 
-  while ( iter != animations.End() )
+  while ( iter != mImpl->animations.End() )
   {
     Animation* animation = *iter;
     bool finished = false;
@@ -667,7 +666,7 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // Remove animations that had been destroyed but were still waiting for an update
     if (animation->GetState() == Animation::Destroyed)
     {
-      iter = animations.Erase(iter);
+      iter = mImpl->animations.Erase(iter);
     }
     else
     {

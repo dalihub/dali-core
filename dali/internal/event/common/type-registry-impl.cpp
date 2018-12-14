@@ -84,12 +84,12 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo( const std::type_info& r
   return GetTypeInfo( typeName );
 }
 
-size_t TypeRegistry::GetTypeNameCount() const
+uint32_t TypeRegistry::GetTypeNameCount() const
 {
-  return mRegistryLut.size();
+  return static_cast<uint32_t>( mRegistryLut.size() );
 }
 
-std::string TypeRegistry::GetTypeName( size_t index ) const
+std::string TypeRegistry::GetTypeName( uint32_t index ) const
 {
   std::string name;
 

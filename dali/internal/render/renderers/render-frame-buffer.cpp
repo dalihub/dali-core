@@ -27,7 +27,7 @@ namespace Internal
 namespace Render
 {
 
-FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, uint32_t attachments )
+FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 :mId( 0u ),
  mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
  mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),

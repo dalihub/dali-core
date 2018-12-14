@@ -43,7 +43,7 @@ public:
    * @param [in] property The property to access.
    */
   PropertyAccessor( SceneGraph::PropertyBase* property )
-  : mProperty( dynamic_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) )
+  : mProperty( static_cast< SceneGraph::AnimatableProperty<PropertyType>* >(property) ) // we know the type
   {
   }
 
@@ -60,7 +60,7 @@ public:
    */
   bool IsSet() const
   {
-    return mProperty != NULL;
+    return mProperty != nullptr;
   }
 
   /**
@@ -69,7 +69,7 @@ public:
    */
   void Reset()
   {
-    mProperty = NULL;
+    mProperty = nullptr;
   }
 
   /**
@@ -86,7 +86,7 @@ public:
    */
   const PropertyType& Get( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Get() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
     return mProperty->Get( bufferIndex );
   }
 
@@ -95,7 +95,7 @@ public:
    */
   void Set( BufferIndex bufferIndex, const PropertyType& value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Set() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Set() mProperty was nullptr" );
     mProperty->Set( bufferIndex, value );
   }
 
@@ -104,27 +104,25 @@ public:
    */
   void Bake( BufferIndex bufferIndex, const PropertyType& value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Bake() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Bake() mProperty was nullptr" );
     mProperty->Bake( bufferIndex, value );
   }
 
 private:
 
   // Undefined
-  PropertyAccessor(const PropertyAccessor& property);
-
-  // Undefined
-  PropertyAccessor& operator=(const PropertyAccessor& rhs);
+  PropertyAccessor() = delete;
+  PropertyAccessor(const PropertyAccessor& property) = delete;
+  PropertyAccessor& operator=(const PropertyAccessor& rhs) = delete;
 
 private:
 
   SceneGraph::AnimatableProperty<PropertyType>* mProperty; ///< The real property
+
 };
 
-
-
 /**
- * A wrapper class for getting/setting a property.
+ * A wrapper class for getting/setting a transform manager property
  * Animators use this instead of accessing properties directly.
  */
 template <typename T>
@@ -137,7 +135,7 @@ public:
    * @param [in] property The property to access.
    */
   TransformManagerPropertyAccessor( SceneGraph::PropertyBase* property )
-  : mProperty( dynamic_cast< SceneGraph::TransformManagerPropertyHandler<T>* >(property) )
+  : mProperty( static_cast< SceneGraph::TransformManagerPropertyHandler<T>* >(property) ) // we know the type
   {
   }
 
@@ -154,7 +152,7 @@ public:
    */
   bool IsSet() const
   {
-    return mProperty != NULL;
+    return mProperty != nullptr;
   }
 
   /**
@@ -163,7 +161,7 @@ public:
    */
   void Reset()
   {
-    mProperty = NULL;
+    mProperty = nullptr;
   }
 
   /**
@@ -181,7 +179,7 @@ public:
    */
   const T& Get( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Get() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
     return mProperty->Get( bufferIndex );
   }
 
@@ -190,7 +188,7 @@ public:
    */
   void Set( BufferIndex bufferIndex, const T& value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Set() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Set() mProperty was nullptr" );
     mProperty->Set( bufferIndex, value );
   }
 
@@ -199,24 +197,27 @@ public:
    */
   void Bake( BufferIndex bufferIndex, const T& value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Bake() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Bake() mProperty was nullptr" );
     mProperty->Bake( bufferIndex, value );
   }
 
 private:
 
   // Undefined
-  TransformManagerPropertyAccessor(const TransformManagerPropertyAccessor& property);
-
-  // Undefined
-  TransformManagerPropertyAccessor& operator=(const TransformManagerPropertyAccessor& rhs);
+  TransformManagerPropertyAccessor() = delete;
+  TransformManagerPropertyAccessor(const TransformManagerPropertyAccessor& property) = delete;
+  TransformManagerPropertyAccessor& operator=(const TransformManagerPropertyAccessor& rhs) = delete;
 
 private:
 
   SceneGraph::TransformManagerPropertyHandler<T>* mProperty; ///< The real property
+
 };
 
-
+/**
+ * A wrapper class for getting/setting a transform manager property component
+ * Animators use this instead of accessing properties directly.
+ */
 template <typename T, uint32_t COMPONENT>
 class TransformManagerPropertyComponentAccessor
 {
@@ -227,7 +228,7 @@ public:
    * @param [in] property The property to access.
    */
   TransformManagerPropertyComponentAccessor( SceneGraph::PropertyBase* property )
-  : mProperty( dynamic_cast< SceneGraph::TransformManagerPropertyHandler<T>* >(property) )
+  : mProperty( static_cast< SceneGraph::TransformManagerPropertyHandler<T>* >(property) ) // we know the type
   {
   }
 
@@ -244,7 +245,7 @@ public:
    */
   bool IsSet() const
   {
-    return mProperty != NULL;
+    return mProperty != nullptr;
   }
 
   /**
@@ -253,7 +254,7 @@ public:
    */
   void Reset()
   {
-    mProperty = NULL;
+    mProperty = nullptr;
   }
 
   /**
@@ -269,41 +270,41 @@ public:
    * @param [in] bufferIndex The current update buffer index.
    * @return The value of the component of the property
    */
-  const float& Get( BufferIndex bufferIndex ) const
+  float Get( BufferIndex bufferIndex ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Get() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Get() mProperty was nullptr" );
     return mProperty->GetFloatComponent( COMPONENT );
   }
 
   /**
    * @copydoc AnimatableProperty<float>::Set()
    */
-  void Set( BufferIndex bufferIndex, const float& value ) const
+  void Set( BufferIndex bufferIndex, float value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Set() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Set() mProperty was nullptr" );
     mProperty->SetFloatComponent( value, COMPONENT );
   }
 
   /**
    * @copydoc AnimatableProperty<float>::Bake()
    */
-  void Bake( BufferIndex bufferIndex, const float& value ) const
+  void Bake( BufferIndex bufferIndex, float value ) const
   {
-    DALI_ASSERT_DEBUG( NULL != mProperty && "PropertyAccessor::Bake() mProperty was NULL" );
+    DALI_ASSERT_DEBUG( nullptr != mProperty && "PropertyAccessor::Bake() mProperty was nullptr" );
     mProperty->BakeFloatComponent( value, COMPONENT );
   }
 
 private:
 
   // Undefined
-  TransformManagerPropertyComponentAccessor(const TransformManagerPropertyComponentAccessor& property);
-
-  // Undefined
-  TransformManagerPropertyComponentAccessor& operator=(const TransformManagerPropertyComponentAccessor& rhs);
+  TransformManagerPropertyComponentAccessor() = delete;
+  TransformManagerPropertyComponentAccessor(const TransformManagerPropertyComponentAccessor& property) = delete;
+  TransformManagerPropertyComponentAccessor& operator=(const TransformManagerPropertyComponentAccessor& rhs) = delete;
 
 private:
 
   SceneGraph::TransformManagerPropertyHandler<T>* mProperty; ///< The real property
+
 };
 
 } // namespace Internal

@@ -67,12 +67,12 @@ std::size_t Geometry::GetNumberOfVertexBuffers() const
 
 void Geometry::RemoveVertexBuffer( std::size_t index )
 {
-  GetImplementation(*this).RemoveVertexBuffer( index );
+  GetImplementation(*this).RemoveVertexBuffer( static_cast<uint32_t>( index ) );
 }
 
 void Geometry::SetIndexBuffer( const uint16_t* indices, size_t count )
 {
-  GetImplementation(*this).SetIndexBuffer( indices, count );
+  GetImplementation(*this).SetIndexBuffer( indices, static_cast<uint32_t>( count ) );
 }
 
 void Geometry::SetType( Type geometryType )

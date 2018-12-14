@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Dali
 namespace Internal
 {
 
-FrameBufferPtr FrameBuffer::New( unsigned int width, unsigned int height, unsigned int attachments  )
+FrameBufferPtr FrameBuffer::New( uint32_t width, uint32_t height, Mask attachments  )
 {
   FrameBufferPtr frameBuffer( new FrameBuffer( width, height, attachments ) );
   frameBuffer->Initialize();
@@ -41,7 +41,7 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
   return mRenderObject;
 }
 
-FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
+FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : mEventThreadServices( *Stage::GetCurrent() ),
   mRenderObject( NULL ),
   mColor( NULL ),
@@ -57,7 +57,7 @@ void FrameBuffer::Initialize()
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
-void FrameBuffer::AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer )
+void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer )
 {
   if( ( texture->GetWidth() / ( 1u << mipmapLevel ) == mWidth ) &&
       ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )

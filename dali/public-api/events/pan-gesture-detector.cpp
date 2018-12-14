@@ -105,7 +105,7 @@ size_t PanGestureDetector::GetAngleCount() const
 
 PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
 {
-  return GetImplementation(*this).GetAngle(index);
+  return GetImplementation(*this).GetAngle( static_cast<uint32_t>( index ) );
 }
 
 void PanGestureDetector::ClearAngles()

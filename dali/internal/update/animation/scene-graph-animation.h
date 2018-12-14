@@ -35,13 +35,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-class Animation;
-
-typedef OwnerContainer< Animation* > AnimationContainer;
-
-typedef AnimationContainer::Iterator AnimationIter;
-typedef AnimationContainer::ConstIterator AnimationConstIter;
-
 /**
  * Animations are used to change the properties of scene graph objects, as part of a scene
  * managers "update" phase. An animation is a container of Animator objects; the actual setting
@@ -51,7 +44,7 @@ class Animation
 {
 public:
 
-  typedef Dali::Animation::EndAction EndAction;
+  using EndAction = Dali::Animation::EndAction;
 
   enum State
   {
@@ -283,15 +276,6 @@ public:
   void AddAnimator( OwnerPointer<AnimatorBase>& animator );
 
   /**
-   * Retrieve the animators from an animation.
-   * @return The container of animators.
-   */
-  AnimatorContainer& GetAnimators()
-  {
-    return mAnimators;
-  }
-
-  /**
    * This causes the animators to change the properties of objects in the scene graph.
    * @pre The animation is playing or paused.
    * @param[in] bufferIndex The buffer to update.
@@ -343,7 +327,7 @@ private:
 
 protected:
 
-  AnimatorContainer mAnimators;
+  OwnerContainer< AnimatorBase* > mAnimators;
 
   Vector2 mPlayRange;
 
@@ -379,7 +363,7 @@ namespace SceneGraph
 
 inline void SetDurationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float durationSeconds )
 {
-  typedef MessageValue1< Animation, float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -390,7 +374,7 @@ inline void SetDurationMessage( EventThreadServices& eventThreadServices, const 
 
 inline void SetProgressNotificationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
 {
-  typedef MessageValue1< Animation, float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -402,7 +386,7 @@ inline void SetProgressNotificationMessage( EventThreadServices& eventThreadServ
 
 inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const Animation& animation, int32_t loopCount )
 {
-  typedef MessageValue1< Animation, int32_t > LocalType;
+  using LocalType = MessageValue1< Animation, int32_t >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -413,7 +397,7 @@ inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const A
 
 inline void SetEndActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
 {
-  typedef MessageValue1< Animation, Dali::Animation::EndAction > LocalType;
+  using LocalType = MessageValue1< Animation, Dali::Animation::EndAction >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -424,7 +408,7 @@ inline void SetEndActionMessage( EventThreadServices& eventThreadServices, const
 
 inline void SetDisconnectActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
 {
-  typedef MessageValue1< Animation, Dali::Animation::EndAction > LocalType;
+  using LocalType = MessageValue1< Animation, Dali::Animation::EndAction >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -435,7 +419,7 @@ inline void SetDisconnectActionMessage( EventThreadServices& eventThreadServices
 
 inline void SetCurrentProgressMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
 {
-  typedef MessageValue1< Animation, float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -446,7 +430,7 @@ inline void SetCurrentProgressMessage( EventThreadServices& eventThreadServices,
 
 inline void SetSpeedFactorMessage( EventThreadServices& eventThreadServices, const Animation& animation, float factor )
 {
-  typedef MessageValue1< Animation, float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -457,7 +441,7 @@ inline void SetSpeedFactorMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetPlayRangeMessage( EventThreadServices& eventThreadServices, const Animation& animation, const Vector2& range )
 {
-  typedef MessageValue1< Animation, Vector2 > LocalType;
+  using LocalType = MessageValue1< Animation, Vector2 >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -468,7 +452,7 @@ inline void SetPlayRangeMessage( EventThreadServices& eventThreadServices, const
 
 inline void PlayAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
 {
-  typedef Message< Animation > LocalType;
+  using LocalType = Message< Animation >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -479,7 +463,7 @@ inline void PlayAnimationMessage( EventThreadServices& eventThreadServices, cons
 
 inline void PlayAnimationFromMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
 {
-  typedef MessageValue1< Animation,float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -490,7 +474,7 @@ inline void PlayAnimationFromMessage( EventThreadServices& eventThreadServices, 
 
 inline void PauseAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
 {
-  typedef Message< Animation > LocalType;
+  using LocalType = Message< Animation >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -501,7 +485,7 @@ inline void PauseAnimationMessage( EventThreadServices& eventThreadServices, con
 
 inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const Animation& animation, AnimatorBase& animator )
 {
-  typedef MessageValue1< Animation, OwnerPointer<AnimatorBase> > LocalType;
+  using LocalType = MessageValue1< Animation, OwnerPointer<AnimatorBase> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -513,7 +497,7 @@ inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const 
 
 inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const Animation& animation, float delaySeconds )
 {
-  typedef MessageValue1< Animation, float > LocalType;
+  using LocalType = MessageValue1< Animation, float >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -524,7 +508,7 @@ inline void PlayAfterMessage( EventThreadServices& eventThreadServices, const An
 
 inline void SetLoopingModeMessage( EventThreadServices& eventThreadServices, const Animation& animation, bool loopingMode )
 {
-  typedef MessageValue1< Animation, bool > LocalType;
+  using LocalType = MessageValue1< Animation, bool >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

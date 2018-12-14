@@ -153,7 +153,7 @@ void MessageQueue::EventProcessingStarted()
 }
 
 // Called from event thread
-uint32_t* MessageQueue::ReserveMessageSlot( std::size_t requestedSize, bool updateScene )
+uint32_t* MessageQueue::ReserveMessageSlot( uint32_t requestedSize, bool updateScene )
 {
   DALI_ASSERT_DEBUG( 0 != requestedSize );
 

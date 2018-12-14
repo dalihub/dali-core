@@ -69,7 +69,7 @@ size_t TypeRegistry::GetTypeNameCount() const
 
 std::string TypeRegistry::GetTypeName(size_t index) const
 {
-  return GetImplementation(*this).GetTypeName(index);
+  return GetImplementation(*this).GetTypeName( static_cast<uint32_t>( index ) );
 }
 
 TypeRegistry::TypeRegistry(Internal::TypeRegistry* internal)

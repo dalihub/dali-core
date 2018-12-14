@@ -40,29 +40,74 @@ namespace Dali
 namespace Internal
 {
 
-typedef Dali::Animation::Interpolation Interpolation;
+using Interpolation = Dali::Animation::Interpolation;
 
-struct AnimatorFunctionBase;
+/**
+ * AnimatorFunction base class.
+ * Needs to be declared first so AnimatorBase knows about it's destructor
+ * All update functions must inherit from AnimatorFunctionBase and overload the appropiate "()" operator
+ */
+struct AnimatorFunctionBase
+{
+  /**
+   * Constructor
+   */
+  AnimatorFunctionBase() {}
+
+  /*
+   * Virtual destructor (Intended as base class)
+   */
+  virtual ~AnimatorFunctionBase() {}
+
+  ///Stub "()" operators.
+  virtual bool operator()(float progress, const bool& property)
+  {
+    return property;
+  }
+
+  virtual float operator()(float progress, const int32_t& property)
+  {
+    return static_cast<float>( property );
+  }
+
+  virtual float operator()(float progress, const float& property)
+  {
+    return property;
+  }
+
+  virtual Vector2 operator()(float progress, const Vector2& property)
+  {
+    return property;
+  }
+
+  virtual Vector3 operator()(float progress, const Vector3& property)
+  {
+    return property;
+  }
+
+  virtual Vector4 operator()(float progress, const Vector4& property)
+  {
+    return property;
+  }
+
+  virtual Quaternion operator()(float progress, const Quaternion& property)
+  {
+    return property;
+  }
+};
 
 namespace SceneGraph
 {
-
-class AnimatorBase;
-
-typedef OwnerContainer< AnimatorBase* > AnimatorContainer;
-
-typedef AnimatorContainer::Iterator AnimatorIter;
-typedef AnimatorContainer::ConstIterator AnimatorConstIter;
 
 /**
  * An abstract base class for Animators, which can be added to scene graph animations.
  * Each animator changes a single property of an object in the scene graph.
  */
-class AnimatorBase
+class AnimatorBase : public PropertyOwner::Observer
 {
 public:
 
-  typedef float (*AlphaFunc)(float progress); ///< Definition of an alpha function
+  using AlphaFunc = float (*)(float progress); ///< Definition of an alpha function
 
   /**
    * Observer to determine when the animator is no longer present
@@ -86,17 +131,23 @@ public:
   /**
    * Constructor.
    */
-  AnimatorBase()
-  : mLifecycleObserver(nullptr),
-    mDurationSeconds(1.0f),
-    mIntervalDelaySeconds(0.0f),
-    mSpeedFactor(1.0f),
-    mLoopCount(1),
-    mAlphaFunction(AlphaFunction::DEFAULT),
-    mDisconnectAction(Dali::Animation::BakeFinal),
-    mAnimationPlaying(false),
-    mEnabled(true),
-    mConnectedToSceneGraph(false),
+  AnimatorBase( PropertyOwner* propertyOwner,
+                AnimatorFunctionBase* animatorFunction,
+                AlphaFunction alphaFunction,
+                const TimePeriod& timePeriod )
+  : mLifecycleObserver( nullptr ),
+    mPropertyOwner( propertyOwner ),
+    mAnimatorFunction( animatorFunction ),
+    mDurationSeconds( timePeriod.durationSeconds ),
+    mIntervalDelaySeconds( timePeriod.delaySeconds ),
+    mSpeedFactor( 1.0f ),
+    mCurrentProgress( 0.f ),
+    mLoopCount( 1 ),
+    mAlphaFunction( alphaFunction ),
+    mDisconnectAction( Dali::Animation::BakeFinal ),
+    mAnimationPlaying( false ),
+    mEnabled( true ),
+    mConnectedToSceneGraph( false ),
     mAutoReverseEnabled( false )
   {
   }
@@ -106,6 +157,11 @@ public:
    */
   virtual ~AnimatorBase()
   {
+    delete mAnimatorFunction;
+    if (mPropertyOwner && mConnectedToSceneGraph)
+    {
+      mPropertyOwner->RemoveObserver(*this);
+    }
     if( mLifecycleObserver != nullptr )
     {
       mLifecycleObserver->ObjectDestroyed();
@@ -122,10 +178,48 @@ public:
     mLifecycleObserver = nullptr;
   }
 
+private: // From PropertyOwner::Observer
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
+   */
+  void PropertyOwnerConnected( PropertyOwner& owner ) override final
+  {
+    mEnabled = true;
+  }
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+   */
+  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override final
+  {
+    // If we are active, then bake the value if required
+    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
+    {
+      // Bake to target-value if BakeFinal, otherwise bake current value
+      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
+    }
+
+    mEnabled = false;
+  }
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
+   */
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override final
+  {
+    mPropertyOwner = nullptr;
+  }
+
+public:
   /**
    * Called when Animator is added to the scene-graph in update-thread.
    */
-  virtual void ConnectToSceneGraph() = 0;
+  void ConnectToSceneGraph()
+  {
+    mConnectedToSceneGraph = true;
+    mPropertyOwner->AddObserver(*this);
+  }
 
   /**
    * Set the duration of the animator.
@@ -380,7 +474,7 @@ public:
   }
 
   /**
-   * Retrive wheter the animator's target object is valid and on the stage.
+   * Whether the animator's target object is valid and on the stage.
    * @return The enabled state.
    */
   bool IsEnabled() const
@@ -403,7 +497,10 @@ public:
    * @return True if animator is orphan, false otherwise   *
    * @note The SceneGraph::Animation will delete any orphan animator in its Update method.
    */
-  virtual bool Orphan() = 0;
+  bool Orphan()
+  {
+    return (mPropertyOwner == nullptr);
+  }
 
   /**
    * Update the scene object attached to the animator.
@@ -411,7 +508,29 @@ public:
    * @param[in] progress A value from 0 to 1, where 0 is the start of the animation, and 1 is the end point.
    * @param[in] bake Bake.
    */
-  virtual void Update(BufferIndex bufferIndex, float progress, bool bake) = 0;
+  void Update( BufferIndex bufferIndex, float progress, bool bake )
+  {
+    if( mLoopCount >= 0 )
+    {
+      // Update the progress value
+      progress = SetProgress( progress );
+    }
+
+    float alpha = ApplyAlphaFunction( progress );
+
+    // PropertyType specific part
+    DoUpdate( bufferIndex, bake, alpha );
+
+    mCurrentProgress = progress;
+  }
+
+  /**
+   * Type specific part of the animator
+   * @param bufferIndex index to use
+   * @param bake whether to bake or not
+   * @param alpha value from alpha based on progress
+   */
+  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) = 0;
 
 protected:
 
@@ -429,9 +548,12 @@ protected:
   }
 
   LifecycleObserver* mLifecycleObserver;
+  PropertyOwner* mPropertyOwner;
+  AnimatorFunctionBase* mAnimatorFunction;
   float mDurationSeconds;
   float mIntervalDelaySeconds;
   float mSpeedFactor;
+  float mCurrentProgress;
 
   int32_t mLoopCount;
 
@@ -448,7 +570,7 @@ protected:
  * An animator for a specific property type PropertyType.
  */
 template < typename PropertyType, typename PropertyAccessorType >
-class Animator : public AnimatorBase, public PropertyOwner::Observer
+class Animator : public AnimatorBase
 {
 public:
 
@@ -466,18 +588,12 @@ public:
                             AlphaFunction alphaFunction,
                             const TimePeriod& timePeriod )
   {
-    typedef Animator< PropertyType, PropertyAccessorType > AnimatorType;
-
     // The property was const in the actor-thread, but animators are used in the scene-graph thread.
-    AnimatorType* animator = new AnimatorType( const_cast<PropertyOwner*>( &propertyOwner ),
-                                               const_cast<PropertyBase*>( &property ),
-                                               animatorFunction );
-
-    animator->SetAlphaFunction( alphaFunction );
-    animator->SetIntervalDelay( timePeriod.delaySeconds );
-    animator->SetDuration( timePeriod.durationSeconds );
-
-    return animator;
+    return new Animator( const_cast<PropertyOwner*>( &propertyOwner ),
+                                  const_cast<PropertyBase*>( &property ),
+                                  animatorFunction,
+                                  alphaFunction,
+                                  timePeriod );
   }
 
   /**
@@ -485,71 +601,18 @@ public:
    */
   virtual ~Animator()
   {
-    if (mPropertyOwner && mConnectedToSceneGraph)
-    {
-      mPropertyOwner->RemoveObserver(*this);
-    }
-
-    delete mAnimatorFunction;
   }
 
   /**
-   * Called when Animator is added to the scene-graph in update-thread.
+   * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  virtual void ConnectToSceneGraph()
+  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) override final
   {
-    mConnectedToSceneGraph = true;
-    mPropertyOwner->AddObserver(*this);
-  }
-
-  /**
-   * Called when mPropertyOwner is connected to the scene graph.
-   */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner )
-  {
-    mEnabled = true;
-  }
-
-  /**
-   * Called when mPropertyOwner is disconnected from the scene graph.
-   */
-  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
-  {
-    // If we are active, then bake the value if required
-    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
-    {
-      // Bake to target-value if BakeFinal, otherwise bake current value
-      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
-    }
-
-    mEnabled = false;
-  }
-
-  /**
-   * Called shortly before mPropertyOwner is destroyed
-   */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner )
-  {
-    mPropertyOwner = NULL;
-  }
-
-  /**
-   * From AnimatorBase.
-   */
-  virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
-  {
-    if( mLoopCount >= 0 )
-    {
-      // Update the progress value
-      progress = SetProgress( progress );
-    }
-
-    float alpha = ApplyAlphaFunction( progress );
-
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>( (*mAnimatorFunction)( alpha, current ) );
+
     if ( bake )
     {
       mPropertyAccessor.Bake( bufferIndex, result );
@@ -558,16 +621,6 @@ public:
     {
       mPropertyAccessor.Set( bufferIndex, result );
     }
-
-    mCurrentProgress = progress;
-  }
-
-  /**
-   * From AnimatorBase.
-   */
-  virtual bool Orphan()
-  {
-    return (mPropertyOwner == NULL);
   }
 
 private:
@@ -577,11 +630,11 @@ private:
    */
   Animator( PropertyOwner* propertyOwner,
             PropertyBase* property,
-            AnimatorFunctionBase* animatorFunction )
-  : mPropertyOwner( propertyOwner ),
-    mPropertyAccessor( property ),
-    mAnimatorFunction( animatorFunction ),
-    mCurrentProgress( 0.0f )
+            AnimatorFunctionBase* animatorFunction,
+            AlphaFunction alphaFunction,
+            const TimePeriod& timePeriod )
+  : AnimatorBase( propertyOwner, animatorFunction, alphaFunction, timePeriod ),
+    mPropertyAccessor( property )
   {
     // WARNING - this object is created in the event-thread
     // The scene-graph mPropertyOwner object cannot be observed here
@@ -595,11 +648,8 @@ private:
 
 protected:
 
-  PropertyOwner* mPropertyOwner;
   PropertyAccessorType mPropertyAccessor;
 
-  AnimatorFunctionBase* mAnimatorFunction;
-  float mCurrentProgress;
 };
 
 
@@ -607,8 +657,8 @@ protected:
 /**
  * An animator for a specific property type PropertyType.
  */
-template <typename T, typename PropertyAccessorType>
-class AnimatorTransformProperty : public AnimatorBase, public PropertyOwner::Observer
+template <typename PropertyType, typename PropertyAccessorType>
+class AnimatorTransformProperty : public AnimatorBase
 {
 public:
 
@@ -628,15 +678,11 @@ public:
   {
 
     // The property was const in the actor-thread, but animators are used in the scene-graph thread.
-    AnimatorTransformProperty* animator = new AnimatorTransformProperty( const_cast<PropertyOwner*>( &propertyOwner ),
-                                               const_cast<PropertyBase*>( &property ),
-                                               animatorFunction );
-
-    animator->SetAlphaFunction( alphaFunction );
-    animator->SetIntervalDelay( timePeriod.delaySeconds );
-    animator->SetDuration( timePeriod.durationSeconds );
-
-    return animator;
+    return new AnimatorTransformProperty( const_cast<PropertyOwner*>( &propertyOwner ),
+                                                                         const_cast<PropertyBase*>( &property ),
+                                                                         animatorFunction,
+                                                                         alphaFunction,
+                                                                         timePeriod );
   }
 
   /**
@@ -644,71 +690,17 @@ public:
    */
   virtual ~AnimatorTransformProperty()
   {
-    if (mPropertyOwner && mConnectedToSceneGraph)
-    {
-      mPropertyOwner->RemoveObserver(*this);
-    }
-
-    delete mAnimatorFunction;
   }
 
   /**
-   * Called when Animator is added to the scene-graph in update-thread.
+   * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
    */
-  virtual void ConnectToSceneGraph()
+  virtual void DoUpdate( BufferIndex bufferIndex, bool bake, float alpha ) override final
   {
-    mConnectedToSceneGraph = true;
-    mPropertyOwner->AddObserver(*this);
-  }
-
-  /**
-   * Called when mPropertyOwner is connected to the scene graph.
-   */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner )
-  {
-    mEnabled = true;
-  }
-
-  /**
-   * Called when mPropertyOwner is disconnected from the scene graph.
-   */
-  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
-  {
-    // If we are active, then bake the value if required
-    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
-    {
-      // Bake to target-value if BakeFinal, otherwise bake current value
-      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
-    }
-
-    mEnabled = false;
-  }
-
-  /**
-   * Called shortly before mPropertyOwner is destroyed
-   */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner )
-  {
-    mPropertyOwner = NULL;
-  }
-
-  /**
-   * From AnimatorBase.
-   */
-  virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
-  {
-    if( mLoopCount >= 0 )
-    {
-      // Update the progress value
-      progress = SetProgress( progress );
-    }
-
-    float alpha = ApplyAlphaFunction( progress );
-
-    const T& current = mPropertyAccessor.Get( bufferIndex );
+    const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
     // need to cast the return value in case property is integer
-    T result = static_cast<T>( (*mAnimatorFunction)( alpha, current ) );
+    const PropertyType result = static_cast<PropertyType>( (*mAnimatorFunction)( alpha, current ) );
 
     if ( bake )
     {
@@ -718,16 +710,6 @@ public:
     {
       mPropertyAccessor.Set( bufferIndex, result );
     }
-
-    mCurrentProgress = progress;
-  }
-
-  /**
-   * From AnimatorBase.
-   */
-  virtual bool Orphan()
-  {
-    return (mPropertyOwner == NULL);
   }
 
 private:
@@ -737,85 +719,28 @@ private:
    */
   AnimatorTransformProperty( PropertyOwner* propertyOwner,
             PropertyBase* property,
-            AnimatorFunctionBase* animatorFunction )
-  : mPropertyOwner( propertyOwner ),
-    mPropertyAccessor( property ),
-    mAnimatorFunction( animatorFunction ),
-    mCurrentProgress( 0.0f )
+            AnimatorFunctionBase* animatorFunction,
+            AlphaFunction alphaFunction,
+            const TimePeriod& timePeriod )
+  : AnimatorBase( propertyOwner, animatorFunction, alphaFunction, timePeriod ),
+    mPropertyAccessor( property )
   {
     // WARNING - this object is created in the event-thread
     // The scene-graph mPropertyOwner object cannot be observed here
   }
 
   // Undefined
-  AnimatorTransformProperty( const AnimatorTransformProperty& );
-
-  // Undefined
-  AnimatorTransformProperty& operator=( const AnimatorTransformProperty& );
+  AnimatorTransformProperty() = delete;
+  AnimatorTransformProperty( const AnimatorTransformProperty& ) = delete;
+  AnimatorTransformProperty& operator=( const AnimatorTransformProperty& ) = delete;
 
 protected:
 
-  PropertyOwner* mPropertyOwner;
   PropertyAccessorType mPropertyAccessor;
 
-  AnimatorFunctionBase* mAnimatorFunction;
-  float mCurrentProgress;
 };
 
 } // namespace SceneGraph
-
-/*
- * AnimatorFunction base class.
- * All update functions must inherit from AnimatorFunctionBase and overload the appropiate "()" operator
- */
-struct AnimatorFunctionBase
-{
-  /**
-   * Constructor
-   */
-  AnimatorFunctionBase(){}
-
-  /*
-   * Virtual destructor (Intended as base class)
-   */
-  virtual ~AnimatorFunctionBase(){}
-
-  ///Stub "()" operators.
-  virtual bool operator()(float progress, const bool& property)
-  {
-    return property;
-  }
-
-  virtual float operator()(float progress, const int32_t& property)
-  {
-    return static_cast<float>( property );
-  }
-
-  virtual float operator()(float progress, const float& property)
-  {
-    return property;
-  }
-
-  virtual Vector2 operator()(float progress, const Vector2& property)
-  {
-    return property;
-  }
-
-  virtual Vector3 operator()(float progress, const Vector3& property)
-  {
-    return property;
-  }
-
-  virtual Vector4 operator()(float progress, const Vector4& property)
-  {
-    return property;
-  }
-
-  virtual Quaternion operator()(float progress, const Quaternion& property)
-  {
-    return property;
-  }
-};
 
 // Update functions
 
