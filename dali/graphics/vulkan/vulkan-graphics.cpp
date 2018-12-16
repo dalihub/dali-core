@@ -124,8 +124,8 @@ void* Memory::Map( uint32_t offset, uint32_t requestedMappedSize )
   {
     return mappedPtr;
   }
-  mappedPtr = graphics->GetDevice().mapMemory( memory, offset, requestedMappedSize ? requestedMappedSize : VK_WHOLE_SIZE ).value;
-  mappedSize = requestedMappedSize;
+  mappedSize = requestedMappedSize ? requestedMappedSize : VK_WHOLE_SIZE;
+  mappedPtr = graphics->GetDevice().mapMemory( memory, offset, mappedSize ).value;
   return mappedPtr;
 }
 
