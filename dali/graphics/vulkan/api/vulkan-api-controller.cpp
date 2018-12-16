@@ -451,6 +451,10 @@ struct Controller::Impl
         {
           image = req.imageToImageInfo.dstImage;
         }
+        else if ( req.requestType == TransferRequestType::LAYOUT_TRANSITION_ONLY )
+        {
+          image = req.imageLayoutTransitionInfo.image;
+        }
 
         assert( image );
 
@@ -492,13 +496,22 @@ struct Controller::Impl
       // in eTransferDstOptimal layout
       std::vector<vk::ImageMemoryBarrier> preLayoutBarriers;
       std::vector<vk::ImageMemoryBarrier> postLayoutBarriers;
+      std::vector<vk::ImageMemoryBarrier> onlyLayoutBarriers;
       for( auto& item : requestMap )
       {
         auto image = item.image;
-        // add barrier
-        preLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal ) );
-        postLayoutBarriers.push_back( mGraphics.CreateImageMemoryBarrier( image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal ) );
-        image->SetImageLayout( vk::ImageLayout::eShaderReadOnlyOptimal );
+        if( image->GetImageTiling() == vk::ImageTiling::eLinear )
+        {
+          onlyLayoutBarriers.push_back(mGraphics.CreateImageMemoryBarrier(image, image->GetImageLayout(), vk::ImageLayout::eShaderReadOnlyOptimal));
+          image->SetImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+        }
+        else
+        {
+          // add barrier
+          preLayoutBarriers.push_back(mGraphics.CreateImageMemoryBarrier(image, image->GetImageLayout(), vk::ImageLayout::eTransferDstOptimal));
+          postLayoutBarriers.push_back(mGraphics.CreateImageMemoryBarrier(image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal));
+          image->SetImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+        }
       }
 
       // Build command buffer for each image until reaching next sync point
@@ -520,7 +533,14 @@ struct Controller::Impl
         // change image layouts only once
         if( i == 0 )
         {
-          commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers );
+          if( !preLayoutBarriers.empty() )
+          {
+            commandBuffer->PipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, preLayoutBarriers);
+          }
+          else if ( !onlyLayoutBarriers.empty() )
+          {
+            commandBuffer->PipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, onlyLayoutBarriers);
+          }
         }
 
         for( auto& item : requestMap )
@@ -553,7 +573,7 @@ struct Controller::Impl
         }
 
         // if this is the last batch restore original layouts
-        if( i == highestBatchIndex - 1 )
+        if( !postLayoutBarriers.empty() && i == highestBatchIndex - 1 )
         {
           commandBuffer->PipelineBarrier( vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, postLayoutBarriers );
         }
