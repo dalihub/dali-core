@@ -69,6 +69,7 @@ enum class TransferRequestType
   IMAGE_TO_IMAGE,
   BUFFER_TO_BUFFER,
   IMAGE_TO_BUFFER,
+  LAYOUT_TRANSITION_ONLY,
   UNDEFINED
 };
 
@@ -97,6 +98,13 @@ struct ResourceTransferRequest
     vk::ImageCopy                              copyInfo    { };          /// Vulkan specific copy info
   } imageToImageInfo;
 
+  struct
+  {
+    Vulkan::RefCountedImage                    image;
+    vk::ImageLayout                            srcLayout;
+    vk::ImageLayout                            dstLayout;
+  } imageLayoutTransitionInfo;
+
   bool                                         deferredTransferMode{ true }; // Vulkan implementation prefers deferred mode
 
   // delete copy
@@ -120,6 +128,12 @@ struct ResourceTransferRequest
       imageToImageInfo.srcImage = std::move( obj.imageToImageInfo.srcImage );
       imageToImageInfo.dstImage = std::move( obj.imageToImageInfo.dstImage );
       imageToImageInfo.copyInfo = std::move( obj.imageToImageInfo.copyInfo );
+    }
+    else if( requestType == TransferRequestType::LAYOUT_TRANSITION_ONLY )
+    {
+      imageLayoutTransitionInfo.image = std::move( obj.imageLayoutTransitionInfo.image );
+      imageLayoutTransitionInfo.srcLayout = obj.imageLayoutTransitionInfo.srcLayout;
+      imageLayoutTransitionInfo.dstLayout = obj.imageLayoutTransitionInfo.dstLayout;
     }
   }
 

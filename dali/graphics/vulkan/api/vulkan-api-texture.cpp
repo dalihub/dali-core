@@ -31,8 +31,10 @@
 #include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 #include <dali/graphics/vulkan/api/vulkan-api-buffer.h>
 #include <dali/graphics/vulkan/api/vulkan-api-texture-factory.h>
+#include <dali/graphics/vulkan/api/vulkan-api-controller.h>
 
 #include <algorithm>
+
 
 namespace Dali
 {
@@ -885,12 +887,15 @@ Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
     mLayout( vk::ImageLayout::eUndefined ),
     mComponentMapping()
 {
+  // Check env variable in order to disable staging buffers
+  auto var = getenv( "DALI_DISABLE_TEXTURE_STAGING_BUFFERS" );
+  if( var && var[0] != '0')
+  {
+    mDisableStagingBuffer = true;
+  }
 }
 
-Texture::~Texture()
-{
-
-}
+Texture::~Texture() = default;
 
 bool Texture::Initialise()
 {
@@ -931,7 +936,7 @@ bool Texture::Initialise()
   if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
   {
     auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
-    if( !formatProperties.optimalTilingFeatures )
+    if( !formatProperties.optimalTilingFeatures && !formatProperties.linearTilingFeatures )
     {
       if( data && sizeInBytes > 0 )
       {
@@ -974,50 +979,96 @@ bool Texture::Initialise()
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
-  // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
-  uint32_t allocationSize = 0u;
+  if( !mDisableStagingBuffer )
+  {
+    // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
+    uint32_t allocationSize{};
 
-  auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
-  allocationSize = uint32_t( requirements.size );
+    auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
+    allocationSize = uint32_t( requirements.size );
 
-  // allocate transient buffer
-  auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
-                            .setSize( allocationSize )
-                            .setSharingMode( vk::SharingMode::eExclusive )
-                            .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
+    // allocate transient buffer
+    auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
+                              .setSize( allocationSize )
+                              .setSharingMode( vk::SharingMode::eExclusive )
+                              .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
 
-  // bind memory
-  mGraphics.BindBufferMemory( buffer,
-                              mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
-                              0u );
+    // bind memory
+    mGraphics.BindBufferMemory( buffer,
+                                mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
+                                0u );
 
-  // write into the buffer
-  auto ptr = buffer->GetMemory()->MapTyped<char>();
-  std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+srcMemorySize, ptr );
-  buffer->GetMemory()->Unmap();
+    // write into the buffer
+    auto ptr = buffer->GetMemory()->MapTyped<char>();
+    std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+srcMemorySize, ptr );
+    buffer->GetMemory()->Unmap();
 
-  ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
+    ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
 
-  transferRequest.bufferToImageInfo.copyInfo
-          .setImageSubresource( vk::ImageSubresourceLayers{}
-                                    .setBaseArrayLayer( layer )
-                                    .setLayerCount( 1 )
-                                    .setAspectMask( vk::ImageAspectFlagBits::eColor )
-                                    .setMipLevel( level ) )
-          .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
-          .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
-          .setBufferRowLength({ 0u })
-          .setBufferOffset({ 0u })
-          .setBufferImageHeight( 0u );
+    transferRequest.bufferToImageInfo.copyInfo
+            .setImageSubresource( vk::ImageSubresourceLayers{}
+                                      .setBaseArrayLayer( layer )
+                                      .setLayerCount( 1 )
+                                      .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                      .setMipLevel( level ) )
+            .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
+            .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+            .setBufferRowLength({ 0u })
+            .setBufferOffset({ 0u })
+            .setBufferImageHeight( 0u );
 
-  transferRequest.bufferToImageInfo.dstImage = mImage;
-  transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
-  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+    transferRequest.bufferToImageInfo.dstImage = mImage;
+    transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
+    transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
 
-  assert( transferRequest.bufferToImageInfo.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
+    assert( transferRequest.bufferToImageInfo.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
 
-  // schedule transfer
-  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+    // schedule transfer
+    mController.ScheduleResourceTransfer( std::move(transferRequest) );
+  }
+  else
+  {
+    auto memory = mImage->GetMemory();
+    if( !memory )
+    {
+      return;
+    }
+    auto ptr = mImage->GetMemory()->MapTyped<char>();
+    auto subresourceLayout = mGraphics.GetDevice().
+      getImageSubresourceLayout( mImage->GetVkHandle(),
+                                 vk::ImageSubresource{}
+                                   .setAspectMask( vk::ImageAspectFlagBits::eColor )
+                                   .setMipLevel( 0 )
+                                   .setArrayLayer( 0 ));
+
+    auto format = mImage->GetFormat();
+    auto formatInfo = Vulkan::GetFormatInfo( format );
+    int  sizeInBytes = int(formatInfo.blockSizeInBits / 8);
+    auto dstRowLength = subresourceLayout.rowPitch;
+    auto dstPtr = ptr + int(dstRowLength)*dstOffset.y + sizeInBytes*dstOffset.x;
+    auto srcPtr = reinterpret_cast<const char*>( srcMemory );
+    auto srcRowLength = int(srcExtent.width)*sizeInBytes;
+
+    for( auto i = 0u; i < srcExtent.height; ++i )
+    {
+      std::copy( srcPtr, srcPtr + int(srcExtent.width)*sizeInBytes, dstPtr );
+
+      dstPtr += dstRowLength;
+      srcPtr += srcRowLength;
+    }
+
+    mImage->GetMemory()->Unmap();
+
+    ResourceTransferRequest transferRequest( TransferRequestType::LAYOUT_TRANSITION_ONLY );
+
+    transferRequest.imageLayoutTransitionInfo.image = mImage;
+    transferRequest.imageLayoutTransitionInfo.srcLayout = mImage->GetImageLayout();
+    transferRequest.imageLayoutTransitionInfo.dstLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+    transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+
+    // schedule transfer
+    mController.ScheduleResourceTransfer( std::move(transferRequest) );
+  }
 }
 
 void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
@@ -1092,14 +1143,16 @@ bool Texture::InitialiseTexture()
     .setExtent( { mWidth, mHeight, 1 } )
     .setArrayLayers( 1 )
     .setImageType( vk::ImageType::e2D )
-    .setTiling( vk::ImageTiling::eOptimal )
+    .setTiling( mDisableStagingBuffer ? vk::ImageTiling::eLinear : vk::ImageTiling::eOptimal )
     .setMipLevels( 1 );
 
   // Create the image handle
   mImage = mGraphics.CreateImage( imageCreateInfo );
 
   // allocate memory for the image
-  auto memory = mGraphics.AllocateMemory( mImage, vk::MemoryPropertyFlagBits::eDeviceLocal );
+  auto memory = mGraphics.AllocateMemory( mImage, mDisableStagingBuffer ?
+    vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent :
+    vk::MemoryPropertyFlagBits::eDeviceLocal );
 
   // bind the allocated memory to the image
   mGraphics.BindImageMemory( mImage, std::move(memory), 0 );

@@ -84,6 +84,8 @@ private:
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
+
+  bool mDisableStagingBuffer { false };
 };
 
 } // namespace VulkanAPI
