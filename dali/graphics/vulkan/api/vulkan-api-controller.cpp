@@ -228,6 +228,9 @@ struct Controller::Impl
 
     mMemoryTransferFutures.clear();
 
+    // reset staging memory
+    //mStagingMemory.clear();
+
     swapchain->Present();
   }
 
@@ -921,6 +924,15 @@ void Controller::EndFrame()
 {
   mImpl->EndFrame();
 
+<<<<<<< HEAD
+=======
+  //Vulkan::Tizen::MEM_PS memps;
+  //Vulkan::Tizen::vd_memps( &memps );
+  //printf("ENDFRAME: PID: %d, diff: PSS: %d, GPU: %d\n", int(memps.pid), int(memps.pss), int(memps.gpu));
+
+  //Vulkan::DeviceMemoryTracker::Get()->debugPrintStats();
+  //Vulkan::PrintAllocationStatus();
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 #if(DEBUG_ENABLED)
   // print stats
   PrintStats();

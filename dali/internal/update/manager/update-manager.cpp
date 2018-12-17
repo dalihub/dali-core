@@ -165,6 +165,12 @@ void SortSiblingNodesRecursively( Node& node )
 
 } // unnamed namespace
 
+struct TextureUploadRequest
+{
+  Texture*                        texture;
+  PixelDataPtr                    pixelData;
+  Internal::Texture::UploadParams uploadParams;
+};
 
 /**
  * Structure to contain UpdateManager internal data
@@ -186,7 +192,7 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
-    graphicsAlgorithms(),
+    graphicsAlgorithms( graphics.GetController() ),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphics( graphics ),
@@ -317,7 +323,12 @@ struct UpdateManager::Impl
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
   bool                                 graphicsShutdown;              ///< True if the graphics subsystem has shutdown
 
+<<<<<<< HEAD
   ShaderCache                          shaderCache;
+=======
+  std::vector<TextureUploadRequest>    textureUploadRequestContainer;
+
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -769,6 +780,115 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   }
 }
 
+void UpdateManager::UploadTexture( Texture* texture,
+                                   PixelDataPtr pixelData,
+                                   const Internal::Texture::UploadParams& params )
+{
+  mImpl->textureUploadRequestContainer.emplace_back();
+  mImpl->textureUploadRequestContainer.back() = { texture, pixelData, params };
+}
+
+void UpdateManager::ProcessTextureUploadRequests()
+{
+  if( mImpl->textureUploadRequestContainer.empty() )
+  {
+    return;
+  }
+  auto totalStagingSize = 0u;
+  std::vector<std::pair<uint32_t, uint32_t>> offsetSize;
+  int k = 0;
+  for( auto& request : mImpl->textureUploadRequestContainer )
+  {
+    printf("TEX %p\n", request.texture);
+  }
+  for( auto& request : mImpl->textureUploadRequestContainer )
+  {
+    printf("texture %p\n", request.texture);
+    auto pixelData = request.pixelData;
+    auto uploadParams = request.uploadParams;
+    if(k == 7)
+    {
+      puts("a");
+
+    }
+    //request.texture->InitialiseTexture();
+
+    request.texture->UploadTexture( pixelData,
+                                    uploadParams );
+
+    // Try to initialise texture if it's not initialised yet
+
+    // for each image compute memory requirements
+    const auto size = request.texture->GetGfxObject()->GetMemoryRequirements().size;
+    const auto alignment = request.texture->GetGfxObject()->GetMemoryRequirements().alignment;
+    const auto currentOffset = totalStagingSize;
+
+    if( currentOffset % alignment )
+    {
+      //@todo: implement alignmment and size accordingly
+      puts("not aligned");
+    }
+    else
+    {
+      puts("Aligned");
+    }
+
+    // update list of offsets and sizes
+    offsetSize.emplace_back( currentOffset, size );
+    totalStagingSize += size;
+    ++k;
+  }
+
+  printf("Total staging size: %d\n", int(totalStagingSize));
+
+
+  // Use graphics buffer manager to create large staging buffer and copy data
+  auto& gfxBufferManager = mImpl->graphicsAlgorithms.GetGraphicsBufferManager();
+
+  auto buffer = gfxBufferManager.AllocateStagingBuffer( totalStagingSize );
+
+  using DataPtr = char*;
+
+  auto mappedData = DataPtr( buffer->Map() );
+  auto i = 0u;
+  for( auto& request : mImpl->textureUploadRequestContainer )
+  {
+    if( offsetSize[i].first + request.pixelData->GetBufferSize() < totalStagingSize )
+    {
+      printf("Copy: %d, size: %d, %d\n", int(offsetSize[i].first), int(offsetSize[i].second),
+             int(request.pixelData->GetBufferSize()) );
+    std::copy( request.pixelData->GetBuffer(),
+               request.pixelData->GetBuffer()+request.pixelData->GetBufferSize(),
+               &mappedData[ offsetSize[i++].first ] );
+    }
+    else
+    {
+      puts("Dammit!");
+    }
+
+  }
+
+  buffer->Unmap();
+
+  // Bulk upload the textures using buffer as a staging buffer. Hold on to the buffer until uploads are finished
+/*
+  for( auto& request : mImpl->textureUploadRequestContainer )
+  {
+
+    auto gfxTexture = request.texture->GetGfxObject();
+
+    gfxTexture->CopyBuffer( *buffer->GetBuffer(),
+                            { request.pixelData->GetWidth(), request.pixelData->GetHeight() },
+                            { request.uploadParams.xOffset, request.uploadParams.yOffset },
+                            0, 0, Graphics::API::TextureDetails::UpdateMode::DEFERRED );
+
+  }
+*/
+  // clearing the container should happen in the next frame ( all uploads should be submitted by the time )
+  // or on running pure garbage collector
+  mImpl->textureUploadRequestContainer.clear();
+}
+
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
@@ -902,6 +1022,8 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       {
         mImpl->graphics.GetController().RunGarbageCollector( numberOfDiscardedRenderers );
       }
+
+      ProcessTextureUploadRequests();
 
       // generate graphics objects
       PrepareNodes( bufferIndex );
@@ -1169,6 +1291,7 @@ void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
   }
 }
 
+<<<<<<< HEAD
 void UpdateManager::DestroyGraphicsObjects()
 {
   // Wait for the current frame to finish drawing
@@ -1225,6 +1348,8 @@ void UpdateManager::DestroyGraphicsObjects()
   DALI_LOG_ERROR("Destruction complete\n");
 }
 
+=======
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 } // namespace SceneGraph
 
 } // namespace Internal

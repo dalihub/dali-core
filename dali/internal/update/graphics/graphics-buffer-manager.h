@@ -153,6 +153,13 @@ public:
    */
   std::unique_ptr<GraphicsBuffer> AllocateUniformBuffer( uint32_t size );
 
+  /**
+   * Allocates staging buffer with given size
+   * @param size
+   * @return
+   */
+  std::unique_ptr<GraphicsBuffer> AllocateStagingBuffer( uint32_t size );
+
 private:
 
   Dali::Graphics::API::Controller* mController;

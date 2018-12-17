@@ -62,15 +62,18 @@ public:
 
   void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
 
+  API::MemoryRequirements GetMemoryRequirements() const override;
+
 private:
 
   void CreateSampler();
   void CreateImageView();
   bool InitialiseTexture();
 
+  std::vector<uint8_t> ConvertData(const void* data, uint32_t sizeInBytes, uint32_t width, uint32_t height );
 private:
 
-  VulkanAPI::TextureFactory& mTextureFactory;
+  std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
 
@@ -81,6 +84,7 @@ private:
   uint32_t    mWidth;
   uint32_t    mHeight;
   vk::Format  mFormat;
+  vk::Format  mConvertFromFormat;
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};

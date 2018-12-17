@@ -873,16 +873,56 @@ constexpr vk::Format ConvertApiToVk( API::Format format )
   return {};
 }
 
+std::vector<uint8_t> Texture::ConvertData(const void* data, uint32_t sizeInBytes, uint32_t width, uint32_t height )
+{
+  /**
+   * Lots of Vulkan drivers DO NOT SUPPORT R8G8B8 format therefore we are forced
+   * to implement a fallback as lots of textures comes as RGB ( ie. jpg ). In case
+   * the valid format is supported we're going to use it as it is.
+   */
+  std::vector<uint8_t> rgbaBuffer{};
+  if(mTextureFactory->GetFormat() == API::Format::R8G8B8_UNORM )
+  {
+    auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mConvertFromFormat );
+    if( !formatProperties.optimalTilingFeatures )
+    {
+      if( data && sizeInBytes > 0 )
+      {
+        assert( (sizeInBytes == width*height*3) && "Corrupted RGB image data!" );
+
+        auto inData = reinterpret_cast<const uint8_t*>(data);
+
+        rgbaBuffer.resize( width * height * 4 );
+        auto outData = rgbaBuffer.data();
+
+        auto outIdx = 0u;
+        for( auto i = 0u; i < sizeInBytes; i += 3 )
+        {
+          outData[outIdx] = inData[i];
+          outData[outIdx + 1] = inData[i + 1];
+          outData[outIdx + 2] = inData[i + 2];
+          outData[outIdx + 3] = 0xff;
+          outIdx += 4;
+        }
+
+        //mFormat = vk::Format::eR8G8B8A8Unorm;
+      }
+    }
+  }
+  return rgbaBuffer;
+}
+
 Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
-  : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
-    mController( mTextureFactory.GetController() ),
-    mGraphics( mTextureFactory.GetGraphics() ),
+  : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ).Clone() ),
+    mController( mTextureFactory->GetController() ),
+    mGraphics( mTextureFactory->GetGraphics() ),
     mImage(),
     mImageView(),
     mSampler(),
     mWidth( 0u ),
     mHeight( 0u ),
     mFormat( vk::Format::eUndefined ),
+    mConvertFromFormat( vk::Format::eUndefined ),
     mUsage( vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst ),
     mLayout( vk::ImageLayout::eUndefined ),
     mComponentMapping()
@@ -899,13 +939,13 @@ Texture::~Texture() = default;
 
 bool Texture::Initialise()
 {
-  auto size = mTextureFactory.GetSize();
+  auto size = mTextureFactory->GetSize();
   mWidth = uint32_t( size.width );
   mHeight = uint32_t( size.height );
-  auto sizeInBytes = mTextureFactory.GetDataSize();
-  auto data = mTextureFactory.GetData();
+  auto sizeInBytes = mTextureFactory->GetDataSize();
+  auto data = mTextureFactory->GetData();
   mLayout = vk::ImageLayout::eUndefined;
-  switch( mTextureFactory.GetUsage())
+  switch( mTextureFactory->GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
     {
@@ -924,46 +964,27 @@ bool Texture::Initialise()
     }
   }
 
-  mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
-  mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
+  mFormat = ConvertApiToVk( mTextureFactory->GetFormat() );
+  mComponentMapping = GetVkComponentMapping( mTextureFactory->GetFormat() );
 
-  /**
-   * Lots of Vulkan drivers DO NOT SUPPORT R8G8B8 format therefore we are forced
-   * to implement a fallback as lots of textures comes as RGB ( ie. jpg ). In case
-   * the valid format is supported we're going to use it as it is.
-   */
-  std::vector<uint8_t> rgbaBuffer{};
-  if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
+  printf("Tex format: %d\n", int(mFormat));
+
+  // See whether any data conversion is necessary for the requested type
+  if(mTextureFactory->GetFormat() == API::Format::R8G8B8_UNORM )
   {
     auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
     if( !formatProperties.optimalTilingFeatures && !formatProperties.linearTilingFeatures )
     {
-      if( data && sizeInBytes > 0 )
-      {
-        assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
-
-        auto inData = reinterpret_cast<const uint8_t*>(data);
-
-        rgbaBuffer.reserve( mWidth * mHeight * 4 );
-        auto outData = rgbaBuffer.data();
-
-        auto outIdx = 0u;
-        for( auto i = 0u; i < sizeInBytes; i += 3 )
-        {
-          outData[outIdx] = inData[i];
-          outData[outIdx + 1] = inData[i + 1];
-          outData[outIdx + 2] = inData[i + 2];
-          outData[outIdx + 3] = 0xff;
-          outIdx += 4;
-        }
-
-        data = outData;
-        sizeInBytes = mWidth * mHeight * 4;
-        mFormat = vk::Format::eR8G8B8A8Unorm;
-      }
+      mConvertFromFormat = mFormat;
+      mFormat = vk::Format::eR8G8B8A8Unorm;
     }
   }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
   if( InitialiseTexture() )
   {
     // copy data to the image
@@ -979,29 +1000,62 @@ bool Texture::Initialise()
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
+<<<<<<< HEAD
   if( !mDisableStagingBuffer )
   {
     // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
     uint32_t allocationSize{};
+=======
+  const void* srcDataPtr { srcMemory };
+  uint32_t srcDataSize { srcMemorySize };
+
+  // see if conversion is needed
+  auto retval = ConvertData( srcMemory, srcMemorySize, srcExtent.width, srcExtent.height );
+
+  if( retval.size() )
+  {
+    srcDataPtr = retval.data();
+    srcDataSize = uint32_t(retval.size());
+  }
+
+  // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
+  uint32_t allocationSize = 0u;
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 
     auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
     allocationSize = uint32_t( requirements.size );
 
+<<<<<<< HEAD
     // allocate transient buffer
     auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
                               .setSize( allocationSize )
                               .setSharingMode( vk::SharingMode::eExclusive )
                               .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
+=======
+
+  // allocate transient buffer
+  auto buffer = mGraphics.CreateBuffer( vk::BufferCreateInfo{}
+                            .setSize( allocationSize )
+                            .setSharingMode( vk::SharingMode::eExclusive )
+                            .setUsage( vk::BufferUsageFlagBits::eTransferSrc));
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 
     // bind memory
     mGraphics.BindBufferMemory( buffer,
                                 mGraphics.AllocateMemory( buffer, vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent ),
                                 0u );
 
+<<<<<<< HEAD
     // write into the buffer
     auto ptr = buffer->GetMemory()->MapTyped<char>();
     std::copy( reinterpret_cast<const char*>(srcMemory), reinterpret_cast<const char*>(srcMemory)+srcMemorySize, ptr );
     buffer->GetMemory()->Unmap();
+=======
+  // write into the buffer
+  auto ptr = buffer->GetMemory()->MapTyped<char>();
+  std::copy( reinterpret_cast<const char*>(srcDataPtr), reinterpret_cast<const char*>(srcDataPtr)+srcDataSize, ptr );
+  buffer->GetMemory()->Unmap();
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 
     ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
 
@@ -1017,12 +1071,19 @@ void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Ext
             .setBufferOffset({ 0u })
             .setBufferImageHeight( 0u );
 
+<<<<<<< HEAD
     transferRequest.bufferToImageInfo.dstImage = mImage;
     transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
     transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+=======
+  transferRequest.bufferToImageInfo.dstImage = mImage;
+  transferRequest.bufferToImageInfo.srcBuffer = std::move(buffer);
+  transferRequest.deferredTransferMode = true;//!( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 
     assert( transferRequest.bufferToImageInfo.srcBuffer.GetRefCount() == 1 && "Too many transient buffer owners, buffer will be released automatically!" );
 
+<<<<<<< HEAD
     // schedule transfer
     mController.ScheduleResourceTransfer( std::move(transferRequest) );
   }
@@ -1069,6 +1130,10 @@ void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Ext
     // schedule transfer
     mController.ScheduleResourceTransfer( std::move(transferRequest) );
   }
+=======
+  // schedule transfer
+  mController.ScheduleResourceTransfer( std::move(transferRequest) );
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
 }
 
 void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
@@ -1156,13 +1221,19 @@ bool Texture::InitialiseTexture()
 
   // bind the allocated memory to the image
   mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
+<<<<<<< HEAD
 
+=======
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
   // create default image view
   CreateImageView();
 
   // create basic sampler
   CreateSampler();
+<<<<<<< HEAD
 
+=======
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
   return true;
 }
 
@@ -1209,6 +1280,19 @@ Vulkan::RefCountedSampler Texture::GetSamplerRef() const
 {
   return mSampler;
 }
+
+API::MemoryRequirements Texture::GetMemoryRequirements() const
+{
+  API::MemoryRequirements retval{ 0u, 0u };
+  if( mImage )
+  {
+    auto req = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
+    retval.size = req.size;
+    retval.alignment = req.alignment;
+  }
+  return retval;
+}
+
 
 } // namespace VulkanAPI
 } // namespace Graphics
