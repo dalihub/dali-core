@@ -34,7 +34,21 @@ struct TextureFactory::Impl
     mController( controller ),
     mGraphics( controller.GetGraphics() )
   {
+  }
 
+  // Explicit copy constructor used when cloning into new object
+  Impl( const Impl& rhs )
+  : mApi( rhs.mApi ),
+    mController( rhs.mController ),
+    mGraphics( rhs.mGraphics ),
+    mType( rhs.mType ),
+    mUsage( rhs.mUsage ),
+    mSize( rhs.mSize ),
+    mFormat( rhs.mFormat ),
+    mMipmapFlags( rhs.mMipmapFlags ),
+    mData( rhs.mData ),
+    mDataSizeInBytes( rhs.mDataSizeInBytes )
+  {
   }
 
   ~Impl() = default;
@@ -164,6 +178,12 @@ VulkanAPI::Controller& TextureFactory::GetController() const
   return mImpl->mController;
 }
 
+std::unique_ptr<TextureFactory> TextureFactory::Clone()
+{
+  auto newFactory = std::unique_ptr<TextureFactory>( new TextureFactory() );
+  newFactory->mImpl.reset( new Impl( *mImpl.get() ) );
+  return std::move( newFactory );
+}
 
 }
 }

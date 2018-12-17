@@ -80,6 +80,12 @@ public:
 
   VulkanAPI::Controller& GetController() const;
 
+  /**
+   * Clones this texture factory into the new object
+   * @return copy of texture factory
+   */
+  std::unique_ptr<TextureFactory> Clone();
+
 protected:
   /// @brief default constructor
   TextureFactory() = default;

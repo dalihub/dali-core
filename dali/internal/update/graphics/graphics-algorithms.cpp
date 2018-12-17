@@ -182,6 +182,11 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
   return intersectionBox;
 }
 
+GraphicsAlgorithms::GraphicsAlgorithms( Graphics::API::Controller& controller )
+{
+  mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
+}
+
 bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
@@ -969,6 +974,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   auto numberOfInstructions = renderInstructions.Count( bufferIndex );
 
   // Prepare uniform buffers
+<<<<<<< HEAD
   if( !mGraphicsBufferManager )
   {
     mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
@@ -976,6 +982,8 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   controller.BeginFrame();
 
+=======
+>>>>>>> dc3c729b... [EDXPERIMENTAL] experimental staging buffer management
   auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
 
   // Allocate twice memory as required by the uniform buffers

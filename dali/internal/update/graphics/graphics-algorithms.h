@@ -38,7 +38,9 @@ class GraphicsAlgorithms
 {
 public:
 
-  GraphicsAlgorithms() = default;
+  GraphicsAlgorithms() = delete;
+  explicit GraphicsAlgorithms( Graphics::API::Controller& controller );
+
   ~GraphicsAlgorithms() = default;
 
   GraphicsAlgorithms(const GraphicsAlgorithms&) = delete;
@@ -59,6 +61,15 @@ public:
                                 BufferIndex bufferIndex );
 
   void DiscardUnusedResources( Graphics::API::Controller& controller );
+
+  GraphicsBufferManager& GetGraphicsBufferManager() const
+  {
+    if(!mGraphicsBufferManager)
+    {
+      puts("Dammit!");
+    }
+    return *mGraphicsBufferManager.get();
+  }
 
 private:
 
