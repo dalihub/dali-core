@@ -304,33 +304,37 @@ void Texture::Initialize( Integration::Graphics::Graphics& graphics )
   mGraphics = &graphics;
 }
 
-const Graphics::API::Texture* Texture::GetGfxObject() const
+Graphics::API::Texture* Texture::GetGfxObject() const
 {
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::GetGfxObject() = %p\n", this, mGraphicsTexture.get() );
 
   return mGraphicsTexture.get();
 }
 
-void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
+void Texture::InitialiseTexture()
 {
   if( ! mGraphicsTexture )
   {
-    DALI_ASSERT_DEBUG(pixelData->GetPixelFormat() == mFormat && "Pixel format is different");
-    DALI_ASSERT_DEBUG(pixelData->GetWidth() == mWidth && "Pixel buffer width is different");
-    DALI_ASSERT_DEBUG(pixelData->GetHeight() == mHeight && "Pixel buffer height is different");
-    CreateTextureInternal( Usage::SAMPLE, pixelData->GetBuffer(), pixelData->GetBufferSize() );
+    CreateTextureInternal( Usage::SAMPLE, nullptr, 0u );
   }
-  else
-  {
-    // schedule upload
-    mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
-                                  pixelData->GetBufferSize(),
-                                  { params.width, params.height },
-                                  { params.xOffset, params.yOffset },
-                                  params.layer,
-                                  params.mipmap,
-                                  {} );
-  }
+}
+
+
+void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
+{
+  puts("Initialising");
+  InitialiseTexture();
+  puts("Initialised");
+  puts("Copying");
+  // schedule upload
+  mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
+                                pixelData->GetBufferSize(),
+                                { params.width, params.height },
+                                { params.xOffset, params.yOffset },
+                                params.layer,
+                                params.mipmap,
+                                {} );
+
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::UploadTexture() GfxTexture: %p\n", this, mGraphicsTexture.get() );
 }
 

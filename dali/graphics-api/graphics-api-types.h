@@ -841,6 +841,12 @@ inline BufferUsageFlags operator|( BufferUsageFlags flags, BufferUsage usage )
   return flags;
 }
 
+struct MemoryRequirements
+{
+  size_t size;
+  size_t alignment;
+};
+
 } // API
 } // Graphics
 } // Dali
