@@ -311,13 +311,13 @@ public: //Cache management methods
 
   void CollectGarbage();
 
-  void ExecuteActions();
-
   void DiscardResource( std::function< void() > deleter );
 
-  void EnqueueAction( std::function< void() > action );
-
   const DiscardQueue& GetDiscardQueue( uint32_t bufferIndex ) const;
+
+  uint32_t SwapBuffers();
+
+  uint32_t GetCurrentBufferIndex();
 
 private: // Methods
 
@@ -378,11 +378,7 @@ private: // Members
   // Command pool map using thread IDs as keys
   CommandPoolMap mCommandPools;
 
-  DiscardQueue mActionQueue[2u];
   DiscardQueue mDiscardQueue[2u];
-
-  uint32_t mCurrentGarbageBufferIndex { 0u };
-  uint32_t mCurrentActionBufferIndex { 0u };
 
   bool mHasDepth { false };
   bool mHasStencil { false };
@@ -390,6 +386,8 @@ private: // Members
   vk::PipelineCache mVulkanPipelineCache;
 
   bool mSurfaceResized { false };
+
+  uint32_t mCurrentBufferIndex{ 0u };
 };
 
 } // namespace Vulkan

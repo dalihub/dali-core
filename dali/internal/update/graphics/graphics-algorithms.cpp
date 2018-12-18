@@ -515,7 +515,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     // pass shared UBO and offset, return new offset for next item to be used
     // don't process bindings if there are no uniform buffers allocated
     auto shader = renderer->GetShader().GetGfxObject();
-    auto ubo = mUniformBuffer[mUniformBufferIndex].get();
+    auto ubo = mUniformBuffer[bufferIndex].get();
     if( ubo && shader )
     {
       std::vector<Graphics::API::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
@@ -956,8 +956,6 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   bool usesDepth = false;
   bool usesStencil = false;
 
-  mUniformBufferIndex = bufferIndex;
-
   PrepareRendererPipelines( controller, renderInstructions, usesDepth, usesStencil, bufferIndex );
 
   // If state of depth/stencil has changed between frames then the pipelines must be
@@ -976,25 +974,28 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
     mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
   }
 
-  auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
-
   controller.BeginFrame();
+
+  auto pagedAllocation = ( ( mUniformBlockAllocationBytes / UBO_PAGE_SIZE + 1u ) ) * UBO_PAGE_SIZE;
 
   // Allocate twice memory as required by the uniform buffers
   // todo: memory usage backlog to use optimal allocation
-  if( mUniformBlockAllocationBytes && !mUniformBuffer[mUniformBufferIndex] )
+  if( mUniformBlockAllocationBytes && !mUniformBuffer[bufferIndex] )
   {
-    mUniformBuffer[mUniformBufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
+    mUniformBuffer[bufferIndex] = std::move( mGraphicsBufferManager->AllocateUniformBuffer( pagedAllocation ) );
   }
   else if( mUniformBlockAllocationBytes && (
-    mUniformBuffer[mUniformBufferIndex]->GetSize() < pagedAllocation ||
-    (pagedAllocation < uint32_t(float(mUniformBuffer[mUniformBufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
+    mUniformBuffer[bufferIndex]->GetSize() < pagedAllocation ||
+    (pagedAllocation < uint32_t(float(mUniformBuffer[bufferIndex]->GetSize()) * UBO_SHRINK_THRESHOLD ))))
   {
-    mUniformBuffer[mUniformBufferIndex]->Reserve( pagedAllocation, true );
+    mUniformBuffer[bufferIndex]->Reserve( pagedAllocation, true );
   }
 
   // Clear UBO
-  mUniformBuffer[mUniformBufferIndex]->Fill( 0, 0u, 0u );
+  if( mUniformBuffer[bufferIndex] )
+  {
+    mUniformBuffer[bufferIndex]->Fill( 0, 0u, 0u );
+  }
 
   mUboOffset = 0u;
 
@@ -1010,9 +1011,9 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   // Submit all render commands in one go
   controller.SubmitCommands( std::move(commandList) );
 
-  if( mUniformBlockAllocationBytes && mUniformBuffer[mUniformBufferIndex] )
+  if( mUniformBlockAllocationBytes && mUniformBuffer[bufferIndex] )
   {
-    mUniformBuffer[mUniformBufferIndex]->Flush();
+    mUniformBuffer[bufferIndex]->Flush();
   }
 
   controller.EndFrame();
