@@ -61,10 +61,10 @@ typedef Rect<int32_t> ClippingBox;
  * need for it based on the layer's contents; actors in lower layers cannot
  * obscure actors in higher layers.
  *
- * A layer has either LAYER_2D or LAYER_3D mode. LAYER_2D has better
+ * A layer has either LAYER_UI or LAYER_3D mode. LAYER_UI has better
  * performance, the depth test is disabled, and a child actor hides its
  * parent actor.  LAYER_3D uses the depth test, thus a close actor hides a
- * farther one.  LAYER_2D is the default mode and recommended for general
+ * farther one.  LAYER_UI is the default mode and recommended for general
  * cases.  See Layer::Behavior and SetBehavior() for more information.
  *
  * Layer is a type of Actor, thus can have parent or children actors.  A
@@ -118,14 +118,6 @@ public:
   enum Behavior
   {
     /**
-     * @DEPRECATED_1_1.45, use LAYER_UI instead
-     * @brief UI control rendering mode.
-     * @SINCE_1_0.0
-     * @see LAYER_UI
-     */
-    LAYER_2D,
-
-    /**
      * @brief UI control rendering mode (default mode).
      *
      * This mode is designed for UI controls that can overlap. In this
@@ -155,7 +147,7 @@ public:
      *
      * @SINCE_1_1.45
      */
-    LAYER_UI = LAYER_2D,
+    LAYER_UI,
 
     /**
      * @brief Layer will use depth test.

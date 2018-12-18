@@ -1553,55 +1553,6 @@ int UtcDaliActorGetCurrentWorldPosition(void)
   END_TEST;
 }
 
-int UtcDaliActorInheritPosition(void)
-{
-  tet_infoline("Testing Actor::SetPositionInheritanceMode");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
-  parent.SetParentOrigin( ParentOrigin::CENTER );
-  parent.SetAnchorPoint( AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( parent );
-
-  Actor child = Actor::New();
-  child.SetParentOrigin( ParentOrigin::CENTER );
-  child.SetAnchorPoint( AnchorPoint::CENTER );
-  Vector3 childPosition( 10.0f, 11.0f, 12.0f );
-  child.SetPosition( childPosition );
-  parent.Add( child );
-
-  // The actors should not have a world position yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
-
-  // first test default, which is to inherit position
-  DALI_TEST_EQUALS( child.GetPositionInheritanceMode(), Dali::INHERIT_PARENT_POSITION, TEST_LOCATION );
-  application.SendNotification();
-  application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childPosition, TEST_LOCATION );
-
-
-  //Change child position
-  Vector3 childOffset( -1.0f, 1.0f, 0.0f );
-  child.SetPosition( childOffset );
-
-  // Change inheritance mode to not inherit
-  child.SetPositionInheritanceMode( Dali::DONT_INHERIT_POSITION );
-  DALI_TEST_EQUALS( child.GetPositionInheritanceMode(), Dali::DONT_INHERIT_POSITION, TEST_LOCATION );
-  application.SendNotification();
-  application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childOffset, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), childOffset, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliActorSetInheritPosition(void)
 {
   tet_infoline("Testing Actor::SetInheritPosition");
@@ -3297,7 +3248,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "inheritOrientation",       Actor::Property::INHERIT_ORIENTATION,      Property::BOOLEAN     },
   { "inheritScale",             Actor::Property::INHERIT_SCALE,            Property::BOOLEAN     },
   { "colorMode",                Actor::Property::COLOR_MODE,               Property::STRING      },
-  { "positionInheritance",      Actor::Property::POSITION_INHERITANCE,     Property::STRING      },
   { "drawMode",                 Actor::Property::DRAW_MODE,                Property::STRING      },
   { "sizeModeFactor",           Actor::Property::SIZE_MODE_FACTOR,         Property::VECTOR3     },
   { "widthResizePolicy",        Actor::Property::WIDTH_RESIZE_POLICY,      Property::STRING      },
@@ -3816,31 +3766,6 @@ int UtcDaliActorColorModePropertyAsString(void)
   END_TEST;
 }
 
-int UtcDaliActorPositionInheritancePropertyAsString(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "INHERIT_PARENT_POSITION" );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), INHERIT_PARENT_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "USE_PARENT_POSITION" );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "USE_PARENT_POSITION_PLUS_LOCAL_POSITION" );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "DONT_INHERIT_POSITION" );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
-
-  // Invalid should not change anything
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliActorDrawModePropertyAsString(void)
 {
   TestApplication application;
@@ -3853,12 +3778,9 @@ int UtcDaliActorDrawModePropertyAsString(void)
   actor.SetProperty( Actor::Property::DRAW_MODE, "OVERLAY_2D" );
   DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
 
-  actor.SetProperty( Actor::Property::DRAW_MODE, "STENCIL" );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
-
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::DRAW_MODE, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3884,27 +3806,6 @@ int UtcDaliActorColorModePropertyAsEnum(void)
   END_TEST;
 }
 
-int UtcDaliActorPositionInheritancePropertyAsEnum(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, INHERIT_PARENT_POSITION );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), INHERIT_PARENT_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), USE_PARENT_POSITION_PLUS_LOCAL_POSITION, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::POSITION_INHERITANCE, DONT_INHERIT_POSITION );
-  DALI_TEST_EQUALS( actor.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliActorDrawModePropertyAsEnum(void)
 {
   TestApplication application;
@@ -3916,9 +3817,6 @@ int UtcDaliActorDrawModePropertyAsEnum(void)
 
   actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
-
-  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::STENCIL );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
 
   END_TEST;
 }
