@@ -107,11 +107,6 @@ public:
   void FreeDescriptorSets( std::vector<DescriptorSetList>&& descriptorSets );
 
   /**
-   * Swaps internal buffers
-   */
-  void SwapBuffers();
-
-  /**
    * Invalidates and releases all descriptor sets forcing recreating pools. This may happen
    * due to DALi staying in idle state.
    */
@@ -185,8 +180,6 @@ private:
 
   using PoolSet = std::vector<Pool>;
   std::array<PoolSet, 2u> mPoolSet;
-
-  uint32_t mBufferIndex { 1u }; // Starts with 1 to match index of update thread in DALi
 
   uint32_t mPoolUID { 0u };
 };

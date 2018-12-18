@@ -59,33 +59,44 @@ void DescriptorSetAllocator::ResolveFreeDescriptorSets()
 {
   auto& graphics = mController.GetGraphics();
 
-  for( auto& pool : mPoolSet[mBufferIndex] )
+  const auto bufferIndex = mController.GetCurrentBufferIndex();
+  for( auto& pool : mPoolSet[bufferIndex] )
   {
     if( !pool.vkDescriptorSetsToBeFreed.empty() )
     {
       // free unused descriptor sets
-      graphics.GetDevice().freeDescriptorSets( pool.vkPool, pool.vkDescriptorSetsToBeFreed );
-
-      // Update tracked descriptor sets
-      std::sort( pool.vkDescriptorSetsToBeFreed.begin(), pool.vkDescriptorSetsToBeFreed.end() );
-
+      std::vector<vk::DescriptorSet> existingDSToFree;
       auto freeIt = pool.vkDescriptorSetsToBeFreed.begin();
       std::vector<vk::DescriptorSet> newList{};
       std::for_each( pool.vkDescriptorSets.begin(), pool.vkDescriptorSets.end(), [&]( auto& item )
       {
-        if( item != *freeIt )
+        if( static_cast<VkDescriptorSet>(item) <= static_cast<VkDescriptorSet>(*freeIt) )
         {
-          newList.emplace_back( item );
+          if( item != *freeIt )
+          {
+            newList.emplace_back( item );
+          }
+          else
+          {
+            existingDSToFree.emplace_back( *freeIt );
+            ++freeIt;
+          }
         }
-        else
+        else if( freeIt != pool.vkDescriptorSetsToBeFreed.end() )
         {
           ++freeIt;
         }
       });
+
+      if( !existingDSToFree.empty() )
+      {
+        graphics.GetDevice().freeDescriptorSets( pool.vkPool, existingDSToFree );
+      }
+
       pool.vkDescriptorSets = std::move( newList );
 
       // update available number of descriptor
-      pool.available += uint32_t( pool.vkDescriptorSetsToBeFreed.size() );
+      pool.available += uint32_t( existingDSToFree.size() );
 
       // clear the free list
       pool.vkDescriptorSetsToBeFreed.clear();
@@ -136,7 +147,15 @@ void DescriptorSetAllocator::UpdateWithRequirements(
 {
   ResolveFreeDescriptorSets();
 
-  auto& poolset = mPoolSet[mBufferIndex];
+  const auto bufferIndex = mController.GetCurrentBufferIndex();
+
+  // clean pools dirty flags
+  for( auto& pool : mPoolSet[mController.GetCurrentBufferIndex()] )
+  {
+    pool.dirty = false;
+  }
+
+  auto& poolset = mPoolSet[bufferIndex];
 
   // For each signature decide whether we should reallocate pool or not.
   // Newly created pool always reallocates
@@ -268,7 +287,7 @@ bool DescriptorSetAllocator::AllocateDescriptorSets(
   DescriptorSetList& descriptorSets )
 {
   // access correct pool
-  auto& poolset = mPoolSet[mBufferIndex];
+  auto& poolset = mPoolSet[mController.GetCurrentBufferIndex()];
 
   auto& retval = descriptorSets.descriptorSets;
 
@@ -308,7 +327,7 @@ bool DescriptorSetAllocator::AllocateDescriptorSets(
     (*it).available -= uint32_t( result.size() );
     descriptorSets.reserved.reset( new DescriptorSetList::Internal() );
     descriptorSets.reserved->pool = (*it).vkPool;
-    descriptorSets.reserved->bufferIndex = mBufferIndex;
+    descriptorSets.reserved->bufferIndex = mController.GetCurrentBufferIndex();
     descriptorSets.reserved->signature = (*it).signature;
     descriptorSets.reserved->poolUID = (*it).uid;
 
@@ -354,7 +373,7 @@ void DescriptorSetAllocator::FreeDescriptorSets( std::vector<DescriptorSetList>&
     auto bufferIndex = list.reserved->bufferIndex;
     std::find_if( mPoolSet[bufferIndex].begin(), mPoolSet[bufferIndex].end(), [&]( Pool& pool )
     {
-      if( pool.uid == list.reserved->poolUID )
+      if( pool.uid == list.reserved->poolUID && pool.vkPool == list.reserved->pool )
       {
         pool.vkDescriptorSetsToBeFreed.insert( pool.vkDescriptorSetsToBeFreed.end(), list.descriptorSets.begin(), list.descriptorSets.end() );
         return true;
@@ -364,33 +383,17 @@ void DescriptorSetAllocator::FreeDescriptorSets( std::vector<DescriptorSetList>&
   }
 }
 
-void DescriptorSetAllocator::SwapBuffers()
-{
-  // clean pools dirty flags
-  for( auto& pools : mPoolSet )
-  {
-    for( auto& pool : pools )
-    {
-      pool.dirty = false;
-    }
-  }
-  mBufferIndex = (mBufferIndex+1) & 1;
-}
-
 void DescriptorSetAllocator::InvalidateAllDescriptorSets()
 {
   auto& graphics = mController.GetGraphics();
   graphics.DeviceWaitIdle();
-  for( auto& set : mPoolSet )
+  for( auto& pool : mPoolSet[mController.GetCurrentBufferIndex()] )
   {
-    for( auto& pool : set )
-    {
-      graphics.GetDevice().destroyDescriptorPool(
-        pool.vkPool,
-        &mController.GetGraphics().GetAllocator("DESCRIPTORPOOL") );
-    }
-    set.clear();
+    graphics.GetDevice().destroyDescriptorPool(
+      pool.vkPool,
+      &mController.GetGraphics().GetAllocator("DESCRIPTORPOOL") );
   }
+  mPoolSet[mController.GetCurrentBufferIndex()].clear();
 }
 
 } // Namespace Internal

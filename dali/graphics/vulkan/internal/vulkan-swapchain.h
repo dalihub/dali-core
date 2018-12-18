@@ -161,7 +161,6 @@ private:
   RefCountedFence mBetweenRenderPassFence;
 
   uint32_t mFrameCounter { 0u }; ///< Current frame number
-  uint32_t mBufferIndex { 0u }; ///< Current buffer index number
 
   bool mIsValid; // indicates whether the swapchain is still valid or requires to be recreated
 };

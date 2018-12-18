@@ -201,6 +201,8 @@ public:
 
   // VULKAN only
 
+  uint32_t GetCurrentBufferIndex();
+
 public:
 
   Vulkan::Graphics& GetGraphics() const;
