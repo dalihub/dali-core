@@ -30,6 +30,8 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
 
+#undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
+
 namespace Dali
 {
 /**
