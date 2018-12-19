@@ -179,6 +179,13 @@ public:
   virtual bool IsDiscardQueueEmpty() = 0;
 
   /**
+   * @brief Test if the graphics subsystem has resumed & should force a draw
+   *
+   * @return true if the graphics subsystem requires a re-draw
+   */
+  virtual bool IsDrawOnResumeRequired() = 0;
+
+  /**
    * @brief Waits until all previously submitted commands have been fully
    * executed.
    */
