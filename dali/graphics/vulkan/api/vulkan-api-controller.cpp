@@ -787,6 +787,7 @@ struct Controller::Impl
   std::vector<DescriptorSetList> mDescriptorSetsFreeList;
 
   uint32_t mBufferIndex{0u};
+  bool mDrawOnResume{ false };
 };
 
 // TODO: @todo temporarily ignore missing return type, will be fixed later
@@ -851,6 +852,7 @@ Controller& Controller::operator=( Controller&& ) noexcept = default;
 
 void Controller::BeginFrame()
 {
+  mImpl->mDrawOnResume = false;
   mStats.samplerTextureBindings = 0;
   mStats.uniformBufferBindings = 0;
 
@@ -920,6 +922,8 @@ void Controller::Pause()
 
 void Controller::Resume()
 {
+  // Ensure we re-draw at least once:
+  mImpl->mDrawOnResume = true;
 }
 
 API::TextureFactory& Controller::GetTextureFactory() const
@@ -1009,6 +1013,11 @@ void Controller::DiscardUnusedResources()
 bool Controller::IsDiscardQueueEmpty()
 {
   return mImpl->IsDiscardQueueEmpty();
+}
+
+bool Controller::IsDrawOnResumeRequired()
+{
+  return mImpl->mDrawOnResume;
 }
 
 void Controller::WaitIdle()

@@ -193,6 +193,8 @@ public:
 
   bool IsDiscardQueueEmpty() override;
 
+  bool IsDrawOnResumeRequired() override;
+
   void WaitIdle() override;
 
   void SwapBuffers() override;

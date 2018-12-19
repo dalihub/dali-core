@@ -64,7 +64,6 @@
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
-
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -801,12 +800,13 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
+  const bool resumed = mImpl->graphics.GetController().IsDrawOnResumeRequired();
 
-  bool updateScene = // The scene-graph requires an update if..
-      (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
-      IsAnimationRunning()                            ||    // ..at least one animation is running OR
-      mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
-      gestureUpdated;                                       // ..a gesture property was updated
+  bool updateScene =                                   // The scene-graph requires an update if..
+    (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
+    IsAnimationRunning()                            || // ..at least one animation is running OR
+    mImpl->messageQueue.IsSceneUpdateRequired()     || // ..a message that modifies the scene graph node tree is queued OR
+    gestureUpdated;                                    // ..a gesture property was updated OR
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -821,6 +821,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
+  updateScene |= resumed;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
