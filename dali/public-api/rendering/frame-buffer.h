@@ -60,17 +60,17 @@ public:
       DEPTH         = 1 << 0,                     ///< Depth buffer is created                          @SINCE_1_1.45
       STENCIL       = 1 << 1,                     ///< Stencil buffer is created                        @SINCE_1_1.45
       DEPTH_STENCIL = DEPTH | STENCIL,            ///< Depth and stencil buffer will be created         @SINCE_1_1.45
-      COLOR         = 1 << 2,                     ///< Color texture will be created                    @SINCE_1_3.54
-      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer will be created   @SINCE_1_3.54
-      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer will be created @SINCE_1_3.54
-      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer will be created  @SINCE_1_3.54
+      COLOR         = 1 << 2,                     ///< Color texture will be created                    @SINCE_1_4.0
+      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer will be created   @SINCE_1_4.0
+      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer will be created @SINCE_1_4.0
+      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer will be created  @SINCE_1_4.0
     };
   };
 
   /**
    * @brief Creates a new FrameBuffer with only COLOR texture attached on it
    *
-   * @SINCE_1_3.54
+   * @SINCE_1_4.0
    *
    * @note Call GetColorTexture() to get the COLOR texture
    *
@@ -83,7 +83,7 @@ public:
   /**
    * @brief Creates a new FrameBuffer with the specified attachments
    *
-   * @SINCE_1_3.54
+   * @SINCE_1_4.0
    *
    * @param[in] width The width of the FrameBuffer and the attachments
    * @param[in] height The height of the FrameBuffer and the attachments
@@ -93,7 +93,7 @@ public:
   static FrameBuffer New( uint32_t width, uint32_t height, Attachment::Mask attachments );
 
   /**
-   * @DEPRECATED_1_3.54 use New( uint32_t width, uint32_t height ) or New( uint32_t width, uint32_t height, Attachment::Mask attachments ) instead
+   * @DEPRECATED_1_4.0 use New( uint32_t width, uint32_t height ) or New( uint32_t width, uint32_t height, Attachment::Mask attachments ) instead
    * @brief Creates a new FrameBuffer object.
    *
    * @SINCE_1_1.43
