@@ -34,7 +34,7 @@ namespace DevelTouchData
  * @param[in] point The point required
  * @return The mouse button value
  */
-MouseButton::Type GetMouseButton( TouchData touchData, std::size_t point );
+DALI_CORE_API MouseButton::Type GetMouseButton( TouchData touchData, std::size_t point );
 
 } // namespace DevelTouchData
 
