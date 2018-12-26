@@ -823,7 +823,9 @@ Stage::Stage( AnimationPlaylist& playlist,
   mRenderingBehavior( DevelStage::Rendering::IF_REQUIRED ),
   mDepthTreeDirty( false ),
   mForceNextUpdate( false ),
-  mRenderToFbo( false )
+  mRenderToFbo( false ),
+  mNeedToRotation( false ),
+  mCurrentOrientation( 0 )
 {
 }
 
