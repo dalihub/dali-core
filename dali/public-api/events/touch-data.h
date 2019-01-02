@@ -27,7 +27,6 @@
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/math/degree.h>
-#include <dali/devel-api/events/mouse-button.h>
 
 namespace Dali
 {

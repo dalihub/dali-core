@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/touch-data.h>
+#include <dali/devel-api/events/mouse-button.h>
 
 namespace Dali
 {
