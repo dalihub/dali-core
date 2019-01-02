@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ include ../../../dali/internal/file.list
 public_api_src_dir = ../../../dali/public-api
 include ../../../dali/public-api/file.list
 
+graphics_api_src_dir = ../../../dali/graphics-api
+include ../../../dali/graphics-api/file.list
+
 devel_api_src_dir = ../../../dali/devel-api
 include ../../../dali/devel-api/file.list
 
@@ -46,9 +49,6 @@ DALI_CORE_LA_CXXFLAGS = -DDALI_COMPILATION \
                          $(dali_core_includes) \
                          $(DALI_CFLAGS)
 
-
-DALI_CORE_LA_LDFLAGS = $(DALI_LDFLAGS) -Wl,--whole-archive,graphics/libdali-graphics.a,--no-whole-archive
-
 DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
                       $(VULKAN_LIBS) \
                       -lpthread
@@ -62,7 +62,7 @@ lib_LTLIBRARIES = libdali-core-vk.la
 
 libdali_core_vk_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_vk_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_vk_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
+libdali_core_vk_la_LIBADD = $(DALI_CORE_LA_LIBADD)
 
 else
 
@@ -70,7 +70,7 @@ lib_LTLIBRARIES = libdali-core-vk-cxx11.la
 
 libdali_core_vk_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_vk_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_vk_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD) graphics/libdali-graphics.a
+libdali_core_vk_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD)
 
 endif
 
@@ -78,12 +78,16 @@ endif
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
 platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
-platformabstractiongraphicsvulkandir = $(includedir)/dali/integration-api/graphics/vulkan
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
 platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
-platformabstractiongraphicsvulkan_HEADERS = $(graphics_vulkan_integration_header_files)
+
+# Graphics API (Integration)
+graphicsapidir = $(includedir)/dali/graphics-api
+graphicsapiutilitydir = $(includedir)/dali/graphics-api/utility
+graphicsapi_HEADERS = $(graphics_api_header_files)
+graphicsapiutility_HEADERS = $(graphics_api_utility_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
@@ -152,6 +156,14 @@ noinst_PROGRAMS = linker.test
 
 linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-controller.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-buffer-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-framebuffer-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-pipeline-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-sampler-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-shader-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-texture-factory.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \

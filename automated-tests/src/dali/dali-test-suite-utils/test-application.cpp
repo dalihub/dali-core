@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,6 @@
 namespace Dali
 {
 
-namespace Integration
-{
-namespace Graphics
-{
-class SurfaceFactory
-{
-public:
-  SurfaceFactory()
-  {
-  }
-};
-
-}
-}
 
 bool TestApplication::mLoggingEnabled = true;
 
@@ -50,14 +36,13 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
-  Integration::Graphics::GraphicsCreateInfo info;
+  Dali::Integration::Graphics::GraphicsCreateInfo info;
   info.surfaceWidth = 480;
   info.surfaceHeight = 800;
   info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
-  mGraphics = std::unique_ptr<Dali::Integration::Graphics::Graphics>(
-    new Dali::Integration::Graphics::Graphics( info,
-                                               Integration::DepthBufferAvailable::FALSE,
-                                               Integration::StencilBufferAvailable::FALSE));
+  mGraphics = std::unique_ptr<Test::Graphics>( new Test::Graphics( info,
+                                                                   Integration::DepthBufferAvailable::FALSE,
+                                                                   Integration::StencilBufferAvailable::FALSE));
 
   Initialize();
 }

@@ -1,4 +1,0 @@
-# Add graphics integration source files here
-
-graphics_integration_src_files = \
-   $(graphics_integration_dir)/graphics.cpp

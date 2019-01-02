@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,7 @@ void Renderer::operator delete( void* ptr )
   gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
 }
 
-void Renderer::Initialize( Integration::Graphics::Graphics& graphics )
+void Renderer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
 

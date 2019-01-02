@@ -2,7 +2,7 @@
 #define __DALI_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@
 #include <test-platform-abstraction.h>
 #include "test-gesture-manager.h"
 #include "test-render-controller.h"
+#include "test-graphics.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/trace.h>
 
@@ -87,7 +88,7 @@ private:
 
 protected:
   TestPlatformAbstraction             mPlatformAbstraction;
-  std::unique_ptr<Integration::Graphics::Graphics> mGraphics;
+  std::unique_ptr<Test::Graphics>     mGraphics;
   TestRenderController                mRenderController;
   TestGestureManager                  mGestureManager;
 

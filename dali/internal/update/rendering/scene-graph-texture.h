@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
@@ -77,7 +77,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::Graphics& graphics );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
 
   /**
    * Retrieve wheter the texture has an alpha channel
@@ -145,7 +145,7 @@ public:
   void CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize );
 
 private:
-  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
   std::unique_ptr<Graphics::API::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/devel-api/common/stage-devel.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 
 #include <dali/internal/common/message.h>
 
@@ -60,10 +61,6 @@ class FrameCallbackInterface;
 namespace Integration
 {
 class RenderController;
-namespace Graphics
-{
-class Graphics;
-}
 } // namespace Integration
 
 namespace Internal
@@ -111,6 +108,7 @@ public:
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
+   * @param[in] graphics The graphics backend
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationPlaylist,
@@ -118,7 +116,7 @@ public:
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
                  RenderTaskProcessor& renderTaskProcessor,
-                 Dali::Integration::Graphics::Graphics& graphics);
+                 Dali::Integration::Graphics::GraphicsInterface& graphics);
 
   /**
    * Destructor.

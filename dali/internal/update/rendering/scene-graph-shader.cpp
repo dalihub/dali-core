@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ Shader::~Shader()
   mConnectionObservers.Destroy( *this );
 }
 
-void Shader::Initialize( Integration::Graphics::Graphics& graphics, ShaderCache& shaderCache )
+void Shader::Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache )
 {
   mGraphics = &graphics;
   mShaderCache = &shaderCache;

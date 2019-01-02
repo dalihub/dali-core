@@ -57,14 +57,5 @@ platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/touch-event-combiner.h \
    $(platform_abstraction_src_dir)/events/touch-event-integ.h
 
-graphics_integration_src_files = \
-   $(platform_abstraction_src_dir)/graphics/graphics.cpp
-
 graphics_integration_header_files = \
-  $(platform_abstraction_src_dir)/graphics/graphics.h \
-  $(platform_abstraction_src_dir)/graphics/graphics-interface.h \
-  $(platform_abstraction_src_dir)/graphics/surface-factory.h
-
-graphics_vulkan_integration_header_files = \
-  $(platform_abstraction_src_dir)/graphics/vulkan/vk-surface-factory.h \
-  $(platform_abstraction_src_dir)/graphics/vulkan/vulkan-hpp-wrapper.h
+  $(platform_abstraction_src_dir)/graphics/graphics-interface.h

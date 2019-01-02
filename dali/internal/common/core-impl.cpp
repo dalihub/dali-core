@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/system-overlay.h>
@@ -72,12 +72,12 @@ using Integration::GestureManager;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
-using Integration::Graphics::Graphics;
+using Integration::Graphics::GraphicsInterface;
 
 
 Core::Core( RenderController& renderController,
             PlatformAbstraction& platform,
-            Graphics& graphics,
+            GraphicsInterface& graphics,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -88,9 +88,6 @@ Core::Core( RenderController& renderController,
   mProcessingEvent(false),
   mGraphics(graphics)
 {
-  // fixme: for now to ensure libgraphics.a won't be removed during linking due to being
-  Integration::Graphics::IncludeThisLibrary();
-
   // Create the thread local storage
   CreateThreadLocalStorage();
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 #include <dali/integration-api/core-enumerations.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
@@ -34,10 +35,6 @@ namespace Dali
 
 namespace Integration
 {
-namespace Graphics
-{
-class Graphics;
-}
 class Processor;
 class RenderController;
 class PlatformAbstraction;
@@ -81,7 +78,7 @@ public:
    */
   Core( Integration::RenderController& renderController,
         Integration::PlatformAbstraction& platform,
-        Integration::Graphics::Graphics& graphics,
+        Integration::Graphics::GraphicsInterface& graphics,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -247,7 +244,7 @@ private:
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
   Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
 
-  Integration::Graphics::Graphics& mGraphics; ///< Graphics object
+  Integration::Graphics::GraphicsInterface& mGraphics; ///< Graphics object
 
   friend class ThreadLocalStorage;
 

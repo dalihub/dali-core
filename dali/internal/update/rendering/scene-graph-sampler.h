@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SAMPLER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-types.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 
 #include <memory>
 
@@ -156,7 +156,7 @@ struct Sampler
     return {};
   }
 
-  void Initialize( Integration::Graphics::Graphics& graphics )
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics )
   {
     mGraphics = &graphics;
     mGfxSampler.reset( nullptr );
@@ -171,7 +171,7 @@ struct Sampler
                     );
   }
 
-  Integration::Graphics::Graphics*              mGraphics;   ///< Graphics interface
+  Integration::Graphics::GraphicsInterface* mGraphics;   ///< Graphics interface
   std::unique_ptr<Dali::Graphics::API::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
 
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter

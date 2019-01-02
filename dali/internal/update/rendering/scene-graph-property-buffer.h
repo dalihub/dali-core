@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -79,7 +79,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::Graphics& graphics );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
 
   /**
    * @brief Set the format of the buffer
@@ -178,7 +178,7 @@ public:
   }
 
 private:
-  Integration::Graphics::Graphics*        mGraphics;  ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface* mGraphics;  ///< Graphics interface object
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
 

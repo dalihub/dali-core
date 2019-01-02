@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -84,14 +84,6 @@ if test "x$enable_cxx03_abi" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
 fi
 
-AC_ARG_ENABLE([vulkan],
-              [AC_HELP_STRING([--enable-vulkan],
-                              [Enables Vulkan support])],
-              [enable_vulkan=$enableval],
-              [enable_vulkan=no])
-
-DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
-
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
@@ -129,18 +121,6 @@ fi
 DALI_CFLAGS="$DALI_CFLAGS -I${includedir} -DDali=DaliVk"
 DALI_LDFLAGS="-L${libdir}"
 
-# forward VULKAN_SDK path to the graphics library if set correctly
-if test x"$enable_vulkan" != x"no"; then
-  PKG_CHECK_MODULES(VULKAN, vulkan, AC_DEFINE(ENABLE_VULKAN, 1, [Vulkan available as package]),
-                    [ AC_MSG_ERROR([Vulkan not available as a package!]) ]
-                    )
-  DALI_LDFLAGS+=" ${VULKAN_LIBS}"
-  DALI_CFLAGS+=" ${VULKAN_CFLAGS}"
-  AC_SUBST(VULKAN_SDK)
-  AC_SUBST(VULKAN_LIBS)
-  AC_SUBST(VULKAN_CFLAGS)
-fi
-AM_CONDITIONAL([VULKAN_SDK_SET], [test x"$enable_vulkan" != x"no"])
 
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
@@ -152,7 +132,7 @@ AC_SUBST(DALI_LDFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
-AC_CONFIG_FILES([Makefile dali-core/Makefile dali-core/graphics/Makefile])
+AC_CONFIG_FILES([Makefile dali-core/Makefile])
 
 if test "x$enable_cxx03_abi" = "xyes"; then
 AC_CONFIG_FILES([dali-core-vk-cxx03.pc])
@@ -174,8 +154,6 @@ Configuration
   Data Dir (Read Only):             $dataReadOnlyDir
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
-  Vulkan Support:                   $enable_vulkan
-  OpenGL ES version:                $enable_gles
   C++03 ABI:                        $enable_cxx03_abi
   Rename so file:                   $enable_rename_so
 "

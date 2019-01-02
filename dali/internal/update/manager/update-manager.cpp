@@ -27,7 +27,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -95,6 +95,7 @@ extern Debug::Filter* gRenderTaskLogFilter;
 
 using namespace Dali::Integration;
 using Dali::Internal::Update::MessageQueue;
+using Dali::Integration::Graphics::GraphicsInterface;
 
 namespace Dali
 {
@@ -183,7 +184,7 @@ struct UpdateManager::Impl
         RenderController& renderController,
         SceneGraphBuffers& sceneGraphBuffers,
         RenderTaskProcessor& renderTaskProcessor,
-        Integration::Graphics::Graphics& graphics )
+        GraphicsInterface& graphics )
   : notificationManager( notificationManager ),
     transformManager(),
     animationPlaylist( animationPlaylist ),
@@ -276,7 +277,7 @@ struct UpdateManager::Impl
   RenderInstructionContainer           renderInstructions;            ///< List of current instructions per frame
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
-  Integration::Graphics::Graphics&     graphics;                      ///< Graphics
+  GraphicsInterface&                   graphics;                      ///< Graphics
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -335,7 +336,7 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                               DiscardQueue&                    discardQueue,
                               RenderController&                controller,
                               RenderTaskProcessor&             renderTaskProcessor,
-                              Integration::Graphics::Graphics& graphics )
+                              GraphicsInterface& graphics )
 : mImpl( new Impl( notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,

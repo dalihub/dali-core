@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,18 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/graphics/graphics-interface.h>
-#include <dali/integration-api/graphics/graphics.h>
 #include <dali/internal/common/core-impl.h>
+
+using Dali::Integration::Graphics::GraphicsInterface;
 
 namespace Dali
 {
-
 namespace Integration
 {
 
 Core* Core::New( RenderController& renderController,
                  PlatformAbstraction& platformAbstraction,
-                 Graphics::GraphicsInterface& graphics,
+                 GraphicsInterface& graphics,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
                  RenderToFrameBuffer renderToFboEnabled,
@@ -44,7 +44,7 @@ Core* Core::New( RenderController& renderController,
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
                                         platformAbstraction,
-                                        static_cast<Integration::Graphics::Graphics&>(graphics),
+                                        graphics,
                                         gestureManager,
                                         policy,
                                         renderToFboEnabled,

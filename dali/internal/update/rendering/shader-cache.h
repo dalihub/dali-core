@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_RENDERING_SHADER_CACHE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 #include <dali/graphics-api/graphics-api-shader-details.h>
 

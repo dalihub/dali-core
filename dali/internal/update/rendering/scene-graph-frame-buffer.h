@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::Graphics& graphics );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
 
   /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
@@ -102,7 +102,7 @@ public:
   void DestroyGraphicsObjects();
 
 private:
-  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
   std::unique_ptr<Graphics::API::Framebuffer> mGraphicsFramebuffer;
 
   struct Attachment

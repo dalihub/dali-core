@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_GEOMETRY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/buffer-index.h>
@@ -56,7 +56,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::Graphics& graphics );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
 
   /**
    * Adds a property buffer to the geometry
@@ -135,7 +135,7 @@ public:
   }
 
 private:
-  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;

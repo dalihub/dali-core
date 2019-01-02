@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
@@ -67,7 +67,7 @@ public:
    * @param[in] graphics The Graphics API
    * @param[in] shaderCache A cache
    */
-  void Initialize( Integration::Graphics::Graphics& graphics, ShaderCache& shaderCache );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache );
 
   /**
    * Query whether a shader hint is set.
@@ -154,7 +154,7 @@ private:
   void BuildReflection();
 
 private: // Data
-  Integration::Graphics::Graphics*               mGraphics; ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface*      mGraphics; ///< Graphics interface object
   Graphics::API::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
   ShaderCache*                                   mShaderCache;
   Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader

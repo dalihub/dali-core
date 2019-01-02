@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
-#include <dali/integration-api/graphics/graphics.h>
+#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -88,7 +88,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::Graphics& graphics );
+  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
 
   /**
    * Set the texture set for the renderer
@@ -488,7 +488,7 @@ private:
   Renderer();
 
 private:
-  Integration::Graphics::Graphics* mGraphics; ///< Graphics interface object
+  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)

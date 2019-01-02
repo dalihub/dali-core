@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_RENDER_COMMAND_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -538,15 +538,17 @@ public:
   std::vector<PushConstantsBinding>         mPushConstantsBindings;
   const Pipeline*                           mPipeline;
 
+protected:
+  uint32_t mUpdateFlags; // update flags to be handled by implementation
+
+public:
+  // WARNING: Be careful with these - all libraries must be built with DEBUG_ENABLED
+  // to ensure every instantiation has the same size.
 #if defined(DEBUG_ENABLED)
   // Debug
   std::string                               mDebugString{""};
   void*                                     mDebugObject{nullptr};
 #endif
-
-protected:
-
-  uint32_t mUpdateFlags; // update flags to be handled by implementation
 
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 
 FrameBuffer::~FrameBuffer() = default;
 
-void FrameBuffer::Initialize( Integration::Graphics::Graphics& graphics )
+void FrameBuffer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
   // Defer creation of framebuffer until a render instruction uses it
