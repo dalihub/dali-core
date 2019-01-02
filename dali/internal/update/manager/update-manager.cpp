@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
 
-#include <iostream>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -823,10 +822,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
-
-  std::cout << "Update: updateScene:" << updateScene << std::endl;
-  std::cout << "        resumed:" << resumed << std::endl;
-
   updateScene |= resumed;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered

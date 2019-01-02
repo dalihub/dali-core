@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@
 #include <dali/graphics/vulkan/api/internal/vulkan-api-descriptor-set-allocator.h>
 
 #include <dali/graphics/thread-pool.h>
-#include <iostream>
 
 namespace Dali
 {
@@ -919,13 +918,10 @@ void Controller::PrintStats()
 
 void Controller::Pause()
 {
-  std::cout << "VulkanAPIController::Pause()" << std::endl;
 }
 
 void Controller::Resume()
 {
-  std::cout << "VulkanAPIController::Resume()" << std::endl;
-
   // Ensure we re-draw at least once:
   mImpl->mDrawOnResume = true;
 }
