@@ -43,6 +43,7 @@ my @system_packages = (
     "libdrm-dev",
     "libgif-dev",
     "libturbojpeg",
+    "libturbojpeg0-dev",
     "libfribidi-dev",
     "libharfbuzz-dev",
     "doxygen",
@@ -211,11 +212,15 @@ sub check_system_package
     my $package;
     foreach $package (@_)
     {
-        my @x=split(/\s+/, `dpkg -l $package|grep $package`);
+        my @x=split(/\s+/, `dpkg -l $package 2> /dev/null|grep $package`);
         if($x[0] ne "ii")
         {
-            print "Attempting to install $package\n";
-            system("sudo apt-get -y --force-yes install $package");
+            # Check if the package is available to install, exit-code is 0 if the package is found.
+            if(system("apt-cache show $package > /dev/null 2>&1") == 0)
+            {
+                print "Attempting to install $package\n";
+                system("sudo apt-get -y --force-yes install $package");
+            }
         }
     }
 }
@@ -257,9 +262,12 @@ sub check_source_packages
         }
         elsif ($pkg eq "gtest")
         {
-            print "Attempting to build $pkg\n";
-            # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-            run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
+            if(! -e "/usr/lib/libgtest.a")
+            {
+                print "Attempting to build $pkg\n";
+                # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
+                run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
+            }
         }
     }
 }
