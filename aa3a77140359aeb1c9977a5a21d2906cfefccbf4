@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aaaeac18_a1146a3a",
+        "filename": "build/scripts/dali_env",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-03T21:15:14Z",
+      "side": 1,
+      "message": "Switch to \"vulkan-list-version\", that way, can invoke with \"-vulkan-l\".",
+      "revId": "aa3a77140359aeb1c9977a5a21d2906cfefccbf4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
