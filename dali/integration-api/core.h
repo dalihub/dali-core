@@ -75,6 +75,7 @@ public:
   UpdateStatus()
   : keepUpdating(false),
     needsNotification(false),
+    surfaceRectChanged(false),
     secondsFromLastFrame( 0.0f )
   {
   }
