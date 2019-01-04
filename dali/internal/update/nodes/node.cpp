@@ -51,7 +51,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 uint32_t Node::mNodeCounter = 0;        ///< A counter to provide unique node ids, up-to 4 billion

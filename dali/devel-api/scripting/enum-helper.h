@@ -49,7 +49,7 @@ namespace Dali
 
 /**
  * Adds a value, typically an enum, to the table within a scope but without the scope name
- * Example converts ( Layer, LAYER_2D ) to ( "LAYER_2D", Layer::Layer2D )
+ * Example converts ( Layer, LAYER_UI ) to ( "LAYER_UI", Layer::LayerUI )
  */
 #define DALI_ENUM_TO_STRING_WITH_SCOPE( className, enumName ) { #enumName, className::enumName },
 

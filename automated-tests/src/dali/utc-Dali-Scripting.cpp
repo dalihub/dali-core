@@ -37,15 +37,6 @@ const StringEnum COLOR_MODE_VALUES[] =
 };
 const unsigned int COLOR_MODE_VALUES_COUNT = sizeof( COLOR_MODE_VALUES ) / sizeof( COLOR_MODE_VALUES[0] );
 
-const StringEnum POSITION_INHERITANCE_MODE_VALUES[] =
-{
-    { "INHERIT_PARENT_POSITION", INHERIT_PARENT_POSITION },
-    { "USE_PARENT_POSITION", USE_PARENT_POSITION },
-    { "USE_PARENT_POSITION_PLUS_LOCAL_POSITION", USE_PARENT_POSITION_PLUS_LOCAL_POSITION },
-    { "DONT_INHERIT_POSITION", DONT_INHERIT_POSITION },
-};
-const unsigned int POSITION_INHERITANCE_MODE_VALUES_COUNT = sizeof( POSITION_INHERITANCE_MODE_VALUES ) / sizeof( POSITION_INHERITANCE_MODE_VALUES[0] );
-
 const StringEnum DRAW_MODE_VALUES[] =
 {
     { "NORMAL", DrawMode::NORMAL },
@@ -479,7 +470,6 @@ int UtcDaliScriptingNewActorProperties(void)
   map[ "colorMode" ] = "USE_PARENT_COLOR";
   map[ "sensitive" ] = false;
   map[ "leaveRequired" ] = true;
-  map[ "positionInheritance" ] = "DONT_INHERIT_POSITION";
   map[ "drawMode" ] = "OVERLAY_2D";
   map[ "inheritOrientation" ] = false;
   map[ "inheritScale" ] = false;
@@ -502,7 +492,6 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsSensitive(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsOrientationInherited(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsScaleInherited(), false, TEST_LOCATION );
@@ -711,9 +700,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
   // ColorMode
   TestEnumStrings< ColorMode >( "colorMode",  application, COLOR_MODE_VALUES, COLOR_MODE_VALUES_COUNT, &Actor::SetColorMode );
-
-  // PositionInheritanceMode
-  TestEnumStrings< PositionInheritanceMode >( "positionInheritance",  application, POSITION_INHERITANCE_MODE_VALUES, POSITION_INHERITANCE_MODE_VALUES_COUNT, &Actor::SetPositionInheritanceMode );
 
   // DrawMode
   TestEnumStrings< DrawMode::Type >( "drawMode",  application, DRAW_MODE_VALUES, DRAW_MODE_VALUES_COUNT, &Actor::SetDrawMode );

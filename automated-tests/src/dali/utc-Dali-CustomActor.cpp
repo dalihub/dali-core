@@ -1352,7 +1352,7 @@ namespace Impl
  */
 struct UnregisteredCustomActor : public Dali::CustomActorImpl
 {
-  UnregisteredCustomActor() : CustomActorImpl( ACTOR_BEHAVIOUR_NONE )
+  UnregisteredCustomActor() : CustomActorImpl( ACTOR_BEHAVIOUR_DEFAULT )
   { }
   virtual ~UnregisteredCustomActor()
   { }

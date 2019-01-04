@@ -41,19 +41,6 @@ enum ColorMode
 };
 
 /**
- * @DEPRECATED_1_1.24 Use SetInheritPosition instead
- * @brief Enumeration for Actor position inheritance mode.
- * @SINCE_1_0.0
- */
-enum PositionInheritanceMode
-{
-  INHERIT_PARENT_POSITION,                 ///< Actor will inherit its parent position. This is the default @SINCE_1_0.0
-  USE_PARENT_POSITION,                     ///< Actor will copy its parent position. This is useful if many actors are stacked together in the same place. This option ignores parent origin and anchor point. @SINCE_1_0.0
-  USE_PARENT_POSITION_PLUS_LOCAL_POSITION, ///< Actor will copy its parent position and add local position. This is useful if many actors are stacked together in the same place with an offset.  This option ignores parent origin and anchor point. @SINCE_1_0.0
-  DONT_INHERIT_POSITION                    ///< Actor will not inherit position. Local position is treated as world position. This is useful if a constraint is used to override local position or if an actor is positioned globally. This option ignores parent origin, anchor point and local position. @SINCE_1_0.0
-};
-
-/**
  * @brief Enumeration for layout Dimensions.
  * @SINCE_1_0.0
  */

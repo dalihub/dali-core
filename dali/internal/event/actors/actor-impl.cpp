@@ -192,7 +192,6 @@ DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
 DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
 DALI_PROPERTY( "colorMode",                 STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "positionInheritance",       STRING,   true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE )
 DALI_PROPERTY( "drawMode",                  STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
 DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
@@ -280,17 +279,9 @@ DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_COLOR )
 DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_ALPHA )
 DALI_ENUM_TO_STRING_TABLE_END( COLOR_MODE )
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( POSITION_INHERITANCE_MODE )
-DALI_ENUM_TO_STRING( INHERIT_PARENT_POSITION )
-DALI_ENUM_TO_STRING( USE_PARENT_POSITION )
-DALI_ENUM_TO_STRING( USE_PARENT_POSITION_PLUS_LOCAL_POSITION )
-DALI_ENUM_TO_STRING( DONT_INHERIT_POSITION )
-DALI_ENUM_TO_STRING_TABLE_END( POSITION_INHERITANCE_MODE )
-
 DALI_ENUM_TO_STRING_TABLE_BEGIN( DRAW_MODE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, NORMAL )
 DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, OVERLAY_2D )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, STENCIL )
 DALI_ENUM_TO_STRING_TABLE_END( DRAW_MODE )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( RESIZE_POLICY )
@@ -817,20 +808,6 @@ const Vector2 Actor::GetCurrentScreenPosition() const
   }
 
   return Vector2::ZERO;
-}
-
-void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
-{
-  // this flag is not animatable so keep the value
-  mPositionInheritanceMode = mode;
-  // node is being used in a separate thread; queue a message to set the value
-  SetInheritPositionMessage( GetEventThreadServices(), GetNode(), mode == INHERIT_PARENT_POSITION );
-}
-
-PositionInheritanceMode Actor::GetPositionInheritanceMode() const
-{
-  // Cached for event-thread access
-  return mPositionInheritanceMode;
 }
 
 void Actor::SetInheritPosition( bool inherit )
@@ -1508,11 +1485,9 @@ void Actor::SetDrawMode( DrawMode::Type drawMode )
 {
   // this flag is not animatable so keep the value
   mDrawMode = drawMode;
-  if( drawMode != DrawMode::STENCIL )
-  {
-    // node is being used in a separate thread; queue a message to set the value
-    SetDrawModeMessage( GetEventThreadServices(), GetNode(), drawMode );
-  }
+
+  // node is being used in a separate thread; queue a message to set the value
+  SetDrawModeMessage( GetEventThreadServices(), GetNode(), drawMode );
 }
 
 DrawMode::Type Actor::GetDrawMode() const
@@ -2072,7 +2047,6 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mInheritLayoutDirection( true ),
   mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT ),
   mDrawMode( DrawMode::NORMAL ),
-  mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
   mClippingMode( ClippingMode::DISABLED )
 {
@@ -2588,16 +2562,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       if ( Scripting::GetEnumerationProperty< ColorMode >( property, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode ) )
       {
         SetColorMode( mode );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_INHERITANCE:
-    {
-      PositionInheritanceMode mode = mPositionInheritanceMode;
-      if( Scripting::GetEnumerationProperty< PositionInheritanceMode >( property, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode ) )
-      {
-        SetPositionInheritanceMode( mode );
       }
       break;
     }
@@ -3703,12 +3667,6 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
     case Dali::Actor::Property::COLOR_MODE:
     {
       value = Scripting::GetLinearEnumerationName< ColorMode >( GetColorMode(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_INHERITANCE:
-    {
-      value = Scripting::GetLinearEnumerationName< PositionInheritanceMode >( GetPositionInheritanceMode(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
       break;
     }
 

@@ -469,16 +469,6 @@ public:
   const Vector3& GetCurrentWorldPosition() const;
 
   /**
-   * @copydoc Dali::Actor::SetPositionInheritanceMode()
-   */
-  void SetPositionInheritanceMode( PositionInheritanceMode mode );
-
-  /**
-   * @copydoc Dali::Actor::GetPositionInheritanceMode()
-   */
-  PositionInheritanceMode GetPositionInheritanceMode() const;
-
-  /**
    * @copydoc Dali::Actor::SetInheritPosition()
    */
   void SetInheritPosition( bool inherit );
@@ -1978,7 +1968,6 @@ protected:
   bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
   LayoutDirection::Type mLayoutDirection           : 2; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 3; ///< Cached: How the actor and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode : 3; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 3; ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type mClippingMode                 : 3; ///< Cached: Determines which clipping mode (if any) to use.
 
