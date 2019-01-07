@@ -240,7 +240,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   /**
    * Prepare vertex attribute buffer bindings
    */
-  std::vector<const Graphics::API::Buffer*> vertexBuffers{};
+  std::vector<const Graphics::Buffer*> vertexBuffers{};
 
   for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
   {
@@ -285,7 +285,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
           texture->PrepareTexture(); // Ensure that a native texture is ready to be drawn
 
-          auto binding    = Graphics::API::RenderCommand::TextureBinding{}
+          auto binding    = Graphics::RenderCommand::TextureBinding{}
             .SetBinding(samplers[i].binding)
             .SetTexture(texture->GetGfxObject())
             .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
@@ -308,7 +308,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   bool usesIndexBuffer{false};
   if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
   {
-    cmd.BindIndexBuffer(Graphics::API::RenderCommand::IndexBufferBinding()
+    cmd.BindIndexBuffer(Graphics::RenderCommand::IndexBufferBinding()
                         .SetBuffer(mGeometry->GetIndexBuffer())
                         .SetOffset(0)
     );
@@ -318,9 +318,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
   if(usesIndexBuffer)
   {
-    cmd.Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
                                         .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
-                                        .SetDrawType( Graphics::API::RenderCommand::DrawType::INDEXED_DRAW )
+                                        .SetDrawType( Graphics::RenderCommand::DrawType::INDEXED_DRAW )
                                         .SetFirstInstance( 0u )
                                         .SetIndicesCount(
                                           mIndexedDrawElementsCount ?
@@ -330,9 +330,9 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   }
   else
   {
-    cmd.Draw(std::move(Graphics::API::RenderCommand::DrawCommand{}
+    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
                                         .SetFirstVertex(0u)
-                                        .SetDrawType(Graphics::API::RenderCommand::DrawType::VERTEX_DRAW)
+                                        .SetDrawType(Graphics::RenderCommand::DrawType::VERTEX_DRAW)
                                         .SetFirstInstance(0u)
                                         .SetVertexCount(vb->GetElementCount())
                                         .SetInstanceCount(1u)));
@@ -341,14 +341,14 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
   DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
 }
 
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
+void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
 {
   if( !mShader->GetGfxObject() )
   {
     // Invalid pipeline
     return;
   }
-  auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+  auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
   if( mShader->GetUniform( name, hash, uniformInfo ) )
   {
     ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
@@ -357,7 +357,7 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::AP
 
 bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
                                      GraphicsBuffer& ubo,
-                                     std::vector<Graphics::API::RenderCommand::UniformBufferBinding>*& outBindings,
+                                     std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
                                      uint32_t& offset,
                                      BufferIndex updateBufferIndex )
 {
@@ -415,7 +415,7 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
   for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
   {
     // Convert uniform name into hash value
-    auto uniformInfo = Graphics::API::ShaderDetails::UniformInfo{};
+    auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
     bool uniformFound = false;
 
     // test for array ( special case )

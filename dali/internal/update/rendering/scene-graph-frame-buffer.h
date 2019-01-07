@@ -94,7 +94,7 @@ public:
   /**
    * Get the graphics object associated with this framebuffer
    */
-  const Graphics::API::Framebuffer* GetGfxObject() const;
+  const Graphics::Framebuffer* GetGfxObject() const;
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -103,7 +103,7 @@ public:
 
 private:
   Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
-  std::unique_ptr<Graphics::API::Framebuffer> mGraphicsFramebuffer;
+  std::unique_ptr<Graphics::Framebuffer> mGraphicsFramebuffer;
 
   struct Attachment
   {

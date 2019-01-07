@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,56 +62,56 @@ static constexpr float CLIP_MATRIX_DATA[] = {
 
 static const Matrix CLIP_MATRIX(CLIP_MATRIX_DATA);
 
-constexpr Graphics::API::BlendFactor ConvertBlendFactor( BlendFactor::Type blendFactor )
+constexpr Graphics::BlendFactor ConvertBlendFactor( BlendFactor::Type blendFactor )
 {
   switch( blendFactor )
   {
     case BlendFactor::ZERO:
-      return Graphics::API::BlendFactor::ZERO;
+      return Graphics::BlendFactor::ZERO;
     case BlendFactor::ONE:
-      return Graphics::API::BlendFactor::ONE;
+      return Graphics::BlendFactor::ONE;
     case BlendFactor::SRC_COLOR:
-      return Graphics::API::BlendFactor::SRC_COLOR;
+      return Graphics::BlendFactor::SRC_COLOR;
     case BlendFactor::ONE_MINUS_SRC_COLOR:
-      return Graphics::API::BlendFactor::ONE_MINUS_SRC_COLOR;
+      return Graphics::BlendFactor::ONE_MINUS_SRC_COLOR;
     case BlendFactor::SRC_ALPHA:
-      return Graphics::API::BlendFactor::SRC_ALPHA;
+      return Graphics::BlendFactor::SRC_ALPHA;
     case BlendFactor::ONE_MINUS_SRC_ALPHA:
-      return Graphics::API::BlendFactor::ONE_MINUS_SRC_ALPHA;
+      return Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA;
     case BlendFactor::DST_ALPHA:
-      return Graphics::API::BlendFactor::DST_ALPHA;
+      return Graphics::BlendFactor::DST_ALPHA;
     case BlendFactor::ONE_MINUS_DST_ALPHA:
-      return Graphics::API::BlendFactor::ONE_MINUS_DST_ALPHA;
+      return Graphics::BlendFactor::ONE_MINUS_DST_ALPHA;
     case BlendFactor::DST_COLOR:
-      return Graphics::API::BlendFactor::DST_COLOR;
+      return Graphics::BlendFactor::DST_COLOR;
     case BlendFactor::ONE_MINUS_DST_COLOR:
-      return Graphics::API::BlendFactor::ONE_MINUS_DST_COLOR;
+      return Graphics::BlendFactor::ONE_MINUS_DST_COLOR;
     case BlendFactor::SRC_ALPHA_SATURATE:
-      return Graphics::API::BlendFactor::SRC_ALPHA_SATURATE;
+      return Graphics::BlendFactor::SRC_ALPHA_SATURATE;
     case BlendFactor::CONSTANT_COLOR:
-      return Graphics::API::BlendFactor::CONSTANT_COLOR;
+      return Graphics::BlendFactor::CONSTANT_COLOR;
     case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
-      return Graphics::API::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR;
     case BlendFactor::CONSTANT_ALPHA:
-      return Graphics::API::BlendFactor::CONSTANT_ALPHA;
+      return Graphics::BlendFactor::CONSTANT_ALPHA;
     case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
-      return Graphics::API::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
+      return Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA;
   }
-  return Graphics::API::BlendFactor{};
+  return Graphics::BlendFactor{};
 }
 
-constexpr Graphics::API::BlendOp ConvertBlendEquation( BlendEquation::Type blendEquation )
+constexpr Graphics::BlendOp ConvertBlendEquation( BlendEquation::Type blendEquation )
 {
   switch( blendEquation )
   {
     case BlendEquation::ADD:
-      return Graphics::API::BlendOp::ADD;
+      return Graphics::BlendOp::ADD;
     case BlendEquation::SUBTRACT:
-      return Graphics::API::BlendOp::SUBTRACT;
+      return Graphics::BlendOp::SUBTRACT;
     case BlendEquation::REVERSE_SUBTRACT:
-      return Graphics::API::BlendOp::REVERSE_SUBTRACT;
+      return Graphics::BlendOp::REVERSE_SUBTRACT;
   }
-  return Graphics::API::BlendOp{};
+  return Graphics::BlendOp{};
 }
 
 
@@ -130,34 +130,34 @@ const HashedName UNIFORM_PROJECTION_MATRIX{ "uProjection",       CalculateHash( 
 const HashedName UNIFORM_SIZE{              "uSize",             CalculateHash( std::string("uSize") ) };
 const HashedName UNIFORM_COLOR{             "uColor",            CalculateHash( std::string("uColor") ) };
 
-constexpr Graphics::API::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
+constexpr Graphics::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
 {
   switch( stencilOp )
   {
-    case StencilOperation::ZERO: return Graphics::API::StencilOp::ZERO;
-    case StencilOperation::DECREMENT: return Graphics::API::StencilOp::DECREMENT_AND_CLAMP;
-    case StencilOperation::DECREMENT_WRAP: return Graphics::API::StencilOp::DECREMENT_AND_WRAP;
-    case StencilOperation::INCREMENT: return Graphics::API::StencilOp::INCREMENT_AND_CLAMP;
-    case StencilOperation::INCREMENT_WRAP: return Graphics::API::StencilOp::INCREMENT_AND_WRAP;
-    case StencilOperation::INVERT: return Graphics::API::StencilOp::INVERT;
-    case StencilOperation::KEEP: return Graphics::API::StencilOp::KEEP;
-    case StencilOperation::REPLACE: return Graphics::API::StencilOp::REPLACE;
+    case StencilOperation::ZERO: return Graphics::StencilOp::ZERO;
+    case StencilOperation::DECREMENT: return Graphics::StencilOp::DECREMENT_AND_CLAMP;
+    case StencilOperation::DECREMENT_WRAP: return Graphics::StencilOp::DECREMENT_AND_WRAP;
+    case StencilOperation::INCREMENT: return Graphics::StencilOp::INCREMENT_AND_CLAMP;
+    case StencilOperation::INCREMENT_WRAP: return Graphics::StencilOp::INCREMENT_AND_WRAP;
+    case StencilOperation::INVERT: return Graphics::StencilOp::INVERT;
+    case StencilOperation::KEEP: return Graphics::StencilOp::KEEP;
+    case StencilOperation::REPLACE: return Graphics::StencilOp::REPLACE;
   }
   return {};
 }
 
-constexpr Graphics::API::CompareOp ConvertStencilFunc( StencilFunction::Type stencilFunc )
+constexpr Graphics::CompareOp ConvertStencilFunc( StencilFunction::Type stencilFunc )
 {
   switch( stencilFunc )
   {
-    case StencilFunction::NEVER: return Graphics::API::CompareOp::NEVER;
-    case StencilFunction::LESS: return Graphics::API::CompareOp::LESS;
-    case StencilFunction::EQUAL: return Graphics::API::CompareOp::EQUAL;
-    case StencilFunction::LESS_EQUAL: return Graphics::API::CompareOp::LESS_OR_EQUAL;
-    case StencilFunction::GREATER: return Graphics::API::CompareOp::GREATER;
-    case StencilFunction::NOT_EQUAL: return Graphics::API::CompareOp::NOT_EQUAL;
-    case StencilFunction::GREATER_EQUAL: return Graphics::API::CompareOp::GREATER_OR_EQUAL;
-    case StencilFunction::ALWAYS: return Graphics::API::CompareOp::ALWAYS;
+    case StencilFunction::NEVER: return Graphics::CompareOp::NEVER;
+    case StencilFunction::LESS: return Graphics::CompareOp::LESS;
+    case StencilFunction::EQUAL: return Graphics::CompareOp::EQUAL;
+    case StencilFunction::LESS_EQUAL: return Graphics::CompareOp::LESS_OR_EQUAL;
+    case StencilFunction::GREATER: return Graphics::CompareOp::GREATER;
+    case StencilFunction::NOT_EQUAL: return Graphics::CompareOp::NOT_EQUAL;
+    case StencilFunction::GREATER_EQUAL: return Graphics::CompareOp::GREATER_OR_EQUAL;
+    case StencilFunction::ALWAYS: return Graphics::CompareOp::ALWAYS;
   }
   return {};
 }
@@ -314,13 +314,13 @@ bool GraphicsAlgorithms::SetupStencilClipping( const RenderItem& item, uint32_t&
     // As the mask is made up of contiguous "1" values, we can do this quickly with a bit-shift.
     const uint32_t testMask = currentDepthMask >> 1u;
 
-    mCurrentStencilState.front.compareOp = Graphics::API::CompareOp::EQUAL;
+    mCurrentStencilState.front.compareOp = Graphics::CompareOp::EQUAL;
     mCurrentStencilState.front.reference = currentDepthMask;
     mCurrentStencilState.front.compareMask = testMask;
 
-    mCurrentStencilState.front.failOp = Graphics::API::StencilOp::KEEP;
-    mCurrentStencilState.front.depthFailOp = Graphics::API::StencilOp::REPLACE;
-    mCurrentStencilState.front.passOp = Graphics::API::StencilOp::REPLACE;
+    mCurrentStencilState.front.failOp = Graphics::StencilOp::KEEP;
+    mCurrentStencilState.front.depthFailOp = Graphics::StencilOp::REPLACE;
+    mCurrentStencilState.front.passOp = Graphics::StencilOp::REPLACE;
 
     mCurrentStencilState.back = mCurrentStencilState.front;
   }
@@ -330,13 +330,13 @@ bool GraphicsAlgorithms::SetupStencilClipping( const RenderItem& item, uint32_t&
     // This calculation sets all the bits up to the current depth bit.
     // This has the effect of testing that the pixel being written to exists in every bit-plane up to the current depth.
 
-    mCurrentStencilState.front.compareOp = Graphics::API::CompareOp::EQUAL;
+    mCurrentStencilState.front.compareOp = Graphics::CompareOp::EQUAL;
     mCurrentStencilState.front.reference = currentDepthMask;
     mCurrentStencilState.front.compareMask = 0xff;
 
-    mCurrentStencilState.front.failOp = Graphics::API::StencilOp::KEEP;
-    mCurrentStencilState.front.depthFailOp = Graphics::API::StencilOp::KEEP;
-    mCurrentStencilState.front.passOp = Graphics::API::StencilOp::KEEP;
+    mCurrentStencilState.front.failOp = Graphics::StencilOp::KEEP;
+    mCurrentStencilState.front.depthFailOp = Graphics::StencilOp::KEEP;
+    mCurrentStencilState.front.passOp = Graphics::StencilOp::KEEP;
 
     mCurrentStencilState.back = mCurrentStencilState.front;
   }
@@ -431,7 +431,7 @@ void GraphicsAlgorithms::SetupClipping( const RenderItem& item,
 }
 
 
-bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState )
+bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::ViewportState& outViewportState )
 {
   // The scissor test is enabled if we have more than one child (the first entry is always the viewport)
   // on the stack, or the stack is empty and there is a layer clipping box.
@@ -457,13 +457,13 @@ bool GraphicsAlgorithms::SetupPipelineViewportState( Graphics::API::ViewportStat
 }
 
 void GraphicsAlgorithms::RecordRenderItemList(
-  Graphics::API::Controller &graphics,
+  Graphics::Controller &graphics,
   BufferIndex bufferIndex,
-  Graphics::API::RenderCommand::RenderTargetBinding &renderTargetBinding,
+  Graphics::RenderCommand::RenderTargetBinding &renderTargetBinding,
   Matrix viewProjection,
   RenderInstruction &instruction,
   const RenderList &renderItemList,
-  std::vector<Graphics::API::RenderCommand *> &commandList)
+  std::vector<Graphics::RenderCommand *> &commandList)
 {
   auto numberOfRenderItems = renderItemList.Count();
 
@@ -518,7 +518,7 @@ void GraphicsAlgorithms::RecordRenderItemList(
     auto ubo = mUniformBuffer[bufferIndex].get();
     if( ubo && shader )
     {
-      std::vector<Graphics::API::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
+      std::vector<Graphics::RenderCommand::UniformBufferBinding>* bindings{ nullptr };
       if( renderer->UpdateUniformBuffers( instruction, *ubo, bindings, mUboOffset, bufferIndex ) )
       {
         cmd.BindUniformBuffers( bindings );
@@ -561,12 +561,12 @@ void GraphicsAlgorithms::RecordRenderItemList(
 }
 
 void GraphicsAlgorithms::RecordInstruction(
-  Graphics::API::Controller& graphics,
+  Graphics::Controller& graphics,
   BufferIndex bufferIndex,
   RenderInstruction& instruction,
-  std::vector<Graphics::API::RenderCommand*>& commandList)
+  std::vector<Graphics::RenderCommand*>& commandList)
 {
-  using namespace Graphics::API;
+  using namespace Graphics;
 
   // Create constant buffer with static uniforms: view matrix, projection matrix
   const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
@@ -575,7 +575,7 @@ void GraphicsAlgorithms::RecordInstruction(
   Matrix::Multiply( viewProjection, *viewMatrix, *projectionMatrix );
 
 
-  auto renderTargetBinding = Graphics::API::RenderCommand::RenderTargetBinding{}
+  auto renderTargetBinding = Graphics::RenderCommand::RenderTargetBinding{}
   .SetClearColors( {{ instruction.mClearColor.r,
                     instruction.mClearColor.g,
                     instruction.mClearColor.b,
@@ -601,7 +601,7 @@ void GraphicsAlgorithms::RecordInstruction(
   }
 }
 
-bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::Controller& controller,
                               RenderInstruction& instruction,
                               const RenderList* renderList,
                               RenderItem& item,
@@ -609,7 +609,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
                               bool& usesStencil,
                               BufferIndex bufferIndex )
 {
-  using namespace Dali::Graphics::API;
+  using namespace Dali::Graphics;
 
   const uint32_t UBO_ALIGNMENT = 256u;
 
@@ -644,7 +644,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    * Prepare vertex attribute buffer bindings
    */
   uint32_t bindingIndex{0u};
-  std::vector<Graphics::API::Buffer*> vertexBuffers{};
+  std::vector<Graphics::Buffer*> vertexBuffers{};
 
   for (auto &&vertexBuffer : geometry->GetVertexBuffers())
   {
@@ -808,13 +808,13 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
    * Scissor test is represented only by the dynamic state as it can be transformed
    * any time.
    */
-  Graphics::API::PipelineDynamicStateMask dynamicStateMask{ 0u };
+  Graphics::PipelineDynamicStateMask dynamicStateMask{ 0u };
 
   if( SetupPipelineViewportState( viewportState) )
   {
     cmd.mDrawCommand.SetScissor( viewportState.scissor );
     cmd.mDrawCommand.SetScissorTestEnable( true );
-    dynamicStateMask = Graphics::API::PipelineDynamicStateBits::SCISSOR_BIT;
+    dynamicStateMask = Graphics::PipelineDynamicStateBits::SCISSOR_BIT;
   }
   else
   {
@@ -822,7 +822,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
   }
 
   // todo: make it possible to decide earlier whether we want dynamic or static viewport
-  dynamicStateMask |= Graphics::API::PipelineDynamicStateBits::VIEWPORT_BIT;
+  dynamicStateMask |= Graphics::PipelineDynamicStateBits::VIEWPORT_BIT;
 
   // reset pipeline's viewport to prevent hashing function changing due to animated values.
   viewportState.SetViewport({0.0, 0.0, 0.0, 0.0, 0.0, 1.0});
@@ -902,7 +902,7 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline( Graphics::API::Controller& con
 }
 
 
-void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& controller,
+void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::Controller& controller,
                                                    RenderInstructionContainer& renderInstructions,
                                                    bool& usesDepth,
                                                    bool& usesStencil,
@@ -949,7 +949,7 @@ void GraphicsAlgorithms::PrepareRendererPipelines( Graphics::API::Controller& co
 }
 
 void GraphicsAlgorithms::SubmitRenderInstructions(
-  Graphics::API::Controller&  controller,
+  Graphics::Controller&  controller,
   RenderInstructionContainer& renderInstructions,
   BufferIndex                 bufferIndex )
 {
@@ -999,7 +999,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
 
   mUboOffset = 0u;
 
-  std::vector<Graphics::API::RenderCommand*> commandList{};
+  std::vector<Graphics::RenderCommand*> commandList{};
 
   for( uint32_t i = 0; i < numberOfInstructions; ++i )
   {
@@ -1021,7 +1021,7 @@ void GraphicsAlgorithms::SubmitRenderInstructions(
   mCurrentFrameIndex++;
 }
 
-void GraphicsAlgorithms::DiscardUnusedResources( Graphics::API::Controller& controller )
+void GraphicsAlgorithms::DiscardUnusedResources( Graphics::Controller& controller )
 {
   // wait for queues to be idle
   controller.WaitIdle();

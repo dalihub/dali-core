@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_BUFFER_FACTORY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,8 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
-class BufferFactory : public API::BaseFactory<API::Buffer>
+
+class BufferFactory : public BaseFactory<Buffer>
 {
 public:
 
@@ -44,7 +43,7 @@ public:
    * @param usage
    * @return
    */
-  virtual BufferFactory& SetUsageFlags( API::BufferUsageFlags usage ) = 0;
+  virtual BufferFactory& SetUsageFlags( BufferUsageFlags usage ) = 0;
 
   /**
    * Sets size of the buffer
@@ -63,8 +62,7 @@ protected:
   BufferFactory& operator=(BufferFactory&&) = default;
 };
 
-}
-}
-}
+} // Graphics
+} // Dali
 
 #endif //DALI_GRAPHICS_API_BUFFER_FACTORY_H

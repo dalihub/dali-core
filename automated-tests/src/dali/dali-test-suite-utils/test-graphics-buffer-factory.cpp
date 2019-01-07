@@ -23,17 +23,17 @@ GraphicsBufferFactory::GraphicsBufferFactory()=default;
 GraphicsBufferFactory::~GraphicsBufferFactory()=default;
 
 
-Dali::Graphics::API::BufferFactory& GraphicsBufferFactory::SetUsageFlags( Dali::Graphics::API::BufferUsageFlags usage )
+Dali::Graphics::BufferFactory& GraphicsBufferFactory::SetUsageFlags( Dali::Graphics::BufferUsageFlags usage )
 {
   return *this;
 }
 
-Dali::Graphics::API::BufferFactory& GraphicsBufferFactory::SetSize( uint32_t size )
+Dali::Graphics::BufferFactory& GraphicsBufferFactory::SetSize( uint32_t size )
 {
   return *this;
 }
 
-Dali::Graphics::API::BufferFactory::PointerType GraphicsBufferFactory::Create() const
+Dali::Graphics::BufferFactory::PointerType GraphicsBufferFactory::Create() const
 {
   return nullptr;
 }

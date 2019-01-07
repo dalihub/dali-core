@@ -22,20 +22,20 @@
 namespace Test
 {
 
-class GraphicsTextureFactory : public Dali::Graphics::API::TextureFactory
+class GraphicsTextureFactory : public Dali::Graphics::TextureFactory
 {
 public:
   GraphicsTextureFactory();
   virtual ~GraphicsTextureFactory();
 
-  Dali::Graphics::API::TextureFactory& SetType(Dali::Graphics::API::TextureDetails::Type type) override;
-  Dali::Graphics::API::TextureFactory& SetSize(const Dali::Graphics::API::RectSize& size) override;
-  Dali::Graphics::API::TextureFactory& SetFormat(Dali::Graphics::API::TextureDetails::Format format) override;
-  Dali::Graphics::API::TextureFactory& SetMipMapFlag(Dali::Graphics::API::TextureDetails::MipMapFlag mipMapFlag) override;
-  Dali::Graphics::API::TextureFactory& SetUsage( Dali::Graphics::API::TextureDetails::Usage usage ) override;
-  Dali::Graphics::API::TextureFactory& SetData( void* pData ) override;
-  Dali::Graphics::API::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
-  Dali::Graphics::API::TextureFactory::PointerType Create() const override;
+  Dali::Graphics::TextureFactory& SetType(Dali::Graphics::TextureDetails::Type type) override;
+  Dali::Graphics::TextureFactory& SetSize(const Dali::Graphics::RectSize& size) override;
+  Dali::Graphics::TextureFactory& SetFormat(Dali::Graphics::TextureDetails::Format format) override;
+  Dali::Graphics::TextureFactory& SetMipMapFlag(Dali::Graphics::TextureDetails::MipMapFlag mipMapFlag) override;
+  Dali::Graphics::TextureFactory& SetUsage( Dali::Graphics::TextureDetails::Usage usage ) override;
+  Dali::Graphics::TextureFactory& SetData( void* pData ) override;
+  Dali::Graphics::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
+  Dali::Graphics::TextureFactory::PointerType Create() const override;
 };
 
 } // Test

@@ -111,7 +111,7 @@ public:
    * @param[in] controller
    * @return
    */
-  bool Update( Dali::Graphics::API::Controller& controller );
+  bool Update( Dali::Graphics::Controller& controller );
 
   /**
    * Get the number of attributes present in the buffer
@@ -167,7 +167,7 @@ public:
   {
     return mFormat.Get();
   }
-  inline Graphics::API::Buffer* GetGfxObject() const
+  inline Graphics::Buffer* GetGfxObject() const
   {
     return mGraphicsBuffer.get();
   }
@@ -186,8 +186,8 @@ private:
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
 
   // GRAPHICS
-  std::unique_ptr<Graphics::API::Buffer> mGraphicsBuffer;
-  Graphics::API::BufferUsageFlags mGraphicsBufferUsage;
+  std::unique_ptr<Graphics::Buffer> mGraphicsBuffer;
+  Graphics::BufferUsageFlags mGraphicsBufferUsage;
 };
 
 

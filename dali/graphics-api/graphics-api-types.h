@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TYPES_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
+
 class Shader;
 class Framebuffer;
 using Extension = void*;
@@ -387,7 +386,7 @@ struct ViewportState
     return *this;
   }
 
-  ViewportState& SetScissorTestEnable( bool value )
+ ViewportState& SetScissorTestEnable( bool value )
   {
     scissorTestEnable = value;
     return *this;
@@ -841,7 +840,6 @@ inline BufferUsageFlags operator|( BufferUsageFlags flags, BufferUsage usage )
   return flags;
 }
 
-} // API
 } // Graphics
 } // Dali
 

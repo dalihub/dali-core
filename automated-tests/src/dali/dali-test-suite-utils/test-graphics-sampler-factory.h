@@ -23,39 +23,39 @@ namespace Test
 {
 
 
-class GraphicsSamplerFactory : public Dali::Graphics::API::SamplerFactory
+class GraphicsSamplerFactory : public Dali::Graphics::SamplerFactory
 {
 public:
   GraphicsSamplerFactory();
   virtual ~GraphicsSamplerFactory();
 
-  Dali::Graphics::API::SamplerFactory& SetAddressModeU( Dali::Graphics::API::SamplerAddressMode mode ) override;
+  Dali::Graphics::SamplerFactory& SetAddressModeU( Dali::Graphics::SamplerAddressMode mode ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetAddressModeV( Dali::Graphics::API::SamplerAddressMode mode ) override;
+  Dali::Graphics::SamplerFactory& SetAddressModeV( Dali::Graphics::SamplerAddressMode mode ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetAddressModeW( Dali::Graphics::API::SamplerAddressMode mode ) override;
+  Dali::Graphics::SamplerFactory& SetAddressModeW( Dali::Graphics::SamplerAddressMode mode ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMinFilter( Dali::Graphics::API::SamplerFilter filter ) override;
+  Dali::Graphics::SamplerFactory& SetMinFilter( Dali::Graphics::SamplerFilter filter ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMagFilter( Dali::Graphics::API::SamplerFilter filter ) override;
+  Dali::Graphics::SamplerFactory& SetMagFilter( Dali::Graphics::SamplerFilter filter ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMipmapMode( Dali::Graphics::API::SamplerMipmapMode mipmapMode ) override;
+  Dali::Graphics::SamplerFactory& SetMipmapMode( Dali::Graphics::SamplerMipmapMode mipmapMode ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetAnisotropyEnable( bool anisotropyEnable ) override;
+  Dali::Graphics::SamplerFactory& SetAnisotropyEnable( bool anisotropyEnable ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMaxAnisotropy( float maxAnisotropy ) override;
+  Dali::Graphics::SamplerFactory& SetMaxAnisotropy( float maxAnisotropy ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMinLod( float minLod ) override;
+  Dali::Graphics::SamplerFactory& SetMinLod( float minLod ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetMaxLod( float maxLod ) override;
+  Dali::Graphics::SamplerFactory& SetMaxLod( float maxLod ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetUnnormalizeCoordinates( bool unnormalizedCoordinates ) override;
+  Dali::Graphics::SamplerFactory& SetUnnormalizeCoordinates( bool unnormalizedCoordinates ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetCompareEnable( bool compareEnable ) override;
+  Dali::Graphics::SamplerFactory& SetCompareEnable( bool compareEnable ) override;
 
-  Dali::Graphics::API::SamplerFactory& SetCompareOp( Dali::Graphics::API::CompareOp compareOp ) override;
+  Dali::Graphics::SamplerFactory& SetCompareOp( Dali::Graphics::CompareOp compareOp ) override;
 
-  Dali::Graphics::API::SamplerFactory::PointerType Create() const override;
+  Dali::Graphics::SamplerFactory::PointerType Create() const override;
 };
 
 } // Test

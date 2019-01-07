@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ namespace Internal
 namespace SceneGraph
 {
 
-ShaderCache::ShaderCache( Dali::Graphics::API::Controller& controller )
+ShaderCache::ShaderCache( Dali::Graphics::Controller& controller )
 : mController( controller )
 {
 }
 
-Dali::Graphics::API::Shader& ShaderCache::GetShader(
-  const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
-  const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh )
+Dali::Graphics::Shader& ShaderCache::GetShader(
+  const Dali::Graphics::ShaderDetails::ShaderSource& vsh,
+  const Dali::Graphics::ShaderDetails::ShaderSource& fsh )
 {
   for( auto&& item : mItems )
   {
@@ -42,11 +42,11 @@ Dali::Graphics::API::Shader& ShaderCache::GetShader(
   }
   auto shader =
     mController.CreateShader( mController.GetShaderFactory()
-                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::VERTEX,
-                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                              .SetShaderModule( Graphics::ShaderDetails::PipelineStage::VERTEX,
+                                                Graphics::ShaderDetails::Language::SPIRV_1_0,
                                                 vsh )
-                              .SetShaderModule( Graphics::API::ShaderDetails::PipelineStage::FRAGMENT,
-                                                Graphics::API::ShaderDetails::Language::SPIRV_1_0,
+                              .SetShaderModule( Graphics::ShaderDetails::PipelineStage::FRAGMENT,
+                                                Graphics::ShaderDetails::Language::SPIRV_1_0,
                                                 fsh ) );
 
   auto retval = shader.get();

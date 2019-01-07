@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_RENDER_COMMAND_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ struct RenderCommand
   {
   }
 
-  Graphics::API::RenderCommand& AllocateGfxRenderCommand( Graphics::API::Controller& controller,
+  Graphics::RenderCommand& AllocateGfxRenderCommand( Graphics::Controller& controller,
                                                           BufferIndex updateBufferIndex )
   {
     if (!mGfxRenderCommand)
@@ -51,24 +51,24 @@ struct RenderCommand
     return *mGfxRenderCommand.get();
   }
 
-  Graphics::API::RenderCommand& GetGfxRenderCommand( BufferIndex bufferIndex )
+  Graphics::RenderCommand& GetGfxRenderCommand( BufferIndex bufferIndex )
   {
     DALI_ASSERT_ALWAYS( mGfxRenderCommand != nullptr );
     return *mGfxRenderCommand.get();
   }
 
-  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex )
+  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex )
   {
     mGfxPipeline = std::move(pipeline);
     mGfxRenderCommand->BindPipeline( mGfxPipeline.get() );
   }
 
-  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
+  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex )
   {
     return std::move( mGfxPipeline );
   }
 
-  void BindTextures( std::vector<Graphics::API::RenderCommand::TextureBinding>& textureBindings,
+  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings,
                      BufferIndex updateBufferIndex )
   {
     if( !mGfxRenderCommand->GetTextureBindings() )
@@ -77,7 +77,7 @@ struct RenderCommand
     }
   }
 
-  void BindTextures( std::vector<Graphics::API::RenderCommand::TextureBinding>& textureBindings )
+  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings )
   {
     if( mGfxRenderCommand )
     {
@@ -85,9 +85,9 @@ struct RenderCommand
     }
   }
 
-  std::unique_ptr<Graphics::API::RenderCommand> mGfxRenderCommand;
-  std::unique_ptr<Graphics::API::Pipeline> mGfxPipeline;
-  std::vector<Graphics::API::RenderCommand::UniformBufferBinding> mUboBindings;
+  std::unique_ptr<Graphics::RenderCommand> mGfxRenderCommand;
+  std::unique_ptr<Graphics::Pipeline> mGfxPipeline;
+  std::vector<Graphics::RenderCommand::UniformBufferBinding> mUboBindings;
 };
 
 } // namespace SceneGraph

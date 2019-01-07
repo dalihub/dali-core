@@ -107,7 +107,7 @@ public:
    * Get the Graphics object associated with this texture
    * @return The graphics object.
    */
-  const Graphics::API::Texture* GetGfxObject() const;
+  const Graphics::Texture* GetGfxObject() const;
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -146,7 +146,7 @@ public:
 
 private:
   Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
-  std::unique_ptr<Graphics::API::Texture> mGraphicsTexture; ///< Graphics texture
+  std::unique_ptr<Graphics::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
   SceneGraph::Sampler     mSampler;          ///< The current sampler state

@@ -124,143 +124,143 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
 }
 
 /**
- * Converts DALi pixel format to Graphics::API::Format
+ * Converts DALi pixel format to Graphics::Format
  * @param format
  * @return
  */
-constexpr Graphics::API::Format ConvertPixelFormat( Pixel::Format format )
+constexpr Graphics::Format ConvertPixelFormat( Pixel::Format format )
 {
   switch( format )
   {
     case Pixel::INVALID:
-      return Graphics::API::Format::UNDEFINED;
+      return Graphics::Format::UNDEFINED;
     case Pixel::A8:
-      return Graphics::API::Format::R8_UNORM;
+      return Graphics::Format::R8_UNORM;
     case Pixel::L8:
-      return Graphics::API::Format::L8;
+      return Graphics::Format::L8;
     case Pixel::LA88:
-      return Graphics::API::Format::L8A8;
+      return Graphics::Format::L8A8;
     case Pixel::RGB565:
-      return Graphics::API::Format::R5G6B5_UNORM_PACK16;
+      return Graphics::Format::R5G6B5_UNORM_PACK16;
     case Pixel::BGR565:
-      return Graphics::API::Format::B5G6R5_UNORM_PACK16;
+      return Graphics::Format::B5G6R5_UNORM_PACK16;
     case Pixel::RGBA4444:
-      return Graphics::API::Format::R4G4B4A4_UNORM_PACK16;
+      return Graphics::Format::R4G4B4A4_UNORM_PACK16;
     case Pixel::BGRA4444:
-      return Graphics::API::Format::B4G4R4A4_UNORM_PACK16;
+      return Graphics::Format::B4G4R4A4_UNORM_PACK16;
     case Pixel::RGBA5551:
-      return Graphics::API::Format::R5G5B5A1_UNORM_PACK16;
+      return Graphics::Format::R5G5B5A1_UNORM_PACK16;
     case Pixel::BGRA5551:
-      return Graphics::API::Format::B5G5R5A1_UNORM_PACK16;
+      return Graphics::Format::B5G5R5A1_UNORM_PACK16;
     case Pixel::RGB888:
-      return Graphics::API::Format::R8G8B8_UNORM;
+      return Graphics::Format::R8G8B8_UNORM;
     case Pixel::RGB8888:
-      return Graphics::API::Format::R8G8B8A8_UNORM;
+      return Graphics::Format::R8G8B8A8_UNORM;
     case Pixel::BGR8888:
-      return Graphics::API::Format::B8G8R8A8_UNORM;
+      return Graphics::Format::B8G8R8A8_UNORM;
     case Pixel::RGBA8888:
-      return Graphics::API::Format::R8G8B8A8_UNORM;
+      return Graphics::Format::R8G8B8A8_UNORM;
     case Pixel::BGRA8888:
-      return Graphics::API::Format::B8G8R8A8_UNORM;
+      return Graphics::Format::B8G8R8A8_UNORM;
 
     // EAC
     case Pixel::COMPRESSED_R11_EAC:
-      return Graphics::API::Format::EAC_R11_UNORM_BLOCK;
+      return Graphics::Format::EAC_R11_UNORM_BLOCK;
     case Pixel::COMPRESSED_SIGNED_R11_EAC:
-      return Graphics::API::Format::EAC_R11_SNORM_BLOCK;
+      return Graphics::Format::EAC_R11_SNORM_BLOCK;
     case Pixel::COMPRESSED_RG11_EAC:
-      return Graphics::API::Format::EAC_R11G11_UNORM_BLOCK;
+      return Graphics::Format::EAC_R11G11_UNORM_BLOCK;
     case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-      return Graphics::API::Format::EAC_R11G11_SNORM_BLOCK;
+      return Graphics::Format::EAC_R11G11_SNORM_BLOCK;
 
     // ETC
     case Pixel::COMPRESSED_RGB8_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK;
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8_SRGB_BLOCK;
+      return Graphics::Format::ETC2_R8G8B8_SRGB_BLOCK;
 
     case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
+      return Graphics::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
 
     case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::API::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
+      return Graphics::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
 
     case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
 
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::API::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
+      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
 
     case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::API::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
+      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
 
     case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-      return Graphics::API::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
+      return Graphics::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
 
     // ASTC
     case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-      return Graphics::API::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
+      return Graphics::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
     case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-      return Graphics::API::Format::ASTC_5x4_UNORM_BLOCK;
+      return Graphics::Format::ASTC_5x4_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-      return Graphics::API::Format::ASTC_5x5_UNORM_BLOCK;
+      return Graphics::Format::ASTC_5x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-      return Graphics::API::Format::ASTC_6x5_UNORM_BLOCK;
+      return Graphics::Format::ASTC_6x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-      return Graphics::API::Format::ASTC_6x6_UNORM_BLOCK;
+      return Graphics::Format::ASTC_6x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-      return Graphics::API::Format::ASTC_8x5_UNORM_BLOCK;
+      return Graphics::Format::ASTC_8x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-      return Graphics::API::Format::ASTC_8x6_UNORM_BLOCK;
+      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-      return Graphics::API::Format::ASTC_8x8_UNORM_BLOCK;
+      return Graphics::Format::ASTC_8x8_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-      return Graphics::API::Format::ASTC_10x5_UNORM_BLOCK;
+      return Graphics::Format::ASTC_10x5_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-      return Graphics::API::Format::ASTC_10x6_UNORM_BLOCK;
+      return Graphics::Format::ASTC_10x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-      return Graphics::API::Format::ASTC_10x8_UNORM_BLOCK;
+      return Graphics::Format::ASTC_10x8_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-      return Graphics::API::Format::ASTC_10x10_UNORM_BLOCK;
+      return Graphics::Format::ASTC_10x10_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-      return Graphics::API::Format::ASTC_12x10_UNORM_BLOCK;
+      return Graphics::Format::ASTC_12x10_UNORM_BLOCK;
     case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-      return Graphics::API::Format::ASTC_12x12_UNORM_BLOCK;
+      return Graphics::Format::ASTC_12x12_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
 
-      return Graphics::API::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
+      return Graphics::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-      return Graphics::API::Format::ASTC_5x4_SRGB_BLOCK;
+      return Graphics::Format::ASTC_5x4_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-      return Graphics::API::Format::ASTC_5x5_SRGB_BLOCK;
+      return Graphics::Format::ASTC_5x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-      return Graphics::API::Format::ASTC_6x5_SRGB_BLOCK;
+      return Graphics::Format::ASTC_6x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-      return Graphics::API::Format::ASTC_6x6_SRGB_BLOCK;
+      return Graphics::Format::ASTC_6x6_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-      return Graphics::API::Format::ASTC_8x5_SRGB_BLOCK;
+      return Graphics::Format::ASTC_8x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-      return Graphics::API::Format::ASTC_8x6_UNORM_BLOCK;
+      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-      return Graphics::API::Format::ASTC_8x8_SRGB_BLOCK;
+      return Graphics::Format::ASTC_8x8_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-      return Graphics::API::Format::ASTC_10x5_SRGB_BLOCK;
+      return Graphics::Format::ASTC_10x5_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-      return Graphics::API::Format::ASTC_10x6_SRGB_BLOCK;
+      return Graphics::Format::ASTC_10x6_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-      return Graphics::API::Format::ASTC_10x8_SRGB_BLOCK;
+      return Graphics::Format::ASTC_10x8_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-      return Graphics::API::Format::ASTC_10x10_SRGB_BLOCK;
+      return Graphics::Format::ASTC_10x10_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-      return Graphics::API::Format::ASTC_12x10_SRGB_BLOCK;
+      return Graphics::Format::ASTC_12x10_SRGB_BLOCK;
     case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-      return Graphics::API::Format::ASTC_12x12_SRGB_BLOCK;
+      return Graphics::Format::ASTC_12x12_SRGB_BLOCK;
     case Pixel::RGB16F:
-      return Graphics::API::Format::R16G16B16_SFLOAT;
+      return Graphics::Format::R16G16B16_SFLOAT;
     case Pixel::RGB32F:
-      return Graphics::API::Format::R32G32B32_SFLOAT;
+      return Graphics::Format::R32G32B32_SFLOAT;
   }
-  return Graphics::API::Format::UNDEFINED;
+  return Graphics::Format::UNDEFINED;
 }
 
 } //Unnamed namespace
@@ -304,7 +304,7 @@ void Texture::Initialize( Integration::Graphics::GraphicsInterface& graphics )
   mGraphics = &graphics;
 }
 
-const Graphics::API::Texture* Texture::GetGfxObject() const
+const Graphics::Texture* Texture::GetGfxObject() const
 {
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::GetGfxObject() = %p\n", this, mGraphicsTexture.get() );
 
@@ -349,22 +349,22 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
   {
     auto& controller = mGraphics->GetController();
 
-    Graphics::API::TextureDetails::Usage graphicsUsage{};
+    Graphics::TextureDetails::Usage graphicsUsage{};
     switch( usage )
     {
       case Usage::SAMPLE:
       {
-        graphicsUsage = Graphics::API::TextureDetails::Usage::SAMPLE;
+        graphicsUsage = Graphics::TextureDetails::Usage::SAMPLE;
         break;
       }
       case Usage::COLOR_ATTACHMENT:
       {
-        graphicsUsage = Graphics::API::TextureDetails::Usage::COLOR_ATTACHMENT;
+        graphicsUsage = Graphics::TextureDetails::Usage::COLOR_ATTACHMENT;
         break;
       }
       case Usage::DEPTH_ATTACHMENT:
       {
-        graphicsUsage = Graphics::API::TextureDetails::Usage::DEPTH_ATTACHMENT;
+        graphicsUsage = Graphics::TextureDetails::Usage::DEPTH_ATTACHMENT;
         break;
       }
     }
@@ -374,8 +374,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetFormat( ConvertPixelFormat( mFormat ) )
                                                            .SetUsage( graphicsUsage )
                                                            .SetSize( { mWidth, mHeight } )
-                                                           .SetType( Graphics::API::TextureDetails::Type::TEXTURE_2D )
-                                                           .SetMipMapFlag( Graphics::API::TextureDetails::MipMapFlag::DISABLED )
+                                                           .SetType( Graphics::TextureDetails::Type::TEXTURE_2D )
+                                                           .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
                                                            .SetDataSize( bufferSize ) );
   }

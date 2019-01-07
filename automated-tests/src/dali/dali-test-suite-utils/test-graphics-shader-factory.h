@@ -22,17 +22,17 @@
 namespace Test
 {
 
-class GraphicsShaderFactory : public Dali::Graphics::API::ShaderFactory
+class GraphicsShaderFactory : public Dali::Graphics::ShaderFactory
 {
 public:
   GraphicsShaderFactory();
   ~GraphicsShaderFactory();
 
-  Dali::Graphics::API::ShaderFactory& SetShaderModule( Dali::Graphics::API::ShaderDetails::PipelineStage pipelineStage,
-                                                       Dali::Graphics::API::ShaderDetails::Language language,
-                                                       const Dali::Graphics::API::ShaderDetails::ShaderSource& source ) override;
+  Dali::Graphics::ShaderFactory& SetShaderModule( Dali::Graphics::ShaderDetails::PipelineStage pipelineStage,
+                                                       Dali::Graphics::ShaderDetails::Language language,
+                                                       const Dali::Graphics::ShaderDetails::ShaderSource& source ) override;
 
-  Dali::Graphics::API::ShaderFactory::PointerType Create() const override;
+  Dali::Graphics::ShaderFactory::PointerType Create() const override;
 };
 
 } // Test

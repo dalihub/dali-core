@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_FRAMEBUFFER_FACTORY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,11 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
 
 /**
  * @brief Interface class for FramebufferFactory types in the graphics API.
  */
-class FramebufferFactory : public BaseFactory< API::Framebuffer >
+class FramebufferFactory : public BaseFactory< Framebuffer >
 {
 public:
   /**
@@ -74,7 +72,6 @@ protected:
   FramebufferFactory& operator=(FramebufferFactory&&) = default;
 };
 
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 

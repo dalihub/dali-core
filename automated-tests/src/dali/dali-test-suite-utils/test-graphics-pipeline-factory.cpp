@@ -22,68 +22,68 @@ namespace Test
 GraphicsPipelineFactory::GraphicsPipelineFactory() = default;
 GraphicsPipelineFactory::~GraphicsPipelineFactory() = default;
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetColorBlendState( const Dali::Graphics::API::ColorBlendState& state )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetColorBlendState( const Dali::Graphics::ColorBlendState& state )
 {
   return *this;
 }
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetShaderState( const Dali::Graphics::API::ShaderState& state )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetShaderState( const Dali::Graphics::ShaderState& state )
 {
   return *this;
 }
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetViewportState( const Dali::Graphics::API::ViewportState& state )
-{
-  return *this;
-}
-
-
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetFramebufferState( const Dali::Graphics::API::FramebufferState& state )
-{
-  return *this;
-}
-
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetBasePipeline( Dali::Graphics::API::Pipeline& pipeline )
-{
-  return *this;
-}
-
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetDepthStencilState( Dali::Graphics::API::DepthStencilState state )
-{
-  return *this;
-}
-
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetRasterizationState( const Dali::Graphics::API::RasterizationState& state )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetViewportState( const Dali::Graphics::ViewportState& state )
 {
   return *this;
 }
 
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetVertexInputState( const Dali::Graphics::API::VertexInputState& state )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetFramebufferState( const Dali::Graphics::FramebufferState& state )
+{
+  return *this;
+}
+
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetBasePipeline( Dali::Graphics::Pipeline& pipeline )
+{
+  return *this;
+}
+
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetDepthStencilState( Dali::Graphics::DepthStencilState state )
+{
+  return *this;
+}
+
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetRasterizationState( const Dali::Graphics::RasterizationState& state )
 {
   return *this;
 }
 
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetInputAssemblyState( const Dali::Graphics::API::InputAssemblyState& state )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetVertexInputState( const Dali::Graphics::VertexInputState& state )
 {
   return *this;
 }
 
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetDynamicStateMask( const Dali::Graphics::API::PipelineDynamicStateMask mask )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetInputAssemblyState( const Dali::Graphics::InputAssemblyState& state )
 {
   return *this;
 }
 
 
-Dali::Graphics::API::PipelineFactory& GraphicsPipelineFactory::SetOldPipeline( std::unique_ptr<Dali::Graphics::API::Pipeline> oldPipeline )
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetDynamicStateMask( const Dali::Graphics::PipelineDynamicStateMask mask )
 {
   return *this;
 }
 
 
-std::unique_ptr<Dali::Graphics::API::Pipeline> GraphicsPipelineFactory::Create()
+Dali::Graphics::PipelineFactory& GraphicsPipelineFactory::SetOldPipeline( std::unique_ptr<Dali::Graphics::Pipeline> oldPipeline )
+{
+  return *this;
+}
+
+
+std::unique_ptr<Dali::Graphics::Pipeline> GraphicsPipelineFactory::Create()
 {
   return nullptr;
 }

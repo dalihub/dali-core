@@ -107,7 +107,7 @@ struct Sampler
    * Returns Graphics API sampler object
    * @return Pointer to API sampler or nullptr
    */
-  const Dali::Graphics::API::Sampler* GetGfxObject() const
+  const Dali::Graphics::Sampler* GetGfxObject() const
   {
     return mGfxSampler.get();
   }
@@ -117,40 +117,40 @@ struct Sampler
     mGfxSampler.reset();
   }
 
-  inline Graphics::API::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
+  inline Graphics::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
   {
     switch(mode)
     {
-      case WrapMode::REPEAT: return Graphics::API::SamplerAddressMode::REPEAT;
-      case WrapMode::MIRRORED_REPEAT: return Graphics::API::SamplerAddressMode::MIRRORED_REPEAT;
-      case WrapMode::CLAMP_TO_EDGE: return Graphics::API::SamplerAddressMode::CLAMP_TO_EDGE;
-      case WrapMode::DEFAULT: return Graphics::API::SamplerAddressMode::CLAMP_TO_EDGE;
+      case WrapMode::REPEAT: return Graphics::SamplerAddressMode::REPEAT;
+      case WrapMode::MIRRORED_REPEAT: return Graphics::SamplerAddressMode::MIRRORED_REPEAT;
+      case WrapMode::CLAMP_TO_EDGE: return Graphics::SamplerAddressMode::CLAMP_TO_EDGE;
+      case WrapMode::DEFAULT: return Graphics::SamplerAddressMode::CLAMP_TO_EDGE;
     }
     return {};
   }
 
-  inline Graphics::API::SamplerMipmapMode GetGfxSamplerMipmapMode( FilterMode mode ) const
+  inline Graphics::SamplerMipmapMode GetGfxSamplerMipmapMode( FilterMode mode ) const
   {
     switch(mode)
     {
-      case FilterMode::LINEAR_MIPMAP_LINEAR: return Graphics::API::SamplerMipmapMode::LINEAR;
-      case FilterMode::NEAREST_MIPMAP_LINEAR: return Graphics::API::SamplerMipmapMode::LINEAR;
-      case FilterMode::NEAREST_MIPMAP_NEAREST: return Graphics::API::SamplerMipmapMode::NEAREST;
-      case FilterMode::LINEAR_MIPMAP_NEAREST: return Graphics::API::SamplerMipmapMode::NEAREST;
-      case FilterMode::DEFAULT: return Graphics::API::SamplerMipmapMode::LINEAR;
+      case FilterMode::LINEAR_MIPMAP_LINEAR: return Graphics::SamplerMipmapMode::LINEAR;
+      case FilterMode::NEAREST_MIPMAP_LINEAR: return Graphics::SamplerMipmapMode::LINEAR;
+      case FilterMode::NEAREST_MIPMAP_NEAREST: return Graphics::SamplerMipmapMode::NEAREST;
+      case FilterMode::LINEAR_MIPMAP_NEAREST: return Graphics::SamplerMipmapMode::NEAREST;
+      case FilterMode::DEFAULT: return Graphics::SamplerMipmapMode::LINEAR;
       default: return {};
     }
     return {};
   }
 
-  inline Graphics::API::SamplerFilter GetGfxFilter( FilterMode mode ) const
+  inline Graphics::SamplerFilter GetGfxFilter( FilterMode mode ) const
   {
     switch(mode)
     {
-      case FilterMode::LINEAR: return Graphics::API::SamplerFilter::LINEAR;
-      case FilterMode::NEAREST: return Graphics::API::SamplerFilter::NEAREST;
-      case FilterMode::DEFAULT: return Graphics::API::SamplerFilter::LINEAR;
-      case FilterMode::NONE: return Graphics::API::SamplerFilter::NEAREST;
+      case FilterMode::LINEAR: return Graphics::SamplerFilter::LINEAR;
+      case FilterMode::NEAREST: return Graphics::SamplerFilter::NEAREST;
+      case FilterMode::DEFAULT: return Graphics::SamplerFilter::LINEAR;
+      case FilterMode::NONE: return Graphics::SamplerFilter::NEAREST;
       default: return {};
     }
     return {};
@@ -172,7 +172,7 @@ struct Sampler
   }
 
   Integration::Graphics::GraphicsInterface* mGraphics;   ///< Graphics interface
-  std::unique_ptr<Dali::Graphics::API::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
+  std::unique_ptr<Dali::Graphics::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
 
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter
   FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter

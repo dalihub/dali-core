@@ -38,7 +38,7 @@ PropertyBuffer::PropertyBuffer()
   mSize(0),
   mDataChanged(true),
   mGraphicsBuffer{ nullptr },
-  mGraphicsBufferUsage{ 0u | Graphics::API::BufferUsage::VERTEX_BUFFER }
+  mGraphicsBufferUsage{ 0u | Graphics::BufferUsage::VERTEX_BUFFER }
 {
 }
 
@@ -68,11 +68,11 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint3
     auto& controller = mGraphics->GetController();
     mGraphicsBuffer = controller.CreateBuffer( controller.GetBufferFactory()
                                            .SetSize( uint32_t( mFormat->size * size) )
-                                           .SetUsageFlags( 0u | Graphics::API::BufferUsage::VERTEX_BUFFER ));
+                                           .SetUsageFlags( 0u | Graphics::BufferUsage::VERTEX_BUFFER ));
   }
 }
 
-bool PropertyBuffer::Update( Dali::Graphics::API::Controller& controller )
+bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
 {
   if( !mData || !mFormat || !mSize )
   {

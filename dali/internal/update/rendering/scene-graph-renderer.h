@@ -372,12 +372,12 @@ public:
   RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
 
   template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
   {
     WriteUniform( ubo, bindings, name, hash, &data, sizeof(T) );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
   {
     // Matrix3 has to take stride in account ( 16 )
     float values[12];
@@ -390,7 +390,7 @@ public:
     WriteUniform( ubo, bindings, name, hash, &values, sizeof(float)*12 );
   }
 
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::API::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
+  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -409,7 +409,7 @@ public:
    */
   bool UpdateUniformBuffers( RenderInstruction& instruction,
                              GraphicsBuffer& ubo,
-                             std::vector<Graphics::API::RenderCommand::UniformBufferBinding>*& outBindings,
+                             std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
                              uint32_t& offset,
                              BufferIndex updateBufferIndex );
 
@@ -423,12 +423,12 @@ public:
    */
   void TextureSetDeleted();
 
-  void BindPipeline( std::unique_ptr<Graphics::API::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
+  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
   {
     GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline), updateBufferIndex );
   }
 
-  std::unique_ptr<Graphics::API::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
+  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
   {
     return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
   }
@@ -517,7 +517,7 @@ private:
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
   RenderCommandContainer       mRenderCommands;
-  std::vector<Graphics::API::RenderCommand::TextureBinding> mTextureBindings;
+  std::vector<Graphics::RenderCommand::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value

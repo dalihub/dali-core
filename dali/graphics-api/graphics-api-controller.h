@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_CONTROLLER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
 class ShaderFactory;
+
+
 /**
  * @brief Interface class for Manager types in the graphics API.
  */
@@ -122,13 +122,13 @@ public:
    * @brief alAllocates render command ( depends on implementation );
    * @return
    */
-  virtual std::unique_ptr<API::RenderCommand> AllocateRenderCommand() = 0;
+  virtual std::unique_ptr<RenderCommand> AllocateRenderCommand() = 0;
 
   /**
    * @brief Submits a list of commands
    * @param commands
    */
-  virtual void SubmitCommands( std::vector<API::RenderCommand*> commands ) = 0;
+  virtual void SubmitCommands( std::vector<RenderCommand*> commands ) = 0;
 
   /**
    * @brief Mark the beginning of a frame
@@ -220,7 +220,6 @@ protected:
 private:
 };
 
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 

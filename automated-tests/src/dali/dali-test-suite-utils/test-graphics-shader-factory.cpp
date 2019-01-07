@@ -21,15 +21,15 @@ namespace Test
 GraphicsShaderFactory::GraphicsShaderFactory() = default;
 GraphicsShaderFactory::~GraphicsShaderFactory() = default;
 
-Dali::Graphics::API::ShaderFactory& GraphicsShaderFactory::SetShaderModule(
-  Dali::Graphics::API::ShaderDetails::PipelineStage pipelineStage,
-  Dali::Graphics::API::ShaderDetails::Language language,
-  const Dali::Graphics::API::ShaderDetails::ShaderSource& source )
+Dali::Graphics::ShaderFactory& GraphicsShaderFactory::SetShaderModule(
+  Dali::Graphics::ShaderDetails::PipelineStage pipelineStage,
+  Dali::Graphics::ShaderDetails::Language language,
+  const Dali::Graphics::ShaderDetails::ShaderSource& source )
 {
   return *this;
 }
 
-Dali::Graphics::API::ShaderFactory::PointerType GraphicsShaderFactory::Create() const
+Dali::Graphics::ShaderFactory::PointerType GraphicsShaderFactory::Create() const
 {
   return nullptr;
 }

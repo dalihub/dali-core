@@ -23,35 +23,35 @@ namespace Test
 GraphicsTextureFactory::GraphicsTextureFactory() = default;
 GraphicsTextureFactory::~GraphicsTextureFactory() = default;
 
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetType(Dali::Graphics::API::TextureDetails::Type type)
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetType(Dali::Graphics::TextureDetails::Type type)
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetSize(const Dali::Graphics::API::RectSize& size)
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetSize(const Dali::Graphics::RectSize& size)
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetFormat(Dali::Graphics::API::TextureDetails::Format format)
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetFormat(Dali::Graphics::TextureDetails::Format format)
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetMipMapFlag(Dali::Graphics::API::TextureDetails::MipMapFlag mipMapFlag)
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetMipMapFlag(Dali::Graphics::TextureDetails::MipMapFlag mipMapFlag)
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetUsage( Dali::Graphics::API::TextureDetails::Usage usage )
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetUsage( Dali::Graphics::TextureDetails::Usage usage )
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetData( void* pData )
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetData( void* pData )
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory& GraphicsTextureFactory::SetDataSize( uint32_t dataSizeInBytes )
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetDataSize( uint32_t dataSizeInBytes )
 {
   return *this;
 }
-Dali::Graphics::API::TextureFactory::PointerType GraphicsTextureFactory::Create() const
+Dali::Graphics::TextureFactory::PointerType GraphicsTextureFactory::Create() const
 {
   return nullptr;
 }

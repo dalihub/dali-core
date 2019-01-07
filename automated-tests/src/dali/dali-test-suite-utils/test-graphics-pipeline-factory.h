@@ -22,35 +22,35 @@
 namespace Test
 {
 
-class GraphicsPipelineFactory : public Dali::Graphics::API::PipelineFactory
+class GraphicsPipelineFactory : public Dali::Graphics::PipelineFactory
 {
 public:
   GraphicsPipelineFactory();
   virtual ~GraphicsPipelineFactory();
 
-  Dali::Graphics::API::PipelineFactory& SetColorBlendState( const Dali::Graphics::API::ColorBlendState& state ) override;
+  Dali::Graphics::PipelineFactory& SetColorBlendState( const Dali::Graphics::ColorBlendState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetShaderState( const Dali::Graphics::API::ShaderState& state ) override;
+  Dali::Graphics::PipelineFactory& SetShaderState( const Dali::Graphics::ShaderState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetViewportState( const Dali::Graphics::API::ViewportState& state ) override;
+  Dali::Graphics::PipelineFactory& SetViewportState( const Dali::Graphics::ViewportState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetFramebufferState( const Dali::Graphics::API::FramebufferState& state ) override;
+  Dali::Graphics::PipelineFactory& SetFramebufferState( const Dali::Graphics::FramebufferState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetBasePipeline( Dali::Graphics::API::Pipeline& pipeline ) override;
+  Dali::Graphics::PipelineFactory& SetBasePipeline( Dali::Graphics::Pipeline& pipeline ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetDepthStencilState( Dali::Graphics::API::DepthStencilState state ) override;
+  Dali::Graphics::PipelineFactory& SetDepthStencilState( Dali::Graphics::DepthStencilState state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetRasterizationState( const Dali::Graphics::API::RasterizationState& state ) override;
+  Dali::Graphics::PipelineFactory& SetRasterizationState( const Dali::Graphics::RasterizationState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetVertexInputState( const Dali::Graphics::API::VertexInputState& state ) override;
+  Dali::Graphics::PipelineFactory& SetVertexInputState( const Dali::Graphics::VertexInputState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetInputAssemblyState( const Dali::Graphics::API::InputAssemblyState& state ) override;
+  Dali::Graphics::PipelineFactory& SetInputAssemblyState( const Dali::Graphics::InputAssemblyState& state ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetDynamicStateMask( const Dali::Graphics::API::PipelineDynamicStateMask mask ) override;
+  Dali::Graphics::PipelineFactory& SetDynamicStateMask( const Dali::Graphics::PipelineDynamicStateMask mask ) override;
 
-  Dali::Graphics::API::PipelineFactory& SetOldPipeline( std::unique_ptr<Dali::Graphics::API::Pipeline> oldPipeline ) override;
+  Dali::Graphics::PipelineFactory& SetOldPipeline( std::unique_ptr<Dali::Graphics::Pipeline> oldPipeline ) override;
 
-  std::unique_ptr<Dali::Graphics::API::Pipeline> Create() override;
+  std::unique_ptr<Dali::Graphics::Pipeline> Create() override;
 };
 
 } // Test

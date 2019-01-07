@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TEXTURE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
+
 class Buffer;
 
 /**
@@ -75,7 +74,7 @@ public:
    * @param layer Destination layer
    * @param level Mipmap level
    */
-  virtual void CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level,  TextureDetails::UpdateMode updateMode ) = 0;
+  virtual void CopyBuffer(const Buffer &srcBuffer, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level,  TextureDetails::UpdateMode updateMode ) = 0;
 
 protected:
   // derived types should not be moved directly to prevent slicing
@@ -88,7 +87,6 @@ protected:
   Texture() = default;
 };
 
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 

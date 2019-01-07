@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ namespace SceneGraph
 {
 
 GraphicsBuffer::GraphicsBuffer(
-        Dali::Graphics::API::Controller* controller,
+        Dali::Graphics::Controller* controller,
         uint32_t sizeInBytes,
         uint32_t alignment,
         bool persistentMappedEnabled,
-        Graphics::API::BufferUsageFlags usageFlags )
+        Graphics::BufferUsageFlags usageFlags )
 : mController( controller ),
   mSize( 0u ),
   mMappedPtr( nullptr ),
@@ -135,7 +135,7 @@ void GraphicsBuffer::Unmap()
   }
 }
 
-GraphicsBufferManager::GraphicsBufferManager( Dali::Graphics::API::Controller* controller )
+GraphicsBufferManager::GraphicsBufferManager( Dali::Graphics::Controller* controller )
 : mController( controller )
 {
 }
@@ -146,9 +146,9 @@ std::unique_ptr<GraphicsBuffer> GraphicsBufferManager::AllocateUniformBuffer( ui
 {
 
   return std::unique_ptr<GraphicsBuffer>(
-    new GraphicsBuffer( mController, size, 256u, true, Dali::Graphics::API::BufferUsageFlags{0u} |
-                                                            Dali::Graphics::API::BufferUsage::TRANSFER_DST |
-                                                            Dali::Graphics::API::BufferUsage::UNIFORM_BUFFER )
+    new GraphicsBuffer( mController, size, 256u, true, Dali::Graphics::BufferUsageFlags{0u} |
+                                                            Dali::Graphics::BufferUsage::TRANSFER_DST |
+                                                            Dali::Graphics::BufferUsage::UNIFORM_BUFFER )
   );
 }
 
@@ -157,4 +157,3 @@ std::unique_ptr<GraphicsBuffer> GraphicsBufferManager::AllocateUniformBuffer( ui
 } // namespace Internal
 
 } // namespace Dali
-

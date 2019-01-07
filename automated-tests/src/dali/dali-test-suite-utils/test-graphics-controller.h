@@ -31,7 +31,7 @@
 namespace Test
 {
 
-class GraphicsController : public Dali::Graphics::API::Controller
+class GraphicsController : public Dali::Graphics::Controller
 {
 public:
   explicit GraphicsController();
@@ -41,80 +41,80 @@ public:
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<Dali::Graphics::API::Shader> CreateShader( const Dali::Graphics::API::BaseFactory<Dali::Graphics::API::Shader>& factory ) override;
+  std::unique_ptr<Dali::Graphics::Shader> CreateShader( const Dali::Graphics::BaseFactory<Dali::Graphics::Shader>& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<Dali::Graphics::API::Texture> CreateTexture( const Dali::Graphics::API::BaseFactory<Dali::Graphics::API::Texture>& factory ) override;
+  std::unique_ptr<Dali::Graphics::Texture> CreateTexture( const Dali::Graphics::BaseFactory<Dali::Graphics::Texture>& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<Dali::Graphics::API::Buffer> CreateBuffer( const Dali::Graphics::API::BaseFactory<Dali::Graphics::API::Buffer>& factory ) override;
+  std::unique_ptr<Dali::Graphics::Buffer> CreateBuffer( const Dali::Graphics::BaseFactory<Dali::Graphics::Buffer>& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<Dali::Graphics::API::Sampler> CreateSampler( const Dali::Graphics::API::BaseFactory<Dali::Graphics::API::Sampler>& factory ) override;
+  std::unique_ptr<Dali::Graphics::Sampler> CreateSampler( const Dali::Graphics::BaseFactory<Dali::Graphics::Sampler>& factory ) override;
 
   /**
    * @brief Create a new object
    */
-  std::unique_ptr<Dali::Graphics::API::Framebuffer> CreateFramebuffer( const Dali::Graphics::API::BaseFactory<Dali::Graphics::API::Framebuffer>& factory ) override;
+  std::unique_ptr<Dali::Graphics::Framebuffer> CreateFramebuffer( const Dali::Graphics::BaseFactory<Dali::Graphics::Framebuffer>& factory ) override;
 
   /**
    * Creates new pipeline
    */
-  std::unique_ptr<Dali::Graphics::API::Pipeline> CreatePipeline( const Dali::Graphics::API::PipelineFactory& factory ) override;
+  std::unique_ptr<Dali::Graphics::Pipeline> CreatePipeline( const Dali::Graphics::PipelineFactory& factory ) override;
 
   /**
    * @brief Returns texture factory
    * @return
    */
-  Dali::Graphics::API::TextureFactory& GetTextureFactory() const override;
+  Dali::Graphics::TextureFactory& GetTextureFactory() const override;
 
   /**
    * @brief Returns shader factory
    * @return
    */
-  Dali::Graphics::API::ShaderFactory& GetShaderFactory() const override;
+  Dali::Graphics::ShaderFactory& GetShaderFactory() const override;
 
   /**
    * @brief Returns Framebuffer factory
    * @return
    */
-  Dali::Graphics::API::FramebufferFactory& GetFramebufferFactory() const override;
+  Dali::Graphics::FramebufferFactory& GetFramebufferFactory() const override;
 
   /**
    * @brief Returns shader factory
    * @return
    */
-  Dali::Graphics::API::BufferFactory& GetBufferFactory() const override;
+  Dali::Graphics::BufferFactory& GetBufferFactory() const override;
 
   /**
    * @brief Returns pipeline factory
    * @return
    */
-  Dali::Graphics::API::PipelineFactory& GetPipelineFactory() override;
+  Dali::Graphics::PipelineFactory& GetPipelineFactory() override;
 
   /**
    * @brief Returns sampler factory
    * @return
    */
-  Dali::Graphics::API::SamplerFactory& GetSamplerFactory() override;
+  Dali::Graphics::SamplerFactory& GetSamplerFactory() override;
 
   /**
    * @brief alAllocates render command ( depends on implementation );
    * @return
    */
-  std::unique_ptr<Dali::Graphics::API::RenderCommand> AllocateRenderCommand() override;
+  std::unique_ptr<Dali::Graphics::RenderCommand> AllocateRenderCommand() override;
 
   /**
    * @brief Submits a list of commands
    * @param commands
    */
-  void SubmitCommands( std::vector<Dali::Graphics::API::RenderCommand*> commands ) override;
+  void SubmitCommands( std::vector<Dali::Graphics::RenderCommand*> commands ) override;
 
   /**
    * @brief Mark the beginning of a frame

@@ -68,7 +68,7 @@ void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
   auto indexBuffer = mController.CreateBuffer(
                         mController.GetBufferFactory()
                                  .SetSize( uint32_t(indices.Size() * sizeof(indices[0])) )
-                                 .SetUsageFlags( 0u | Graphics::API::BufferUsage::INDEX_BUFFER )
+                                 .SetUsageFlags( 0u | Graphics::BufferUsage::INDEX_BUFFER )
   );
 
   // transfer data

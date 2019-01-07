@@ -67,7 +67,7 @@ void Graphics::PostRender()
 {
 }
 
-Dali::Graphics::API::Controller& Graphics::GetController()
+Dali::Graphics::Controller& Graphics::GetController()
 {
   return mImpl->controller;
 }

@@ -39,9 +39,9 @@ struct ShaderCache
     Item( const Item& ) = delete;
     Item( Item&& ) = default;
 
-    Item( std::unique_ptr<Dali::Graphics::API::Shader> _shader,
-          Dali::Graphics::API::ShaderDetails::ShaderSource _vertexSource,
-          Dali::Graphics::API::ShaderDetails::ShaderSource _fragmentSource )
+    Item( std::unique_ptr<Dali::Graphics::Shader> _shader,
+          Dali::Graphics::ShaderDetails::ShaderSource _vertexSource,
+          Dali::Graphics::ShaderDetails::ShaderSource _fragmentSource )
     : shader(std::move(_shader)),
       vertexSource( _vertexSource ),
       fragmentSource( _fragmentSource )
@@ -49,9 +49,9 @@ struct ShaderCache
 
     ~Item() = default;
 
-    std::unique_ptr<Dali::Graphics::API::Shader>               shader{ nullptr };
-    Dali::Graphics::API::ShaderDetails::ShaderSource           vertexSource{""};
-    Dali::Graphics::API::ShaderDetails::ShaderSource           fragmentSource{""};
+    std::unique_ptr<Dali::Graphics::Shader>               shader{ nullptr };
+    Dali::Graphics::ShaderDetails::ShaderSource           vertexSource{""};
+    Dali::Graphics::ShaderDetails::ShaderSource           fragmentSource{""};
   };
 
   /**
@@ -59,14 +59,14 @@ struct ShaderCache
    *
    * @param[in] controller The graphics controller
    */
-  explicit ShaderCache( Dali::Graphics::API::Controller& controller );
+  explicit ShaderCache( Dali::Graphics::Controller& controller );
 
   /**
    * Get a shader from it's source code
    */
-  Dali::Graphics::API::Shader& GetShader(
-    const Dali::Graphics::API::ShaderDetails::ShaderSource& vsh,
-    const Dali::Graphics::API::ShaderDetails::ShaderSource& fsh );
+  Dali::Graphics::Shader& GetShader(
+    const Dali::Graphics::ShaderDetails::ShaderSource& vsh,
+    const Dali::Graphics::ShaderDetails::ShaderSource& fsh );
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -75,7 +75,7 @@ struct ShaderCache
 
 private:
   std::vector<Item> mItems;
-  Dali::Graphics::API::Controller& mController;
+  Dali::Graphics::Controller& mController;
 };
 
 } // namespace SceneGraph

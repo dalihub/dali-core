@@ -21,30 +21,30 @@ namespace Test
 GraphicsFramebufferFactory::GraphicsFramebufferFactory() = default;
 GraphicsFramebufferFactory::~GraphicsFramebufferFactory() = default;
 
-Dali::Graphics::API::FramebufferFactory& GraphicsFramebufferFactory::SetSize( const Dali::Graphics::API::RectSize& size )
+Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetSize( const Dali::Graphics::RectSize& size )
 {
   return *this;
 }
 
-Dali::Graphics::API::FramebufferFactory& GraphicsFramebufferFactory::SetColorAttachment(
-  Dali::Graphics::API::TextureDetails::AttachmentId attachmentIndex,
-  const Dali::Graphics::API::Texture&               texture,
-  Dali::Graphics::API::TextureDetails::LayerId      layer,
-  Dali::Graphics::API::TextureDetails::LevelId      level )
+Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetColorAttachment(
+  Dali::Graphics::TextureDetails::AttachmentId attachmentIndex,
+  const Dali::Graphics::Texture&               texture,
+  Dali::Graphics::TextureDetails::LayerId      layer,
+  Dali::Graphics::TextureDetails::LevelId      level )
 {
   return *this;
 }
 
-Dali::Graphics::API::FramebufferFactory& GraphicsFramebufferFactory::SetDepthStencilAttachment(
-  const Dali::Graphics::API::Texture&                   texture,
-  Dali::Graphics::API::TextureDetails::LayerId          layer,
-  Dali::Graphics::API::TextureDetails::LevelId          level,
-  Dali::Graphics::API::TextureDetails::DepthStencilFlag depthStencilFlag )
+Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetDepthStencilAttachment(
+  const Dali::Graphics::Texture&                   texture,
+  Dali::Graphics::TextureDetails::LayerId          layer,
+  Dali::Graphics::TextureDetails::LevelId          level,
+  Dali::Graphics::TextureDetails::DepthStencilFlag depthStencilFlag )
 {
   return *this;
 }
 
-Dali::Graphics::API::FramebufferFactory::PointerType GraphicsFramebufferFactory::Create() const
+Dali::Graphics::FramebufferFactory::PointerType GraphicsFramebufferFactory::Create() const
 {
   return nullptr;
 }

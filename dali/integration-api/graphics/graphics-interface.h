@@ -126,7 +126,7 @@ public:
    * Returns controller object
    * @return
    */
-  virtual Dali::Graphics::API::Controller& GetController() = 0;
+  virtual Dali::Graphics::Controller& GetController() = 0;
 
   /*
    * Surface resized

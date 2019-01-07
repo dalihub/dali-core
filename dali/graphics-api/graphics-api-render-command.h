@@ -35,8 +35,6 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
 class Shader;
 class Texture;
 class Buffer;
@@ -44,7 +42,7 @@ class Sampler;
 class Pipeline;
 
 /**
- * RenderCOmmand update flag bits
+ * RenderCommand update flag bits
  */
 constexpr uint32_t RENDER_COMMAND_UPDATE_PIPELINE_BIT           = 1 << 0;
 constexpr uint32_t RENDER_COMMAND_UPDATE_UNIFORM_BUFFER_BIT     = 1 << 1;
@@ -552,7 +550,6 @@ public:
 
 };
 
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 

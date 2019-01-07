@@ -26,72 +26,72 @@ GraphicsSamplerFactory::GraphicsSamplerFactory()
 
 GraphicsSamplerFactory::~GraphicsSamplerFactory() = default;
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetAddressModeU( Dali::Graphics::API::SamplerAddressMode mode )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetAddressModeU( Dali::Graphics::SamplerAddressMode mode )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetAddressModeV( Dali::Graphics::API::SamplerAddressMode mode )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetAddressModeV( Dali::Graphics::SamplerAddressMode mode )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetAddressModeW( Dali::Graphics::API::SamplerAddressMode mode )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetAddressModeW( Dali::Graphics::SamplerAddressMode mode )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMinFilter( Dali::Graphics::API::SamplerFilter filter )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMinFilter( Dali::Graphics::SamplerFilter filter )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMagFilter( Dali::Graphics::API::SamplerFilter filter )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMagFilter( Dali::Graphics::SamplerFilter filter )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMipmapMode( Dali::Graphics::API::SamplerMipmapMode mipmapMode )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMipmapMode( Dali::Graphics::SamplerMipmapMode mipmapMode )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetAnisotropyEnable( bool anisotropyEnable )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetAnisotropyEnable( bool anisotropyEnable )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMaxAnisotropy( float maxAnisotropy )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMaxAnisotropy( float maxAnisotropy )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMinLod( float minLod )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMinLod( float minLod )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetMaxLod( float maxLod )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetMaxLod( float maxLod )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetUnnormalizeCoordinates( bool unnormalizedCoordinates )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetUnnormalizeCoordinates( bool unnormalizedCoordinates )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetCompareEnable( bool compareEnable )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetCompareEnable( bool compareEnable )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory& GraphicsSamplerFactory::SetCompareOp( Dali::Graphics::API::CompareOp compareOp )
+Dali::Graphics::SamplerFactory& GraphicsSamplerFactory::SetCompareOp( Dali::Graphics::CompareOp compareOp )
 {
   return *this;
 }
 
-Dali::Graphics::API::SamplerFactory::PointerType GraphicsSamplerFactory::Create() const
+Dali::Graphics::SamplerFactory::PointerType GraphicsSamplerFactory::Create() const
 {
   return nullptr;
 };

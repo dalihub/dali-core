@@ -52,12 +52,12 @@ void Shader::Initialize( Integration::Graphics::GraphicsInterface& graphics, Sha
   mShaderCache = &shaderCache;
 }
 
-const Graphics::API::Shader* Shader::GetGfxObject() const
+const Graphics::Shader* Shader::GetGfxObject() const
 {
   return mGraphicsShader;
 }
 
-Graphics::API::Shader* Shader::GetGfxObject()
+Graphics::Shader* Shader::GetGfxObject()
 {
   return mGraphicsShader;
 }
@@ -85,8 +85,8 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
   if (shaderData->GetType() == ShaderData::Type::BINARY)
   {
     mGraphicsShader = &mShaderCache->GetShader(
-      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
-      Graphics::API::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
+      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
+      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
   }
 
   if( mGraphicsShader )
@@ -109,7 +109,7 @@ void Shader::BuildReflection()
     // add uniform block fields
     for( auto i = 0u; i < uniformBlockCount; ++i )
     {
-      Graphics::API::ShaderDetails::UniformBlockInfo uboInfo;
+      Graphics::ShaderDetails::UniformBlockInfo uboInfo;
       mGraphicsShader->GetUniformBlock( i, uboInfo );
 
       // for each member store data
@@ -156,7 +156,7 @@ void Shader::BuildReflection()
   }
 }
 
-bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::API::ShaderDetails::UniformInfo& out ) const
+bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const
 {
   if( mReflection.empty() )
   {

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_PIPELINE_FACTORY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 namespace Dali
 {
 namespace Graphics
-{
-namespace API
 {
 class PipelineCache;
 
@@ -62,7 +60,7 @@ public:
 
   virtual PipelineFactory& SetDynamicStateMask( const PipelineDynamicStateMask mask ) = 0;
 
-  virtual PipelineFactory& SetOldPipeline( std::unique_ptr<API::Pipeline> oldPipeline ) = 0;
+  virtual PipelineFactory& SetOldPipeline( std::unique_ptr<Pipeline> oldPipeline ) = 0;
 
   virtual std::unique_ptr<Pipeline> Create() = 0;
 
@@ -74,9 +72,7 @@ protected:
   PipelineFactory& operator=(PipelineFactory&&) = default;
 };
 
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 
 #endif // DALI_GRAPHICS_API_PIPELINE_FACTORY_H
-

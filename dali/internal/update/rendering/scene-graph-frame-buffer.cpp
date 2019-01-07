@@ -84,7 +84,7 @@ void FrameBuffer::PrepareFramebuffer()
   if( !mGraphicsFramebuffer )
   {
     auto& factory = controller.GetFramebufferFactory();
-    factory.SetSize( Graphics::API::RectSize{ mWidth, mHeight } );
+    factory.SetSize( Graphics::RectSize{ mWidth, mHeight } );
 
     /**
      * If the framebuffer has a color attachment without a graphics object, create one
@@ -109,27 +109,27 @@ void FrameBuffer::PrepareFramebuffer()
       auto graphicsTexture = mDepthAttachment.texture->GetGfxObject();
       if( graphicsTexture )
       {
-        auto depthStencilFormat = Graphics::API::TextureDetails::DepthStencilFlag::NONE;
+        auto depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::NONE;
         switch( mDepthAttachment.format )
         {
           case Dali::FrameBuffer::Attachment::NONE:
           {
-            depthStencilFormat = Graphics::API::TextureDetails::DepthStencilFlag::NONE;
+            depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::NONE;
             break;
           }
           case Dali::FrameBuffer::Attachment::DEPTH:
           {
-            depthStencilFormat = Graphics::API::TextureDetails::DepthStencilFlag::DEPTH;
+            depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::DEPTH;
             break;
           }
           case Dali::FrameBuffer::Attachment::STENCIL:
           {
-            depthStencilFormat = Graphics::API::TextureDetails::DepthStencilFlag::STENCIL;
+            depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::STENCIL;
             break;
           }
           case Dali::FrameBuffer::Attachment::DEPTH_STENCIL:
           {
-            depthStencilFormat = Graphics::API::TextureDetails::DepthStencilFlag::DEPTH_STENCIL;
+            depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::DEPTH_STENCIL;
             break;
           }
         }
@@ -143,7 +143,7 @@ void FrameBuffer::PrepareFramebuffer()
   }
 }
 
-const Graphics::API::Framebuffer* FrameBuffer::GetGfxObject() const
+const Graphics::Framebuffer* FrameBuffer::GetGfxObject() const
 {
   return mGraphicsFramebuffer.get();
 }

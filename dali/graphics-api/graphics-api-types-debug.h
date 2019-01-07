@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TYPES_DEBUG_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,14 @@ namespace Dali
 {
 namespace Graphics
 {
-namespace API
-{
+
 namespace Debug
 {
 #if defined(DEBUG_ENABLED)
 
-#define CASE(TYPE, VALUE) case API::TYPE::VALUE: return std::string(#VALUE)
+#define CASE(TYPE, VALUE) case TYPE::VALUE: return std::string(#VALUE)
 
-inline std::string str( const API::VertexInputRate& rate )
+inline std::string str( const VertexInputRate& rate )
 {
   switch( rate )
   {
@@ -41,7 +40,7 @@ inline std::string str( const API::VertexInputRate& rate )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::PrimitiveTopology& topology )
+inline std::string str( const PrimitiveTopology& topology )
 {
   switch( topology )
   {
@@ -55,7 +54,7 @@ inline std::string str( const API::PrimitiveTopology& topology )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::CompareOp& op )
+inline std::string str( const CompareOp& op )
 {
   switch( op )
   {
@@ -71,7 +70,7 @@ inline std::string str( const API::CompareOp& op )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::CullMode& mode )
+inline std::string str( const CullMode& mode )
 {
   switch( mode )
   {
@@ -83,7 +82,7 @@ inline std::string str( const API::CullMode& mode )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::PolygonMode& mode )
+inline std::string str( const PolygonMode& mode )
 {
   switch( mode )
   {
@@ -94,7 +93,7 @@ inline std::string str( const API::PolygonMode& mode )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::FrontFace& mode )
+inline std::string str( const FrontFace& mode )
 {
   switch( mode )
   {
@@ -104,7 +103,7 @@ inline std::string str( const API::FrontFace& mode )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::BlendFactor& factor )
+inline std::string str( const BlendFactor& factor )
 {
   switch( factor )
   {
@@ -131,7 +130,7 @@ inline std::string str( const API::BlendFactor& factor )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::BlendOp& op )
+inline std::string str( const BlendOp& op )
 {
   switch( op )
   {
@@ -144,7 +143,7 @@ inline std::string str( const API::BlendOp& op )
   return "UNDEFINED";
 }
 
-inline std::string str( const API::Format& format )
+inline std::string str( const Format& format )
 {
   switch( format )
   {
@@ -347,8 +346,8 @@ inline std::string str( const API::Format& format )
   return "UNDEFINED";
 }
 #endif
+
 } // namespace Debug
-} // namespace API
 } // namespace Graphics
 } // namespace Dali
 

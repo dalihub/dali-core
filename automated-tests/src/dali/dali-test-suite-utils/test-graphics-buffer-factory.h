@@ -22,15 +22,15 @@
 namespace Test
 {
 
-class GraphicsBufferFactory : public Dali::Graphics::API::BufferFactory
+class GraphicsBufferFactory : public Dali::Graphics::BufferFactory
 {
 public:
   GraphicsBufferFactory();
   ~GraphicsBufferFactory();
 
-  Dali::Graphics::API::BufferFactory& SetUsageFlags( Dali::Graphics::API::BufferUsageFlags usage )  override;
-  Dali::Graphics::API::BufferFactory& SetSize( uint32_t size ) override;
-  Dali::Graphics::API::BufferFactory::PointerType Create() const override;
+  Dali::Graphics::BufferFactory& SetUsageFlags( Dali::Graphics::BufferUsageFlags usage )  override;
+  Dali::Graphics::BufferFactory& SetSize( uint32_t size ) override;
+  Dali::Graphics::BufferFactory::PointerType Create() const override;
 };
 
 } // Test

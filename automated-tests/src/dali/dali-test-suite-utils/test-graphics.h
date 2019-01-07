@@ -73,7 +73,7 @@ public:
    * Returns controller object
    * @return
    */
-  Dali::Graphics::API::Controller& GetController();
+  Dali::Graphics::Controller& GetController();
 
   /*
    * Surface resized

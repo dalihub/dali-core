@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GRAPHICS_ALGORITHMS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,11 @@ public:
    * @param renderInstructions container of render instructions
    * @param bufferIndex current buffer index
    */
-  void SubmitRenderInstructions(Graphics::API::Controller &graphics,
+  void SubmitRenderInstructions(Graphics::Controller &graphics,
                                 SceneGraph::RenderInstructionContainer &renderInstructions,
                                 BufferIndex bufferIndex );
 
-  void DiscardUnusedResources( Graphics::API::Controller& controller );
+  void DiscardUnusedResources( Graphics::Controller& controller );
 
 private:
 
@@ -72,22 +72,22 @@ private:
                             uint32_t& lastClippingId );
 
 
-  bool SetupPipelineViewportState( Graphics::API::ViewportState& outViewportState );
+  bool SetupPipelineViewportState( Graphics::ViewportState& outViewportState );
 
-  void RecordRenderItemList(Graphics::API::Controller& graphics,
+  void RecordRenderItemList(Graphics::Controller& graphics,
                             BufferIndex bufferIndex,
-                            Graphics::API::RenderCommand::RenderTargetBinding& renderTargetBinding,
+                            Graphics::RenderCommand::RenderTargetBinding& renderTargetBinding,
                             Matrix viewProjection,
                             RenderInstruction& instruction,
                             const RenderList& renderItemList,
-                            std::vector<Graphics::API::RenderCommand*>& commandList);
+                            std::vector<Graphics::RenderCommand*>& commandList);
 
-  void RecordInstruction(Graphics::API::Controller& graphics,
+  void RecordInstruction(Graphics::Controller& graphics,
                          BufferIndex bufferIndex,
                          RenderInstruction& instruction,
-                         std::vector<Graphics::API::RenderCommand*>& commandList);
+                         std::vector<Graphics::RenderCommand*>& commandList);
 
-  bool PrepareGraphicsPipeline( Graphics::API::Controller& controller,
+  bool PrepareGraphicsPipeline( Graphics::Controller& controller,
                                 RenderInstruction& instruction,
                                 const RenderList* renderList,
                                 RenderItem& item,
@@ -95,7 +95,7 @@ private:
                                 bool& usesStencil,
                                 BufferIndex bufferIndex );
 
-  void PrepareRendererPipelines( Graphics::API::Controller& controller,
+  void PrepareRendererPipelines( Graphics::Controller& controller,
                                  RenderInstructionContainer& renderInstructions,
                                  bool& usesDepth,
                                  bool& usesStencil,
@@ -116,7 +116,7 @@ private:
   uint32_t mUboOffset { 0u };
   uint32_t mCurrentFrameIndex { 0u };
 
-  Dali::Graphics::API::DepthStencilState mCurrentStencilState{};
+  Dali::Graphics::DepthStencilState mCurrentStencilState{};
 };
 } // namespace SceneGraph
 } // namespace Internal

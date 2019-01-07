@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_COMMAND_CONTAINER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class RenderCommandContainer
 public:
 
   RenderCommand& AllocRenderCommand( RenderInstruction* renderInstruction,
-                                     Graphics::API::Controller& controller,
+                                     Graphics::Controller& controller,
                                      BufferIndex updateBufferIndex )
   {
     RenderCommand* renderCommand;
@@ -77,7 +77,7 @@ public:
     return *renderCommand;
   }
 
-  void BindTextures( std::vector<Graphics::API::RenderCommand::TextureBinding>& textureBindings )
+  void BindTextures( std::vector<Graphics::RenderCommand::TextureBinding>& textureBindings )
   {
     for( auto& elem : mRenderCommands )
     {

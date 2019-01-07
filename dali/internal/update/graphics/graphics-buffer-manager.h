@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GRAPHICS_UNIFORM_BUFFER_MANAGER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ private:
    * @param[in] sizeInBytes initial size of allocated buffer
    * @param[in] alignment memory alignment in bytes
    * @param[in] persistentMappingEnabled if true, buffer is mapped persistently
-   * @param[in] usageFlags type of usage ( Graphics::API::BufferUsage )
+   * @param[in] usageFlags type of usage ( Graphics::BufferUsage )
    */
-  GraphicsBuffer( Dali::Graphics::API::Controller* mController,
+  GraphicsBuffer( Dali::Graphics::Controller* mController,
                   uint32_t sizeInBytes,
                   uint32_t alignment,
                   bool persistentMappingEnabled,
-                  Graphics::API::BufferUsageFlags usageFlags );
+                  Graphics::BufferUsageFlags usageFlags );
 
 public:
 
@@ -84,7 +84,7 @@ public:
    * Return Graphics API buffer
    * @return pointer to the buffer object
    */
-  const Dali::Graphics::API::Buffer* GetBuffer() const
+  const Dali::Graphics::Buffer* GetBuffer() const
   {
     return mBuffer.get();
   }
@@ -127,22 +127,22 @@ public:
 
 private:
 
-  std::unique_ptr<Dali::Graphics::API::Buffer> mBuffer;
-  Dali::Graphics::API::Controller* mController;
+  std::unique_ptr<Dali::Graphics::Buffer> mBuffer;
+  Dali::Graphics::Controller* mController;
 
   uint32_t  mSize;
   uint32_t  mAlignment;
   void*     mMappedPtr;
   bool      mPersistentMappedEnabled;
 
-  Graphics::API::BufferUsageFlags mUsageFlags;
+  Graphics::BufferUsageFlags mUsageFlags;
 };
 
 class GraphicsBufferManager
 {
 public:
 
-  GraphicsBufferManager( Dali::Graphics::API::Controller* controller );
+  GraphicsBufferManager( Dali::Graphics::Controller* controller );
 
   ~GraphicsBufferManager();
 
@@ -155,7 +155,7 @@ public:
 
 private:
 
-  Dali::Graphics::API::Controller* mController;
+  Dali::Graphics::Controller* mController;
 };
 
 

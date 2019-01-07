@@ -276,6 +276,7 @@ exit 0
 %{_libdir}/pkgconfig/dali-core-vk-cxx03.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/devel-api/*
+%{dev_include_path}/dali/graphics-api/*
 %{dev_include_path}/dali/doc/*
 
 %files integration-devel-cxx03
@@ -288,6 +289,7 @@ exit 0
 %{_libdir}/pkgconfig/dali-core-vk.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/devel-api/*
+%{dev_include_path}/dali/graphics-api/*
 %{dev_include_path}/dali/doc/*
 
 %files integration-devel

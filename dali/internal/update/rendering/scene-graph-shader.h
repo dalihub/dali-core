@@ -92,13 +92,13 @@ public:
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  const Graphics::API::Shader* GetGfxObject() const;
+  const Graphics::Shader* GetGfxObject() const;
 
   /**
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  Graphics::API::Shader* GetGfxObject();
+  Graphics::Shader* GetGfxObject();
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -117,7 +117,7 @@ public:
    *
    * @return False when uniform is not found or due to hash collision the result is ambiguous
    */
-  bool GetUniform( const std::string& name, size_t hashedName, Graphics::API::ShaderDetails::UniformInfo& out ) const;
+  bool GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const;
 
 public: // Messages
   /**
@@ -155,7 +155,7 @@ private:
 
 private: // Data
   Integration::Graphics::GraphicsInterface*      mGraphics; ///< Graphics interface object
-  Graphics::API::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
+  Graphics::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
   ShaderCache*                                   mShaderCache;
   Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader
   ConnectionChangePropagator                     mConnectionObservers; ///< Watch for connection changes
@@ -169,8 +169,8 @@ private: // Data
   {
     size_t                                    hashValue;
     bool                                      hasCollision;
-    Graphics::API::Shader*                    graphicsShader;
-    Graphics::API::ShaderDetails::UniformInfo uniformInfo;
+    Graphics::Shader*                    graphicsShader;
+    Graphics::ShaderDetails::UniformInfo uniformInfo;
   };
 
   using UniformReflectionContainer = std::vector< ReflectionUniformInfo >;
