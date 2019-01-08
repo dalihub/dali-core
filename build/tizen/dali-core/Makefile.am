@@ -85,9 +85,7 @@ platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
 
 # Graphics API (Integration)
 graphicsapidir = $(includedir)/dali/graphics-api
-graphicsapiutilitydir = $(includedir)/dali/graphics-api/utility
 graphicsapi_HEADERS = $(graphics_api_header_files)
-graphicsapiutility_HEADERS = $(graphics_api_utility_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api

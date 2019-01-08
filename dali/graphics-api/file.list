@@ -25,12 +25,3 @@ graphics_api_header_files = \
     $(graphics_api_src_dir)/graphics-api-types-debug.h \
     $(graphics_api_src_dir)/graphics-api-types.h \
     $(graphics_api_src_dir)/graphics-api-utility.h
-
-graphics_api_utility_header_files=\
-    $(graphics_api_src_dir)/utility/graphics-asserts.h \
-    $(graphics_api_src_dir)/utility/utility-builder.h \
-    $(graphics_api_src_dir)/utility/utility-memory-pool.h \
-    $(graphics_api_src_dir)/utility/utility-queue.h \
-    $(graphics_api_src_dir)/utility/utility-strong-type.h \
-    $(graphics_api_src_dir)/utility/utility-synchronized.h \
-    $(graphics_api_src_dir)/utility/utility-traits.h

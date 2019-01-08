@@ -34,7 +34,6 @@
 #include <dali/graphics-api/graphics-api-pipeline-factory.h>
 #include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/graphics-api-sampler-factory.h>
-#include <dali/graphics-api/utility/utility-builder.h>
 
 namespace Dali
 {
