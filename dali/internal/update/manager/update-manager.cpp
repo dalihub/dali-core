@@ -66,6 +66,9 @@
 
 #include <iostream>
 
+// thread pool
+#include <dali/graphics/thread-pool.h>
+
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -171,6 +174,17 @@ void SortSiblingNodesRecursively( Node& node )
 
 } // unnamed namespace
 
+struct TextureUploadRequest
+{
+  TextureUploadRequest( Texture* texture, const PixelDataPtr& pixelData, const Internal::Texture::UploadParams& uploadParams )
+    : texture( texture ),
+      pixelData( pixelData ),
+      uploadParams( uploadParams )
+  {}
+  Texture*                        texture;
+  PixelDataPtr                    pixelData;
+  Internal::Texture::UploadParams uploadParams;
+};
 
 /**
  * Structure to contain UpdateManager internal data
@@ -192,7 +206,7 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
-    graphicsAlgorithms(),
+    graphicsAlgorithms( graphics.GetController() ),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphics( graphics ),
@@ -324,6 +338,7 @@ struct UpdateManager::Impl
   bool                                 graphicsShutdown;              ///< True if the graphics subsystem has shutdown
 
   ShaderCache                          shaderCache;
+  std::vector<TextureUploadRequest>    textureUploadRequestContainer;
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -775,6 +790,130 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   }
 }
 
+void UpdateManager::UploadTexture( Texture* texture,
+                                   PixelDataPtr pixelData,
+                                   const Internal::Texture::UploadParams& params )
+{
+  mImpl->textureUploadRequestContainer.emplace_back( texture, pixelData, params );
+}
+
+struct DT
+{
+  timespec t0;
+  timespec t1;
+  uint64_t totalSumMs{0u};
+  uint64_t lastMs{0u};
+  std::string strName;
+  DT( const char* name ) :
+    strName( name )
+  {}
+
+  void stop()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t1 );
+    uint64_t result = uint64_t((t1.tv_sec*1000) + (t1.tv_nsec/1000000)) - uint64_t((t0.tv_sec*1000) + (t0.tv_nsec/1000000));
+    totalSumMs += result;
+    lastMs = result;
+  }
+
+  void start()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t0 );
+  }
+
+};
+
+void UpdateManager::ProcessTextureUploadRequests()
+{
+  if( mImpl->textureUploadRequestContainer.empty() )
+  {
+    return;
+  }
+  const static bool useSingleStagingBuffer = (getenv( "DALI_VK_OPTIMIZED_TEXTURE_UPLOAD" ) && getenv( "DALI_VK_OPTIMIZED_TEXTURE_UPLOAD" )[0] == '1' ) ? true : false;
+
+  printf("SINGLE STAGING: %d\n", int(useSingleStagingBuffer));
+
+  DT tt0("std::copy");
+  DT tt2("convert");
+  DT tt3("getProperties");
+  DT tt1("UpdateTextures");
+  DT tt4("initialiseTexture");
+  DT tt5("totalStagingSize");
+  std::vector<std::pair<uint32_t, uint32_t>> offsetSize;
+  offsetSize.reserve( mImpl->textureUploadRequestContainer.size() );
+
+  std::vector<Graphics::API::TextureUpdateInfo> updateInfos;
+  std::vector<Graphics::API::TextureUpdateSourceInfo> sourceInfos;
+  updateInfos.reserve( mImpl->textureUploadRequestContainer.size() );
+  sourceInfos.reserve( mImpl->textureUploadRequestContainer.size() );
+
+  uint32_t sourceIndex { 0u };
+  timespec t0;
+  clock_gettime( CLOCK_MONOTONIC, &t0 );
+
+  for( auto& request : mImpl->textureUploadRequestContainer )
+  {
+    auto pixelData = request.pixelData;
+
+    // Intialise texture
+    if( useSingleStagingBuffer )
+    {
+      auto info = Graphics::API::TextureUpdateInfo{};
+
+      // initialise texture object without allocating memory for it yet
+      tt4.start();
+      request.texture->InitialiseTexture();
+      tt4.stop();
+      // prepare transfer info structure
+      info.dstTexture = request.texture->GetGfxObject();
+      info.dstOffset2D = { request.uploadParams.xOffset, request.uploadParams.yOffset };
+      info.srcOffset = 0u;
+      info.srcSize = request.pixelData->GetBufferSize();
+      info.srcReference = sourceIndex++;
+      info.srcExtent2D = { request.pixelData->GetWidth(), request.pixelData->GetHeight() };
+      updateInfos.emplace_back( info );
+
+      // store source
+      auto source = Graphics::API::TextureUpdateSourceInfo{};
+      source.sourceType = Graphics::API::TextureUpdateSourceInfo::Type::Memory;
+      source.memorySource.pMemory = pixelData->GetBuffer();
+      sourceInfos.emplace_back( source );
+    }
+    else
+    {
+      tt4.start();
+      request.texture->InitialiseTexture();
+      tt4.stop();
+      tt1.start();
+      request.texture->UploadTexture( pixelData, request.uploadParams );
+      tt1.stop();
+    }
+  }
+
+  if( useSingleStagingBuffer )
+  {
+    tt1.start();
+    mImpl->graphics.GetController().UpdateTextures( updateInfos, sourceInfos );
+    tt1.stop();
+  }
+  // clearing the container should happen in the next frame ( all uploads should be submitted by the time )
+  // or on running pure garbage collector
+  timespec t1;
+  clock_gettime( CLOCK_MONOTONIC, &t1 );
+
+  uint64_t result = uint64_t((t1.tv_sec*1000) + (t1.tv_nsec/1000000)) - uint64_t((t0.tv_sec*1000) + (t0.tv_nsec/1000000));
+
+  printf( "uploads: %d ms: %d\n", int(mImpl->textureUploadRequestContainer.size()), int(result));
+  printf("tt0: %s, t = %d\n", tt0.strName.c_str(), int( tt0.totalSumMs ));
+  printf("tt1: %s, t = %d\n", tt1.strName.c_str(), int( tt1.totalSumMs ));
+  printf("tt2: %s, t = %d\n", tt2.strName.c_str(), int( tt2.totalSumMs ));
+  printf("tt3: %s, t = %d\n", tt3.strName.c_str(), int( tt3.totalSumMs ));
+  printf("tt4: %s, t = %d\n", tt4.strName.c_str(), int( tt4.totalSumMs ));
+  printf("tt5: %s, t = %d\n", tt5.strName.c_str(), int( tt5.totalSumMs ));
+  mImpl->textureUploadRequestContainer.clear();
+
+}
+
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
@@ -823,12 +962,15 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
-
-  std::cout << "Update: updateScene:" << updateScene << std::endl;
-  std::cout << "        resumed:" << resumed << std::endl;
-
   updateScene |= resumed;
 
+  ProcessTextureUploadRequests();
+  //auto lambda = [&](auto workerThread) {  };
+
+  //auto future = Graphics::ThreadPool::Get().SubmitTask( 0, lambda );
+
+
+  //future->Wait();
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
@@ -1149,6 +1291,20 @@ void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
 {
   DALI_ASSERT_DEBUG( NULL != texture );
 
+  // Remove upload requests to this texture if exists ( there may be more than one )
+  if( !mImpl->textureUploadRequestContainer.empty() )
+  {
+    decltype(mImpl->textureUploadRequestContainer) newRequests;
+    for( auto& request : mImpl->textureUploadRequestContainer )
+    {
+      if( request.texture != texture )
+      {
+        newRequests.emplace_back( request );
+      }
+    }
+    mImpl->textureUploadRequestContainer = std::move( newRequests );
+  }
+
   // Find the texture, use reference to pointer so we can do the erase safely
   for ( auto&& iter : mImpl->textureContainer )
   {
@@ -1158,6 +1314,7 @@ void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
       return;
     }
   }
+
 }
 
 void UpdateManager::AddFrameBuffer( OwnerPointer< SceneGraph::FrameBuffer>& frameBuffer )

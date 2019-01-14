@@ -873,10 +873,150 @@ constexpr vk::Format ConvertApiToVk( API::Format format )
   return {};
 }
 
+struct ColorConversion
+{
+  vk::Format oldFormat;
+  vk::Format newFormat;
+  std::vector<uint8_t>(*pConversionFunc)(const void*, uint32_t, uint32_t, uint32_t, uint32_t);
+  void(*pConversionWriteFunc)(const void*, uint32_t, uint32_t, uint32_t, uint32_t, void*);
+};
+
+/**
+ * Converts RGB to RGBA
+ */
+inline std::vector<uint8_t> ConvertRGB32ToRGBA32( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, uint32_t rowStride )
+{
+  //@todo: use stride if non-zero
+  std::vector<uint8_t> rgbaBuffer{};
+
+  auto inData = reinterpret_cast<const uint8_t*>(pData);
+
+  rgbaBuffer.resize( width * height * 4 );
+  auto outData = rgbaBuffer.data();
+  auto outIdx = 0u;
+  for( auto i = 0u; i < sizeInBytes; i += 3 )
+  {
+    outData[outIdx] = inData[i];
+    outData[outIdx + 1] = inData[i + 1];
+    outData[outIdx + 2] = inData[i + 2];
+    outData[outIdx + 3] = 0xff;
+    outIdx += 4;
+  }
+  return rgbaBuffer;
+}
+
+inline void WriteRGB32ToRGBA32( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, uint32_t rowStride, void* pOutput )
+{
+  auto inData = reinterpret_cast<const uint8_t*>(pData);
+  auto outData = reinterpret_cast<uint8_t*>(pOutput);
+  auto outIdx = 0u;
+  for( auto i = 0u; i < sizeInBytes; i += 3 )
+  {
+    outData[outIdx] = inData[i];
+    outData[outIdx + 1] = inData[i + 1];
+    outData[outIdx + 2] = inData[i + 2];
+    outData[outIdx + 3] = 0xff;
+    outIdx += 4;
+  }
+}
+
+/**
+ * Format conversion table
+ */
+static const std::vector<ColorConversion> COLOR_CONVERSION_TABLE =
+                                      {
+                                        { vk::Format::eR8G8B8Unorm, vk::Format::eR8G8B8A8Unorm, ConvertRGB32ToRGBA32, WriteRGB32ToRGBA32 }
+                                      };
+
+/**
+ * This function tests whether format is supported by the driver. If possible it applies
+ * format conversion to suitable supported pixel format.
+ */
+bool Texture::TryConvertPixelData( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, std::vector<uint8_t>& outputBuffer )
+{
+  // No need to convert
+  if( mConvertFromFormat == vk::Format::eUndefined )
+  {
+    return false;
+  }
+
+  auto it = std::find_if( COLOR_CONVERSION_TABLE.begin(), COLOR_CONVERSION_TABLE.end(), [&]( auto& item )
+  {
+    return item.oldFormat == mConvertFromFormat;
+  });
+
+  // No suitable format, return empty array
+  if( it == COLOR_CONVERSION_TABLE.end() )
+  {
+    return false;
+  }
+
+  auto begin = reinterpret_cast<const uint8_t*>( pData );
+
+  outputBuffer = std::move( it->pConversionFunc( begin, sizeInBytes, width, height, 0u ) );
+  return !outputBuffer.empty();
+}
+
+bool Texture::TryConvertPixelData( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, void* pOutputBuffer )
+{
+  // No need to convert
+  if( mConvertFromFormat == vk::Format::eUndefined )
+  {
+    return false;
+  }
+
+  auto it = std::find_if( COLOR_CONVERSION_TABLE.begin(), COLOR_CONVERSION_TABLE.end(), [&]( auto& item )
+  {
+    return item.oldFormat == mConvertFromFormat;
+  });
+
+  // No suitable format, return empty array
+  if( it == COLOR_CONVERSION_TABLE.end() )
+  {
+    return false;
+  }
+
+  auto begin = reinterpret_cast<const uint8_t*>( pData );
+
+  it->pConversionWriteFunc( begin, sizeInBytes, width, height, 0u, pOutputBuffer );
+
+  return true;
+}
+
+vk::Format Texture::ValidateFormat( vk::Format sourceFormat )
+{
+  auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( sourceFormat );
+  vk::FormatFeatureFlags formatFlags = ( mDisableStagingBuffer ? formatProperties.linearTilingFeatures : formatProperties.optimalTilingFeatures );
+
+  auto retval = vk::Format::eUndefined;
+
+  // if format isn't supported, see whether suitable conversion is implemented
+  if( !formatFlags )
+  {
+    auto it = std::find_if( COLOR_CONVERSION_TABLE.begin(), COLOR_CONVERSION_TABLE.end(), [&]( auto& item )
+    {
+      return item.oldFormat == sourceFormat;
+    });
+
+    // No suitable format, return empty array
+    if( it != COLOR_CONVERSION_TABLE.end() )
+    {
+      retval = it->newFormat;
+    }
+  }
+  else
+  {
+    retval = sourceFormat;
+  }
+
+  return retval;
+}
+
+
 Texture::Texture( Dali::Graphics::API::TextureFactory& factory )
-  : mTextureFactory( dynamic_cast<VulkanAPI::TextureFactory&>( factory ) ),
-    mController( mTextureFactory.GetController() ),
-    mGraphics( mTextureFactory.GetGraphics() ),
+  : mTextureFactory( static_cast<VulkanAPI::TextureFactory&>(factory).Clone() ),
+    mController( mTextureFactory->GetController() ),
+    mGraphics( mTextureFactory->GetGraphics() ),
     mImage(),
     mImageView(),
     mSampler(),
@@ -899,13 +1039,11 @@ Texture::~Texture() = default;
 
 bool Texture::Initialise()
 {
-  auto size = mTextureFactory.GetSize();
+  auto size = mTextureFactory->GetSize();
   mWidth = uint32_t( size.width );
   mHeight = uint32_t( size.height );
-  auto sizeInBytes = mTextureFactory.GetDataSize();
-  auto data = mTextureFactory.GetData();
   mLayout = vk::ImageLayout::eUndefined;
-  switch( mTextureFactory.GetUsage())
+  switch( mTextureFactory->GetUsage())
   {
     case API::TextureDetails::Usage::COLOR_ATTACHMENT:
     {
@@ -924,61 +1062,55 @@ bool Texture::Initialise()
     }
   }
 
-  mFormat = ConvertApiToVk( mTextureFactory.GetFormat() );
-  mComponentMapping = GetVkComponentMapping( mTextureFactory.GetFormat() );
+  auto format = ConvertApiToVk( mTextureFactory->GetFormat() );
 
-  /**
-   * Lots of Vulkan drivers DO NOT SUPPORT R8G8B8 format therefore we are forced
-   * to implement a fallback as lots of textures comes as RGB ( ie. jpg ). In case
-   * the valid format is supported we're going to use it as it is.
-   */
-  std::vector<uint8_t> rgbaBuffer{};
-  if(mTextureFactory.GetFormat() == API::Format::R8G8B8_UNORM )
+  mFormat = ValidateFormat( format );
+  mConvertFromFormat = vk::Format::eUndefined;
+  if( mFormat == vk::Format::eUndefined )
   {
-    auto formatProperties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
-    if( !formatProperties.optimalTilingFeatures && !formatProperties.linearTilingFeatures )
-    {
-      if( data && sizeInBytes > 0 )
-      {
-        assert( (sizeInBytes == mWidth*mHeight*3) && "Corrupted RGB image data!" );
-
-        auto inData = reinterpret_cast<const uint8_t*>(data);
-
-        rgbaBuffer.reserve( mWidth * mHeight * 4 );
-        auto outData = rgbaBuffer.data();
-
-        auto outIdx = 0u;
-        for( auto i = 0u; i < sizeInBytes; i += 3 )
-        {
-          outData[outIdx] = inData[i];
-          outData[outIdx + 1] = inData[i + 1];
-          outData[outIdx + 2] = inData[i + 2];
-          outData[outIdx + 3] = 0xff;
-          outIdx += 4;
-        }
-
-        data = outData;
-        sizeInBytes = mWidth * mHeight * 4;
-        mFormat = vk::Format::eR8G8B8A8Unorm;
-      }
-    }
+    // not supported!
+    return false;
   }
 
-  if( InitialiseTexture() )
+  if( format != mFormat )
   {
-    // copy data to the image
-    if( data )
-    {
-      CopyMemory(data, sizeInBytes, {mWidth, mHeight}, {0, 0}, 0, 0, API::TextureDetails::UpdateMode::UNDEFINED );
-    }
-    return true;
+    mConvertFromFormat = format;
   }
 
-  return false;
+  mComponentMapping = GetVkComponentMapping( mTextureFactory->GetFormat() );
+
+  auto retval = InitialiseTexture();
+
+  // force generating properties
+  GetProperties();
+
+  return retval;
 }
 
 void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
+  if(!mImageView)
+  {
+    InitialiseMemory();
+  }
+
+  // Validate source
+  std::vector<uint8_t> convertedData{};
+
+  if( mConvertFromFormat != vk::Format::eUndefined )
+  {
+    if( TryConvertPixelData( srcMemory, srcMemorySize, srcExtent.width, srcExtent.height, convertedData ) )
+    {
+      srcMemorySize = uint32_t( convertedData.size() );
+      srcMemory = convertedData.data();
+    }
+    else
+    {
+      // format unsupported, early exit
+      return;
+    }
+  }
+
   if( !mDisableStagingBuffer )
   {
     // @todo transient buffer memory could be persistently mapped and aliased ( work like a per-frame stack )
@@ -1073,6 +1205,11 @@ void Texture::CopyMemory(const void *srcMemory, uint32_t srcMemorySize, API::Ext
 
 void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
 {
+  if(!mImageView)
+  {
+    InitialiseMemory();
+  }
+
   ResourceTransferRequest transferRequest( TransferRequestType::IMAGE_TO_IMAGE );
 
   auto imageSubresourceLayers = vk::ImageSubresourceLayers{}
@@ -1096,8 +1233,19 @@ void Texture::CopyTexture(const API::Texture &srcTexture, API::Rect2D srcRegion,
   mController.ScheduleResourceTransfer( std::move(transferRequest) );
 }
 
-void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode )
+void Texture::CopyBuffer(const API::Buffer& buffer,
+                uint32_t bufferOffset,
+                API::Extent2D extent2D,
+                API::Offset2D textureOffset2D,
+                uint32_t layer,
+                uint32_t level,
+                API::TextureUpdateFlags flags )
 {
+  if(!mImageView)
+  {
+    InitialiseMemory();
+  }
+
   ResourceTransferRequest transferRequest( TransferRequestType::BUFFER_TO_IMAGE );
 
   transferRequest.bufferToImageInfo.copyInfo
@@ -1106,15 +1254,15 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
                                          .setLayerCount( 1 )
                                          .setAspectMask( vk::ImageAspectFlagBits::eColor )
                                          .setMipLevel( level ) )
-                 .setImageOffset({ dstOffset.x, dstOffset.y, 0 } )
-                 .setImageExtent({ srcExtent.width, srcExtent.height, 1 } )
+                 .setImageOffset({ textureOffset2D.x, textureOffset2D.y, 0 } )
+                 .setImageExtent({ extent2D.width, extent2D.height, 1 } )
                  .setBufferRowLength({ 0u })
-                 .setBufferOffset({ 0u })
-                 .setBufferImageHeight({ srcExtent.height });
+                 .setBufferOffset({ bufferOffset })
+                 .setBufferImageHeight({ extent2D.height });
 
   transferRequest.bufferToImageInfo.dstImage = mImage;
-  transferRequest.bufferToImageInfo.srcBuffer = static_cast<const VulkanAPI::Buffer&>(srcBuffer).GetBufferRef();
-  transferRequest.deferredTransferMode = !( updateMode == API::TextureDetails::UpdateMode::IMMEDIATE );
+  transferRequest.bufferToImageInfo.srcBuffer = static_cast<const VulkanAPI::Buffer&>(buffer).GetBufferRef();
+  transferRequest.deferredTransferMode = true;
 
   // schedule transfer
   mController.ScheduleResourceTransfer( std::move(transferRequest) );
@@ -1124,12 +1272,8 @@ void Texture::CopyBuffer(const API::Buffer &srcBuffer, API::Extent2D srcExtent, 
 // uploaded at this point
 bool Texture::InitialiseTexture()
 {
-  // Check whether format is supported  by the platform
-  auto properties = mGraphics.GetPhysicalDevice().getFormatProperties( mFormat );
-
-  if( !properties.optimalTilingFeatures )
+  if( mImage )
   {
-    // terminate if not supported
     return false;
   }
 
@@ -1149,20 +1293,35 @@ bool Texture::InitialiseTexture()
   // Create the image handle
   mImage = mGraphics.CreateImage( imageCreateInfo );
 
-  // allocate memory for the image
-  auto memory = mGraphics.AllocateMemory( mImage, mDisableStagingBuffer ?
-    vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent :
-    vk::MemoryPropertyFlagBits::eDeviceLocal );
+  if( !mImage )
+  {
+    return false;
+  }
 
-  // bind the allocated memory to the image
-  mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
+  //InitialiseMemory();
 
-  // create default image view
-  CreateImageView();
+  return true;
+}
 
-  // create basic sampler
-  CreateSampler();
+bool Texture::InitialiseMemory()
+{
+  if( !mImageView )
+  {
+    // allocate memory for the image
+    auto memory = mGraphics.AllocateMemory( mImage,
+                                            mDisableStagingBuffer ?
+                                            vk::MemoryPropertyFlagBits::eHostVisible|vk::MemoryPropertyFlagBits::eHostCoherent :
+                                            vk::MemoryPropertyFlagBits::eDeviceLocal );
 
+    // bind the allocated memory to the image
+    mGraphics.BindImageMemory( mImage, std::move(memory), 0 );
+
+    // create default image view
+    CreateImageView();
+
+    // create basic sampler
+    CreateSampler();
+  }
   return true;
 }
 
@@ -1210,6 +1369,33 @@ Vulkan::RefCountedSampler Texture::GetSamplerRef() const
   return mSampler;
 }
 
+API::MemoryRequirements Texture::GetMemoryRequirements() const
+{
+  auto requirements = mGraphics.GetDevice().getImageMemoryRequirements( mImage->GetVkHandle() );
+  API::MemoryRequirements retval{};
+  retval.alignment = size_t(requirements.alignment);
+  retval.size = size_t(requirements.size);
+  return retval;
+}
+
+const API::TextureProperties& Texture::GetProperties()
+{
+  if( !mProperties )
+  {
+    mProperties = std::move(std::make_unique<API::TextureProperties>());
+
+    auto formatInfo = GetFormatInfo( mFormat );
+    mProperties->compressed = formatInfo.compressed;
+    mProperties->packed = formatInfo.packed;
+    mProperties->emulated = mConvertFromFormat != vk::Format::eUndefined;
+    mProperties->format = mTextureFactory->GetFormat();
+    mProperties->format1 = mTextureFactory->GetFormat();
+    mProperties->extent2D = { mWidth, mHeight };
+  }
+  return *mProperties;
+}
+
 } // namespace VulkanAPI
 } // namespace Graphics
 } // namespace Dali
+

@@ -16,6 +16,7 @@
  */
 
 #include "thread-pool.h"
+#include <cmath>
 
 namespace Dali
 {
@@ -85,6 +86,22 @@ void WorkerThread::AddTask( Task task )
   mConditionVariable.notify_one();
 }
 
+void WorkerThread::AddTask( Task task, bool doNotify )
+{
+  std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+  mTaskQueue.push( std::move( task ) );
+  if( doNotify )
+  {
+    mConditionVariable.notify_one();
+  }
+}
+
+void WorkerThread::Notify()
+{
+  std::lock_guard< std::mutex > lock{ mTaskQueueMutex };
+  mConditionVariable.notify_one();
+}
+
 void WorkerThread::Wait()
 {
   std::unique_lock< std::mutex > lock{ mTaskQueueMutex };
@@ -94,8 +111,6 @@ void WorkerThread::Wait()
 }
 
 // ThreadPool -----------------------------------------------------------------------------------------------
-
-uint32_t ThreadPool::sWorkerIndex{ 0 };
 
 bool ThreadPool::Initialize()
 {
@@ -110,6 +125,8 @@ bool ThreadPool::Initialize()
   {
     return false;
   }
+
+  sThreadPoolSingleton = this;
 
   /**
   * Spawn the worker threads.
@@ -151,25 +168,83 @@ std::shared_ptr< Future< void > > ThreadPool::SubmitTask( uint32_t workerIndex, 
 
 std::shared_ptr< Future< void > > ThreadPool::SubmitTasks( const std::vector< Task >& tasks )
 {
+  auto future = std::shared_ptr< Future< void > >( new Future< void > );
+
+  mWorkers[ mWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask(
+  [ future, tasks ]( uint32_t index ) {
+    for( auto& task : tasks )
+    {
+      task( index );
+    }
+
+    future->mPromise.set_value();
+
+  } );
+
+  return future;
+}
+
+std::unique_ptr<FutureGroup<void>> ThreadPool::SubmitTasks( const std::vector< Task >& tasks, uint32_t threadMask )
+{
+  std::unique_ptr<FutureGroup<void>> retval = std::make_unique<FutureGroup<void>>();
+
+  /**
+   * Use square root of number of sumbitted tasks to estimate optimal number of threads
+   * used to execute jobs
+   */
+  auto threads = uint32_t(std::log2(float(tasks.size())));
+
+  if( threadMask != 0 )
+  {
+    threads = threadMask;
+  }
+
+  if( threads > mWorkers.size() )
+  {
+    threads = uint32_t(mWorkers.size());
+  }
+
+  printf("THREADPOOL: Threads: %d\n", int(threads));
+
+  auto payloadPerThread = uint32_t(tasks.size() / threads);
+  auto remaining = uint32_t(tasks.size() % threads);
+
+  uint32_t taskIndex = 0;
+  uint32_t taskSize = uint32_t(remaining + payloadPerThread); // add 'remaining' tasks to the very first job list
+
+  for( auto wt = 0u; wt < threads; ++wt )
+  {
     auto future = std::shared_ptr< Future< void > >( new Future< void > );
-    mWorkers[ sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask(
-    [ future, tasks ]( uint32_t index ) {
-      for( auto& task : tasks )
-      {
-        task( index );
-      }
+    retval->mFutures.emplace_back( future );
+    mWorkers[ mWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask(
+      [ future, tasks, taskIndex, taskSize ]( uint32_t index ) {
+        auto begin = tasks.begin() + int(taskIndex);
+        auto end = begin + int(taskSize);
+        for( auto it = begin; it < end; ++it )
+        {
+          (*it)( index );
+        }
+        future->mPromise.set_value();
+      } );
 
-      future->mPromise.set_value();
+    taskIndex += taskSize;
+    taskSize = payloadPerThread;
+  }
 
-    } );
+  return retval;
+}
 
-    return future;
+ThreadPool& ThreadPool::Get()
+{
+  return *sThreadPoolSingleton;
 }
 
 size_t ThreadPool::GetWorkerCount() const
 {
   return mWorkers.size();
 }
+
+ThreadPool* ThreadPool::sThreadPoolSingleton = nullptr;
 
 } //namespace Graphics
 

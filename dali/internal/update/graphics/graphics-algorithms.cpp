@@ -182,6 +182,11 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
   return intersectionBox;
 }
 
+GraphicsAlgorithms::GraphicsAlgorithms( Graphics::API::Controller& controller )
+{
+  mGraphicsBufferManager.reset( new GraphicsBufferManager( &controller ) );
+}
+
 bool GraphicsAlgorithms::SetupScissorClipping( const RenderItem& item)
 {
   // Get the number of child scissors in the stack (do not include layer or root box).

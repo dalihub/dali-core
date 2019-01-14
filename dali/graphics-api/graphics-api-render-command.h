@@ -91,6 +91,7 @@ public:
 
     UniformBufferBinding& SetBuffer( const Buffer* value )
     {
+
       buffer = value;
       return *this;
     }
@@ -538,15 +539,17 @@ public:
   std::vector<PushConstantsBinding>         mPushConstantsBindings;
   const Pipeline*                           mPipeline;
 
+protected:
+
+  uint32_t mUpdateFlags; // update flags to be handled by implementation
+
+public:
+
 #if defined(DEBUG_ENABLED)
   // Debug
   std::string                               mDebugString{""};
   void*                                     mDebugObject{nullptr};
 #endif
-
-protected:
-
-  uint32_t mUpdateFlags; // update flags to be handled by implementation
 
 };
 

@@ -600,6 +600,21 @@ private:
    */
   void PrepareRenderers( BufferIndex bufferIndex );
 
+public:
+
+  /**
+   * Schedules texture upload for batch upload
+   * @param texture
+   * @param pixelData
+   * @param params
+   */
+
+  void UploadTexture( Texture* texture,
+                      PixelDataPtr pixelData,
+                      const Internal::Texture::UploadParams& params );
+
+  void ProcessTextureUploadRequests();
+
 private:
 
   // needs to be direct member so that getter for event buffer can be inlined
@@ -1112,6 +1127,22 @@ inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInt
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameCallback, &frameCallback );
+}
+
+inline void UploadTextureMessage( EventThreadServices&             eventThreadServices,
+                                  SceneGraph::Texture&             texture,
+                                  PixelDataPtr                     pixelData,
+                                  const Internal::Texture::UploadParams&  params )
+{
+  typedef MessageValue3< UpdateManager, Texture*, PixelDataPtr, Internal::Texture::UploadParams > LocalType;
+
+  auto& manager = eventThreadServices.GetUpdateManager();
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &SceneGraph::UpdateManager::UploadTexture, &texture, pixelData, params );
 }
 
 } // namespace SceneGraph

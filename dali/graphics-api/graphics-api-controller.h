@@ -197,6 +197,11 @@ public:
   virtual void SwapBuffers() = 0;
 
   /**
+   * @brief Updates textures
+   */
+  virtual void UpdateTextures( const std::vector<TextureUpdateInfo>& updateInfoList, const std::vector<TextureUpdateSourceInfo>& sourceList ) = 0;
+
+  /**
    * Returns number of buffers allocated by the swapchain
    * @return
    */

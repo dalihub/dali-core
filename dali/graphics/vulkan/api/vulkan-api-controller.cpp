@@ -48,6 +48,7 @@
 
 #include <dali/graphics/thread-pool.h>
 #include <iostream>
+#include "vulkan-api-controller.h"
 
 namespace Dali
 {
@@ -60,6 +61,32 @@ namespace DepthStencilFlagBits
 static constexpr uint32_t DEPTH_BUFFER_BIT   = 1; // depth buffer enabled
 static constexpr uint32_t STENCIL_BUFFER_BIT = 2; // stencil buffer enabled
 }
+
+struct DT
+{
+  timespec t0;
+  timespec t1;
+  uint64_t totalSumMs{0u};
+  uint64_t lastMs{0u};
+  std::string strName;
+  DT( const char* name ) :
+    strName( name )
+  {}
+
+  void stop()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t1 );
+    uint64_t result = uint64_t((t1.tv_sec*1000) + (t1.tv_nsec/1000000)) - uint64_t((t0.tv_sec*1000) + (t0.tv_nsec/1000000));
+    totalSumMs += result;
+    lastMs = result;
+  }
+
+  void start()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t0 );
+  }
+
+};
 
 // State of the depth-stencil buffer
 using DepthStencilFlags = uint32_t;
@@ -228,6 +255,9 @@ struct Controller::Impl
     }
 
     mMemoryTransferFutures.clear();
+
+    // reset staging memory
+    //mStagingMemory.clear();
 
     swapchain->Present();
   }
@@ -591,8 +621,11 @@ struct Controller::Impl
         if( request.requestType == TransferRequestType::BUFFER_TO_IMAGE )
         {
           auto& buffer = request.bufferToImageInfo.srcBuffer;
-          assert( buffer.GetRefCount() == 1 );
-          buffer->DestroyNow();
+          if( buffer->GetVkHandle() )
+          {
+            //assert( buffer.GetRefCount() == 1 );
+            buffer->DestroyNow();
+          }
         }
         else if( request.requestType == TransferRequestType::IMAGE_TO_IMAGE )
         {
@@ -1062,6 +1095,145 @@ uint32_t Controller::GetSwapchainBufferCount()
 uint32_t Controller::GetCurrentBufferIndex()
 {
   return mImpl->mGraphics.GetCurrentBufferIndex();
+}
+
+void Controller::UpdateTextures( const std::vector<API::TextureUpdateInfo>& updateInfoList, const std::vector<API::TextureUpdateSourceInfo>& sourceList )
+{
+  using MemoryUpdateAndOffset = std::pair<const API::TextureUpdateInfo*, uint32_t>;
+  std::vector<MemoryUpdateAndOffset> relevantUpdates{};
+
+  std::vector<Task> copyTasks{};
+
+  relevantUpdates.reserve( updateInfoList.size() );
+  copyTasks.reserve( updateInfoList.size() );
+
+  uint32_t totalStagingBufferSize{0u};
+
+  void* stagingBufferMappedPtr = nullptr;
+
+  // make a copy of update info lists by storing additional information
+  for( auto& info : updateInfoList )
+  {
+    const auto& source = sourceList[ info.srcReference ];
+    if( source.sourceType == API::TextureUpdateSourceInfo::Type::Memory )
+    {
+      const auto size = info.dstTexture->GetMemoryRequirements().size;
+      auto currentOffset = totalStagingBufferSize;
+      relevantUpdates.emplace_back( &info, currentOffset );
+      totalStagingBufferSize += uint32_t(size);
+
+      auto sourcePtr = reinterpret_cast<char*>(source.memorySource.pMemory);
+      auto ppStagingMemory = &stagingBufferMappedPtr; // this pointer will be set later!
+      auto texture = info.dstTexture;
+      auto pInfo = &info;
+      /**
+       * The staging buffer is not allocated yet. The task knows pointer to the pointer which will point
+       * at staging buffer right before executing tasks. The function will either perform direct copy
+       * or will do suitable conversion if source format isn't supported and emulation is available
+       */
+      auto taskLambda = [ppStagingMemory, currentOffset, pInfo, sourcePtr, texture ]( auto workerThread ){
+
+        char* pStagingMemory = reinterpret_cast<char*>(*ppStagingMemory);
+
+        auto vulkanTexture = static_cast<VulkanAPI::Texture*>( texture );
+
+        /** Try to initialise texture resources if they are not yet initialised */
+        vulkanTexture->InitialiseMemory();
+
+        /**
+         * If texture is 'emulated' convert pixel data otherwise do direct copy
+         */
+        /*
+        if( vulkanTexture->GetProperties().emulated )
+        {
+          vulkanTexture->TryConvertPixelData( sourcePtr, pInfo->srcSize, pInfo->srcExtent2D.width, pInfo->srcExtent2D.height, &pStagingMemory[currentOffset] );
+        }
+        else*/
+        {
+          std::copy( sourcePtr, sourcePtr + pInfo->srcSize, &pStagingMemory[currentOffset] );
+        }
+      };
+
+      // Add task
+      copyTasks.emplace_back( taskLambda );
+      relevantUpdates.emplace_back( &info, currentOffset );
+    }
+    else
+    {
+      // for other source types offset within staging buffer doesn't matter
+      relevantUpdates.emplace_back( &info, 0u );
+    }
+  }
+
+  /**
+   * Allocate staging buffer for all updates using CPU memory
+   * as source. The staging buffer exists only for a time of 1 frame.
+   */
+  auto& threadPool = mImpl->mThreadPool;
+
+  printf("Requested size: %d\n", totalStagingBufferSize);
+  DT a0("Buffer");
+  a0.start();
+  auto stagingBufferUPTR = CreateBuffer(
+                          GetBufferFactory()
+                            .SetSize( totalStagingBufferSize )
+                            .SetUsageFlags( 0u | API::BufferUsage::TRANSFER_SRC )
+  );
+
+  //@fixme: release staging buffer so won't be deleted here
+  auto stagingBuffer = stagingBufferUPTR.release();
+
+  a0.stop();
+  printf("A0: %s: %d\n", a0.strName.c_str(), int(a0.totalSumMs));
+  /** Write into memory in parallel */
+  stagingBufferMappedPtr = stagingBuffer->Map();
+
+  /** Submit tasks */
+  auto futures = threadPool.SubmitTasks( copyTasks, 0u );
+  futures->Wait();
+
+  /** Unmap memory */
+  stagingBuffer->Unmap();
+
+  for( auto& pair : relevantUpdates )
+  {
+    auto& info = *pair.first;
+    const auto& source = sourceList[info.srcReference];
+    switch( source.sourceType )
+    {
+      // directly copy buffer
+      case API::TextureUpdateSourceInfo::Type::Buffer:
+      {
+        info.dstTexture->CopyBuffer( *source.bufferSource.buffer,
+                                     info.srcOffset,
+                                     info.srcExtent2D,
+                                     info.dstOffset2D,
+                                     info.layer, // layer
+                                     info.level, // mipmap
+                                     {} ); // update mode, deprecated
+        break;
+      }
+      // for memory, use staging buffer
+      case API::TextureUpdateSourceInfo::Type::Memory:
+      {
+        auto memoryBufferOffset = pair.second;
+        info.dstTexture->CopyBuffer( *stagingBuffer,
+                                     memoryBufferOffset,
+                                     info.srcExtent2D,
+                                     info.dstOffset2D,
+                                     info.layer, // layer
+                                     info.level, // mipmap
+                                     {} ); // update mode, deprecated
+        break;
+      }
+
+      case API::TextureUpdateSourceInfo::Type::Texture:
+        //@todo support
+        break;
+    }
+
+
+  }
 }
 
 } // namespace VulkanAPI

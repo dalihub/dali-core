@@ -60,17 +60,48 @@ public:
 
   void CopyTexture( const API::Texture &srcTexture, API::Rect2D srcRegion, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode ) override;
 
-  void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
+  //void CopyBuffer( const API::Buffer &srcBuffer, API::Extent2D srcExtent, API::Offset2D dstOffset, uint32_t layer, uint32_t level, API::TextureDetails::UpdateMode updateMode) override;
 
+  void CopyBuffer(const API::Buffer& buffer,
+                  uint32_t bufferOffset,
+                  API::Extent2D extent2D,
+                  API::Offset2D textureOffset2D,
+                  uint32_t layer,
+                  uint32_t level,
+                  API::TextureUpdateFlags flags ) override;
+
+  API::MemoryRequirements GetMemoryRequirements() const override;
+
+  const API::TextureProperties& GetProperties() override;
+
+  bool InitialiseMemory();
+
+  /**
+ *
+ * @param sourceData
+ * @return
+ */
+  bool TryConvertPixelData( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, std::vector<uint8_t>& outputBuffer ) override;
+
+  bool TryConvertPixelData( const void* pData, uint32_t sizeInBytes, uint32_t width, uint32_t height, void* pOutputBuffer ) override;
 private:
 
   void CreateSampler();
   void CreateImageView();
   bool InitialiseTexture();
 
+  /**
+   * Validates initial format
+   * @return if valid, returns existing format
+   *         if possible conversion, returns new converted format
+   *         if not supported returns vk::Format::eUndefined
+   */
+  vk::Format ValidateFormat( vk::Format sourceFormat );
+
+
 private:
 
-  VulkanAPI::TextureFactory& mTextureFactory;
+  std::unique_ptr<VulkanAPI::TextureFactory> mTextureFactory;
   VulkanAPI::Controller& mController;
   Vulkan::Graphics& mGraphics;
 
@@ -81,11 +112,13 @@ private:
   uint32_t    mWidth;
   uint32_t    mHeight;
   vk::Format  mFormat;
+  vk::Format  mConvertFromFormat { vk::Format::eUndefined };
   vk::ImageUsageFlags mUsage;
   vk::ImageLayout mLayout;
   vk::ComponentMapping mComponentMapping{};
 
   bool mDisableStagingBuffer { false };
+  std::unique_ptr<API::TextureProperties> mProperties;
 };
 
 } // namespace VulkanAPI

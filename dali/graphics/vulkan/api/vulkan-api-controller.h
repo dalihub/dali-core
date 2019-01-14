@@ -254,6 +254,8 @@ public:
 
   API::SamplerFactory& GetSamplerFactory() override;
 
+  void UpdateTextures( const std::vector<API::TextureUpdateInfo>& updateInfoList, const std::vector<API::TextureUpdateSourceInfo>& sourceList );
+
 public:
   // not copyable
   Controller( const Controller& ) = delete;

@@ -152,6 +152,14 @@ std::unique_ptr<GraphicsBuffer> GraphicsBufferManager::AllocateUniformBuffer( ui
   );
 }
 
+std::unique_ptr<GraphicsBuffer> GraphicsBufferManager::AllocateStagingBuffer( uint32_t size )
+{
+  return std::unique_ptr<GraphicsBuffer>(
+    new GraphicsBuffer( mController, size, 256u, true, Dali::Graphics::API::BufferUsageFlags{0u} |
+                                                       Dali::Graphics::API::BufferUsage::TRANSFER_SRC )
+  );
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

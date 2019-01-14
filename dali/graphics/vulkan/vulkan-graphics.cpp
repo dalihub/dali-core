@@ -123,7 +123,7 @@ void* Memory::Map( uint32_t offset, uint32_t requestedMappedSize )
   {
     return mappedPtr;
   }
-  mappedSize = requestedMappedSize ? requestedMappedSize : VK_WHOLE_SIZE;
+  mappedSize = size_t(requestedMappedSize ? requestedMappedSize : VK_WHOLE_SIZE);
   mappedPtr = graphics->GetDevice().mapMemory( memory, offset, mappedSize ).value;
   return mappedPtr;
 }
@@ -499,7 +499,7 @@ RefCountedBuffer Graphics::CreateBuffer( size_t size, vk::BufferUsageFlags usage
   auto info = vk::BufferCreateInfo{};
   info.setSharingMode( vk::SharingMode::eExclusive );
   info.setSize( size );
-  info.setUsage( usageFlags | vk::BufferUsageFlagBits::eTransferDst );
+  info.setUsage( usageFlags );
 
   auto buffer = new Buffer( *this, info );
 
