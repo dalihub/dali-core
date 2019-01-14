@@ -45,7 +45,6 @@ namespace Internal
 
 // Value types used by messages.
 template <> struct ParameterType< ColorMode > : public BasicType< ColorMode > {};
-template <> struct ParameterType< PositionInheritanceMode > : public BasicType< PositionInheritanceMode > {};
 template <> struct ParameterType< ClippingMode::Type > : public BasicType< ClippingMode::Type > {};
 
 namespace SceneGraph
@@ -73,7 +72,6 @@ class Node : public PropertyOwner, public NodeDataProvider
 public:
 
   // Defaults
-  static const PositionInheritanceMode DEFAULT_POSITION_INHERITANCE_MODE;
   static const ColorMode DEFAULT_COLOR_MODE;
 
   // Creation methods

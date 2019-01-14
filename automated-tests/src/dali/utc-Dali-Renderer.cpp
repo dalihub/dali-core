@@ -2336,9 +2336,9 @@ int UtcDaliRendererSetDepthTestMode(void)
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
   DALI_TEST_CHECK( !glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
 
-  // Change the layer behavior to LAYER_2D.
+  // Change the layer behavior to LAYER_UI.
   // Note this will also disable depth testing for the layer by default, we test this first.
-  Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_2D );
+  Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_UI );
 
   glEnableDisableStack.Reset();
   application.SendNotification();

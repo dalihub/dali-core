@@ -245,20 +245,6 @@ Vector3 Actor::GetCurrentWorldPosition() const
   return GetImplementation(*this).GetCurrentWorldPosition();
 }
 
-void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetPositionInheritanceMode() is deprecated and will be removed from next release. Use SetInheritPosition() instead.\n" );
-
-  GetImplementation(*this).SetPositionInheritanceMode( mode );
-}
-
-PositionInheritanceMode Actor::GetPositionInheritanceMode() const
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPositionInheritanceMode() is deprecated and will be removed from next release. Use IsPositionInherited() instead.\n" );
-
-  return GetImplementation(*this).GetPositionInheritanceMode();
-}
-
 void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
   GetImplementation(*this).SetOrientation(angle, axis);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/rendering/frame-buffer.h>
 
+// EXTERNAL INCLUDES
+#include <type_traits>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h> // DALI_LOG_WARNING_NOFN
 #include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
@@ -25,6 +28,18 @@
 
 namespace Dali
 {
+
+namespace
+{
+/// Bool operator for FrameBuffer::Attachment::Mask.
+/// in cpp as only used in this file
+bool operator&( FrameBuffer::Attachment::Mask lhs, FrameBuffer::Attachment::Mask rhs )
+{
+  using UnderlyingType = typename std::underlying_type< FrameBuffer::Attachment::Mask >::type;
+  return static_cast<bool>( static_cast<UnderlyingType>( lhs ) & static_cast<UnderlyingType>( rhs ) );
+}
+
+} // unnamed namespace
 
 FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height )
 {
