@@ -38,7 +38,9 @@ class GraphicsAlgorithms
 {
 public:
 
-  GraphicsAlgorithms() = default;
+  GraphicsAlgorithms() = delete;
+  explicit GraphicsAlgorithms( Graphics::API::Controller& controller );
+
   ~GraphicsAlgorithms() = default;
 
   GraphicsAlgorithms(const GraphicsAlgorithms&) = delete;

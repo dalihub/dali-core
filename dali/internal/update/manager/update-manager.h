@@ -52,6 +52,8 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 
+#include <dali/graphics/thread-pool.h>
+
 namespace Dali
 {
 
@@ -600,6 +602,31 @@ private:
    */
   void PrepareRenderers( BufferIndex bufferIndex );
 
+public:
+
+  /**
+   * Schedules texture upload for batch upload
+   * @param[in] texture valid pointer to the texture
+   * @param[in] pixelData pixel data
+   * @param[in] params upload parameters
+   */
+  void UploadTexture( Texture* texture,
+                      PixelDataPtr pixelData,
+                      const Internal::Texture::UploadParams& params );
+
+private:
+
+  /**
+   * Processes texture uploads
+   * @param[in,out] updateInfos Empty array of update info structures
+   * @param[in,out] sourceInfos Empty array of source info structures
+   * @param[in] processParallel True enables parallel processing
+   * @return Shared pointer to the Future object
+   */
+  Graphics::SharedFuture ProcessTextureUploadRequests( std::vector<Graphics::API::TextureUpdateInfo>& updateInfos,
+                                                       std::vector<Graphics::API::TextureUpdateSourceInfo>& sourceInfos,
+                                                       bool processParallel );
+
 private:
 
   // needs to be direct member so that getter for event buffer can be inlined
@@ -1112,6 +1139,22 @@ inline void RemoveFrameCallbackMessage( UpdateManager& manager, FrameCallbackInt
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveFrameCallback, &frameCallback );
+}
+
+inline void UploadTextureMessage( EventThreadServices&             eventThreadServices,
+                                  SceneGraph::Texture&             texture,
+                                  PixelDataPtr                     pixelData,
+                                  const Internal::Texture::UploadParams&  params )
+{
+  typedef MessageValue3< UpdateManager, Texture*, PixelDataPtr, Internal::Texture::UploadParams > LocalType;
+
+  auto& manager = eventThreadServices.GetUpdateManager();
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &SceneGraph::UpdateManager::UploadTexture, &texture, pixelData, params );
 }
 
 } // namespace SceneGraph

@@ -82,13 +82,15 @@ public:
   }
 };
 
+using SharedFuture = std::shared_ptr< Future< void > >;
+
 template< typename T >
 class FutureGroup final
 {
   friend class ThreadPool;
 
 private:
-  std::vector< std::unique_ptr< Future< T > > > mFutures;
+  std::vector< std::shared_ptr< Future< T > > > mFutures;
 
 public:
 
@@ -130,6 +132,10 @@ public:
 
   void AddTask( Task task );
 
+  void AddTask( Task task, bool doNotify );
+
+  void Notify();
+
   void Wait();
 };
 
@@ -138,10 +144,10 @@ class ThreadPool
 private:
   std::vector< std::unique_ptr< WorkerThread>> mWorkers;
 
-  static uint32_t sWorkerIndex;
+  uint32_t mWorkerIndex {0u};
 
 public:
-  bool Initialize();
+  bool Initialize( uint32_t threadCount = 0u );
 
   void Wait();
 
@@ -163,10 +169,12 @@ public:
   template< typename ReturnT >
   std::shared_ptr< Future< void > > SubmitTask( std::function< ReturnT(uint32_t) > task )
   {
-    return SubmitTask( sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() ), std::move( task ) );
+    return SubmitTask( mWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() ), std::move( task ) );
   }
 
   std::shared_ptr< Future< void > > SubmitTasks( const std::vector< Task >& tasks );
+
+  std::unique_ptr<FutureGroup<void>> SubmitTasks( const std::vector< Task >& tasks, uint32_t threadMask );
 
   template< typename T, typename Predicate >
   std::shared_ptr< FutureGroup< void > >
@@ -216,7 +224,7 @@ public:
         futureGroup->mFutures[i]->mPromise.set_value();
       } );
 
-      mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
+      mWorkers[mWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
 
       start = end;
     }
@@ -284,7 +292,7 @@ public:
         futureGroup->mFutures[i]->mPromise.set_value();
       } );
 
-      mWorkers[sWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
+      mWorkers[mWorkerIndex++ % static_cast< uint32_t >( mWorkers.size() )]->AddTask( task );
 
       start = end;
     }

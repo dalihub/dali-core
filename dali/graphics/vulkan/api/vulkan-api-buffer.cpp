@@ -47,7 +47,7 @@ bool Buffer::Initialise()
 
   // allocate memory
   // todo: host visible should be only for dynamic buffers
-  auto memory = mGraphics.AllocateMemory( mBufferRef, vk::MemoryPropertyFlagBits::eHostVisible );
+  auto memory = mGraphics.AllocateMemory( mBufferRef, vk::MemoryPropertyFlagBits::eHostVisible| vk::MemoryPropertyFlagBits::eHostCoherent );
   mGraphics.BindBufferMemory( mBufferRef, std::move(memory), 0 );
 
   return true;

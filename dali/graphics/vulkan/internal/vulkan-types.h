@@ -517,6 +517,34 @@ using RefCountedSampler = Handle< class Sampler >;
 using RefCountedTexture = Handle< class Texture >;
 using RefCountedFramebufferAttachment = Handle< class FramebufferAttachment >;
 
+// debug timer
+struct DT
+{
+  timespec t0;
+  timespec t1;
+  uint64_t totalSumMs{0u};
+  uint64_t lastMs{0u};
+  std::string strName;
+  DT( const char* name ) :
+    strName( name )
+  {}
+
+  void stop()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t1 );
+    uint64_t result = uint64_t((t1.tv_sec*1000) + (t1.tv_nsec/1000000)) - uint64_t((t0.tv_sec*1000) + (t0.tv_nsec/1000000));
+    totalSumMs += result;
+    lastMs = result;
+  }
+
+  void start()
+  {
+    clock_gettime( CLOCK_MONOTONIC, &t0 );
+  }
+
+};
+
+
 } // namespace Vulkan
 } // namespace Graphics
 } // namespace Dali
