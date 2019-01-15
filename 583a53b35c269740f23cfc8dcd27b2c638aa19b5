@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "96cb1e57_fb3e221e",
+        "filename": "dali/graphics/thread-pool.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "log",
+      "range": {
+        "startLine": 194,
+        "startChar": 9,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d2a9183c_6c21c8f1",
+        "filename": "dali/graphics/vulkan/api/vulkan-api-texture.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1306,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "Framebuffer attachments are sampled - should use !eTransferDst to check to initialize them.",
+      "range": {
+        "startLine": 1306,
+        "startChar": 40,
+        "endLine": 1306,
+        "endChar": 48
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d34f26f4_171be919",
+        "filename": "dali/graphics/vulkan/internal/vulkan-types.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "Move to a debug header.",
+      "range": {
+        "startLine": 521,
+        "startChar": 7,
+        "endLine": 521,
+        "endChar": 9
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6381f11_5a3d81a2",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 832,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "Remove (Or use debug macro)",
+      "range": {
+        "startLine": 831,
+        "startChar": 0,
+        "endLine": 832,
+        "endChar": 40
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "36c578a1_c80d4513",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1029,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "We are waiting only if updateScene is true; this won\u0027t be the case for UploadTexture message. Probably need to ensure that updateScene is set, otherwise the graphics backend won\u0027t run.",
+      "range": {
+        "startLine": 1025,
+        "startChar": 0,
+        "endLine": 1029,
+        "endChar": 7
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a04b1a5_b6d7c06d",
+        "filename": "dali/internal/update/manager/update-manager.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 628,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-15T19:45:57Z",
+      "side": 1,
+      "message": "No need for this to be in main update-manager class - could instead move to the Impl inside source, to prevent further spread of dependencies across the codebase.",
+      "range": {
+        "startLine": 619,
+        "startChar": 2,
+        "endLine": 628,
+        "endChar": 78
+      },
+      "revId": "583a53b35c269740f23cfc8dcd27b2c638aa19b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
