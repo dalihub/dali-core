@@ -21,6 +21,8 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/render-task-list-integ.h>
 #include <cstdio>
 #include <string>
 
@@ -204,12 +206,13 @@ int UtcDaliRendererDefaultProperties(void)
   DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
   DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
   DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
+  DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
 */
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
-  DALI_TEST_EQUALS( renderer.GetPropertyCount(), 25, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetPropertyCount(), 26, TEST_LOCATION );
 
   TEST_RENDERER_PROPERTY( renderer, "depthIndex",              Property::INTEGER, true, false, false, Renderer::Property::DEPTH_INDEX, TEST_LOCATION );
   TEST_RENDERER_PROPERTY( renderer, "faceCullingMode",         Property::INTEGER, true, false, false, Renderer::Property::FACE_CULLING_MODE, TEST_LOCATION  );
@@ -236,6 +239,7 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY( renderer, "stencilOperationOnZFail", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, TEST_LOCATION  );
   TEST_RENDERER_PROPERTY( renderer, "stencilOperationOnZPass", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, TEST_LOCATION  );
   TEST_RENDERER_PROPERTY( renderer, "opacity",                 Property::FLOAT,   true, true,  true,  DevelRenderer::Property::OPACITY, TEST_LOCATION  );
+  TEST_RENDERER_PROPERTY( renderer, "renderingBehavior",       Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2933,6 +2937,86 @@ int UtcDaliRendererInvalidProperty(void)
 
   value = renderer.GetCurrentProperty( Renderer::Property::DEPTH_INDEX + 100 );
   DALI_TEST_CHECK( value.GetType() == Property::Type::NONE );
+
+  END_TEST;
+}
+
+int UtcDaliRendererRenderingBehavior(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Test RENDERING_BEHAVIOR property" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  actor.SetColor( Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
+  Stage::GetCurrent().Add( actor );
+
+  Property::Value value = renderer.GetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  int renderingBehavior;
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::IF_REQUIRED, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( !( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING ) );
+
+  renderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
+
+  value = renderer.GetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::CONTINUOUSLY, TEST_LOCATION );
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING );
+
+  value = renderer.GetCurrentProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::CONTINUOUSLY, TEST_LOCATION );
+
+  // Render again and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING );
+
+  // Change rendering behavior
+  renderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( !( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING ) );
+
+  // For test coverage
+  Dali::Integration::Core& core( application.GetCore() );
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+
+  Dali::RenderTaskList additionalRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
