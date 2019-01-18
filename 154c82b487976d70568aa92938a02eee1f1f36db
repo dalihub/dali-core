@@ -45,6 +45,30 @@
       "revId": "154c82b487976d70568aa92938a02eee1f1f36db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c60f6908_3e813aed",
+        "filename": "dali/internal/update/rendering/scene-graph-property-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-18T15:51:43Z",
+      "side": 1,
+      "message": "I think you meant \u0027Graphics\u0027... could move it outside the Graphics namespace?",
+      "parentUuid": "c52e789e_11c1475f",
+      "range": {
+        "startLine": 181,
+        "startChar": 15,
+        "endLine": 181,
+        "endChar": 25
+      },
+      "revId": "154c82b487976d70568aa92938a02eee1f1f36db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
