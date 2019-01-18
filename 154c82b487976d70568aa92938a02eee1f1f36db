@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "05681a3c_b24c66f5",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2019-01-18T15:22:10Z",
+      "side": 1,
+      "message": "Should it just be called Interface as we\u0027re already in the Graphics namespace.",
+      "range": {
+        "startLine": 74,
+        "startChar": 20,
+        "endLine": 74,
+        "endChar": 37
+      },
+      "revId": "154c82b487976d70568aa92938a02eee1f1f36db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c52e789e_11c1475f",
+        "filename": "dali/internal/update/rendering/scene-graph-property-buffer.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2019-01-18T15:22:10Z",
+      "side": 1,
+      "message": "I don\u0027t like that we have the word Interface twice here!",
+      "range": {
+        "startLine": 181,
+        "startChar": 15,
+        "endLine": 181,
+        "endChar": 25
+      },
+      "revId": "154c82b487976d70568aa92938a02eee1f1f36db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
