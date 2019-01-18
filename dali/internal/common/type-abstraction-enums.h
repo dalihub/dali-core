@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/common/stage-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/type-abstraction.h>
 
 namespace Dali
@@ -29,15 +30,16 @@ namespace Dali
 namespace Internal
 {
 
-template <> struct ParameterType< Dali::FaceCullingMode::Type >  : public BasicType< Dali::FaceCullingMode::Type > {};
-template <> struct ParameterType< Dali::BlendMode::Type >        : public BasicType< Dali::BlendMode::Type > {};
-template <> struct ParameterType< Dali::DepthWriteMode::Type >   : public BasicType< Dali::DepthWriteMode::Type > {};
-template <> struct ParameterType< Dali::DepthTestMode::Type >    : public BasicType< Dali::DepthTestMode::Type > {};
-template <> struct ParameterType< Dali::DepthFunction::Type >    : public BasicType< Dali::DepthFunction::Type > {};
-template <> struct ParameterType< Dali::RenderMode::Type >       : public BasicType< Dali::RenderMode::Type > {};
-template <> struct ParameterType< Dali::StencilFunction::Type >  : public BasicType< Dali::StencilFunction::Type > {};
-template <> struct ParameterType< Dali::StencilOperation::Type > : public BasicType< Dali::StencilOperation::Type > {};
-template <> struct ParameterType< Dali::DevelStage::Rendering >  : public BasicType< Dali::DevelStage::Rendering > {};
+template <> struct ParameterType< Dali::FaceCullingMode::Type >          : public BasicType< Dali::FaceCullingMode::Type > {};
+template <> struct ParameterType< Dali::BlendMode::Type >                : public BasicType< Dali::BlendMode::Type > {};
+template <> struct ParameterType< Dali::DepthWriteMode::Type >           : public BasicType< Dali::DepthWriteMode::Type > {};
+template <> struct ParameterType< Dali::DepthTestMode::Type >            : public BasicType< Dali::DepthTestMode::Type > {};
+template <> struct ParameterType< Dali::DepthFunction::Type >            : public BasicType< Dali::DepthFunction::Type > {};
+template <> struct ParameterType< Dali::RenderMode::Type >               : public BasicType< Dali::RenderMode::Type > {};
+template <> struct ParameterType< Dali::StencilFunction::Type >          : public BasicType< Dali::StencilFunction::Type > {};
+template <> struct ParameterType< Dali::StencilOperation::Type >         : public BasicType< Dali::StencilOperation::Type > {};
+template <> struct ParameterType< Dali::DevelStage::Rendering >          : public BasicType< Dali::DevelStage::Rendering > {};
+template <> struct ParameterType< Dali::DevelRenderer::Rendering::Type > : public BasicType< Dali::DevelRenderer::Rendering::Type > {};
 
 } //namespace Internal
 

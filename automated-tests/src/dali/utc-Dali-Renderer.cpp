@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/render-task-list-integ.h>
 #include <cstdio>
 #include <string>
 
@@ -2600,6 +2603,86 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 
   //Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererRenderingBehavior(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Test RENDERING_BEHAVIOR property" );
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  actor.SetColor( Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
+  Stage::GetCurrent().Add( actor );
+
+  Property::Value value = renderer.GetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  int renderingBehavior;
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::IF_REQUIRED, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( !( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING ) );
+
+  renderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
+
+  value = renderer.GetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::CONTINUOUSLY, TEST_LOCATION );
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING );
+
+  value = renderer.GetCurrentProperty( DevelRenderer::Property::RENDERING_BEHAVIOR );
+  DALI_TEST_CHECK( value.Get( renderingBehavior ) );
+  DALI_TEST_EQUALS( static_cast< DevelRenderer::Rendering::Type >( renderingBehavior ), DevelRenderer::Rendering::CONTINUOUSLY, TEST_LOCATION );
+
+  // Render again and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING );
+
+  // Change rendering behavior
+  renderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
+
+  updateStatus = application.GetUpdateStatus();
+
+  DALI_TEST_CHECK( !( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING ) );
+
+  // For test coverage
+  Dali::Integration::Core& core( application.GetCore() );
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+
+  Dali::RenderTaskList additionalRenderTaskList = Integration::RenderTaskList::New();
+  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
+  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
+
+  // Render and check the update status
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

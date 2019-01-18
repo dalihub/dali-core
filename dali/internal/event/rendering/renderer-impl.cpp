@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
+DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX )
 
 // Property string to enumeration tables:
@@ -158,6 +159,11 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INVERT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT_WRAP )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT_WRAP )
 DALI_ENUM_TO_STRING_TABLE_END( STENCIL_OPERATION )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RENDERING_BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, IF_REQUIRED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, CONTINUOUSLY )
+DALI_ENUM_TO_STRING_TABLE_END( RENDERING_BEHAVIOR )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
@@ -624,6 +630,16 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      DevelRenderer::Rendering::Type convertedValue = mRenderingBehavior;
+      if( Scripting::GetEnumerationProperty< DevelRenderer::Rendering::Type >( propertyValue, RENDERING_BEHAVIOR_TABLE, RENDERING_BEHAVIOR_TABLE_COUNT, convertedValue ) )
+      {
+        mRenderingBehavior = convertedValue;
+        SetRenderingBehaviorMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+      }
+      break;
+    }
   }
 }
 
@@ -780,6 +796,11 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
       value = mStencilParameters.stencilOperationOnZPass;
       break;
     }
+    case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      value = mRenderingBehavior;
+      break;
+    }
   }
   return value;
 }
@@ -844,6 +865,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false )
 {
 }

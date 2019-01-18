@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
   mDepthIndex( 0 )
 {
@@ -522,6 +523,16 @@ void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperati
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
+}
+
+void Renderer::SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior )
+{
+  mRenderingBehavior = renderingBehavior;
+}
+
+DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
 }
 
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )

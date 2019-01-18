@@ -825,6 +825,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
       gestureUpdated;                                       // ..a gesture property was updated
 
+  bool keepRendererRendering = false;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -897,7 +898,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
       if ( NULL != mImpl->root )
       {
-        mImpl->renderTaskProcessor.Process( bufferIndex,
+        keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
                                             mImpl->taskList,
                                             *mImpl->root,
                                             mImpl->sortedLayers,
@@ -953,6 +954,11 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
   // Check whether further updates are required
   unsigned int keepUpdating = KeepUpdatingCheck( elapsedSeconds );
+
+  if( keepRendererRendering )
+  {
+    keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
+  }
 
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();

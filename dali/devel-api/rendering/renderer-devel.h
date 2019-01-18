@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,28 @@ namespace Property
     STENCIL_OPERATION_ON_FAIL   = Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL,
     STENCIL_OPERATION_ON_Z_FAIL = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL,
     STENCIL_OPERATION_ON_Z_PASS = Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS,
+
+    /**
+     * @brief The rendering behavior of the renderer.
+     * @details Name "renderingBehavior", type Property::INTEGER.
+     */
+    RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 1,
   };
 } // namespace Property
+
+namespace Rendering
+{
+
+/**
+ * @brief Enumeration for the rendering behavior
+ */
+enum Type
+{
+  IF_REQUIRED,  ///< Default. Will only render if required to do so.
+  CONTINUOUSLY  ///< Will render continuously.
+};
+
+} // namespace Rendering
 
 } // namespace DevelRenderer
 
