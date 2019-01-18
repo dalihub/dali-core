@@ -298,6 +298,7 @@ public:
       INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool        @SINCE_1_0.0
       INHERIT_SCALE,                                      ///< name "inheritScale",          type bool        @SINCE_1_0.0
       COLOR_MODE,                                         ///< name "colorMode",             type std::string @SINCE_1_0.0
+      RESERVED_PROPERTY_01,                               ///< name "reservedProperty01", This property is removed because it's deprecated.
       DRAW_MODE,                                          ///< name "drawMode",              type std::string @SINCE_1_0.0
       SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3     @SINCE_1_0.0
       WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String      @SINCE_1_0.0

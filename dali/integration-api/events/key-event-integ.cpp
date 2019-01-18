@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/key-event-integ.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/key-event-impl.h>
+
 namespace Dali
 {
 
@@ -27,6 +30,7 @@ namespace Integration
 KeyEvent::KeyEvent()
 : Event( Key ),
   keyName(),
+  logicalKey(),
   keyString(),
   keyCode( -1 ),
   keyModifier( 0 ),
@@ -39,11 +43,12 @@ KeyEvent::KeyEvent()
 {
 }
 
-KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,
+KeyEvent::KeyEvent( const std::string& keyName, const std::string& logicalKey, const std::string& keyString, int keyCode, int keyModifier,
                     unsigned long timeStamp, const State& keyState, const std::string& compose, const std::string& deviceName,
                     const Device::Class::Type deviceClass, const Device::Subclass::Type deviceSubclass )
 : Event( Key ),
   keyName( keyName ),
+  logicalKey( logicalKey ),
   keyString( keyString ),
   keyCode( keyCode ),
   keyModifier( keyModifier ),
@@ -59,6 +64,7 @@ KeyEvent::KeyEvent( const std::string& keyName, const std::string& keyString, in
 KeyEvent::KeyEvent( const Dali::KeyEvent& event )
 : Event( Key ),
   keyName( event.keyPressedName ),
+  logicalKey( "" ),
   keyString( event.keyPressed ),
   keyCode( event.keyCode ),
   keyModifier( event.keyModifier ),
@@ -69,6 +75,12 @@ KeyEvent::KeyEvent( const Dali::KeyEvent& event )
   deviceClass( Device::Class::NONE ),
   deviceSubclass( Device::Subclass::NONE )
 {
+  const Internal::KeyEventImpl* keyEventImpl = GetImplementation( &event );
+  logicalKey = keyEventImpl->GetLogicalKey();
+  compose = keyEventImpl->GetCompose();
+  deviceName = keyEventImpl->GetDeviceName();
+  deviceClass = keyEventImpl->GetDeviceClass();
+  deviceSubclass = keyEventImpl->GetDeviceSubclass();
 }
 
 KeyEvent::~KeyEvent()

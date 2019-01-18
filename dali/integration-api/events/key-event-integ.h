@@ -56,6 +56,7 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * Constructor
    * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
+   * @param[in]  logicalKey    The logical key symbol (eg. shift + 1 == "exclamation")
    * @param[in]  keyString     A string of input characters or key pressed
    * @param[in]  keyCode       The unique key code for the key pressed.
    * @param[in]  keyModifier   The key modifier for special keys like shift and alt
@@ -67,6 +68,7 @@ struct DALI_CORE_API KeyEvent : public Event
    * @param[in]  deviceSubclass  Subclass of device KeyEvent originated from
    */
   KeyEvent(const std::string& keyName,
+           const std::string& logicalKey,
            const std::string& keyString,
            int keyCode,
            int keyModifier,
@@ -77,7 +79,7 @@ struct DALI_CORE_API KeyEvent : public Event
            const Device::Class::Type deviceClass,
            const Device::Subclass::Type deviceSubclass );
 
-  /*
+  /**
    * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
    * @param[in] event Dali::KeyEvent to convert from
    */
@@ -94,6 +96,11 @@ struct DALI_CORE_API KeyEvent : public Event
    *@copydoc Dali::KeyEvent::keyPressedName
    */
   std::string keyName;
+
+  /**
+   * The logical key symbol
+   */
+  std::string logicalKey;
 
   /**
    *@copydoc Dali::KeyEvent::keyPressed
