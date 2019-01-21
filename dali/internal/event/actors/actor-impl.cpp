@@ -192,7 +192,6 @@ DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
 DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
 DALI_PROPERTY( "colorMode",                 STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "reservedProperty01",        STRING,   true,  false, false, Dali::Actor::Property::RESERVED_PROPERTY_01 ) // This property was removed, but to keep binary compatibility and TypeRegister test app, remain it here.
 DALI_PROPERTY( "drawMode",                  STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
 DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
