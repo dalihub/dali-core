@@ -55,6 +55,10 @@ constexpr uint32_t RENDER_COMMAND_UPDATE_DRAW_BIT               = 1 << 7;
 constexpr uint32_t RENDER_COMMAND_UPDATE_PUSH_CONSTANTS_BIT     = 1 << 8;
 constexpr uint32_t RENDER_COMMAND_UPDATE_ALL_BITS               = 0xffff;
 
+/**
+ * Class which defines a render operation.
+ * First, bind the relevant graphics objects to the command, finally call the Draw method.
+ */
 class RenderCommand
 {
 public:
@@ -67,6 +71,9 @@ public:
     INDEX_TYPE_UINT32,
   };
 
+  /**
+   * DrawType defines whether vertices are read contiguously, or use a secondary index
+   */
   enum class DrawType
   {
     UNDEFINED_DRAW,
@@ -79,8 +86,14 @@ public:
    */
   struct UniformBufferBinding
   {
-    UniformBufferBinding() :
-    buffer( nullptr ), offset( 0u ), dataSize( 0u ), binding( 0u ) {}
+    UniformBufferBinding()
+    : buffer( nullptr ),
+      offset( 0u ),
+      dataSize( 0u ),
+      binding( 0u )
+    {
+    }
+
     const Buffer*  buffer;
     uint32_t offset;
     uint32_t dataSize;
@@ -112,7 +125,7 @@ public:
   };
 
   /**
-   *
+   * Structure describes texture binding
    */
   struct TextureBinding
   {
@@ -146,11 +159,10 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream& ss, const TextureBinding& object);
-
   };
 
   /**
-   *
+   * structure defining the sampler binding
    */
   struct SamplerBinding
   {
@@ -172,7 +184,7 @@ public:
   };
 
   /**
-   *
+   * structure defining the index buffer binding
    */
   struct IndexBufferBinding
   {
@@ -204,6 +216,9 @@ public:
     friend std::ostream& operator<<(std::ostream& ss, const IndexBufferBinding&);
   };
 
+  /**
+   * structure defining the framebuffer (if any) of the render target
+   */
   struct RenderTargetBinding
   {
     const Framebuffer*                    framebuffer { nullptr };
@@ -211,8 +226,8 @@ public:
     Framebuffer::DepthStencilClearColor   depthStencilClearColor {};
     float framebufferWidth; // Store the framebuffer size in case we need to set viewport
     float framebufferHeight;
+    void* pNext{ nullptr };
 
-    void*    pNext{ nullptr };
     RenderTargetBinding() = default;
 
     RenderTargetBinding& SetFramebuffer( const Framebuffer* value )
@@ -236,6 +251,9 @@ public:
     friend std::ostream& operator<<(std::ostream& ss, const RenderTargetBinding&);
   };
 
+  /**
+   * Structure defining the draw command
+   */
   struct DrawCommand
   {
     DrawCommand() : drawType( DrawType::UNDEFINED_DRAW )
@@ -329,7 +347,7 @@ public:
   };
 
   /**
-   *
+   * Structure defining the push constants
    */
   struct PushConstantsBinding
   {
@@ -359,6 +377,9 @@ public:
     friend std::ostream& operator<<(std::ostream& ss, const PushConstantsBinding&);
   };
 
+  /**
+   * Constructor
+   */
   RenderCommand()
   : mVertexBufferBindings(),
     mUniformBufferBindings(),
@@ -435,13 +456,6 @@ public:
     return *this;
   }
 
-  RenderCommand& Draw( DrawCommand&& drawCommand )
-  {
-    mDrawCommand = drawCommand;
-    mUpdateFlags |= RENDER_COMMAND_UPDATE_DRAW_BIT;
-    return *this;
-  }
-
   RenderCommand& BindPipeline( const Pipeline* pipeline )
   {
     if( !mPipeline || mPipeline != pipeline )
@@ -456,6 +470,13 @@ public:
   {
     mIndexBufferBinding = binding;
     mUpdateFlags |= RENDER_COMMAND_UPDATE_INDEX_BUFFER_BIT;
+    return *this;
+  }
+
+  RenderCommand& Draw( DrawCommand&& drawCommand )
+  {
+    mDrawCommand = drawCommand;
+    mUpdateFlags |= RENDER_COMMAND_UPDATE_DRAW_BIT;
     return *this;
   }
 
@@ -529,7 +550,6 @@ public:
   const std::vector<TextureBinding>*        mTextureBindings;
   std::vector<SamplerBinding>               mSamplerBindings;
 
-
   IndexBufferBinding                        mIndexBufferBinding;
   RenderTargetBinding                       mRenderTargetBinding;
   DrawCommand                               mDrawCommand;
@@ -542,12 +562,12 @@ protected:
 public:
   // WARNING: Be careful with these - all libraries must be built with DEBUG_ENABLED
   // to ensure every instantiation has the same size.
+  // They should always be the last attributes in this class.
 #if defined(DEBUG_ENABLED)
   // Debug
   std::string                               mDebugString{""};
   void*                                     mDebugObject{nullptr};
 #endif
-
 };
 
 } // namespace Graphics

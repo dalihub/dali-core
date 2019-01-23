@@ -25,10 +25,9 @@ namespace Dali
 {
 namespace Graphics
 {
-class PipelineCache;
 
 /**
- * @brief Interface class for ShaderFactory types in the graphics API.
+ * @brief Interface class for generating Pipeline types in the graphics API.
  */
 class PipelineFactory
 {

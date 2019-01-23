@@ -810,8 +810,8 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     mImpl->messageQueue.IsSceneUpdateRequired()     || // ..a message that modifies the scene graph node tree is queued OR
     gestureUpdated;                                    // ..a gesture property was updated OR
 
-  // Although the scene-graph may not require an update, we still need to synchronize double-buffered
-  // values if the scene was updated in the previous frame.
+  // Although the scene-graph may not require an update, we still need to synchronize
+  // double-buffered values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
   {
     //Reset properties from the previous update
@@ -819,15 +819,15 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     mImpl->transformManager.ResetToBaseValue();
   }
 
-  // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
-  // between calling IsSceneUpdateRequired() above and here, so updateScene should
-  // be set again
+  // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called between calling
+  // IsSceneUpdateRequired() above and here, so updateScene should be set again
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
   updateScene |= resumed;
 
-  // Although the scene-graph may not require an update, we still need to synchronize double-buffered
-  // renderer lists if the scene was updated in the previous frame.
-  // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
+  // Although the scene-graph may not require an update, we still need to synchronize
+  // double-buffered renderer lists if the scene was updated in the previous frame.  We should not
+  // start skipping update steps or reusing lists until there have been two frames where nothing
+  // changes
   if( updateScene || mImpl->previousUpdateScene )
   {
     //Animate
@@ -904,7 +904,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-      // Pass the graphics back end the total number of renderers that were discarded this frame.
+      // Pass the total number of renderers that were discarded this frame to the graphics backend.
       // This may trigger garbage collection.
       if( numberOfDiscardedRenderers > 0 )
       {

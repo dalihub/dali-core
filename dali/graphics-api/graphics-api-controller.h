@@ -118,7 +118,7 @@ public:
   virtual SamplerFactory& GetSamplerFactory() = 0;
 
   /**
-   * @brief alAllocates render command ( depends on implementation );
+   * @brief Allocates render command ( depends on implementation );
    * @return
    */
   virtual std::unique_ptr<RenderCommand> AllocateRenderCommand() = 0;
@@ -212,11 +212,9 @@ protected:
   Controller& operator=( Controller&& ) = default;
 
   /**
-   * Objects of this type should not directly.
+   * Objects of this type should not be directly instantiated.
    */
   Controller() = default;
-
-private:
 };
 
 } // namespace Graphics

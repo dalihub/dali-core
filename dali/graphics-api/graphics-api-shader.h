@@ -103,7 +103,7 @@ protected:
   Shader& operator=(Shader&&) = default;
 
   /**
-   * Objects of this type should not directly.
+   * Objects of this type should not be directly instantiated.
    */
   Shader() = default;
 };

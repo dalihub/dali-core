@@ -524,8 +524,8 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
 
-  // Rebind textures to make sure old data won't be used
-  // Note, why are we binding textures for render commands on all buffer indexes?
+  // Rebind textures to make sure old data won't be used. Ensure this
+  // occurs for both buffers.
   mRenderCommands.BindTextures( mTextureBindings );
 
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
