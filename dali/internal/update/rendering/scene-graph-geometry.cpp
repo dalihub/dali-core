@@ -47,7 +47,7 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Geometry::Initialize( Integration::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
 }

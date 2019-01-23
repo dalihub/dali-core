@@ -79,7 +79,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Integration::GraphicsInterface& graphics );
 
   /**
    * @brief Set the format of the buffer
@@ -178,7 +178,7 @@ public:
   }
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics;  ///< Graphics interface object
+  Integration::GraphicsInterface* mGraphics;  ///< Graphics interface object
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
 

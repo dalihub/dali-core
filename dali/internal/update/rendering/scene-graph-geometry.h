@@ -56,7 +56,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Integration::GraphicsInterface& graphics );
 
   /**
    * Adds a property buffer to the geometry
@@ -135,7 +135,7 @@ public:
   }
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Integration::GraphicsInterface* mGraphics; ///< Graphics interface object
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;

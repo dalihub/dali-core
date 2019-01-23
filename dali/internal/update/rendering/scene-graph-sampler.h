@@ -156,7 +156,7 @@ struct Sampler
     return {};
   }
 
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics )
+  void Initialize( Integration::GraphicsInterface& graphics )
   {
     mGraphics = &graphics;
     mGfxSampler.reset( nullptr );
@@ -171,7 +171,7 @@ struct Sampler
                     );
   }
 
-  Integration::Graphics::GraphicsInterface* mGraphics;   ///< Graphics interface
+  Integration::GraphicsInterface* mGraphics;   ///< Graphics interface
   std::unique_ptr<Dali::Graphics::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
 
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter

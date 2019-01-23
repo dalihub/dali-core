@@ -25,7 +25,7 @@
 #include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/core-impl.h>
 
-using Dali::Integration::Graphics::GraphicsInterface;
+using Dali::Integration::GraphicsInterface;
 
 namespace Dali
 {

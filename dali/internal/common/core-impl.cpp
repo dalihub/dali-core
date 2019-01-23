@@ -72,7 +72,7 @@ using Integration::GestureManager;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
-using Integration::Graphics::GraphicsInterface;
+using Integration::GraphicsInterface;
 
 
 Core::Core( RenderController& renderController,
@@ -85,8 +85,8 @@ Core::Core( RenderController& renderController,
             Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
-  mProcessingEvent(false),
-  mGraphics(graphics)
+  mGraphics(graphics),
+  mProcessingEvent(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();

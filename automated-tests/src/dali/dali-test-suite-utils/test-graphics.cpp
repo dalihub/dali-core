@@ -29,7 +29,7 @@ public:
 
 
 
-Graphics::Graphics( const Dali::Integration::Graphics::GraphicsCreateInfo& info,
+Graphics::Graphics( const Dali::Integration::GraphicsCreateInfo& info,
                     Dali::Integration::DepthBufferAvailable depthBufferAvailable,
                     Dali::Integration::StencilBufferAvailable stencilBufferRequired )
 : GraphicsInterface( info, depthBufferAvailable, stencilBufferRequired ),

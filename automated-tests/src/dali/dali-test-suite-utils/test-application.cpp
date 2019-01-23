@@ -36,10 +36,10 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
-  Dali::Integration::Graphics::GraphicsCreateInfo info;
+  Dali::Integration::GraphicsCreateInfo info;
   info.surfaceWidth = 480;
   info.surfaceHeight = 800;
-  info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
+  info.depthStencilMode = Integration::DepthStencilMode::NONE;
   mGraphics = std::unique_ptr<Test::Graphics>( new Test::Graphics( info,
                                                                    Integration::DepthBufferAvailable::FALSE,
                                                                    Integration::StencilBufferAvailable::FALSE));

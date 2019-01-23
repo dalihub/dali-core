@@ -299,7 +299,7 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 Texture::~Texture()
 {}
 
-void Texture::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Texture::Initialize( Integration::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
 }

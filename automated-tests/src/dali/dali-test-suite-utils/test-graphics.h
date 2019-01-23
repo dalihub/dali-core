@@ -33,11 +33,11 @@ class Controller;
 /**
  * Graphics implementation class
  */
-class Graphics : public Dali::Integration::Graphics::GraphicsInterface
+class Graphics : public Dali::Integration::GraphicsInterface
 {
 public:
 
-  Graphics( const Dali::Integration::Graphics::GraphicsCreateInfo& info,
+  Graphics( const Dali::Integration::GraphicsCreateInfo& info,
             Dali::Integration::DepthBufferAvailable depthBufferAvailable,
             Dali::Integration::StencilBufferAvailable stencilBufferRequired );
 
@@ -80,13 +80,13 @@ public:
    */
   void SurfaceResized( unsigned int width, unsigned int height );
 
-  Dali::Integration::Graphics::GraphicsCreateInfo& GetCreateInfo()
+  Dali::Integration::GraphicsCreateInfo& GetCreateInfo()
   {
     return mCreateInfo;
   }
 
 private:
-  Dali::Integration::Graphics::GraphicsCreateInfo mCreateInfo;
+  Dali::Integration::GraphicsCreateInfo mCreateInfo;
 
   struct Impl;
   Impl* mImpl;

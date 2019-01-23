@@ -42,7 +42,7 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 
 FrameBuffer::~FrameBuffer() = default;
 
-void FrameBuffer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void FrameBuffer::Initialize( Integration::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
   // Defer creation of framebuffer until a render instruction uses it

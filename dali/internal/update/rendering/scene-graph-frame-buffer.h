@@ -52,7 +52,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Integration::GraphicsInterface& graphics );
 
   /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
@@ -102,7 +102,7 @@ public:
   void DestroyGraphicsObjects();
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Integration::GraphicsInterface* mGraphics; ///< Graphics interface object
   std::unique_ptr<Graphics::Framebuffer> mGraphicsFramebuffer;
 
   struct Attachment
