@@ -46,7 +46,7 @@ Shader::~Shader()
   mConnectionObservers.Destroy( *this );
 }
 
-void Shader::Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache )
+void Shader::Initialize( Integration::GraphicsInterface& graphics, ShaderCache& shaderCache )
 {
   mGraphics = &graphics;
   mShaderCache = &shaderCache;

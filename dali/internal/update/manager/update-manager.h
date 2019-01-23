@@ -116,7 +116,7 @@ public:
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
                  RenderTaskProcessor& renderTaskProcessor,
-                 Dali::Integration::Graphics::GraphicsInterface& graphics);
+                 Dali::Integration::GraphicsInterface& graphics);
 
   /**
    * Destructor.

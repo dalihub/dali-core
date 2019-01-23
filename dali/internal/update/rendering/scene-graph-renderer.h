@@ -88,7 +88,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Integration::GraphicsInterface& graphics );
 
   /**
    * Set the texture set for the renderer
@@ -488,7 +488,7 @@ private:
   Renderer();
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Integration::GraphicsInterface* mGraphics; ///< Graphics interface object
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)

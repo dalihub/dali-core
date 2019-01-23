@@ -26,8 +26,6 @@ namespace Dali
 
 namespace Integration
 {
-namespace Graphics
-{
 
 enum class DepthStencilMode
 {
@@ -161,7 +159,6 @@ protected:
   const Integration::StencilBufferAvailable mStencilBufferRequired;   ///< Whether the stencil buffer is required
 };
 
-} // namespace Graphics
 } // namespace Integration
 } // namespace Dali
 

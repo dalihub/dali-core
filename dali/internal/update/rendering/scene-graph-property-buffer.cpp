@@ -46,7 +46,7 @@ PropertyBuffer::~PropertyBuffer()
 {
 }
 
-void PropertyBuffer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void PropertyBuffer::Initialize( Integration::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
 }

@@ -165,7 +165,7 @@ void Renderer::operator delete( void* ptr )
   gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
 }
 
-void Renderer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Renderer::Initialize( Integration::GraphicsInterface& graphics )
 {
   mGraphics = &graphics;
 

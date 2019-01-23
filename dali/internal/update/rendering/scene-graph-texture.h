@@ -77,7 +77,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Integration::GraphicsInterface& graphics );
 
   /**
    * Retrieve wheter the texture has an alpha channel
@@ -145,7 +145,7 @@ public:
   void CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize );
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Integration::GraphicsInterface* mGraphics; ///< Graphics interface object
   std::unique_ptr<Graphics::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image

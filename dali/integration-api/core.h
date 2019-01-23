@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,10 @@ class Core;
 
 namespace Integration
 {
-namespace Graphics
-{
-class GraphicsInterface;
-}
-
 class Core;
 class GestureManager;
 class PlatformAbstraction;
+class GraphicsInterface;
 class RenderController;
 class SystemOverlay;
 struct Event;
@@ -249,7 +245,7 @@ public:
    */
   static Core* New( RenderController& renderController,
                     PlatformAbstraction& platformAbstraction,
-                    Graphics::GraphicsInterface& graphics,
+                    GraphicsInterface& graphics,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,

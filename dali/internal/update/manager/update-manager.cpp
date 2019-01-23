@@ -95,7 +95,7 @@ extern Debug::Filter* gRenderTaskLogFilter;
 
 using namespace Dali::Integration;
 using Dali::Internal::Update::MessageQueue;
-using Dali::Integration::Graphics::GraphicsInterface;
+using Dali::Integration::GraphicsInterface;
 
 namespace Dali
 {

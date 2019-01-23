@@ -67,7 +67,7 @@ public:
    * @param[in] graphics The Graphics API
    * @param[in] shaderCache A cache
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache );
+  void Initialize( Integration::GraphicsInterface& graphics, ShaderCache& shaderCache );
 
   /**
    * Query whether a shader hint is set.
@@ -154,12 +154,11 @@ private:
   void BuildReflection();
 
 private: // Data
-  Integration::Graphics::GraphicsInterface*      mGraphics; ///< Graphics interface object
-  Graphics::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
-  ShaderCache*                                   mShaderCache;
-  Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader
-  ConnectionChangePropagator                     mConnectionObservers; ///< Watch for connection changes
-
+  Integration::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Graphics::Shader*               mGraphicsShader; ///< The graphics object ( owned by cache )
+  ShaderCache*                    mShaderCache;
+  Dali::Shader::Hint::Value       mHints; ///< Hints for the shader
+  ConnectionChangePropagator      mConnectionObservers; ///< Watch for connection changes
 
   /**
    * Struct ReflectionUniformInfo
@@ -167,8 +166,8 @@ private: // Data
    */
   struct ReflectionUniformInfo
   {
-    size_t                                    hashValue;
-    bool                                      hasCollision;
+    size_t                               hashValue;
+    bool                                 hasCollision;
     Graphics::Shader*                    graphicsShader;
     Graphics::ShaderDetails::UniformInfo uniformInfo;
   };
