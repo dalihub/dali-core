@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4cac115b_22a571f6",
+        "filename": "dali/integration-api/graphics/graphics-interface.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-01-23T15:21:18Z",
+      "side": 1,
+      "message": "Will remove graphics namespace from this file.",
+      "parentUuid": "05681a3c_b24c66f5",
+      "range": {
+        "startLine": 74,
+        "startChar": 20,
+        "endLine": 74,
+        "endChar": 37
+      },
+      "revId": "154c82b487976d70568aa92938a02eee1f1f36db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c52e789e_11c1475f",
         "filename": "dali/internal/update/rendering/scene-graph-property-buffer.h",
         "patchSetId": 1
