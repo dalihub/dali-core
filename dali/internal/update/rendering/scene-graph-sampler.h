@@ -23,7 +23,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-types.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
 
 #include <memory>
 
@@ -45,7 +44,7 @@ struct Sampler
    * Constructor
    */
   Sampler()
-  : mGraphics( nullptr ),
+  : mGraphicsController( nullptr ),
     mGfxSampler( nullptr ),
     mMinificationFilter(FilterMode::DEFAULT),
     mMagnificationFilter(FilterMode::DEFAULT),
@@ -156,12 +155,12 @@ struct Sampler
     return {};
   }
 
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics )
+  void Initialize( Graphics::Controller& graphicsController )
   {
-    mGraphics = &graphics;
+    mGraphicsController = &graphicsController;
     mGfxSampler.reset( nullptr );
-    mGfxSampler = mGraphics->GetController().CreateSampler(
-                    mGraphics->GetController().GetSamplerFactory()
+    mGfxSampler = graphicsController.CreateSampler(
+                    graphicsController.GetSamplerFactory()
                     .SetMinFilter( GetGfxFilter( mMinificationFilter ) )
                     .SetMagFilter( GetGfxFilter( mMagnificationFilter ) )
                     .SetAddressModeU( GetGfxSamplerAddressMode( mSWrapMode ) )
@@ -171,7 +170,7 @@ struct Sampler
                     );
   }
 
-  Integration::Graphics::GraphicsInterface* mGraphics;   ///< Graphics interface
+  Graphics::Controller* mGraphicsController;   ///< Graphics interface
   std::unique_ptr<Dali::Graphics::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
 
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter

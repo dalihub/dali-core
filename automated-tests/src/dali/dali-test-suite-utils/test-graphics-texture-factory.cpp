@@ -27,7 +27,7 @@ Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetType(Dali::Graphics::
 {
   return *this;
 }
-Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetSize(const Dali::Graphics::RectSize& size)
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetSize(const Dali::Graphics::Extent2D& size)
 {
   return *this;
 }

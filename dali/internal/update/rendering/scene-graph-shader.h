@@ -22,8 +22,6 @@
 #include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-shader.h>
 
-#include <dali/integration-api/graphics/graphics-interface.h>
-
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -67,7 +65,7 @@ public:
    * @param[in] graphics The Graphics API
    * @param[in] shaderCache A cache
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache );
+  void Initialize( Graphics::Controller& graphics, ShaderCache& shaderCache );
 
   /**
    * Query whether a shader hint is set.
@@ -154,12 +152,11 @@ private:
   void BuildReflection();
 
 private: // Data
-  Integration::Graphics::GraphicsInterface*      mGraphics; ///< Graphics interface object
-  Graphics::Shader*                         mGraphicsShader; ///< The graphics object ( owned by cache )
-  ShaderCache*                                   mShaderCache;
-  Dali::Shader::Hint::Value                      mHints; ///< Hints for the shader
-  ConnectionChangePropagator                     mConnectionObservers; ///< Watch for connection changes
-
+  Graphics::Controller*           mGraphicsController; ///< Graphics interface object
+  Graphics::Shader*               mGraphicsShader; ///< The graphics object ( owned by cache )
+  ShaderCache*                    mShaderCache;
+  Dali::Shader::Hint::Value       mHints; ///< Hints for the shader
+  ConnectionChangePropagator      mConnectionObservers; ///< Watch for connection changes
 
   /**
    * Struct ReflectionUniformInfo
@@ -167,8 +164,8 @@ private: // Data
    */
   struct ReflectionUniformInfo
   {
-    size_t                                    hashValue;
-    bool                                      hasCollision;
+    size_t                               hashValue;
+    bool                                 hasCollision;
     Graphics::Shader*                    graphicsShader;
     Graphics::ShaderDetails::UniformInfo uniformInfo;
   };

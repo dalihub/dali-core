@@ -22,7 +22,6 @@
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics-api/graphics-api-utility.h>
 
 namespace Dali
 {
@@ -38,7 +37,7 @@ public:
   /**
    * @brief Set the size of framebuffer
    */
-  virtual FramebufferFactory& SetSize( const RectSize& size ) = 0;
+  virtual FramebufferFactory& SetSize( const Extent2D& size ) = 0;
 
   /**
    * @brief Set a color attachment texture on the framebuffer

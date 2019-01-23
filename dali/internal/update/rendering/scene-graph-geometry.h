@@ -21,7 +21,6 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/buffer-index.h>
@@ -56,7 +55,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Graphics::Controller& graphics );
 
   /**
    * Adds a property buffer to the geometry
@@ -135,7 +134,7 @@ public:
   }
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Graphics::Controller* mGraphicsController; ///< Graphics interface object
 
   // PropertyBuffers
   Vector< SceneGraph::PropertyBuffer* > mVertexBuffers;

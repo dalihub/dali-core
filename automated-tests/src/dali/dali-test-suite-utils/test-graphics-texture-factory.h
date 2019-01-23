@@ -29,7 +29,7 @@ public:
   virtual ~GraphicsTextureFactory();
 
   Dali::Graphics::TextureFactory& SetType(Dali::Graphics::TextureDetails::Type type) override;
-  Dali::Graphics::TextureFactory& SetSize(const Dali::Graphics::RectSize& size) override;
+  Dali::Graphics::TextureFactory& SetSize(const Dali::Graphics::Extent2D& size) override;
   Dali::Graphics::TextureFactory& SetFormat(Dali::Graphics::TextureDetails::Format format) override;
   Dali::Graphics::TextureFactory& SetMipMapFlag(Dali::Graphics::TextureDetails::MipMapFlag mipMapFlag) override;
   Dali::Graphics::TextureFactory& SetUsage( Dali::Graphics::TextureDetails::Usage usage ) override;

@@ -77,11 +77,9 @@ endif
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
-platformabstractiongraphicsdir = $(includedir)/dali/integration-api/graphics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
-platformabstractiongraphics_HEADERS = $(graphics_integration_header_files)
 
 # Graphics API (Integration)
 graphicsapidir = $(includedir)/dali/graphics-api
@@ -155,7 +153,6 @@ noinst_PROGRAMS = linker.test
 linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-controller.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-buffer-factory.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-framebuffer-factory.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-pipeline-factory.cpp \

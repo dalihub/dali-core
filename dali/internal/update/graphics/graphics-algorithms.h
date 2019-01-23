@@ -54,9 +54,9 @@ public:
    * @param renderInstructions container of render instructions
    * @param bufferIndex current buffer index
    */
-  void SubmitRenderInstructions(Graphics::Controller &graphics,
-                                SceneGraph::RenderInstructionContainer &renderInstructions,
-                                BufferIndex bufferIndex );
+  void SubmitRenderInstructions( Graphics::Controller &graphics,
+                                 SceneGraph::RenderInstructionContainer &renderInstructions,
+                                 BufferIndex bufferIndex );
 
   void DiscardUnusedResources( Graphics::Controller& controller );
 
@@ -74,18 +74,18 @@ private:
 
   bool SetupPipelineViewportState( Graphics::ViewportState& outViewportState );
 
-  void RecordRenderItemList(Graphics::Controller& graphics,
-                            BufferIndex bufferIndex,
-                            Graphics::RenderCommand::RenderTargetBinding& renderTargetBinding,
-                            Matrix viewProjection,
-                            RenderInstruction& instruction,
-                            const RenderList& renderItemList,
-                            std::vector<Graphics::RenderCommand*>& commandList);
+  void RecordRenderItemList( Graphics::Controller& graphics,
+                             BufferIndex bufferIndex,
+                             Graphics::RenderCommand::RenderTargetBinding& renderTargetBinding,
+                             Matrix viewProjection,
+                             RenderInstruction& instruction,
+                             const RenderList& renderItemList,
+                             std::vector<Graphics::RenderCommand*>& commandList);
 
-  void RecordInstruction(Graphics::Controller& graphics,
-                         BufferIndex bufferIndex,
-                         RenderInstruction& instruction,
-                         std::vector<Graphics::RenderCommand*>& commandList);
+  void RecordInstruction( Graphics::Controller& graphics,
+                          BufferIndex bufferIndex,
+                          RenderInstruction& instruction,
+                          std::vector<Graphics::RenderCommand*>& commandList);
 
   bool PrepareGraphicsPipeline( Graphics::Controller& controller,
                                 RenderInstruction& instruction,

@@ -18,7 +18,6 @@
  *
  */
 
-#include <dali/graphics-api/graphics-api-utility.h>
 #include <vector>
 #include <string>
 

@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 
 namespace Dali
@@ -52,7 +53,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Graphics::Controller& graphics );
 
   /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
@@ -102,7 +103,7 @@ public:
   void DestroyGraphicsObjects();
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Graphics::Controller* mGraphicsController;
   std::unique_ptr<Graphics::Framebuffer> mGraphicsFramebuffer;
 
   struct Attachment

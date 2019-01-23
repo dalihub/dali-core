@@ -36,13 +36,7 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
-  Dali::Integration::Graphics::GraphicsCreateInfo info;
-  info.surfaceWidth = 480;
-  info.surfaceHeight = 800;
-  info.depthStencilMode = Integration::Graphics::DepthStencilMode::NONE;
-  mGraphics = std::unique_ptr<Test::Graphics>( new Test::Graphics( info,
-                                                                   Integration::DepthBufferAvailable::FALSE,
-                                                                   Integration::StencilBufferAvailable::FALSE));
+  mGraphicsController = std::unique_ptr<Test::GraphicsController>( new Test::GraphicsController() );
 
   Initialize();
 }
@@ -54,7 +48,7 @@ void TestApplication::Initialize()
 
   mCore = Dali::Integration::Core::New( mRenderController,
                                         mPlatformAbstraction,
-                                        *mGraphics,
+                                        *mGraphicsController,
                                         mGestureManager,
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,

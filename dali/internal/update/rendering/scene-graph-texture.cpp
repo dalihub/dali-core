@@ -267,7 +267,7 @@ constexpr Graphics::Format ConvertPixelFormat( Pixel::Format format )
 
 
 Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mGraphicsTexture( nullptr ),
   mNativeImage(),
   mSampler(),
@@ -282,7 +282,7 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
 }
 
 Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mGraphicsTexture( nullptr ),
   mNativeImage( nativeImageInterface ),
   mSampler(),
@@ -299,9 +299,9 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 Texture::~Texture()
 {}
 
-void Texture::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Texture::Initialize( Graphics::Controller& graphicsController )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphicsController;
 }
 
 const Graphics::Texture* Texture::GetGfxObject() const
@@ -345,10 +345,8 @@ void Texture::CreateTexture( Usage usage )
 
 void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize )
 {
-  if( mGraphics )
+  if( mGraphicsController )
   {
-    auto& controller = mGraphics->GetController();
-
     Graphics::TextureDetails::Usage graphicsUsage{};
     switch( usage )
     {
@@ -370,7 +368,7 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
     }
 
     // Convert DALi format to Graphics API format
-    mGraphicsTexture = controller.CreateTexture( controller.GetTextureFactory()
+    mGraphicsTexture = mGraphicsController->CreateTexture( mGraphicsController->GetTextureFactory()
                                                            .SetFormat( ConvertPixelFormat( mFormat ) )
                                                            .SetUsage( graphicsUsage )
                                                            .SetSize( { mWidth, mHeight } )

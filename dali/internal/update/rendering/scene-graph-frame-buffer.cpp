@@ -19,11 +19,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/rendering/scene-graph-texture.h>
-#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-framebuffer.h>
 #include <dali/graphics-api/graphics-api-framebuffer-factory.h>
-#include <dali/graphics-api/graphics-api-utility.h>
 
 namespace Dali
 {
@@ -33,7 +31,7 @@ namespace SceneGraph
 {
 
 FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments )
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mGraphicsFramebuffer( nullptr ),
   mWidth( width ),
   mHeight( height )
@@ -42,9 +40,9 @@ FrameBuffer::FrameBuffer( unsigned int width, unsigned int height, unsigned int 
 
 FrameBuffer::~FrameBuffer() = default;
 
-void FrameBuffer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void FrameBuffer::Initialize( Graphics::Controller& graphicsController )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphicsController;
   // Defer creation of framebuffer until a render instruction uses it
 }
 
@@ -78,13 +76,11 @@ unsigned int FrameBuffer::GetHeight() const
 
 void FrameBuffer::PrepareFramebuffer()
 {
-  auto& controller = mGraphics->GetController();
-
   // @todo Check if the color attachments or depth attachments have changed since the graphics object was created
   if( !mGraphicsFramebuffer )
   {
-    auto& factory = controller.GetFramebufferFactory();
-    factory.SetSize( Graphics::RectSize{ mWidth, mHeight } );
+    auto& factory = mGraphicsController->GetFramebufferFactory();
+    factory.SetSize( Graphics::Extent2D{ mWidth, mHeight } );
 
     /**
      * If the framebuffer has a color attachment without a graphics object, create one
@@ -139,7 +135,7 @@ void FrameBuffer::PrepareFramebuffer()
       }
     }
 
-    mGraphicsFramebuffer = controller.CreateFramebuffer( factory );
+    mGraphicsFramebuffer = mGraphicsController->CreateFramebuffer( factory );
   }
 }
 

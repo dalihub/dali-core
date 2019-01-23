@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -79,7 +79,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Graphics::Controller& graphics );
 
   /**
    * @brief Set the format of the buffer
@@ -178,7 +178,7 @@ public:
   }
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics;  ///< Graphics interface object
+  Graphics::Controller* mGraphicsController;  ///< Graphics controller
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
 

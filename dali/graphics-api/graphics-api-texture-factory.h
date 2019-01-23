@@ -21,7 +21,6 @@
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-texture.h>
-#include <dali/graphics-api/graphics-api-utility.h>
 
 namespace Dali
 {
@@ -35,7 +34,7 @@ class TextureFactory : public BaseFactory<Texture>
 {
 public:
   virtual TextureFactory& SetType(TextureDetails::Type type)             = 0;
-  virtual TextureFactory& SetSize(const RectSize& size)                  = 0;
+  virtual TextureFactory& SetSize(const Extent2D& size)                  = 0;
   virtual TextureFactory& SetFormat(TextureDetails::Format format)       = 0;
   virtual TextureFactory& SetMipMapFlag(TextureDetails::MipMapFlag mipMapFlag) = 0;
   virtual TextureFactory& SetUsage( TextureDetails::Usage usage )        = 0;

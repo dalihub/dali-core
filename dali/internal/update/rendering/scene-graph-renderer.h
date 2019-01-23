@@ -19,7 +19,6 @@
 
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
-#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -30,9 +29,9 @@
 #include <dali/internal/update/rendering/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/update/rendering/render-command-container.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-api-pipeline.h>
+#include <dali/graphics-api/graphics-api-render-command.h>
 #include <cstring>
 
 namespace Dali
@@ -88,7 +87,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Integration::Graphics::GraphicsInterface& graphics );
+  void Initialize( Graphics::Controller& graphics );
 
   /**
    * Set the texture set for the renderer
@@ -488,7 +487,7 @@ private:
   Renderer();
 
 private:
-  Integration::Graphics::GraphicsInterface* mGraphics; ///< Graphics interface object
+  Graphics::Controller*        mGraphicsController;               ///< Graphics controller
 
   CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)

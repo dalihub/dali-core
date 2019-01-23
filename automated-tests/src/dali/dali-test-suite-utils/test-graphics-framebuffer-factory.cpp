@@ -21,7 +21,7 @@ namespace Test
 GraphicsFramebufferFactory::GraphicsFramebufferFactory() = default;
 GraphicsFramebufferFactory::~GraphicsFramebufferFactory() = default;
 
-Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetSize( const Dali::Graphics::RectSize& size )
+Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetSize( const Dali::Graphics::Extent2D& size )
 {
   return *this;
 }

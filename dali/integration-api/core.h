@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ namespace Internal
 class Core;
 }
 
-namespace Integration
-{
 namespace Graphics
 {
-class GraphicsInterface;
+class Controller;
 }
 
+namespace Integration
+{
 class Core;
 class GestureManager;
 class PlatformAbstraction;
@@ -237,7 +237,7 @@ public:
    * This object is used for integration with the native windowing system.
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
-   * @param[in] graphics The interface providing graphics services
+   * @param[in] graphicsController The interface providing graphics services
    * @param[in] gestureManager The interface providing gesture manager services.
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
@@ -249,7 +249,7 @@ public:
    */
   static Core* New( RenderController& renderController,
                     PlatformAbstraction& platformAbstraction,
-                    Graphics::GraphicsInterface& graphics,
+                    Graphics::Controller& graphics,
                     GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,

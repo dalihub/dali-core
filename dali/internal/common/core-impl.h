@@ -24,8 +24,8 @@
 #include <dali/public-api/object/ref-object.h>
 
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -78,7 +78,7 @@ public:
    */
   Core( Integration::RenderController& renderController,
         Integration::PlatformAbstraction& platform,
-        Integration::Graphics::GraphicsInterface& graphics,
+        Graphics::Controller& graphicsController,
         Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -228,23 +228,20 @@ private:
 
   Integration::RenderController&            mRenderController;            ///< Reference to Render controller to tell it to keep rendering
   Integration::PlatformAbstraction&         mPlatform;                    ///< The interface providing platform specific services.
-
+  Graphics::Controller&                     mGraphicsController;          ///< Graphics object
   IntrusivePtr<Stage>                       mStage;                       ///< The current stage
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
-  bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
-
-  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
-  OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;               ///< Update manager
-  OwnerPointer<SceneGraph::DiscardQueue>        mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
-  OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory
-  OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
-  OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
-  OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
-  Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
-
-  Integration::Graphics::GraphicsInterface& mGraphics; ///< Graphics object
+  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;     ///< Handles the processing of render tasks
+  OwnerPointer<SceneGraph::UpdateManager>   mUpdateManager;               ///< Update manager
+  OwnerPointer<SceneGraph::DiscardQueue>    mDiscardQueue;                ///< Used to cleanup nodes & resources when no longer in use.
+  OwnerPointer<ShaderFactory>               mShaderFactory;               ///< Shader resource factory
+  OwnerPointer<NotificationManager>         mNotificationManager;         ///< Notification manager
+  OwnerPointer<GestureEventProcessor>       mGestureEventProcessor;       ///< The gesture event processor
+  OwnerPointer<EventProcessor>              mEventProcessor;              ///< The event processor
+  Dali::Vector<Integration::Processor*>     mProcessors;                  ///< Registered processors (not owned)
+  bool                                      mProcessingEvent : 1;         ///< True during ProcessEvents()
 
   friend class ThreadLocalStorage;
 

@@ -32,7 +32,7 @@ namespace SceneGraph
 {
 
 PropertyBuffer::PropertyBuffer()
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mFormat( nullptr ),
   mData( nullptr ),
   mSize(0),
@@ -46,9 +46,9 @@ PropertyBuffer::~PropertyBuffer()
 {
 }
 
-void PropertyBuffer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void PropertyBuffer::Initialize( Graphics::Controller& graphicsController )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphicsController;
 }
 
 void PropertyBuffer::SetFormat( OwnerPointer< PropertyBuffer::Format >& format )
@@ -63,12 +63,11 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint3
   mSize = size;
   mDataChanged = true;
 
-  if( mGraphics )
+  if( mGraphicsController )
   {
-    auto& controller = mGraphics->GetController();
-    mGraphicsBuffer = controller.CreateBuffer( controller.GetBufferFactory()
-                                           .SetSize( uint32_t( mFormat->size * size) )
-                                           .SetUsageFlags( 0u | Graphics::BufferUsage::VERTEX_BUFFER ));
+    mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
+                                                         .SetSize( uint32_t( mFormat->size * size) )
+                                                         .SetUsageFlags( 0u | Graphics::BufferUsage::VERTEX_BUFFER ));
   }
 }
 
@@ -83,9 +82,9 @@ bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
   {
     if( !mGraphicsBuffer )
     {
-      mGraphicsBuffer = controller.CreateBuffer( controller.GetBufferFactory()
-                                                      .SetUsageFlags( mGraphicsBufferUsage )
-                                                      .SetSize( mSize ) );
+      mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
+                                                           .SetUsageFlags( mGraphicsBufferUsage )
+                                                           .SetSize( mSize ) );
     }
 
     // schedule deferred write

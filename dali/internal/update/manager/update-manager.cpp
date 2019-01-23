@@ -19,7 +19,6 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 // EXTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-controller.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
@@ -27,7 +26,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -95,7 +94,7 @@ extern Debug::Filter* gRenderTaskLogFilter;
 
 using namespace Dali::Integration;
 using Dali::Internal::Update::MessageQueue;
-using Dali::Integration::Graphics::GraphicsInterface;
+
 
 namespace Dali
 {
@@ -184,7 +183,7 @@ struct UpdateManager::Impl
         RenderController& renderController,
         SceneGraphBuffers& sceneGraphBuffers,
         RenderTaskProcessor& renderTaskProcessor,
-        GraphicsInterface& graphics )
+        Graphics::Controller& graphicsController )
   : notificationManager( notificationManager ),
     transformManager(),
     animationPlaylist( animationPlaylist ),
@@ -195,7 +194,7 @@ struct UpdateManager::Impl
     graphicsAlgorithms(),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
-    graphics( graphics ),
+    graphicsController( graphicsController ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     renderers(),
     textureSets(),
@@ -213,7 +212,7 @@ struct UpdateManager::Impl
     renderersAdded( false ),
     surfaceRectChanged( false ),
     graphicsShutdown( false ),
-    shaderCache( graphics.GetController() )
+    shaderCache( graphicsController )
   {
     sceneController = new SceneControllerImpl( discardQueue );
 
@@ -276,8 +275,7 @@ struct UpdateManager::Impl
   GraphicsAlgorithms                   graphicsAlgorithms;            ///< Graphics algorithms
   RenderInstructionContainer           renderInstructions;            ///< List of current instructions per frame
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
-
-  GraphicsInterface&                   graphics;                      ///< Graphics
+  Graphics::Controller&                graphicsController;            ///< Graphics controller
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
@@ -336,7 +334,7 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                               DiscardQueue&                    discardQueue,
                               RenderController&                controller,
                               RenderTaskProcessor&             renderTaskProcessor,
-                              GraphicsInterface& graphics )
+                              Graphics::Controller&            graphicsController )
 : mImpl( new Impl( notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,
@@ -344,7 +342,7 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                    controller,
                    mSceneGraphBuffers,
                    renderTaskProcessor,
-                   graphics) )
+                   graphicsController) )
 {
 }
 
@@ -534,7 +532,7 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
 
 void UpdateManager::AddShader( OwnerPointer< Shader >& shader )
 {
-  shader->Initialize( mImpl->graphics, mImpl->shaderCache );
+  shader->Initialize( mImpl->graphicsController, mImpl->shaderCache );
   mImpl->shaders.PushBack( shader.Release() );
 }
 
@@ -546,7 +544,7 @@ void UpdateManager::RemoveShader( Shader* shader )
 
 void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
-  renderer->Initialize( mImpl->graphics );
+  renderer->Initialize( mImpl->graphicsController );
   mImpl->renderers.PushBack( renderer.Release() );
   mImpl->renderersAdded = true;
 }
@@ -802,7 +800,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
   //Process Touches & Gestures
   const bool gestureUpdated = ProcessGestures( bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
-  const bool resumed = mImpl->graphics.GetController().IsDrawOnResumeRequired();
+  const bool resumed = mImpl->graphicsController.IsDrawOnResumeRequired();
 
   bool updateScene =                                   // The scene-graph requires an update if..
     (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
@@ -908,19 +906,19 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       // This may trigger garbage collection.
       if( numberOfDiscardedRenderers > 0 )
       {
-        mImpl->graphics.GetController().RunGarbageCollector( numberOfDiscardedRenderers );
+        mImpl->graphicsController.RunGarbageCollector( numberOfDiscardedRenderers );
       }
 
       // generate graphics objects
       PrepareNodes( bufferIndex );
       PrepareRenderers( bufferIndex );
-      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphics.GetController(), mImpl->renderInstructions, bufferIndex );
+      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphicsController, mImpl->renderInstructions, bufferIndex );
     }
   }
   else
   {
     // Discard graphics resources
-    mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphics.GetController() );
+    mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphicsController );
   }
 
   for( auto taskList : mImpl->taskLists )
@@ -974,7 +972,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
 
-  mImpl->graphics.GetController().SwapBuffers();
+  mImpl->graphicsController.SwapBuffers();
   return keepUpdating;
 }
 
@@ -1014,7 +1012,7 @@ uint32_t UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
   if( !mImpl->discardQueue.IsEmpty( bufferIndex ) ||
-      !mImpl->graphics.GetController().IsDiscardQueueEmpty() )
+      !mImpl->graphicsController.IsDiscardQueueEmpty() )
   {
     keepUpdatingRequest |= KeepUpdating::DISCARD_RESOURCES;
   }
@@ -1104,7 +1102,7 @@ void UpdateManager::RemoveFrameCallback( FrameCallbackInterface* frameCallback )
 
 void UpdateManager::AddSampler( OwnerPointer< SceneGraph::Sampler >& sampler )
 {
-  sampler->Initialize( mImpl->graphics );
+  sampler->Initialize( mImpl->graphicsController );
   mImpl->samplerContainer.PushBack( sampler.Release() );
 }
 
@@ -1115,7 +1113,7 @@ void UpdateManager::RemoveSampler( SceneGraph::Sampler* sampler )
 
 void UpdateManager::AddPropertyBuffer( OwnerPointer< SceneGraph::PropertyBuffer >& propertyBuffer )
 {
-  propertyBuffer->Initialize( mImpl->graphics );
+  propertyBuffer->Initialize( mImpl->graphicsController );
   mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );
 }
 
@@ -1126,7 +1124,7 @@ void UpdateManager::RemovePropertyBuffer( SceneGraph::PropertyBuffer* propertyBu
 
 void UpdateManager::AddGeometry( OwnerPointer< SceneGraph::Geometry >& geometry )
 {
-  geometry->Initialize( mImpl->graphics );
+  geometry->Initialize( mImpl->graphicsController );
   mImpl->geometryContainer.PushBack( geometry.Release() );
 }
 
@@ -1137,7 +1135,7 @@ void UpdateManager::RemoveGeometry( SceneGraph::Geometry* geometry )
 
 void UpdateManager::AddTexture( OwnerPointer< SceneGraph::Texture >& texture )
 {
-  texture->Initialize( mImpl->graphics );
+  texture->Initialize( mImpl->graphicsController );
   mImpl->textureContainer.PushBack( texture.Release() );
 }
 
@@ -1158,7 +1156,7 @@ void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
 
 void UpdateManager::AddFrameBuffer( OwnerPointer< SceneGraph::FrameBuffer>& frameBuffer )
 {
-  frameBuffer->Initialize( mImpl->graphics );
+  frameBuffer->Initialize( mImpl->graphicsController );
   mImpl->frameBufferContainer.PushBack( frameBuffer.Release() );
 }
 
@@ -1180,7 +1178,7 @@ void UpdateManager::RemoveFrameBuffer( SceneGraph::FrameBuffer* frameBuffer)
 void UpdateManager::DestroyGraphicsObjects()
 {
   // Wait for the current frame to finish drawing
-  mImpl->graphics.GetController().WaitIdle();
+  mImpl->graphicsController.WaitIdle();
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Destroying graphics objects\n");
 
@@ -1226,7 +1224,7 @@ void UpdateManager::DestroyGraphicsObjects()
   mImpl->shaderCache.DestroyGraphicsObjects();
 
   // Ensure resources are discarded
-  mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphics.GetController() );
+  mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphicsController );
 
   mImpl->graphicsShutdown = true;
 

@@ -23,5 +23,4 @@ graphics_api_header_files = \
     $(graphics_api_src_dir)/graphics-api-texture-factory.h \
     $(graphics_api_src_dir)/graphics-api-texture.h \
     $(graphics_api_src_dir)/graphics-api-types-debug.h \
-    $(graphics_api_src_dir)/graphics-api-types.h \
-    $(graphics_api_src_dir)/graphics-api-utility.h
+    $(graphics_api_src_dir)/graphics-api-types.h

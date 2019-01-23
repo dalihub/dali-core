@@ -32,7 +32,7 @@ namespace SceneGraph
 {
 
 Geometry::Geometry()
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mIndexBuffer{ nullptr },
   mIndexBufferElementCount( 0 ),
   mGeometryType( Dali::Geometry::TRIANGLES ),
@@ -47,9 +47,9 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Geometry::Initialize( Graphics::Controller& graphics )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphics;
 }
 
 void Geometry::AddPropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
@@ -61,14 +61,10 @@ void Geometry::AddPropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
 void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
 {
   // set new index buffer
-  auto& mController = mGraphics->GetController();
-
-  // create index buffer]
   auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
-  auto indexBuffer = mController.CreateBuffer(
-                        mController.GetBufferFactory()
-                                 .SetSize( uint32_t(indices.Size() * sizeof(indices[0])) )
-                                 .SetUsageFlags( 0u | Graphics::BufferUsage::INDEX_BUFFER )
+  auto indexBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
+                                                        .SetSize( uint32_t(indices.Size() * sizeof(indices[0])) )
+                                                        .SetUsageFlags( 0u | Graphics::BufferUsage::INDEX_BUFFER )
   );
 
   // transfer data

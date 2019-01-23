@@ -121,7 +121,7 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mTextureSet( NULL ),
   mGeometry( NULL ),
   mShader( NULL ),
@@ -165,9 +165,9 @@ void Renderer::operator delete( void* ptr )
   gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
 }
 
-void Renderer::Initialize( Integration::Graphics::GraphicsInterface& graphics )
+void Renderer::Initialize( Graphics::Controller& graphicsController )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphicsController;
 
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
@@ -228,8 +228,7 @@ RenderCommand& Renderer::GetRenderCommand( RenderInstruction* renderInstruction,
 
 void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
 {
-  auto &controller = mGraphics->GetController();
-  auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, controller, updateBufferIndex );
+  auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, *mGraphicsController, updateBufferIndex );
   auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
 
   if (!mShader->GetGfxObject())
@@ -278,7 +277,7 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
             else
             {
               // reinitialize sampler
-              sampler->Initialize( *mGraphics );
+              sampler->Initialize( *mGraphicsController );
             }
             sampler->mIsDirty = false;
           }

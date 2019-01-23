@@ -22,10 +22,9 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
+#include <dali/graphics-api/graphics-api-controller.h>
 #include <dali/internal/common/core-impl.h>
 
-using Dali::Integration::Graphics::GraphicsInterface;
 
 namespace Dali
 {
@@ -34,7 +33,7 @@ namespace Integration
 
 Core* Core::New( RenderController& renderController,
                  PlatformAbstraction& platformAbstraction,
-                 GraphicsInterface& graphics,
+                 Graphics::Controller& graphicsController,
                  GestureManager& gestureManager,
                  ResourcePolicy::DataRetention policy,
                  RenderToFrameBuffer renderToFboEnabled,
@@ -44,7 +43,7 @@ Core* Core::New( RenderController& renderController,
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
                                         platformAbstraction,
-                                        graphics,
+                                        graphicsController,
                                         gestureManager,
                                         policy,
                                         renderToFboEnabled,

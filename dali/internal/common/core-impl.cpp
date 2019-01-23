@@ -23,7 +23,6 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/system-overlay.h>
@@ -72,12 +71,12 @@ using Integration::GestureManager;
 using Integration::Event;
 using Integration::UpdateStatus;
 using Integration::RenderStatus;
-using Integration::Graphics::GraphicsInterface;
+
 
 
 Core::Core( RenderController& renderController,
             PlatformAbstraction& platform,
-            GraphicsInterface& graphics,
+            Graphics::Controller& graphicsController,
             GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             Integration::RenderToFrameBuffer renderToFboEnabled,
@@ -85,8 +84,8 @@ Core::Core( RenderController& renderController,
             Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
-  mProcessingEvent(false),
-  mGraphics(graphics)
+  mGraphicsController(graphicsController),
+  mProcessingEvent(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();
@@ -110,7 +109,7 @@ Core::Core( RenderController& renderController,
                                       *mDiscardQueue,
                                        renderController,
                                       *mRenderTaskProcessor,
-                                       graphics );
+                                       graphicsController );
 
 
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager, mRenderController ) );
@@ -164,8 +163,6 @@ void Core::SurfaceResized( uint32_t width, uint32_t height )
   // The stage-size may be less than surface-size (reduced by top-margin)
   Vector2 size = mStage->GetSize();
   mRelayoutController->SetStageSize( static_cast<uint32_t>( size.width ), static_cast<uint32_t>( size.height ) ); // values get truncated
-
-  mGraphics.SurfaceResized( width, height );
 }
 
 void Core::SetTopMargin( uint32_t margin )

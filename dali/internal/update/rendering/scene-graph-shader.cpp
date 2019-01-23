@@ -32,7 +32,7 @@ namespace SceneGraph
 {
 
 Shader::Shader( Dali::Shader::Hint::Value& hints )
-: mGraphics( nullptr ),
+: mGraphicsController( nullptr ),
   mGraphicsShader( nullptr ),
   mShaderCache( nullptr ),
   mHints( hints ),
@@ -46,9 +46,9 @@ Shader::~Shader()
   mConnectionObservers.Destroy( *this );
 }
 
-void Shader::Initialize( Integration::Graphics::GraphicsInterface& graphics, ShaderCache& shaderCache )
+void Shader::Initialize( Graphics::Controller& graphicsController, ShaderCache& shaderCache )
 {
-  mGraphics = &graphics;
+  mGraphicsController = &graphicsController;
   mShaderCache = &shaderCache;
 }
 

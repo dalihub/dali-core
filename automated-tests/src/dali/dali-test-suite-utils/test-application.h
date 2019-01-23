@@ -22,11 +22,10 @@
 #include <test-platform-abstraction.h>
 #include "test-gesture-manager.h"
 #include "test-render-controller.h"
-#include "test-graphics.h"
+#include "test-graphics-controller.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/trace.h>
 
@@ -88,7 +87,7 @@ private:
 
 protected:
   TestPlatformAbstraction             mPlatformAbstraction;
-  std::unique_ptr<Test::Graphics>     mGraphics;
+  std::unique_ptr<Test::GraphicsController> mGraphicsController;
   TestRenderController                mRenderController;
   TestGestureManager                  mGestureManager;
 

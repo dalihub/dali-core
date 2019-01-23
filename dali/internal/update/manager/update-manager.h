@@ -27,10 +27,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/devel-api/common/stage-devel.h>
-#include <dali/integration-api/graphics/graphics-interface.h>
-
 #include <dali/internal/common/message.h>
-
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -51,6 +48,7 @@
 #include <dali/internal/update/rendering/scene-graph-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
+
 #include <dali/graphics-api/graphics-api-controller.h>
 
 namespace Dali
@@ -108,7 +106,7 @@ public:
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
    * @param[in] controller After messages are flushed, we request a render from the RenderController.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
-   * @param[in] graphics The graphics backend
+   * @param[in] graphicsController The graphics backend
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationPlaylist,
@@ -116,7 +114,7 @@ public:
                  DiscardQueue& discardQueue,
                  Integration::RenderController& controller,
                  RenderTaskProcessor& renderTaskProcessor,
-                 Dali::Integration::Graphics::GraphicsInterface& graphics);
+                 Graphics::Controller& graphicsController );
 
   /**
    * Destructor.

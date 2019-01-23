@@ -28,7 +28,7 @@ public:
   GraphicsFramebufferFactory();
   virtual ~GraphicsFramebufferFactory();
 
-  Dali::Graphics::FramebufferFactory& SetSize( const Dali::Graphics::RectSize& size ) override;
+  Dali::Graphics::FramebufferFactory& SetSize( const Dali::Graphics::Extent2D& size ) override;
 
   Dali::Graphics::FramebufferFactory& SetColorAttachment( Dali::Graphics::TextureDetails::AttachmentId attachmentIndex,
                                                                const Dali::Graphics::Texture&               texture,
