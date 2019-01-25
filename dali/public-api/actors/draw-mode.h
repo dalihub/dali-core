@@ -27,6 +27,11 @@ namespace Dali
  * @{
  */
 
+/**
+ * @brief DrawMode to determine how the Actor and its children will be drawn.
+ *
+ * @SINCE_1_0.0
+ */
 namespace DrawMode
 {
 
