@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
@@ -65,6 +64,7 @@ DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
+DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties )
 
 // Property string to enumeration tables:
@@ -158,6 +158,11 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INVERT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT_WRAP )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT_WRAP )
 DALI_ENUM_TO_STRING_TABLE_END( STENCIL_OPERATION )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RENDERING_BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, IF_REQUIRED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, CONTINUOUSLY )
+DALI_ENUM_TO_STRING_TABLE_END( RENDERING_BEHAVIOR )
 
 BaseHandle Create()
 {
@@ -608,6 +613,16 @@ void Renderer::SetDefaultProperty( Property::Index index,
       }
       break;
     }
+    case DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      DevelRenderer::Rendering::Type convertedValue = mRenderingBehavior;
+      if( Scripting::GetEnumerationProperty< DevelRenderer::Rendering::Type >( propertyValue, RENDERING_BEHAVIOR_TABLE, RENDERING_BEHAVIOR_TABLE_COUNT, convertedValue ) )
+      {
+        mRenderingBehavior = convertedValue;
+        SetRenderingBehaviorMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
+      }
+      break;
+    }
   }
 }
 
@@ -706,6 +721,7 @@ Renderer::Renderer( const SceneGraph::Renderer* sceneObject )
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false )
 {
 }
@@ -889,6 +905,11 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       value = mOpacity;
       break;
     }
+    case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      value = mRenderingBehavior;
+      break;
+    }
     default:
     {
       // Must be a scene-graph only property
@@ -1056,6 +1077,11 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     case Dali::DevelRenderer::Property::OPACITY:
     {
       value = sceneObject.GetOpacity( GetEventThreadServices().GetEventBufferIndex() );
+      break;
+    }
+    case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      value = sceneObject.GetRenderingBehavior();
       break;
     }
     default:

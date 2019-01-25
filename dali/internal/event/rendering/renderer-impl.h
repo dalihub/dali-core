@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -266,6 +267,7 @@ private: // data
   BlendMode::Type                     mBlendMode:3;                ///< Local copy of the mode of blending
   DepthWriteMode::Type                mDepthWriteMode:3;           ///< Local copy of the depth write mode
   DepthTestMode::Type                 mDepthTestMode:3;            ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type      mRenderingBehavior:2;        ///< The rendering behavior
   bool                                mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
