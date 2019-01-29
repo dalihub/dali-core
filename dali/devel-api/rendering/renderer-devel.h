@@ -62,8 +62,28 @@ namespace Property
      * @details Name "opacity", type Property::FLOAT.
      */
     OPACITY = STENCIL_OPERATION_ON_Z_PASS + 1,
+
+    /**
+     * @brief The rendering behavior of the renderer.
+     * @details Name "renderingBehavior", type Property::INTEGER.
+     */
+    RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 2,
   };
 } // namespace Property
+
+namespace Rendering
+{
+
+/**
+ * @brief Enumeration for the rendering behavior
+ */
+enum Type
+{
+  IF_REQUIRED,  ///< Default. Will only render if required to do so.
+  CONTINUOUSLY  ///< Will render continuously.
+};
+
+} // namespace Rendering
 
 } // namespace DevelRenderer
 

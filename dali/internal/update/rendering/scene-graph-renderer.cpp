@@ -141,6 +141,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
@@ -588,6 +589,16 @@ void Renderer::BakeOpacity( BufferIndex updateBufferIndex, float opacity )
 float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
 {
   return mOpacity[updateBufferIndex];
+}
+
+void Renderer::SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior )
+{
+  mRenderingBehavior = renderingBehavior;
+}
+
+DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
 }
 
 //Called when SceneGraph::Renderer is added to update manager ( that happens when an "event-thread renderer" is created )

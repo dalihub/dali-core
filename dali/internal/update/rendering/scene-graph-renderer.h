@@ -19,6 +19,7 @@
 
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -323,6 +324,18 @@ public:
   float GetOpacity( BufferIndex updateBufferIndex ) const;
 
   /**
+   * Sets the rendering behavior
+   * @param[in] renderingBehavior The rendering behavior required.
+   */
+  void SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior );
+
+  /**
+   * Gets the rendering behavior
+   * @return The rendering behavior
+   */
+  DevelRenderer::Rendering::Type GetRenderingBehavior() const;
+
+  /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -456,6 +469,7 @@ private:
   BlendMode::Type              mBlendMode:3;                      ///< Local copy of the mode of blending
   DepthWriteMode::Type         mDepthWriteMode:3;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:3;                  ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior:2;            ///< The rendering behavior
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
@@ -701,6 +715,16 @@ inline void BakeOpacityMessage( EventThreadServices& eventThreadServices, const 
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::BakeOpacity, opacity );
+}
+
+inline void SetRenderingBehaviorMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DevelRenderer::Rendering::Type renderingBehavior )
+{
+  using LocalType = MessageValue1< Renderer, DevelRenderer::Rendering::Type >;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetRenderingBehavior, renderingBehavior );
 }
 
 } // namespace SceneGraph
