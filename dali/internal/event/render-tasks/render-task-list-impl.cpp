@@ -70,7 +70,9 @@ void RenderTaskList::RemoveTask( Internal::RenderTask& task )
 {
   for ( RenderTaskContainer::iterator iter = mTasks.begin(); mTasks.end() != iter; ++iter )
   {
-    if ( iter->Get() == &task )
+    RenderTask *ptr = iter->Get();
+
+    if ( ptr == &task )
     {
       const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
 
@@ -81,7 +83,7 @@ void RenderTaskList::RemoveTask( Internal::RenderTask& task )
 
       for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
       {
-        if ( exclusiveIt->renderTaskPtr == iter->Get() )
+        if ( exclusiveIt->renderTaskPtr == ptr )
         {
           mExclusives.Erase( exclusiveIt );
           break;
