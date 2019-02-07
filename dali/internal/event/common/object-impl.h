@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,10 +59,9 @@ class PropertyBase;
 class PropertyOwner;
 }
 
-typedef std::vector< Dali::Constraint >     ConstraintContainer;
-typedef ConstraintContainer::iterator       ConstraintIter;
-typedef ConstraintContainer::const_iterator ConstraintConstIter;
-
+using ConstraintContainer = std::vector< Dali::Constraint >;
+using ConstraintIter = ConstraintContainer::iterator;
+using ConstraintConstIter = ConstraintContainer::const_iterator;
 
 /**
  * A base class for objects which optionally provide properties.
@@ -72,19 +71,15 @@ typedef ConstraintContainer::const_iterator ConstraintConstIter;
  * An object for a property-owning object in the scene-graph.
  * This provides an interface for observing the addition/removal of scene-objects.
  *
- * The concrete derived class is responsible for:
- *   1) Adding & removing an object from the scene-graph. The OnSceneObjectAdd() and OnSceneObjectRemove()
- *      methods should be called by the derived class, to trigger observer callbacks.
- *   3) Implementing the GetSceneObject() methods, used to access the scene-object.
- *   4) Providing access to properties stored by the scene-graph object. These should match the properties
- *      reported by the base Dali::Internal::Object methods.
- *
+ * The derived class should either:
+ *   a) Create their own scene-graph object and pass it to Object constructor.
+ *   b) pass nullptr to Object constructor, in this case Object will create default scene object for property handling
  */
 class Object : public Dali::BaseObject
 {
 public:
 
-  typedef Dali::Handle::Capability Capability;
+  using Capability = Dali::Handle::Capability;
 
   class Observer
   {
@@ -117,9 +112,11 @@ public:
   };
 
   /**
-   * Constructor.
+   * Creates a new object
+   *
+   * @return an smart pointer to the object
    */
-  Object();
+  static IntrusivePtr<Object> New();
 
   /**
    * Add an observer to the object.
@@ -268,14 +265,17 @@ public:
   /******************************** Uniform Mappings ********************************/
 
   /**
-   * @copydoc Dali::Handle::AddUniformMapping()
+   * Adds uniform mapping for given property
+   * @param propertyIndex index of the property
+   * @param uniformName name of the uniform (same as property name)
    */
   void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName ) const;
 
   /**
-   * @copydoc Dali::Handle::RemoveUniformMapping( )
+   * Removes uniform mapping for given property
+   * @param uniformName name of the uniform (same as property name)
    */
-  void RemoveUniformMapping( const std::string& uniformName );
+  void RemoveUniformMapping( const std::string& uniformName ) const;
 
   /******************************** Constraints ********************************/
 
@@ -315,13 +315,13 @@ public:
     return PROPERTY_CUSTOM_START_INDEX;
   }
 
-  /********************  To be overridden by deriving classes ********************/
-
   /**
    * Retrieve the scene-graph object added by this object.
-   * @return A pointer to the object, or NULL if no object has been added to the scene-graph.
+   * @return reference to the scene-graph object, it will always exist
    */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const = 0;
+  const SceneGraph::PropertyOwner& GetSceneObject() const;
+
+  /********************  Can be overridden by deriving classes ********************/
 
   /**
    * Retrieve an animatable property owned by the scene-graph object.
@@ -329,7 +329,7 @@ public:
    * @param[in] index The index of the property.
    * @return A dereferenceable pointer to a property, or NULL if a scene-object does not exist with this property.
    */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const = 0;
+  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
    * Retrieve a constraint input-property owned by the scene-graph object.
@@ -337,7 +337,7 @@ public:
    * @param[in] index The index of the property.
    * @return A dereferenceable pointer to an input property, or NULL if a scene-object does not exist with this property.
    */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const = 0;
+  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
   /**
    * Query whether the property is a component of a scene-graph property.
@@ -353,6 +353,13 @@ public:
   DevelHandle::PropertySetSignalType& PropertySetSignal();
 
 protected:
+
+  /**
+   * Constructor. Protected so use New to construct an instance of this class
+   *
+   * @param sceneObject the scene graph property owner
+   */
+  Object( const SceneGraph::PropertyOwner* sceneObject );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -375,7 +382,7 @@ protected:
   virtual Object* GetParentObject() const
   {
     // By default the Object does not have a parent
-    return NULL;
+    return nullptr;
   };
 
   /**
@@ -415,7 +422,7 @@ protected:
    * @param [in] value The value of the property.
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
-  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const;
+  Property::Index RegisterSceneGraphProperty( const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue ) const;
 
   /**
    * Registers animatable scene property
@@ -446,21 +453,21 @@ private: // Default property extensions for derived classes
    * @param [in] index The index of the property.
    * @param [in] propertyValue The new value of the property.
    */
-  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue ) = 0;
+  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * Retrieve a default property value.
    * @param [in] index The index of the property.
    * @return The property value.
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const = 0;
+  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
    * Retrieve the latest scene-graph value of a default property.
    * @param[in] index The index of the property.
    * @return The latest scene-graph value of a default property.
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const = 0;
+  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
   /**
    * Notifies that a default property is being animated so the deriving class should update the cached value.
@@ -472,19 +479,10 @@ private: // Default property extensions for derived classes
   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type propertyChangeType )
   { }
 
-  /**
-   * @todo this is virtual so that for now actor can override it,
-   * it needs to be removed and only have GetSceneObject but that requires changing actor and constraint logic
-   * Retrieve the scene-graph object added by this object.
-   * @return A pointer to the object, or NULL if no object has been added to the scene-graph.
-   */
-  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const
-  {
-    return GetSceneObject();
-  }
-
 private:
 
+  // no default, copy or assignment
+  Object() = delete;
   Object(const Object& rhs) = delete;
   Object& operator=(const Object& rhs) = delete;
 
@@ -544,18 +542,26 @@ private:
 
   EventThreadServices& mEventThreadServices;
 
+protected:
+
+  // mutable because it's lazy initialised and GetSceneObject has to be const so it can be called from const methods
+  // const to prevent accidentally calling setters directly from event thread
+  // protected to allow fast access from derived classes that have their own scene object (no function call overhead)
+  mutable const SceneGraph::PropertyOwner* mUpdateObject; ///< Reference to object to hold the scene graph properties
+
 private:
 
   Dali::Vector<Observer*> mObservers;
   mutable OwnerContainer<PropertyMetadata*> mCustomProperties; ///< Used for accessing custom Node properties
   mutable OwnerContainer<PropertyMetadata*> mAnimatableProperties; ///< Used for accessing animatable Node properties
-  mutable TypeInfo const * mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
+  mutable const TypeInfo* mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   ConstraintContainer* mConstraints;               ///< Container of owned -constraints.
 
   using PropertyNotificationContainer = std::vector< Dali::PropertyNotification >;
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
   DevelHandle::PropertySetSignalType mPropertySetSignal;
+
 };
 
 } // namespace Internal

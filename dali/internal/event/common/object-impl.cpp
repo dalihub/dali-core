@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/event/animation/constraint-impl.h>
@@ -45,7 +46,7 @@ namespace Internal
 
 namespace // unnamed namespace
 {
-const int SUPPORTED_CAPABILITIES = Dali::Handle::DYNAMIC_PROPERTIES;  // Object provides this capability
+const int32_t SUPPORTED_CAPABILITIES = Dali::Handle::DYNAMIC_PROPERTIES;  // Object provides this capability
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJECT" );
@@ -55,12 +56,9 @@ constexpr Property::Index MAX_PER_CLASS_PROPERTY_INDEX = ANIMATABLE_PROPERTY_REG
 
 } // unnamed namespace
 
-Object::Object()
-: mEventThreadServices( *Stage::GetCurrent() ),
-  mTypeInfo( NULL ),
-  mConstraints( NULL ),
-  mPropertyNotifications( NULL )
+IntrusivePtr<Object> Object::New()
 {
+  return new Object( nullptr ); // no scene object by default
 }
 
 void Object::AddObserver(Observer& observer)
@@ -430,7 +428,7 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   }
 }
 
-Property::Value Object::GetProperty(Property::Index index) const
+Property::Value Object::GetProperty( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
@@ -608,7 +606,6 @@ Property::Index Object::RegisterProperty( const std::string& name, Property::Ind
   else
   {
     // Otherwise register the property
-
     if( Property::ANIMATABLE == accessMode )
     {
       index = RegisterSceneGraphProperty( name, key, PROPERTY_CUSTOM_START_INDEX + static_cast<Property::Index>( mCustomProperties.Count() ), propertyValue );
@@ -734,7 +731,7 @@ void Object::NotifyPropertyAnimation( Animation& animation, Property::Index inde
   }
   else
   {
-    PropertyMetadata* propertyMetadata = NULL;
+    PropertyMetadata* propertyMetadata = nullptr;
     if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
     {
       propertyMetadata = FindAnimatableProperty( index );
@@ -776,45 +773,38 @@ void Object::AddUniformMapping( Property::Index propertyIndex, const std::string
   const PropertyInputImpl* propertyPtr = GetSceneObjectInputProperty( propertyIndex );
 
   // Check instead for newly registered properties
-  if( propertyPtr == NULL )
+  if( propertyPtr == nullptr )
   {
     PropertyMetadata* animatable = FindAnimatableProperty( propertyIndex );
-    if( animatable != NULL )
+    if( animatable )
     {
       propertyPtr = animatable->GetSceneGraphProperty();
     }
   }
 
-  if( propertyPtr == NULL )
+  if( propertyPtr == nullptr )
   {
     PropertyMetadata* custom = FindCustomProperty( propertyIndex );
-    if( custom != NULL )
+    if( custom )
     {
       propertyPtr = custom->GetSceneGraphProperty();
     }
   }
 
-  if( propertyPtr != NULL )
+  if( propertyPtr )
   {
-    const SceneGraph::PropertyOwner* sceneObject = GetPropertyOwner();
+    const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
 
-    if( sceneObject != NULL )
-    {
-      OwnerPointer< SceneGraph::UniformPropertyMapping > map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
-      // Message takes ownership of Uniform map (and will delete it after copy)
-      AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *sceneObject, map );
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(0 && "MESH_REWORK - Need to store property whilst off-stage" );
-    }
+    OwnerPointer< SceneGraph::UniformPropertyMapping > map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
+    // Message takes ownership of Uniform map (and will delete it after copy)
+    AddUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, map );
   }
 }
 
-void Object::RemoveUniformMapping( const std::string& uniformName )
+void Object::RemoveUniformMapping( const std::string& uniformName ) const
 {
-  const SceneGraph::PropertyOwner* sceneObject = GetSceneObject();
-  RemoveUniformMapMessage( GetEventThreadServices(), *sceneObject, uniformName);
+  const SceneGraph::PropertyOwner& sceneObject = GetSceneObject();
+  RemoveUniformMapMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), sceneObject, uniformName);
 }
 
 void Object::ApplyConstraint( ConstraintBase& constraint )
@@ -828,7 +818,7 @@ void Object::ApplyConstraint( ConstraintBase& constraint )
 
 void Object::RemoveConstraint( ConstraintBase& constraint )
 {
-  // NULL if the Constraint sources are destroyed before Constraint::Apply()
+  // nullptr if the Constraint sources are destroyed before Constraint::Apply()
   if( mConstraints )
   {
     ConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), Dali::Constraint( &constraint ) ) );
@@ -844,19 +834,13 @@ void Object::RemoveConstraints()
   // guard against constraint sending messages during core destruction
   if( mConstraints && Stage::IsInstalled() )
   {
-    // If we have nothing in the scene-graph, just clear constraint containers
-    const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();
-    if ( NULL != propertyOwner )
+    for ( auto&& item : *mConstraints )
     {
-      const auto endIter = mConstraints->end();
-      for ( auto iter = mConstraints->begin(); endIter != iter; ++iter )
-      {
-        GetImplementation( *iter ).RemoveInternal();
-      }
+      GetImplementation( item ).RemoveInternal();
     }
 
     delete mConstraints;
-    mConstraints = NULL;
+    mConstraints = nullptr;
   }
 }
 
@@ -883,7 +867,7 @@ void Object::RemoveConstraints( uint32_t tag )
     if ( mConstraints->empty() )
     {
       delete mConstraints;
-      mConstraints = NULL;
+      mConstraints = nullptr;
     }
   }
 }
@@ -893,14 +877,66 @@ void Object::SetTypeInfo( const TypeInfo* typeInfo )
   mTypeInfo = typeInfo;
 }
 
+const SceneGraph::PropertyOwner& Object::GetSceneObject() const
+{
+  if( !mUpdateObject )
+  {
+    auto sceneObject = SceneGraph::PropertyOwner::New();
+    OwnerPointer< SceneGraph::PropertyOwner > transferOwnership( sceneObject );
+    mUpdateObject = sceneObject;
+    AddObjectMessage( const_cast<EventThreadServices&>( GetEventThreadServices() ).GetUpdateManager(), transferOwnership );
+  }
+  DALI_ASSERT_DEBUG( mUpdateObject && "there must always be a scene object" );
+  return *mUpdateObject;
+}
+
+const PropertyBase* Object::GetSceneObjectAnimatableProperty( Property::Index index ) const
+{
+  const SceneGraph::PropertyBase* property = nullptr;
+  if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
+  {
+    AnimatablePropertyMetadata* animatable = GetSceneAnimatableProperty( index, nullptr );
+    DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+
+    property = animatable->GetSceneGraphProperty();
+  }
+  else if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
+            ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
+  {
+    CustomPropertyMetadata* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+
+    property = custom->GetSceneGraphProperty();
+  }
+  return property;
+}
+
+const PropertyInputImpl* Object::GetSceneObjectInputProperty( Property::Index index ) const
+{
+  // reuse animatable version as they are inputs as well
+  return GetSceneObjectAnimatableProperty( index );
+}
+
 int32_t Object::GetPropertyComponentIndex( Property::Index index ) const
 {
   int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
 
-  const TypeInfo* typeInfo( GetTypeInfo() );
-  if ( typeInfo )
+  if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    componentIndex = typeInfo->GetComponentIndex(index);
+    // check whether the animatable property is registered already, if not then register one.
+    AnimatablePropertyMetadata* animatableProperty = GetSceneAnimatableProperty( index, nullptr );
+    if( animatableProperty )
+    {
+      componentIndex = animatableProperty->componentIndex;
+    }
+  }
+  if( Property::INVALID_COMPONENT_INDEX == componentIndex )
+  {
+    const TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      componentIndex = typeInfo->GetComponentIndex(index);
+    }
   }
 
   return componentIndex;
@@ -911,24 +947,41 @@ DevelHandle::PropertySetSignalType& Object::PropertySetSignal()
   return mPropertySetSignal;
 }
 
+Object::Object( const SceneGraph::PropertyOwner* sceneObject )
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mUpdateObject( sceneObject ),
+  mTypeInfo( nullptr ),
+  mConstraints( nullptr ),
+  mPropertyNotifications( nullptr )
+{
+}
+
 Object::~Object()
 {
   // Notification for observers
-  for( auto iter = mObservers.Begin(), endIter =  mObservers.End(); iter != endIter; ++iter)
+  for( auto&& item : mObservers )
   {
-    (*iter)->ObjectDestroyed(*this);
+    item->ObjectDestroyed( *this );
   }
-
   delete mConstraints;
   delete mPropertyNotifications;
+
+  // Guard to allow handle destruction after Core has been destroyed
+  if( Stage::IsInstalled() )
+  {
+    if( nullptr != mUpdateObject )
+    {
+      RemoveObjectMessage( GetEventThreadServices().GetUpdateManager(), mUpdateObject );
+    }
+  }
 }
 
 void Object::OnSceneObjectAdd()
 {
   // Notification for observers
-  for( auto iter = mObservers.Begin(), endIter =  mObservers.End(); iter != endIter; ++iter)
+  for( auto&& item : mObservers )
   {
-    (*iter)->SceneObjectAdded(*this);
+    item->SceneObjectAdded(*this);
   }
 
   // enable property notifications in scene graph
@@ -938,9 +991,9 @@ void Object::OnSceneObjectAdd()
 void Object::OnSceneObjectRemove()
 {
   // Notification for observers
-  for( auto iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter )
+  for( auto&& item : mObservers )
   {
-    (*iter)->SceneObjectRemoved(*this);
+    item->SceneObjectRemoved(*this);
   }
 
   // disable property notifications in scene graph
@@ -966,7 +1019,7 @@ const TypeInfo* Object::GetTypeInfo() const
 
 CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) const
 {
-  CustomPropertyMetadata* property( NULL );
+  CustomPropertyMetadata* property = nullptr;
   if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     for ( std::size_t arrayIndex = 0; arrayIndex < mCustomProperties.Count(); arrayIndex++ )
@@ -980,10 +1033,10 @@ CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) cons
   }
   else
   {
-    int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
+    int32_t arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
     if( arrayIndex >= 0 )
     {
-      if( arrayIndex < static_cast<int>( mCustomProperties.Count() ) ) // we can only access the first 2 billion custom properties
+      if( arrayIndex < static_cast<int32_t>( mCustomProperties.Count() ) ) // we can only access the first 2 billion custom properties
       {
         property = static_cast<CustomPropertyMetadata*>(mCustomProperties[ arrayIndex ]);
       }
@@ -1002,10 +1055,10 @@ AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index inde
       return property;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
-Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue) const
+Property::Index Object::RegisterSceneGraphProperty( const std::string& name, Property::Index key, Property::Index index, const Property::Value& propertyValue ) const
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -1020,7 +1073,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
 
     case Property::INTEGER:
     {
-      newProperty = new AnimatableProperty<int>( propertyValue.Get<int>() );
+      newProperty = new AnimatableProperty<int32_t>( propertyValue.Get<int32_t>() );
       break;
     }
 
@@ -1078,34 +1131,25 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     }
   }
 
-  // get the scene property owner from derived class
-  const SceneGraph::PropertyOwner* scenePropertyOwner = GetPropertyOwner();
-  // we can only pass properties to scene graph side if there is a scene object
-  if( scenePropertyOwner )
+  // get the scene property owner
+  const SceneGraph::PropertyOwner& scenePropertyOwner = GetSceneObject();
+  // keep a local pointer to the property as the OwnerPointer will pass its copy to the message
+  const PropertyBase* property = newProperty.Get();
+  if(index >= PROPERTY_CUSTOM_START_INDEX)
   {
-    // keep a local pointer to the property as the OwnerPointer will pass its copy to the message
-    const PropertyBase* property = newProperty.Get();
-    if(index >= PROPERTY_CUSTOM_START_INDEX)
-    {
-      DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
+    DALI_ASSERT_ALWAYS( index <= PROPERTY_CUSTOM_MAX_INDEX && "Too many custom properties have been registered" );
 
-      mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue, property ) );
-    }
-    else
-    {
-      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue, property ) );
-    }
-
-    // queue a message to add the property
-    InstallCustomPropertyMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), *scenePropertyOwner, newProperty ); // Message takes ownership
-
-    return index;
+    mCustomProperties.PushBack( new CustomPropertyMetadata( name, key, propertyValue, property ) );
   }
   else
   {
-    // property was orphaned and killed so return invalid index
-    return Property::INVALID_INDEX;
+    mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue, property ) );
   }
+
+  // queue a message to add the property
+  InstallCustomPropertyMessage( const_cast<EventThreadServices&>(GetEventThreadServices()), scenePropertyOwner, newProperty ); // Message takes ownership
+
+  return index;
 }
 
 void Object::RegisterAnimatableProperty( const TypeInfo& typeInfo,
@@ -1206,6 +1250,21 @@ void Object::ResolveChildProperties()
   }
 }
 
+void Object::SetDefaultProperty( Property::Index index, const Property::Value& property )
+{
+  // do nothing
+}
+
+Property::Value Object::GetDefaultProperty(Property::Index index) const
+{
+  return Property::Value();
+}
+
+Property::Value Object::GetDefaultPropertyCurrentValue( Property::Index index ) const
+{
+  return GetDefaultProperty( index );
+}
+
 void Object::EnablePropertyNotifications()
 {
   if( mPropertyNotifications )
@@ -1245,7 +1304,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::BOOLEAN:
       {
         const AnimatableProperty<bool>* property = static_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1253,8 +1312,8 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
 
       case Property::INTEGER:
       {
-        const AnimatableProperty<int>* property = static_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        const AnimatableProperty<int32_t>* property = static_cast< const AnimatableProperty<int32_t>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1263,7 +1322,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::FLOAT:
       {
         const AnimatableProperty<float>* property = static_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1272,7 +1331,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::VECTOR2:
       {
         const AnimatableProperty<Vector2>* property = static_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         if(entry.componentIndex == 0)
         {
@@ -1292,7 +1351,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::VECTOR3:
       {
         const AnimatableProperty<Vector3>* property = static_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         if(entry.componentIndex == 0)
         {
@@ -1316,7 +1375,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::VECTOR4:
       {
         const AnimatableProperty<Vector4>* property = static_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         if(entry.componentIndex == 0)
         {
@@ -1344,7 +1403,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::MATRIX:
       {
         const AnimatableProperty<Matrix>* property = static_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1353,7 +1412,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::MATRIX3:
       {
         const AnimatableProperty<Matrix3>* property = static_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1362,7 +1421,7 @@ Property::Value Object::GetCurrentPropertyValue( const PropertyMetadata& entry )
       case Property::ROTATION:
       {
         const AnimatableProperty<Quaternion>* property = static_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+        DALI_ASSERT_DEBUG( property );
 
         value = (*property)[ bufferIndex ];
         break;
@@ -1385,7 +1444,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::BOOLEAN:
     {
       const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<bool>( GetEventThreadServices(), *property, value.Get<bool>() );
@@ -1394,18 +1453,18 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
 
     case Property::INTEGER:
     {
-      const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      const AnimatableProperty<int32_t>* property = dynamic_cast< const AnimatableProperty<int32_t>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<int>( GetEventThreadServices(), *property, value.Get<int>() );
+      BakeMessage<int32_t>( GetEventThreadServices(), *property, value.Get<int32_t>() );
       break;
     }
 
     case Property::FLOAT:
     {
       const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<float>( GetEventThreadServices(), *property, value.Get<float>() );
@@ -1415,7 +1474,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::VECTOR2:
     {
       const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
@@ -1436,7 +1495,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::VECTOR3:
     {
       const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
@@ -1462,7 +1521,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::VECTOR4:
     {
       const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       if(entry.componentIndex == 0)
@@ -1491,7 +1550,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::ROTATION:
     {
       const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<Quaternion>( GetEventThreadServices(), *property, value.Get<Quaternion>() );
@@ -1501,7 +1560,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::MATRIX:
     {
       const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<Matrix>( GetEventThreadServices(), *property, value.Get<Matrix>() );
@@ -1511,7 +1570,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
     case Property::MATRIX3:
     {
       const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
+      DALI_ASSERT_DEBUG( property );
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<Matrix3>( GetEventThreadServices(), *property, value.Get<Matrix3>() );

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -37,20 +38,23 @@ class EventThreadServices;
 
 namespace SceneGraph
 {
+class RenderTaskList;
 class RenderTask;
 class Camera;
 }
+
+using RenderTaskPtr = IntrusivePtr<RenderTask>;
 
 class RenderTask : public Object
 {
 public:
 
-  typedef Dali::RenderTask::ScreenToFrameBufferFunction ScreenToFrameBufferFunction;
+  using ScreenToFrameBufferFunction = Dali::RenderTask::ScreenToFrameBufferFunction;
 
   /**
    * Creates a new RenderTask.
    */
-  static RenderTask* New();
+  static RenderTaskPtr New( Actor* sourceActor, CameraActor* cameraActor, SceneGraph::RenderTaskList& parentSceneObject );
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
@@ -125,12 +129,12 @@ public:
   /**
    * copydoc Dali::RenderTask::SetScreenToFrameBufferMappingActor
    */
-  void SetScreenToFrameBufferMappingActor( Actor* mappingActor );
+  void SetScreenToFrameBufferMappingActor( Dali::Actor& mappingActor );
 
   /**
    * copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
    */
-  Actor* GetScreenToFrameBufferMappingActor() const;
+  Dali::Actor GetScreenToFrameBufferMappingActor() const;
 
   /**
    * @copydoc Dali::RenderTask::SetViewportPosition
@@ -241,22 +245,10 @@ public:
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
 
   /**
-   * Create the scene-graph RenderTask object.
-   * @pre CreateSceneObject has not already been called.
-   * @return A newly allocated scene-graph object; the caller takes ownership.
-   */
-  SceneGraph::RenderTask* CreateSceneObject();
-
-  /**
    * Retrieve the scene-graph RenderTask object.
-   * @return The scene-graph object, or NULL if this has been discarded.
+   * @return The scene-graph object
    */
-  SceneGraph::RenderTask* GetRenderTaskSceneObject();
-
-  /**
-   * Discard the scene-graph RenderTask object.
-   */
-  void DiscardSceneObject();
+  const SceneGraph::RenderTask& GetRenderTaskSceneObject() const;
 
 public: // Implementation of Object
 
@@ -279,11 +271,6 @@ public: // Implementation of Object
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
@@ -330,92 +317,28 @@ public: //signals
 protected:
 
   /**
-   * Construct a new RenderTask.
+   * Constructor.
+   *
+   * @param sceneObject the scene graph object
    */
-  RenderTask();
+  RenderTask( const SceneGraph::RenderTask* sceneObject );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~RenderTask();
 
-  /**
-   * Helper class for connecting Nodes to the scene-graph RenderTask
-   */
-  class Connector : public Object::Observer
-  {
-  public:
+private: // not copyable
 
-    enum Type
-    {
-      SOURCE_CONNECTOR,
-      CAMERA_CONNECTOR,
-      MAPPING_CONNECTOR
-    };
-
-    /**
-     * Create the helper class
-     */
-    Connector( Type type, RenderTask& renderTask );
-
-    /**
-     * Non-virtual destructor; not suitable as a base object.
-     */
-    ~Connector();
-
-    /**
-     * Set the actor to be observed.
-     * @param[in] actor The actor to be observed.
-     */
-    void SetActor( Actor* actor );
-
-    /**
-     * Update the scene-graph RenderTask with a new source/camera Node.
-     */
-    void UpdateRenderTask();
-
-  public: // From Object::Observer
-
-    /**
-     * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded
-     */
-    virtual void SceneObjectAdded( Object& object );
-
-    /**
-     * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded
-     */
-    virtual void SceneObjectRemoved( Object& object );
-
-    /**
-     * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed
-     */
-    virtual void ObjectDestroyed( Object& object );
-
-  private:
-
-    // Undefined
-    Connector(const Connector&);
-
-    // Undefined
-    Connector& operator=(const Connector& rhs);
-
-  public:
-
-    const Type mType;
-
-    RenderTask& mRenderTask;
-
-    Actor* mActor; ///< Raw-pointer to the actor; not owned.
-    const SceneGraph::Camera* mCamera;    ///< Raw-pointer to camera scene-graph object; not owned.
-  };
+  RenderTask() = delete;
+  RenderTask( const RenderTask& ) = delete;
+  RenderTask& operator=( const RenderTask& ) = delete;
 
 private:
 
-  SceneGraph::RenderTask* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
-
-  Connector mSourceConnector; ///< Responsible for connecting/disconnecting source Nodes
-  Connector mCameraConnector; ///< Responsible for connecting/disconnecting camera Nodes
-  Connector mMappingConnector; /// Responsible for connecting/disconnecting actor node, which used to mapping screen to frame buffer coordinate
+  Actor* mSourceActor; ///< Source actor, we cannot keep the actor alive so raw pointer.
+  CameraActor* mCameraActor; ///< Camera actor, we cannot keep the actor alive so raw pointer.
+  WeakHandle<Dali::Actor> mInputMappingActor; /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
 
   Vector4 mClearColor;       ///< Optional clear color
 

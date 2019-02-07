@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,7 +188,7 @@ void CameraActor::OnInitialize()
   SceneGraph::Camera* sceneGraphCamera = SceneGraph::Camera::New();
 
   // Store a pointer to this camera node inside the scene-graph camera.
-  sceneGraphCamera->SetNode( &mNode );
+  sceneGraphCamera->SetNode( &GetNode() );
 
   mSceneObject = sceneGraphCamera;
   OwnerPointer< SceneGraph::Camera > sceneGraphCameraOwner( sceneGraphCamera );
@@ -452,7 +452,7 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
   {
     // Build a picking ray in the world reference system.
     // ray starts from the camera world position
-    rayOrigin = mNode.GetWorldMatrix(0).GetTranslation();
+    rayOrigin = GetNode().GetWorldMatrix(0).GetTranslation();
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
@@ -734,60 +734,27 @@ Property::Value CameraActor::GetDefaultPropertyCurrentValue( Property::Index ind
   return ret;
 }
 
-const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty( Property::Index index ) const
-{
-  DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
-
-  const SceneGraph::PropertyBase* property( NULL );
-
-  // This method should only return a property of an object connected to the scene-graph
-  if ( !OnStage() )
-  {
-    return property;
-  }
-
-  // let actor handle animatable properties, we have no animatable properties
-  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
-  {
-    property = Actor::GetSceneObjectAnimatableProperty(index);
-  }
-
-  return property;
-}
-
 const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty( Property::Index index ) const
 {
   const PropertyInputImpl* property( NULL );
 
-  // This method should only return a property of an object connected to the scene-graph
-  if ( !OnStage() )
+  switch( index )
   {
-    return property;
+    case Dali::CameraActor::Property::PROJECTION_MATRIX:
+    {
+      property = mSceneObject->GetProjectionMatrix();
+      break;
+    }
+    case Dali::CameraActor::Property::VIEW_MATRIX:
+    {
+      property = mSceneObject->GetViewMatrix();
+      break;
+    }
+    // no default on purpose as we chain method up to actor
   }
-
-  // if its an actor default property or a custom property (actor already handles custom properties)
-  if( ( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT ) || ( index >= DEFAULT_PROPERTY_MAX_COUNT ) )
+  if( !property )
   {
     property = Actor::GetSceneObjectInputProperty( index );
-  }
-  else
-  {
-    switch( index )
-    {
-      case Dali::CameraActor::Property::PROJECTION_MATRIX:
-      {
-        property = mSceneObject->GetProjectionMatrix();
-        break;
-      }
-      case Dali::CameraActor::Property::VIEW_MATRIX:
-      {
-        property = mSceneObject->GetViewMatrix();
-        break;
-      }
-      default:
-        DALI_LOG_WARNING("Not an input property (%d)\n", index);
-        break;
-    }
   }
 
   return property;

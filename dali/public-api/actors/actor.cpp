@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,20 +243,6 @@ Vector3 Actor::GetCurrentPosition() const
 Vector3 Actor::GetCurrentWorldPosition() const
 {
   return GetImplementation(*this).GetCurrentWorldPosition();
-}
-
-void Actor::SetPositionInheritanceMode( PositionInheritanceMode mode )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetPositionInheritanceMode() is deprecated and will be removed from next release. Use SetInheritPosition() instead.\n" );
-
-  GetImplementation(*this).SetPositionInheritanceMode( mode );
-}
-
-PositionInheritanceMode Actor::GetPositionInheritanceMode() const
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPositionInheritanceMode() is deprecated and will be removed from next release. Use IsPositionInherited() instead.\n" );
-
-  return GetImplementation(*this).GetPositionInheritanceMode();
 }
 
 void Actor::SetOrientation(const Radian& angle, const Vector3& axis)

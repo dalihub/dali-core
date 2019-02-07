@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ Layer::Layer()
   mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
   mLastCamera( NULL ),
-  mBehavior( Dali::Layer::LAYER_2D ),
+  mBehavior( Dali::Layer::LAYER_UI ),
   mIsClipping( false ),
   mDepthTestDisabled( true ),
   mIsDefaultSortFunction( true )

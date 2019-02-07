@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,17 +71,10 @@ public:
                         Dali::Shader::Hint::Value hints );
 
   /**
-   * @brief Get the shader scene object
-   *
-   * @return the shader scene object
-   */
-  const SceneGraph::Shader* GetShaderSceneObject() const;
-
-  /**
    * Retrieve the scene-graph shader added by this object.
    * @return A pointer to the shader.
    */
-  SceneGraph::Shader* GetShaderSceneObject();
+  const SceneGraph::Shader& GetShaderSceneObject() const;
 
 public: // Default property extensions from Object
 
@@ -89,11 +82,6 @@ public: // Default property extensions from Object
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
-
-  /**
-   * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
-   */
-  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
@@ -105,38 +93,19 @@ public: // Default property extensions from Object
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
 
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyOwner()
-   */
-  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
-   */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
-   */
-  virtual int GetPropertyComponentIndex( Property::Index index ) const;
-
 private: // implementation
-  Shader();
+
+  /**
+   * Constructor
+   *
+   * @param sceneObject the scene object
+   */
+  Shader( const SceneGraph::Shader* sceneObject );
 
   /**
    * Second stage initialization
    */
-  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
+  void SetShader( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::Hint::Value hints );
 
   /**
    *
@@ -149,7 +118,7 @@ private: // implementation
    * @param specializationConstants
    * @param[in] hints Hints to define the geometry of the rendered object
    */
-  void Initialize( std::vector<char>& vertexShader,
+  void SetShader( std::vector<char>& vertexShader,
                    std::vector<char>& fragmentShader,
                    DevelShader::ShaderLanguage language,
                    const Property::Map& specializationConstants,
@@ -162,12 +131,15 @@ protected:
   virtual ~Shader();
 
 private: // unimplemented methods
-  Shader( const Shader& );
-  Shader& operator=( const Shader& );
+
+  Shader() = delete;
+  Shader( const Shader& ) = delete;
+  Shader& operator=( const Shader& ) = delete;
 
 private:
-  SceneGraph::Shader* mSceneObject;
+
   Internal::ShaderDataPtr mShaderData;
+
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/rendering/shader-devel.h>
-#include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
@@ -91,15 +90,24 @@ Property::Value HintString(const Dali::Shader::Hint::Value& hints)
   return Property::Value(s);
 }
 
-
 } // unnamed namespace
 
 ShaderPtr Shader::New( const std::string& vertexShader,
                        const std::string& fragmentShader,
                        Dali::Shader::Hint::Value hints )
 {
-  ShaderPtr shader( new Shader() );
-  shader->Initialize( vertexShader, fragmentShader, hints );
+  // create scene object first so it's guaranteed to exist for the event side
+  auto sceneObject = new SceneGraph::Shader( hints );
+  OwnerPointer< SceneGraph::Shader > transferOwnership( sceneObject );
+  // pass the pointer to base for message passing
+  ShaderPtr shader( new Shader( sceneObject ) );
+  // transfer scene object ownership to update manager
+  auto&& services = shader->GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = services.GetUpdateManager();
+  AddShaderMessage( updateManager, transferOwnership );
+
+  services.RegisterObject( shader.Get() );
+  shader->SetShader( vertexShader, fragmentShader, hints );
   return shader;
 }
 
@@ -109,23 +117,27 @@ ShaderPtr Shader::New( std::vector<char>& vertexShader,
                        const Property::Map& specializationConstants,
                        Dali::Shader::Hint::Value hints )
 {
-  ShaderPtr shader( new Shader() );
-  shader->Initialize(vertexShader, fragmentShader, language, specializationConstants, hints );
+  // create scene object first so it's guaranteed to exist for the event side
+  auto sceneObject = new SceneGraph::Shader( hints );
+  OwnerPointer< SceneGraph::Shader > transferOwnership( sceneObject );
+  // pass the pointer to base for message passing
+  ShaderPtr shader( new Shader( sceneObject ) );
+  // transfer scene object ownership to update manager
+  auto&& services = shader->GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = services.GetUpdateManager();
+  AddShaderMessage( updateManager, transferOwnership );
+
+  services.RegisterObject( shader.Get() );
+  shader->SetShader(vertexShader, fragmentShader, language, specializationConstants, hints );
   return shader;
 }
 
-const SceneGraph::Shader* Shader::GetShaderSceneObject() const
+const SceneGraph::Shader& Shader::GetShaderSceneObject() const
 {
-  return mSceneObject;
+  return static_cast<const SceneGraph::Shader&>( GetSceneObject() );
 }
 
-SceneGraph::Shader* Shader::GetShaderSceneObject()
-{
-  return mSceneObject;
-}
-
-void Shader::SetDefaultProperty( Property::Index index,
-                                 const Property::Value& propertyValue )
+void Shader::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
   switch(index)
   {
@@ -158,7 +170,7 @@ void Shader::SetDefaultProperty( Property::Index index,
               );
           }
 
-          Initialize(vertex, fragment, hints );
+          SetShader( vertex, fragment, hints );
         }
       }
       else
@@ -168,14 +180,6 @@ void Shader::SetDefaultProperty( Property::Index index,
       break;
     }
   }
-}
-
-void Shader::SetSceneGraphProperty( Property::Index index,
-                                    const PropertyMetadata& entry,
-                                    const Property::Value& value )
-{
-  ObjectImplHelper::SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
-  OnPropertySet(index, value);
 }
 
 Property::Value Shader::GetDefaultProperty( Property::Index index ) const
@@ -206,107 +210,38 @@ Property::Value Shader::GetDefaultPropertyCurrentValue( Property::Index index ) 
   return GetDefaultProperty( index ); // Event-side only properties
 }
 
-const SceneGraph::PropertyOwner* Shader::GetPropertyOwner() const
-{
-  return mSceneObject;
-}
-
-const SceneGraph::PropertyOwner* Shader::GetSceneObject() const
-{
-  return mSceneObject;
-}
-
-const SceneGraph::PropertyBase* Shader::GetSceneObjectAnimatableProperty( Property::Index index ) const
-{
-  DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
-  const SceneGraph::PropertyBase* property = NULL;
-
-  property = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
-                                                                &Shader::FindAnimatableProperty,
-                                                                &Shader::FindCustomProperty,
-                                                                index );
-
-  if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-  {
-    DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
-  }
-
-  return property;
-}
-
-const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index index ) const
-{
-  PropertyMetadata* property = NULL;
-
-  if( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && // Child properties are also stored as custom properties
-      ( index <= PROPERTY_CUSTOM_MAX_INDEX ) )
-  {
-    property = FindCustomProperty( index );
-  }
-  else if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
-  {
-    property = FindAnimatableProperty( index );
-  }
-
-  DALI_ASSERT_ALWAYS( property && "property index is invalid" );
-  return property->GetSceneGraphProperty();
-}
-
-int Shader::GetPropertyComponentIndex( Property::Index index ) const
-{
-  return Property::INVALID_COMPONENT_INDEX;
-}
-
-Shader::Shader()
-  : mSceneObject( NULL ),
-    mShaderData( NULL )
+Shader::Shader( const SceneGraph::Shader* sceneObject )
+: Object( sceneObject ),
+  mShaderData( nullptr )
 {
 }
 
-void Shader::Initialize(
-  const std::string& vertexSource,
-  const std::string& fragmentSource,
-  Dali::Shader::Hint::Value hints )
+void Shader::SetShader( const std::string& vertexSource,
+                        const std::string& fragmentSource,
+                        Dali::Shader::Hint::Value hints )
 {
-  EventThreadServices& eventThreadServices = GetEventThreadServices();
-  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-  mSceneObject = new SceneGraph::Shader( hints );
-
-  OwnerPointer< SceneGraph::Shader > transferOwnership( mSceneObject );
-  AddShaderMessage( updateManager, transferOwnership );
-
-  // Try to load a precompiled shader binary for the source pair:
+  // Try to load a pre-compiled shader binary for the source pair:
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
   ShaderFactory& shaderFactory = tls.GetShaderFactory();
   size_t shaderHash;
   mShaderData = shaderFactory.Load( vertexSource, fragmentSource, hints, shaderHash );
 
-  // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
-
-  eventThreadServices.RegisterObject( this );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SetShaderProgramMessage( eventThreadServices, *const_cast<SceneGraph::Shader*>(&GetShaderSceneObject()), mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
 }
 
-void Shader::Initialize( std::vector<char>& vertexShader,
-                         std::vector<char>& fragmentShader,
-                         DevelShader::ShaderLanguage language,
-                         const Property::Map& specializationConstants,
-                         Dali::Shader::Hint::Value hints )
+
+void Shader::SetShader( std::vector<char>& vertexShader,
+                        std::vector<char>& fragmentShader,
+                        DevelShader::ShaderLanguage language,
+                        const Property::Map& specializationConstants,
+                        Dali::Shader::Hint::Value hints )
 {
   EventThreadServices& eventThreadServices = GetEventThreadServices();
-  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-  mSceneObject = new SceneGraph::Shader( hints );
-
-  OwnerPointer< SceneGraph::Shader > transferOwnership( mSceneObject );
-  AddShaderMessage( updateManager, transferOwnership );
 
   mShaderData = new ShaderData( vertexShader, fragmentShader, hints );
+  SetShaderProgramMessage( eventThreadServices, *const_cast<SceneGraph::Shader*>(&GetShaderSceneObject()), mShaderData, (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x0 );
 
-  // Add shader program to scene-object using a message to the UpdateManager
-  bool shaderModifiesGeometry = (hints & Dali::Shader::Hint::MODIFIES_GEOMETRY) != 0x00;
-  SetShaderProgramMessage( eventThreadServices, *mSceneObject, mShaderData, shaderModifiesGeometry );
-
-  eventThreadServices.RegisterObject( this );
 }
 
 Shader::~Shader()
@@ -315,7 +250,7 @@ Shader::~Shader()
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveShaderMessage( updateManager, *mSceneObject);
+    RemoveShaderMessage( updateManager, &GetShaderSceneObject() );
 
     eventThreadServices.UnregisterObject( this );
   }

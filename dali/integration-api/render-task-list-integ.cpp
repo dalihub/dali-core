@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ Dali::RenderTaskList New()
 
 Dali::RenderTask CreateTask( Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor)
 {
-  return GetImplementation(taskList).CreateTask( &GetImplementation( sourceActor), &GetImplementation(cameraActor) );
+  return RenderTask( GetImplementation(taskList).CreateTask( &GetImplementation( sourceActor), &GetImplementation(cameraActor) ).Get() );
 }
 
 } // namespace RenderTaskList

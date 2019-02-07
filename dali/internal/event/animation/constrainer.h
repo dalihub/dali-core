@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_CONSTRAINER_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,38 +49,6 @@ public:
    * Virtual destructor.
    */
   virtual ~Constrainer();
-
-public: // Object methods
-
-  /**
-   * @copydoc Dali::Internal::Object::SetDefaultProperty()
-   */
-  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue ){}
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultProperty()
-   */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const{return Property::Value();}
-
-  /**
-   * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
-   */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const{return Property::Value();}
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const{return 0;}
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const{return 0;}
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
-   */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const{return 0;}
 
 public: // Object::Observer methods
 

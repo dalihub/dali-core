@@ -136,6 +136,7 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
   mRenderCommands{},
   mTextureBindings{},
@@ -742,6 +743,17 @@ float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
 {
   return mOpacity[updateBufferIndex];
 }
+void Renderer::SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior )
+{
+  mRenderingBehavior = renderingBehavior;
+}
+
+DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
+}
+
+
 
 Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1344,7 +1344,6 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
     { "inheritOrientation",     Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION },
     { "inheritScale",           Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE },
     { "colorMode",              Property::STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE },
-    { "positionInheritance",    Property::STRING,   true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE },
     { "drawMode",               Property::STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE },
     { "sizeModeFactor",         Property::VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR },
     { "widthResizePolicy",      Property::STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY },

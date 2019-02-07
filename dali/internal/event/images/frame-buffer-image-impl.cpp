@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ namespace Internal
 
 namespace
 {
-const int RenderBufferFormatToFrameBufferAttachments[]  = { Dali::FrameBuffer::Attachment::NONE,
-                                                            Dali::FrameBuffer::Attachment::DEPTH,
-                                                            Dali::FrameBuffer::Attachment::STENCIL,
-                                                            Dali::FrameBuffer::Attachment::DEPTH_STENCIL
-                                                          };
-
+const Dali::FrameBuffer::Attachment::Mask RenderBufferFormatToFrameBufferAttachments[]  =
+  { Dali::FrameBuffer::Attachment::NONE,
+    Dali::FrameBuffer::Attachment::DEPTH,
+    Dali::FrameBuffer::Attachment::STENCIL,
+    Dali::FrameBuffer::Attachment::DEPTH_STENCIL };
 } // unnamed namespace
 
 FrameBufferImagePtr FrameBufferImage::New( unsigned int width,

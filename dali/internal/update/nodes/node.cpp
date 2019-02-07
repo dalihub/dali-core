@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
 
 uint32_t Node::mNodeCounter = 0;        ///< A counter to provide unique node ids, up-to 4 billion
@@ -269,7 +268,7 @@ void Node::AddRenderer( Renderer* renderer )
   mRenderer.PushBack( renderer );
 }
 
-void Node::RemoveRenderer( Renderer* renderer )
+void Node::RemoveRenderer( const Renderer* renderer )
 {
   RendererContainer::SizeType rendererCount( mRenderer.Size() );
   for( RendererContainer::SizeType i = 0; i < rendererCount; ++i )

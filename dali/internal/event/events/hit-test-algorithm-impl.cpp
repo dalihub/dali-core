@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -507,7 +507,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
 
         if( hit.actor )
         {
-          results.renderTask = Dali::RenderTask( &renderTask );
+          results.renderTask = RenderTaskPtr( &renderTask );
           results.actor = Dali::Actor( hit.actor );
           results.actorCoordinates = hit.hitPosition;
 
@@ -549,8 +549,8 @@ bool HitTestRenderTaskList( Stage& stage,
 
   for( RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter )
   {
-    RenderTask& renderTask = GetImplementation( *iter );
-    bool isOffscreenRenderTask = ( iter->GetTargetFrameBuffer() || iter->GetFrameBuffer() );
+    RenderTask& renderTask = *iter->Get();
+    bool isOffscreenRenderTask = ( renderTask.GetTargetFrameBuffer() || renderTask.GetFrameBuffer() );
     if( (onScreen && isOffscreenRenderTask) || (!onScreen && !isOffscreenRenderTask) )
     {
       // Skip to next task

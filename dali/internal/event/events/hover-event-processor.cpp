@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,7 +229,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "\n" );
   DALI_LOG_INFO( gLogFilter, Debug::General, "Point(s): %d\n", event.GetPointCount() );
 
-  Dali::RenderTask currentRenderTask;
+  RenderTaskPtr currentRenderTask;
 
   for ( Integration::PointContainerConstIterator iter = event.points.begin(), beginIter = event.points.begin(), endIter = event.points.end(); iter != endIter; ++iter )
   {
@@ -289,7 +289,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     if ( mLastRenderTask )
     {
       Dali::Actor leaveEventConsumer;
-      RenderTask& lastRenderTaskImpl( GetImplementation( mLastRenderTask ) );
+      RenderTask& lastRenderTaskImpl = *mLastRenderTask.Get();
 
       if( lastPrimaryHitActor &&
           lastPrimaryHitActor != primaryHitActor &&

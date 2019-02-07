@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -467,16 +467,6 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldPosition()
    */
   const Vector3& GetCurrentWorldPosition() const;
-
-  /**
-   * @copydoc Dali::Actor::SetPositionInheritanceMode()
-   */
-  void SetPositionInheritanceMode( PositionInheritanceMode mode );
-
-  /**
-   * @copydoc Dali::Actor::GetPositionInheritanceMode()
-   */
-  PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
    * @copydoc Dali::Actor::SetInheritPosition()
@@ -1662,16 +1652,6 @@ public:
   virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
 
   /**
-   * @copydoc Dali::Internal::Object::GetPropertyOwner()
-   */
-  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObject()
-   */
-  virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
-
-  /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
@@ -1684,7 +1664,7 @@ public:
   /**
    * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
    */
-  virtual int GetPropertyComponentIndex( Property::Index index ) const;
+  virtual int32_t GetPropertyComponentIndex( Property::Index index ) const;
 
   /**
    * Retrieve the actor's node.
@@ -1692,7 +1672,7 @@ public:
    */
   const SceneGraph::Node& GetNode() const
   {
-    return mNode;
+    return *static_cast<const SceneGraph::Node*>( mUpdateObject );
   }
 
   /**
@@ -1937,7 +1917,6 @@ protected:
   ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized
   RendererContainer* mRenderers;   ///< Renderer container
 
-  const SceneGraph::Node& mNode;  ///< Not owned
   Vector3* mParentOrigin;         ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
@@ -1989,7 +1968,6 @@ protected:
   bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
   LayoutDirection::Type mLayoutDirection           : 2; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 3; ///< Cached: How the actor and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode : 3; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 3; ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type mClippingMode                 : 3; ///< Cached: Determines which clipping mode (if any) to use.
 

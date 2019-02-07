@@ -2,7 +2,7 @@
 #define DALI_ACTOR_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,19 +38,6 @@ enum ColorMode
   USE_PARENT_COLOR,              ///< Actor will use its parent color @SINCE_1_0.0
   USE_OWN_MULTIPLY_PARENT_COLOR, ///< Actor will blend its color with its parents color. @SINCE_1_0.0
   USE_OWN_MULTIPLY_PARENT_ALPHA  ///< Actor will blend its alpha with its parents alpha. This means when parent fades in or out child does as well. This is the default. @SINCE_1_0.0
-};
-
-/**
- * @DEPRECATED_1_1.24 Use SetInheritPosition instead
- * @brief Enumeration for Actor position inheritance mode.
- * @SINCE_1_0.0
- */
-enum PositionInheritanceMode
-{
-  INHERIT_PARENT_POSITION,                 ///< Actor will inherit its parent position. This is the default @SINCE_1_0.0
-  USE_PARENT_POSITION,                     ///< Actor will copy its parent position. This is useful if many actors are stacked together in the same place. This option ignores parent origin and anchor point. @SINCE_1_0.0
-  USE_PARENT_POSITION_PLUS_LOCAL_POSITION, ///< Actor will copy its parent position and add local position. This is useful if many actors are stacked together in the same place with an offset.  This option ignores parent origin and anchor point. @SINCE_1_0.0
-  DONT_INHERIT_POSITION                    ///< Actor will not inherit position. Local position is treated as world position. This is useful if a constraint is used to override local position or if an actor is positioned globally. This option ignores parent origin, anchor point and local position. @SINCE_1_0.0
 };
 
 /**

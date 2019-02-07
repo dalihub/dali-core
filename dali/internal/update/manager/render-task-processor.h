@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_PROCESSOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,9 @@ public:
    * @param[out] instructions       The instructions for rendering the next frame.
    * @param[in]  renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
    * @param[in]  isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
+   * @return true if rendering should be kept, false otherwise.
    */
-  void Process( BufferIndex updateBufferIndex,
+  bool Process( BufferIndex updateBufferIndex,
                 RenderTaskList& renderTasks,
                 Layer& rootNode,
                 SortedLayerPointers& sortedLayers,

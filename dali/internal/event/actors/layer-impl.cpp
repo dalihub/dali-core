@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace
 typedef Layer::Behavior Behavior;
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( BEHAVIOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_2D )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_UI )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Layer, LAYER_3D )
 DALI_ENUM_TO_STRING_TABLE_END( BEHAVIOR )
 
@@ -124,7 +124,7 @@ Layer::Layer( Actor::DerivedType type, const SceneGraph::Layer& layer )
   mLayerList( NULL ),
   mClippingBox( 0, 0, 0, 0 ),
   mSortFunction( Layer::ZValue ),
-  mBehavior( Dali::Layer::LAYER_2D ),
+  mBehavior( Dali::Layer::LAYER_UI ),
   mIsClipping( false ),
   mDepthTestDisabled( true ),
   mTouchConsumed( false ),
@@ -229,8 +229,8 @@ void Layer::SetBehavior( Dali::Layer::Behavior behavior )
 
   // Notify update side object.
   SetBehaviorMessage( GetEventThreadServices(), GetSceneLayerOnStage(), behavior );
-  // By default, disable depth test for LAYER_2D, and enable for LAYER_3D.
-  SetDepthTestDisabled( mBehavior == Dali::Layer::LAYER_2D );
+  // By default, disable depth test for LAYER_UI, and enable for LAYER_3D.
+  SetDepthTestDisabled( mBehavior == Dali::Layer::LAYER_UI );
 }
 
 void Layer::SetClipping(bool enabled)
@@ -348,7 +348,7 @@ void Layer::OnStageDisconnectionInternal()
 
 const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
 {
-  return dynamic_cast< const SceneGraph::Layer& >( mNode );
+  return static_cast< const SceneGraph::Layer& >( GetNode() ); // we know our node is a layer node
 }
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
@@ -374,7 +374,7 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        Behavior behavior(Dali::Layer::LAYER_2D);
+        Behavior behavior(Dali::Layer::LAYER_UI);
         if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
         {
           SetBehavior( behavior );

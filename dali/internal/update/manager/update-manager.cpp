@@ -112,22 +112,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_UPD
 #endif
 
 /**
- * Helper to reset animate-able objects to base values
- * @param container to iterate over
- * @param updateBufferIndex to use
- */
-template< class T >
-inline void ResetToBaseValues( OwnerContainer<T*>& container, BufferIndex updateBufferIndex )
-{
-  // Reset animatable properties to base values
-  // use reference to avoid extra copies of the iterator
-  for( auto&& iter : container )
-  {
-    iter->ResetToBaseValues( updateBufferIndex );
-  }
-}
-
-/**
  * Helper to Erase an object from OwnerContainer using discard queue
  * @param container to remove from
  * @param object to remove
@@ -291,7 +275,7 @@ struct UpdateManager::Impl
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
 
   OwnerContainer< PropertyResetterBase* > propertyResetters;          ///< A container of property resetters
-  AnimationContainer                   animations;                    ///< A container of owned animations
+  OwnerContainer< Animation* >         animations;                    ///< A container of owned animations
   PropertyNotificationContainer        propertyNotifications;         ///< A container of owner property notifications.
   OwnerContainer< Renderer* >          renderers;                     ///< A container of owned renderers
   OwnerContainer< TextureSet* >        textureSets;                   ///< A container of owned texture sets
@@ -441,10 +425,10 @@ void UpdateManager::AddCamera( OwnerPointer< Camera >& camera )
   mImpl->cameras.PushBack( camera.Release() ); // takes ownership
 }
 
-void UpdateManager::RemoveCamera( const Camera* camera )
+void UpdateManager::RemoveCamera( Camera* camera )
 {
   // Find the camera and destroy it
-  EraseUsingDiscardQueue( mImpl->cameras, const_cast<Camera*>( camera ), mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  EraseUsingDiscardQueue( mImpl->cameras, camera, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::AddObject( OwnerPointer<PropertyOwner>& object )
@@ -641,11 +625,10 @@ bool UpdateManager::ProcessGestures( BufferIndex bufferIndex, uint32_t lastVSync
 
 void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
 {
-  AnimationContainer &animations = mImpl->animations;
-  AnimationIter iter = animations.Begin();
+  auto&& iter = mImpl->animations.Begin();
   bool animationLooped = false;
 
-  while ( iter != animations.End() )
+  while ( iter != mImpl->animations.End() )
   {
     Animation* animation = *iter;
     bool finished = false;
@@ -664,7 +647,7 @@ void UpdateManager::Animate( BufferIndex bufferIndex, float elapsedSeconds )
     // Remove animations that had been destroyed but were still waiting for an update
     if (animation->GetState() == Animation::Destroyed)
     {
-      iter = animations.Erase(iter);
+      iter = mImpl->animations.Erase(iter);
     }
     else
     {
@@ -806,8 +789,9 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
     IsAnimationRunning()                            || // ..at least one animation is running OR
     mImpl->messageQueue.IsSceneUpdateRequired()     || // ..a message that modifies the scene graph node tree is queued OR
-    gestureUpdated;                                    // ..a gesture property was updated OR
+    gestureUpdated;                                    // ..a gesture property was updated
 
+  bool keepRendererRendering = false;
   // Although the scene-graph may not require an update, we still need to synchronize
   // double-buffered values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
@@ -892,7 +876,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       {
         if ( NULL != mImpl->roots[index] )
         {
-          mImpl->renderTaskProcessor.Process( bufferIndex,
+          keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
                                               *mImpl->taskLists[index],
                                               *mImpl->roots[index],
                                               mImpl->sortedLayerLists[index],
@@ -964,6 +948,12 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   if( updateScene )
   {
     keepUpdating |= KeepUpdating::DISCARD_RESOURCES;
+  }
+
+
+  if( keepRendererRendering )
+  {
+    keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
   }
 
   // tell the update manager that we're done so the queue can be given to event thread

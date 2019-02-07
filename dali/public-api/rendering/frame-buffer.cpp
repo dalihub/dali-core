@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -18,16 +18,50 @@
 // CLASS HEADER
 #include <dali/public-api/rendering/frame-buffer.h>
 
-// INTERNAL INCLUDES
-#include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
+// EXTERNAL INCLUDES
+#include <type_traits>
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/debug.h> // DALI_LOG_WARNING_NOFN
+#include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
+#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
 namespace Dali
 {
 
-FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, uint32_t attachments )
+namespace
+{
+/// Bool operator for FrameBuffer::Attachment::Mask.
+/// in cpp as only used in this file
+bool operator&( FrameBuffer::Attachment::Mask lhs, FrameBuffer::Attachment::Mask rhs )
+{
+  using UnderlyingType = typename std::underlying_type< FrameBuffer::Attachment::Mask >::type;
+  return static_cast<bool>( static_cast<UnderlyingType>( lhs ) & static_cast<UnderlyingType>( rhs ) );
+}
+
+} // unnamed namespace
+
+FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height )
+{
+  return New( width, height, FrameBuffer::Attachment::COLOR );
+}
+
+FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, Attachment::Mask attachments )
 {
   Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, attachments );
+  if( attachments & FrameBuffer::Attachment::COLOR )
+  {
+    Internal::TexturePtr texture = Internal::Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGB888, width, height );
+    frameBuffer->AttachColorTexture( texture, 0u, 0u );
+  }
+  return FrameBuffer( frameBuffer.Get() );
+}
+
+FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, uint32_t attachments )
+{
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: FrameBuffer::New(uint32_t,uint32_t,uint32_t) is deprecated and will be removed from next release. use New(uint32_t, uint32_t,Attachment::Mask) instead.\n" );
+  // have to static cast, which according to standard since C++11 is undefined behaviour, hence this variant is deprecated
+  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, static_cast<Attachment::Mask>( attachments ) );
   return FrameBuffer( frameBuffer.Get() );
 }
 

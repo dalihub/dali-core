@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,12 +73,12 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   {
     Property::Value value( Property::ARRAY );
     Property::Array* array = value.GetArray();
-    size_t count( mValue.Size() );
+    uint32_t count = static_cast<uint32_t>( mValue.Size() );
 
     if( array )
     {
       array->Reserve( count );
-      for( size_t i( 0 ); i != count; ++i )
+      for( uint32_t i( 0 ); i != count; ++i )
       {
         array->PushBack( mValue[i] );
       }
@@ -89,12 +89,12 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   {
     Property::Value value( Property::ARRAY );
     Property::Array* array = value.GetArray();
-    size_t count( mProgress.Size() );
+    uint32_t count = static_cast<uint32_t>( mProgress.Size() );
 
     if( array )
     {
       array->Reserve( count );
-      for( size_t i( 0 ); i != count; ++i )
+      for( uint32_t i( 0 ); i != count; ++i )
       {
         array->PushBack( mProgress[i] );
       }
@@ -115,12 +115,12 @@ void LinearConstrainer::SetDefaultProperty( Property::Index index, const Propert
   const Property::Array* array = propertyValue.GetArray();
   if( array )
   {
-    size_t propertyArrayCount = array->Count();
+    uint32_t propertyArrayCount = static_cast<uint32_t>( array->Count() );
     if( index == Dali::LinearConstrainer::Property::VALUE  )
     {
       mValue.Clear(); // remove old values
       mValue.Resize( propertyArrayCount );
-      for( size_t i(0); i != propertyArrayCount; ++i )
+      for( uint32_t i(0); i != propertyArrayCount; ++i )
       {
         array->GetElementAt( i ).Get( mValue[ i ] );
       }
@@ -129,7 +129,7 @@ void LinearConstrainer::SetDefaultProperty( Property::Index index, const Propert
     {
       mProgress.Clear(); // remove old values
       mProgress.Resize( propertyArrayCount );
-      for( size_t i(0); i != propertyArrayCount; ++i )
+      for( uint32_t i(0); i != propertyArrayCount; ++i )
       {
         array->GetElementAt( i ).Get( mProgress[ i ] );
       }

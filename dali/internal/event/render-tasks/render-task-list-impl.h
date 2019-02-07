@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -37,7 +37,7 @@ class Actor;
 class CameraActor;
 
 class RenderTaskList;
-typedef IntrusivePtr<RenderTaskList> RenderTaskListPtr;
+using RenderTaskListPtr = IntrusivePtr<RenderTaskList>;
 
 namespace SceneGraph
 {
@@ -53,7 +53,7 @@ class RenderTaskList : public BaseObject, public CompleteNotificationInterface
 {
 public:
 
-  typedef std::vector< Dali::RenderTask > RenderTaskContainer;
+  using RenderTaskContainer = std::vector< RenderTaskPtr >;
 
   struct Exclusive
   {
@@ -70,7 +70,7 @@ public:
   /**
    * @copydoc Dali::RenderTaskList::CreateTask()
    */
-  Dali::RenderTask CreateTask();
+  RenderTaskPtr CreateTask();
 
   /**
    * @brief Creates a new RenderTask.
@@ -81,12 +81,12 @@ public:
    * @param[in] cameraActor The actor from which the scene is viewed for this render task.
    * @return A valid handle to a new RenderTask
    */
-  Dali::RenderTask CreateTask( Actor* sourceActor, CameraActor* cameraActor);
+  RenderTaskPtr CreateTask( Actor* sourceActor, CameraActor* cameraActor);
 
   /**
    * @copydoc Dali::RenderTaskList::RemoveTask()
    */
-  void RemoveTask( Dali::RenderTask task );
+  void RemoveTask( Internal::RenderTask& task );
 
   /**
    * @copydoc Dali::RenderTaskList::GetTaskCount()
@@ -96,7 +96,7 @@ public:
   /**
    * @copydoc Dali::RenderTaskList::GetTask()
    */
-  Dali::RenderTask GetTask( uint32_t index ) const;
+  RenderTaskPtr GetTask( uint32_t index ) const;
 
   /**
    * Retrieve the container of render-tasks.
@@ -155,16 +155,6 @@ protected:
    * 2nd-phase construction
    */
   void Initialize();
-
-  /**
-   * Helper to create a scene-graph render task list
-   */
-  void CreateSceneObject();
-
-  /**
-   * Helper to destroy a scene-graph render task list
-   */
-  void DestroySceneObject();
 
 private: // from CompleteNotificationInterface
 

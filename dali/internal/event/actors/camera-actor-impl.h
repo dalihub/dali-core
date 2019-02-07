@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,11 +212,6 @@ public: // properties
    * copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
   virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
-   */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()

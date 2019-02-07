@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@ namespace Internal
 {
 
 KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
-: mCompose( "" ),
+: mLogicalKey( "" ),
+  mCompose( "" ),
   mDeviceName( "" ),
   mDeviceClass( Device::Class::NONE ),
   mDeviceSubclass( Device::Subclass::NONE )
@@ -68,6 +69,7 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
 {
   if( this != &rhs )
   {
+    mLogicalKey = rhs.mLogicalKey;
     mCompose = rhs.mCompose;
     mDeviceName = rhs.mDeviceName;
     mDeviceClass = rhs.mDeviceClass;
@@ -75,6 +77,16 @@ KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
   }
 
   return *this;
+}
+
+std::string KeyEventImpl::GetLogicalKey() const
+{
+  return mLogicalKey;
+}
+
+void KeyEventImpl::SetLogicalKey( const std::string& logicalKey )
+{
+  mLogicalKey = logicalKey;
 }
 
 std::string KeyEventImpl::GetCompose() const

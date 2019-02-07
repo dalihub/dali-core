@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ class FrameBuffer : public BaseObject
 {
 public:
 
+  using Mask = Dali::FrameBuffer::Attachment::Mask;
+
   /**
    * @brief Create a new FrameBuffer
    *
@@ -50,7 +52,7 @@ public:
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    * @return A smart-pointer to the newly allocated Texture.
    */
-  static FrameBufferPtr New( unsigned int width, unsigned int height, unsigned int attachments );
+  static FrameBufferPtr New( uint32_t width, uint32_t height, Mask attachments );
 
   /**
    * @brief Get the FrameBuffer render object
@@ -62,7 +64,7 @@ public:
   /**
    * @copydoc Dali::FrameBuffer::AttachColorTexture()
    */
-  void AttachColorTexture( TexturePtr texture, unsigned int mipmapLevel, unsigned int layer );
+  void AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
@@ -87,7 +89,7 @@ private: // implementation
    * @param[in] height      The height of the FrameBuffer
    * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( unsigned int width, unsigned int height, unsigned int attachments );
+  FrameBuffer( uint32_t width, uint32_t height, Mask attachments );
 
   /**
    * Second stage initialization of the Texture
@@ -102,8 +104,10 @@ protected:
   virtual ~FrameBuffer();
 
 private: // unimplemented methods
-  FrameBuffer( const FrameBuffer& );
-  FrameBuffer& operator=( const FrameBuffer& );
+
+  FrameBuffer() = delete;
+  FrameBuffer( const FrameBuffer& ) = delete;
+  FrameBuffer& operator=( const FrameBuffer& ) = delete;
 
 private: // data
 
@@ -111,9 +115,9 @@ private: // data
   SceneGraph::FrameBuffer* mRenderObject;        ///< The Render::Framebuffer associated with this framebuffer
 
   TexturePtr mColor;
-  unsigned int mWidth;
-  unsigned int mHeight;
-  unsigned int mAttachments; ///< Bit-mask of type FrameBuffer::Attachment::Mask
+  uint32_t mWidth;
+  uint32_t mHeight;
+  Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
 };
 
 } // namespace Internal

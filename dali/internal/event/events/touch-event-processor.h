@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -91,7 +91,7 @@ private:
   ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
   ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
   ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
-  Dali::RenderTask mLastRenderTask; ///< The RenderTask used for the last hit actor
+  RenderTaskPtr mLastRenderTask; ///< The RenderTask used for the last hit actor
 };
 
 } // namespace Internal

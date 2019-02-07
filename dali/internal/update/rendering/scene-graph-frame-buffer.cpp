@@ -109,20 +109,24 @@ void FrameBuffer::PrepareFramebuffer()
         switch( mDepthAttachment.format )
         {
           case Dali::FrameBuffer::Attachment::NONE:
+          case Dali::FrameBuffer::Attachment::COLOR:
           {
             depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::NONE;
             break;
           }
+          case Dali::FrameBuffer::Attachment::COLOR_DEPTH:
           case Dali::FrameBuffer::Attachment::DEPTH:
           {
             depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::DEPTH;
             break;
           }
+          case Dali::FrameBuffer::Attachment::COLOR_STENCIL:
           case Dali::FrameBuffer::Attachment::STENCIL:
           {
             depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::STENCIL;
             break;
           }
+          case Dali::FrameBuffer::Attachment::COLOR_DEPTH_STENCIL:
           case Dali::FrameBuffer::Attachment::DEPTH_STENCIL:
           {
             depthStencilFormat = Graphics::TextureDetails::DepthStencilFlag::DEPTH_STENCIL;

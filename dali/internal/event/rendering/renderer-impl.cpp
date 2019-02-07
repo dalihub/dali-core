@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h>    // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/rendering/stencil-parameters.h>
@@ -72,6 +70,7 @@ DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false
 DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
 DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
 DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
+DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties )
 
 // Property string to enumeration tables:
@@ -166,6 +165,11 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, INCREMENT_WRAP )
 DALI_ENUM_TO_STRING_WITH_SCOPE( StencilOperation, DECREMENT_WRAP )
 DALI_ENUM_TO_STRING_TABLE_END( STENCIL_OPERATION )
 
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RENDERING_BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, IF_REQUIRED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelRenderer::Rendering, CONTINUOUSLY )
+DALI_ENUM_TO_STRING_TABLE_END( RENDERING_BEHAVIOR )
+
 BaseHandle Create()
 {
   return Dali::BaseHandle();
@@ -177,8 +181,17 @@ TypeRegistration mType( typeid( Dali::Renderer ), typeid( Dali::Handle ), Create
 
 RendererPtr Renderer::New()
 {
-  RendererPtr rendererPtr( new Renderer() );
-  rendererPtr->Initialize();
+  // create scene object first so it's guaranteed to exist for the event side
+  auto sceneObject = SceneGraph::Renderer::New();
+  OwnerPointer< SceneGraph::Renderer > transferOwnership( sceneObject );
+  // pass the pointer to base for message passing
+  RendererPtr rendererPtr( new Renderer( sceneObject ) );
+  // transfer scene object ownership to update manager
+  EventThreadServices& eventThreadServices = rendererPtr->GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+  AddRendererMessage( updateManager, transferOwnership );
+
+  eventThreadServices.RegisterObject( rendererPtr.Get() );
   return rendererPtr;
 }
 
@@ -187,48 +200,48 @@ void Renderer::SetGeometry( Geometry& geometry )
   mGeometry = &geometry;
 
   const SceneGraph::Geometry* geometrySceneObject = geometry.GetRenderObject();
-  SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
+  SetGeometryMessage( GetEventThreadServices(), GetRendererSceneObject(), *geometrySceneObject );
 }
 
-Geometry* Renderer::GetGeometry() const
+GeometryPtr Renderer::GetGeometry() const
 {
-  return mGeometry.Get();
+  return mGeometry;
 }
 
 void Renderer::SetTextures( TextureSet& textureSet )
 {
   mTextureSet = &textureSet;
   const SceneGraph::TextureSet* textureSetSceneObject = textureSet.GetTextureSetSceneObject();
-  SetTexturesMessage( GetEventThreadServices(), *mSceneObject, *textureSetSceneObject );
+  SetTexturesMessage( GetEventThreadServices(), GetRendererSceneObject(), *textureSetSceneObject );
 }
 
-TextureSet* Renderer::GetTextures() const
+TextureSetPtr Renderer::GetTextures() const
 {
-  return mTextureSet.Get();
+  return mTextureSet;
 }
 
 void Renderer::SetShader( Shader& shader )
 {
   mShader = &shader;
-  SceneGraph::Shader& sceneGraphShader = *shader.GetShaderSceneObject();
-  SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
+  const SceneGraph::Shader& sceneGraphShader = shader.GetShaderSceneObject();
+  SceneGraph::SetShaderMessage( GetEventThreadServices(), GetRendererSceneObject(), sceneGraphShader );
 }
 
-Shader* Renderer::GetShader() const
+ShaderPtr Renderer::GetShader() const
 {
-  return mShader.Get();
+  return mShader;
 }
 
-void Renderer::SetDepthIndex( int depthIndex )
+void Renderer::SetDepthIndex( int32_t depthIndex )
 {
   if ( mDepthIndex != depthIndex )
   {
     mDepthIndex = depthIndex;
-    SetDepthIndexMessage( GetEventThreadServices(), *mSceneObject, depthIndex );
+    SetDepthIndexMessage( GetEventThreadServices(), GetRendererSceneObject(), depthIndex );
   }
 }
 
-int Renderer::GetDepthIndex() const
+int32_t Renderer::GetDepthIndex() const
 {
   return mDepthIndex;
 }
@@ -241,7 +254,7 @@ void Renderer::SetBlendMode( BlendMode::Type mode )
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Renderer::SetBlendMode( %s )\n", Scripting::GetEnumerationName<BlendMode::Type>( mBlendMode, BLEND_MODE_TABLE, BLEND_MODE_TABLE_COUNT ) );
 
-    SetBlendModeMessage( GetEventThreadServices(), *mSceneObject, mBlendMode );
+    SetBlendModeMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendMode );
   }
 }
 
@@ -253,7 +266,7 @@ BlendMode::Type Renderer::GetBlendMode() const
 void Renderer::SetBlendFunc( BlendFactor::Type srcFactorRgba, BlendFactor::Type destFactorRgba )
 {
   mBlendingOptions.SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
-  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void Renderer::SetBlendFunc( BlendFactor::Type srcFactorRgb,
@@ -262,7 +275,7 @@ void Renderer::SetBlendFunc( BlendFactor::Type srcFactorRgb,
                              BlendFactor::Type destFactorAlpha )
 {
   mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void Renderer::GetBlendFunc( BlendFactor::Type& srcFactorRgb,
@@ -279,14 +292,14 @@ void Renderer::GetBlendFunc( BlendFactor::Type& srcFactorRgb,
 void Renderer::SetBlendEquation( BlendEquation::Type equationRgba )
 {
   mBlendingOptions.SetBlendEquation( equationRgba, equationRgba );
-  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void Renderer::SetBlendEquation( BlendEquation::Type equationRgb,
                                  BlendEquation::Type equationAlpha )
 {
   mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
-  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void Renderer::GetBlendEquation( BlendEquation::Type& equationRgb,
@@ -302,7 +315,7 @@ void Renderer::SetIndexedDrawFirstElement( uint32_t firstElement )
   if( firstElement != mIndexedDrawFirstElement )
   {
     mIndexedDrawFirstElement = firstElement;
-    SetIndexedDrawFirstElementMessage( GetEventThreadServices(), *mSceneObject, mIndexedDrawFirstElement );
+    SetIndexedDrawFirstElementMessage( GetEventThreadServices(), GetRendererSceneObject(), mIndexedDrawFirstElement );
   }
 }
 
@@ -311,7 +324,7 @@ void Renderer::SetIndexedDrawElementsCount( uint32_t elementsCount )
   if( elementsCount != mIndexedDrawElementCount )
   {
     mIndexedDrawElementCount = elementsCount;
-    SetIndexedDrawElementsCountMessage( GetEventThreadServices(), *mSceneObject, mIndexedDrawElementCount );
+    SetIndexedDrawElementsCountMessage( GetEventThreadServices(), GetRendererSceneObject(), mIndexedDrawElementCount );
   }
 }
 
@@ -329,7 +342,7 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
       SetBlendFunc( BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA );
     }
     mPremultipledAlphaEnabled = preMultipled;
-    SetEnablePreMultipliedAlphaMessage( GetEventThreadServices(), *mSceneObject, mPremultipledAlphaEnabled );
+    SetEnablePreMultipliedAlphaMessage( GetEventThreadServices(), GetRendererSceneObject(), mPremultipledAlphaEnabled );
   }
 }
 
@@ -338,9 +351,9 @@ bool Renderer::IsPreMultipliedAlphaEnabled() const
   return mPremultipledAlphaEnabled;
 }
 
-SceneGraph::Renderer* Renderer::GetRendererSceneObject()
+const SceneGraph::Renderer& Renderer::GetRendererSceneObject() const
 {
-  return mSceneObject;
+  return static_cast<const SceneGraph::Renderer&>( GetSceneObject() );
 }
 
 void Renderer::SetDefaultProperty( Property::Index index,
@@ -350,7 +363,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
   {
     case Dali::Renderer::Property::DEPTH_INDEX:
     {
-      SetDepthIndex( propertyValue.Get<int>() );
+      SetDepthIndex( propertyValue.Get<int32_t>() );
       break;
     }
     case Dali::Renderer::Property::FACE_CULLING_MODE:
@@ -359,7 +372,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< FaceCullingMode::Type >( propertyValue, FACE_CULLING_MODE_TABLE, FACE_CULLING_MODE_TABLE_COUNT, convertedValue ) )
       {
         mFaceCullingMode = convertedValue;
-        SetFaceCullingModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetFaceCullingModeMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -380,7 +393,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       {
         BlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
         mBlendingOptions.SetBlendEquation( convertedValue, alphaEquation );
-        SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+        SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
       }
       break;
     }
@@ -392,7 +405,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       {
         BlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
         mBlendingOptions.SetBlendEquation( rgbEquation, convertedValue );
-        SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
+        SetBlendingOptionsMessage( GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask() );
       }
       break;
     }
@@ -460,7 +473,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::INDEX_RANGE_FIRST:
     {
-      int firstElement;
+      int32_t firstElement;
       if( propertyValue.Get( firstElement ) )
       {
         SetIndexedDrawFirstElement( firstElement );
@@ -469,7 +482,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
     }
     case Dali::Renderer::Property::INDEX_RANGE_COUNT:
     {
-      int elementsCount;
+      int32_t elementsCount;
       if( propertyValue.Get( elementsCount ) )
       {
         SetIndexedDrawElementsCount( elementsCount );
@@ -482,7 +495,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< DepthWriteMode::Type >( propertyValue, DEPTH_WRITE_MODE_TABLE, DEPTH_WRITE_MODE_TABLE_COUNT, convertedValue ) )
       {
         mDepthWriteMode = convertedValue;
-        SetDepthWriteModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetDepthWriteModeMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -492,7 +505,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< DepthFunction::Type >( propertyValue, DEPTH_FUNCTION_TABLE, DEPTH_FUNCTION_TABLE_COUNT, convertedValue ) )
       {
         mDepthFunction = convertedValue;
-        SetDepthFunctionMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetDepthFunctionMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -502,7 +515,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< DepthTestMode::Type >( propertyValue, DEPTH_TEST_MODE_TABLE, DEPTH_TEST_MODE_TABLE_COUNT, convertedValue ) )
       {
         mDepthTestMode = convertedValue;
-        SetDepthTestModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetDepthTestModeMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -512,7 +525,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< RenderMode::Type >( propertyValue, RENDER_MODE_TABLE, RENDER_MODE_TABLE_COUNT, convertedValue ) )
       {
         mStencilParameters.renderMode = convertedValue;
-        SetRenderModeMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetRenderModeMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -522,45 +535,45 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< StencilFunction::Type >( propertyValue, STENCIL_FUNCTION_TABLE, STENCIL_FUNCTION_TABLE_COUNT, convertedValue ) )
       {
         mStencilParameters.stencilFunction = convertedValue;
-        SetStencilFunctionMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetStencilFunctionMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_MASK:
     {
-      int stencilFunctionMask;
+      int32_t stencilFunctionMask;
       if( propertyValue.Get( stencilFunctionMask ) )
       {
         if( stencilFunctionMask != mStencilParameters.stencilFunctionMask )
         {
           mStencilParameters.stencilFunctionMask = stencilFunctionMask;
-          SetStencilFunctionMaskMessage( GetEventThreadServices(), *mSceneObject, stencilFunctionMask );
+          SetStencilFunctionMaskMessage( GetEventThreadServices(), GetRendererSceneObject(), stencilFunctionMask );
         }
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE:
     {
-      int stencilFunctionReference;
+      int32_t stencilFunctionReference;
       if( propertyValue.Get( stencilFunctionReference ) )
       {
         if( stencilFunctionReference != mStencilParameters.stencilFunctionReference )
         {
           mStencilParameters.stencilFunctionReference = stencilFunctionReference;
-          SetStencilFunctionReferenceMessage( GetEventThreadServices(), *mSceneObject, stencilFunctionReference );
+          SetStencilFunctionReferenceMessage( GetEventThreadServices(), GetRendererSceneObject(), stencilFunctionReference );
         }
       }
       break;
     }
     case Dali::Renderer::Property::STENCIL_MASK:
     {
-      int stencilMask;
+      int32_t stencilMask;
       if( propertyValue.Get( stencilMask ) )
       {
         if( stencilMask != mStencilParameters.stencilMask )
         {
           mStencilParameters.stencilMask = stencilMask;
-          SetStencilMaskMessage( GetEventThreadServices(), *mSceneObject, stencilMask );
+          SetStencilMaskMessage( GetEventThreadServices(), GetRendererSceneObject(), stencilMask );
         }
       }
       break;
@@ -571,7 +584,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
       {
         mStencilParameters.stencilOperationOnFail = convertedValue;
-        SetStencilOperationOnFailMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetStencilOperationOnFailMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -581,7 +594,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
       {
         mStencilParameters.stencilOperationOnZFail = convertedValue;
-        SetStencilOperationOnZFailMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetStencilOperationOnZFailMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -591,7 +604,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty< StencilOperation::Type >( propertyValue, STENCIL_OPERATION_TABLE, STENCIL_OPERATION_TABLE_COUNT, convertedValue ) )
       {
         mStencilParameters.stencilOperationOnZPass = convertedValue;
-        SetStencilOperationOnZPassMessage( GetEventThreadServices(), *mSceneObject, convertedValue );
+        SetStencilOperationOnZPassMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
       }
       break;
     }
@@ -603,20 +616,22 @@ void Renderer::SetDefaultProperty( Property::Index index,
         if( !Equals( mOpacity, opacity ) )
         {
           mOpacity = opacity;
-          BakeOpacityMessage( GetEventThreadServices(), *mSceneObject, mOpacity );
+          BakeOpacityMessage( GetEventThreadServices(), GetRendererSceneObject(), mOpacity );
         }
       }
       break;
     }
+    case DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      DevelRenderer::Rendering::Type convertedValue = mRenderingBehavior;
+      if( Scripting::GetEnumerationProperty< DevelRenderer::Rendering::Type >( propertyValue, RENDERING_BEHAVIOR_TABLE, RENDERING_BEHAVIOR_TABLE_COUNT, convertedValue ) )
+      {
+        mRenderingBehavior = convertedValue;
+        SetRenderingBehaviorMessage( GetEventThreadServices(), GetRendererSceneObject(), convertedValue );
+      }
+      break;
+    }
   }
-}
-
-void Renderer::SetSceneGraphProperty( Property::Index index,
-                                      const PropertyMetadata& entry,
-                                      const Property::Value& value )
-{
-  ObjectImplHelper::SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
-  OnPropertySet(index, value);
 }
 
 Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
@@ -678,32 +693,18 @@ void Renderer::OnNotifyDefaultPropertyAnimation( Animation& animation, Property:
   }
 }
 
-const SceneGraph::PropertyOwner* Renderer::GetPropertyOwner() const
-{
-  return mSceneObject;
-}
-
-const SceneGraph::PropertyOwner* Renderer::GetSceneObject() const
-{
-  return mSceneObject;
-}
-
 const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
   const SceneGraph::PropertyBase* property = NULL;
 
-  property = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
-                                                                &Renderer::FindAnimatableProperty,
-                                                                &Renderer::FindCustomProperty,
-                                                                index );
-
+  if( index == DevelRenderer::Property::OPACITY )
+  {
+    property = &GetRendererSceneObject().mOpacity;
+  }
   if( !property )
   {
-    if( index == DevelRenderer::Property::OPACITY )
-    {
-      property = &mSceneObject->mOpacity;
-    }
+    // not our property, ask base
+    property = Object::GetSceneObjectAnimatableProperty( index );
   }
 
   return property;
@@ -711,24 +712,12 @@ const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Prop
 
 const PropertyInputImpl* Renderer::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  const PropertyInputImpl* property = NULL;
-
-  const SceneGraph::PropertyBase* baseProperty = ObjectImplHelper::GetRegisteredSceneGraphProperty( this,
-                                                                                                    &Renderer::FindAnimatableProperty,
-                                                                                                    &Renderer::FindCustomProperty,
-                                                                                                    index );
-  property = static_cast<const PropertyInputImpl*>( baseProperty );
-
-  return property;
+  // reuse animatable property getter, Object::GetSceneObjectInputProperty does the same so no need to call that0
+  return GetSceneObjectAnimatableProperty( index );
 }
 
-int Renderer::GetPropertyComponentIndex( Property::Index index ) const
-{
-  return Property::INVALID_COMPONENT_INDEX;
-}
-
-Renderer::Renderer()
-: mSceneObject(NULL ),
+Renderer::Renderer( const SceneGraph::Renderer* sceneObject )
+: Object( sceneObject ),
   mDepthIndex( 0 ),
   mIndexedDrawFirstElement( 0 ),
   mIndexedDrawElementCount( 0 ),
@@ -740,26 +729,15 @@ Renderer::Renderer()
   mBlendMode( BlendMode::AUTO ),
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
+  mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false )
 {
-}
-
-void Renderer::Initialize()
-{
-  EventThreadServices& eventThreadServices = GetEventThreadServices();
-  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-
-  mSceneObject = SceneGraph::Renderer::New();
-  OwnerPointer< SceneGraph::Renderer > transferOwnership( mSceneObject );
-  AddRendererMessage( updateManager, transferOwnership );
-
-  eventThreadServices.RegisterObject( this );
 }
 
 void Renderer::SetBlendColor( const Vector4& blendColor )
 {
   mBlendingOptions.SetBlendColor( blendColor );
-  SetBlendColorMessage( GetEventThreadServices(), *mSceneObject, GetBlendColor() );
+  SetBlendColorMessage( GetEventThreadServices(), GetRendererSceneObject(), GetBlendColor() );
 }
 
 const Vector4& Renderer::GetBlendColor() const
@@ -778,7 +756,7 @@ Renderer::~Renderer()
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveRendererMessage( updateManager, *mSceneObject );
+    RemoveRendererMessage( updateManager, GetRendererSceneObject() );
 
     eventThreadServices.UnregisterObject( this );
   }
@@ -935,6 +913,11 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
       value = mOpacity;
       break;
     }
+    case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      value = mRenderingBehavior;
+      break;
+    }
     default:
     {
       // Must be a scene-graph only property
@@ -949,22 +932,23 @@ bool Renderer::GetCachedPropertyValue( Property::Index index, Property::Value& v
 bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const
 {
   bool valueSet = true;
+  const SceneGraph::Renderer& sceneObject = GetRendererSceneObject();
 
   switch( index )
   {
     case Dali::Renderer::Property::DEPTH_INDEX:
     {
-      value = mSceneObject->GetDepthIndex();
+      value = sceneObject.GetDepthIndex();
       break;
     }
     case Dali::Renderer::Property::FACE_CULLING_MODE:
     {
-      value = mSceneObject->GetFaceCullingMode();
+      value = sceneObject.GetFaceCullingMode();
       break;
     }
     case Dali::Renderer::Property::BLEND_MODE:
     {
-      value = mSceneObject->GetBlendMode();
+      value = sceneObject.GetBlendMode();
       break;
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
@@ -999,90 +983,95 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
     }
     case Dali::Renderer::Property::BLEND_COLOR:
     {
-      value = mSceneObject->GetBlendColor();
+      value = sceneObject.GetBlendColor();
       break;
     }
     case Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA:
     {
-      value = mSceneObject->IsPreMultipliedAlphaEnabled();
+      value = sceneObject.IsPreMultipliedAlphaEnabled();
       break;
     }
     case Dali::Renderer::Property::INDEX_RANGE_FIRST:
     {
-      value = static_cast<int>( mSceneObject->GetIndexedDrawFirstElement() );
+      value = static_cast<int32_t>( sceneObject.GetIndexedDrawFirstElement() );
       break;
     }
     case Dali::Renderer::Property::INDEX_RANGE_COUNT:
     {
-      value = static_cast<int>( mSceneObject->GetIndexedDrawElementsCount() );
+      value = static_cast<int32_t>( sceneObject.GetIndexedDrawElementsCount() );
       break;
     }
     case Dali::Renderer::Property::DEPTH_WRITE_MODE:
     {
-      value = mSceneObject->GetDepthWriteMode();
+      value = sceneObject.GetDepthWriteMode();
       break;
     }
     case Dali::Renderer::Property::DEPTH_FUNCTION:
     {
-      value = mSceneObject->GetDepthFunction();
+      value = sceneObject.GetDepthFunction();
       break;
     }
     case Dali::Renderer::Property::DEPTH_TEST_MODE:
     {
-      value = mSceneObject->GetDepthTestMode();
+      value = sceneObject.GetDepthTestMode();
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilFunction;
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_MASK:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilFunctionMask;
       break;
     }
     case Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilFunctionReference;
       break;
     }
     case Dali::Renderer::Property::STENCIL_MASK:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilMask;
       break;
     }
     case Dali::Renderer::Property::RENDER_MODE:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.renderMode;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilOperationOnFail;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilOperationOnZFail;
       break;
     }
     case Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS:
     {
-      SceneGraph::StencilParameters stencilParameters = mSceneObject->GetStencilParameters();
+      SceneGraph::StencilParameters stencilParameters = sceneObject.GetStencilParameters();
       value = stencilParameters.stencilOperationOnZPass;
       break;
     }
     case Dali::DevelRenderer::Property::OPACITY:
     {
-      value = mSceneObject->GetOpacity( GetEventThreadServices().GetEventBufferIndex() );
+      value = sceneObject.GetOpacity( GetEventThreadServices().GetEventBufferIndex() );
+      break;
+    }
+    case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
+    {
+      value = sceneObject.GetRenderingBehavior();
       break;
     }
     default:
@@ -1097,4 +1086,5 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
 }
 
 } // namespace Internal
+
 } // namespace Dali

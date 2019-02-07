@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ size_t PanGestureDetector::GetAngleCount() const
 
 PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
 {
-  return GetImplementation(*this).GetAngle(index);
+  return GetImplementation(*this).GetAngle( static_cast<uint32_t>( index ) );
 }
 
 void PanGestureDetector::ClearAngles()

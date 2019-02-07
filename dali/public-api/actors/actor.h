@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
+
+#undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
 
 namespace Dali
 {
@@ -296,7 +298,7 @@ public:
       INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool        @SINCE_1_0.0
       INHERIT_SCALE,                                      ///< name "inheritScale",          type bool        @SINCE_1_0.0
       COLOR_MODE,                                         ///< name "colorMode",             type std::string @SINCE_1_0.0
-      POSITION_INHERITANCE,                               ///< name "positionInheritance",   type std::string @DEPRECATED_1_1.24 Use INHERIT_POSITION instead
+      RESERVED_PROPERTY_01,                               ///< name "reservedProperty01", This property is removed because it's deprecated.
       DRAW_MODE,                                          ///< name "drawMode",              type std::string @SINCE_1_0.0
       SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3     @SINCE_1_0.0
       WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String      @SINCE_1_0.0
@@ -782,19 +784,6 @@ public:
   Vector3 GetCurrentWorldPosition() const;
 
   /**
-   * @DEPRECATED_1_1.24 Use SetInheritPosition instead
-   * @brief Sets the actors position inheritance mode.
-   *
-   * The default is to inherit.
-   * Switching this off means that using SetPosition() sets the actor's world position.
-   * @SINCE_1_0.0
-   * @param[in] mode to use
-   * @pre The Actor has been initialized.
-   * @see PositionInheritanceMode
-   */
-  void SetPositionInheritanceMode( PositionInheritanceMode mode ) DALI_DEPRECATED_API;
-
-  /**
    * @brief Sets whether a child actor inherits it's parent's position.
    *
    * Default is to inherit.
@@ -808,16 +797,6 @@ public:
   {
     SetProperty(Property::INHERIT_POSITION, inherit );
   }
-
-  /**
-   * @DEPRECATED_1_1.24 Use IsPositionInherited
-   * @brief Returns the actors position inheritance mode.
-   *
-   * @SINCE_1_0.0
-   * @return Return the position inheritance mode
-   * @pre The Actor has been initialized.
-   */
-  PositionInheritanceMode GetPositionInheritanceMode() const DALI_DEPRECATED_API;
 
   /**
    * @brief Returns whether the actor inherits its parent's position.

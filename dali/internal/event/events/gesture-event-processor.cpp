@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,27 +235,27 @@ void GestureEventProcessor::SetPanGesturePredictionMode(int mode)
   mPanGestureProcessor.SetPredictionMode(mode);
 }
 
-void GestureEventProcessor::SetPanGesturePredictionAmount( unsigned int amount )
+void GestureEventProcessor::SetPanGesturePredictionAmount( uint32_t amount )
 {
   mPanGestureProcessor.SetPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGestureMaximumPredictionAmount( unsigned int amount )
+void GestureEventProcessor::SetPanGestureMaximumPredictionAmount( uint32_t amount )
 {
   mPanGestureProcessor.SetMaximumPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGestureMinimumPredictionAmount( unsigned int amount )
+void GestureEventProcessor::SetPanGestureMinimumPredictionAmount( uint32_t amount )
 {
   mPanGestureProcessor.SetMinimumPredictionAmount(amount);
 }
 
-void GestureEventProcessor::SetPanGesturePredictionAmountAdjustment( unsigned int amount )
+void GestureEventProcessor::SetPanGesturePredictionAmountAdjustment( uint32_t amount )
 {
   mPanGestureProcessor.SetPredictionAmountAdjustment(amount);
 }
 
-void GestureEventProcessor::SetPanGestureSmoothingMode(int mode)
+void GestureEventProcessor::SetPanGestureSmoothingMode( int32_t mode )
 {
   mPanGestureProcessor.SetSmoothingMode(mode);
 }
@@ -270,7 +270,7 @@ void GestureEventProcessor::SetPanGestureUseActualTimes( bool value )
   mPanGestureProcessor.SetUseActualTimes( value );
 }
 
-void GestureEventProcessor::SetPanGestureInterpolationTimeRange( int value )
+void GestureEventProcessor::SetPanGestureInterpolationTimeRange( int32_t value )
 {
   mPanGestureProcessor.SetInterpolationTimeRange( value );
 }
@@ -300,11 +300,15 @@ void GestureEventProcessor::SetPanGestureTwoPointAccelerationBias( float value )
   mPanGestureProcessor.SetTwoPointAccelerationBias( value );
 }
 
-void GestureEventProcessor::SetPanGestureMultitapSmoothingRange( int value )
+void GestureEventProcessor::SetPanGestureMultitapSmoothingRange( int32_t value )
 {
   mPanGestureProcessor.SetMultitapSmoothingRange( value );
 }
 
+const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()
+{
+  return mPanGestureProcessor;
+}
 
 } // namespace Internal
 

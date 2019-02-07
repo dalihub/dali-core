@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/internal/update/rendering/render-tracker.h>
 #include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
+#include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/integration-api/debug.h>
 
 #if defined(DEBUG_ENABLED)
@@ -96,8 +97,9 @@ Layer* FindLayer( Node& node )
  * @param[in]  clippingDepth The current stencil clipping depth
  * @param[in]  clippingDepth The current scissor clipping depth
  * @param[out] clippingUsed  Gets set to true if any clipping nodes have been found
+ * @return true if rendering should be kept, false otherwise.
  */
-void AddRenderablesForTask( BufferIndex updateBufferIndex,
+bool AddRenderablesForTask( BufferIndex updateBufferIndex,
                             Node& node,
                             Layer& currentLayer,
                             RenderTask& renderTask,
@@ -107,17 +109,19 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
                             uint32_t scissorDepth,
                             bool& clippingUsed )
 {
+  bool keepRendering = false;
+
   // Short-circuit for invisible nodes
   if( !node.IsVisible( updateBufferIndex ) )
   {
-    return;
+    return keepRendering;
   }
 
   // Check whether node is exclusive to a different render-task
   const RenderTask* exclusiveTo = node.GetExclusiveRenderTask();
   if( exclusiveTo && ( exclusiveTo != &renderTask ) )
   {
-    return;
+    return keepRendering;
   }
 
   // Assume all children go to this layer (if this node is a layer).
@@ -176,6 +180,11 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
     {
       layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
     }
+
+    if( renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY )
+    {
+      keepRendering = true;
+    }
   }
 
   // Recurse children.
@@ -184,8 +193,10 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
   for( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed );
+    keepRendering |= AddRenderablesForTask( updateBufferIndex, child, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed );
   }
+
+  return keepRendering;
 }
 
 /**
@@ -201,8 +212,9 @@ void AddRenderablesForTask( BufferIndex updateBufferIndex,
  * @param[in]  renderToFboEnabled         Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
  * @param[in]  isRenderingToFbo           Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
  * @param[in]  processOffscreen           Whether the offscreen render tasks are the ones processed. Otherwise it processes the onscreen tasks.
+ * @return true if rendering should be kept, false otherwise.
  */
-void ProcessTasks( BufferIndex updateBufferIndex,
+bool ProcessTasks( BufferIndex updateBufferIndex,
                    RenderTaskList::RenderTaskContainer& taskContainer,
                    Layer& rootNode,
                    SortedLayerPointers& sortedLayers,
@@ -216,6 +228,7 @@ void ProcessTasks( BufferIndex updateBufferIndex,
   bool hasClippingNodes = false;
 
   bool isFirstRenderTask = true;
+  bool keepRendering = false;
   for( RenderTaskList::RenderTaskContainer::Iterator iter = taskContainer.Begin(), endIter = taskContainer.End(); endIter != iter; ++iter )
   {
     RenderTask& renderTask = **iter;
@@ -266,15 +279,15 @@ void ProcessTasks( BufferIndex updateBufferIndex,
         sortedLayer->ClearRenderables();
       }
 
-      AddRenderablesForTask( updateBufferIndex,
-                             *sourceNode,
-                             *layer,
-                             renderTask,
-                             sourceNode->GetDrawMode(),
-                             clippingId,
-                             0u,
-                             0u,
-                             hasClippingNodes );
+      keepRendering |= AddRenderablesForTask( updateBufferIndex,
+                                              *sourceNode,
+                                              *layer,
+                                              renderTask,
+                                              sourceNode->GetDrawMode(),
+                                              clippingId,
+                                              0u,
+                                              0u,
+                                              hasClippingNodes );
 
       renderInstructionProcessor.Prepare( updateBufferIndex,
                                           sortedLayers,
@@ -295,6 +308,8 @@ void ProcessTasks( BufferIndex updateBufferIndex,
       }
     }
   }
+
+  return keepRendering;
 }
 
 } // Anonymous namespace.
@@ -307,7 +322,7 @@ RenderTaskProcessor::~RenderTaskProcessor()
 {
 }
 
-void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
+bool RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    RenderTaskList& renderTasks,
                                    Layer& rootNode,
                                    SortedLayerPointers& sortedLayers,
@@ -316,11 +331,12 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    bool isRenderingToFbo )
 {
   RenderTaskList::RenderTaskContainer& taskContainer = renderTasks.GetTasks();
+  bool keepRendering = false;
 
   if( taskContainer.IsEmpty() )
   {
     // Early-exit if there are no tasks to process
-    return;
+    return keepRendering;
   }
 
   // For each render-task:
@@ -333,30 +349,32 @@ void RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
 
   // First process off screen render tasks - we may need the results of these for the on screen renders
 
-  ProcessTasks( updateBufferIndex,
-                taskContainer,
-                rootNode,
-                sortedLayers,
-                instructions,
-                mRenderInstructionProcessor,
-                renderToFboEnabled,
-                isRenderingToFbo,
-                true );
+  keepRendering = ProcessTasks( updateBufferIndex,
+                                taskContainer,
+                                rootNode,
+                                sortedLayers,
+                                instructions,
+                                mRenderInstructionProcessor,
+                                renderToFboEnabled,
+                                isRenderingToFbo,
+                                true );
 
   DALI_LOG_INFO( gRenderTaskLogFilter, Debug::General, "RenderTaskProcessor::Process() Onscreen\n" );
 
   // Now that the off screen renders are done we can process on screen render tasks.
   // Reset the clipping Id for the OnScreen render tasks.
 
-  ProcessTasks( updateBufferIndex,
-                taskContainer,
-                rootNode,
-                sortedLayers,
-                instructions,
-                mRenderInstructionProcessor,
-                renderToFboEnabled,
-                isRenderingToFbo,
-                false );
+  keepRendering |= ProcessTasks( updateBufferIndex,
+                                 taskContainer,
+                                 rootNode,
+                                 sortedLayers,
+                                 instructions,
+                                 mRenderInstructionProcessor,
+                                 renderToFboEnabled,
+                                 isRenderingToFbo,
+                                 false );
+
+  return keepRendering;
 }
 
 } // SceneGraph

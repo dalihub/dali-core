@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
   KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
 
+  GetImplementation( &keyEvent )->SetLogicalKey( event.logicalKey );
   GetImplementation( &keyEvent )->SetCompose( event.compose );
   GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
   GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ Path* Path::New()
 }
 
 Path::Path()
-: Object()
+: Object( nullptr ) // we don't have our own scene object
 {
 }
 
@@ -137,11 +137,6 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
   return Property::Value();
 }
 
-Property::Value Path::GetDefaultPropertyCurrentValue( Property::Index index ) const
-{
-  return GetDefaultProperty( index ); // Event-side only properties
-}
-
 void Path::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
   const Property::Array* array = propertyValue.GetArray();
@@ -181,20 +176,20 @@ void Path::AddControlPoint(const Vector3& point )
   mControlPoint.PushBack( point );
 }
 
-unsigned int Path::GetNumberOfSegments() const
+uint32_t Path::GetNumberOfSegments() const
 {
-  return static_cast<unsigned int>( (mPoint.Size()>1) ? mPoint.Size()-1 : 0 );
+  return static_cast<uint32_t>( (mPoint.Size()>1) ? mPoint.Size()-1 : 0 );
 }
 
 void Path::GenerateControlPoints( float curvature )
 {
-  unsigned int numSegments = GetNumberOfSegments();
+  uint32_t numSegments = GetNumberOfSegments();
   DALI_ASSERT_ALWAYS( numSegments > 0 && "Need at least 1 segment to generate control points" ); // need at least 1 segment
 
   mControlPoint.Resize( numSegments * 2);
 
   //Generate two control points for each segment
-  for( unsigned int i(0); i<numSegments; ++i )
+  for( uint32_t i(0); i<numSegments; ++i )
   {
     //Segment end-points
     Vector3 p1 = mPoint[i];
@@ -245,10 +240,10 @@ void Path::GenerateControlPoints( float curvature )
   }
 }
 
-void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal ) const
+void Path::FindSegmentAndProgress( float t, uint32_t& segment, float& tLocal ) const
 {
   //Find segment and local progress
-  unsigned int numSegs = GetNumberOfSegments();
+  uint32_t numSegs = GetNumberOfSegments();
 
   if( t <= 0.0f || numSegs == 0 )
   {
@@ -262,7 +257,7 @@ void Path::FindSegmentAndProgress( float t, unsigned int& segment, float& tLocal
   }
   else
   {
-    segment = static_cast<unsigned int>( t * static_cast<float>( numSegs ) );
+    segment = static_cast<uint32_t>( t * static_cast<float>( numSegs ) );
     float segLength = 1.0f / static_cast<float>( numSegs );
     float segStart  = static_cast<float>( segment ) * segLength;
     tLocal = (t - segStart) * static_cast<float>( numSegs );
@@ -283,7 +278,7 @@ bool Path::SampleAt( float t, Vector3& position, Vector3& tangent ) const
 
   if( PathIsComplete(mPoint, mControlPoint) )
   {
-    unsigned int segment;
+    uint32_t segment;
     float tLocal;
     FindSegmentAndProgress( t, segment, tLocal );
 
@@ -352,7 +347,7 @@ bool Path::SamplePosition( float t, Vector3& position ) const
 
   if( PathIsComplete(mPoint, mControlPoint) )
   {
-    unsigned int segment;
+    uint32_t segment;
     float tLocal;
     FindSegmentAndProgress( t, segment, tLocal );
 
@@ -404,7 +399,7 @@ bool Path::SampleTangent( float t, Vector3& tangent ) const
 
   if( PathIsComplete(mPoint, mControlPoint) )
   {
-    unsigned int segment;
+    uint32_t segment;
     float tLocal;
     FindSegmentAndProgress( t, segment, tLocal );
 
@@ -451,23 +446,23 @@ bool Path::SampleTangent( float t, Vector3& tangent ) const
   return done;
 }
 
-Vector3& Path::GetPoint( size_t index )
+Vector3& Path::GetPoint( uint32_t index )
 {
   DALI_ASSERT_ALWAYS( index < mPoint.Size() && "Path: Point index out of bounds" );
 
   return mPoint[index];
 }
 
-Vector3& Path::GetControlPoint( size_t index )
+Vector3& Path::GetControlPoint( uint32_t index )
 {
   DALI_ASSERT_ALWAYS( index < mControlPoint.Size() && "Path: Control Point index out of bounds" );
 
   return mControlPoint[index];
 }
 
-size_t Path::GetPointCount() const
+uint32_t Path::GetPointCount() const
 {
-  return mPoint.Size();
+  return static_cast<uint32_t>( mPoint.Size() );
 }
 
 void Path::ClearPoints()

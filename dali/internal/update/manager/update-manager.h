@@ -176,7 +176,7 @@ public:
    * Remove a camera from scene
    * @param[in] camera to remove
    */
-  void RemoveCamera( const Camera* camera );
+  void RemoveCamera( Camera* camera );
 
   /**
    * Add a newly created object.
@@ -689,13 +689,13 @@ inline void AddCameraMessage( UpdateManager& manager, OwnerPointer< Camera >& ca
 
 inline void RemoveCameraMessage( UpdateManager& manager, const Camera* camera )
 {
-  typedef MessageValue1< UpdateManager, const Camera* > LocalType;
+  typedef MessageValue1< UpdateManager, Camera* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveCamera, camera );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveCamera, const_cast<Camera*>( camera ) );
 }
 
 inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner>& object )
@@ -710,7 +710,7 @@ inline void AddObjectMessage( UpdateManager& manager, OwnerPointer<PropertyOwner
   new (slot) LocalType( &manager, &UpdateManager::AddObject, object );
 }
 
-inline void RemoveObjectMessage( UpdateManager& manager, PropertyOwner* object )
+inline void RemoveObjectMessage( UpdateManager& manager, const PropertyOwner* object )
 {
   typedef MessageValue1< UpdateManager, PropertyOwner* > LocalType;
 
@@ -718,7 +718,7 @@ inline void RemoveObjectMessage( UpdateManager& manager, PropertyOwner* object )
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveObject, object );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveObject, const_cast<PropertyOwner*>( object ) );
 }
 
 inline void AddAnimationMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Animation >& animation )
@@ -838,7 +838,7 @@ inline void AddShaderMessage( UpdateManager& manager, OwnerPointer< Shader >& sh
   new (slot) LocalType( &manager, &UpdateManager::AddShader, shader );
 }
 
-inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
+inline void RemoveShaderMessage( UpdateManager& manager, const Shader* shader )
 {
   typedef MessageValue1< UpdateManager, Shader* > LocalType;
 
@@ -846,7 +846,7 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveShader, &shader );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveShader, const_cast<Shader*>( shader ) );
 }
 
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
@@ -920,14 +920,14 @@ inline void AddRendererMessage( UpdateManager& manager, OwnerPointer< Renderer >
   new (slot) LocalType( &manager, &UpdateManager::AddRenderer, object );
 }
 
-inline void RemoveRendererMessage( UpdateManager& manager, Renderer& object )
+inline void RemoveRendererMessage( UpdateManager& manager, const Renderer& object )
 {
   typedef MessageValue1< UpdateManager, Renderer* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderer, &object );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveRenderer, const_cast<Renderer*>( &object ) );
 }
 
 // The render thread can safely change the Shader

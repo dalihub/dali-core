@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/internal/event/events/pan-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -226,6 +226,13 @@ public: // To be called by GestureEventProcessor
    */
   void SetMultitapSmoothingRange( int value );
 
+public: // for PanGestureDetector
+
+  /**
+   * @return the pan gesture scene object
+   */
+  const SceneGraph::PanGesture& GetSceneObject() const;
+
 private:
 
   // Undefined
@@ -252,7 +259,7 @@ private:
                       const Integration::PanGestureEvent& panEvent,
                       Vector2 localCurrent,
                       Gesture::State state,
-                      Dali::RenderTask renderTask );
+                      RenderTaskPtr renderTask );
 
   // GestureProcessor overrides
 
@@ -277,11 +284,11 @@ private:
   Integration::GestureManager& mGestureManager;
   PanGestureDetectorContainer mGestureDetectors;
   GestureDetectorContainer mCurrentPanEmitters;
-  Dali::RenderTask mCurrentRenderTask;
+  RenderTaskPtr mCurrentRenderTask;
   Vector2 mPossiblePanPosition;
 
-  unsigned int mMinTouchesRequired;
-  unsigned int mMaxTouchesRequired;
+  uint32_t mMinTouchesRequired;
+  uint32_t mMaxTouchesRequired;
 
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.

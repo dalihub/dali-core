@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -318,6 +318,28 @@ int UtcDaliShaderAnimatedProperty02(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
 
+  // change shader program
+  Property::Map map;
+  map["vertex"] = VertexSource;
+  map["fragment"] = FragmentSource;
+  map["hints"] = "MODIFIES_GEOMETRY";
+  shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  application.SendNotification();
+  application.Render(100);
+
+  // register another custom property as well
+  Property::Index customIndex = shader.RegisterProperty( "uCustom", Vector3(1,2,3) );
+  DALI_TEST_EQUALS( shader.GetProperty<Vector3>( customIndex ), Vector3(1,2,3), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(100);
+
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
+
+  Vector3 customValue;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "uCustom", customValue ) );
+  DALI_TEST_EQUALS( customValue, Vector3(1,2,3), TEST_LOCATION );
   END_TEST;
 }
 
@@ -336,6 +358,9 @@ int UtcDaliShaderProgramProperty(void)
   map["hints"] = hintSet;
 
   shader.SetProperty( Shader::Property::PROGRAM, Property::Value(map) );
+  // register a custom property as well
+  Property::Index customIndex = shader.RegisterProperty( "custom", Vector3(1,2,3) );
+  DALI_TEST_EQUALS( shader.GetProperty<Vector3>( customIndex ), Vector3(1,2,3), TEST_LOCATION );
 
   Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
   DALI_TEST_CHECK( value.GetType() == Property::MAP);
@@ -352,6 +377,15 @@ int UtcDaliShaderProgramProperty(void)
   value = shader.GetCurrentProperty( Shader::Property::PROGRAM );
   DALI_TEST_CHECK( value.GetType() == Property::MAP);
   outMap = value.GetMap();
+  // check that changing the shader did not cause us to loose custom property
+  DALI_TEST_EQUALS( shader.GetProperty<Vector3>( customIndex ), Vector3(1,2,3), TEST_LOCATION );
+  using Dali::Animation;
+  Animation animation = Animation::New( 0.1f );
+  animation.AnimateTo( Property( shader, customIndex ), Vector3(4,5,6) );
+  animation.Play();
+  application.SendNotification();
+  application.Render(100);
+  DALI_TEST_EQUALS( shader.GetProperty<Vector3>( customIndex ), Vector3(4,5,6), TEST_LOCATION );
 
   v = (*outMap)["vertex"].Get<std::string>();
   f = (*outMap)["fragment"].Get<std::string>();

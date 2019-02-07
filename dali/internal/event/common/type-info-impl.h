@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_INFO_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,22 +93,22 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetActionCount
    */
-  size_t GetActionCount() const;
+  uint32_t GetActionCount() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetActionName
    */
-  std::string GetActionName(size_t index) const;
+  std::string GetActionName( uint32_t index ) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetSignalCount
    */
-  size_t GetSignalCount() const;
+  uint32_t GetSignalCount() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetSignalName
    */
-  std::string GetSignalName(size_t index) const;
+  std::string GetSignalName( uint32_t index ) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetPropertyCount

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ class RenderInstruction;
 /**
  * RenderTasks describe how the Dali scene should be rendered.
  */
-class RenderTask : public PropertyOwner
+class RenderTask : public PropertyOwner, public PropertyOwner::Observer
 {
 public:
 
-  enum State
+  enum State : uint8_t
   {
     RENDER_CONTINUOUSLY,               ///< mRefreshRate > 0
     RENDER_ONCE_WAITING_FOR_RESOURCES, ///< mRefreshRate = REFRESH_ONCE
@@ -324,19 +324,35 @@ public:
     return mRenderInstruction[updateBufferIndex];
   }
 
-private:
+private: // from PropertyOwner::Observer
 
   /**
-   * Protected constructor.
+   * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
+   */
+  void PropertyOwnerConnected( PropertyOwner& owner );
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner )
+   */
+  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner );
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
+   */
+  void PropertyOwnerDestroyed( PropertyOwner& owner );
+
+private:
+
+  void SetActiveStatus();
+
+  /**
+   * Constructor.
    */
   RenderTask();
 
   // Undefined
-  RenderTask(const RenderTask&);
-
-  // Undefined
-  RenderTask& operator=(const RenderTask&);
-
+  RenderTask(const RenderTask&) = delete;
+  RenderTask& operator=(const RenderTask&) = delete;
 
 public: // Animatable Properties
   AnimatableProperty< Vector2 >   mViewportPosition;    ///< viewportPosition
@@ -351,23 +367,24 @@ private:
 
   RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
 
-  bool mWaitingToRender:1; ///< True when an render once to FBO is waiting
-  bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering
-  bool mExclusive: 1; ///< Whether the render task has exclusive access to the source actor (node in the scene graph implementation).
-  bool mClearEnabled: 1; ///< Whether previous results are cleared.
-  bool mCullMode: 1; ///< Whether renderers should be frustum culled
+  uint32_t mRefreshRate;   ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
+  uint32_t mFrameCounter;  ///< counter for rendering every N frames
+  uint32_t mRenderedOnceCounter;///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
 
-  State mState;                     ///< Render state.
-  uint32_t mRefreshRate;        ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
-  uint32_t mFrameCounter;       ///< counter for rendering every N frames
+  State mState;           ///< Render state.
 
-  uint32_t mRenderedOnceCounter;  ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
-  bool mRequiresSync;              ///< Whether sync is needed to track the render
+  bool mRequiresSync:1;   ///< Whether sync is needed to track the render
+  bool mActive:1;         ///< True when the task is active, i.e. has valid source and camera
+  bool mWaitingToRender:1;///< True when an render once to FBO is waiting
+  bool mNotifyTrigger:1;  ///< True if a render once render task has finished renderering
+  bool mExclusive:1;      ///< Whether the render task has exclusive access to the source actor (node in the scene graph).
+  bool mClearEnabled:1;   ///< Whether previous results are cleared.
+  bool mCullMode:1;       ///< Whether renderers should be frustum culled
 
 };
 
 // Messages for RenderTask
-inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, RenderTask& task, SceneGraph::FrameBuffer* frameBuffer )
+inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, const RenderTask& task, SceneGraph::FrameBuffer* frameBuffer )
 {
   typedef MessageValue1< RenderTask, SceneGraph::FrameBuffer*> LocalType;
 
@@ -378,7 +395,7 @@ inline void SetFrameBufferMessage( EventThreadServices& eventThreadServices, Ren
   new (slot) LocalType( &task, &RenderTask::SetFrameBuffer, frameBuffer );
 }
 
-inline void SetClearColorMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Vector4& value )
+inline void SetClearColorMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Vector4& value )
 {
   typedef MessageDoubleBuffered1< RenderTask, Vector4 > LocalType;
 
@@ -400,7 +417,7 @@ inline void BakeClearColorMessage( EventThreadServices& eventThreadServices, con
   new (slot) LocalType( &task, &RenderTask::BakeClearColor, value );
 }
 
-inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, RenderTask& task, bool enabled )
+inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool enabled )
 {
   typedef MessageValue1< RenderTask, bool > LocalType;
 
@@ -411,7 +428,7 @@ inline void SetClearEnabledMessage( EventThreadServices& eventThreadServices, Re
   new (slot) LocalType( &task, &RenderTask::SetClearEnabled, enabled );
 }
 
-inline void SetCullModeMessage( EventThreadServices& eventThreadServices, RenderTask& task, bool mode )
+inline void SetCullModeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool mode )
 {
   typedef MessageValue1< RenderTask, bool > LocalType;
 
@@ -422,7 +439,7 @@ inline void SetCullModeMessage( EventThreadServices& eventThreadServices, Render
   new (slot) LocalType( &task, &RenderTask::SetCullMode, mode );
 }
 
-inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, RenderTask& task, uint32_t refreshRate )
+inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t refreshRate )
 {
   typedef MessageValue1< RenderTask, uint32_t > LocalType;
 
@@ -433,7 +450,7 @@ inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, Ren
   new (slot) LocalType( &task, &RenderTask::SetRefreshRate, refreshRate );
 }
 
-inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Node* constNode )
+inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode )
 {
   // Scene graph thread can destroy this object.
   Node* node = const_cast< Node* >( constNode );
@@ -447,7 +464,7 @@ inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, Rend
   new (slot) LocalType( &task, &RenderTask::SetSourceNode, node );
 }
 
-inline void SetCameraMessage( EventThreadServices& eventThreadServices, RenderTask& task, const Node* constNode, const Camera* constCamera )
+inline void SetCameraMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode, const Camera* constCamera )
 {
   typedef MessageValue2< RenderTask, Node*, Camera* > LocalType;
 
@@ -460,7 +477,7 @@ inline void SetCameraMessage( EventThreadServices& eventThreadServices, RenderTa
   new (slot) LocalType( &task, &RenderTask::SetCamera, node, camera );
 }
 
-inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, RenderTask& task, bool exclusive )
+inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, const RenderTask& task, bool exclusive )
 {
   typedef MessageValue1< RenderTask, bool > LocalType;
 
@@ -471,7 +488,7 @@ inline void SetExclusiveMessage( EventThreadServices& eventThreadServices, Rende
   new (slot) LocalType( &task, &RenderTask::SetExclusive, exclusive );
 }
 
-inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, RenderTask& task, bool requiresSync )
+inline void SetSyncRequiredMessage(EventThreadServices& eventThreadServices, const RenderTask& task, bool requiresSync )
 {
   typedef MessageValue1< RenderTask, bool > LocalType;
 

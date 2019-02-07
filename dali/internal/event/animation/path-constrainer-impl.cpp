@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
       Property::Value value( Property::ARRAY );
       Property::Array* array = value.GetArray();
       const Dali::Vector<Vector3>& point = mPath->GetPoints();
-      Property::Array::SizeType pointCount = point.Size();
+      Property::Array::SizeType pointCount = static_cast<Property::Array::SizeType>( point.Size() );
 
       if( array )
       {
@@ -98,7 +98,7 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
       Property::Value value( Property::ARRAY );
       Property::Array* array = value.GetArray();
       const Dali::Vector<Vector3>& point = mPath->GetControlPoints();
-      Property::Array::SizeType pointCount = point.Size();
+      Property::Array::SizeType pointCount = static_cast<Property::Array::SizeType>( point.Size() );
 
       if( array )
       {

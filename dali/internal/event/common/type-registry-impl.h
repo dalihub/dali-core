@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,12 +62,12 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeNameCount
    */
-  size_t GetTypeNameCount() const;
+  uint32_t GetTypeNameCount() const;
 
   /**
    * @copydoc Dali::TypeRegistry::GetTypeName
    */
-  std::string GetTypeName(size_t index) const;
+  std::string GetTypeName( uint32_t index ) const;
 
   /**
    * Register a type

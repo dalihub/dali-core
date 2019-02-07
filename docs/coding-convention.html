@@ -325,7 +325,7 @@ function toggleVisibility( button, obj )
       <P>
 
         auto keyword should only be used where it improves the readability of the code and does not lead to ambiguities.
-        never use auto in a line where multiple different types occur as part of expressions like additions, subtracts, multiplies as whe conversion ordering rules are not always obvious.
+        never use auto in a line where multiple different types occur as part of expressions like additions, subtracts, multiplies as the conversion ordering rules are not always obvious.
 
         <CODE class="good">
 
@@ -363,6 +363,70 @@ function toggleVisibility( button, obj )
   MeasureSpec specification( GetMeasuredHeight(), MeasureSpec::Mode::EXACTLY ); // obvious construction of a type with parameters
         </CODE>
 
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <H2>Class Inheritance <input type="button" value="Hide" onclick="toggleVisibility( this, 'class_inheritance' );"/></H2>
+    <H3>Overriding</H3>
+    <ARTICLE class="detail" id="class_inheritance">
+      <P>
+
+        When using inheritance, any methods in the base class that can be overridden MUST be marked as <b>virtual</b>.
+        In deriving classes, when a virtual method is overridden, then only use the <b>override</b> keyword.
+        If a method should not be overridden further, then use the <b>final</b> keyword alone.
+
+        <CODE class="good">
+
+  // Good:
+  class Base
+  {
+  public:
+    virtual void Print() const;
+    virtual void SetPrintSpeed( float speed );
+  };
+
+  class Derived : public Base
+  {
+  public:
+    void Print() const override;
+    void SetPrintSpeed( float speed ) final;
+  };
+        </CODE>
+      </P>
+      <P>
+        If a class should not be overridden then use the <b>final</b> keyword on the class itself.
+        This should also be done for a derived class that should not to be overridden further as well.
+        Overridden methods within that class can be marked as <b>final</b> or <b>override</b>.
+
+        <CODE class="good">
+
+  class Derived final : public Base
+  {
+  public:
+    void Print() const override;
+    void SetPrintSpeed( float speed ) final;
+  };
+        </CODE>
+      </P>
+    <H3>Overloading</H3>
+      <P>
+        Overloading of Base class methods SHOULD be avoided but if it's required, then use the <b>using</b> keyword.
+
+        <CODE class="good">
+
+  class Derived : public Base
+  {
+  public:
+    void Print( float number ) const; // overloaded member
+    using Base::Print; // Make the Base class' Print method visible here as well.
+  };
+        </CODE>
+      </P>
+      <P>
+        If we do not add the using line, then we can only use the overloaded Print method for a Derived object (unless we cast to the Base class).
+        Attempting to use the base class' Print() method on a Derived object would result in a compilation error.
       </P>
       <P>
       </P>

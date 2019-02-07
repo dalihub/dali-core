@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -690,6 +690,62 @@ int UtcLinearConstrainerProperties(void)
       DALI_TEST_EQUALS( ( *array )[i].Get< float >(), points[i].Get< float >(), TEST_LOCATION );
     }
   }
+
+  END_TEST;
+}
+
+int UtcDaliLinearConstrainerDetectorRegisterProperty(void)
+{
+  TestApplication application;
+
+  Dali::LinearConstrainer constrainer = Dali::LinearConstrainer::New();
+
+  Property::Index index = constrainer.RegisterProperty( "sceneProperty", 0 );
+  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( constrainer.GetProperty< int32_t >( index ), 0, TEST_LOCATION );
+
+  constrainer.SetProperty( index, -123 );
+  DALI_TEST_EQUALS( constrainer.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+
+  using Dali::Animation;
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( constrainer, index ), 99 );
+
+  DALI_TEST_EQUALS( constrainer.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+  // Start the animation
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 /* 100% progress */);
+  DALI_TEST_EQUALS( constrainer.GetProperty< int32_t >( index ), 99, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPathConstrainerDetectorRegisterProperty(void)
+{
+  TestApplication application;
+
+  Dali::PathConstrainer constrainer = Dali::PathConstrainer::New();
+
+  Property::Index index = constrainer.RegisterProperty( "pathProperty", Vector2() );
+  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS( constrainer.GetProperty< Vector2 >( index ), Vector2(), TEST_LOCATION );
+
+  constrainer.SetProperty( index, Vector2(1,2) );
+  DALI_TEST_EQUALS( constrainer.GetProperty< Vector2 >( index ), Vector2(1,2), TEST_LOCATION );
+
+  using Dali::Animation;
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( constrainer, index ), Vector2(3,4) );
+
+  DALI_TEST_EQUALS( constrainer.GetProperty< Vector2 >( index ), Vector2(1,2), TEST_LOCATION );
+  // Start the animation
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1000 /* 100% progress */);
+  DALI_TEST_EQUALS( constrainer.GetProperty< Vector2 >( index ), Vector2(3,4), TEST_LOCATION );
 
   END_TEST;
 }

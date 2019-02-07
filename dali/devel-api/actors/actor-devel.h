@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ enum Type
   INHERIT_ORIENTATION         = Dali::Actor::Property::INHERIT_ORIENTATION,
   INHERIT_SCALE               = Dali::Actor::Property::INHERIT_SCALE,
   COLOR_MODE                  = Dali::Actor::Property::COLOR_MODE,
-  POSITION_INHERITANCE        = Dali::Actor::Property::POSITION_INHERITANCE,
+  RESERVED_PROPERTY_01        = Dali::Actor::Property::RESERVED_PROPERTY_01,
   DRAW_MODE                   = Dali::Actor::Property::DRAW_MODE,
   SIZE_MODE_FACTOR            = Dali::Actor::Property::SIZE_MODE_FACTOR,
   WIDTH_RESIZE_POLICY         = Dali::Actor::Property::WIDTH_RESIZE_POLICY,

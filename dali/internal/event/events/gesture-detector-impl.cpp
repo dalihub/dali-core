@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,10 @@ namespace Dali
 namespace Internal
 {
 
-GestureDetector::GestureDetector(Gesture::Type type)
-: mType(type),
-  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor())
+GestureDetector::GestureDetector(Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject )
+: Object( sceneObject ),
+  mType( type ),
+  mGestureEventProcessor( ThreadLocalStorage::Get().GetGestureEventProcessor() )
 {
 }
 
@@ -194,36 +195,6 @@ void GestureDetector::ObjectDestroyed(Object& object)
       }
     }
   }
-}
-
-void GestureDetector::SetDefaultProperty( Property::Index index, const Property::Value& property )
-{
-  // None of our properties should be settable from Public API
-}
-
-Property::Value GestureDetector::GetDefaultProperty(Property::Index index) const
-{
-  return Property::Value();
-}
-
-Property::Value GestureDetector::GetDefaultPropertyCurrentValue( Property::Index index ) const
-{
-  return Property::Value();
-}
-
-const SceneGraph::PropertyOwner* GestureDetector::GetSceneObject() const
-{
-  return NULL;
-}
-
-const SceneGraph::PropertyBase* GestureDetector::GetSceneObjectAnimatableProperty( Property::Index index ) const
-{
-  return NULL;
-}
-
-const PropertyInputImpl* GestureDetector::GetSceneObjectInputProperty( Property::Index index ) const
-{
-  return NULL;
 }
 
 } // namespace Internal

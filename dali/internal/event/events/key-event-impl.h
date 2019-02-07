@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_KEY_EVENT_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,18 @@ public:
    * @return A reference to this
    */
   KeyEventImpl& operator=( const KeyEventImpl& rhs );
+
+  /**
+   * @brief Get the key symbol string.
+   * @return The key symbol
+   */
+  std::string GetLogicalKey() const;
+
+  /**
+   * @brief Set the key symbol string to the KeyEvent.
+   * @param[in] key The key symbol to set
+   */
+  void SetLogicalKey( const std::string& logicalKey );
 
   /**
    * @brief Get the compose string.
@@ -116,6 +128,7 @@ private:
 
 private:
 
+  std::string mLogicalKey;
   std::string mCompose;
   std::string mDeviceName;
   Device::Class::Type mDeviceClass;

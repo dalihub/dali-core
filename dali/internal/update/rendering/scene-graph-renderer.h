@@ -19,6 +19,7 @@
 
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -341,13 +342,25 @@ public:
    * @return The opacity
    */
   float GetOpacity( BufferIndex updateBufferIndex ) const;
-
+  
   /**
    * Helper function to update the uniform map.
    * @param[in] bufferIndex The buffer to read from.
    * @param[in] node NodeDataProvider to get uniform map
    */
   void UpdateUniformMap( BufferIndex bufferIndex, Node& node );
+  
+  /**
+   * Sets the rendering behavior
+   * @param[in] renderingBehavior The rendering behavior required.
+   */
+  void SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior );
+
+  /**
+   * Gets the rendering behavior
+   * @return The rendering behavior
+   */
+  DevelRenderer::Rendering::Type GetRenderingBehavior() const;
 
   /**
    * Prepare the object for rendering.
@@ -512,6 +525,7 @@ private:
 
   DepthWriteMode::Type         mDepthWriteMode:3;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:3;                  ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior:2;            ///< The rendering behavior
 
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
@@ -520,7 +534,7 @@ private:
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
-  int                          mDepthIndex;                       ///< Used only in PrepareRenderInstructions
+  int32_t                      mDepthIndex;                       ///< Used only in PrepareRenderInstructions
 };
 
 
@@ -547,7 +561,7 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
   new (slot) LocalType( &renderer, &Renderer::SetGeometry, const_cast<SceneGraph::Geometry*>(&geometry) );
 }
 
-inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Shader& shader )
+inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, const Shader& shader )
 {
   typedef MessageValue1< Renderer, Shader* > LocalType;
 
@@ -555,7 +569,7 @@ inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Re
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &renderer, &Renderer::SetShader, &shader );
+  new (slot) LocalType( &renderer, &Renderer::SetShader, const_cast<Shader*>( &shader ) );
 }
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, int depthIndex )
@@ -757,6 +771,16 @@ inline void BakeOpacityMessage( EventThreadServices& eventThreadServices, const 
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::BakeOpacity, opacity );
+}
+
+inline void SetRenderingBehaviorMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DevelRenderer::Rendering::Type renderingBehavior )
+{
+  using LocalType = MessageValue1< Renderer, DevelRenderer::Rendering::Type >;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetRenderingBehavior, renderingBehavior );
 }
 
 } // namespace SceneGraph

@@ -2,7 +2,7 @@
 #define __DALI_MATH_UTILS_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -278,8 +278,8 @@ inline float WrapInDomain(float x, float start, float end)
  * @endcode
  *
  * Knowing the shortest distance is useful with wrapped domains
- * to solve problems such as determing the closest object to
- * a given point, or determing whether turning left or turning
+ * to solve problems such as determining the closest object to
+ * a given point, or determining whether turning left or turning
  * right is the shortest route to get from angle 10 degrees
  * to angle 350 degrees (clearly in a 0-360 degree domain, turning
  * left 20 degrees is quicker than turning right 340 degrees).

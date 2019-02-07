@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,6 +137,86 @@ int UtcDaliFrameBufferNew06(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliFrameBufferNewWithColor01(void)
+{
+  TestApplication application;
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  // check that texture is not empty handle
+  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  END_TEST;
+}
+
+int UtcDaliFrameBufferNewWithColor02(void)
+{
+  TestApplication application;
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  // check that texture is not empty handle
+  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  END_TEST;
+}
+
+int UtcDaliFrameBufferNewWithColor03(void)
+{
+  TestApplication application;
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  // check that texture is not empty handle
+  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  END_TEST;
+}
+
+int UtcDaliFrameBufferNewWithColor04(void)
+{
+  TestApplication application;
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_STENCIL );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  // check that texture is not empty handle
+  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+  END_TEST;
+}
+
+int UtcDaliFrameBufferNewWithColor05(void)
+{
+  TestApplication application;
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH_STENCIL );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  // check that texture is not empty handle
+  DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
   END_TEST;
 }
 

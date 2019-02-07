@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,12 +84,12 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo( const std::type_info& r
   return GetTypeInfo( typeName );
 }
 
-size_t TypeRegistry::GetTypeNameCount() const
+uint32_t TypeRegistry::GetTypeNameCount() const
 {
-  return mRegistryLut.size();
+  return static_cast<uint32_t>( mRegistryLut.size() );
 }
 
-std::string TypeRegistry::GetTypeName( size_t index ) const
+std::string TypeRegistry::GetTypeName( uint32_t index ) const
 {
   std::string name;
 
