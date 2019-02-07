@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/platform-abstraction.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
 
 #include <dali/internal/event/actors/actor-impl.h>

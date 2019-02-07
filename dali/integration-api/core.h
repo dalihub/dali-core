@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@ class Core;
 
 namespace Integration
 {
-
 class Core;
 class GestureManager;
 class GlAbstraction;
 class GlSyncAbstraction;
 class PlatformAbstraction;
+class Processor;
 class RenderController;
 class SystemOverlay;
 struct Event;
@@ -175,22 +175,6 @@ private:
 
   bool needsUpdate      :1;  ///< True if update is required to be run
   bool needsPostRender  :1;  ///< True if post-render is required to be run.
-};
-
-/**
- * Interface to enable classes to be processed after the event loop. Classes are processed
- * in the order they are registered.
- */
-class DALI_CORE_API Processor
-{
-public:
-  /**
-   * @brief Run the processor
-   */
-  virtual void Process() = 0;
-
-protected:
-  virtual ~Processor() { }
 };
 
 
