@@ -1,8 +1,8 @@
-#ifndef __DALI_MAP_H__
-#define __DALI_MAP_H__
+#ifndef DALI_MAP_WRAPPER_H
+#define DALI_MAP_WRAPPER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-
-
 #ifndef HIDE_DALI_INTERNALS
 
-# include <map>
+#include <map>
 
 #else
+
+// Ensure that default visibility is used with any class that is used as an exception type
+#include <memory>
+#include <new>
+#include <stdexcept>
 
 #if defined(__clang__)
 
@@ -44,22 +45,20 @@
 
 #else
 
-// ensure that default visibility is used with any class that is used as an exception type
-# include <memory>
-# include <new>
-# include <stdexcept>
+#include <bits/c++config.h>
+#include <bits/stl_tree.h>
+#undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ ("hidden")))
+#include <map>
+#undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY`
 
-# include <bits/c++config.h>
-# include <bits/stl_tree.h>
-# undef _GLIBCXX_VISIBILITY_ATTR
-# define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
-# include <map>
-# undef _GLIBCXX_VISIBILITY_ATTR
-# define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#endif // #ifdef __clang__
 
-#endif //ifdef __clang__
+#endif // #ifndef HIDE_DALI_INTERNALS
 
-#endif //ifndef HIDE_DALI_INTERNALS
-
-
-#endif /* __DALI_MAP_H__ */
+#endif // DALI_MAP_WRAPPER_H
