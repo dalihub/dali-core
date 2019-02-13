@@ -43,7 +43,6 @@ struct Vector2;
 
 namespace Integration
 {
-class SystemOverlay;
 class RenderController;
 }
 
@@ -59,7 +58,6 @@ class AnimationPlaylist;
 class PropertyNotificationManager;
 class Layer;
 class LayerList;
-class SystemOverlay;
 class CameraActor;
 class RenderTaskList;
 
@@ -214,19 +212,6 @@ public:
    * @return The layer-list.
    */
   LayerList& GetLayerList();
-
-  // System-level overlay actors
-
-  /**
-   * @copydoc Dali::Integration::Core::GetSystemOverlay()
-   */
-  Integration::SystemOverlay& GetSystemOverlay();
-
-  /**
-   * Retrieve the internal implementation of the SystemOverlay.
-   * @return The implementation, or NULL if this has never been requested from Integration API.
-   */
-  SystemOverlay* GetSystemOverlayInternal();
 
   // Keyboard stuff
 
@@ -512,8 +497,6 @@ private:
 
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
-
-  Integration::SystemOverlay* mSystemOverlay; ///< SystemOverlay stage access
 
   // The key event signal
   Dali::Stage::KeyEventSignalType                 mKeyEventSignal;

@@ -37,7 +37,6 @@ internal_src_files = \
   $(internal_src_dir)/event/common/property-notification-manager.cpp \
   $(internal_src_dir)/event/common/property-helper.cpp \
   $(internal_src_dir)/event/common/stage-impl.cpp \
-  $(internal_src_dir)/event/common/system-overlay-impl.cpp \
   $(internal_src_dir)/event/common/thread-local-storage.cpp \
   $(internal_src_dir)/event/common/type-info-impl.cpp \
   $(internal_src_dir)/event/common/type-registry-impl.cpp \
