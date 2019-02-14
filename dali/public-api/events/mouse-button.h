@@ -27,14 +27,14 @@ namespace Dali
 
 /**
  * @brief Mouse Button Type
- * @SINCE_1_3.31
+ * @SINCE_1_3_31
  */
 namespace MouseButton
 {
 
 /**
  * @brief Enumeration for mouse button type.
- * @SINCE_1_3.31
+ * @SINCE_1_3_31
  */
 enum Type
 {
