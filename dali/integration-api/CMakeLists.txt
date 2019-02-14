@@ -6,7 +6,6 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/debug.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/profiling.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/input-options.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/system-overlay.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render-task-list-integ.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/event.cpp
@@ -40,7 +39,6 @@ SET(INTEGRATION_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/gesture-manager.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-controller.h
   ${CMAKE_CURRENT_SOURCE_DIR}/platform-abstraction.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/system-overlay.h
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-task-list-integ.h
 

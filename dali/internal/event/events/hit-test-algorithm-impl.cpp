@@ -19,7 +19,6 @@
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
@@ -28,7 +27,6 @@
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
@@ -626,17 +624,6 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
 bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
 {
   bool wasHit( false );
-
-  // Hit-test the system-overlay actors first
-  SystemOverlay* systemOverlay = stage.GetSystemOverlayInternal();
-
-  if( systemOverlay )
-  {
-    RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
-    LayerList& overlayLayerList = systemOverlay->GetLayerList();
-
-    wasHit = HitTestForEachRenderTask( stage, overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
-  }
 
   // Hit-test the regular on-stage actors
   if( !wasHit )
