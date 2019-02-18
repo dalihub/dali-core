@@ -19,7 +19,6 @@
 #include <dali/internal/common/core-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
@@ -308,11 +307,6 @@ void Core::ProcessEvents()
 uint32_t Core::GetMaximumUpdateCount() const
 {
   return MAXIMUM_UPDATE_COUNT;
-}
-
-Integration::SystemOverlay& Core::GetSystemOverlay()
-{
-  return mStage->GetSystemOverlay();
 }
 
 void Core::RegisterProcessor( Integration::Processor& processor )

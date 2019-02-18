@@ -323,7 +323,6 @@ void Layer::OnStageConnectionInternal()
     DALI_ASSERT_DEBUG( NULL == mLayerList );
 
     // Find the ordered layer-list
-    // This is different for Layers added via Integration::GetSystemOverlay()
     for ( Actor* parent = mParent; parent != NULL; parent = parent->GetParent() )
     {
       if( parent->IsLayer() )

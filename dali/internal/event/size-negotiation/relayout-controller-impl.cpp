@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #if defined(DEBUG_ENABLED)
 #include <sstream>
-#include <dali/internal/event/common/system-overlay-impl.h>
 #endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
@@ -31,7 +30,6 @@
 #include <dali/public-api/object/object-registry.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
@@ -215,15 +213,6 @@ void RelayoutController::OnApplicationSceneCreated()
   Dali::Stage stage = Dali::Stage::GetCurrent();
   Dali::Actor rootLayer = stage.GetRootLayer();
   RequestRelayoutTree( rootLayer );
-
-  // Also add request on the root of system overlay
-  Dali::Internal::SystemOverlay* systemOverlay = GetImplementation(stage).GetSystemOverlayInternal();
-  if( systemOverlay )
-  {
-    Dali::Internal::Actor& systemOverlayInternalRoot = systemOverlay->GetDefaultRootActor();
-    Dali::Actor systemOverlayRoot = Dali::Actor(&systemOverlayInternalRoot);
-    RequestRelayoutTree( systemOverlayRoot );
-  }
 
   // Flag request for end of frame
   Request();

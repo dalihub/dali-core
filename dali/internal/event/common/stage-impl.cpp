@@ -24,11 +24,9 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
@@ -124,10 +122,6 @@ void Stage::Initialize( bool renderToFbo )
 
 void Stage::Uninitialize()
 {
-  // Remove actors added to SystemOverlay
-  delete mSystemOverlay;
-  mSystemOverlay = NULL;
-
   if( mDefaultCamera )
   {
     // its enough to release the handle so the object is released
@@ -224,14 +218,6 @@ void Stage::SurfaceResized( float width, float height )
 
     mRootLayer->SetSize( mSize.width, mSize.height );
 
-    // Repeat for SystemOverlay actors
-    if( mSystemOverlay )
-    {
-      // Note that the SystemOverlay has a separate camera, configured for the full surface-size.
-      // This will remain unaffected by changes in SetDefaultCameraPosition()
-      mSystemOverlay->GetImpl()->SetSize( width, height );
-    }
-
     SetDefaultSurfaceRectMessage( mUpdateManager, Rect<int32_t>( 0, 0, static_cast<int32_t>( width ), static_cast<int32_t>( height ) ) ); // truncated
 
     // if single render task to screen then set its viewport parameters
@@ -327,32 +313,6 @@ Dali::Layer Stage::GetRootLayer() const
 LayerList& Stage::GetLayerList()
 {
   return *mLayerList;
-}
-
-Integration::SystemOverlay& Stage::GetSystemOverlay()
-{
-  // Lazily create system-level if requested
-  if( !mSystemOverlay )
-  {
-    mSystemOverlay = new Integration::SystemOverlay( SystemOverlay::New( *this ) );
-    DALI_ASSERT_ALWAYS( NULL != mSystemOverlay && "Failed to create system overlay" );
-
-    mSystemOverlay->GetImpl()->SetSize( mSize.width, mSize.height );
-  }
-
-  return *mSystemOverlay;
-}
-
-SystemOverlay* Stage::GetSystemOverlayInternal()
-{
-  SystemOverlay* overlay( NULL );
-
-  if( mSystemOverlay )
-  {
-    overlay = mSystemOverlay->GetImpl();
-  }
-
-  return overlay;
 }
 
 void Stage::SetBackgroundColor(Vector4 color)
@@ -596,7 +556,6 @@ Stage::Stage( AnimationPlaylist& playlist,
   mBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
   mTopMargin( 0 ),
   mDpi( Vector2::ZERO ),
-  mSystemOverlay( NULL ),
   mKeyEventSignal(),
   mKeyEventGeneratedSignal(),
   mEventProcessingFinishedSignal(),
@@ -647,9 +606,6 @@ bool Stage::IsNextUpdateForced()
 
 Stage::~Stage()
 {
-  delete mSystemOverlay;
-
-  mObjectRegistry.Reset();
 }
 
 } // namespace Internal

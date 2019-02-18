@@ -44,7 +44,6 @@ class GlSyncAbstraction;
 class PlatformAbstraction;
 class Processor;
 class RenderController;
-class SystemOverlay;
 struct Event;
 struct TouchData;
 
@@ -375,14 +374,6 @@ public:
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    */
   void Render( RenderStatus& status, bool forceClear );
-
-  // System-level overlay
-
-  /**
-   * Use the SystemOverlay to draw content for system-level indicators, dialogs etc.
-   * @return The SystemOverlay.
-   */
-  SystemOverlay& GetSystemOverlay();
 
   /**
    * @brief Register a processor

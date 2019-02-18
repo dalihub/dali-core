@@ -1034,7 +1034,7 @@ inline void SetRenderingBehaviorMessage( UpdateManager& manager, DevelStage::Ren
  * Create a message for setting the depth of a layer
  * @param[in] manager The update manager
  * @param[in] layers list of layers
- * @param[in] rootLayer True if the layers are added via the SystemOverlay API
+ * @param[in] rootLayer The rool layer
  */
 inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< Layer* >& layers, const Layer* rootLayer )
 {
