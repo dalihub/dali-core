@@ -36,6 +36,8 @@ public:
   Dali::Graphics::TextureFactory& SetData( void* pData ) override;
   Dali::Graphics::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
   Dali::Graphics::TextureFactory::PointerType Create() const override;
+  Dali::Graphics::TextureFactory& SetNativeImage( Dali::NativeImageInterfacePtr nativeImageInterface ) override;
+
 };
 
 } // Test

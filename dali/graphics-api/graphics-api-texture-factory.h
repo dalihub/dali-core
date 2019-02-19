@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TEXTURE_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali/graphics-api/graphics-api-base-factory.h>
 #include <dali/graphics-api/graphics-api-texture-details.h>
 #include <dali/graphics-api/graphics-api-texture.h>
+#include <dali/public-api/images/native-image-interface.h>
 
 namespace Dali
 {
@@ -35,11 +36,12 @@ class TextureFactory : public BaseFactory<Texture>
 public:
   virtual TextureFactory& SetType(TextureDetails::Type type)             = 0;
   virtual TextureFactory& SetSize(const Extent2D& size)                  = 0;
-  virtual TextureFactory& SetFormat(TextureDetails::Format format)       = 0;
+  virtual TextureFactory& SetFormat(Format format)                       = 0;
   virtual TextureFactory& SetMipMapFlag(TextureDetails::MipMapFlag mipMapFlag) = 0;
   virtual TextureFactory& SetUsage( TextureDetails::Usage usage )        = 0;
   virtual TextureFactory& SetData( void* pData )                         = 0;
   virtual TextureFactory& SetDataSize( uint32_t dataSizeInBytes )        = 0;
+  virtual TextureFactory& SetNativeImage( NativeImageInterfacePtr nativeImageInterface ) = 0;
 
   // not copyable
   TextureFactory(const TextureFactory&) = delete;

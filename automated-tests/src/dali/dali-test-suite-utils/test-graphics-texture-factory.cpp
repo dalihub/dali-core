@@ -56,4 +56,9 @@ Dali::Graphics::TextureFactory::PointerType GraphicsTextureFactory::Create() con
   return nullptr;
 }
 
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetNativeImage( Dali::NativeImageInterfacePtr nativeImageInterface )
+{
+  return *this;
+}
+
 } // Test
