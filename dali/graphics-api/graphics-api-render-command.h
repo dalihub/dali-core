@@ -558,16 +558,20 @@ public:
 
 protected:
   uint32_t mUpdateFlags; // update flags to be handled by implementation
+};
 
-public:
-  // WARNING: Be careful with these - all libraries must be built with DEBUG_ENABLED
-  // to ensure every instantiation has the same size.
-  // They should always be the last attributes in this class.
-#if defined(DEBUG_ENABLED)
-  // Debug
-  std::string                               mDebugString{""};
-  void*                                     mDebugObject{nullptr};
-#endif
+//@todo Move to a better place? (can't go in graphics-api-types, it's a cyclic dependency)
+struct TextureBindingState
+{
+  std::vector<RenderCommand::TextureBinding> textureBindings {};
+
+  Extension extension{ nullptr };
+
+  TextureBindingState& SetTextureBindings( const std::vector<RenderCommand::TextureBinding>& theTextureBindings )
+  {
+    textureBindings = theTextureBindings;
+    return *this;
+  }
 };
 
 } // namespace Graphics
