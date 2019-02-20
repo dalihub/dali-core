@@ -107,7 +107,12 @@ public:
    * Get the Graphics object associated with this texture
    * @return The graphics object.
    */
-  const Graphics::Texture* GetGfxObject() const;
+  Graphics::Texture* GetGfxObject() const;
+
+  /**
+   * @todo: move initialisation somewhere else
+   */
+  void InitialiseTexture();
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -158,18 +163,6 @@ private:
   bool                    mHasAlpha : 1;     ///< Whether the format has an alpha channel
   bool                    mIsCompressed : 1; ///< Whether the format is compressed
 };
-
-
-inline void UploadTextureMessage( EventThreadServices& eventThreadServices, SceneGraph::Texture& texture, PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
-{
-  typedef MessageValue2< SceneGraph::Texture, PixelDataPtr, Internal::Texture::UploadParams > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &texture, &SceneGraph::Texture::UploadTexture, pixelData, params );
-}
 
 inline void GenerateMipmapsMessage( EventThreadServices& eventThreadServices, SceneGraph::Texture& texture )
 {
