@@ -61,4 +61,9 @@ Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetNativeImage( Dali::Na
   return *this;
 }
 
+Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetTiling( Dali::Graphics::TextureTiling tiling )
+{
+  return *this;
+}
+
 } // Test

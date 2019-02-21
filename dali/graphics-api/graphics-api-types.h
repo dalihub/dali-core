@@ -900,6 +900,18 @@ struct TextureProperties
   bool      compressed;
   bool      packed;
   Extent2D  extent2D;
+  bool      directWriteAccessEnabled;
+};
+
+/**
+ * Texture tiling that directly refers to the tiling
+ * mode supported by the Vulkan. Other implementations
+ * of the backend may ignore the value.
+ */
+enum class TextureTiling
+{
+  OPTIMAL,
+  LINEAR
 };
 
 } // Graphics
