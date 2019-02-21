@@ -376,7 +376,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
                                                            .SetDataSize( bufferSize )
-                                                           .SetNativeImage( mNativeImage ));
+                                                           .SetNativeImage( mNativeImage )
+                                                           .SetTiling( Graphics::TextureTiling::LINEAR ));
   }
 }
 

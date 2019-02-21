@@ -42,6 +42,7 @@ public:
   virtual TextureFactory& SetData( void* pData )                         = 0;
   virtual TextureFactory& SetDataSize( uint32_t dataSizeInBytes )        = 0;
   virtual TextureFactory& SetNativeImage( NativeImageInterfacePtr nativeImageInterface ) = 0;
+  virtual TextureFactory& SetTiling( TextureTiling tiling )              = 0;
 
   // not copyable
   TextureFactory(const TextureFactory&) = delete;
