@@ -125,11 +125,6 @@ void Core::Render( RenderStatus& status, bool forceClear )
   mImpl->Render( status, forceClear );
 }
 
-SystemOverlay& Core::GetSystemOverlay()
-{
-  return mImpl->GetSystemOverlay();
-}
-
 void Core::RegisterProcessor( Processor& processor )
 {
   mImpl->RegisterProcessor( processor );

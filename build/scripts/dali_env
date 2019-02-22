@@ -53,6 +53,7 @@ my @system_packages = (
     "libssl-dev",
     "cifs-utils",
     "libgtest-dev",
+    "libcairo2-dev",
 );
 
 # Some packages like require building from source

@@ -37,7 +37,6 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/property-notification-manager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/property-helper.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/stage-impl.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/event/common/system-overlay-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/thread-local-storage.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/type-info-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/type-registry-impl.cpp

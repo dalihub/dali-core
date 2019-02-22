@@ -39,7 +39,6 @@ class PlatformAbstraction;
 class GestureManager;
 class GlAbstraction;
 class GlSyncAbstraction;
-class SystemOverlay;
 class UpdateStatus;
 class RenderStatus;
 struct Event;
@@ -160,11 +159,6 @@ public:
    * @copydoc Dali::Integration::Core::GetMaximumUpdateCount()
    */
   uint32_t GetMaximumUpdateCount() const;
-
-  /**
-   * @copydoc Dali::Integration::Core::GetSystemOverlay()
-   */
-  Integration::SystemOverlay& GetSystemOverlay();
 
   /**
    * @copydoc Dali::Integration::Core::RegisterProcessor
