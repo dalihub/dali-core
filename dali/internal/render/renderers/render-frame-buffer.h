@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,80 +29,75 @@ namespace Internal
 {
 namespace Render
 {
-class Texture;
 
 class FrameBuffer
 {
 public:
 
-  using Mask = Dali::FrameBuffer::Attachment::Mask;
-
   /**
    * Constructor
-   * @param[in] width The width of the FrameBuffer
-   * @param[in] height The height of the FrameBuffer
-   * @param[in] attachments The attachments comprising the format of the FrameBuffer (bit-mask)
    */
-  FrameBuffer( uint32_t width, uint32_t height, Mask attachments );
+  FrameBuffer() {};
 
   /**
    * Destructor
    */
-  ~FrameBuffer();
+  virtual ~FrameBuffer() {};
 
   /**
    * Creates a FrameBuffer object in the GPU.
    * @param[in] context The GL context
    */
-  void Initialize(Context& context);
+  virtual void Initialize( Context& context ) = 0;
 
   /**
    * Deletes the framebuffer object from the GPU
    * @param[in] context The GL context
    */
-  void Destroy( Context& context );
+  virtual void Destroy( Context& context ) = 0;
 
   /**
    * Called by RenderManager to inform the framebuffer that the context has been destroyed
    */
-  void GlContextDestroyed();
-
-  /**
-   * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
-   * param[in] context The GL context
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
-   */
-  void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
+  virtual void GlContextDestroyed() = 0;
 
   /**
    * @brief Bind the framebuffer
    * @param[in] context The GL context
    */
-  void Bind( Context& context );
+  virtual void Bind( Context& context ) = 0;
 
   /**
    * @brief Get the width of the FrameBuffer
    * @return The width of the framebuffer
    */
-  uint32_t GetWidth() const;
+  virtual uint32_t GetWidth() const = 0;
 
   /**
    * @brief Get the height of the FrameBuffer
    * @return The height of the framebuffer
    */
-  uint32_t GetHeight() const;
+  virtual uint32_t GetHeight() const = 0;
+
+  /**
+   * @brief Check whether the FrameBuffer is backed by a render surface
+   * @return True if the FrameBuffer is backed by a render surface
+   */
+  virtual bool IsSurfaceBacked() = 0;
 
 private:
 
-  GLuint mId;
-  GLuint mDepthBuffer;
-  GLuint mStencilBuffer;
-  uint32_t mWidth;
-  uint32_t mHeight;
-};
+  /**
+   * @brief Undefined copy constructor. FrameBuffer cannot be copied
+   */
+  FrameBuffer( const FrameBuffer& rhs ) = delete;
 
+  /**
+   * @brief Undefined assignment operator. FrameBuffer cannot be copied
+   */
+  FrameBuffer& operator=( const FrameBuffer& rhs ) = delete;
+
+};
 
 } // namespace Render
 

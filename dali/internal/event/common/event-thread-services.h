@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_EVENT_THREAD_SERVICES_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,12 @@ public:
    */
   virtual ~EventThreadServices()
   { }
+
+  /**
+   * Get the EventThreadServices
+   * @return reference to the EventThreadServices
+   */
+  static EventThreadServices& Get();
 
   /**
    * @brief Registers the object as created with the Object registry.

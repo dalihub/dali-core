@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -506,6 +506,11 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
+void Renderer::Upload( Context& context )
+{
+  mGeometry->Upload( context );
+}
+
 void Renderer::Render( Context& context,
                        BufferIndex bufferIndex,
                        const SceneGraph::NodeDataProvider& node,
@@ -564,11 +569,11 @@ void Renderer::Render( Context& context,
       mUpdateAttributesLocation = false;
     }
 
-    mGeometry->UploadAndDraw( context,
-                              bufferIndex,
-                              mAttributesLocation,
-                              mIndexedDrawFirstElement,
-                              mIndexedDrawElementsCount );
+    mGeometry->Draw( context,
+                     bufferIndex,
+                     mAttributesLocation,
+                     mIndexedDrawFirstElement,
+                     mIndexedDrawElementsCount );
   }
 }
 
