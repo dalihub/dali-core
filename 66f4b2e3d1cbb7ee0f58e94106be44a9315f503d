@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b24b2b69_254cad96",
+        "filename": "dali/graphics-api/graphics-api-texture-factory.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-25T12:00:58Z",
+      "side": 1,
+      "message": "Does this build?",
+      "range": {
+        "startLine": 39,
+        "startChar": 36,
+        "endLine": 39,
+        "endChar": 42
+      },
+      "revId": "66f4b2e3d1cbb7ee0f58e94106be44a9315f503d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
