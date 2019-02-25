@@ -46,21 +46,13 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
 
   UpdateManager& updateManager = tls.GetUpdateManager();
 
-  StagePtr stage = Stage::GetCurrent();
-  if( stage )
-  {
-    PropertyNotificationManager& propertyNotificationManager = stage->GetPropertyNotificationManager();
-    PropertyNotificationPtr propertyNotification = new PropertyNotification(updateManager,
-                                                                            propertyNotificationManager,
-                                                                            target,
-                                                                            componentIndex,
-                                                                            condition);
-    return propertyNotification;
-  }
-  else
-  {
-    return NULL;
-  }
+  PropertyNotificationManager& propertyNotificationManager = tls.GetPropertyNotificationManager();
+  PropertyNotificationPtr propertyNotification = new PropertyNotification(updateManager,
+                                                                          propertyNotificationManager,
+                                                                          target,
+                                                                          componentIndex,
+                                                                          condition);
+  return propertyNotification;
 }
 
 PropertyNotification::PropertyNotification( UpdateManager& updateManager,

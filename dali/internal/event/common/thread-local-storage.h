@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_THREAD_LOCAL_STORAGE_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/event/common/scene-impl.h>
 
 namespace Dali
 {
@@ -39,6 +40,8 @@ class NotificationManager;
 class ShaderFactory;
 class GestureEventProcessor;
 class RelayoutController;
+class ObjectRegistry;
+class EventThreadServices;
 
 namespace SceneGraph
 {
@@ -130,6 +133,44 @@ public:
    * @Return Return a reference to the relayout controller
    */
   RelayoutController& GetRelayoutController();
+
+  /**
+   * Returns the Object registry.
+   * @return A reference to the Object registry
+   */
+  ObjectRegistry& GetObjectRegistry();
+
+  /**
+   * @brief Gets the event thread services.
+   * @return A reference to the event thread services
+   */
+  EventThreadServices& GetEventThreadServices();
+
+  /**
+   * @brief Gets the property notification manager.
+   * @return A reference to the property notification manager
+   */
+  PropertyNotificationManager& GetPropertyNotificationManager();
+
+  /**
+   * @brief Gets the animation play list.
+   * @return A reference to the animation play list
+   */
+  AnimationPlaylist& GetAnimationPlaylist();
+
+  /**
+   * Add a Scene to the Core.
+   * This is only used by the Scene to add itself to the core when the Scene is created.
+   * @param[in] scene The Scene.
+   */
+  void AddScene( Scene* scene );
+
+  /**
+   * Remove a Scene from the Core.
+   * This is only used by the Scene to remove itself from the core when the Scene is destroyed.
+   * @param[in] scene The Scene.
+   */
+  void RemoveScene( Scene* scene );
 
 private:
 

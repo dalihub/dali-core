@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 namespace Dali
 {
@@ -35,6 +36,7 @@ namespace Internal
 class Actor;
 class CameraActor;
 class EventThreadServices;
+class RenderTaskList;
 
 namespace SceneGraph
 {
@@ -53,8 +55,13 @@ public:
 
   /**
    * Creates a new RenderTask.
+   *
+   * @param[in] sourceActor The source actor.
+   * @param[in] cameraActor The camera actor.
+   * @param[in] renderTaskList The render task list.
+   * @return The created render task
    */
-  static RenderTaskPtr New( Actor* sourceActor, CameraActor* cameraActor, SceneGraph::RenderTaskList& parentSceneObject );
+  static RenderTaskPtr New( Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList );
 
   /**
    * @copydoc Dali::RenderTask::SetSourceActor()
@@ -319,9 +326,10 @@ protected:
   /**
    * Constructor.
    *
-   * @param sceneObject the scene graph object
+   * @param[in] sceneObject The scene graph object
+   * @param[in] renderTaskList The render task list
    */
-  RenderTask( const SceneGraph::RenderTask* sceneObject );
+  RenderTask( const SceneGraph::RenderTask* sceneObject, RenderTaskList& renderTaskList );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -339,6 +347,7 @@ private:
   Actor* mSourceActor; ///< Source actor, we cannot keep the actor alive so raw pointer.
   CameraActor* mCameraActor; ///< Camera actor, we cannot keep the actor alive so raw pointer.
   WeakHandle<Dali::Actor> mInputMappingActor; /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
+  RenderTaskList& mRenderTaskList; ///< The render task list
 
   Vector4 mClearColor;       ///< Optional clear color
 

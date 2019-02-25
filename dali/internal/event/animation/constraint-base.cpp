@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 
@@ -54,7 +55,7 @@ inline void AddUnique( SceneGraph::PropertyOwnerContainer& propertyOwners, Scene
 } // unnamed namespace
 
 ConstraintBase::ConstraintBase( Object& object, Property::Index targetPropertyIndex, SourceContainer& sources )
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mTargetObject( &object ),
   mSceneGraphConstraint( NULL ),
   mSources( sources ),
