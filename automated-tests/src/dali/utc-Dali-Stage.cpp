@@ -21,7 +21,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/common/stage-devel.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -1456,86 +1455,6 @@ int UtcDaliStageSignalWheelEventP(void)
   END_TEST;
 }
 
-int UtcDaliStageContextLostSignalP(void)
-{
-  TestApplication app;
-  Stage stage = Stage::GetCurrent();
-
-  bool contextLost = false;
-  ContextStatusFunctor contextLostFunctor( contextLost );
-  stage.ContextLostSignal().Connect( &app, contextLostFunctor );
-
-  Integration::ContextNotifierInterface* notifier = app.GetCore().GetContextNotifier();
-  notifier->NotifyContextLost();
-  DALI_TEST_EQUALS( contextLost, true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliStageContextLostSignalN(void)
-{
-  TestApplication app;
-  Stage stage;
-
-  // Check that connecting to the signal with a bad stage instance causes an assert.
-  bool asserted = false;
-  bool contextLost = false;
-  ContextStatusFunctor contextLostFunctor( contextLost );
-  try
-  {
-    stage.ContextLostSignal().Connect( &app, contextLostFunctor );
-  }
-  catch( Dali::DaliException& e )
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "stage && \"Stage handle is empty\"", TEST_LOCATION );
-    asserted = true;
-  }
-  DALI_TEST_CHECK( asserted );
-
-  END_TEST;
-}
-
-int UtcDaliStageContextRegainedSignalP(void)
-{
-  TestApplication app;
-  Stage stage = Stage::GetCurrent();
-
-  bool contextRegained = false;
-  ContextStatusFunctor contextRegainedFunctor( contextRegained );
-  stage.ContextRegainedSignal().Connect( &app, contextRegainedFunctor );
-
-  Integration::ContextNotifierInterface* notifier = app.GetCore().GetContextNotifier();
-  notifier->NotifyContextLost();
-  notifier->NotifyContextRegained();
-  DALI_TEST_EQUALS( contextRegained, true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliStageContextRegainedSignalN(void)
-{
-  TestApplication app;
-  Stage stage;
-
-  // Check that connecting to the signal with a bad stage instance causes an assert.
-  bool asserted = false;
-  bool contextRegained = false;
-  ContextStatusFunctor contextRegainedFunctor( contextRegained );
-  try
-  {
-    stage.ContextRegainedSignal().Connect( &app, contextRegainedFunctor );
-  }
-  catch( Dali::DaliException& e )
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "stage && \"Stage handle is empty\"", TEST_LOCATION );
-    asserted = true;
-  }
-  DALI_TEST_CHECK( asserted );
-
-  END_TEST;
-}
 
 int UtcDaliStageSceneCreatedSignalP(void)
 {

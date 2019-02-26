@@ -21,11 +21,12 @@
 
 namespace Test
 {
+class GraphicsController;
 
 class GraphicsFramebufferFactory : public Dali::Graphics::FramebufferFactory
 {
 public:
-  GraphicsFramebufferFactory();
+  GraphicsFramebufferFactory(GraphicsController* controller);
   virtual ~GraphicsFramebufferFactory();
 
   Dali::Graphics::FramebufferFactory& SetSize( const Dali::Graphics::Extent2D& size ) override;
@@ -36,11 +37,36 @@ public:
                                                                Dali::Graphics::TextureDetails::LevelId      level ) override;
 
   Dali::Graphics::FramebufferFactory& SetDepthStencilAttachment( const Dali::Graphics::Texture&                   texture,
-                                                                      Dali::Graphics::TextureDetails::LayerId          layer,
-                                                                      Dali::Graphics::TextureDetails::LevelId          level,
-                                                                      Dali::Graphics::TextureDetails::DepthStencilFlag depthStencilFlag ) override;
+                                                                 Dali::Graphics::TextureDetails::LayerId          layer,
+                                                                 Dali::Graphics::TextureDetails::LevelId          level,
+                                                                 Dali::Graphics::TextureDetails::DepthStencilFlag depthStencilFlag ) override;
+
   Dali::Graphics::FramebufferFactory::PointerType Create() const override;
 
+public: // test methods
+  void TestReset();
+
+public:
+  struct ColorAttachment
+  {
+    const Dali::Graphics::Texture*    texture;
+    Dali::Graphics::TextureDetails::LayerId layer;
+    Dali::Graphics::TextureDetails::LevelId mipmapLevel;
+  };
+
+  struct DepthAttachment
+  {
+    const Dali::Graphics::Texture*                   texture;
+    Dali::Graphics::TextureDetails::LayerId          layer;
+    Dali::Graphics::TextureDetails::LevelId          mipmapLevel;
+    Dali::Graphics::TextureDetails::DepthStencilFlag depthStencilFlag;
+  };
+
+public:
+  GraphicsController& mController;
+  Dali::Graphics::Extent2D mSize;
+  std::vector<ColorAttachment> mColorAttachments;
+  DepthAttachment mDepthAttachment;
 };
 
 } // Test

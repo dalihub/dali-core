@@ -15,14 +15,20 @@
  */
 
 #include "test-graphics-framebuffer-factory.h"
+#include "test-graphics-framebuffer.h"
 
 namespace Test
 {
-GraphicsFramebufferFactory::GraphicsFramebufferFactory() = default;
+GraphicsFramebufferFactory::GraphicsFramebufferFactory(GraphicsController* controller)
+: mController(*controller)
+{
+}
+
 GraphicsFramebufferFactory::~GraphicsFramebufferFactory() = default;
 
 Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetSize( const Dali::Graphics::Extent2D& size )
 {
+  mSize = size;
   return *this;
 }
 
@@ -30,8 +36,15 @@ Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetColorAttachme
   Dali::Graphics::TextureDetails::AttachmentId attachmentIndex,
   const Dali::Graphics::Texture&               texture,
   Dali::Graphics::TextureDetails::LayerId      layer,
-  Dali::Graphics::TextureDetails::LevelId      level )
+  Dali::Graphics::TextureDetails::LevelId      mipmapLevel )
 {
+  if( mColorAttachments.size() <= attachmentIndex )
+  {
+    mColorAttachments.resize( attachmentIndex+1 );
+  }
+  mColorAttachments[attachmentIndex].texture = &texture;
+  mColorAttachments[attachmentIndex].layer = layer;
+  mColorAttachments[attachmentIndex].mipmapLevel = mipmapLevel;
   return *this;
 }
 
@@ -41,12 +54,22 @@ Dali::Graphics::FramebufferFactory& GraphicsFramebufferFactory::SetDepthStencilA
   Dali::Graphics::TextureDetails::LevelId          level,
   Dali::Graphics::TextureDetails::DepthStencilFlag depthStencilFlag )
 {
+  mDepthAttachment = DepthAttachment{ &texture, layer, level, depthStencilFlag };
   return *this;
 }
 
 Dali::Graphics::FramebufferFactory::PointerType GraphicsFramebufferFactory::Create() const
 {
-  return nullptr;
+  auto fb = std::make_unique<Test::GraphicsFramebuffer>( mController, mSize, mColorAttachments, mDepthAttachment );
+  return std::move(fb);
 }
+
+void GraphicsFramebufferFactory::TestReset()
+{
+  mColorAttachments.clear();
+  mDepthAttachment = GraphicsFramebufferFactory::DepthAttachment { };
+  mSize = { 0,0 };
+}
+
 
 } // Test

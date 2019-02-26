@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,8 @@ void utc_dali_render_task_cleanup(void)
 
 namespace // unnamed namespace
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
 
@@ -232,7 +234,7 @@ RenderTask CreateRenderTask(TestApplication& application,
   return newTask;
 }
 
-bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool testDrawn, bool& finishedSig, bool testFinished, bool testKeepUpdating, int lineNumber )
+bool UpdateRender(TestApplication& application, Test::TraceCallStack& callStack, bool testDrawn, bool& finishedSig, bool testFinished, bool testKeepUpdating, int lineNumber )
 {
   finishedSig = false;
   callStack.Reset();
@@ -286,6 +288,7 @@ bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool 
   return result;
 }
 
+#pragma GCC diagnostic pop
 } // unnamed namespace
 
 
@@ -353,6 +356,8 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Stage stage = Stage::GetCurrent();
   RenderTaskList taskList = stage.GetRenderTaskList();
@@ -387,6 +392,7 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   // Check that nothing was rendered
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
 
+#endif
   END_TEST;
 }
 
@@ -396,6 +402,8 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that switching source from a non-renderable to a renderable actor causes the texture to be drawn");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Stage stage = Stage::GetCurrent();
 
@@ -446,6 +454,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   // Check that the newActor was rendered
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+#endif
   END_TEST;
 }
 
@@ -454,6 +463,8 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetSourceActor (on/off stage testing)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Stage stage = Stage::GetCurrent();
   RenderTaskList taskList = stage.GetRenderTaskList();
@@ -498,7 +509,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -507,6 +518,8 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetSourceActor (empty handle case)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Stage stage = Stage::GetCurrent();
   RenderTaskList taskList = stage.GetRenderTaskList();
@@ -549,6 +562,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
 
   // Check that the newActor was rendered
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+#endif
   END_TEST;
 }
 
@@ -613,6 +627,8 @@ int UtcDaliRenderTaskSetExclusive(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetExclusive() Check that exclusion works");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
@@ -757,6 +773,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     // Test that task 2 renders actor2
     DALI_TEST_CHECK( boundTextures[2] == 9u );
   }
+#endif
   END_TEST;
 }
 
@@ -765,6 +782,8 @@ int UtcDaliRenderTaskSetExclusive02(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SetExclusive() Check that changing from exclusive to not-exclusive works");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   std::vector<GLuint> ids;
   ids.push_back( 8 ); // 8 = actor1
@@ -799,6 +818,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
 
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION );
 
+#endif
   END_TEST;
 }
 
@@ -1809,6 +1829,8 @@ int UtcDaliRenderTaskSignalFinished(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::SignalFinished()");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
@@ -1876,6 +1898,8 @@ int UtcDaliRenderTaskSignalFinished(void)
   DALI_TEST_CHECK( finished );
 
   DALI_TEST_EQUALS( application.GetUpdateStatus(), 0, TEST_LOCATION );
+
+#endif
   END_TEST;
 }
 
@@ -1885,6 +1909,8 @@ int UtcDaliRenderTaskContinuous01(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Continuous using loading image\nPRE: render task not ready (source actor not staged)\nPOST:continuous renders, no Finished signal");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1914,6 +1940,7 @@ int UtcDaliRenderTaskContinuous01(void)
 
   // CONTINUE PROCESS/RENDER                  Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false, false, __LINE__ ) );
+#endif
   END_TEST;
 }
 
@@ -1923,6 +1950,8 @@ int UtcDaliRenderTaskContinuous02(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Continuous using loading image\nPRE: render task not ready (source actor not visible)\nPOST:continuous renders, no Finished signal");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1955,6 +1984,8 @@ int UtcDaliRenderTaskContinuous02(void)
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
+
+#endif
   END_TEST;
 }
 
@@ -1963,6 +1994,8 @@ int UtcDaliRenderTaskContinuous03(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Continuous using loading image\nPRE: render task not ready (camera actor not staged)\nPOST:continuous renders, no Finished signal");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1992,6 +2025,8 @@ int UtcDaliRenderTaskContinuous03(void)
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
+
+#endif
   END_TEST;
 }
 
@@ -2001,6 +2036,8 @@ int UtcDaliRenderTaskContinuous04(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Continuous using loaded image");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2023,6 +2060,7 @@ int UtcDaliRenderTaskContinuous04(void)
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, false, false, __LINE__ ) );
+#endif
   END_TEST;
 }
 
@@ -2031,6 +2069,8 @@ int UtcDaliRenderTaskOnce01(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Once GlSync, using loaded image");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2061,6 +2101,8 @@ int UtcDaliRenderTaskOnce01(void)
 
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__  ) );
+
+#endif
   END_TEST;
 }
 
@@ -2069,6 +2111,8 @@ int UtcDaliRenderTaskOnce02(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Once GlSync, using Mesh which accesses texture through sampler with loaded image.\n");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2109,7 +2153,8 @@ int UtcDaliRenderTaskOnce02(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__  ) );
 
-   END_TEST;
+#endif
+  END_TEST;
 }
 
 int UtcDaliRenderTaskOnce03(void)
@@ -2117,6 +2162,8 @@ int UtcDaliRenderTaskOnce03(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Once GlSync, using loaded image. Switch from render always after ready to render once\n");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2152,6 +2199,7 @@ int UtcDaliRenderTaskOnce03(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__  ) );
 
+#endif
   END_TEST;
 }
 
@@ -2162,6 +2210,8 @@ int UtcDaliRenderTaskOnce04(void)
   tet_infoline("Testing RenderTask Render Once GlSync, using Mesh which accesses texture through sampler with loaded image.\n"
                "Switch from render always after ready to render once\n"
               );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2207,6 +2257,7 @@ int UtcDaliRenderTaskOnce04(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true, __LINE__  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__  ) );
 
+#endif
   END_TEST;
 }
 
@@ -2215,6 +2266,8 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask Render Once, \nPRE: Resources ready\nPOST: Finished signal sent once only");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2237,6 +2290,8 @@ int UtcDaliRenderTaskOnceNoSync01(void)
 
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__ ) );
+
+#endif
   END_TEST;
 }
 
@@ -2246,6 +2301,9 @@ int UtcDaliRenderTaskOnceNoSync02(void)
 
   tet_infoline("Testing RenderTask Render Once, using Mesh which accesses texture through sampler with loaded image.\n"
                "PRE: Resources ready\nPOST: Finished signal sent once only");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   // SETUP AN OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
@@ -2279,6 +2337,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__ ) );
 
+#endif
   END_TEST;
 }
 
@@ -2289,6 +2348,8 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   tet_infoline("Testing RenderTask Render Once, using loaded image. Switch from render always after ready to render once\n"
                "PRE: Render task ready, Image loaded\n"
                "POST: Finished signal sent only once");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2315,6 +2376,8 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   application.SendNotification(); //         Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true, __LINE__ ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false, __LINE__ ) );
+
+#endif
   END_TEST;
 }
 
@@ -2326,6 +2389,8 @@ int UtcDaliRenderTaskOnceNoSync04(void)
                "Switch from render always after ready to render once\n"
                "PRE: Render task ready, Image not loaded\n"
                "POST: Finished signal sent only once");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2369,7 +2434,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
 
   lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj == NULL );
-
+#endif
   END_TEST;
 }
 
@@ -2381,6 +2446,8 @@ int UtcDaliRenderTaskOnceNoSync05(void)
                "SetRefreshRate(ONCE), resource load failed, completes render task.\n"
                "PRE: resources failed to load\n"
                "POST: No finished signal sent.");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2407,7 +2474,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false, __LINE__ ) );
-
+#endif
   END_TEST;
 }
 
@@ -2421,6 +2488,8 @@ int UtcDaliRenderTaskOnceChain01(void)
                "SetRefreshRate(ONCE), resource load completes, both render tasks render.\n"
                "PRE: resources ready\n"
                "POST: 2 finished signals sent.");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2461,7 +2530,7 @@ int UtcDaliRenderTaskOnceChain01(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, true, false, __LINE__ ) );
   DALI_TEST_CHECK( firstFinished == true );
   DALI_TEST_CHECK( secondFinished == true );
-
+#endif
   END_TEST;
 }
 
@@ -2483,6 +2552,8 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   TestApplication application;
 
   tet_infoline("Testing RenderTask::FinishInvisibleSourceActor()");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
@@ -2560,6 +2631,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   application.SendNotification();
   DALI_TEST_CHECK( ! finished );
 
+#endif
   END_TEST;
 }
 
