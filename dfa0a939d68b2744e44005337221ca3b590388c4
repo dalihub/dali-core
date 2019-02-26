@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6b51430_ab8db6d5",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-26T14:03:00Z",
+      "side": 1,
+      "message": "Would be more obvious if a test for \u0027future\u0027 was added here",
+      "range": {
+        "startLine": 945,
+        "startChar": 47,
+        "endLine": 945,
+        "endChar": 49
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44202177_8531951a",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1085,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-26T14:03:00Z",
+      "side": 1,
+      "message": "Should uploading a texture trigger another update? (i.e. should updateScene be true if futures was true?)",
+      "range": {
+        "startLine": 1078,
+        "startChar": 1,
+        "endLine": 1085,
+        "endChar": 19
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "13ac52c8_9fc66588",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-26T14:03:00Z",
+      "side": 1,
+      "message": "should be outside Extension condition.",
+      "range": {
+        "startLine": 412,
+        "startChar": 8,
+        "endLine": 412,
+        "endChar": 39
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
