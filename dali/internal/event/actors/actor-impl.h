@@ -54,7 +54,6 @@ class ActorGestureData;
 class Animation;
 class RenderTask;
 class Renderer;
-class Scene;
 
 typedef std::vector< ActorPtr > ActorContainer;
 typedef ActorContainer::iterator ActorIter;
@@ -1706,20 +1705,6 @@ public:
    */
   void LowerBelow( Internal::Actor& target );
 
-public:
-
-  /**
-   * Sets the scene which this actor is added to.
-   * @param[in] scene The scene
-   */
-  void SetScene( Scene& scene );
-
-  /**
-   * Gets the scene which this actor is added to.
-   * @return The scene
-   */
-  Scene& GetScene() const;
-
 private:
 
   struct SendMessage
@@ -1927,8 +1912,6 @@ private:
   void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set = false );
 
 protected:
-
-  Scene* mScene;                  ///< The scene the actor is added to
 
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
   ActorContainer* mChildren;      ///< Container of referenced actors, lazily initialized

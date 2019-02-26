@@ -36,7 +36,6 @@ class RenderTaskDefaults;
 class Actor;
 class CameraActor;
 
-using RenderTaskPtr = IntrusivePtr<RenderTask>;
 class RenderTaskList;
 using RenderTaskListPtr = IntrusivePtr<RenderTaskList>;
 
@@ -139,12 +138,6 @@ public:
    * and a refresh rate of RefreshOnce.
    */
   void RecoverFromContextLoss();
-
-  /**
-   * Retrieve the SceneGraph::RenderTaskList object.
-   * @return The RenderTaskList.
-   */
-  const SceneGraph::RenderTaskList& GetSceneObject() const;
 
 protected:
 

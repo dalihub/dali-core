@@ -77,7 +77,6 @@ SET(TC_SOURCES
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
         utc-Dali-Sampler.cpp
-        utc-Dali-Scene.cpp
         utc-Dali-Scripting.cpp
         utc-Dali-Shader.cpp
         utc-Dali-SignalDelegate.cpp
@@ -116,7 +115,6 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-native-image.cpp
         dali-test-suite-utils/test-platform-abstraction.cpp
         dali-test-suite-utils/test-render-controller.cpp
-        dali-test-suite-utils/test-render-surface.cpp
         dali-test-suite-utils/test-trace-call-stack.cpp
 )
 

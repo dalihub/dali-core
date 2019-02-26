@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
@@ -135,7 +136,7 @@ const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
 }
 
 TextureSet::TextureSet()
-:mEventThreadServices( EventThreadServices::Get() ),
+:mEventThreadServices( *Stage::GetCurrent() ),
  mSceneObject( NULL )
 {
 }

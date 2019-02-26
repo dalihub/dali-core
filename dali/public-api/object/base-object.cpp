@@ -24,7 +24,6 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
 {
@@ -39,21 +38,20 @@ BaseObject::~BaseObject()
 
 void BaseObject::RegisterObject()
 {
-  Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
-  if ( tls )
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  if( stage )
   {
-    tls->GetEventThreadServices().RegisterObject( this );
+    stage->RegisterObject( this );
   }
 }
 
 void BaseObject::UnregisterObject()
 {
-  Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
-
   // Guard to allow handle destruction after Core has been destroyed
-  if( tls )
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  if( stage )
   {
-    tls->GetEventThreadServices().UnregisterObject( this );
+    stage->UnregisterObject( this );
   }
 }
 

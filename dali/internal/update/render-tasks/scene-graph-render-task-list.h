@@ -135,7 +135,7 @@ private:
 
 // Messages for RenderTaskList
 
-inline void AddTaskMessage( EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer< RenderTask >& task )
+inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, OwnerPointer< RenderTask >& task )
 {
   // Message has ownership of the RenderTask while in transit from event -> update
   typedef MessageValue1< RenderTaskList, OwnerPointer< RenderTask > > LocalType;
@@ -147,7 +147,7 @@ inline void AddTaskMessage( EventThreadServices& eventThreadServices, const Rend
   new (slot) LocalType( &list, &RenderTaskList::AddTask, task );
 }
 
-inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, const RenderTaskList& list, const RenderTask& constTask )
+inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, const RenderTask& constTask )
 {
   // Scene graph thread can destroy this object.
   RenderTask& task = const_cast< RenderTask& >( constTask );

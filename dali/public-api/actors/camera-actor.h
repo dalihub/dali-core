@@ -135,8 +135,7 @@ public:
   /**
    * @brief Creates a CameraActor object.
    *
-   * @note No default camera perspective projection is set by this method. @see SetPerspectiveProjection().
-   *
+   * Sets the default camera perspective projection for the stage's size. @see SetPerspectiveProjection().
    * @SINCE_1_0.0
    * @return The newly created camera actor
    */
@@ -333,9 +332,12 @@ public:
    * and the Z position of the actor based on the canvas size so that 1 unit in
    * XY (z=0) plane is 1 pixel on screen.
    *
+   * If the canvas size is ZERO, it sets the default camera perspective
+   * projection for the stage's size.
+   *
    * @SINCE_1_0.0
    * @param[in] size The canvas size
-   * @pre The canvas size must be greater than zero.
+   * @pre If size is non ZERO, \e width and \e height must be greater than zero.
    *
    */
   void SetPerspectiveProjection( const Size& size );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ void TestApplication::Initialize()
                                         Integration::StencilBufferAvailable::TRUE );
 
   mCore->ContextCreated();
+  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
+  mCore->SetDpi( mDpi.x, mDpi.y );
 
   Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
   Dali::Integration::Log::InstallLogFunction(logFunction);
@@ -63,22 +65,12 @@ void TestApplication::Initialize()
 
   Dali::Integration::Trace::LogContext( true, "Test" );
 
-  mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
-  mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
-  mScene.SetSurface( *mRenderSurface );
-
-  mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
-
-  mCore->SurfaceResized( mRenderSurface );
-
   mCore->SceneCreated();
-  mCore->Initialize();
 }
 
 TestApplication::~TestApplication()
 {
   Dali::Integration::Log::UninstallLogFunction();
-  delete mRenderSurface;
   delete mCore;
 }
 
@@ -155,6 +147,19 @@ void TestApplication::ProcessEvent(const Integration::Event& event)
 void TestApplication::SendNotification()
 {
   mCore->ProcessEvents();
+}
+
+void TestApplication::SetSurfaceWidth( uint32_t width, uint32_t height )
+{
+  mSurfaceWidth = width;
+  mSurfaceHeight = height;
+
+  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
+}
+
+void TestApplication::SetTopMargin( uint32_t margin )
+{
+  mCore->SetTopMargin( margin );
 }
 
 void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* location )

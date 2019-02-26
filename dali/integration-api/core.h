@@ -30,9 +30,6 @@
 namespace Dali
 {
 
-class Layer;
-class RenderTaskList;
-
 namespace Internal
 {
 class Core;
@@ -47,7 +44,6 @@ class GlSyncAbstraction;
 class PlatformAbstraction;
 class Processor;
 class RenderController;
-class RenderSurface;
 struct Event;
 struct TouchData;
 
@@ -251,11 +247,6 @@ public:
    */
   ~Core();
 
-  /**
-   * Initialize the core
-   */
-  void Initialize();
-
   // GL Context Lifecycle
 
   /**
@@ -295,9 +286,31 @@ public:
    * This should be done at least once i.e. after the first call to ContextCreated().
    * The Core will use the surface size for camera calculations, and to set the GL viewport.
    * Multi-threading note: this method should be called from the main thread
-   * @param[in] surface The resized surface
+   * @param[in] width The new surface width.
+   * @param[in] height The new surface height.
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized( uint32_t width, uint32_t height );
+
+  /**
+   * Notify the Core about the top margin size.
+   * Available stage size is reduced by this size.
+   * The stage is located below the size at the top of the display
+   * It is mainly useful for indicator in mobile device
+   * @param[in] margin margin size
+   */
+  void SetTopMargin( uint32_t margin );
+
+  // Core setters
+
+  /**
+   * Notify the Core about the display's DPI values.
+   * This should be done after the display is initialized and a Core instance is created.
+   * The Core will use the DPI values for font rendering.
+   * Multi-threading note: this method should be called from the main thread
+   * @param[in] dpiHorizontal Horizontal DPI value.
+   * @param[in] dpiVertical   Vertical DPI value.
+   */
+  void SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical );
 
   // Core Lifecycle
 

@@ -670,16 +670,11 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   // Check that the actor1 was rendered
   const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 0 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( boundTextures.size(), 1u, TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    int c = 0;
-    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
-    if( boundTextures.size() > 1 )
-    {
-      DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
-    }
+    DALI_TEST_EQUALS( boundTextures[0], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
   BufferImage img2 = BufferImage::New( 1,1 );
@@ -698,17 +693,12 @@ int UtcDaliRenderTaskSetExclusive(void)
   application.Render();
 
   // Check that the actors were rendered
-  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 1 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( boundTextures.size(), 2u, TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    int c = 0;
-    DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor2*/, TEST_LOCATION );
-    if( boundTextures.size() > 2 )
-    {
-      DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor1*/, TEST_LOCATION );
-    }
-    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[0], 9u/*unique to actor2*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[1], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
   BufferImage img3 = BufferImage::New( 1,1 );
@@ -727,18 +717,13 @@ int UtcDaliRenderTaskSetExclusive(void)
   application.Render();
 
   // Check that the actors were rendered
-  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 2 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( boundTextures.size(), 3u, TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    int c = 0;
-    DALI_TEST_EQUALS( boundTextures[c++], 10u/*unique to actor3*/, TEST_LOCATION );
-    if( boundTextures.size() > 3 )
-    {
-      DALI_TEST_EQUALS( boundTextures[c++], 10u/*unique to actor2*/, TEST_LOCATION );
-    }
-    DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor2*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[0], 10u/*unique to actor3*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[1], 9u/*unique to actor2*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[2], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
   // Both actors are now connected to the root node
@@ -1154,9 +1139,9 @@ int UtcDaliRenderTaskGetFrameBufferN(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  // A scene creates frame buffer by default
+  // By default render-tasks do not render off-screen
   FrameBuffer frameBuffer = task.GetFrameBuffer();
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK( !frameBuffer );
 
   END_TEST;
 }
@@ -1929,7 +1914,7 @@ int UtcDaliRenderTaskContinuous01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
@@ -1967,7 +1952,7 @@ int UtcDaliRenderTaskContinuous02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
@@ -2007,7 +1992,7 @@ int UtcDaliRenderTaskContinuous03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2045,7 +2030,7 @@ int UtcDaliRenderTaskContinuous04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2076,7 +2061,7 @@ int UtcDaliRenderTaskOnce01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
 
@@ -2114,7 +2099,7 @@ int UtcDaliRenderTaskOnce02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2162,7 +2147,7 @@ int UtcDaliRenderTaskOnce03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2207,7 +2192,7 @@ int UtcDaliRenderTaskOnce04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2259,7 +2244,7 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2289,7 +2274,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2333,7 +2318,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2370,7 +2355,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2425,7 +2410,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2465,7 +2450,7 @@ int UtcDaliRenderTaskOnceChain01(void)
   Actor defaultRootActor = Actor::New(); // Root for default RT
   Stage::GetCurrent().Add( defaultRootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor offscreenCameraActor = CameraActor::New();
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor firstRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(firstRootActor);

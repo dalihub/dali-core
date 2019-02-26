@@ -282,7 +282,7 @@ int UtcDaliCameraActorSetFieldOfViewP(void)
   CameraActor defaultCamera = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   const float defaultFieldOfView = defaultCamera.GetFieldOfView();
 
-  CameraActor actor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor actor = CameraActor::New();
   DALI_TEST_EQUALS( actor.GetFieldOfView(), defaultFieldOfView, TEST_LOCATION );
 
   float fieldOfView = Math::PI / 3.0f;
@@ -303,7 +303,7 @@ int UtcDaliCameraActorSetFieldOfViewN(void)
   CameraActor defaultCamera = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   const float defaultFieldOfView = defaultCamera.GetFieldOfView();
 
-  CameraActor actor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor actor = CameraActor::New();
   DALI_TEST_EQUALS( actor.GetFieldOfView(), defaultFieldOfView, TEST_LOCATION );
 
   float fieldOfView = Math::PI / 3.0f;
@@ -327,7 +327,7 @@ int UtcDaliCameraActorGetFieldOfViewP(void)
   const float cameraZ = 2.0f * std::max( size.width, size.height );
   const float expectedFieldOfView = 2.0f * std::atan( size.height * 0.5f / cameraZ );
 
-  CameraActor actor = CameraActor::New( size );
+  CameraActor actor = CameraActor::New();
   DALI_TEST_EQUALS( actor.GetFieldOfView(), expectedFieldOfView, TEST_LOCATION );
 
   float value;
@@ -364,7 +364,7 @@ int UtcDaliCameraActorSetAspectRatioP(void)
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor Set Aspect Ratio (P)" );
 
-  CameraActor actor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor actor = CameraActor::New();
   DALI_TEST_EQUALS( actor.GetAspectRatio(), static_cast<float>( TestApplication::DEFAULT_SURFACE_WIDTH ) / static_cast<float>( TestApplication::DEFAULT_SURFACE_HEIGHT ), TEST_LOCATION );
 
   // Set an initial value to confirm a further set changes it.
@@ -407,7 +407,7 @@ int UtcDaliCameraActorGetAspectRatioP(void)
   TestApplication application;
   tet_infoline("Testing Dali::CameraActor Get Aspect Ratio");
 
-  CameraActor actor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor actor = CameraActor::New();
   float defaultAspect = static_cast<float>( TestApplication::DEFAULT_SURFACE_WIDTH ) / static_cast<float>( TestApplication::DEFAULT_SURFACE_HEIGHT );
 
   DALI_TEST_EQUALS( actor.GetAspectRatio(), defaultAspect, TEST_LOCATION );
@@ -576,7 +576,7 @@ int UtcDaliCameraActorGetFarClippingPlaneP(void)
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor Get Far clipping plane (P)" );
 
-  CameraActor actor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  CameraActor actor = CameraActor::New();
   float defaultValue = 800.0f + ( 0xFFFF >> 4 );
   DALI_TEST_EQUALS( actor.GetFarClippingPlane(), defaultValue, TEST_LOCATION );
 
@@ -805,14 +805,16 @@ int UtcDaliCameraActorSetPerspectiveProjectionN(void)
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor::SetPerspectiveProjection (N)" );
 
+  Stage stage = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
   CameraActor actor = CameraActor::New();
 
-  // Check that setting perspective projection without a size does not do anything.
+  // Check that setting perspective projection without a size (using zero size) uses the stages size.
   actor.SetPerspectiveProjection( Size::ZERO );
 
-  // So the default values should be the same as defined in CameraActor
-  float nearClippingPlane = 800.0f;
-  float farClippingPlane = nearClippingPlane + 2.0f * nearClippingPlane;
+  float nearClippingPlane = std::max( stageSize.width, stageSize.height );
+  float farClippingPlane = nearClippingPlane + static_cast<float>( 0xFFFF >> 4 );
 
   DALI_TEST_EQUALS( nearClippingPlane, actor.GetNearClippingPlane(), FLOAT_EPSILON, TEST_LOCATION );
   DALI_TEST_EQUALS( farClippingPlane, actor.GetFarClippingPlane(), FLOAT_EPSILON, TEST_LOCATION );
