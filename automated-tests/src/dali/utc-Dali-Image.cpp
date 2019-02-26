@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,8 @@ int UtcDaliImageDiscard01(void)
 {
   TestApplication application;
   tet_infoline("UtcDaliImageDiscard01 - no actors");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   {
     Image image = ResourceImage::New(gTestImageFilename);
@@ -127,5 +129,7 @@ int UtcDaliImageDiscard01(void)
   const std::vector<GLuint>& texIds = application.GetGlAbstraction().GetNextTextureIds();
   DALI_TEST_CHECK( texIds.size() == 1 );
   DALI_TEST_CHECK( texIds[0] == 23 );
+
+#endif
   END_TEST;
 }

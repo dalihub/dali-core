@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
-#include <dali/integration-api/gl-abstraction.h>
+
 
 using std::max;
 using namespace Dali;
@@ -113,6 +113,8 @@ int UtcDaliFrameBufferImageAttachments01(void)
   TestApplication application;
 
   tet_infoline("UtcDaliFrameBufferImageAttachments01 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // invoke default handle constructor
   FrameBufferImage image;
@@ -130,7 +132,7 @@ int UtcDaliFrameBufferImageAttachments01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -139,6 +141,8 @@ int UtcDaliFrameBufferImageAttachments02(void)
   TestApplication application;
 
   tet_infoline("UtcDaliFrameBufferImageAttachments02 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // invoke default handle constructor
   FrameBufferImage image;
@@ -156,7 +160,7 @@ int UtcDaliFrameBufferImageAttachments02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -165,6 +169,8 @@ int UtcDaliFrameBufferImageAttachments03(void)
   TestApplication application;
 
   tet_infoline("UtcDaliFrameBufferImageAttachments03 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // invoke default handle constructor
   FrameBufferImage image;
@@ -182,7 +188,7 @@ int UtcDaliFrameBufferImageAttachments03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -191,6 +197,8 @@ int UtcDaliFrameBufferImageAttachments04(void)
   TestApplication application;
 
   tet_infoline("UtcDaliFrameBufferImageAttachments04 - FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // invoke default handle constructor
   FrameBufferImage image;
@@ -208,7 +216,7 @@ int UtcDaliFrameBufferImageAttachments04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 

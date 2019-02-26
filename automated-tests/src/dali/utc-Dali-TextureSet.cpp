@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ enum SetSampler
   DONT_SET_SAMPLER
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 Actor CreateActor( SetSampler setSamplerOption )
 {
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64 );
@@ -60,7 +62,7 @@ Actor CreateActor( SetSampler setSamplerOption )
 
   return actor;
 }
-
+#pragma GCC diagnostic pop
 } // namespace
 
 
@@ -147,6 +149,9 @@ int UtcDaliTextureSetDownCast02(void)
 int UtcDaliTextureSetTexture01(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureSetTexture01");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Actor actor = CreateActor( DONT_SET_SAMPLER );
 
@@ -170,13 +175,16 @@ int UtcDaliTextureSetTexture01(void)
   // There are four calls to TexParameteri when the texture is first created
   // as the texture is using default sampling parametrers there shouldn't be any more calls to TexParameteri
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureSetTexture02(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureSetTexture02");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Actor actor = CreateActor(SET_SAMPLER);
 
@@ -201,13 +209,16 @@ int UtcDaliTextureSetTexture02(void)
   // Texture minification and magnification filters are now different than default so
   //there should have been two extra TexParameteri calls to set the new filter mode
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 6, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureSetMultiple(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureSetMultiple");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Actor actor1 = CreateActor(SET_SAMPLER);
   Actor actor2 = CreateActor(SET_SAMPLER);
@@ -234,13 +245,16 @@ int UtcDaliTextureSetMultiple(void)
   // Texture minification and magnification filters are now different than default so
   //there should have been two extra TexParameteri calls to set the new filter mode
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2 * 6, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureSetSetSampler(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureSetSetSampler");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -294,7 +308,7 @@ int UtcDaliTextureSetSetSampler(void)
   //There should have been two calls to TexParameteri to set the new filtering mode
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
 
-
+#endif
   END_TEST;
 }
 

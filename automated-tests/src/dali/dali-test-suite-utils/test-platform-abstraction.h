@@ -2,7 +2,7 @@
 #define __DALI_TEST_PLATFORM_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public: // TEST FUNCTIONS
 
   inline void EnableTrace(bool enable) { mTrace.Enable(enable); }
   inline void ResetTrace() { mTrace.Reset(); }
-  inline TraceCallStack& GetTrace() { return mTrace; }
+  inline Test::TraceCallStack& GetTrace() { return mTrace; }
 
   /**
    * @brief Checks if a platform function was called
@@ -175,7 +175,7 @@ private:
     Dali::Vector< unsigned char> buffer;
   };
 
-  mutable TraceCallStack        mTrace;
+  mutable Test::TraceCallStack  mTrace;
   bool                          mIsLoadingResult;
   ImageDimensions               mClosestSize;
 

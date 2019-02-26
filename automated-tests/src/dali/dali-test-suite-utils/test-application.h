@@ -64,6 +64,7 @@ public:
   static void LogContext( bool start, const char* tag );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
+  Test::GraphicsController& GetGraphicsController();
   TestRenderController& GetRenderController();
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);

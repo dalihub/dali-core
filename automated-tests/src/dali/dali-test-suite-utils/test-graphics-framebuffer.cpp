@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,36 +12,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali-test-suite-utils.h>
-#include <dali/graphics/graphics-controller.h>
+#include "test-graphics-framebuffer.h"
 
-using Dali::Graphics::Manager;
-
-void utc_dali_graphics_manager_startup(void)
+namespace Test
 {
-  test_return_value = TET_UNDEF;
+
+GraphicsFramebuffer::GraphicsFramebuffer(
+  GraphicsController& controller,
+  Dali::Graphics::Extent2D size,
+  const std::vector<GraphicsFramebufferFactory::ColorAttachment>& colorAttachments,
+  const GraphicsFramebufferFactory::DepthAttachment& depthAttachment )
+: mController( controller ),
+  mSize ( size ),
+  mColorAttachments( colorAttachments ),
+  mDepthAttachment( depthAttachment )
+{
 }
 
-void utc_dali_graphics_manager_cleanup(void)
+GraphicsFramebuffer::~GraphicsFramebuffer()
 {
-  test_return_value = TET_PASS;
 }
 
-int UtcDaliGraphicsManagerCreation(void)
-{
-  Manager manager;
-
-  END_TEST;
-}
-
-int UtcDaliGraphicsManagerCreateTexture(void)
-{
-  Manager manager;
-
-  //  auto texture = manager.CreateTexture();
-
-  END_TEST;
-}
+}//Test
