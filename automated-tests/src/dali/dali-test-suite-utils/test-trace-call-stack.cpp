@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,14 @@
  *
  */
 
+#include "dali-test-suite-utils.h"
 #include "test-trace-call-stack.h"
 #include <sstream>
+#include <cstring>
+#include <unistd.h>
 
-namespace Dali
+namespace Test
 {
-
-std::string ToString(int x)
-{
-  std::stringstream out;
-  out << x;
-  return out.str();
-}
-
-std::string ToString(unsigned int x)
-{
-  std::stringstream out;
-  out << x;
-  return out.str();
-}
-
-std::string ToString(float x)
-{
-  std::stringstream out;
-  out << x;
-  return out.str();
-}
-
 /**
  * Constructor
  */
@@ -59,25 +40,20 @@ void TraceCallStack::Enable(bool enable) { mTraceActive = enable; }
 
 bool TraceCallStack::IsEnabled() { return mTraceActive; }
 
-/**
- * Push a call onto the stack if the trace is active
- * @param[in] method The name of the method
- * @param[in] params A comma separated list of parameter values
- */
-void TraceCallStack::PushCall(std::string method, std::string params)
+void TraceCallStack::PushCall(std::string method)
 {
   if(mTraceActive)
   {
-    FunctionCall stackFrame(method, params);
+    FunctionCall stackFrame(method);
     mCallStack.push_back( stackFrame );
   }
 }
 
-void TraceCallStack::PushCall(std::string method, std::string params, const TraceCallStack::NamedParams& altParams)
+void TraceCallStack::PushCall(std::string method, const TraceCallStack::NamedParams& params)
 {
   if(mTraceActive)
   {
-    FunctionCall stackFrame(method, params, altParams);
+    FunctionCall stackFrame(method, params);
     mCallStack.push_back( stackFrame );
   }
 }
@@ -101,7 +77,7 @@ bool TraceCallStack::FindMethod(std::string method) const
   return found;
 }
 
-bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string& params ) const
+bool TraceCallStack::FindMethodAndGetParameters(std::string method, NamedParams& params ) const
 {
   bool found = false;
   for( size_t i=0; i < mCallStack.size(); i++ )
@@ -109,7 +85,7 @@ bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string&
     if( 0 == mCallStack[i].method.compare(method) )
     {
       found = true;
-      params = mCallStack[i].paramList;
+      params = mCallStack[i].namedParams;
       break;
     }
   }
@@ -129,83 +105,101 @@ int TraceCallStack::CountMethod(std::string method) const
   return numCalls;
 }
 
-/**
- * Search for a method in the stack with the given parameter list
- * @param[in] method The name of the method
- * @param[in] params A comma separated list of parameter values
- * @return true if the method was in the stack
- */
-bool TraceCallStack::FindMethodAndParams(std::string method, std::string params) const
+bool TraceCallStack::FindMethodAndParams(std::string method, const TraceCallStack::NamedParams& params) const
 {
   return FindIndexFromMethodAndParams( method, params ) > -1;
 }
 
-bool TraceCallStack::FindMethodAndParams(std::string method, const NamedParams& params) const
+bool AnyEquals( Dali::Any test, Dali::Any match )
 {
-  return FindIndexFromMethodAndParams( method, params ) > -1;
-}
-
-bool TraceCallStack::FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const
-{
-  for( size_t i = startIndex; i < mCallStack.size(); ++i )
+  if( test.GetType() == match.GetType() )
   {
-    if( ( mCallStack[i].method.compare( method ) == 0 ) && ( mCallStack[i].paramList.compare( params ) == 0 ) )
+    if( test.GetType() == typeid(bool) )
     {
-      startIndex = i;
-      return true;
+      return test.Get<bool>() == match.Get<bool>();
+    }
+    if( test.GetType() == typeid(size_t) )
+    {
+      return test.Get<size_t>() == match.Get<size_t>();
+    }
+    if( test.GetType() == typeid(uint32_t) )
+    {
+      return test.Get<uint32_t>() == match.Get<uint32_t>();
+    }
+    if( test.GetType() == typeid(int32_t) )
+    {
+      return test.Get<int32_t>() == match.Get<int32_t>();
+    }
+    if( test.GetType() == typeid(int) )
+    {
+      return test.Get<int>() == match.Get<int>();
+    }
+    else if( test.GetType() == typeid(float) )
+    {
+      return Equals(test.Get<float>(), match.Get<float>());
+    }
+    else if( test.GetType() == typeid(std::string) )
+    {
+      return test.Get<std::string>() == match.Get<std::string>();
+    }
+    else
+    {
+      DALI_TEST_CHECK(false); // Fail the test case if it's constructed with an unknown type.
     }
   }
   return false;
 }
 
-/**
- * Search for a method in the stack with the given parameter list
- * @param[in] method The name of the method
- * @param[in] params A comma separated list of parameter values
- * @return index in the stack where the method was found or -1 otherwise
- */
-int32_t TraceCallStack::FindIndexFromMethodAndParams(std::string method, std::string params) const
+bool TraceCallStack::FindMethodAndParamsFromStartIndex(
+  std::string method,
+  const TraceCallStack::NamedParams& params,
+  uint32_t& startIndex ) const
 {
-  int32_t index = -1;
-  for( size_t i=0; i < mCallStack.size(); i++ )
+  for( uint32_t i = startIndex; i < uint32_t(mCallStack.size()); ++i )
   {
-    if( 0 == mCallStack[i].method.compare(method) && 0 == mCallStack[i].paramList.compare(params) )
+    if( mCallStack[i].method.compare( method ) == 0 )
     {
-      index = static_cast<int32_t>( i );
-      break;
-    }
-  }
-  return index;
-}
-
-int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const TraceCallStack::NamedParams& params) const
-{
-  int32_t index = -1;
-  for( size_t i=0; i < mCallStack.size(); i++ )
-  {
-    if( 0 == mCallStack[i].method.compare(method) )
-    {
-      // Test each of the passed in parameters:
-      bool match = true;
-      for( NamedParams::const_iterator iter = params.begin() ; iter != params.end() ; ++iter )
+      bool found = true;
+      auto& namedParams = mCallStack[i].namedParams;
+      for( auto param : params )
       {
-        NamedParams::const_iterator paramIter = mCallStack[i].namedParams.find(iter->first);
-        if( paramIter == params.end() || paramIter->second.compare(iter->second) != 0 )
+        const std::string& paramName = param.first;
+        auto iter = namedParams.find(paramName);
+        if( iter == mCallStack[i].namedParams.end() )
         {
-          match = false;
+          found = false;
           break;
         }
+        else
+        {
+          Any test = iter->second;
+          Any match = param.second;
+          if( !AnyEquals( test, match ) )
+          {
+            found = false;
+            break;
+          }
+        }
       }
-      if( match == true )
+      if(found)
       {
-        index = static_cast<int32_t>( i );
-        break;
+        startIndex = i;
+        return true;
       }
     }
   }
-  return index;
+  return false;
 }
 
+int32_t TraceCallStack::FindIndexFromMethodAndParams(std::string method, const TraceCallStack::NamedParams& params) const
+{
+  uint32_t index = 0;
+  if( FindMethodAndParamsFromStartIndex( method, params, index ) )
+  {
+    return int32_t(index);
+  }
+  return -1;
+}
 
 /**
  * Test if the given method and parameters are at a given index in the stack
@@ -213,9 +207,10 @@ int TraceCallStack::FindIndexFromMethodAndParams(std::string method, const Trace
  * @param[in] method Name of method to test
  * @param[in] params A comma separated list of parameter values to test
  */
-bool TraceCallStack::TestMethodAndParams(int index, std::string method, std::string params) const
+bool TraceCallStack::TestMethodAndParams(uint32_t index, std::string method, const NamedParams& params) const
 {
-  return ( 0 == mCallStack[index].method.compare(method) && 0 == mCallStack[index].paramList.compare(params) );
+  uint32_t startIndex = index;
+  return( FindMethodAndParamsFromStartIndex( method, params, startIndex ) && startIndex == index );
 }
 
 /**
@@ -226,5 +221,63 @@ void TraceCallStack::Reset()
   mCallStack.clear();
 }
 
+std::ostream& operator<<( std::ostream& o, const Dali::Any& param)
+{
+  if(param.GetType() == typeid(bool))
+  {
+    o << param.Get<bool>();
+  }
+  else if( param.GetType() == typeid(uint32_t) )
+  {
+    o << param.Get<uint32_t>();
+  }
+  else if( param.GetType() == typeid(int32_t) )
+  {
+    o << param.Get<int32_t>();
+  }
+  else if(param.GetType() == typeid(int))
+  {
+    o << param.Get<int>();
+  }
+  else if(param.GetType() == typeid(size_t))
+  {
+    o << param.Get<size_t>();
+  }
+  else if(param.GetType() == typeid(float))
+  {
+    o << param.Get<float>();
+  }
+  else if(param.GetType() == typeid(std::string))
+  {
+    o << param.Get<std::string>();
+  }
+  return o;
+}
 
-} // namespace Dali
+std::ostream& operator<<( std::ostream& o, const TraceCallStack::NamedParams& params)
+{
+  bool first = true;
+  for( auto& param : params )
+  {
+    if(!first) o << ", ";
+    first = false;
+    o << param.first << ":" << param.second;
+  }
+  return o;
+}
+
+std::string TraceCallStack::GetTraceString()
+{
+  std::stringstream traceStream;
+  std::size_t functionCount = mCallStack.size();
+  for( std::size_t i = 0; i < functionCount; ++i )
+  {
+    Test::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
+    traceStream << "StackTrace: Index:" << i << ", " << functionCall.method << "(" << functionCall.namedParams << ")"<<std::endl;
+  }
+
+  return traceStream.str();
+}
+
+
+} // namespace Test

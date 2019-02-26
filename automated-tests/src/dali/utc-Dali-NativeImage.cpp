@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,10 @@ int UtcDaliNativeImageGetCustomSamplerTypenameP(void)
 int UtcDaliNativeImageTestCreationFailure(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliNativeImageTestCreationFailure");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   TestNativeImagePointer nativeImageInterface = TestNativeImage::New( 16, 16 );
   NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
 
@@ -203,5 +207,6 @@ int UtcDaliNativeImageTestCreationFailure(void)
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION );
 
+#endif
   END_TEST;
 }

@@ -35,6 +35,9 @@ void framebuffer_set_cleanup(void)
 int UtcDaliFrameBufferNew01(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFramebufferNew01");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -48,13 +51,16 @@ int UtcDaliFrameBufferNew01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNew02(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFramebufferNew02");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -68,7 +74,7 @@ int UtcDaliFrameBufferNew02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -76,6 +82,9 @@ int UtcDaliFrameBufferNew03(void)
 {
   TestApplication application;
 
+  tet_infoline("UtcDaliFramebufferNew03");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   unsigned int width(64);
   unsigned int height(64);
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::STENCIL );
@@ -88,13 +97,16 @@ int UtcDaliFrameBufferNew03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNew04(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFramebufferNew04");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -108,13 +120,15 @@ int UtcDaliFrameBufferNew04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNew05(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNew05");
+
   FrameBuffer frameBuffer;
   DALI_TEST_CHECK( !frameBuffer );
   END_TEST;
@@ -123,6 +137,9 @@ int UtcDaliFrameBufferNew05(void)
 int UtcDaliFrameBufferNew06(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNew06");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -136,13 +153,16 @@ int UtcDaliFrameBufferNew06(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor01(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNewWithColor01");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   uint32_t width = 64;
   uint32_t height = 64;
   FrameBuffer frameBuffer = FrameBuffer::New( width, height );
@@ -153,12 +173,17 @@ int UtcDaliFrameBufferNewWithColor01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor02(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNewWithColor02");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   uint32_t width = 64;
   uint32_t height = 64;
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR );
@@ -169,12 +194,17 @@ int UtcDaliFrameBufferNewWithColor02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor03(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNewWithColor03");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   uint32_t width = 64;
   uint32_t height = 64;
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH );
@@ -185,12 +215,18 @@ int UtcDaliFrameBufferNewWithColor03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor04(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNewWithColor04");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   uint32_t width = 64;
   uint32_t height = 64;
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_STENCIL );
@@ -201,12 +237,17 @@ int UtcDaliFrameBufferNewWithColor04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferNewWithColor05(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferNewWithColor05");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   uint32_t width = 64;
   uint32_t height = 64;
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH_STENCIL );
@@ -217,6 +258,8 @@ int UtcDaliFrameBufferNewWithColor05(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK( frameBuffer.GetColorTexture() );
+
+#endif
   END_TEST;
 }
 
@@ -279,6 +322,9 @@ int UtcDaliFrameBufferDownCast02(void)
 int UtcDaliFrameBufferAttachColorTexture01(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferAttachColorTexture01");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -292,13 +338,16 @@ int UtcDaliFrameBufferAttachColorTexture01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferAttachColorTexture02(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferAttachColorTexture02");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -315,13 +364,16 @@ int UtcDaliFrameBufferAttachColorTexture02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferAttachColorTexture03(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferAttachColorTexture03");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -338,13 +390,16 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
 int UtcDaliFrameBufferAttachColorTexture04(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliFrameBufferAttachColorTexture04");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int width(64);
   unsigned int height(64);
@@ -358,7 +413,7 @@ int UtcDaliFrameBufferAttachColorTexture04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -388,34 +443,6 @@ int UtcDaliFrameBufferGetColorTexture02(void)
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliFramebufferContextLoss(void)
-{
-  tet_infoline("UtcDaliFramebufferContextLoss\n");
-  TestApplication application; // Default config: DALI_DISCARDS_ALL_DATA
-
-  //Create the texture
-  unsigned int width(64);
-  unsigned int height(64);
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  DALI_TEST_CHECK( texture );
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
-  DALI_TEST_CHECK( frameBuffer );
-  frameBuffer.AttachColorTexture( texture, 0u, 1u );
-
-  Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New(geometry, shader);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Lose & regain context (in render 'thread')
-  application.ResetContext();
-  DALI_TEST_CHECK( frameBuffer );
 
   END_TEST;
 }

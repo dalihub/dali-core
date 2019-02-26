@@ -2,7 +2,7 @@
 #define DALI_TEST_ACTOR_UTILS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
+
+#include <vector>
+#include <dali/public-api/rendering/texture-set.h>
 
 namespace Dali
 {
@@ -39,6 +41,7 @@ Actor CreateRenderableActor();
  * @return An actor with a renderer.
  */
 Actor CreateRenderableActor( Image texture );
+Actor CreateRenderableActor( TextureSet texture );
 
 /**
  * @brief Creates a renderable-actor with a texture and custom shaders.
@@ -47,7 +50,9 @@ Actor CreateRenderableActor( Image texture );
  * @param[in] fragmentShader The fragment-shader.
  * @return An actor with a renderer.
  */
-Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader );
+Actor CreateRenderableActor( Image texture, std::vector<uint32_t>& vertexShader, std::vector<uint32_t>& fragmentShader );
+
+Actor CreateRenderableActor( TextureSet textures, std::vector<uint32_t>& vertexShader, std::vector<uint32_t>& fragmentShader );
 
 } // namespace Dali
 

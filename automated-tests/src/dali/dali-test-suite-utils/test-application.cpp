@@ -120,6 +120,11 @@ TestPlatformAbstraction& TestApplication::GetPlatform()
   return mPlatformAbstraction;
 }
 
+Test::GraphicsController& TestApplication::GetGraphicsController()
+{
+  return *mGraphicsController.get();
+}
+
 TestRenderController& TestApplication::GetRenderController()
 {
   return mRenderController;
@@ -163,7 +168,6 @@ void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* locat
 bool TestApplication::Render( uint32_t intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
-  mCore->Render( mRenderStatus, false );
 
   mFrame++;
 

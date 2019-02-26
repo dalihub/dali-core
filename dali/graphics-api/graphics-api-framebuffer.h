@@ -18,6 +18,8 @@
  *
  */
 
+#include <cstdint>
+
 namespace Dali
 {
 namespace Graphics

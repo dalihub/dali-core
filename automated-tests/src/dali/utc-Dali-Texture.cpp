@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,9 @@ int UtcDaliTextureDownCast02(void)
 int UtcDaliTextureUpload01(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureUpload01");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create the texture
   unsigned int width(64);
@@ -181,13 +184,16 @@ int UtcDaliTextureUpload01(void)
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", out.str().c_str() ) );
   }
 
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUpload02(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureUpload02");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create the texture
   unsigned int width(64);
@@ -304,7 +310,7 @@ int UtcDaliTextureUpload02(void)
       DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
     }
   }
-
+#endif
   END_TEST;
 }
 
@@ -312,6 +318,9 @@ int UtcDaliTextureUpload03(void)
 {
   TestApplication application;
 
+  tet_infoline("UtcDaliTextureUpload03");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   //Create the texture
   unsigned int width(64);
   unsigned int height(64);
@@ -360,13 +369,16 @@ int UtcDaliTextureUpload03(void)
     out << GL_TEXTURE_2D <<", "<< 1u << ", " << widthMipmap1 <<", "<< heightMipmap1;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUpload04(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureUpload04");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create the texture
   unsigned int width(64);
@@ -403,12 +415,16 @@ int UtcDaliTextureUpload04(void)
     out << GL_TEXTURE_CUBE_MAP_NEGATIVE_X <<", "<< 1u << ", " << widthMipmap1 <<", "<< heightMipmap1;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUpload05(void)
 {
+  tet_infoline("UtcDaliTextureUpload05");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   Pixel::Format COMPRESSED_PIXEL_FORMATS[] =
   {
     Pixel::COMPRESSED_R11_EAC,
@@ -511,12 +527,16 @@ int UtcDaliTextureUpload05(void)
     }
   }
 
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUpload06(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureUpload06");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create the texture
   unsigned int width(64);
@@ -555,12 +575,16 @@ int UtcDaliTextureUpload06(void)
     out << GL_TEXTURE_2D <<", "<< 0u << ", " << width <<", "<< height;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
   }
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUpload07(void)
 {
+  tet_infoline("UtcDaliTextureUpload07");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   Pixel::Format FLOATING_POINT_PIXEL_FORMATS[] =
   {
     Pixel::RGB16F,
@@ -610,13 +634,16 @@ int UtcDaliTextureUpload07(void)
       DALI_TEST_CHECK( callStack.FindMethodAndParams("TexImage2D", out.str().c_str() ) );
     }
   }
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureUploadSmallerThanSize(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTextureUploadSmallerThanSize");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create the texture
   unsigned int width(64);
@@ -657,13 +684,18 @@ int UtcDaliTextureUploadSmallerThanSize(void)
     DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("TexSubImage2D", params ) );
     DALI_TEST_EQUALS( out.str(), params, TEST_LOCATION );
   }
-
+#endif
   END_TEST;
 }
 
 int UtcDaliTextureGenerateMipmaps(void)
 {
   TestApplication application;
+
+  tet_infoline("UtcDaliTextureGenerateMipmaps");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   unsigned int width(64);
   unsigned int height(64);
 
@@ -688,7 +720,7 @@ int UtcDaliTextureGenerateMipmaps(void)
     out << GL_TEXTURE_CUBE_MAP;
     DALI_TEST_CHECK( callStack.FindMethodAndParams("GenerateMipmap", out.str().c_str() ) );
   }
-
+#endif
   END_TEST;
 }
 
@@ -715,27 +747,6 @@ int UtcDaliTextureGetHeight(void)
   END_TEST;
 }
 
-int UtcDaliTextureContextLoss(void)
-{
-  tet_infoline("UtcDaliTextureContextLoss\n");
-  TestApplication application; // Default config: DALI_DISCARDS_ALL_DATA
-
-  //Create the texture
-  unsigned int width(64);
-  unsigned int height(64);
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
-  DALI_TEST_CHECK( texture );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Lose & regain context (in render 'thread')
-  application.ResetContext();
-  DALI_TEST_CHECK( texture );
-
-  END_TEST;
-}
-
 int UtcDaliNativeImageTexture(void)
 {
   TestApplication application;
@@ -752,4 +763,3 @@ int UtcDaliNativeImageTexture(void)
 
   END_TEST;
 }
-
