@@ -18,15 +18,16 @@
  */
 
 #include <dali/graphics-api/graphics-api-sampler-factory.h>
+#include "test-graphics-sampler.h"
 
 namespace Test
 {
-
+class GraphicsController;
 
 class GraphicsSamplerFactory : public Dali::Graphics::SamplerFactory
 {
 public:
-  GraphicsSamplerFactory();
+  GraphicsSamplerFactory( GraphicsController* controller );
   virtual ~GraphicsSamplerFactory();
 
   Dali::Graphics::SamplerFactory& SetAddressModeU( Dali::Graphics::SamplerAddressMode mode ) override;
@@ -56,6 +57,13 @@ public:
   Dali::Graphics::SamplerFactory& SetCompareOp( Dali::Graphics::CompareOp compareOp ) override;
 
   Dali::Graphics::SamplerFactory::PointerType Create() const override;
+
+public: // Test configuration methods
+  void TestReset();
+
+public:
+  GraphicsController& mController;
+  GraphicsSamplerCreateInfo mCreateInfo;
 };
 
 } // Test

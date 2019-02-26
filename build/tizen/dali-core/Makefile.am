@@ -159,6 +159,13 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-sampler-factory.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-shader-factory.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-texture-factory.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-buffer.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-framebuffer.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-pipeline.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-render-command.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-sampler.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-shader.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-graphics-texture.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \

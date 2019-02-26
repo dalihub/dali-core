@@ -2885,12 +2885,6 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   app.SendNotification();
   app.Render(1);
 
-  std::vector<GLuint> ids;
-  ids.push_back( 8 );   // first rendered actor
-  ids.push_back( 9 );   // second rendered actor
-  ids.push_back( 10 );  // third rendered actor
-  app.GetGlAbstraction().SetNextTextureIds( ids );
-
   BufferImage imageA = BufferImage::New(16, 16);
   BufferImage imageB = BufferImage::New(16, 16);
   BufferImage imageC = BufferImage::New(16, 16);
@@ -2901,13 +2895,10 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   app.SendNotification();
   app.Render(1);
 
-  //Textures are bound when first created. Clear bound textures vector
-  app.GetGlAbstraction().ClearBoundTextures();
-
   // Render a,b,c as regular non-overlays. so order will be:
-  // a (8)
-  // b (9)
-  // c (10)
+  // a
+  // b
+  // c
   Stage::GetCurrent().Add(a);
   Stage::GetCurrent().Add(b);
   Stage::GetCurrent().Add(c);
@@ -2916,35 +2907,46 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   app.Render(1);
 
   // Should be 3 textures changes.
-  const std::vector<GLuint>& boundTextures = app.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-  typedef std::vector<GLuint>::size_type TextureSize;
-  DALI_TEST_EQUALS( boundTextures.size(), static_cast<TextureSize>( 3 ), TEST_LOCATION );
-  if( boundTextures.size() == 3 )
+  auto& renderCmds = app.GetGraphicsController().GetRenderCommands();
+  auto& createdTextures = app.GetGraphicsController().GetTextures();
+  int textureIndex=0;
+  for( auto& renderCmd : renderCmds )
   {
-    DALI_TEST_CHECK( boundTextures[0] == 8u );
-    DALI_TEST_CHECK( boundTextures[1] == 9u );
-    DALI_TEST_CHECK( boundTextures[2] == 10u );
+    const auto& textures = *renderCmd->GetTextureBindings();
+    if( textures.size() > 0 )
+    {
+      DALI_TEST_CHECK(textures[0].texture == createdTextures[textureIndex] );
+      ++textureIndex;
+    }
   }
 
   // Now texture ids have been set, we can monitor their render order.
   // render a as an overlay (last), so order will be:
-  // b (9)
-  // c (10)
-  // a (8)
+  // b
+  // c
+  // a
   a.SetDrawMode( DrawMode::OVERLAY_2D );
-  app.GetGlAbstraction().ClearBoundTextures();
 
   app.SendNotification();
   app.Render(1);
 
   // Should be 3 texture changes.
-  DALI_TEST_EQUALS( boundTextures.size(), static_cast<TextureSize>(3), TEST_LOCATION );
-  if( boundTextures.size() == 3 )
+
+  renderCmds = app.GetGraphicsController().GetRenderCommands();
+  createdTextures = app.GetGraphicsController().GetTextures();
+  std::vector<int> expectedTextures = {1, 2, 0};
+  textureIndex = 0;
+
+  for( auto& renderCmd : renderCmds )
   {
-    DALI_TEST_CHECK( boundTextures[0] == 9u );
-    DALI_TEST_CHECK( boundTextures[1] == 10u );
-    DALI_TEST_CHECK( boundTextures[2] == 8u );
+    const auto& textures = *renderCmd->GetTextureBindings();
+    if( textures.size() > 0 )
+    {
+      DALI_TEST_CHECK(textures[0].texture == createdTextures[expectedTextures[textureIndex]] );
+      ++textureIndex;
+    }
   }
+
   END_TEST;
 }
 
@@ -4017,7 +4019,7 @@ Actor CreateActorWithContent16x16()
   return CreateActorWithContent( 16, 16 );
 }
 
-void GenerateTrace( TestApplication& application, TraceCallStack& enabledDisableTrace, TraceCallStack& stencilTrace )
+void GenerateTrace( TestApplication& application, Test::TraceCallStack& enabledDisableTrace, Test::TraceCallStack& stencilTrace )
 {
   enabledDisableTrace.Reset();
   stencilTrace.Reset();
@@ -4031,6 +4033,7 @@ void GenerateTrace( TestApplication& application, TraceCallStack& enabledDisable
   stencilTrace.Enable( false );
 }
 
+#if 0
 void CheckColorMask( TestGlAbstraction& glAbstraction, bool maskValue )
 {
   const TestGlAbstraction::ColorMaskParams& colorMaskParams = glAbstraction.GetColorMaskParams();
@@ -4040,6 +4043,7 @@ void CheckColorMask( TestGlAbstraction& glAbstraction, bool maskValue )
   DALI_TEST_EQUALS<bool>( colorMaskParams.blue,  maskValue, TEST_LOCATION );
   DALI_TEST_EQUALS<bool>( colorMaskParams.alpha, maskValue, TEST_LOCATION );
 }
+#endif
 
 int UtcDaliActorPropertyClippingP(void)
 {
@@ -4128,6 +4132,8 @@ int UtcDaliActorPropertyClippingActor(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4157,6 +4163,7 @@ int UtcDaliActorPropertyClippingActor(void)
   DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "1", startIndex ) );
   DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilOp", "7680, 7681, 7681", startIndex ) ); // GL_KEEP, GL_REPLACE, GL_REPLACE
 
+#endif
   END_TEST;
 }
 
@@ -4164,6 +4171,8 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
 {
   // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4205,7 +4214,7 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   // Ensure all values in stencil-mask are set to 1.
   startIndex = 0u;
   DALI_TEST_CHECK( stencilTrace.FindMethodAndParamsFromStartIndex( "StencilMask", "255", startIndex ) );
-
+#endif
   END_TEST;
 }
 
@@ -4214,6 +4223,8 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   // This test checks that a hierarchy of actors are clipped correctly by
   // writing to and reading from the correct bit-planes of the stencil buffer.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN nested children" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& stencilTrace = glAbstraction.GetStencilFunctionTrace();
@@ -4283,7 +4294,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
       GenerateTrace( application, enabledDisableTrace, stencilTrace );
     }
   }
-
+#endif
   END_TEST;
 }
 
@@ -4291,6 +4302,8 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
 {
   // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_CHILDREN draw order" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
@@ -4375,7 +4388,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   startIndex = 0u;
   DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParamsFromStartIndex(  "Enable",  "2960", startIndex ) );
   DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParamsFromStartIndex( "Disable", "2960", startIndex ) );
-
+#endif
   END_TEST;
 }
 
@@ -4383,6 +4396,8 @@ int UtcDaliActorPropertyScissorClippingActor(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4426,7 +4441,7 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   compareParametersString.clear();
   compareParametersString << ( stageSize.x - imageSize.x ) << ", " << ( stageSize.y - imageSize.y ) << ", " << imageSize.x << ", " << imageSize.y;
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 464, 784, 16, 16
-
+#endif
   END_TEST;
 }
 
@@ -4434,6 +4449,8 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actors which are siblings" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
 
@@ -4480,7 +4497,7 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
 
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipA ) );
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipB ) );
-
+#endif
   END_TEST;
 }
 
@@ -4488,6 +4505,8 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4557,7 +4576,7 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
     compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
     DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with the expected result
   }
-
+#endif
   END_TEST;
 }
 
@@ -4565,6 +4584,8 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
 {
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline( "Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4647,6 +4668,7 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", clipD ) );
   DALI_TEST_CHECK( scissorTrace.CountMethod( "Scissor" ) == 4 );    // Scissor rect should not be changed in clippingActorE case. So count should be 4.
 
+#endif
   END_TEST;
 }
 
@@ -4654,6 +4676,8 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 {
   // This test checks that an actor with clipping will be ignored if overridden by the Renderer properties.
   tet_infoline( "Testing Actor::Property::CLIPPING_MODE actor with renderer override" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -4694,7 +4718,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   DALI_TEST_CHECK( !enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) );    // 3089 = 0xC11 (GL_SCISSOR_TEST)
 
   DALI_TEST_CHECK( !scissorTrace.FindMethod( "StencilFunc" ) );
-
+#endif
   END_TEST;
 }
 
@@ -4842,7 +4866,8 @@ int UtcDaliActorRaiseLower(void)
 int UtcDaliActorRaiseToTopLowerToBottom(void)
 {
   tet_infoline( "UtcDaliActorRaiseToTop and LowerToBottom test \n" );
-
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestApplication application;
 
   Stage stage( Stage::GetCurrent() );
@@ -5070,13 +5095,15 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  true , TEST_LOCATION );
 
   ResetTouchCallbacks();
-
+#endif
   END_TEST;
 }
 
 int UtcDaliActorRaiseAbove(void)
 {
-  tet_infoline( "UtcDaliActor RaiseToAbove test \n" );
+  tet_infoline( "UtcDaliActorRaiseToAbove test \n" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestApplication application;
 
@@ -5179,13 +5206,15 @@ int UtcDaliActorRaiseAbove(void)
   DALI_TEST_EQUALS( gTouchCallBackCalled3,  false , TEST_LOCATION );
 
   ResetTouchCallbacks();
-
+#endif
   END_TEST;
 }
 
 int UtcDaliActorLowerBelow(void)
 {
   tet_infoline( "UtcDaliActor LowerBelow test \n" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestApplication application;
 
@@ -5404,7 +5433,7 @@ int UtcDaliActorLowerBelow(void)
 
   DALI_TEST_EQUALS( indexC > indexB, true, TEST_LOCATION );
   DALI_TEST_EQUALS( indexA > indexC, true, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 

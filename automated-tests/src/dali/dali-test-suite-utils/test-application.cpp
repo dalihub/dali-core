@@ -119,6 +119,11 @@ TestPlatformAbstraction& TestApplication::GetPlatform()
   return mPlatformAbstraction;
 }
 
+Test::GraphicsController& TestApplication::GetGraphicsController()
+{
+  return *mGraphicsController.get();
+}
+
 TestRenderController& TestApplication::GetRenderController()
 {
   return mRenderController;

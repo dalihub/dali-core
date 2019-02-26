@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,9 @@ int UtcDaliSamplerAssignmentOperator(void)
 int UtcSamplerSetFilterMode(void)
 {
   TestApplication application;
+  tet_infoline("UtcSamplerSetFilterMode");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   Sampler sampler = Sampler::New();
@@ -244,12 +247,16 @@ int UtcSamplerSetFilterMode(void)
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
   DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
+#endif
   END_TEST;
 }
 
 int UtcSamplerSetWrapMode1(void)
 {
   TestApplication application;
+  tet_infoline("UtcSamplerSetWrapMode1");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
   TextureSet textureSet = CreateTextureSet();
@@ -311,13 +318,16 @@ int UtcSamplerSetWrapMode1(void)
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
 
   //Todo: Test the other wrap mode ( REPEAT, MIRRORED_REPEAT )  , currently not support!!
-
+#endif
   END_TEST;
 }
 
 int UtcSamplerSetWrapMode2(void)
 {
   TestApplication application;
+  tet_infoline("UtcSamplerSetWrapMode2");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   // Create a cube-map texture.
   unsigned int width = 8u;
@@ -385,5 +395,6 @@ int UtcSamplerSetWrapMode2(void)
 
   // Verify that 3 TexParameteri calls occurred.
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3u, TEST_LOCATION );
+#endif
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ enum TestAttribType
 };
 
 // Create bitmap actor
+#if 0
 static Actor CreateBitmapActor()
 {
   BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
@@ -51,7 +52,7 @@ static Actor CreateBitmapActor()
   actor.SetName("Test Image Rendering Actor");
   return actor;
 }
-
+#endif
 } // anonymous namespace
 
 
@@ -59,6 +60,8 @@ static Actor CreateBitmapActor()
 int UtcDaliContextVertexAttribStartup(void)
 {
   tet_infoline("Testing vertex attrib initial state in context");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestApplication application;
 
@@ -74,6 +77,7 @@ int UtcDaliContextVertexAttribStartup(void)
   }
 
   tet_result(TET_PASS);
+#endif
   END_TEST;
 }
 
@@ -81,6 +85,8 @@ int UtcDaliContextVertexAttribStartup(void)
 int UtcDaliContextVertexAttribImageRendering(void)
 {
   tet_infoline("Testing vertex attrib rendering state in context with images");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestApplication application;
 
@@ -119,5 +125,6 @@ int UtcDaliContextVertexAttribImageRendering(void)
 
 
   tet_result(TET_PASS);
+#endif
   END_TEST;
 }

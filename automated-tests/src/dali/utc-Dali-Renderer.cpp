@@ -44,6 +44,7 @@ const BlendFactor::Type   DEFAULT_BLEND_FACTOR_DEST_ALPHA( BlendFactor::ONE_MINU
 const BlendEquation::Type DEFAULT_BLEND_EQUATION_RGB(      BlendEquation::ADD );
 const BlendEquation::Type DEFAULT_BLEND_EQUATION_ALPHA(    BlendEquation::ADD );
 
+#if 0
 /**
  * @brief Get GL stencil test enumeration value as a string.
  * @return The string representation of the value of GL_STENCIL_TEST
@@ -73,6 +74,7 @@ void ResetDebugAndFlush( TestApplication& application, TraceCallStack& glEnableD
   application.SendNotification();
   application.Render();
 }
+#endif
 
 void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
 {
@@ -277,6 +279,8 @@ int UtcDaliRendererSetGetShader(void)
 {
   TestApplication application;
   tet_infoline( "Test SetShader, GetShader" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableCullFaceCallTrace(true);
@@ -316,7 +320,7 @@ int UtcDaliRendererSetGetShader(void)
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   DALI_TEST_EQUALS( renderer.GetShader(), shader2, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -364,6 +368,8 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
   TestApplication application;
 
   tet_infoline("Test SetFaceCullingMode(cullingMode)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New( geometry, shader );
@@ -439,7 +445,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
     cullFace = renderer.GetProperty<int>( Renderer::Property::FACE_CULLING_MODE );
     DALI_TEST_CHECK( static_cast< FaceCullingMode::Type >( cullFace ) == FaceCullingMode::NONE );
   }
-
+#endif
   END_TEST;
 }
 
@@ -448,6 +454,8 @@ int UtcDaliRendererBlendOptions01(void)
   TestApplication application;
 
   tet_infoline("Test BLEND_FACTOR properties ");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -485,7 +493,7 @@ int UtcDaliRendererBlendOptions01(void)
   DALI_TEST_EQUALS( (GLenum)GL_SRC_ALPHA_SATURATE,  glAbstraction.GetLastBlendFuncDstRgb(),   TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_SRC_COLOR, glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_SRC_ALPHA_SATURATE,  glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -494,6 +502,8 @@ int UtcDaliRendererBlendOptions02(void)
   TestApplication application;
 
   tet_infoline("Test BLEND_FACTOR properties ");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -531,7 +541,7 @@ int UtcDaliRendererBlendOptions02(void)
   DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_CONSTANT_COLOR, glAbstraction.GetLastBlendFuncDstRgb(),   TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_CONSTANT_ALPHA,           glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_CONSTANT_ALPHA, glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -565,6 +575,8 @@ int UtcDaliRendererBlendOptions04(void)
   TestApplication application;
 
   tet_infoline("Test SetBlendEquation() ");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -601,7 +613,7 @@ int UtcDaliRendererBlendOptions04(void)
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   DALI_TEST_EQUALS( (GLenum)GL_FUNC_REVERSE_SUBTRACT, glAbstraction.GetLastBlendEquationRgb(),   TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_FUNC_REVERSE_SUBTRACT, glAbstraction.GetLastBlendEquationAlpha(), TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -610,6 +622,8 @@ int UtcDaliRendererSetBlendMode01(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to on with an opaque color renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -633,7 +647,7 @@ int UtcDaliRendererSetBlendMode01(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -642,6 +656,8 @@ int UtcDaliRendererSetBlendMode01b(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to on with an transparent color renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -668,7 +684,7 @@ int UtcDaliRendererSetBlendMode01b(void)
   DALI_TEST_CHECK( !glEnableStack.FindMethod( "Enable" ) );
 
   DALI_TEST_CHECK( !glAbstraction.GetDrawTrace().FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
@@ -677,6 +693,8 @@ int UtcDaliRendererSetBlendMode02(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to off with a transparent color renders with blending disabled (and not enabled)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -700,7 +718,7 @@ int UtcDaliRendererSetBlendMode02(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -709,6 +727,8 @@ int UtcDaliRendererSetBlendMode03(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to auto with a transparent color renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -732,7 +752,7 @@ int UtcDaliRendererSetBlendMode03(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -741,6 +761,8 @@ int UtcDaliRendererSetBlendMode04(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to auto with an opaque color renders with blending disabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -763,7 +785,7 @@ int UtcDaliRendererSetBlendMode04(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -772,6 +794,8 @@ int UtcDaliRendererSetBlendMode04b(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to auto with a transparent actor color renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -795,7 +819,7 @@ int UtcDaliRendererSetBlendMode04b(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -804,6 +828,8 @@ int UtcDaliRendererSetBlendMode04c(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to auto with an opaque opaque actor color renders with blending disabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -827,7 +853,7 @@ int UtcDaliRendererSetBlendMode04c(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -836,6 +862,8 @@ int UtcDaliRendererSetBlendMode05(void)
   TestApplication application;
 
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image with an alpha channel renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   BufferImage image = BufferImage::New( 40, 40, Pixel::RGBA8888 );
@@ -862,7 +890,7 @@ int UtcDaliRendererSetBlendMode05(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -870,6 +898,8 @@ int UtcDaliRendererSetBlendMode06(void)
 {
   TestApplication application;
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_TRANSPARENT renders with blending enabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::Hint::OUTPUT_IS_TRANSPARENT );
@@ -893,7 +923,7 @@ int UtcDaliRendererSetBlendMode06(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-
+#endif
   END_TEST;
 }
 
@@ -901,6 +931,8 @@ int UtcDaliRendererSetBlendMode07(void)
 {
   TestApplication application;
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_OPAQUE renders with blending disabled");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
@@ -925,7 +957,7 @@ int UtcDaliRendererSetBlendMode07(void)
 
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", "GL_BLEND" ) );
-
+#endif
   END_TEST;
 }
 
@@ -961,6 +993,8 @@ int UtcDaliRendererSetBlendColor(void)
   TestApplication application;
 
   tet_infoline("Test SetBlendColor(color)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
@@ -1002,7 +1036,7 @@ int UtcDaliRendererSetBlendColor(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( glAbstraction.GetLastBlendColor(), color, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1037,6 +1071,8 @@ int UtcDaliRendererPreMultipledAlpha(void)
   TestApplication application;
 
   tet_infoline("Test BLEND_PRE_MULTIPLIED_ALPHA property");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
@@ -1124,7 +1160,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Vector4( 1.0f, 0.0f, 1.0f, 0.5f ), TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1175,6 +1211,8 @@ int UtcDaliRendererConstraint02(void)
   TestApplication application;
 
   tet_infoline("Test that a uniform map renderer property can be constrained");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
@@ -1220,7 +1258,7 @@ int UtcDaliRendererConstraint02(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::WHITE, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1270,6 +1308,8 @@ int UtcDaliRendererAnimatedProperty02(void)
   TestApplication application;
 
   tet_infoline("Test that a uniform map renderer property can be animated");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
@@ -1310,7 +1350,7 @@ int UtcDaliRendererAnimatedProperty02(void)
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1319,6 +1359,8 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   TestApplication application;
 
   tet_infoline("Test the uniform map precedence is applied properly");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -1367,7 +1409,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1376,6 +1418,8 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   TestApplication application;
 
   tet_infoline("Test the uniform map precedence is applied properly");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -1424,7 +1468,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
   application.Render(500);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1434,6 +1478,8 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   TestApplication application;
 
   tet_infoline("Test the uniform map precedence is applied properly");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -1463,7 +1509,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::BLACK, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1472,6 +1518,8 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   TestApplication application;
 
   tet_infoline("Test the uniform maps are collected from all objects (same type)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -1510,7 +1558,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   Vector4 uniform3Value(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform3", uniform3Value ) );
   DALI_TEST_EQUALS( uniform3Value, Color::MAGENTA, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1519,6 +1567,8 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   TestApplication application;
 
   tet_infoline("Test the uniform maps are collected from all objects (different types)");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
 
@@ -1562,7 +1612,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   Matrix3 uniform3Value;
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uANormalMatrix", uniform3Value ) );
   DALI_TEST_EQUALS( uniform3Value, value3.Get<Matrix3>(), TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1597,6 +1647,8 @@ int UtcDaliRendererRenderOrder2DLayer(void)
 {
   TestApplication application;
   tet_infoline("Test the rendering order in a 2D layer is correct");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
@@ -1661,7 +1713,7 @@ int UtcDaliRendererRenderOrder2DLayer(void)
 
   //Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER( textureBindIndex[3], textureBindIndex[0], TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1669,6 +1721,8 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 {
   TestApplication application;
   tet_infoline("Test the rendering order in a 2D layer is correct using multiple renderers per actor");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   /*
    * Creates the following hierarchy:
@@ -1734,7 +1788,7 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
 
   //Check that renderer2 has been rendered after renderer1
   DALI_TEST_GREATER( textureBindIndex[2], textureBindIndex[1], TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1743,6 +1797,8 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
 {
   TestApplication application;
   tet_infoline("Test the rendering order in a 2D layer is correct using sibling order");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   /*
    * Creates the following hierarchy:
@@ -1837,7 +1893,7 @@ int UtcDaliRendererRenderOrder2DLayerSiblingOrder(void)
   DALI_TEST_EQUALS( textureBindIndex[2], 3, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[3], 4, TEST_LOCATION );
   DALI_TEST_EQUALS( textureBindIndex[4], 5, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1845,6 +1901,8 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
 {
   TestApplication application;
   tet_infoline("Test the rendering order in a 2D layer is correct for overlays");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = CreateQuadGeometry();
@@ -1921,7 +1979,7 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
 
   //Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER( textureBindIndex[3], textureBindIndex[0], TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -1944,6 +2002,8 @@ int UtcDaliRendererSetIndexRange(void)
 
   TestApplication application;
   tet_infoline("Test setting the range of indices to draw");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableDrawCallTrace( true );
@@ -2065,7 +2125,7 @@ int UtcDaliRendererSetIndexRange(void)
     bool result = gl.GetDrawTrace().FindMethodAndParams( "DrawElements" , buffer );
     DALI_TEST_CHECK( result );
   }
-
+#endif
   END_TEST;
 }
 
@@ -2075,6 +2135,8 @@ int UtcDaliRendererSetDepthFunction(void)
   TestApplication application;
 
   tet_infoline("Test setting the depth function");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -2202,7 +2264,7 @@ int UtcDaliRendererSetDepthFunction(void)
     depthFunctionStr << GL_GEQUAL;
     DALI_TEST_CHECK( glDepthFunctionStack.FindMethodAndParams( "DepthFunc", depthFunctionStr.str().c_str() ) );
   }
-
+#endif
   END_TEST;
 }
 
@@ -2303,6 +2365,8 @@ int UtcDaliRendererSetDepthTestMode(void)
 {
   TestApplication application;
   tet_infoline("Test setting the DepthTestMode");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2360,7 +2424,7 @@ int UtcDaliRendererSetDepthTestMode(void)
 
   // Check depth-test is *still* disabled.
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetDepthTestString() ) );
-
+#endif
   END_TEST;
 }
 
@@ -2368,6 +2432,8 @@ int UtcDaliRendererSetDepthWriteMode(void)
 {
   TestApplication application;
   tet_infoline("Test setting the DepthWriteMode");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2406,7 +2472,7 @@ int UtcDaliRendererSetDepthWriteMode(void)
 
   // Check depth-write is now disabled.
   DALI_TEST_CHECK( !glAbstraction.GetLastDepthMask() );
-
+#endif
   END_TEST;
 }
 
@@ -2414,6 +2480,8 @@ int UtcDaliRendererCheckStencilDefaults(void)
 {
   TestApplication application;
   tet_infoline("Test the stencil defaults");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2433,6 +2501,7 @@ int UtcDaliRendererCheckStencilDefaults(void)
   DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL ).Get<int>() ), static_cast<int>( StencilOperation::KEEP ), TEST_LOCATION );
   DALI_TEST_EQUALS<int>( static_cast<int>( renderer.GetProperty( Renderer::Property::STENCIL_OPERATION_ON_Z_PASS ).Get<int>() ), static_cast<int>( StencilOperation::KEEP ), TEST_LOCATION );
 
+#endif
   END_TEST;
 }
 
@@ -2440,6 +2509,8 @@ int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
 {
   TestApplication application;
   tet_infoline("Test setting the RenderMode to use the stencil buffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2488,6 +2559,7 @@ int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Enable", GetStencilTestString() ) );
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethod( methodString ) );
 
+#endif
   END_TEST;
 }
 
@@ -2498,7 +2570,7 @@ void CheckRenderModeColorMask( TestApplication& application, Renderer& renderer,
   renderer.SetProperty( Renderer::Property::RENDER_MODE, renderMode );
   application.SendNotification();
   application.Render();
-
+#if 0
   // Check if ColorMask has been called, and that the values are correct.
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   const TestGlAbstraction::ColorMaskParams& colorMaskParams( glAbstraction.GetColorMaskParams() );
@@ -2507,12 +2579,15 @@ void CheckRenderModeColorMask( TestApplication& application, Renderer& renderer,
   DALI_TEST_EQUALS<bool>( colorMaskParams.green, expectedValue, TEST_LOCATION );
   DALI_TEST_EQUALS<bool>( colorMaskParams.blue,  expectedValue, TEST_LOCATION );
   DALI_TEST_EQUALS<bool>( colorMaskParams.alpha, expectedValue, TEST_LOCATION );
+#endif
 }
 
 int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
 {
   TestApplication application;
   tet_infoline("Test setting the RenderMode to use the color buffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
 
@@ -2523,7 +2598,7 @@ int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
   CheckRenderModeColorMask( application, renderer, RenderMode::COLOR, true );
   CheckRenderModeColorMask( application, renderer, RenderMode::STENCIL, false );
   CheckRenderModeColorMask( application, renderer, RenderMode::COLOR_STENCIL, true );
-
+#endif
   END_TEST;
 }
 
@@ -2531,6 +2606,8 @@ int UtcDaliRendererSetStencilFunction(void)
 {
   TestApplication application;
   tet_infoline("Test setting the StencilFunction");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2618,6 +2695,7 @@ int UtcDaliRendererSetStencilFunction(void)
 
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterStream.str() ) );
 
+#endif
   END_TEST;
 }
 
@@ -2625,6 +2703,8 @@ int UtcDaliRendererSetStencilOperation(void)
 {
   TestApplication application;
   tet_infoline("Test setting the StencilOperation");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2712,7 +2792,7 @@ int UtcDaliRendererSetStencilOperation(void)
       }
     }
   }
-
+#endif
   END_TEST;
 }
 
@@ -2720,6 +2800,8 @@ int UtcDaliRendererSetStencilMask(void)
 {
   TestApplication application;
   tet_infoline("Test setting the StencilMask");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Renderer renderer = RendererTestFixture( application );
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2761,7 +2843,7 @@ int UtcDaliRendererSetStencilMask(void)
 
   // Check the function was called and the parameters were correct.
   DALI_TEST_CHECK( glStencilFunctionStack.FindMethodAndParams( methodString, parameterString ) );
-
+#endif
   END_TEST;
 }
 
@@ -2769,6 +2851,8 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 {
   TestApplication application;
   tet_infoline("Test renderer does render even if number of textures is different than active samplers in the shader");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   //Create a TextureSet with 4 textures (One more texture in the texture set than active samplers)
   //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
@@ -2811,7 +2895,7 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 
   //Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 
@@ -2820,6 +2904,8 @@ int UtcDaliRendererOpacity(void)
   TestApplication application;
 
   tet_infoline( "Test OPACITY property" );
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
@@ -2859,7 +2945,7 @@ int UtcDaliRendererOpacity(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue< Vector4 >( "uColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue.a, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
-
+#endif
   END_TEST;
 }
 

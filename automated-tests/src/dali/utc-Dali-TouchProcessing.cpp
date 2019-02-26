@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -957,6 +957,11 @@ int UtcDaliTouchMultipleRenderTasksWithChildLayer(void)
 int UtcDaliTouchOffscreenRenderTasks(void)
 {
   TestApplication application;
+  tet_infoline("UtcDaliTouchOffscreenRenderTasks");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
+
   Stage stage ( Stage::GetCurrent() );
   Vector2 stageSize ( stage.GetSize() );
 
@@ -1001,6 +1006,8 @@ int UtcDaliTouchOffscreenRenderTasks(void)
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
+
+#endif
   END_TEST;
 }
 

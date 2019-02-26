@@ -21,16 +21,28 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp
-        ../dali/dali-test-suite-utils/test-gl-abstraction.cpp
-        ../dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp
         ../dali/dali-test-suite-utils/test-native-image.cpp
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
+        ../dali/dali-test-suite-utils/test-graphics-buffer.cpp
+        ../dali/dali-test-suite-utils/test-graphics-buffer-factory.cpp
+        ../dali/dali-test-suite-utils/test-graphics-controller.cpp
+        ../dali/dali-test-suite-utils/test-graphics-framebuffer.cpp
+        ../dali/dali-test-suite-utils/test-graphics-framebuffer-factory.cpp
+        ../dali/dali-test-suite-utils/test-graphics-pipeline.cpp
+        ../dali/dali-test-suite-utils/test-graphics-pipeline-factory.cpp
+        ../dali/dali-test-suite-utils/test-graphics-render-command.cpp
+        ../dali/dali-test-suite-utils/test-graphics-sampler.cpp
+        ../dali/dali-test-suite-utils/test-graphics-sampler-factory.cpp
+        ../dali/dali-test-suite-utils/test-graphics-shader.cpp
+        ../dali/dali-test-suite-utils/test-graphics-shader-factory.cpp
+        ../dali/dali-test-suite-utils/test-graphics-texture.cpp
+        ../dali/dali-test-suite-utils/test-graphics-texture-factory.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
         ../dali/dali-test-suite-utils/test-trace-call-stack.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-     dali-core
+     dali-core-vk
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )

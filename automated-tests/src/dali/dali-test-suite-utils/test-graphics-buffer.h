@@ -1,5 +1,5 @@
-#ifndef TEST_GRAPHICS_BUFFER_FACTORY_H
-#define TEST_GRAPHICS_BUFFER_FACTORY_H
+#ifndef TEST_GRAPHICS_BUFFER_H
+#define TEST_GRAPHICS_BUFFER_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -17,28 +17,35 @@
  * limitations under the License.
  */
 
-#include <dali/graphics-api/graphics-api-buffer-factory.h>
+#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-api-types.h>
+#include <vector>
 
 namespace Test
 {
 class GraphicsController;
 
-class GraphicsBufferFactory : public Dali::Graphics::BufferFactory
+class GraphicsBuffer : public Dali::Graphics::Buffer
 {
 public:
-  GraphicsBufferFactory(GraphicsController* controller);
-  ~GraphicsBufferFactory();
+  GraphicsBuffer( GraphicsController& controller, Dali::Graphics::BufferUsageFlags usage, uint32_t size );
+  ~GraphicsBuffer();
 
-  Dali::Graphics::BufferFactory& SetUsageFlags( Dali::Graphics::BufferUsageFlags usage )  override;
-  Dali::Graphics::BufferFactory& SetSize( uint32_t size ) override;
-  Dali::Graphics::BufferFactory::PointerType Create() const override;
+  void* Map() override;
+
+  void Unmap() override;
+
+  void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) override;
+
+  void Flush() override;
+
+  void DestroyNow() override;
 
 public:
   GraphicsController& mController;
-  Dali::Graphics::BufferUsageFlags mUsageFlags;
-  uint32_t mSize;
+  std::vector<uint8_t> mBuffer;
 };
 
 } // Test
 
-#endif //TEST_GRAPHICS_BUFFER_FACTORY_H
+#endif //TEST_GRAPHICS_BUFFER_H
