@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,8 @@ int UtcDaliGeometryAddVertexBuffer(void)
   TestApplication application;
 
   tet_infoline("Test AddVertexBuffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
   Geometry geometry = Geometry::New();
@@ -176,7 +178,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
     DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
   }
-
+#endif
   END_TEST;
 }
 
@@ -242,6 +244,8 @@ int UtcDaliGeometrySetIndexBuffer(void)
   TestApplication application;
 
   tet_infoline("Test SetIndexBuffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
 
@@ -290,7 +294,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
     DALI_TEST_EQUALS( bufferDataCalls[0], 6*sizeof( unsigned short ), TEST_LOCATION );
   }
 
-
+#endif
   END_TEST;
 }
 
@@ -299,6 +303,8 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   TestApplication application;
 
   tet_infoline("Test SetType and GetType: without index buffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int numVertex = 4u;
   PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
@@ -418,7 +424,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS( geometry.GetType(), Geometry::TRIANGLE_FAN, TEST_LOCATION);
-
+#endif
   END_TEST;
 }
 
@@ -427,6 +433,8 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   TestApplication application;
 
   tet_infoline("Test SetType and GetType: with index buffer");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   unsigned int numVertex = 4u;
   unsigned int numIndex = 6u; // 6 unsigned short
@@ -546,6 +554,6 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawElements", out.str()), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS( geometry.GetType(), Geometry::TRIANGLE_FAN, TEST_LOCATION);
-
+#endif
   END_TEST;
 }

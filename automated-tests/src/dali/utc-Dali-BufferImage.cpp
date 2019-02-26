@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,6 +242,8 @@ int UtcDaliBufferImageUpdate01(void)
   TestApplication application;
 
   tet_infoline("UtcDaliBufferImageUpdate01 - single empty rect");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
 
@@ -280,6 +282,8 @@ int UtcDaliBufferImageUpdate01(void)
   std::stringstream out;
   out << GL_TEXTURE_2D <<", "<< 0u << ", " << 16u <<", "<< 16u;
   DALI_TEST_EQUALS( callStack.TestMethodAndParams(0, "TexImage2D", out.str().c_str() ), true, TEST_LOCATION);
+
+#endif
   END_TEST;
 }
 
@@ -288,6 +292,8 @@ int UtcDaliBufferImageUpdate02(void)
   TestApplication application;
 
   tet_infoline("UtcDaliBufferImageUpdate02 - Multiple rects");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
   BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
@@ -337,6 +343,6 @@ int UtcDaliBufferImageUpdate02(void)
     DALI_TEST_EQUALS( callStack.TestMethodAndParams(2, "TexSubImage2D", out.str().c_str()), true, TEST_LOCATION);
   }
 
+#endif
   END_TEST;
 }
-

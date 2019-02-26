@@ -2,7 +2,7 @@
 #define TEST_TRACE_CALL_STACK_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,12 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <ostream>
 #include <sstream>
+#include <dali/public-api/object/any.h>
 
-namespace Dali
+namespace Test
 {
-
-template<typename T>
-std::string ToString(const T& x)
-{
-  return "undefined";
-}
-
-std::string ToString(int x);
-std::string ToString(unsigned int x);
-std::string ToString(float x);
 
 /**
  * Helper class to track method calls in the abstraction and search for them in test cases
@@ -43,8 +35,8 @@ class TraceCallStack
 {
 public:
 
-  /// Typedef for passing and storing named parameters
-  typedef std::map< std::string, std::string > NamedParams;
+  typedef std::map< std::string, Dali::Any > NamedParams;
+  friend std::ostream& operator<<( std::ostream& o, const TraceCallStack::NamedParams& params);
 
   /**
    * Constructor
@@ -66,17 +58,15 @@ public:
   /**
    * Push a call onto the stack if the trace is active
    * @param[in] method The name of the method
-   * @param[in] params A comma separated list of parameter values
+   * @param[in] params A map of named parameter values
    */
-  void PushCall(std::string method, std::string params);
+  void PushCall(std::string method, const NamedParams& params);
 
   /**
    * Push a call onto the stack if the trace is active
    * @param[in] method The name of the method
-   * @param[in] params A comma separated list of parameter values
-   * @param[in] altParams A map of named parameter values
    */
-  void PushCall(std::string method, std::string params, const NamedParams& altParams);
+  void PushCall(std::string method);
 
   /**
    * Search for a method in the stack
@@ -91,7 +81,7 @@ public:
    * @param[out] params of the method
    * @return true if the method was in the stack
    */
-  bool FindMethodAndGetParameters(std::string method, std::string& params ) const;
+  bool FindMethodAndGetParameters(std::string method, NamedParams& params ) const;
 
   /**
    * Count how many times a method was called
@@ -103,18 +93,18 @@ public:
   /**
    * Search for a method in the stack with the given parameter list
    * @param[in] method The name of the method
-   * @param[in] params A comma separated list of parameter values
+   * @param[in] params A map of named parameters to match
    * @return true if the method was in the stack
    */
-  bool FindMethodAndParams(std::string method, std::string params) const;
+  bool FindMethodAndParams(std::string method, const NamedParams& params) const;
 
   /**
    * Search for a method in the stack with the given parameter list
    * @param[in] method The name of the method
-   * @param[in] params A map of named parameters to test for
-   * @return true if the method was in the stack
+   * @param[in] params A map of named parameters to match
+   * @return index in the stack where the method was found or -1 otherwise
    */
-  bool FindMethodAndParams(std::string method, const NamedParams& params) const;
+  int32_t FindIndexFromMethodAndParams(std::string method, const NamedParams& params) const;
 
   /**
    * Search for a method in the stack with the given parameter list.
@@ -127,31 +117,15 @@ public:
    *                calls can search for methods occuring after this one.
    * @return True if the method was in the stack
    */
-  bool FindMethodAndParamsFromStartIndex( std::string method, std::string params, size_t& startIndex ) const;
-
-  /**
-   * Search for a method in the stack with the given parameter list
-   * @param[in] method The name of the method
-   * @param[in] params A comma separated list of parameter values
-   * @return index in the stack where the method was found or -1 otherwise
-   */
-  int FindIndexFromMethodAndParams(std::string method, std::string params) const;
-
-  /**
-   * Search for a method in the stack with the given parameter list
-   * @param[in] method The name of the method
-   * @param[in] params A map of named parameter values to match
-   * @return index in the stack where the method was found or -1 otherwise
-   */
-  int FindIndexFromMethodAndParams(std::string method, const NamedParams& params) const;
+  bool FindMethodAndParamsFromStartIndex( std::string method, const NamedParams& params, uint32_t& startIndex ) const;
 
   /**
    * Test if the given method and parameters are at a given index in the stack
    * @param[in] index Index in the call stack
    * @param[in] method Name of method to test
-   * @param[in] params A comma separated list of parameter values to test
+   * @param[in] params A map of named parameter values to match
    */
-  bool TestMethodAndParams(int index, std::string method, std::string params) const;
+  bool TestMethodAndParams(uint32_t index, std::string method, const NamedParams& params) const;
 
   /**
    * Reset the call stack
@@ -162,18 +136,7 @@ public:
    * Method to display contents of the TraceCallStack.
    * @return A string containing a list of function calls and parameters (may contain newline characters)
    */
-  std::string GetTraceString()
-  {
-    std::stringstream traceStream;
-    std::size_t functionCount = mCallStack.size();
-    for( std::size_t i = 0; i < functionCount; ++i )
-    {
-      Dali::TraceCallStack::FunctionCall functionCall = mCallStack[ i ];
-      traceStream << "StackTrace: Index:" << i << ",  Function:" << functionCall.method << ",  ParamList:" << functionCall.paramList << std::endl;
-    }
-
-    return traceStream.str();
-  }
+  std::string GetTraceString();
 
 private:
   bool mTraceActive; ///< True if the trace is active
@@ -181,14 +144,13 @@ private:
   struct FunctionCall
   {
     std::string method;
-    std::string paramList;
     NamedParams namedParams;
-    FunctionCall( const std::string& aMethod, const std::string& aParamList )
-    : method( aMethod ), paramList( aParamList )
+    FunctionCall( const std::string& aMethod, const NamedParams& params )
+    : method( aMethod ), namedParams( params )
     {
     }
-    FunctionCall( const std::string& aMethod, const std::string& aParamList, const NamedParams& altParams )
-    : method( aMethod ), paramList( aParamList ), namedParams( altParams )
+    FunctionCall( const std::string& aMethod )
+    : method( aMethod )
     {
     }
   };
@@ -196,6 +158,8 @@ private:
   std::vector< FunctionCall > mCallStack; ///< The call stack
 };
 
-} // namespace dali
+std::ostream& operator<<( std::ostream& o, const TraceCallStack::NamedParams& params);
+
+} // namespace Test
 
 #endif // TEST_TRACE_CALL_STACK_H

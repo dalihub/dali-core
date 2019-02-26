@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-api-controller.h>
+#include "test-trace-call-stack.h"
 
 #include "test-graphics-texture-factory.h"
 #include "test-graphics-shader-factory.h"
@@ -27,6 +28,7 @@
 #include "test-graphics-framebuffer-factory.h"
 #include "test-graphics-sampler-factory.h"
 #include "test-graphics-pipeline-factory.h"
+#include "test-graphics-render-command.h"
 
 namespace Test
 {
@@ -188,6 +190,16 @@ public:
    */
   uint32_t GetSwapchainBufferCount() override;
 
+public: // For test cases
+  std::vector<Test::GraphicsRenderCommand>& GetRenderCommands()
+  {
+    return mRenderCommands;
+  }
+  std::vector<Dali::Graphics::Texture*>& GetTextures()
+  {
+    return mTextures;
+  }
+
 public:
   // not copyable
   GraphicsController( const GraphicsController& ) = delete;
@@ -198,13 +210,39 @@ protected:
   GraphicsController( GraphicsController&& ) = default;
   GraphicsController& operator=( GraphicsController&& ) = default;
 
-private:
+
+public: // For test framework
+  void DestroyShader( Dali::Graphics::Shader* shader );
+  void DestroyTexture( Dali::Graphics::Texture* texture );
+  void DestroyFramebuffer( Dali::Graphics::Framebuffer* framebuffer );
+  void DestroyBuffer( Dali::Graphics::Buffer* buffer );
+  void DestroySampler( Dali::Graphics::Sampler* sampler );
+  void DestroyPipeline( Dali::Graphics::Pipeline* pipeline );
+
+
+public:
   GraphicsTextureFactory mTextureFactory;
   GraphicsShaderFactory mShaderFactory;
   GraphicsFramebufferFactory mFramebufferFactory;
   GraphicsBufferFactory mBufferFactory;
   GraphicsPipelineFactory mPipelineFactory;
   GraphicsSamplerFactory mSamplerFactory;
+
+  TraceCallStack mTextureTrace;
+  TraceCallStack mShaderTrace;
+  TraceCallStack mBufferTrace;
+  TraceCallStack mControllerTrace;
+
+  std::vector<Dali::Graphics::Texture*> mTextures;
+
+  // Add these as needed
+  //std::vector<Dali::Graphics::Shader*> mShaders;
+  //std::vector<Dali::Graphics::Framebuffer*> mFramebuffers;
+  //std::vector<Dali::Graphics::Buffer*> mBuffers;
+  //std::vector<Dali::Graphics::Sampler*> mSampler;
+  //std::vector<Dali::Graphics::Pipeline*> mPipeline;
+
+  std::vector<Test::GraphicsRenderCommand> mRenderCommands;
 };
 
 } // namespace Test

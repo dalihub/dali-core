@@ -15,27 +15,35 @@
  */
 
 #include "test-graphics-buffer-factory.h"
+#include "test-graphics-buffer.h"
 
 namespace Test
 {
 
-GraphicsBufferFactory::GraphicsBufferFactory()=default;
+GraphicsBufferFactory::GraphicsBufferFactory(GraphicsController* controller)
+: mController(*controller)
+{
+}
+
 GraphicsBufferFactory::~GraphicsBufferFactory()=default;
 
 
 Dali::Graphics::BufferFactory& GraphicsBufferFactory::SetUsageFlags( Dali::Graphics::BufferUsageFlags usage )
 {
+  mUsageFlags = usage;
   return *this;
 }
 
 Dali::Graphics::BufferFactory& GraphicsBufferFactory::SetSize( uint32_t size )
 {
+  mSize = size;
   return *this;
 }
 
 Dali::Graphics::BufferFactory::PointerType GraphicsBufferFactory::Create() const
 {
-  return nullptr;
+  auto buffer = std::make_unique< GraphicsBuffer >( mController, mUsageFlags, mSize );
+  return std::move(buffer);
 }
 
-}
+} // Test

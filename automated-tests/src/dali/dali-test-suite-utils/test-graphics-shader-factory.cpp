@@ -18,7 +18,10 @@
 
 namespace Test
 {
-GraphicsShaderFactory::GraphicsShaderFactory() = default;
+GraphicsShaderFactory::GraphicsShaderFactory(GraphicsController* controller)
+: mController(*controller)
+{
+}
 GraphicsShaderFactory::~GraphicsShaderFactory() = default;
 
 Dali::Graphics::ShaderFactory& GraphicsShaderFactory::SetShaderModule(
@@ -26,12 +29,20 @@ Dali::Graphics::ShaderFactory& GraphicsShaderFactory::SetShaderModule(
   Dali::Graphics::ShaderDetails::Language language,
   const Dali::Graphics::ShaderDetails::ShaderSource& source )
 {
+  mCreateInfo.mPipelineStage = pipelineStage;
+  mCreateInfo.mLanguage = language;
+  mCreateInfo.mSource = source;
   return *this;
 }
 
 Dali::Graphics::ShaderFactory::PointerType GraphicsShaderFactory::Create() const
 {
-  return nullptr;
+  return std::unique_ptr<GraphicsShader>(new GraphicsShader( mController, mCreateInfo));
+}
+
+void GraphicsShaderFactory::TestReset()
+{
+  mCreateInfo = GraphicsShaderCreateInfo { };
 }
 
 } // Test

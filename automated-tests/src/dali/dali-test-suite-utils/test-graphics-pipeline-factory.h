@@ -18,14 +18,18 @@
  */
 
 #include <dali/graphics-api/graphics-api-pipeline-factory.h>
+#include "test-graphics-pipeline.h"
 
 namespace Test
 {
+class GraphicsController;
+class GraphicsPipeline;
 
 class GraphicsPipelineFactory : public Dali::Graphics::PipelineFactory
 {
 public:
-  GraphicsPipelineFactory();
+  GraphicsPipelineFactory( GraphicsController* controller );
+
   virtual ~GraphicsPipelineFactory();
 
   Dali::Graphics::PipelineFactory& SetColorBlendState( const Dali::Graphics::ColorBlendState& state ) override;
@@ -51,6 +55,22 @@ public:
   Dali::Graphics::PipelineFactory& SetOldPipeline( std::unique_ptr<Dali::Graphics::Pipeline> oldPipeline ) override;
 
   std::unique_ptr<Dali::Graphics::Pipeline> Create() override;
+
+public: // Test methods
+  void TestSetUseOldPipeline( bool useOldPipeline )
+  {
+    mUseOldPipeline = useOldPipeline;
+  }
+  void TestReset();
+
+public:
+  GraphicsController& mController;
+  GraphicsPipelineCreateInfo mCreateInfo;
+  Dali::Graphics::Pipeline* mBasePipeline;
+  std::unique_ptr<Dali::Graphics::Pipeline> mOldPipeline;
+
+public: // Test configurations
+  bool mUseOldPipeline{false};
 };
 
 } // Test

@@ -1,0 +1,20 @@
+UtcDaliActorSetDrawModeOverlayRender            texture ids
+UtcDaliActorPropertyClippingActor               color mask
+UtcDaliActorPropertyClippingActorEnableThenDisable    Trace, : glEnable, glStencil... glDisable, color mask
+UtcDaliActorPropertyClippingNestedChildren            "
+UtcDaliActorPropertyClippingActorDrawOrder            Trace: glEnable, glDisable
+UtcDaliActorPropertyScissorClippingActor              Trace: glEnable, glDisable, Scissor
+UtcDaliActorPropertyScissorClippingActorSiblings      Trace: glEnable, Scissor
+UtcDaliActorPropertyScissorClippingActorNested01      "
+UtcDaliActorPropertyScissorClippingActorNested02      "
+UtcDaliActorPropertyClippingActorWithRendererOverride ", color mask
+UtcDaliActorRaiseToTop                                Trace: SetUniform for a specific uniform & value ><  (Could use texture handles instead)
+UtcDaliActorRaiseAbove                                "
+UtcDaliActorLowerBelow                                "
+UtcDaliBufferImageUpdate01                            Trace: TexImage2D
+UtcDaliBufferImageUpdate02                            "
+UtcDaliCameraActorModelView                           UniformValue   - Can't do this any more
+UtcDaliCameraActorReadProjectionMatrix                UniformValue s - Can't do this any more
+UtcDaliContextVertexAttribStartup                     EnableVertexAttribArray (With index) (Not thru trace)
+UtcDaliContextVertexAttribImageRendering              EnableVertexAttribArray (With index) (Not thru trace)
+UtcDaliFramebufferNew01                               framebuffer attachments

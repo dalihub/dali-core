@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,9 @@ bool GetCameraDepths( TestApplication& application, float& nearPlane, float& far
 int UtcFrustumCullN(void)
 {
   TestApplication application;
+  tet_infoline("UtcFrustumCullN");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -121,13 +124,15 @@ int UtcFrustumCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumLeftCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -146,13 +151,15 @@ int UtcFrustumLeftCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumLeftCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -165,13 +172,15 @@ int UtcFrustumLeftCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumRightCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -191,13 +200,15 @@ int UtcFrustumRightCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumRightCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -210,13 +221,15 @@ int UtcFrustumRightCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumTopCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -236,13 +249,15 @@ int UtcFrustumTopCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumTopCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -256,13 +271,15 @@ int UtcFrustumTopCullN(void)
 
   // This will be box culled
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumBottomCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -282,13 +299,15 @@ int UtcFrustumBottomCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumBottomCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -301,13 +320,15 @@ int UtcFrustumBottomCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumNearCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -329,13 +350,16 @@ int UtcFrustumNearCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumNearCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
+
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -355,13 +379,15 @@ int UtcFrustumNearCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumFarCullP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -383,13 +409,15 @@ int UtcFrustumFarCullP(void)
 
   // This will be sphere culled
   DALI_TEST_CHECK( !drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumFarCullN(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -409,13 +437,15 @@ int UtcFrustumFarCullN(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }
 
 int UtcFrustumCullDisabledP(void)
 {
   TestApplication application;
+  tet_infoline("   Test requires GraphicsController");
+#if 0
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
@@ -428,6 +458,6 @@ int UtcFrustumCullDisabledP(void)
 
   // This should not be culled
   DALI_TEST_CHECK( drawTrace.FindMethod( "DrawElements" ) );
-
+#endif
   END_TEST;
 }

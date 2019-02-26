@@ -18,14 +18,16 @@
  */
 
 #include <dali/graphics-api/graphics-api-texture-factory.h>
+#include "test-graphics-texture.h"
 
 namespace Test
 {
+class GraphicsController;
 
 class GraphicsTextureFactory : public Dali::Graphics::TextureFactory
 {
 public:
-  GraphicsTextureFactory();
+  GraphicsTextureFactory(GraphicsController* controller);
   virtual ~GraphicsTextureFactory();
 
   Dali::Graphics::TextureFactory& SetType(Dali::Graphics::TextureDetails::Type type) override;
@@ -36,6 +38,14 @@ public:
   Dali::Graphics::TextureFactory& SetData( void* pData ) override;
   Dali::Graphics::TextureFactory& SetDataSize( uint32_t dataSizeInBytes ) override;
   Dali::Graphics::TextureFactory::PointerType Create() const override;
+
+public: // Test Methods
+  void TestReset();
+
+
+public:
+  GraphicsController& mController;
+  GraphicsTextureCreateInfo mCreateInfo;
 };
 
 } // Test

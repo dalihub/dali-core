@@ -182,6 +182,8 @@ int UtcDaliShaderConstraint02(void)
   TestApplication application;
 
   tet_infoline("Test that a uniform map shader property can be constrained");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
   Geometry geometry = CreateQuadGeometry();
@@ -228,6 +230,7 @@ int UtcDaliShaderConstraint02(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::WHITE, TEST_LOCATION );
 
+#endif
   END_TEST;
 }
 
@@ -277,6 +280,8 @@ int UtcDaliShaderAnimatedProperty02(void)
   TestApplication application;
 
   tet_infoline("Test that a uniform map shader property can be animated");
+  tet_infoline("   Test requires GraphicsController");
+#if 0
 
   Shader shader = Shader::New(VertexSource, FragmentSource);
   Geometry geometry = CreateQuadGeometry();
@@ -340,6 +345,8 @@ int UtcDaliShaderAnimatedProperty02(void)
   Vector3 customValue;
   DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "uCustom", customValue ) );
   DALI_TEST_EQUALS( customValue, Vector3(1,2,3), TEST_LOCATION );
+
+#endif
   END_TEST;
 }
 
@@ -347,7 +354,7 @@ int UtcDaliShaderProgramProperty(void)
 {
   TestApplication application;
 
-  tet_infoline("Test get/set progam property");
+  tet_infoline("Test get/set program property");
 
   Shader shader = Shader::New("", "");
   std::string hintSet = "MODIFIES_GEOMETRY";

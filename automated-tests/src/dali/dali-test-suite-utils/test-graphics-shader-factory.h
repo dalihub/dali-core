@@ -18,21 +18,30 @@
  */
 
 #include <dali/graphics-api/graphics-api-shader-factory.h>
+#include "test-graphics-shader.h"
 
 namespace Test
 {
+class GraphicsController;
 
 class GraphicsShaderFactory : public Dali::Graphics::ShaderFactory
 {
 public:
-  GraphicsShaderFactory();
+  GraphicsShaderFactory(GraphicsController* controller);
   ~GraphicsShaderFactory();
 
   Dali::Graphics::ShaderFactory& SetShaderModule( Dali::Graphics::ShaderDetails::PipelineStage pipelineStage,
-                                                       Dali::Graphics::ShaderDetails::Language language,
-                                                       const Dali::Graphics::ShaderDetails::ShaderSource& source ) override;
+                                                  Dali::Graphics::ShaderDetails::Language language,
+                                                  const Dali::Graphics::ShaderDetails::ShaderSource& source ) override;
 
   Dali::Graphics::ShaderFactory::PointerType Create() const override;
+
+public:
+  void TestReset();
+
+public:
+  GraphicsController& mController;
+  GraphicsShaderCreateInfo mCreateInfo;
 };
 
 } // Test

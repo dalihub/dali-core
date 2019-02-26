@@ -16,44 +16,61 @@
  */
 
 #include "test-graphics-texture-factory.h"
+#include "test-graphics-texture.h"
 
 namespace Test
 {
 
-GraphicsTextureFactory::GraphicsTextureFactory() = default;
+GraphicsTextureFactory::GraphicsTextureFactory(GraphicsController* controller)
+: mController(*controller)
+{
+}
 GraphicsTextureFactory::~GraphicsTextureFactory() = default;
 
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetType(Dali::Graphics::TextureDetails::Type type)
 {
+  mCreateInfo.type = type;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetSize(const Dali::Graphics::Extent2D& size)
 {
+  mCreateInfo.size = size;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetFormat(Dali::Graphics::TextureDetails::Format format)
 {
+  mCreateInfo.format = format;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetMipMapFlag(Dali::Graphics::TextureDetails::MipMapFlag mipMapFlag)
 {
+  mCreateInfo.mipMapFlag = mipMapFlag;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetUsage( Dali::Graphics::TextureDetails::Usage usage )
 {
+  mCreateInfo.usage = usage;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetData( void* pData )
 {
+  mCreateInfo.pData = pData;
   return *this;
 }
 Dali::Graphics::TextureFactory& GraphicsTextureFactory::SetDataSize( uint32_t dataSizeInBytes )
 {
+  mCreateInfo.dataSizeInBytes = dataSizeInBytes;
   return *this;
 }
+
 Dali::Graphics::TextureFactory::PointerType GraphicsTextureFactory::Create() const
 {
-  return nullptr;
+  return std::unique_ptr<GraphicsTexture>( new GraphicsTexture( mController, mCreateInfo ) );
+}
+
+void GraphicsTextureFactory::TestReset()
+{
+  mCreateInfo = GraphicsTextureCreateInfo {};
 }
 
 } // Test

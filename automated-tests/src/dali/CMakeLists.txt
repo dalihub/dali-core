@@ -110,8 +110,20 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
         dali-test-suite-utils/test-gesture-manager.cpp
-        dali-test-suite-utils/test-gl-abstraction.cpp
-        dali-test-suite-utils/test-gl-sync-abstraction.cpp
+        dali-test-suite-utils/test-graphics-buffer.cpp
+        dali-test-suite-utils/test-graphics-buffer-factory.cpp
+        dali-test-suite-utils/test-graphics-controller.cpp
+        dali-test-suite-utils/test-graphics-framebuffer.cpp
+        dali-test-suite-utils/test-graphics-framebuffer-factory.cpp
+        dali-test-suite-utils/test-graphics-pipeline.cpp
+        dali-test-suite-utils/test-graphics-pipeline-factory.cpp
+        dali-test-suite-utils/test-graphics-render-command.cpp
+        dali-test-suite-utils/test-graphics-sampler.cpp
+        dali-test-suite-utils/test-graphics-sampler-factory.cpp
+        dali-test-suite-utils/test-graphics-shader.cpp
+        dali-test-suite-utils/test-graphics-shader-factory.cpp
+        dali-test-suite-utils/test-graphics-texture.cpp
+        dali-test-suite-utils/test-graphics-texture-factory.cpp
         dali-test-suite-utils/test-native-image.cpp
         dali-test-suite-utils/test-platform-abstraction.cpp
         dali-test-suite-utils/test-render-controller.cpp
@@ -119,7 +131,7 @@ LIST(APPEND TC_SOURCES
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-     dali-core
+     dali-core-vk
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
