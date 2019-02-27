@@ -71,6 +71,52 @@
     },
     {
       "key": {
+        "uuid": "9c97e313_345d6e49",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-27T11:07:22Z",
+      "side": 1,
+      "message": "Do you even need this method? Just call CreateTexture with the right argument. (I don\u0027t like the method name :)",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 324,
+        "endChar": 1
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b50c61a9_f207391a",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-27T11:07:22Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 329,
+        "startChar": 0,
+        "endLine": 329,
+        "endChar": 4
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "13ac52c8_9fc66588",
         "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
         "patchSetId": 1
