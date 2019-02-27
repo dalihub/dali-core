@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "2a9d5e76_2fc234ba",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2019-02-27T10:51:05Z",
+      "side": 1,
+      "message": "Doxygen comment missing",
+      "range": {
+        "startLine": 278,
+        "startChar": 82,
+        "endLine": 278,
+        "endChar": 104
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e6b51430_ab8db6d5",
         "filename": "dali/internal/update/manager/update-manager.cpp",
         "patchSetId": 1
