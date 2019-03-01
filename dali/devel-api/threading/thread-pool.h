@@ -102,6 +102,8 @@ public:
 
 };
 
+using UniqueFutureGroup = std::unique_ptr< FutureGroup<void>>;
+
 class DALI_CORE_API WorkerThread
 {
 private:
