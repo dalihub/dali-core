@@ -144,6 +144,10 @@ void GraphicsController::SwapBuffers()
 {
 }
 
+void GraphicsController::UpdateTextures( const std::vector<Dali::Graphics::TextureUpdateInfo>& updateInfoList, const std::vector<Dali::Graphics::TextureUpdateSourceInfo>& sourceList )
+{
+}
+
 uint32_t GraphicsController::GetSwapchainBufferCount()
 {
   return 2;

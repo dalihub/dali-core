@@ -25,7 +25,8 @@ namespace Dali
 {
 namespace Graphics
 {
-
+class Texture;
+class Buffer;
 class Shader;
 class Framebuffer;
 using Extension = void*;
@@ -838,6 +839,68 @@ inline BufferUsageFlags operator|( BufferUsageFlags flags, BufferUsage usage )
   flags |= static_cast<uint32_t>( usage );
   return flags;
 }
+
+struct MemoryRequirements
+{
+  size_t size;
+  size_t alignment;
+};
+
+using TextureUpdateFlags = uint32_t;
+enum class TextureUpdateFlagBits
+{
+  KEEP_SOURCE = 1 << 0,
+};
+
+struct TextureUpdateInfo
+{
+  Texture*      dstTexture;
+  Offset2D      dstOffset2D;
+  uint32_t      layer;
+  uint32_t      level;
+
+  uint32_t      srcReference;
+  Extent2D      srcExtent2D;
+  uint32_t      srcOffset;
+  uint32_t      srcSize;
+};
+
+struct TextureUpdateSourceInfo
+{
+  enum class Type
+  {
+    Buffer,
+    Memory,
+    Texture
+  };
+
+  Type sourceType;
+
+  struct BufferSource
+  {
+    Buffer* buffer;
+  } bufferSource;
+
+  struct MemorySource
+  {
+    void* pMemory;
+  } memorySource;
+
+  struct TextureSource
+  {
+    Texture* texture;
+  } textureSource;
+};
+
+struct TextureProperties
+{
+  Format    format;
+  Format    format1;
+  bool      emulated;
+  bool      compressed;
+  bool      packed;
+  Extent2D  extent2D;
+};
 
 } // Graphics
 } // Dali
