@@ -109,12 +109,7 @@ void Geometry::OnRenderFinished()
   mAttributesChanged = false;
 }
 
-void Geometry::UploadAndDraw(
-    Context& context,
-    BufferIndex bufferIndex,
-    Vector<GLint>& attributeLocation,
-    uint32_t elementBufferOffset,
-    uint32_t elementBufferCount )
+void Geometry::Upload( Context& context )
 {
   if( !mHasBeenUpdated )
   {
@@ -133,7 +128,7 @@ void Geometry::UploadAndDraw(
         }
 
         uint32_t bufferSize = static_cast<uint32_t>( sizeof( uint16_t ) * mIndices.Size() );
-        mIndexBuffer->UpdateDataBuffer( bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER );
+        mIndexBuffer->UpdateDataBuffer( context, bufferSize, &mIndices[0], GpuBuffer::STATIC_DRAW, GpuBuffer::ELEMENT_ARRAY_BUFFER );
       }
 
       mIndicesChanged = false;
@@ -150,13 +145,21 @@ void Geometry::UploadAndDraw(
 
     mHasBeenUpdated = true;
   }
+}
 
+void Geometry::Draw(
+    Context& context,
+    BufferIndex bufferIndex,
+    Vector<GLint>& attributeLocation,
+    uint32_t elementBufferOffset,
+    uint32_t elementBufferCount )
+{
   //Bind buffers to attribute locations
   uint32_t base = 0u;
   const uint32_t vertexBufferCount = static_cast<uint32_t>( mVertexBuffers.Count() );
   for( uint32_t i = 0; i < vertexBufferCount; ++i )
   {
-    mVertexBuffers[i]->BindBuffer( GpuBuffer::ARRAY_BUFFER );
+    mVertexBuffers[i]->BindBuffer( context, GpuBuffer::ARRAY_BUFFER );
     base += mVertexBuffers[i]->EnableVertexAttributes( context, attributeLocation, base );
   }
 
@@ -223,7 +226,7 @@ void Geometry::UploadAndDraw(
   if( mIndexBuffer && geometryGLType != GL_POINTS )
   {
     //Indexed draw call
-    mIndexBuffer->Bind( GpuBuffer::ELEMENT_ARRAY_BUFFER );
+    mIndexBuffer->Bind( context, GpuBuffer::ELEMENT_ARRAY_BUFFER );
     // numIndices truncated, no value loss happening in practice
     context.DrawElements( geometryGLType, static_cast<GLsizei>( numIndices ), GL_UNSIGNED_SHORT, reinterpret_cast<void*>( firstIndexOffset ) );
   }

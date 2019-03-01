@@ -2,7 +2,7 @@
 #define __DALI_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,11 @@
 #include "test-gl-sync-abstraction.h"
 #include "test-gl-abstraction.h"
 #include "test-render-controller.h"
+#include "test-render-surface.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/trace.h>
+#include <dali/integration-api/scene.h>
 
 namespace Dali
 {
@@ -69,8 +71,6 @@ public:
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
-  void SetSurfaceWidth( uint32_t width, unsigned height );
-  void SetTopMargin( uint32_t margin );
   bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
   uint32_t GetUpdateStatus();
   bool UpdateOnly( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
@@ -83,6 +83,11 @@ public:
     mLoggingEnabled = enabled;
   }
 
+  Integration::Scene GetScene() const
+  {
+    return mScene;
+  }
+
 private:
   void DoUpdate( uint32_t intervalMilliseconds, const char* location=NULL );
 
@@ -92,11 +97,13 @@ protected:
   TestGlAbstraction         mGlAbstraction;
   TestGlSyncAbstraction     mGlSyncAbstraction;
   TestGestureManager        mGestureManager;
+  TestRenderSurface*        mRenderSurface;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
 
   Integration::Core* mCore;
+  Dali::Integration::Scene mScene;
 
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;

@@ -1,3 +1,6 @@
+#ifndef DALI_TOUCH_DATA_DEVEL_H
+#define DALI_TOUCH_DATA_DEVEL_H
+
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
@@ -12,28 +15,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
-// CLASS HEADER
-#include <dali/internal/event/common/event-thread-services.h>
-
-// INTERNAL INCLUDES
-#include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
 {
-namespace Internal
+
+class TouchData;
+struct TouchEvent;
+
+namespace DevelTouchData
 {
 
-EventThreadServices& EventThreadServices::Get()
-{
-  return ThreadLocalStorage::Get().GetEventThreadServices();
-}
+/**
+ * @brief Convert TouchEvent to TouchData.
+ *
+ * @return The TouchData convert from Dali::TouchEvent
+ *
+ * @note Use this API with caution.
+*/
+DALI_CORE_API TouchData Convert( const TouchEvent& touchEvent );
 
-bool EventThreadServices::IsCoreRunning()
-{
-  return ThreadLocalStorage::Created();
-}
+} // namespace DevelTouchData
 
-} // Internal
-} // Dali
+} // namespace Dali
+
+
+
+#endif // DALI_TOUCH_DATA_DEVEL_H

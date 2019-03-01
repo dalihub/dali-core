@@ -12,28 +12,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-// CLASS HEADER
-#include <dali/internal/event/common/event-thread-services.h>
-
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/devel-api/events/touch-data-devel.h>
+#include <dali/internal/event/events/touch-data-impl.h>
 
 namespace Dali
 {
-namespace Internal
+
+namespace DevelTouchData
 {
 
-EventThreadServices& EventThreadServices::Get()
+TouchData Convert( const TouchEvent& touchEvent )
 {
-  return ThreadLocalStorage::Get().GetEventThreadServices();
+  Internal::TouchDataPtr touchDataImpl( new Internal::TouchData(touchEvent.time ) );
+
+  for( auto&& touchEventPoint : touchEvent.points )
+  {
+    touchDataImpl->AddPoint( Integration::Point( touchEventPoint ) );
+  }
+
+  return TouchData( touchDataImpl.Get() );
 }
 
-bool EventThreadServices::IsCoreRunning()
-{
-  return ThreadLocalStorage::Created();
-}
+} // namespace DevelTouchData
 
-} // Internal
-} // Dali
+} // namespace Dali

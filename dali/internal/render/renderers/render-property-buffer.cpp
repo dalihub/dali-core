@@ -160,7 +160,7 @@ bool PropertyBuffer::Update( Context& context )
     if ( mGpuBuffer )
     {
       DALI_ASSERT_DEBUG( mSize && "No data in the property buffer!" );
-      mGpuBuffer->UpdateDataBuffer( GetDataSize(), &((*mData)[0]), GpuBuffer::STATIC_DRAW, GpuBuffer::ARRAY_BUFFER );
+      mGpuBuffer->UpdateDataBuffer( context, GetDataSize(), &((*mData)[0]), GpuBuffer::STATIC_DRAW, GpuBuffer::ARRAY_BUFFER );
     }
 
     mDataChanged = false;
@@ -169,11 +169,11 @@ bool PropertyBuffer::Update( Context& context )
   return true;
 }
 
-void PropertyBuffer::BindBuffer(GpuBuffer::Target target)
+void PropertyBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
 {
   if(mGpuBuffer)
   {
-    mGpuBuffer->Bind(target);
+    mGpuBuffer->Bind(context, target);
   }
 }
 
