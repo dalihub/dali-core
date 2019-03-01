@@ -101,6 +101,8 @@ public:
 
 };
 
+using UniqueFutureGroup = std::unique_ptr< FutureGroup<void>>;
+
 class WorkerThread
 {
 private:
