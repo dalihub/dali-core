@@ -183,6 +183,13 @@ public:
   void SwapBuffers() override;
 
   /**
+   * Updates multiple textures
+   * @param updateInfoList list of update info structures
+   * @param sourceList  list of source info structures
+   */
+  void UpdateTextures( const std::vector<Dali::Graphics::TextureUpdateInfo>& updateInfoList, const std::vector<Dali::Graphics::TextureUpdateSourceInfo>& sourceList ) override;
+
+  /**
    * Returns number of buffers allocated by the swapchain
    * @return
    */

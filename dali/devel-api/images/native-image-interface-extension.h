@@ -56,10 +56,10 @@ public:
   virtual int GetEglImageTextureTarget() = 0;
 
   /**
- * @brief Retrieves the internal native image.
- *
- * @return Any object containing the internal native image source
- */
+   * @brief Retrieves the internal native image.
+   *
+   * @return Any object containing the internal native image source
+   */
   virtual Any GetNativeImageHandle() const = 0;
 
   /**

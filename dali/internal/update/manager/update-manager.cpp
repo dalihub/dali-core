@@ -30,6 +30,7 @@
 
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/devel-api/threading/thread-pool.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
@@ -62,7 +63,6 @@
 
 #include <dali/graphics-api/graphics-api-buffer-factory.h>
 #include <dali/graphics-api/graphics-api-buffer.h>
-
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -154,6 +154,20 @@ void SortSiblingNodesRecursively( Node& node )
 
 } // unnamed namespace
 
+/**
+ * Structures describes a single request for texture upload
+ */
+struct TextureUploadRequest
+{
+  TextureUploadRequest( Texture* texture, const PixelDataPtr& pixelData, const Internal::Texture::UploadParams& uploadParams )
+    : texture( texture ),
+      pixelData( pixelData ),
+      uploadParams( uploadParams )
+  {}
+  Texture*                        texture;
+  PixelDataPtr                    pixelData;
+  Internal::Texture::UploadParams uploadParams;
+};
 
 /**
  * Structure to contain UpdateManager internal data
@@ -175,7 +189,7 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     renderController( renderController ),
     sceneController( NULL ),
-    graphicsAlgorithms(),
+    graphicsAlgorithms( graphicsController ),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphicsController( graphicsController ),
@@ -200,12 +214,21 @@ struct UpdateManager::Impl
   {
     sceneController = new SceneControllerImpl( discardQueue );
 
+    /**
+     * Create thread pool with just one thread ( there may be a need to create more threads in the future ).
+     */
+
+    threadPool = std::make_unique<Dali::ThreadPool>();
+    threadPool->Initialize( 1 );
+
     // create first 'dummy' node
     nodes.PushBack(0u);
   }
 
   ~Impl()
   {
+    threadPool.reset( nullptr ); // reset now to maintain correct destruction order
+
     // Disconnect render tasks from nodes, before destroying the nodes
     for( auto taskList : taskLists )
     {
@@ -245,6 +268,89 @@ struct UpdateManager::Impl
       frameCallbackProcessor = new FrameCallbackProcessor( updateManager, transformManager );
     }
     return *frameCallbackProcessor;
+  }
+
+  /**
+   * Processes texture uploads
+   * @param[in] processParallel True enables parallel processing
+   * @param[in] useSingleStagingBuffer if true a single staging buffer is used for all uploads during frame
+   * @return Shared pointer to the Future object
+   */
+  Dali::SharedFuture ProcessTextureUploadRequests( bool processParallel, bool useSingleStagingBuffer )
+  {
+    if( textureUploadRequestContainer.empty() )
+    {
+      return {};
+    }
+
+    /**
+     * Worker thread lambda function
+     */
+    auto workerFunction = [&, processParallel, useSingleStagingBuffer]( int workerThread )
+    {
+      textureUpdateInfoArray.clear();
+      textureUpdateSourceInfoArray.clear();
+      textureUpdateInfoArray.reserve( textureUploadRequestContainer.size() );
+      textureUpdateSourceInfoArray.reserve( textureUploadRequestContainer.size() );
+
+      uint32_t sourceIndex { 0u };
+      for( auto& request : textureUploadRequestContainer )
+      {
+        auto pixelData = request.pixelData;
+
+        // Intialise texture
+        if( useSingleStagingBuffer )
+        {
+          auto info = Graphics::TextureUpdateInfo{};
+
+          // initialise texture object without allocating memory for it yet
+          if(!request.texture->GetGfxObject())
+          {
+            request.texture->CreateTextureInternal( Texture::Usage::SAMPLE, nullptr, 0u );
+          }
+
+          // prepare transfer info structure
+          info.dstTexture = request.texture->GetGfxObject();
+          info.dstOffset2D = { request.uploadParams.xOffset, request.uploadParams.yOffset };
+          info.srcOffset = 0u;
+          info.srcSize = request.pixelData->GetBufferSize();
+          info.srcReference = sourceIndex++;
+          info.srcExtent2D = { request.pixelData->GetWidth(), request.pixelData->GetHeight() };
+          textureUpdateInfoArray.emplace_back( info );
+
+          // store source
+          auto source = Graphics::TextureUpdateSourceInfo{};
+          source.sourceType = Graphics::TextureUpdateSourceInfo::Type::Memory;
+          source.memorySource.pMemory = pixelData->GetBuffer();
+          textureUpdateSourceInfoArray.emplace_back( source );
+        }
+        else
+        {
+          request.texture->UploadTexture( pixelData, request.uploadParams );
+        }
+      }
+
+      /**
+       * When using single staging buffer delegate all uploads to the controller for further processing
+       */
+      if( useSingleStagingBuffer )
+      {
+        auto controller = &graphicsController;
+        controller->UpdateTextures( textureUpdateInfoArray, textureUpdateSourceInfoArray );
+      }
+    };
+
+    if( processParallel )
+    {
+      return threadPool->SubmitTask( 0u, workerFunction );
+    }
+    else
+    {
+      // If not processing in parallel, just call lambda directly and return empty future
+      workerFunction(0);
+    }
+
+    return {};
   }
 
   SceneGraphBuffers                    sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
@@ -306,6 +412,12 @@ struct UpdateManager::Impl
   bool                                 graphicsShutdown;              ///< True if the graphics subsystem has shutdown
 
   ShaderCache                          shaderCache;
+  std::vector<TextureUploadRequest>    textureUploadRequestContainer;
+  std::unique_ptr<Dali::ThreadPool> threadPool;
+
+  std::vector<Graphics::TextureUpdateInfo> textureUpdateInfoArray;
+  std::vector<Graphics::TextureUpdateSourceInfo> textureUpdateSourceInfoArray;
+
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -756,6 +868,13 @@ void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
   }
 }
 
+void UpdateManager::UploadTexture( Texture* texture,
+                                   PixelDataPtr pixelData,
+                                   const Internal::Texture::UploadParams& params )
+{
+  mImpl->textureUploadRequestContainer.emplace_back( texture, pixelData, params );
+}
+
 void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
@@ -806,11 +925,19 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   updateScene |= mImpl->messageQueue.ProcessMessages( bufferIndex );
   updateScene |= resumed;
 
+  // Temporarily, switch between single and multithreaded texture
+  // DALI_DISABLE_PARALLEL_TEXTURE_UPLOAD - disables running texture processing on the worker thread
+  // DALI_DISABLE_SINGLE_STAGING_BUFFER - disables allocating single staging buffer
+  auto processParallel = (getenv( "DALI_DISABLE_PARALLEL_TEXTURE_UPLOAD" ) && getenv( "DALI_DISABLE_PARALLEL_TEXTURE_UPLOAD" )[0] == '1' ) ? false : true;
+  auto singleStagingBuffer = (getenv( "DALI_DISABLE_SINGLE_STAGING_BUFFER" ) && getenv( "DALI_DISABLE_SINGLE_STAGING_BUFFER" )[0] == '1' ) ? false : true;
+
+  auto future = mImpl->ProcessTextureUploadRequests( processParallel, singleStagingBuffer  );
+
   // Although the scene-graph may not require an update, we still need to synchronize
   // double-buffered renderer lists if the scene was updated in the previous frame.  We should not
   // start skipping update steps or reusing lists until there have been two frames where nothing
-  // changes
-  if( updateScene || mImpl->previousUpdateScene )
+  // changes.
+  if( future || updateScene || mImpl->previousUpdateScene )
   {
     //Animate
     Animate( bufferIndex, elapsedSeconds );
@@ -895,6 +1022,11 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
       // generate graphics objects
       PrepareNodes( bufferIndex );
+      if( future )
+      {
+        future->Wait();
+        future.reset();
+      }
       PrepareRenderers( bufferIndex );
       mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphicsController, mImpl->renderInstructions, bufferIndex );
     }
@@ -963,6 +1095,19 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   mSceneGraphBuffers.Swap();
 
   mImpl->graphicsController.SwapBuffers();
+
+  // Clear texture upload requests
+  if( !mImpl->textureUploadRequestContainer.empty() )
+  {
+    if( future )
+    {
+      future->Wait();
+      future.reset();
+    }
+  }
+
+  // Clear the texture upload requests container
+  mImpl->textureUploadRequestContainer.clear();
   return keepUpdating;
 }
 
@@ -1132,6 +1277,20 @@ void UpdateManager::AddTexture( OwnerPointer< SceneGraph::Texture >& texture )
 void UpdateManager::RemoveTexture( SceneGraph::Texture* texture)
 {
   DALI_ASSERT_DEBUG( NULL != texture );
+
+  // Remove upload requests to this texture if exists ( there may be more than one )
+  if( !mImpl->textureUploadRequestContainer.empty() )
+  {
+    decltype(mImpl->textureUploadRequestContainer) newRequests;
+    for( auto& request : mImpl->textureUploadRequestContainer )
+    {
+      if( request.texture != texture )
+      {
+        newRequests.emplace_back( request );
+      }
+    }
+    mImpl->textureUploadRequestContainer = std::move( newRequests );
+  }
 
   // Find the texture, use reference to pointer so we can do the erase safely
   for ( auto&& iter : mImpl->textureContainer )

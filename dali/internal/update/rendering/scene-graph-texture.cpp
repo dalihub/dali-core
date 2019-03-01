@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/devel-api/images/native-image-interface-extension.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
@@ -296,15 +297,18 @@ Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
 {
 }
 
-Texture::~Texture()
-{}
+Texture::~Texture() = default;
 
 void Texture::Initialize( Graphics::Controller& graphicsController )
 {
   mGraphicsController = &graphicsController;
+  if (mNativeImage)
+  {
+    CreateTexture( Usage::SAMPLE );
+  }
 }
 
-const Graphics::Texture* Texture::GetGfxObject() const
+Graphics::Texture* Texture::GetGfxObject() const
 {
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::GetGfxObject() = %p\n", this, mGraphicsTexture.get() );
 
@@ -313,24 +317,20 @@ const Graphics::Texture* Texture::GetGfxObject() const
 
 void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::UploadParams& params )
 {
-  if( ! mGraphicsTexture )
+  if( !mGraphicsTexture )
   {
-    DALI_ASSERT_DEBUG(pixelData->GetPixelFormat() == mFormat && "Pixel format is different");
-    DALI_ASSERT_DEBUG(pixelData->GetWidth() == mWidth && "Pixel buffer width is different");
-    DALI_ASSERT_DEBUG(pixelData->GetHeight() == mHeight && "Pixel buffer height is different");
-    CreateTextureInternal( Usage::SAMPLE, pixelData->GetBuffer(), pixelData->GetBufferSize() );
+    CreateTextureInternal( Usage::SAMPLE, nullptr, 0u );
   }
-  else
-  {
-    // schedule upload
-    mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
-                                  pixelData->GetBufferSize(),
-                                  { params.width, params.height },
-                                  { params.xOffset, params.yOffset },
-                                  params.layer,
-                                  params.mipmap,
-                                  {} );
-  }
+
+  // schedule upload
+  mGraphicsTexture->CopyMemory( pixelData->GetBuffer(),
+                                pixelData->GetBufferSize(),
+                                { params.width, params.height },
+                                { params.xOffset, params.yOffset },
+                                params.layer,
+                                params.mipmap,
+                                {} );
+
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SC::Texture(%p)::UploadTexture() GfxTexture: %p\n", this, mGraphicsTexture.get() );
 }
 
@@ -375,7 +375,8 @@ void Texture::CreateTextureInternal( Usage usage, unsigned char* buffer, unsigne
                                                            .SetType( Graphics::TextureDetails::Type::TEXTURE_2D )
                                                            .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
                                                            .SetData( buffer )
-                                                           .SetDataSize( bufferSize ) );
+                                                           .SetDataSize( bufferSize )
+                                                           .SetNativeImage( mNativeImage ));
   }
 }
 
@@ -383,6 +384,28 @@ void Texture::PrepareTexture()
 {
   if( mNativeImage )
   {
+    //TODO : use NativeImageInterface::Extension::IsSetSource for Native Surface
+    NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
+    if ( extension != NULL )
+    {
+      if ( extension->IsSetSource() )
+      {
+        // When native image is changed, are the width and height changed?
+        mGraphicsTexture.reset();
+        mWidth = uint16_t(mNativeImage->GetWidth());
+        mHeight = uint16_t(mNativeImage->GetHeight());
+        mHasAlpha= mNativeImage->RequiresBlending();
+        mGraphicsTexture = mGraphicsController->CreateTexture( mGraphicsController->GetTextureFactory()
+                                                               .SetFormat( ConvertPixelFormat( mFormat ) )
+                                                               .SetUsage( Graphics::TextureDetails::Usage::SAMPLE )
+                                                               .SetSize( { mWidth, mHeight } )
+                                                               .SetType( Graphics::TextureDetails::Type::TEXTURE_2D )
+                                                               .SetMipMapFlag( Graphics::TextureDetails::MipMapFlag::DISABLED )
+                                                               .SetData( nullptr )
+                                                               .SetDataSize( 0 )
+                                                               .SetNativeImage( mNativeImage ));
+      }
+    }
     mNativeImage->PrepareTexture();
   }
 }

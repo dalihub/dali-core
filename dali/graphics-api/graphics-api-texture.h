@@ -66,15 +66,35 @@ public:
   virtual void CopyTexture(const Texture &srcTexture, Rect2D srcRegion, Offset2D dstOffset, uint32_t layer, uint32_t level, TextureDetails::UpdateMode updateMode ) = 0;
 
   /**
-   * Copies buffer to the texture
-   *
-   * @param srcBuffer Source buffer, the format of data must match the texture
-   * @param srcExtent Source dimensions
-   * @param dstOffset Destination offset
-   * @param layer Destination layer
-   * @param level Mipmap level
+   * Copies buffer content into the texture
+   * @param buffer source buffer
+   * @param bufferOffset offset in bytes in the buffer
+   * @param extent2D extents of source image ( width, height )
+   * @param textureOffset2D destination blitting offset
+   * @param layer destination layer
+   * @param level destination mipmap leve;
+   * @param flags additional flags
    */
-  virtual void CopyBuffer(const Buffer &srcBuffer, Extent2D srcExtent, Offset2D dstOffset, uint32_t layer, uint32_t level,  TextureDetails::UpdateMode updateMode ) = 0;
+  virtual void CopyBuffer(const Dali::Graphics::Buffer& buffer,
+                          uint32_t bufferOffset,
+                          Extent2D extent2D,
+                          Offset2D textureOffset2D,
+                          uint32_t layer,
+                          uint32_t level,
+                          TextureUpdateFlags flags ) = 0;
+
+  /**
+   * Returns memory requirements for the texture
+   *
+   * @return Instance of memory requirements
+   */
+  virtual MemoryRequirements GetMemoryRequirements() const = 0;
+
+  /**
+   * Returns texture properties
+   * @return texture properties structure
+   */
+  virtual const TextureProperties& GetProperties() = 0;
 
 protected:
   // derived types should not be moved directly to prevent slicing
