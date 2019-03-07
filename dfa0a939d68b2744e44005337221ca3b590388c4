@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e7a1ee64_086029ac",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a9d5e76_2fc234ba",
+      "range": {
+        "startLine": 278,
+        "startChar": 82,
+        "endLine": 278,
+        "endChar": 104
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e6b51430_ab8db6d5",
         "filename": "dali/internal/update/manager/update-manager.cpp",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "9f7df4f4_310dc57a",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6b51430_ab8db6d5",
+      "range": {
+        "startLine": 945,
+        "startChar": 47,
+        "endLine": 945,
+        "endChar": 49
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "44202177_8531951a",
         "filename": "dali/internal/update/manager/update-manager.cpp",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2019-02-26T14:03:00Z",
       "side": 1,
       "message": "Should uploading a texture trigger another update? (i.e. should updateScene be true if futures was true?)",
+      "range": {
+        "startLine": 1078,
+        "startChar": 1,
+        "endLine": 1085,
+        "endChar": 19
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70854dc2_00b27264",
+        "filename": "dali/internal/update/manager/update-manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1085,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "no such need. the upload will be complete by that point and there should be no need to call an extra update.",
+      "parentUuid": "44202177_8531951a",
       "range": {
         "startLine": 1078,
         "startChar": 1,
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "a1006f6b_95088fe8",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c97e313_345d6e49",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 324,
+        "endChar": 1
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b50c61a9_f207391a",
         "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
         "patchSetId": 1
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "0139b3bd_a48f1f40",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b50c61a9_f207391a",
+      "range": {
+        "startLine": 329,
+        "startChar": 0,
+        "endLine": 329,
+        "endChar": 4
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "13ac52c8_9fc66588",
         "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
         "patchSetId": 1
@@ -137,6 +257,30 @@
       "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcbaec6e_bade2c51",
+        "filename": "dali/internal/update/rendering/scene-graph-texture.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1010808
+      },
+      "writtenOn": "2019-03-07T15:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13ac52c8_9fc66588",
+      "range": {
+        "startLine": 412,
+        "startChar": 8,
+        "endLine": 412,
+        "endChar": 39
+      },
+      "revId": "dfa0a939d68b2744e44005337221ca3b590388c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
