@@ -34,12 +34,6 @@ bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, H
   return Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
 }
 
-bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
-{
-  Stage stage = Stage::GetCurrent();
-  return Internal::HitTestAlgorithm::HitTest( GetImplementation( stage ), GetImplementation(renderTask), screenCoordinates, results, func );
-}
-
 } // namespace HitTestAlgorithm
 
 } // namespace Dali
