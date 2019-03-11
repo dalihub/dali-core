@@ -52,13 +52,13 @@ public:
    * @brief Get the key symbol string.
    * @return The key symbol
    */
-  std::string GetKey() const;
+  std::string GetLogicalKey() const;
 
   /**
    * @brief Set the key symbol string to the KeyEvent.
    * @param[in] key The key symbol to set
    */
-  void SetKey( const std::string& key );
+  void SetLogicalKey( const std::string& logicalKey );
 
   /**
    * @brief Get the compose string.
@@ -128,7 +128,7 @@ private:
 
 private:
 
-  std::string mKey;
+  std::string mLogicalKey;
   std::string mCompose;
   std::string mDeviceName;
   Device::Class::Type mDeviceClass;

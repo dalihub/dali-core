@@ -30,7 +30,7 @@ namespace Integration
 KeyEvent::KeyEvent()
 : Event( Key ),
   keyName(),
-  key(),
+  logicalKey(),
   keyString(),
   keyCode( -1 ),
   keyModifier( 0 ),
@@ -43,12 +43,12 @@ KeyEvent::KeyEvent()
 {
 }
 
-KeyEvent::KeyEvent( const std::string& keyName, const std::string& key, const std::string& keyString, int keyCode, int keyModifier,
+KeyEvent::KeyEvent( const std::string& keyName, const std::string& logicalKey, const std::string& keyString, int keyCode, int keyModifier,
                     unsigned long timeStamp, const State& keyState, const std::string& compose, const std::string& deviceName,
                     const Device::Class::Type deviceClass, const Device::Subclass::Type deviceSubclass )
 : Event( Key ),
   keyName( keyName ),
-  key( key ),
+  logicalKey( logicalKey ),
   keyString( keyString ),
   keyCode( keyCode ),
   keyModifier( keyModifier ),
@@ -64,7 +64,7 @@ KeyEvent::KeyEvent( const std::string& keyName, const std::string& key, const st
 KeyEvent::KeyEvent( const Dali::KeyEvent& event )
 : Event( Key ),
   keyName( event.keyPressedName ),
-  key( "" ),
+  logicalKey( "" ),
   keyString( event.keyPressed ),
   keyCode( event.keyCode ),
   keyModifier( event.keyModifier ),
@@ -76,7 +76,7 @@ KeyEvent::KeyEvent( const Dali::KeyEvent& event )
   deviceSubclass( Device::Subclass::NONE )
 {
   const Internal::KeyEventImpl* keyEventImpl = GetImplementation( &event );
-  key = keyEventImpl->GetKey();
+  logicalKey = keyEventImpl->GetLogicalKey();
   compose = keyEventImpl->GetCompose();
   deviceName = keyEventImpl->GetDeviceName();
   deviceClass = keyEventImpl->GetDeviceClass();

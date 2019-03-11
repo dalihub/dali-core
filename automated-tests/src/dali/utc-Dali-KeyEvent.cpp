@@ -295,7 +295,7 @@ int UtcDaliIntegrationKeyEvent(void)
     Integration::KeyEvent keyEvent;
     DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
     DALI_TEST_CHECK( keyEvent.keyName == std::string() );
-    DALI_TEST_CHECK( keyEvent.key == std::string() );
+    DALI_TEST_CHECK( keyEvent.logicalKey == std::string() );
     DALI_TEST_CHECK( keyEvent.keyString == std::string() );
     DALI_TEST_EQUALS( keyEvent.keyCode, -1, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.keyModifier, 0, TEST_LOCATION );
@@ -305,7 +305,7 @@ int UtcDaliIntegrationKeyEvent(void)
 
   {
     const std::string keyName("keyName");
-    const std::string key("key");
+    const std::string logicalKey("logicalKey");
     const std::string keyString("keyString");
     const int keyCode(333);
     const int keyModifier(312);
@@ -316,10 +316,10 @@ int UtcDaliIntegrationKeyEvent(void)
     const Device::Class::Type deviceClass = Device::Class::KEYBOARD;
     const Device::Subclass::Type deviceSubclass = Device::Subclass::NONE;
 
-    Integration::KeyEvent keyEvent(keyName, key, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
+    Integration::KeyEvent keyEvent(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
     DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
     DALI_TEST_CHECK( keyEvent.keyName == keyName );
-    DALI_TEST_CHECK( keyEvent.key == key );
+    DALI_TEST_CHECK( keyEvent.logicalKey == logicalKey );
     DALI_TEST_CHECK( keyEvent.keyString == keyString );
     DALI_TEST_EQUALS( keyEvent.keyCode, keyCode, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.keyModifier, keyModifier, TEST_LOCATION );
@@ -343,7 +343,7 @@ int UtcDaliIntegrationKeyEventConvertor(void)
 
   DALI_TEST_EQUALS( keyEvent.type, Integration::Event::Key, TEST_LOCATION );
   DALI_TEST_CHECK( keyEvent.keyName == TEST_STRING_1 );
-  DALI_TEST_CHECK( keyEvent.key == "" );
+  DALI_TEST_CHECK( keyEvent.logicalKey == "" );
   DALI_TEST_CHECK( keyEvent.keyString == "i" );
   DALI_TEST_EQUALS( keyEvent.keyCode, 99, TEST_LOCATION );
   DALI_TEST_EQUALS( keyEvent.keyModifier, SHIFT_MODIFIER, TEST_LOCATION );
