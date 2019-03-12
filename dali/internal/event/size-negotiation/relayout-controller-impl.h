@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,13 @@ public:
    * @return A handle to the RelayoutController control.
    */
   static RelayoutController* Get();
+
+  /**
+   * Set the stage size
+   * @param width of the stage
+   * @param height of the stage
+   */
+  void SetStageSize( uint32_t width, uint32_t height );
 
   /**
    * @brief Request to relayout the given actor and all sub-actors of it.
@@ -143,7 +150,7 @@ public: // CALLBACKS
 
 private:
 
-  using RawActorList = Dali::Vector< Dali::Internal::Actor* >;
+  typedef Dali::Vector< BaseObject* > RawActorList;
 
   /**
    * @brief Request for relayout. Relays out whole scene.
@@ -187,7 +194,7 @@ private:
    * @param[in] actors The container to add the actor to
    * @param[in] size The size that this actor should be
    */
-  void QueueActor( Internal::Actor* actor, RelayoutContainer& actors, Vector2 size );
+  void QueueActor( Dali::Actor& actor, RelayoutContainer& actors, Vector2 size );
 
   /**
    * @brief Find the given object in the list and null it out
@@ -198,8 +205,8 @@ private:
   void FindAndZero( const RawActorList& list, const Dali::RefObject* object );
 
   // Undefined
-  RelayoutController(const RelayoutController&) = delete;
-  RelayoutController& operator=(const RelayoutController&) = delete;
+  RelayoutController(const RelayoutController&);
+  RelayoutController& operator=(const RelayoutController&);
 
 private:
 
@@ -211,6 +218,7 @@ private:
   RawActorList mDirtyLayoutSubTrees;    ///< List of roots of sub trees that are dirty
   MemoryPoolRelayoutContainer* mRelayoutStack;  ///< Stack for relayouting
 
+  Vector2 mStageSize;              ///< size of the stage
   bool mRelayoutConnection : 1;    ///< Whether EventProcessingFinishedSignal signal is connected.
   bool mRelayoutFlag : 1;          ///< Relayout flag to avoid unnecessary calls
   bool mEnabled : 1;               ///< Initially disabled. Must be enabled at some point.

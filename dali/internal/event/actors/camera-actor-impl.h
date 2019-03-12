@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,8 +154,9 @@ public:
 
   /**
    * @copydoc Dali::CameraActor::SetPerspectiveProjection()
+   * @param[in] stereoBias The frustum horizontal and vertical offset for stereoscopic cameras
    */
-  void SetPerspectiveProjection( const Size& size );
+  void SetPerspectiveProjection( const Size& size, const Vector2& stereoBias = Vector2::ZERO );
 
   /**
    * @copydoc Dali::CameraActor::SetOrthographicProjection(const Vector2& size);

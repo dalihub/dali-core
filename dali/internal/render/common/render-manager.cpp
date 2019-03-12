@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/renderers/render-texture-frame-buffer.h>
-#include <dali/internal/render/renderers/render-surface-frame-buffer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
@@ -60,8 +58,6 @@ struct RenderManager::Impl
         Integration::DepthBufferAvailable depthBufferAvailableParam,
         Integration::StencilBufferAvailable stencilBufferAvailableParam )
   : context( glAbstraction ),
-    currentContext( &context ),
-    glAbstraction( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     renderQueue(),
     instructions(),
@@ -96,17 +92,6 @@ struct RenderManager::Impl
     mRenderTrackers.EraseObject( renderTracker );
   }
 
-  Context* CreateSurfaceContext()
-  {
-    surfaceContextContainer.PushBack( new Context( glAbstraction ) );
-    return surfaceContextContainer[ surfaceContextContainer.Count() - 1 ];
-  }
-
-  void DestroySurfaceContext( Context* surfaceContext )
-  {
-    surfaceContextContainer.EraseObject( surfaceContext );
-  }
-
   void UpdateTrackers()
   {
     for( auto&& iter : mRenderTrackers )
@@ -117,10 +102,7 @@ struct RenderManager::Impl
 
   // the order is important for destruction,
   // programs are owned by context at the moment.
-  Context                                   context;                 ///< Holds the GL state of the share resource context
-  Context*                                  currentContext;          ///< Holds the GL state of the current context for rendering
-  OwnerContainer< Context* >                surfaceContextContainer; ///< List of owned contexts holding the GL state per surface
-  Integration::GlAbstraction&               glAbstraction;           ///< GL abstraction
+  Context                                   context;                 ///< holds the GL state
   Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
   RenderQueue                               renderQueue;             ///< A message queue for receiving messages from the update-thread.
 
@@ -306,14 +288,7 @@ void RenderManager::SetWrapMode( Render::Sampler* sampler, uint32_t rWrapMode, u
 void RenderManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
 {
   mImpl->frameBufferContainer.PushBack( frameBuffer );
-  if ( frameBuffer->IsSurfaceBacked() )
-  {
-    frameBuffer->Initialize( *mImpl->CreateSurfaceContext() );
-  }
-  else
-  {
-    frameBuffer->Initialize( mImpl->context );
-  }
+  frameBuffer->Initialize(mImpl->context);
 }
 
 void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
@@ -326,15 +301,7 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
     if ( iter == frameBuffer )
     {
       frameBuffer->Destroy( mImpl->context );
-
-      if ( frameBuffer->IsSurfaceBacked() )
-      {
-        auto surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( frameBuffer );
-        mImpl->DestroySurfaceContext( surfaceFrameBuffer->GetContext() );
-      }
-
       mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
-
       break;
     }
   }
@@ -342,11 +309,7 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
 
 void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
-  if ( !frameBuffer->IsSurfaceBacked() )
-  {
-    auto textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( frameBuffer );
-    textureFrameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
-  }
+  frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
 void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
@@ -456,50 +419,48 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender( true );
 
-    // Switch to the shared context
-    if ( mImpl->currentContext != &mImpl->context )
+    // switch rendering to adaptor provided (default) buffer
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
+
+    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                             mImpl->defaultSurfaceRect.y,
+                             mImpl->defaultSurfaceRect.width,
+                             mImpl->defaultSurfaceRect.height );
+
+    mImpl->context.ClearColor( mImpl->backgroundColor.r,
+                               mImpl->backgroundColor.g,
+                               mImpl->backgroundColor.b,
+                               mImpl->backgroundColor.a );
+
+    // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
+    // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
+    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+
+    mImpl->context.SetScissorTest( false );
+
+    GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
+
+    mImpl->context.ColorMask( true );
+
+    if( mImpl->depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
     {
-      mImpl->currentContext = &mImpl->context;
-      // Clear the current cached program when the context is switched
-      mImpl->programController.ClearCurrentProgram();
+      mImpl->context.DepthMask( true );
+      clearMask |= GL_DEPTH_BUFFER_BIT;
     }
 
-
-    // Upload the geometries
-    for( uint32_t i = 0; i < count; ++i )
+    if( mImpl->stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
     {
-      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
-
-      const Matrix* viewMatrix       = instruction.GetViewMatrix( mImpl->renderBufferIndex );
-      const Matrix* projectionMatrix = instruction.GetProjectionMatrix( mImpl->renderBufferIndex );
-
-      DALI_ASSERT_DEBUG( viewMatrix );
-      DALI_ASSERT_DEBUG( projectionMatrix );
-
-      if( viewMatrix && projectionMatrix )
-      {
-        const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
-
-        // Iterate through each render list.
-        for( RenderListContainer::SizeType index = 0; index < renderListCount; ++index )
-        {
-          const RenderList* renderList = instruction.GetRenderList( index );
-
-          if( renderList && !renderList->IsEmpty() )
-          {
-            const std::size_t itemCount = renderList->Count();
-            for( uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex )
-            {
-              const RenderItem& item = renderList->GetItem( itemIndex );
-              if( DALI_LIKELY( item.mRenderer ) )
-              {
-                item.mRenderer->Upload( *mImpl->currentContext );
-              }
-            }
-          }
-        }
-      }
+      mImpl->context.ClearStencil( 0 );
+      mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+      clearMask |= GL_STENCIL_BUFFER_BIT;
     }
+
+    mImpl->context.Clear( clearMask, Context::FORCE_CLEAR );
+
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    mImpl->programController.ResetProgramMatrices();
 
     for( uint32_t i = 0; i < count; ++i )
     {
@@ -510,10 +471,6 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
 
     GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-    for ( auto&& context : mImpl->surfaceContextContainer )
-    {
-      context->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-    }
 
     //Notify RenderGeometries that rendering has finished
     for ( auto&& iter : mImpl->geometryContainer )
@@ -551,166 +508,69 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
   }
 
-  Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
-  Vector4 backgroundColor = mImpl->backgroundColor;
-  Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
-  Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-
-  Render::SurfaceFrameBuffer* surfaceFrameBuffer = nullptr;
-  if ( ( instruction.mFrameBuffer != 0 ) && instruction.mFrameBuffer->IsSurfaceBacked() )
-  {
-    surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
-
-#if DALI_GLES_VERSION >= 30
-    Context* surfaceContext = surfaceFrameBuffer->GetContext();
-    if ( mImpl->currentContext != surfaceContext )
-    {
-      // Switch the correct context if rendering to a surface
-      mImpl->currentContext = surfaceContext;
-      // Clear the current cached program when the context is switched
-      mImpl->programController.ClearCurrentProgram();
-    }
-#endif
-
-    surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
-    backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
-  }
-
-  DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
-
-  // reset the program matrices for all programs once per frame
-  // this ensures we will set view and projection matrix once per program per camera
-  mImpl->programController.ResetProgramMatrices();
-
-  if( instruction.mFrameBuffer )
-  {
-    instruction.mFrameBuffer->Bind( *mImpl->currentContext );
-  }
-
-  mImpl->currentContext->Viewport( surfaceRect.x,
-                            surfaceRect.y,
-                            surfaceRect.width,
-                            surfaceRect.height );
-
-  mImpl->currentContext->ClearColor( backgroundColor.r,
-                              backgroundColor.g,
-                              backgroundColor.b,
-                              backgroundColor.a );
-
-  // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
-  // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
-  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-
-  mImpl->currentContext->SetScissorTest( false );
-
-  GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
-
-  mImpl->currentContext->ColorMask( true );
-
-  if( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
-  {
-    mImpl->currentContext->DepthMask( true );
-    clearMask |= GL_DEPTH_BUFFER_BIT;
-  }
-
-  if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
-  {
-    mImpl->currentContext->ClearStencil( 0 );
-    mImpl->currentContext->StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    clearMask |= GL_STENCIL_BUFFER_BIT;
-  }
-
-  mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-
   if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
-    if ( instruction.mFrameBuffer->IsSurfaceBacked() ) // Surface rendering
+    instruction.mFrameBuffer->Bind( mImpl->context );
+    if ( instruction.mIsViewportSet )
     {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( surfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect = surfaceRect;
-      }
-    }
-    else // Offscreen buffer rendering
-    {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
-      }
-    }
-  }
-  else // No Offscreen frame buffer rendering
-  {
-    // Check whether a viewport is specified, otherwise the full surface size is used
-    if ( instruction.mFrameBuffer != 0 )
-    {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
-      }
+      // For glViewport the lower-left corner is (0,0)
+      const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
+      viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
     }
     else
     {
-      viewportRect = surfaceRect;
+      viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
+    }
+  }
+  else // !(instruction.mOffscreenTexture)
+  {
+    // switch rendering to adaptor provided (default) buffer
+    mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    // Check whether a viewport is specified, otherwise the full surface size is used
+    if ( instruction.mIsViewportSet )
+    {
+      // For glViewport the lower-left corner is (0,0)
+      const int32_t y = ( mImpl->defaultSurfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
+      viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
+    }
+    else
+    {
+      viewportRect = mImpl->defaultSurfaceRect;
     }
   }
 
-  mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+  mImpl->context.Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
 
   if ( instruction.mIsClearColorSet )
   {
-    mImpl->currentContext->ClearColor( clearColor.r,
-                                       clearColor.g,
-                                       clearColor.b,
-                                       clearColor.a );
+    mImpl->context.ClearColor( clearColor.r,
+                               clearColor.g,
+                               clearColor.b,
+                               clearColor.a );
 
     // Clear the viewport area only
-    mImpl->currentContext->SetScissorTest( true );
-    mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
-    mImpl->currentContext->ColorMask( true );
-    mImpl->currentContext->Clear( GL_COLOR_BUFFER_BIT , Context::CHECK_CACHED_VALUES );
-    mImpl->currentContext->SetScissorTest( false );
+    mImpl->context.SetScissorTest( true );
+    mImpl->context.Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
+    mImpl->context.ColorMask( true );
+    mImpl->context.Clear( GL_COLOR_BUFFER_BIT , Context::CHECK_CACHED_VALUES );
+    mImpl->context.SetScissorTest( false );
   }
 
   mImpl->renderAlgorithms.ProcessRenderInstruction(
       instruction,
-      *mImpl->currentContext,
+      mImpl->context,
       mImpl->renderBufferIndex,
-      depthBufferAvailable,
-      stencilBufferAvailable );
+      mImpl->depthBufferAvailable,
+      mImpl->stencilBufferAvailable );
 
-  if( instruction.mRenderTracker && ( instruction.mFrameBuffer != 0 ) )
+  if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {
     // This will create a sync object every frame this render tracker
     // is alive (though it should be now be created only for
     // render-once render tasks)
     instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
     instruction.mRenderTracker = NULL; // Only create once.
-  }
-
-  if ( surfaceFrameBuffer )
-  {
-    surfaceFrameBuffer->PostRender();
   }
 }
 

@@ -140,19 +140,29 @@ void ValidateParameters( Property::Type propertyType, Property::Type destination
 
 AnimationPtr Animation::New(float durationSeconds)
 {
-  if( durationSeconds < 0.0f )
+  Stage* stage = Stage::GetCurrent();
+
+  if( stage )
   {
-    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
-    durationSeconds = 0.0f;
+    AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
+
+    if( durationSeconds < 0.0f )
+    {
+      DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+      durationSeconds = 0.0f;
+    }
+
+    AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
+
+    // Second-phase construction
+    animation->Initialize();
+
+    return animation;
   }
-
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  AnimationPtr animation = new Animation( tls.GetEventThreadServices(), tls.GetAnimationPlaylist(), durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
-
-  // Second-phase construction
-  animation->Initialize();
-
-  return animation;
+  else
+  {
+    return NULL;
+  }
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )

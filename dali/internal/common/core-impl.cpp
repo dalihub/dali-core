@@ -26,7 +26,6 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/render-surface.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -34,7 +33,6 @@
 #include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/events/event-processor.h>
@@ -91,8 +89,7 @@ Core::Core( RenderController& renderController,
             Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
-  mProcessingEvent(false),
-  mForceNextUpdate( false )
+  mProcessingEvent(false)
 {
   // Create the thread local storage
   CreateThreadLocalStorage();
@@ -125,12 +122,12 @@ Core::Core( RenderController& renderController,
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
-  mObjectRegistry = ObjectRegistry::New();
-
-  mStage = IntrusivePtr<Stage>( Stage::New( *mUpdateManager ) );
+  mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager, mRenderController ) );
 
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
+
+  mStage->Initialize( renderToFboEnabled == Integration::RenderToFrameBuffer::TRUE );
 
   mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
   mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
@@ -157,19 +154,15 @@ Core::~Core()
     delete tls;
   }
 
-  mObjectRegistry.Reset();
-
   // Stop relayout requests being raised on stage destruction
   mRelayoutController.Reset();
+
+  // Clean-up stage - remove default camera and root layer
+  mStage->Uninitialize();
 
   // remove (last?) reference to stage
   mStage.Reset();
 
-}
-
-void Core::Initialize()
-{
-  mStage->Initialize( *mScenes[0] );
 }
 
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
@@ -194,15 +187,27 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
+void Core::SurfaceResized( uint32_t width, uint32_t height )
 {
-  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
-  {
-    if( (*iter)->GetSurface() == surface )
-    {
-      (*iter)->SetSurface( *surface );
-    }
-  }
+  mStage->SurfaceResized( static_cast<float>( width ), static_cast<float>( height ) );
+
+  // The stage-size may be less than surface-size (reduced by top-margin)
+  Vector2 size = mStage->GetSize();
+  mRelayoutController->SetStageSize( static_cast<uint32_t>( size.width ), static_cast<uint32_t>( size.height ) ); // values get truncated
+}
+
+void Core::SetTopMargin( uint32_t margin )
+{
+  mStage->SetTopMargin( margin );
+
+  // The stage-size may be less than surface-size (reduced by top-margin)
+  Vector2 size = mStage->GetSize();
+  mRelayoutController->SetStageSize( static_cast<uint32_t>( size.width ), static_cast<uint32_t>( size.height ) ); // values get truncated
+}
+
+void Core::SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical )
+{
+  mStage->SetDpi( Vector2( static_cast<float>( dpiHorizontal ), static_cast<float>( dpiVertical ) ) );
 }
 
 void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
@@ -239,12 +244,6 @@ void Core::SceneCreated()
   mStage->EmitSceneCreatedSignal();
 
   mRelayoutController->OnApplicationSceneCreated();
-
-  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
-  {
-    Dali::Actor sceneRootLayer = (*iter)->GetRootLayer();
-    mRelayoutController->RequestRelayoutTree( sceneRootLayer );
-  }
 }
 
 void Core::QueueEvent( const Integration::Event& event )
@@ -283,10 +282,7 @@ void Core::ProcessEvents()
 
 
   // Rebuild depth tree after event processing has finished
-  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
-  {
-    (*iter)->RebuildDepthTree();
-  }
+  mStage->RebuildDepthTree();
 
   // Flush any queued messages for the update-thread
   const bool messagesToProcess = mUpdateManager->FlushQueue();
@@ -294,7 +290,7 @@ void Core::ProcessEvents()
   // Check if the touch or gestures require updates.
   const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
   // Check if the next update is forced.
-  const bool forceUpdate = IsNextUpdateForced();
+  const bool forceUpdate = mStage->IsNextUpdateForced();
 
   if( messagesToProcess || gestureNeedsUpdate || forceUpdate )
   {
@@ -381,84 +377,11 @@ RelayoutController& Core::GetRelayoutController()
   return *(mRelayoutController.Get());
 }
 
-ObjectRegistry& Core::GetObjectRegistry() const
-{
-  return *(mObjectRegistry.Get());
-}
-
-EventThreadServices& Core::GetEventThreadServices()
-{
-  return *this;
-}
-
-PropertyNotificationManager& Core::GetPropertyNotificationManager() const
-{
-  return *(mPropertyNotificationManager);
-}
-
-AnimationPlaylist& Core::GetAnimationPlaylist() const
-{
-  return *(mAnimationPlaylist);
-}
-
-void Core::AddScene( Scene* scene )
-{
-  mScenes.push_back( scene );
-}
-
-void Core::RemoveScene( Scene* scene )
-{
-  auto iter = std::find( mScenes.begin(), mScenes.end(), scene );
-  if( iter != mScenes.end() )
-  {
-    mScenes.erase( iter );
-  }
-}
-
 void Core::CreateThreadLocalStorage()
 {
   // a pointer to the ThreadLocalStorage object will be stored in TLS
   // The ThreadLocalStorage object should be deleted by the Core destructor
   new ThreadLocalStorage(this);
-}
-
-void Core::RegisterObject( Dali::BaseObject* object )
-{
-  mObjectRegistry = &ThreadLocalStorage::Get().GetObjectRegistry();
-  mObjectRegistry->RegisterObject( object );
-}
-
-void Core::UnregisterObject( Dali::BaseObject* object )
-{
-  mObjectRegistry = &ThreadLocalStorage::Get().GetObjectRegistry();
-  mObjectRegistry->UnregisterObject( object );
-}
-
-Integration::RenderController& Core::GetRenderController()
-{
-  return mRenderController;
-}
-
-uint32_t* Core::ReserveMessageSlot( uint32_t size, bool updateScene )
-{
-  return mUpdateManager->ReserveMessageSlot( size, updateScene );
-}
-
-BufferIndex Core::GetEventBufferIndex() const
-{
-  return mUpdateManager->GetEventBufferIndex();
-}
-
-void Core::ForceNextUpdate()
-{
-  mForceNextUpdate = true;
-}
-
-bool Core::IsNextUpdateForced()
-{
-  bool nextUpdateForced = mForceNextUpdate;
-  mForceNextUpdate = false;
-  return nextUpdateForced;
 }
 
 } // namespace Internal

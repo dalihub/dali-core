@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,9 +237,8 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
     const bool isDefaultRenderTask = isFirstRenderTask;
     isFirstRenderTask = false;
 
-    const bool isSurfaceBacked = hasFrameBuffer && renderTask.GetFrameBuffer()->IsSurfaceBacked();
-    if( ( !renderToFboEnabled && ( ( !processOffscreen && hasFrameBuffer && !isSurfaceBacked ) ||
-                                   ( processOffscreen && ( !hasFrameBuffer || isSurfaceBacked ) ) ) ) ||
+    if( ( !renderToFboEnabled && ( ( !processOffscreen && hasFrameBuffer ) ||
+                                   ( processOffscreen && !hasFrameBuffer ) ) ) ||
         ( renderToFboEnabled && ( ( processOffscreen && !hasFrameBuffer ) ||
                                   ( isDefaultRenderTask && processOffscreen ) ||
                                   ( !isDefaultRenderTask && !processOffscreen && hasFrameBuffer ) ) ) ||

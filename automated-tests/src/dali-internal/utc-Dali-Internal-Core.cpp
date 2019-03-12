@@ -66,6 +66,35 @@ public:
 
 } // anonymous namespace
 
+int UtcDaliCoreTopMargin(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::SetTopMargin");
+
+  Stage stage = Stage::GetCurrent();
+
+  // Test Stage size without top-margin
+
+  const unsigned int initialWidth(  stage.GetSize().width );
+  const unsigned int initialHeight( stage.GetSize().height );
+
+  DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_WIDTH,  initialWidth,  TEST_LOCATION );
+  DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_HEIGHT, initialHeight, TEST_LOCATION );
+
+  // Retest with top-margin
+
+  unsigned int margin( 10 );
+  application.SetTopMargin( margin );
+
+  const unsigned int newWidth(  stage.GetSize().width );
+  const unsigned int newHeight( stage.GetSize().height );
+
+  DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_WIDTH,             newWidth,  TEST_LOCATION );
+  DALI_TEST_EQUALS( (TestApplication::DEFAULT_SURFACE_HEIGHT - margin), newHeight, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliCoreProcessEvents(void)
 {
   TestApplication application;

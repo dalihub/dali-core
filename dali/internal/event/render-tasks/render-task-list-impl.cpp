@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -59,7 +60,7 @@ RenderTaskPtr RenderTaskList::CreateTask()
 
 RenderTaskPtr RenderTaskList::CreateTask( Actor* sourceActor, CameraActor* cameraActor)
 {
-  RenderTaskPtr task = RenderTask::New( sourceActor, cameraActor, *this );
+  RenderTaskPtr task = RenderTask::New( sourceActor, cameraActor, *mSceneObject );
 
   mTasks.push_back( task );
 
@@ -134,7 +135,7 @@ void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
 }
 
 RenderTaskList::RenderTaskList()
-: mEventThreadServices( EventThreadServices::Get() ),
+: mEventThreadServices( *Stage::GetCurrent() ),
   mDefaults( *Stage::GetCurrent() ),
   mSceneObject( nullptr )
 {
@@ -194,11 +195,6 @@ void RenderTaskList::RecoverFromContextLoss()
       item->SetRefreshRate( Dali::RenderTask::REFRESH_ONCE );
     }
   }
-}
-
-const SceneGraph::RenderTaskList& RenderTaskList::GetSceneObject() const
-{
-  return *mSceneObject;
 }
 
 } // namespace Internal

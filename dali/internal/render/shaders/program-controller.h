@@ -124,11 +124,6 @@ public: // API
    */
   void SetShaderSaver( ShaderSaver& shaderSaver );
 
-  /**
-   * Clear current cached program
-   */
-  void ClearCurrentProgram();
-
 private: // From ProgramCache
 
   /**

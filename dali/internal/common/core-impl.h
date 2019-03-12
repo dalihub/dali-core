@@ -24,12 +24,9 @@
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/integration-api/resource-policies.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/object-registry-impl.h>
 
 namespace Dali
 {
@@ -44,7 +41,6 @@ class GlAbstraction;
 class GlSyncAbstraction;
 class UpdateStatus;
 class RenderStatus;
-class RenderSurface;
 struct Event;
 struct TouchData;
 }
@@ -60,7 +56,6 @@ class GestureEventProcessor;
 class ShaderFactory;
 class TouchResampler;
 class RelayoutController;
-class EventThreadServices;
 
 namespace SceneGraph
 {
@@ -73,7 +68,7 @@ class RenderTaskProcessor;
 /**
  * Internal class for Dali::Integration::Core
  */
-class Core : public EventThreadServices
+class Core
 {
 public:
 
@@ -96,11 +91,6 @@ public:
   ~Core();
 
   /**
-   * @copydoc Dali::Integration::Core::Initialize()
-   */
-  void Initialize();
-
-  /**
    * @copydoc Dali::Integration::Core::GetContextNotifier()
    */
   Integration::ContextNotifierInterface* GetContextNotifier();
@@ -121,9 +111,19 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(Integration::RenderSurface*)
+   * @copydoc Dali::Integration::Core::SurfaceResized(uint32_t, uint32_t)
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized(uint32_t width, uint32_t height);
+
+  /**
+   * @copydoc Dali::Integration::Core::SetTopMargin( uint32_t margin )
+   */
+  void SetTopMargin( uint32_t margin );
+
+  /**
+   * @copydoc Dali::Integration::Core::SetDpi(uint32_t, uint32_t)
+   */
+  void SetDpi(uint32_t dpiHorizontal, uint32_t dpiVertical);
 
   /**
    * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)
@@ -170,58 +170,6 @@ public:
    */
   void UnregisterProcessor( Dali::Integration::Processor& processor );
 
-  /**
-   * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
-   */
-  void AddScene( Scene* scene );
-
-  /**
-   * @copydoc Dali::Internal::ThreadLocalStorage::RemoveScene()
-   */
-  void RemoveScene( Scene* scene );
-
-public: // Implementation of EventThreadServices
-
-  /**
-   * @copydoc EventThreadServices::RegisterObject
-   */
-  void RegisterObject( BaseObject* object) override;
-
-  /**
-   * @copydoc EventThreadServices::UnregisterObject
-   */
-  void UnregisterObject( BaseObject* object) override;
-
-  /**
-   * @copydoc EventThreadServices::GetUpdateManager
-   */
-  SceneGraph::UpdateManager& GetUpdateManager() override;
-
-  /**
-   * @copydoc EventThreadServices::GetRenderController
-   */
-  Integration::RenderController& GetRenderController() override;
-
-  /**
-   * @copydoc EventThreadServices::ReserveMessageSlot
-   */
-  uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene ) override;
-
-  /**
-   * @copydoc EventThreadServices::GetEventBufferIndex
-   */
-  BufferIndex GetEventBufferIndex() const override;
-
-  /**
-   * @copydoc EventThreadServices::ForceNextUpdate
-   */
-  void ForceNextUpdate() override;
-
-  /**
-   * @copydoc EventThreadServices::IsNextUpdateForced
-   */
-  bool IsNextUpdateForced() override;
-
 private:
   /**
    * Run each registered processor
@@ -241,6 +189,12 @@ private:
    * @return A reference to the platform abstraction.
    */
   Integration::PlatformAbstraction& GetPlatform();
+
+  /**
+   * Returns the update manager.
+   * @return A reference to the update manager.
+   */
+  SceneGraph::UpdateManager& GetUpdateManager();
 
   /**
    * Returns the render manager.
@@ -272,37 +226,13 @@ private:
    */
   RelayoutController& GetRelayoutController();
 
-  /**
-   * @brief Gets the Object registry.
-   * @return A reference to the object registry
-   */
-  ObjectRegistry& GetObjectRegistry() const;
-
-  /**
-   * @brief Gets the event thread services.
-   * @return A reference to the event thread services
-   */
-  EventThreadServices& GetEventThreadServices();
-
-  /**
-   * @brief Gets the property notification manager.
-   * @return A reference to the property notification manager
-   */
-  PropertyNotificationManager& GetPropertyNotificationManager() const;
-
-  /**
-   * @brief Gets the animation play list.
-   * @return A reference to the animation play list
-   */
-  AnimationPlaylist& GetAnimationPlaylist() const;
-
 private:
 
   /**
    * Undefined copy and assignment operators
    */
-  Core(const Core& core) = delete;  // No definition
-  Core& operator=(const Core& core) = delete;  // No definition
+  Core(const Core& core);  // No definition
+  Core& operator=(const Core& core);  // No definition
 
   /**
    * Create Thread local storage
@@ -318,6 +248,7 @@ private:
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
+  bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
 
   OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;         ///< Handles the processing of render tasks
   OwnerPointer<SceneGraph::RenderManager>       mRenderManager;               ///< Render manager
@@ -328,14 +259,6 @@ private:
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
   Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
-
-  std::vector<ScenePtr>                         mScenes;                      ///< A container of scenes that bound to a surface for rendering, owned by Core
-
-  // The object registry
-  ObjectRegistryPtr                             mObjectRegistry;
-
-  bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
-  bool                                      mForceNextUpdate:1;           ///< True if the next rendering is really required.
 
   friend class ThreadLocalStorage;
 
