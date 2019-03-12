@@ -89,9 +89,10 @@ public:
 
   /**
    * @brief Bind the property buffer
+   * @param context The context to bind the the buffer
    * @param[in] target The binding point
    */
-  void BindBuffer(GpuBuffer::Target target);
+  void BindBuffer( Context& context, GpuBuffer::Target target );
 
   /**
    * Perform the upload of the buffer only when requiered

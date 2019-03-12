@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ Render::Texture* Texture::GetRenderObject() const
 }
 
 Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size )
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mNativeImage(),
   mSize( size ),
@@ -60,7 +60,7 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
 }
 
 Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mNativeImage( nativeImageInterface ),
   mSize( nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight() ),

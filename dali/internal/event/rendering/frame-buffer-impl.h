@@ -28,6 +28,12 @@
 
 namespace Dali
 {
+
+namespace Integration
+{
+class RenderSurface;
+}
+
 namespace Internal
 {
 namespace Render
@@ -53,6 +59,20 @@ public:
    * @return A smart-pointer to the newly allocated Texture.
    */
   static FrameBufferPtr New( uint32_t width, uint32_t height, Mask attachments );
+
+  /**
+   * @brief Create a new FrameBuffer
+   *
+   * @param[in] renderSurface  The render surface
+   * @param[in] attachments    The attachments comprising the format of the FrameBuffer (bit-mask)
+   * @return A smart-pointer to the newly allocated Texture.
+   */
+  static FrameBufferPtr New( Dali::Integration::RenderSurface& renderSurface, Mask attachments );
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~FrameBuffer();
 
   /**
    * @brief Get the FrameBuffer render object
@@ -84,14 +104,9 @@ private: // implementation
   /**
    * Second stage initialization of the Texture
    */
-  void Initialize();
+  void Initialize( Integration::RenderSurface* renderSurface = nullptr );
 
 protected:
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~FrameBuffer();
 
 private: // unimplemented methods
 
@@ -108,6 +123,8 @@ private: // data
   uint32_t mWidth;
   uint32_t mHeight;
   Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
+
+  bool mIsSurfaceBacked:1;
 
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ void PrintHierarchy()
   if ( gLogFilter->IsEnabledFor( Debug::Verbose ) )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "---------- ROOT LAYER ----------\n" );
+
     PrintChildren( Stage::GetCurrent()->GetRootLayer(), 0 );
   }
 }
@@ -109,7 +110,6 @@ RelayoutController::RelayoutController( Integration::RenderController& controlle
   mRelayoutInfoAllocator(),
   mSlotDelegate( this ),
   mRelayoutStack( new MemoryPoolRelayoutContainer( mRelayoutInfoAllocator ) ),
-  mStageSize(), // zero initialized
   mRelayoutConnection( false ),
   mRelayoutFlag( false ),
   mEnabled( false ),
@@ -130,17 +130,12 @@ RelayoutController* RelayoutController::Get()
   return &ThreadLocalStorage::Get().GetRelayoutController();
 }
 
-void RelayoutController::SetStageSize( uint32_t width, uint32_t height )
+void RelayoutController::QueueActor( Internal::Actor* actor, RelayoutContainer& actors, Vector2 size )
 {
-  mStageSize.width = static_cast<float>( width );
-  mStageSize.height = static_cast<float>( height );
-}
-
-void RelayoutController::QueueActor( Dali::Actor& actor, RelayoutContainer& actors, Vector2 size )
-{
-  if( GetImplementation( actor ).RelayoutRequired() )
+  if( actor && actor->RelayoutRequired() )
   {
-    actors.Add( actor, size );
+    Dali::Actor actorHandle = Dali::Actor( actor );
+    actors.Add( actorHandle, size );
   }
 }
 
@@ -207,12 +202,6 @@ void RelayoutController::OnApplicationSceneCreated()
 
   // Open relayout controller to receive relayout requests
   mEnabled = true;
-
-  // Spread the dirty flag through whole tree - don't need to explicity
-  // add request on rootLayer as it will automatically be added below.
-  Dali::Stage stage = Dali::Stage::GetCurrent();
-  Dali::Actor rootLayer = stage.GetRootLayer();
-  RequestRelayoutTree( rootLayer );
 
   // Flag request for end of frame
   Request();
@@ -374,7 +363,7 @@ void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension::Type dim
 
 void RelayoutController::AddRequest( Dali::Actor& actor )
 {
-  BaseObject* actorPtr = &GetImplementation( actor );
+  Internal::Actor* actorPtr = &GetImplementation( actor );
 
   // Only add the rootActor if it is not already recorded
   bool found = false;
@@ -395,7 +384,7 @@ void RelayoutController::AddRequest( Dali::Actor& actor )
 
 void RelayoutController::RemoveRequest( Dali::Actor& actor )
 {
-  BaseObject* actorPtr = &GetImplementation( actor );
+  Internal::Actor* actorPtr = &GetImplementation( actor );
 
   // Remove actor from dirty sub trees
   for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
@@ -414,8 +403,7 @@ void RelayoutController::Request()
 
   if( !mRelayoutConnection )
   {
-    Dali::Stage stage = Dali::Stage::GetCurrent();
-    stage.GetObjectRegistry().ObjectDestroyedSignal().Connect( mSlotDelegate, &RelayoutController::OnObjectDestroyed );
+    ThreadLocalStorage::Get().GetObjectRegistry().ObjectDestroyedSignal().Connect( mSlotDelegate, &RelayoutController::OnObjectDestroyed );
 
     mRelayoutConnection = true;
   }
@@ -441,19 +429,16 @@ void RelayoutController::Relayout()
     //    These controls are paired with the parent/stage size and added to the stack.
     for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
     {
-      BaseObject* dirtyActor = *it;
+      Internal::Actor* dirtyActor = *it;
 
       // Need to test if actor is valid (could have been deleted and had the pointer cleared)
       if( dirtyActor )
       {
-        // We know that BaseObject is a base class of Internal::Actor but need to instruct the compiler to do the cast
-        Dali::Actor actor = Dali::Actor( reinterpret_cast<Dali::Internal::Actor*>( dirtyActor ) );
-
         // Only negotiate actors that are on stage
-        if( actor.OnStage() )
+        if( dirtyActor->OnStage() )
         {
-          Dali::Actor parent = actor.GetParent();
-          QueueActor( actor, *mRelayoutStack, ( parent ) ? Vector2( parent.GetTargetSize() ) : mStageSize );
+          Internal::Actor* parent = dirtyActor->GetParent();
+          QueueActor( dirtyActor, *mRelayoutStack, ( parent ) ? Vector2( parent->GetTargetSize() ) : dirtyActor->GetScene().GetSize() );
         }
       }
     }

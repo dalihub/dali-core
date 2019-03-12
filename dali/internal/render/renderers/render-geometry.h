@@ -116,19 +116,24 @@ public:
   }
 
   /**
-   * Upload the geometry if it has changed, set up the attributes and perform
-   * the Draw call corresponding to the geometry type
+   * Upload the geometry if it has changed
+   * @param[in] context The GL context
+   */
+  void Upload( Context& context );
+
+  /**
+   * Set up the attributes and perform the Draw call corresponding to the geometry type
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    * @param[in] attributeLocation The location for the attributes in the shader
    * @param[in] elementBufferOffset The index of first element to draw if index buffer bound
    * @param[in] elementBufferCount Number of elements to draw if index buffer bound, uses whole buffer when 0
    */
-  void UploadAndDraw(Context& context,
-                     BufferIndex bufferIndex,
-                     Vector<GLint>& attributeLocation,
-                     uint32_t elementBufferOffset,
-                     uint32_t elementBufferCount );
+  void Draw(Context& context,
+            BufferIndex bufferIndex,
+            Vector<GLint>& attributeLocation,
+            uint32_t elementBufferOffset,
+            uint32_t elementBufferCount );
 
 private:
 

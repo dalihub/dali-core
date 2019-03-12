@@ -85,7 +85,7 @@ GpuBuffer::~GpuBuffer()
  * Creates or updates the buffer data depending on whether it
  * already exists or not.
  */
-void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage, Target target)
+void GpuBuffer::UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid *data, Usage usage, Target target)
 {
   DALI_ASSERT_DEBUG( size > 0 );
   mSize = size;
@@ -101,17 +101,17 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usag
   // make sure the buffer is bound, don't perform any checks because size may be zero
   if(ARRAY_BUFFER == target)
   {
-    mContext.BindArrayBuffer( mBufferId );
+    context.BindArrayBuffer( mBufferId );
   }
   else if(ELEMENT_ARRAY_BUFFER == target)
   {
     glTargetEnum = GL_ELEMENT_ARRAY_BUFFER;
-    mContext.BindElementArrayBuffer( mBufferId );
+    context.BindElementArrayBuffer( mBufferId );
   }
   else if(TRANSFORM_FEEDBACK_BUFFER == target)
   {
     glTargetEnum = GL_TRANSFORM_FEEDBACK_BUFFER;
-    mContext.BindTransformFeedbackBuffer( mBufferId );
+    context.BindTransformFeedbackBuffer( mBufferId );
   }
 
   // if the buffer has already been created, just update the data providing it fits
@@ -120,53 +120,53 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usag
     // if the data will fit in the existing buffer, just update it
     if (size <= mCapacity )
     {
-      mContext.BufferSubData( glTargetEnum, 0, size, data );
+      context.BufferSubData( glTargetEnum, 0, size, data );
     }
     else
     {
       // create a new buffer of the larger size,
       // gl should automatically deallocate the old buffer
-      mContext.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
+      context.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
       mCapacity = size;
     }
   }
   else
   {
     // create the buffer
-    mContext.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
+    context.BufferData( glTargetEnum, size, data, ModeAsGlEnum( usage ) );
     mBufferCreated = true;
     mCapacity = size;
   }
 
   if(ARRAY_BUFFER == target)
   {
-    mContext.BindArrayBuffer( 0 );
+    context.BindArrayBuffer( 0 );
   }
   else if(ELEMENT_ARRAY_BUFFER == target)
   {
-    mContext.BindElementArrayBuffer( 0 );
+    context.BindElementArrayBuffer( 0 );
   }
   else if(TRANSFORM_FEEDBACK_BUFFER == target)
   {
-    mContext.BindTransformFeedbackBuffer( 0 );
+    context.BindTransformFeedbackBuffer( 0 );
   }
 }
 
-void GpuBuffer::Bind(Target target) const
+void GpuBuffer::Bind(Context& context, Target target) const
 {
   DALI_ASSERT_DEBUG(mCapacity);
 
   if (target == ARRAY_BUFFER)
   {
-    mContext.BindArrayBuffer(mBufferId);
+    context.BindArrayBuffer(mBufferId);
   }
   else if (target == ELEMENT_ARRAY_BUFFER)
   {
-    mContext.BindElementArrayBuffer(mBufferId);
+    context.BindElementArrayBuffer(mBufferId);
   }
   else if (target == TRANSFORM_FEEDBACK_BUFFER)
   {
-    mContext.BindTransformFeedbackBuffer(mBufferId);
+    context.BindTransformFeedbackBuffer(mBufferId);
   }
 }
 

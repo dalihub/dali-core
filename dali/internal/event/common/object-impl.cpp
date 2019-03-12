@@ -948,7 +948,7 @@ DevelHandle::PropertySetSignalType& Object::PropertySetSignal()
 }
 
 Object::Object( const SceneGraph::PropertyOwner* sceneObject )
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mUpdateObject( sceneObject ),
   mTypeInfo( nullptr ),
   mConstraints( nullptr ),

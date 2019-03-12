@@ -146,6 +146,7 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-surface.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \

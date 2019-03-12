@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/render/renderers/render-texture-frame-buffer.h>
+#include <dali/internal/render/renderers/render-surface-frame-buffer.h>
+#include <dali/integration-api/render-surface.h>
 
 namespace Dali
 {
@@ -35,6 +37,13 @@ FrameBufferPtr FrameBuffer::New( uint32_t width, uint32_t height, Mask attachmen
   return frameBuffer;
 }
 
+FrameBufferPtr FrameBuffer::New( Dali::Integration::RenderSurface& renderSurface, Mask attachments )
+{
+  Dali::PositionSize positionSize = renderSurface.GetPositionSize();
+  FrameBufferPtr frameBuffer( new FrameBuffer( positionSize.width, positionSize.height, attachments ) );
+  frameBuffer->Initialize( &renderSurface );
+  return frameBuffer;
+}
 
 Render::FrameBuffer* FrameBuffer::GetRenderObject() const
 {
@@ -42,38 +51,58 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
 }
 
 FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mColor( NULL ),
   mWidth( width ),
   mHeight( height ),
-  mAttachments( attachments )
+  mAttachments( attachments ),
+  mIsSurfaceBacked( false )
 {
 }
 
-void FrameBuffer::Initialize()
+void FrameBuffer::Initialize( Integration::RenderSurface* renderSurface )
 {
-  mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mAttachments );
+  mIsSurfaceBacked = ( renderSurface != nullptr );
+
+  // If render surface backed, create a different scene object
+  // Make Render::FrameBuffer as a base class, and implement Render::TextureFrameBuffer & Render::WindowFrameBuffer
+  if ( mIsSurfaceBacked )
+  {
+    mRenderObject = new Render::SurfaceFrameBuffer( renderSurface );
+  }
+  else
+  {
+    mRenderObject = new Render::TextureFrameBuffer( mWidth, mHeight, mAttachments );
+  }
+
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
 }
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer )
 {
-  if( ( texture->GetWidth() / ( 1u << mipmapLevel ) == mWidth ) &&
-      ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )
+  if ( mIsSurfaceBacked )
   {
-    mColor = texture;
-    AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
+    DALI_LOG_ERROR( "Attempted to attach color texture to a render surface backed FrameBuffer \n" );
   }
   else
   {
-    DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
+    if( ( texture->GetWidth() / ( 1u << mipmapLevel ) == mWidth ) &&
+        ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )
+    {
+      mColor = texture;
+      AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
+    }
+    else
+    {
+      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
+    }
   }
 }
 
 Texture* FrameBuffer::GetColorTexture()
 {
-  return mColor.Get();
+  return mIsSurfaceBacked ? nullptr : mColor.Get();
 }
 
 FrameBuffer::~FrameBuffer()

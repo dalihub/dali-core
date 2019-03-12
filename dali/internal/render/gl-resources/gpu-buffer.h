@@ -77,18 +77,21 @@ public:
   /**
    *
    * Creates or updates a buffer object and binds it to the target.
+   * @param context The context to bind the the buffer
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
    * @param usage How the buffer will be used
    * @param target The target buffer to update
    */
-  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data, Usage usage, Target target);
+  void UpdateDataBuffer(Context& context, GLsizeiptr size, const GLvoid *data, Usage usage, Target target);
 
   /**
    * Bind the buffer object to the target
    * Will assert if the buffer size is zero
+   * @param context The context to bind the the buffer
+   * @param target The target buffer to bind
    */
-  void Bind(Target target) const;
+  void Bind(Context& context, Target target) const;
 
   /**
    * @return true if the GPU buffer is valid, i.e. its created and not empty
@@ -119,7 +122,7 @@ private:
 
 private: // Data
 
-  Context&           mContext;             ///< dali drawing context
+  Context&           mContext;             ///< shared context for dali drawing
   GLsizeiptr         mCapacity;            ///< buffer capacity
   GLsizeiptr         mSize;                ///< buffer size
   GLuint             mBufferId;            ///< buffer object name(id)
