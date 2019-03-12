@@ -1,5 +1,8 @@
+#ifndef DALI_TOUCH_DATA_DEVEL_H
+#define DALI_TOUCH_DATA_DEVEL_H
+
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +18,28 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/devel-api/events/hit-test-algorithm.h>
-
-// INTERNAL INCLUDES
-#include <dali/internal/event/events/hit-test-algorithm-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
-
 namespace Dali
 {
 
-namespace HitTestAlgorithm
+class TouchData;
+struct TouchEvent;
+
+namespace DevelTouchData
 {
 
-bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
-{
-  return Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
-}
+/**
+ * @brief Convert TouchEvent to TouchData.
+ *
+ * @return The TouchData convert from Dali::TouchEvent
+ *
+ * @note Use this API with caution.
+*/
+DALI_CORE_API TouchData Convert( const TouchEvent& touchEvent );
 
-} // namespace HitTestAlgorithm
+} // namespace DevelTouchData
 
 } // namespace Dali
+
+
+
+#endif // DALI_TOUCH_DATA_DEVEL_H

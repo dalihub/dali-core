@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,30 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/devel-api/events/hit-test-algorithm.h>
-
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/hit-test-algorithm-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/devel-api/events/touch-data-devel.h>
+#include <dali/internal/event/events/touch-data-impl.h>
 
 namespace Dali
 {
 
-namespace HitTestAlgorithm
+namespace DevelTouchData
 {
 
-bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
+TouchData Convert( const TouchEvent& touchEvent )
 {
-  return Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
+  Internal::TouchDataPtr touchDataImpl( new Internal::TouchData(touchEvent.time ) );
+
+  for( auto&& touchEventPoint : touchEvent.points )
+  {
+    touchDataImpl->AddPoint( Integration::Point( touchEventPoint ) );
+  }
+
+  return TouchData( touchDataImpl.Get() );
 }
 
-} // namespace HitTestAlgorithm
+} // namespace DevelTouchData
 
 } // namespace Dali
