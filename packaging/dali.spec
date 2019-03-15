@@ -124,6 +124,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 export DALI_DATA_RW_DIR
 export DALI_DATA_RO_DIR
 
+# Default to GLES 2.0 if not specified.
+%{!?target_gles_version: %define target_gles_version 20}
+
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
 LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
@@ -142,6 +145,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
       --localstatedir=%{_localstatedir} \
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
+      --enable-gles=%{target_gles_version} \
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
@@ -180,6 +184,7 @@ make clean
       --sharedstatedir=%{_sharedstatedir} \
       --mandir=%{_mandir} \
       --enable-cxx03-abi=yes  \
+      --enable-gles=%{target_gles_version} \
 %if 0%{?enable_debug}
       --enable-debug \
 %endif
