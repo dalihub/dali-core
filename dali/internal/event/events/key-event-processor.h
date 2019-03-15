@@ -18,6 +18,8 @@
  *
  */
 
+#include <vector>
+
 namespace Dali
 {
 
@@ -29,12 +31,13 @@ struct KeyEvent;
 namespace Internal
 {
 
+class Scene;
 class Stage;
 
 /**
  *  KeyEventProcessor receives the filtered key events from the Dali Event processor.
  *
- *  When a key event is received the KeyEvent Processor queries the Stage to get the actor in focus.
+ *  When a key event is received the KeyEventProcessor queues the event in the scene events queue.
  *  Any actor can be set by the actor api to be the focus of key events.  The actor is then sent the key event.
  *  If no actor is set for focus then the key event is discarded.
  */
@@ -44,8 +47,9 @@ public:
 
   /**
    * Create a Key event processor.
+   * @param[in] scene The scene the event processor belongs to.
    */
-  KeyEventProcessor(Stage& stage);
+  KeyEventProcessor( Scene& scene );
 
   /**
    * Non-virtual destructor; KeyEventProcessor is not a base class
@@ -68,8 +72,7 @@ private:
 
 private:
 
-  Stage& mStage; ///< Used to deliver touch events
-
+  Scene& mScene; ///< Used to deliver key events
 };
 
 } // namespace Internal

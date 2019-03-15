@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_GL_ABSTRACTION_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,15 @@ public:
    * and how much time was spent.
    */
   virtual void PostRender() = 0;
+
+  /**
+   * Determine whether to convert pixel format or not.
+   * @param[in] imageGlFormat GLformat of input image.
+   * @param[in] textureGlFormat GLformat of Texture.
+   * @param[in] isSubImage Boolian value for the whether the image is subimage or not
+   * @return Whether the texture will be convert or not.
+   */
+  virtual void ConvertTexture( uint8_t* buffer, GLenum& imageGlFormat, const uint32_t dataSize, const GLenum textureGlFormat, const bool isSubImage ) = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.

@@ -48,7 +48,7 @@ const Vector4 DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f); // Default backg
 
 } //Unnamed namespace
 
-ScenePtr Scene::New( Size size )
+ScenePtr Scene::New( const Size& size )
 {
   ScenePtr scene = new Scene( size );
 
@@ -58,12 +58,13 @@ ScenePtr Scene::New( Size size )
   return scene;
 }
 
-Scene::Scene( Size size )
+Scene::Scene( const Size& size )
 : mSurface( nullptr ),
   mSize( size ),
   mSurfaceSize( Vector2::ZERO ),
   mDpi( Vector2::ZERO ),
-  mDepthTreeDirty( false )
+  mDepthTreeDirty( false ),
+  mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
 {
 }
 
@@ -108,7 +109,7 @@ void Scene::Initialize()
   // Create the ordered list of layers
   mLayerList = LayerList::New( updateManager );
 
-  // The stage owns the default layer
+  // The scene owns the default layer
   mRootLayer = Layer::NewRoot( *mLayerList, updateManager );
   mRootLayer->SetName("RootLayer");
   mRootLayer->SetScene( *this );
@@ -238,6 +239,16 @@ void Scene::RequestRebuildDepthTree()
   mDepthTreeDirty = true;
 }
 
+void Scene::QueueEvent( const Integration::Event& event )
+{
+  mEventProcessor.QueueEvent( event );
+}
+
+void Scene::ProcessEvents()
+{
+  mEventProcessor.ProcessEvents();
+}
+
 void Scene::RebuildDepthTree()
 {
   // If the depth tree needs rebuilding, do it in this frame only.
@@ -262,6 +273,51 @@ Vector4 Scene::GetBackgroundColor() const
   return mSurface ? mSurface->GetBackgroundColor() : DEFAULT_BACKGROUND_COLOR;
 }
 
+void Scene::EmitKeyEventSignal(const KeyEvent& event)
+{
+  mKeyEventSignal.Emit( event );
+}
+
+void Scene::EmitEventProcessingFinishedSignal()
+{
+  mEventProcessingFinishedSignal.Emit();
+}
+
+void Scene::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch )
+{
+  mTouchedSignal.Emit( touchEvent );
+  mTouchSignal.Emit( touch );
+}
+
+void Scene::EmitWheelEventSignal(const WheelEvent& event)
+{
+  mWheelEventSignal.Emit( event );
+}
+
+Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
+{
+  return mKeyEventSignal;
+}
+
+Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
+{
+  return mEventProcessingFinishedSignal;
+}
+
+Scene::TouchedSignalType& Scene::TouchedSignal()
+{
+  return mTouchedSignal;
+}
+
+Integration::Scene::TouchSignalType& Scene::TouchSignal()
+{
+  return mTouchSignal;
+}
+
+Integration::Scene::WheelEventSignalType& Scene::WheelEventSignal()
+{
+  return mWheelEventSignal;
+}
 
 } // Internal
 

@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ public:
 
   void PreRender();
   void PostRender();
+
+  void ConvertTexture( uint8_t* buffer, GLenum& imageGlFormat, const uint32_t dataSize, const GLenum textureGlFormat, const bool isSubImage );
 
   /* OpenGL ES 2.0 */
 

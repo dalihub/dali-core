@@ -26,14 +26,23 @@
 #include <dali/integration-api/render-surface.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 
 namespace Dali
 {
 
+namespace Integration
+{
+
+class Event;
+
+}
+
 namespace Internal
 {
 
+class EventProcessor;
 class Layer;
 class LayerList;
 class CameraActor;
@@ -50,11 +59,10 @@ class Scene : public BaseObject, public RenderTaskDefaults
 {
 
 public:
-
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New( Size size );
+  static ScenePtr New( const Size& size );
 
   /**
    * virtual destructor
@@ -118,7 +126,7 @@ public:
   Integration::RenderSurface* GetSurface() const;
 
   /**
-   * Retrieve the ordered list of on-stage layers.
+   * Retrieve the ordered list of on-scene layers.
    * @return The layer-list.
    */
   LayerList& GetLayerList() const;
@@ -127,6 +135,17 @@ public:
    * Request that the depth tree is rebuilt
    */
   void RequestRebuildDepthTree();
+
+  /**
+   * This function is called when an event is queued.
+   * @param[in] event A event to queue.
+   */
+  void QueueEvent( const Integration::Event& event );
+
+  /**
+   * This function is called by Core when events are processed.
+   */
+  void ProcessEvents();
 
   /**
    * Rebuilds the depth tree at the end of the event frame if
@@ -146,6 +165,60 @@ public:
    */
   Vector4 GetBackgroundColor() const;
 
+  /**
+   * Used by the EventProcessor to emit key event signals.
+   * @param[in] event The key event.
+   */
+  void EmitKeyEventSignal(const KeyEvent& event);
+
+  /**
+   * Emits the event processing finished signal.
+   *
+   * @see Dali::Scene::SignalEventProcessingFinished()
+   */
+  void EmitEventProcessingFinishedSignal();
+
+  /**
+   * Emits the touched signal.
+   * @param[in] touchEvent The touch event details (Old API).
+   * @param[in] touch The touch event details.
+   */
+  void EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch );
+
+  /**
+   * Used by the EventProcessor to emit wheel event signals.
+   * @param[in] event The wheel event.
+   */
+  void EmitWheelEventSignal( const WheelEvent& event );
+
+  /**
+   * @copydoc Integration::Scene::KeyEventSignal()
+   */
+  Integration::Scene::KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @copydoc Integration::Scene::SignalEventProcessingFinished()
+   */
+  Integration::Scene::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
+
+  // The touched signal, to support Stage touched signal, will be removed when deprecated in public Stage API
+  using TouchedSignalType = Signal< void (const TouchEvent&) >;
+
+  /**
+   * Touched signal to support deprecated stage touched signal.
+   */
+  TouchedSignalType& TouchedSignal();
+
+  /**
+    * @copydoc Integration::Scene::TouchSignal()
+    */
+  Integration::Scene::TouchSignalType& TouchSignal();
+
+  /**
+   * @copydoc Integration::Scene::sWheelEventSignal()
+   */
+  Integration::Scene::WheelEventSignalType& WheelEventSignal();
+
 public:
 
   /**
@@ -163,7 +236,7 @@ public:
 private:
 
   // Constructor
-  Scene( Size size );
+  Scene( const Size& size );
 
   /**
    * Second-phase constructor.
@@ -177,7 +250,6 @@ private:
   Scene& operator=(const Scene& rhs) = delete;
 
 private:
-
   Integration::RenderSurface* mSurface;
 
   // The scene-size may be different with the surface-size
@@ -200,6 +272,23 @@ private:
   FrameBufferPtr mFrameBuffer;
 
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
+
+  EventProcessor mEventProcessor;
+
+  // The key event signal
+  Integration::Scene::KeyEventSignalType mKeyEventSignal;
+
+  // The event processing finished signal
+  Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
+
+  // The touch signal
+  Integration::Scene::TouchSignalType mTouchSignal;
+
+  // The touched signal
+  TouchedSignalType mTouchedSignal;
+
+  // The wheel event signal
+  Integration::Scene::WheelEventSignalType mWheelEventSignal;
 };
 
 } // Internal

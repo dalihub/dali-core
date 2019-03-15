@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -766,9 +766,6 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
   //Get pointer to the data of the PixelData object
   uint8_t* buffer( pixelData->GetBuffer() );
 
-  //This buffer is only used if manually converting from RGB to RGBA
-  uint8_t* tempBuffer(0);
-
   //Retrieves the pixel data element type, the gl format and gl internal format of the data contained in the PixelData object.
   GLenum glFormat;
   GLint glInternalFormat;
@@ -784,27 +781,8 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
                             ( params.width  != ( mWidth  / ( 1 << params.mipmap ) ) ) ||
                             ( params.height != ( mHeight / ( 1 << params.mipmap ) ) ) );
 
-  bool convert = ( ( glFormat == GL_RGB ) && ( mGlFormat == GL_RGBA ) );
-#if DALI_GLES_VERSION >= 30
-  // Don't convert manually from RGB to RGBA if GLES >= 3.0 and a sub-image is uploaded.
-  convert = convert && !isSubImage;
-#endif
-
-  if( convert )
-  {
-    uint32_t dataSize = static_cast< uint32_t >( params.width ) * params.height;
-    tempBuffer = new uint8_t[dataSize*4u];
-    for( uint32_t i = 0u; i < dataSize; ++i )
-    {
-      tempBuffer[i*4u]   = buffer[i*3u];
-      tempBuffer[i*4u+1] = buffer[i*3u+1];
-      tempBuffer[i*4u+2] = buffer[i*3u+2];
-      tempBuffer[i*4u+3] = 0xFF;
-    }
-
-    buffer = tempBuffer;
-    glFormat = mGlFormat; // Set the glFormat to GL_RGBA
-  }
+  uint32_t dataSize = static_cast< uint32_t >( params.width ) * params.height;
+  context.ConvertTexture( buffer, glFormat, dataSize, mGlFormat, isSubImage );
 
   //Upload data to the texture
 
@@ -845,10 +823,6 @@ void Texture::Upload( Context& context, PixelDataPtr pixelData, const Internal::
                                        glFormat, static_cast<GLsizei>( pixelData->GetBufferSize() ), buffer );
     }
   }
-
-
-  //Destroy temp buffer used for conversion RGB->RGBA
-  delete[] tempBuffer;
 }
 
 bool Texture::Bind( Context& context, uint32_t textureUnit, Render::Sampler* sampler )
@@ -914,14 +888,10 @@ void Texture::ApplySampler( Context& context, Render::Sampler* sampler )
       }
     }
 
-#if DALI_GLES_VERSION >= 30
-    //In GLES 3.0 we do not need to upload all of the mipmap levels, but GL_TEXTURE_MAX_LEVEL must be set
     if(mMaxMipMapLevel)
     {
       context.TexParameteri( mTarget, GL_TEXTURE_MAX_LEVEL, mMaxMipMapLevel );
     }
-#endif
-
   }
 }
 

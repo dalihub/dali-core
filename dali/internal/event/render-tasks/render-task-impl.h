@@ -257,6 +257,12 @@ public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
    */
   const SceneGraph::RenderTask& GetRenderTaskSceneObject() const;
 
+  /**
+   * Retrieve the render task list RenderTask object belongs to.
+   * @return The render task list
+   */
+  RenderTaskList& GetRenderTaskList() const;
+
 public: // Implementation of Object
 
   /**

@@ -26,8 +26,11 @@ namespace Dali
 {
 
 class Actor;
+class KeyEvent;
 class Layer;
 class RenderTaskList;
+class TouchData;
+class WheelEvent;
 
 namespace Internal DALI_INTERNAL
 {
@@ -38,6 +41,7 @@ namespace Integration
 {
 
 class RenderSurface;
+struct Event;
 
 /**
  * @brief
@@ -48,6 +52,10 @@ class RenderSurface;
 class DALI_CORE_API Scene : public BaseHandle
 {
 public:
+  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
+  typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
+  typedef Signal< void (const Dali::TouchData&) > TouchSignalType; ///< Touch signal type
+  typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< Touched signal type
 
   /**
    * @brief Create an initialized Scene handle.
@@ -56,7 +64,7 @@ public:
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New( Size size );
+  static Scene New( const Size& size );
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -177,6 +185,70 @@ public:
    * @return The root layer
    */
   void SetSurface( Integration::RenderSurface& surface );
+
+  /**
+   * @brief Gets the rendering surface bound to the scene
+   *
+   * @return The render surface
+   */
+  Integration::RenderSurface* GetSurface() const;
+
+  /**
+   * This function is called when an event is queued.
+   * @param[in] event A event to queue.
+   */
+  void QueueEvent( const Integration::Event& event );
+
+  /**
+   * This function is called by Core when events are processed.
+   */
+  void ProcessEvents();
+
+  /**
+   * @brief This signal is emitted just after the event processing is finished.
+   *
+   * @return The signal to connect to
+   */
+  EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
+
+  /**
+   * @brief This signal is emitted when key event is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const KeyEvent& event);
+   * @endcode
+   * @return The signal to connect to
+   */
+  KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @brief This signal is emitted when the screen is touched and when the touch ends
+   * (i.e. the down & up touch events only).
+   *
+   * If there are multiple touch points, then this will be emitted when the first touch occurs and
+   * then when the last finger is lifted.
+   * An interrupted event will also be emitted (if it occurs).
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( TouchData event );
+   * @endcode
+   *
+   * @return The touch signal to connect to
+   * @note Motion events are not emitted.
+   */
+  TouchSignalType& TouchSignal();
+
+  /**
+   * @brief This signal is emitted when wheel event is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const WheelEvent& event);
+   * @endcode
+   * @return The signal to connect to
+   */
+  WheelEventSignalType& WheelEventSignal();
 
 public: // Not intended for application developers
 

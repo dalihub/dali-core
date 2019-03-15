@@ -132,8 +132,7 @@ Core::Core( RenderController& renderController,
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
-  mGestureEventProcessor = new GestureEventProcessor( *mStage, *mUpdateManager, gestureManager, mRenderController );
-  mEventProcessor = new EventProcessor( *mStage, *mNotificationManager, *mGestureEventProcessor );
+  mGestureEventProcessor = new GestureEventProcessor( *mUpdateManager, gestureManager, mRenderController );
 
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
@@ -249,7 +248,10 @@ void Core::SceneCreated()
 
 void Core::QueueEvent( const Integration::Event& event )
 {
-  mEventProcessor->QueueEvent( event );
+  if (mScenes.size() != 0)
+  {
+    mScenes.front()->QueueEvent( event );
+  }
 }
 
 void Core::ProcessEvents()
@@ -268,19 +270,25 @@ void Core::ProcessEvents()
   // Signal that any messages received will be flushed soon
   mUpdateManager->EventProcessingStarted();
 
-  mEventProcessor->ProcessEvents();
+  // process events in all scenes
+  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
+  {
+    (*iter)->ProcessEvents();
+  }
 
   mNotificationManager->ProcessMessages();
 
   // Emit signal here to inform listeners that event processing has finished.
-  mStage->EmitEventProcessingFinishedSignal();
+  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
+  {
+    (*iter)->EmitEventProcessingFinishedSignal();
+  }
 
   // Run any registered processors
   RunProcessors();
 
   // Run the size negotiation after event processing finished signal
   mRelayoutController->Relayout();
-
 
   // Rebuild depth tree after event processing has finished
   for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
