@@ -561,7 +561,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   {
     surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
 
-    // For the Multi-Windows
+#if DALI_GLES_VERSION >= 30
     Context* surfaceContext = surfaceFrameBuffer->GetContext();
     if ( mImpl->currentContext != surfaceContext )
     {
@@ -570,6 +570,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
       // Clear the current cached program when the context is switched
       mImpl->programController.ClearCurrentProgram();
     }
+#endif
 
     surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
     backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
