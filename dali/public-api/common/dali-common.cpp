@@ -23,9 +23,12 @@
 #include <string>
 #include <cstdio>
 
+#if defined(BACKTRACE_ENABLED)
+#if defined(__GLIBC__)
 #include <execinfo.h>
+#endif
 #include <cxxabi.h>
-
+#endif
 #include <cstring>
 
 // INTERNAL INCLUDES
