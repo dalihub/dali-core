@@ -36,6 +36,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/property-notification-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/property-notification-manager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/property-helper.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/common/scene-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/stage-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/thread-local-storage.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/common/type-info-impl.cpp
@@ -98,7 +99,8 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/render/gl-resources/gl-call-debug.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render/gl-resources/gpu-buffer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render/queue/render-queue.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-frame-buffer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-texture-frame-buffer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-surface-frame-buffer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-property-buffer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/render/renderers/render-renderer.cpp

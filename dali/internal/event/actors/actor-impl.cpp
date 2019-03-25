@@ -42,6 +42,8 @@
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -412,7 +414,8 @@ const SceneGraph::Node* Actor::CreateNode()
   // create node. Nodes are owned by the update manager
   SceneGraph::Node* node = SceneGraph::Node::New();
   OwnerPointer< SceneGraph::Node > transferOwnership( node );
-  AddNodeMessage( Stage::GetCurrent()->GetUpdateManager(), transferOwnership );
+  Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
+  AddNodeMessage( tls->GetUpdateManager(), transferOwnership );
 
   return node;
 }
@@ -792,20 +795,19 @@ const Vector3& Actor::GetCurrentWorldPosition() const
 
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
-  StagePtr stage = Stage::GetCurrent();
-  if( stage && OnStage() )
+  if( mScene && OnStage() )
   {
     Vector3 worldPosition =  GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
-    Vector3 cameraPosition = stage->GetDefaultCameraActor().GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
+    Vector3 cameraPosition = mScene->GetDefaultCameraActor().GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
     worldPosition -= cameraPosition;
 
     Vector3 actorSize = GetCurrentSize() * GetCurrentWorldScale();
-    Vector2 halfStageSize( stage->GetSize() * 0.5f ); // World position origin is center of stage
+    Vector2 halfSceneSize( mScene->GetSize() * 0.5f ); // World position origin is center of scene
     Vector3 halfActorSize( actorSize * 0.5f );
     Vector3 anchorPointOffSet = halfActorSize - actorSize * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
 
-    return Vector2( halfStageSize.width + worldPosition.x - anchorPointOffSet.x,
-                    halfStageSize.height + worldPosition.y - anchorPointOffSet.y );
+    return Vector2( halfSceneSize.width + worldPosition.x - anchorPointOffSet.x,
+                    halfSceneSize.height + worldPosition.y - anchorPointOffSet.y );
   }
 
   return Vector2::ZERO;
@@ -1499,10 +1501,9 @@ DrawMode::Type Actor::GetDrawMode() const
 bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
 {
   // only valid when on-stage
-  StagePtr stage = Stage::GetCurrent();
-  if( stage && OnStage() )
+  if( mScene && OnStage() )
   {
-    const RenderTaskList& taskList = stage->GetRenderTaskList();
+    const RenderTaskList& taskList = mScene->GetRenderTaskList();
 
     Vector2 converted( screenX, screenY );
 
@@ -2002,6 +2003,7 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 
 Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
 : Object( &node ),
+  mScene( nullptr ),
   mParent( NULL ),
   mChildren( NULL ),
   mRenderers( NULL ),
@@ -2100,10 +2102,9 @@ void Actor::ConnectToStage( uint32_t parentDepth )
   // It protects us when the Actor hierarchy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
-  StagePtr stage = Stage::GetCurrent();
-  if( stage )
+  if( mScene )
   {
-    stage->RequestRebuildDepthTree();
+    mScene->RequestRebuildDepthTree();
   }
 
   // This stage is atomic i.e. not interrupted by user callbacks.
@@ -2140,6 +2141,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, uint32_t de
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
+      (*iter)->SetScene( *mScene );
       (*iter)->RecursiveConnectToStage( connectionList, depth + 1 );
     }
   }
@@ -2194,10 +2196,9 @@ void Actor::DisconnectFromStage()
   // It protects us when the Actor hierachy is modified during OnStageDisconnectionExternal callbacks.
   ActorContainer disconnectionList;
 
-  StagePtr stage = Stage::GetCurrent();
-  if( stage )
+  if( mScene )
   {
-    stage->RequestRebuildDepthTree();
+    mScene->RequestRebuildDepthTree();
   }
 
   // This stage is atomic i.e. not interrupted by user callbacks
@@ -3410,6 +3411,8 @@ void Actor::SetParent( Actor* parent )
 
     mParent = parent;
 
+    mScene = parent->mScene;
+
     if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
          parent->OnStage() )
     {
@@ -3435,6 +3438,8 @@ void Actor::SetParent( Actor* parent )
       // Instruct each actor to discard pointers to the scene-graph
       DisconnectFromStage();
     }
+
+    mScene = nullptr;
   }
 }
 
@@ -4782,10 +4787,9 @@ void Actor::RequestRebuildDepthTree()
 {
   if( mIsOnStage )
   {
-    StagePtr stage = Stage::GetCurrent();
-    if( stage )
+    if( mScene )
     {
-      stage->RequestRebuildDepthTree();
+      mScene->RequestRebuildDepthTree();
     }
   }
 }
@@ -4967,6 +4971,16 @@ void Actor::LowerBelow( Internal::Actor& target )
   {
     DALI_LOG_WARNING( "Actor must have a parent, Sibling order not changed.\n" );
   }
+}
+
+void Actor::SetScene( Scene& scene )
+{
+  mScene = &scene;
+}
+
+Scene& Actor::GetScene() const
+{
+  return *mScene;
 }
 
 void Actor::SetInheritLayoutDirection( bool inherit )

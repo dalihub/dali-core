@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,11 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
@@ -368,29 +370,17 @@ bool CameraActor::GetInvertYAxis() const
   return mInvertYAxis;
 }
 
-void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& stereoBias /* = Vector2::ZERO */ )
+void CameraActor::SetPerspectiveProjection( const Size& size )
 {
-  float width = size.width;
-  float height = size.height;
-
-  if( Size::ZERO == size )
+  if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
-    StagePtr stage = Stage::GetCurrent();
-    if( stage )
-    {
-      const Size& stageSize = stage->GetSize();
-
-      width = stageSize.width;
-      height = stageSize.height;
-    }
-  }
-
-  if( ( width < Math::MACHINE_EPSILON_1000 ) || ( height < Math::MACHINE_EPSILON_1000 ) )
-  {
-    // On the stage initialization this method is called but the size has not been set.
-    // There is no point to set any value if width or height is zero.
+    // Not allowed to set the canvas size to be 0.
+    DALI_LOG_ERROR( "Canvas size can not be 0\n" );
     return;
   }
+
+  float width = size.width;
+  float height = size.height;
 
   float nearClippingPlane;
   float farClippingPlane;
