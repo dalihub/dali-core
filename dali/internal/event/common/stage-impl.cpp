@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -94,6 +95,11 @@ void Stage::Initialize( Scene& scene )
 {
   mScene = &scene;
   mScene->SetBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR );
+  mScene->EventProcessingFinishedSignal().Connect( this, &Stage::OnEventProcessingFinished );
+  mScene->KeyEventSignal().Connect( this, &Stage::OnKeyEvent );
+  mScene->TouchedSignal().Connect( this, &Stage::OnTouchedEvent );
+  mScene->TouchSignal().Connect( this, &Stage::OnTouchEvent );
+  mScene->WheelEventSignal().Connect( this, &Stage::OnWheelEvent );
 }
 
 StagePtr Stage::GetCurrent()
@@ -261,6 +267,35 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
+void Stage::OnEventProcessingFinished()
+{
+  EmitEventProcessingFinishedSignal();
+}
+
+void Stage::OnKeyEvent( const Dali::KeyEvent& event )
+{
+  bool consumed = EmitKeyEventGeneratedSignal( event );
+  if( !consumed )
+  {
+    EmitKeyEventSignal( event );
+  }
+}
+
+void Stage::OnTouchedEvent( const Dali::TouchEvent& touchEvent )
+{
+  mTouchedSignal.Emit( touchEvent );
+}
+
+void Stage::OnTouchEvent( const Dali::TouchData& touch )
+{
+  mTouchSignal.Emit( touch );
+}
+
+void Stage::OnWheelEvent( const Dali::WheelEvent& event )
+{
+  EmitWheelEventSignal( event );
+}
+
 void Stage::EmitKeyEventSignal(const KeyEvent& event)
 {
   // Emit the key event signal when no actor in the stage has gained the key input focus
@@ -286,7 +321,7 @@ void Stage::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchDa
   mTouchSignal.Emit( touch );
 }
 
-void Stage::EmitWheelEventSignal(const WheelEvent& event)
+void Stage::EmitWheelEventSignal( const WheelEvent& event )
 {
   // Emit the wheel event signal when no actor in the stage has gained the wheel input focus
 

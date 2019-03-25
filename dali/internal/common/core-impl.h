@@ -326,7 +326,6 @@ private:
   OwnerPointer<ShaderFactory>                   mShaderFactory;               ///< Shader resource factory
   OwnerPointer<NotificationManager>             mNotificationManager;         ///< Notification manager
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
-  OwnerPointer<EventProcessor>                  mEventProcessor;              ///< The event processor
   Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
 
   std::vector<ScenePtr>                         mScenes;                      ///< A container of scenes that bound to a surface for rendering, owned by Core

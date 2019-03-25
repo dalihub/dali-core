@@ -20,11 +20,12 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/devel-api/events/hit-test-algorithm.h>
+
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/hit-test-algorithm-impl.h>
 
 namespace Dali
 {
@@ -121,8 +122,8 @@ bool IsActorWheelableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::Travers
 } // unnamed namespace
 
 
-WheelEventProcessor::WheelEventProcessor(Stage& stage)
-: mStage(stage)
+WheelEventProcessor::WheelEventProcessor( Scene& scene )
+: mScene( scene )
 {
 }
 
@@ -130,15 +131,14 @@ WheelEventProcessor::~WheelEventProcessor()
 {
 }
 
-void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event)
+void WheelEventProcessor::ProcessWheelEvent( const Integration::WheelEvent& event )
 {
-  Stage& stage = mStage;
-  WheelEvent wheelEvent( static_cast< WheelEvent::Type >(event.type), event.direction, event.modifiers, event.point, event.z, event.timeStamp );
+  WheelEvent wheelEvent( static_cast< WheelEvent::Type >( event.type ), event.direction, event.modifiers, event.point, event.z, event.timeStamp );
 
   if( wheelEvent.type == WheelEvent::MOUSE_WHEEL )
   {
-    HitTestAlgorithm::Results hitTestResults;
-    HitTestAlgorithm::HitTest( Dali::Stage(&stage), event.point, hitTestResults, IsActorWheelableFunction );
+    Dali::HitTestAlgorithm::Results hitTestResults;
+    HitTestAlgorithm::HitTest( mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), event.point, hitTestResults, IsActorWheelableFunction );
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "  Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    event.point.x, event.point.y,
@@ -154,8 +154,8 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
   }
   else
   {
-    // if CUSTOM_WHEEL, emit the key event signal from stage.
-    mStage.EmitWheelEventSignal( wheelEvent );
+    // if CUSTOM_WHEEL, emit the wheel event signal from the scene.
+    mScene.EmitWheelEventSignal( wheelEvent );
   }
 }
 

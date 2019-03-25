@@ -65,7 +65,7 @@ class Scene;
 /**
  * Implementation of Stage
  */
-class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface
+class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface, public ConnectionTracker
 {
 public:
 
@@ -194,6 +194,31 @@ public:
    * @copydoc Dali::DevelStage::GetRenderingBehavior()
    */
   DevelStage::Rendering GetRenderingBehavior() const;
+
+  /**
+   * Callback for Internal::Scene EventProcessingFinished signal
+   */
+  void OnEventProcessingFinished();
+
+  /**
+   * Callback for Internal::Scene KeyEventSignal signal
+   */
+  void OnKeyEvent( const Dali::KeyEvent& event );
+
+  /**
+   * Callback for Internal::Scene TouchedEventSignal signal
+   */
+  void OnTouchedEvent( const Dali::TouchEvent& touch );
+
+  /**
+   * Callback for Internal::Scene TouchSignal signal
+   */
+  void OnTouchEvent( const Dali::TouchData& touch );
+
+  /**
+   * Callback for Internal::Scene WheelEventSignal signal
+   */
+  void OnWheelEvent( const Dali::WheelEvent& event );
 
   /**
    * Used by the EventProcessor to emit key event signals.

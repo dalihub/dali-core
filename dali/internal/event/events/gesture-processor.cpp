@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -170,13 +171,10 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
   }
 }
 
-bool GestureProcessor::HitTest(
-  Stage&                     stage,
-  Vector2                    screenCoordinates,
-  HitTestAlgorithm::Results& hitTestResults)
+bool GestureProcessor::HitTest( Scene& scene, Vector2 screenCoordinates, HitTestAlgorithm::Results& hitTestResults )
 {
   GestureHitTestCheck hitCheck( mType );
-  HitTestAlgorithm::HitTest( stage, screenCoordinates, hitTestResults, hitCheck );
+  HitTestAlgorithm::HitTest( scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), screenCoordinates, hitTestResults, hitCheck );
   return hitTestResults.renderTask && hitTestResults.actor;
 }
 

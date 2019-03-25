@@ -47,6 +47,7 @@ namespace Internal
 {
 
 class Stage;
+class Scene;
 
 /**
  * Gesture Event Processing:
@@ -60,12 +61,11 @@ public:
 
   /**
    * Create a gesture event processor.
-   * @param[in] stage The stage.
    * @param[in] updateManager The update manager
    * @param[in] gestureManager The gesture manager
    * @param[in] renderController The render controller
    */
-  GestureEventProcessor( Stage& stage, SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController );
+  GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController );
 
   /**
    * Non-virtual destructor; GestureProcessor is not a base class
@@ -78,7 +78,7 @@ public: // To be called by EventProcessor
    * This function is called by Core whenever a gesture event occurs.
    * @param[in] event The event that has occurred.
    */
-  void ProcessGestureEvent(const Integration::GestureEvent& event);
+  void ProcessGestureEvent( Scene& scene, const Integration::GestureEvent& event );
 
 public: // To be called by gesture detectors
 
@@ -252,7 +252,6 @@ private:
 
 private:
 
-  Stage& mStage;
   Integration::GestureManager& mGestureManager;
 
   LongPressGestureProcessor mLongPressGestureProcessor;

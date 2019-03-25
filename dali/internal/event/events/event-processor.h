@@ -37,7 +37,7 @@ struct GestureEvent;
 namespace Internal
 {
 
-class Stage;
+class Scene;
 class GestureEventProcessor;
 class NotificationManager;
 
@@ -54,11 +54,10 @@ public:
 
   /**
    * Constructor
-   * @param[in] stage                  The stage.
-   * @param[in] notificationManager    The Notification Manager.
+   * @param[in] scene                  The scene.
    * @param[in] gestureEventProcessor  The gesture event processor.
    */
-  EventProcessor(Stage& stage, NotificationManager& notificationManager, GestureEventProcessor& gestureEventProcessor);
+  EventProcessor( Scene& scene, GestureEventProcessor& gestureEventProcessor );
 
   /**
    * Destructor
@@ -68,13 +67,13 @@ public:
 public:
 
   /**
-   * This function is called by Core when an event is queued.
+   * This function is called when an event is queued.
    * @param[in] event A event to queue.
    */
   void QueueEvent( const Integration::Event& event );
 
   /**
-   * This function is called by Core when events are processed.
+   * This function is called when events are processed.
    */
   void ProcessEvents();
 
@@ -87,6 +86,7 @@ private:
 
 private:
 
+  Scene& mScene;                                        ///< The Scene events are processed for.
   TouchEventProcessor      mTouchEventProcessor;        ///< Processes touch events.
   HoverEventProcessor      mHoverEventProcessor;        ///< Processes hover events.
   GestureEventProcessor&   mGestureEventProcessor;      ///< Processes gesture events.
