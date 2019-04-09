@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/integration-api/events/pinch-gesture-event.h>
-#include <dali/integration-api/gesture-manager.h>
+#include <dali/internal/event/events/pinch-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/events/pinch-gesture-recognizer.h>
+#include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
 {
@@ -50,7 +51,7 @@ namespace
 void EmitPinchSignal(
     Actor* actor,
     const GestureDetectorContainer& gestureDetectors,
-    const Integration::PinchGestureEvent& pinchEvent,
+    const PinchGestureEvent& pinchEvent,
     Vector2 localCenter)
 {
   PinchGesture pinch(pinchEvent.state);
@@ -100,12 +101,12 @@ struct IsNotAttachedFunctor
 
 } // unnamed namespace
 
-PinchGestureProcessor::PinchGestureProcessor( Integration::GestureManager& gestureManager )
+PinchGestureProcessor::PinchGestureProcessor()
 : GestureProcessor( Gesture::Pinch ),
-  mGestureManager(gestureManager),
-  mGestureDetectors(),
+  mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
-  mCurrentPinchEvent(NULL)
+  mCurrentPinchEvent(NULL),
+  mMinimumPinchDistance(-1.0f)
 {
 }
 
@@ -113,7 +114,18 @@ PinchGestureProcessor::~PinchGestureProcessor()
 {
 }
 
-void PinchGestureProcessor::Process( Scene& scene, const Integration::PinchGestureEvent& pinchEvent )
+void PinchGestureProcessor::SetMinimumPinchDistance( float value )
+{
+  mMinimumPinchDistance = value;
+
+  if( mGestureRecognizer )
+  {
+    PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
+    pinchRecognizer->SetMinimumPinchDistance(value);
+  }
+}
+
+void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinchEvent )
 {
   switch ( pinchEvent.state )
   {
@@ -198,16 +210,16 @@ void PinchGestureProcessor::Process( Scene& scene, const Integration::PinchGestu
   }
 }
 
-void PinchGestureProcessor::AddGestureDetector( PinchGestureDetector* gestureDetector )
+void PinchGestureProcessor::AddGestureDetector( PinchGestureDetector* gestureDetector, Scene& scene )
 {
-  bool registerWithAdaptor(mGestureDetectors.empty());
+  bool createRecognizer(mPinchGestureDetectors.empty());
 
-  mGestureDetectors.push_back(gestureDetector);
+  mPinchGestureDetectors.push_back(gestureDetector);
 
-  if (registerWithAdaptor)
+  if (createRecognizer)
   {
-    Integration::GestureRequest request(Gesture::Pinch);
-    mGestureManager.Register(request);
+    Size size = scene.GetSize();
+    mGestureRecognizer = new PinchGestureRecognizer( *this, Vector2(size.width, size.height), mMinimumPinchDistance);
   }
 }
 
@@ -227,16 +239,15 @@ void PinchGestureProcessor::RemoveGestureDetector( PinchGestureDetector* gesture
   }
 
   // Find the detector...
-  PinchGestureDetectorContainer::iterator endIter = std::remove( mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mGestureDetectors.end() );
+  PinchGestureDetectorContainer::iterator endIter = std::remove( mPinchGestureDetectors.begin(), mPinchGestureDetectors.end(), gestureDetector );
+  DALI_ASSERT_DEBUG( endIter != mPinchGestureDetectors.end() );
 
   // ...and remove it
-  mGestureDetectors.erase(endIter, mGestureDetectors.end());
+  mPinchGestureDetectors.erase(endIter, mPinchGestureDetectors.end());
 
-  if (mGestureDetectors.empty())
+  if (mPinchGestureDetectors.empty())
   {
-    Integration::GestureRequest request(Gesture::Pinch);
-    mGestureManager.Unregister(request);
+    mGestureRecognizer.Detach();
   }
 }
 

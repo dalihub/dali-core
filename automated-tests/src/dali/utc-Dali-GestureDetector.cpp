@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -284,7 +284,6 @@ int UtcDaliGestureDetectorDetachN02(void)
 int UtcDaliGestureDetectorDetachN03(void)
 {
   TestApplication application;
-  TestGestureManager& gestureManager = application.GetGestureManager();
 
   // Use pan gesture as GestureDetector cannot be created.
   GestureDetector detector = PanGestureDetector::New();
@@ -292,21 +291,22 @@ int UtcDaliGestureDetectorDetachN03(void)
   Actor actor = Actor::New();
   detector.Attach(actor);
 
+  DALI_TEST_EQUALS(1, detector.GetAttachedActorCount(), TEST_LOCATION);
+
   // Detach an actor twice - no exception should happen.
   try
   {
     detector.Detach(actor);
-    DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
-
-    gestureManager.Initialize(); // Reset values
     detector.Detach(actor);
-    DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
   }
   catch (DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
+
+  DALI_TEST_EQUALS(0, detector.GetAttachedActorCount(), TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -339,7 +339,6 @@ int UtcDaliGestureDetectorDetachAllP(void)
 int UtcDaliGestureDetectorDetachAllN(void)
 {
   TestApplication application;
-  TestGestureManager& gestureManager = application.GetGestureManager();
 
   // Use pan gesture as GestureDetector cannot be created.
   GestureDetector detector = PanGestureDetector::New();
@@ -360,14 +359,11 @@ int UtcDaliGestureDetectorDetachAllN(void)
   detector.DetachAll();
 
   DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
   // Call DetachAll again, there should not be any exception
   try
   {
-    gestureManager.Initialize(); // Reset values
     detector.DetachAll();
-    DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
   }
   catch (DaliException& e)
   {

@@ -1,8 +1,8 @@
-#ifndef __DALI_TEST_PLATFORM_ABSTRACTION_H__
-#define __DALI_TEST_PLATFORM_ABSTRACTION_H__
+#ifndef DALI_TEST_PLATFORM_ABSTRACTION_H
+#define DALI_TEST_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,15 @@ public:
    */
   virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
 
+  /**
+   * @copydoc PlatformAbstraction::StartTimer()
+   */
+  virtual uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback );
+
+  /*
+   * @copydoc PlatformAbstraction::CancelTimer()
+   */
+  virtual void CancelTimer ( uint32_t timerId );
 
 public: // TEST FUNCTIONS
 
@@ -156,6 +165,11 @@ public: // TEST FUNCTIONS
    */
   void SetDecodedBitmap( Integration::BitmapPtr bitmap );
 
+  /**
+   * @brief Triggers the previously stored callback function
+   */
+  void TriggerTimer();
+
 private:
 
   TestPlatformAbstraction( const TestPlatformAbstraction& ); ///< Undefined
@@ -184,8 +198,11 @@ private:
 
   Integration::ResourcePointer  mSynchronouslyLoadedResource;
   Integration::BitmapPtr        mDecodedBitmap;
+
+  uint32_t                      mTimerId;
+  CallbackBase*                 mCallbackFunction;
 };
 
 } // Dali
 
-#endif /* __DALI_TEST_PLATFORM_ABSTRACTION_H__ */
+#endif /* DALI_TEST_PLATFORM_ABSTRACTION_H */

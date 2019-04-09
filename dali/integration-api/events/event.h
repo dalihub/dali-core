@@ -2,7 +2,7 @@
 #define __DALI_INTEGRATION_EVENT_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ struct DALI_CORE_API Event
   {
     Touch,         ///< A touch event, when the user interacts with the screen.
     Key,           ///< A key pressed event, from the virtual or external keyboard.
-    Gesture,       ///< A Gesture event has been detected.
     Wheel,         ///< A wheel event, when the wheel is being rolled from an external mouse.
     Hover          ///< A hover event, when the user hovers above the screen.
   };

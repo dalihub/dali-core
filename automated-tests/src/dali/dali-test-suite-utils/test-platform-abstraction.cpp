@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ TestPlatformAbstraction::TestPlatformAbstraction()
   mClosestSize(),
   mLoadFileResult(),
   mSaveFileResult( false ),
-  mSynchronouslyLoadedResource()
+  mSynchronouslyLoadedResource(),
+  mTimerId(0),
+  mCallbackFunction(nullptr)
 {
   Initialize();
 }
@@ -81,7 +83,6 @@ bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename,
 
   return mLoadFileResult.loadResult;
 }
-
 
 /** Call this every test */
 void TestPlatformAbstraction::Initialize()
@@ -142,6 +143,26 @@ void TestPlatformAbstraction::SetSynchronouslyLoadedResource( Integration::Resou
 void TestPlatformAbstraction::SetDecodedBitmap( Integration::BitmapPtr bitmap )
 {
   mDecodedBitmap = bitmap;
+}
+
+uint32_t TestPlatformAbstraction::StartTimer( uint32_t milliseconds, CallbackBase* callback )
+{
+  mCallbackFunction = callback;
+  mTimerId++;
+  return mTimerId;
+}
+
+void TestPlatformAbstraction::TriggerTimer()
+{
+  if (mCallbackFunction != nullptr)
+  {
+    CallbackBase::Execute( *mCallbackFunction );
+  }
+}
+
+void TestPlatformAbstraction::CancelTimer ( uint32_t timerId )
+{
+  mCallbackFunction = nullptr;
 }
 
 } // namespace Dali

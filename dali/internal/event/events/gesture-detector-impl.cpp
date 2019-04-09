@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,18 @@ GestureDetector::GestureDetector(Gesture::Type type, const SceneGraph::PropertyO
 
 GestureDetector::~GestureDetector()
 {
+  if ( !mPendingAttachActors.empty() )
+  {
+    for ( GestureDetectorActorContainer::iterator iter = mPendingAttachActors.begin(), endIter = mPendingAttachActors.end(); iter != endIter; ++iter )
+    {
+      Actor* actor( *iter );
+      actor->RemoveObserver( *this );
+      actor->GetGestureData().RemoveGestureDetector( *this );
+    }
+
+    mPendingAttachActors.clear();
+  }
+
   if ( !mAttachedActors.empty() )
   {
     for ( GestureDetectorActorContainer::iterator iter = mAttachedActors.begin(), endIter = mAttachedActors.end(); iter != endIter; ++iter )
@@ -64,29 +76,88 @@ GestureDetector::~GestureDetector()
 
 void GestureDetector::Attach( Actor& actor )
 {
-  if ( !IsAttached( actor) )
+  if ( !IsAttached( actor ) )
   {
-    // Register with EventProcessor if first actor being added
-    if( mAttachedActors.empty() )
+    if( actor.OnStage() )
     {
-      mGestureEventProcessor.AddGestureDetector( this );
+      // Register with EventProcessor if first actor being added
+      if( mAttachedActors.empty() )
+      {
+        mGestureEventProcessor.AddGestureDetector( this, actor.GetScene() );
+      }
+      mAttachedActors.push_back( &actor );
+      // We need to observe the actor's destruction
+      actor.AddObserver( *this );
+      // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
+      actor.GetGestureData().AddGestureDetector( *this );
+      // Notification for derived classes
+      OnActorAttach( actor );
     }
+    else
+    {
+      actor.AddObserver( *this );
+      // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
+      actor.GetGestureData().AddGestureDetector( *this );
 
-    mAttachedActors.push_back( &actor );
+      mPendingAttachActors.push_back( &actor );
+    }
+  }
+}
 
-    // We need to observe the actor's destruction
-    actor.AddObserver( *this );
+void GestureDetector::SceneObjectAdded( Object& object )
+{
+  Actor& actor = dynamic_cast< Actor& >( object );
 
-    // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
-    actor.GetGestureData().AddGestureDetector( *this );
+  // Make sure the actor has not already been attached. Can't use IsAttached() as that checks the pending list as well
+  if( find(mAttachedActors.begin(), mAttachedActors.end(), &actor) == mAttachedActors.end() )
+  {
+    GestureDetectorActorContainer::iterator match = find(mPendingAttachActors.begin(), mPendingAttachActors.end(), &actor);
 
-    // Notification for derived classes
-    OnActorAttach( actor );
+    if ( match != mPendingAttachActors.end() )
+    {
+      mPendingAttachActors.erase(match);
+
+      // Register with EventProcessor if first actor being added
+      if( mAttachedActors.empty() )
+      {
+        mGestureEventProcessor.AddGestureDetector( this, actor.GetScene() );
+      }
+      mAttachedActors.push_back( &actor );
+
+      // Notification for derived classes
+      OnActorAttach( actor );
+    }
+    else
+    {
+      // Actor was not in the pending list
+      DALI_ASSERT_DEBUG( false );
+    }
+  }
+  else
+  {
+    // Check if actor has been attached and is still in the pending list - this would not be correct
+    DALI_ASSERT_DEBUG( find(mPendingAttachActors.begin(), mPendingAttachActors.end(), &actor) == mPendingAttachActors.end() );
   }
 }
 
 void GestureDetector::Detach(Actor& actor)
 {
+  if ( !mPendingAttachActors.empty() )
+  {
+    GestureDetectorActorContainer::iterator match = find(mPendingAttachActors.begin(), mPendingAttachActors.end(), &actor);
+
+    if ( match != mPendingAttachActors.end() )
+    {
+      // We no longer need to observe the actor's destruction
+      actor.RemoveObserver(*this);
+
+      // Remove detector from actor-gesture-data
+      actor.GetGestureData().RemoveGestureDetector( *this );
+
+      mPendingAttachActors.erase(match);
+    }
+  }
+
   if ( !mAttachedActors.empty() )
   {
     GestureDetectorActorContainer::iterator match = find(mAttachedActors.begin(), mAttachedActors.end(), &actor);
@@ -119,6 +190,24 @@ void GestureDetector::Detach(Actor& actor)
 
 void GestureDetector::DetachAll()
 {
+  if ( !mPendingAttachActors.empty() )
+  {
+    GestureDetectorActorContainer pendingActors(mPendingAttachActors);
+
+    mPendingAttachActors.clear();
+
+    for ( GestureDetectorActorContainer::iterator iter = pendingActors.begin(), endIter = pendingActors.end(); iter != endIter; ++iter )
+    {
+      Actor* actor(*iter);
+
+      // We no longer need to observe the actor's destruction
+      actor->RemoveObserver(*this);
+
+      // Remove detector from actor-gesture-data
+      actor->GetGestureData().RemoveGestureDetector( *this );
+    }
+  }
+
   if ( !mAttachedActors.empty() )
   {
     GestureDetectorActorContainer attachedActors(mAttachedActors);
@@ -151,16 +240,20 @@ void GestureDetector::DetachAll()
 
 size_t GestureDetector::GetAttachedActorCount() const
 {
-  return mAttachedActors.size();
+  return mPendingAttachActors.size() + mAttachedActors.size();
 }
 
 Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
 {
   Dali::Actor actor;
 
-  if( index < mAttachedActors.size() )
+  if( index < mPendingAttachActors.size() )
   {
-    actor = Dali::Actor( mAttachedActors[index] );
+    actor = Dali::Actor( mPendingAttachActors[index] );
+  }
+  else if( index < mPendingAttachActors.size() + mAttachedActors.size() )
+  {
+    actor = Dali::Actor( mAttachedActors[index - mPendingAttachActors.size()] );
   }
 
   return actor;
@@ -168,11 +261,22 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
 
 bool GestureDetector::IsAttached(Actor& actor) const
 {
-  return find(mAttachedActors.begin(), mAttachedActors.end(), &actor) != mAttachedActors.end();
+  return ( find(mPendingAttachActors.begin(), mPendingAttachActors.end(), &actor) != mPendingAttachActors.end() ) ||
+         ( find(mAttachedActors.begin(), mAttachedActors.end(), &actor) != mAttachedActors.end() );
 }
 
 void GestureDetector::ObjectDestroyed(Object& object)
 {
+  if ( !mPendingAttachActors.empty() )
+  {
+    GestureDetectorActorContainer::iterator match = find(mPendingAttachActors.begin(), mPendingAttachActors.end(), &object);
+
+    if ( match != mPendingAttachActors.end() )
+    {
+      mPendingAttachActors.erase(match);
+    }
+  }
+
   if ( !mAttachedActors.empty() )
   {
     GestureDetectorActorContainer::iterator match = find(mAttachedActors.begin(), mAttachedActors.end(), &object);

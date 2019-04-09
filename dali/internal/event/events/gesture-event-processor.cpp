@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,36 @@
 // CLASS HEADER
 #include <dali/internal/event/events/gesture-event-processor.h>
 
+#if defined(DEBUG_ENABLED)
+#include <sstream>
+#endif
+
 // INTERNAL INCLUDES
-#include <dali/integration-api/events/gesture-event.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/events/pinch-gesture-event.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
-#include <dali/integration-api/gesture-manager.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/events/pinch-gesture-detector-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
+#include <dali/integration-api/debug.h>
+
 
 namespace Dali
 {
 
 namespace Internal
 {
-
-GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController )
-: mGestureManager( gestureManager ),
-  mLongPressGestureProcessor( gestureManager ),
-  mPanGestureProcessor( gestureManager, updateManager ),
-  mPinchGestureProcessor( gestureManager ),
-  mTapGestureProcessor( gestureManager ),
+GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController )
+: mLongPressGestureProcessor(),
+  mPanGestureProcessor( updateManager ),
+  mPinchGestureProcessor(),
+  mTapGestureProcessor(),
   mRenderController( renderController ),
-  mUpdateRequired( false )
+  mLongPressDetectorCount(0),
+  mPanDetectorCount(0),
+  mPinchDetectorCount(0),
+  mTapDetectorCount(0),
+  envOptionMinimumPanDistance(-1),
+  envOptionMinimumPanEvents(-1)
 {
 }
 
@@ -52,62 +55,59 @@ GestureEventProcessor::~GestureEventProcessor()
 {
 }
 
-void GestureEventProcessor::ProcessGestureEvent( Scene& scene, const Integration::GestureEvent& event)
+void GestureEventProcessor::ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event)
 {
-  if( Gesture::Started == event.state || Gesture::Continuing == event.state )
+  if( mLongPressDetectorCount > 0 )
   {
-    SetUpdateRequired();
+    mLongPressGestureProcessor.ProcessTouch(scene, event);
   }
-
-  switch(event.gestureType)
+  if( mPanDetectorCount > 0 )
   {
-    case Gesture::LongPress:
-      mLongPressGestureProcessor.Process( scene, static_cast<const Integration::LongPressGestureEvent&>(event) );
-      break;
-
-    case Gesture::Pan:
-      mPanGestureProcessor.Process( scene, static_cast<const Integration::PanGestureEvent&>(event));
-      break;
-
-    case Gesture::Pinch:
-      mPinchGestureProcessor.Process( scene, static_cast<const Integration::PinchGestureEvent&>(event));
-      break;
-
-    case Gesture::Tap:
-      mTapGestureProcessor.Process( scene, static_cast<const Integration::TapGestureEvent&>(event));
-      break;
+    mPanGestureProcessor.ProcessTouch(scene, event);
+  }
+  if( mPinchDetectorCount > 0 )
+  {
+    mPinchGestureProcessor.ProcessTouch(scene, event);
+  }
+  if( mTapDetectorCount > 0 )
+  {
+    mTapGestureProcessor.ProcessTouch(scene, event);
   }
 }
 
-void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector)
+void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)
 {
   switch (gestureDetector->GetType())
   {
     case Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
-      mLongPressGestureProcessor.AddGestureDetector(longPress);
+      mLongPressGestureProcessor.AddGestureDetector(longPress, scene);
+      mLongPressDetectorCount++;
       break;
     }
 
     case Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
-      mPanGestureProcessor.AddGestureDetector(pan);
+      mPanGestureProcessor.AddGestureDetector(pan, scene, envOptionMinimumPanDistance, envOptionMinimumPanEvents);
+      mPanDetectorCount++;
       break;
     }
 
     case Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
-      mPinchGestureProcessor.AddGestureDetector(pinch);
+      mPinchGestureProcessor.AddGestureDetector(pinch, scene);
+      mPinchDetectorCount++;
       break;
     }
 
     case Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
-      mTapGestureProcessor.AddGestureDetector(tap);
+      mTapGestureProcessor.AddGestureDetector(tap, scene);
+      mTapDetectorCount++;
       break;
     }
   }
@@ -121,6 +121,7 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.RemoveGestureDetector(longPress);
+      mLongPressDetectorCount--;
       break;
     }
 
@@ -128,6 +129,7 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.RemoveGestureDetector(pan);
+      mPanDetectorCount--;
       break;
     }
 
@@ -135,6 +137,7 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.RemoveGestureDetector(pinch);
+      mPinchDetectorCount--;
       break;
     }
 
@@ -142,6 +145,7 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.RemoveGestureDetector(tap);
+      mTapDetectorCount--;
       break;
     }
   }
@@ -181,27 +185,16 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
   }
 }
 
-void GestureEventProcessor::SetUpdateRequired()
-{
-  mUpdateRequired = true;
-}
-
 void GestureEventProcessor::SetGestureProperties( const Gesture& gesture )
 {
-  if( Gesture::Started == gesture.state || Gesture::Continuing == gesture.state )
-  {
-    SetUpdateRequired();
-
-    // We may not be updating so we need to ask the render controller for an update.
-    mRenderController.RequestUpdate( false );
-  }
+  bool requestUpdate = false;
 
   switch ( gesture.type )
   {
     case Gesture::Pan:
     {
       const PanGesture& pan = static_cast< const PanGesture& >( gesture );
-      mPanGestureProcessor.SetPanGestureProperties( pan );
+      requestUpdate = mPanGestureProcessor.SetPanGestureProperties( pan );
       break;
     }
 
@@ -213,13 +206,22 @@ void GestureEventProcessor::SetGestureProperties( const Gesture& gesture )
       break;
     }
   }
+
+  if( requestUpdate )
+  {
+    // We may not be updating so we need to ask the render controller for an update.
+    mRenderController.RequestUpdate( false );
+  }
 }
 
 bool GestureEventProcessor::NeedsUpdate()
 {
-  bool updateRequired( mUpdateRequired );
+  bool updateRequired = false;
 
-  mUpdateRequired = false;
+  updateRequired |= mLongPressGestureProcessor.NeedsUpdate();
+  updateRequired |= mPanGestureProcessor.NeedsUpdate();
+  updateRequired |= mPinchGestureProcessor.NeedsUpdate();
+  updateRequired |= mTapGestureProcessor.NeedsUpdate();
 
   return updateRequired;
 }
@@ -302,6 +304,21 @@ void GestureEventProcessor::SetPanGestureTwoPointAccelerationBias( float value )
 void GestureEventProcessor::SetPanGestureMultitapSmoothingRange( int32_t value )
 {
   mPanGestureProcessor.SetMultitapSmoothingRange( value );
+}
+
+void GestureEventProcessor::SetPanGestureMinimumDistance( int32_t value )
+{
+  envOptionMinimumPanDistance =  value;
+}
+
+void GestureEventProcessor::SetPanGestureMinimumPanEvents( int32_t value )
+{
+  envOptionMinimumPanEvents = value;
+}
+
+void GestureEventProcessor::SetPinchGestureMinimumDistance( float value)
+{
+  mPinchGestureProcessor.SetMinimumPinchDistance( value );
 }
 
 const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()

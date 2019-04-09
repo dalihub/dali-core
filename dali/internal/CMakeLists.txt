@@ -48,20 +48,29 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/key-event-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/key-event-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/gesture-detector-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/gesture-event-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/gesture-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/hit-test-algorithm-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/hover-event-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/long-press-gesture-detector-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/long-press-gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/long-press-gesture-processor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/long-press-gesture-recognizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/wheel-event-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/multi-point-event-util.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pan-gesture-detector-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pan-gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pan-gesture-processor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pan-gesture-recognizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pinch-gesture-detector-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pinch-gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pinch-gesture-processor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/pinch-gesture-recognizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/tap-gesture-detector-impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/tap-gesture-event.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/tap-gesture-processor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/event/events/tap-gesture-recognizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/touch-data-impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/events/touch-event-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/event/images/bitmap-packed-pixel.cpp

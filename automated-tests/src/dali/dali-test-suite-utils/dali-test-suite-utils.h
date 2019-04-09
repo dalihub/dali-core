@@ -1,8 +1,8 @@
-#ifndef __DALI_TEST_SUITE_UTILS_H__
-#define __DALI_TEST_SUITE_UTILS_H__
+#ifndef DALI_TEST_SUITE_UTILS_H
+#define DALI_TEST_SUITE_UTILS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ void tet_printf(const char *format, ...);
 
 #include "test-application.h"
 #include "test-actor-utils.h"
+#include "test-gesture-generator.h"
 
 using namespace Dali;
 
@@ -442,4 +443,4 @@ private:
 
 } // namespace Test
 
-#endif // __DALI_TEST_SUITE_UTILS_H__
+#endif // DALI_TEST_SUITE_UTILS_H

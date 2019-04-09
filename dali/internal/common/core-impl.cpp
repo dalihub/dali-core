@@ -74,7 +74,6 @@ namespace Internal
 using Integration::RenderController;
 using Integration::PlatformAbstraction;
 using Integration::GlSyncAbstraction;
-using Integration::GestureManager;
 using Integration::GlAbstraction;
 using Integration::Event;
 using Integration::UpdateStatus;
@@ -84,7 +83,6 @@ Core::Core( RenderController& renderController,
             PlatformAbstraction& platform,
             GlAbstraction& glAbstraction,
             GlSyncAbstraction& glSyncAbstraction,
-            GestureManager& gestureManager,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             Integration::RenderToFrameBuffer renderToFboEnabled,
             Integration::DepthBufferAvailable depthBufferAvailable,
@@ -132,7 +130,7 @@ Core::Core( RenderController& renderController,
   // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
-  mGestureEventProcessor = new GestureEventProcessor( *mUpdateManager, gestureManager, mRenderController );
+  mGestureEventProcessor = new GestureEventProcessor( *mUpdateManager, mRenderController );
 
   mShaderFactory = new ShaderFactory();
   mUpdateManager->SetShaderSaver( *mShaderFactory );
