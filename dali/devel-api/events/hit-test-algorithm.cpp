@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
@@ -31,13 +32,8 @@ namespace HitTestAlgorithm
 
 bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
 {
-  return Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
-}
-
-bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
-{
-  Stage stage = Stage::GetCurrent();
-  return Internal::HitTestAlgorithm::HitTest( GetImplementation( stage ), GetImplementation(renderTask), screenCoordinates, results, func );
+  Internal::Stage& stageImpl = GetImplementation( stage );
+  return Internal::HitTestAlgorithm::HitTest( stageImpl.GetSize(), stageImpl.GetRenderTaskList(), stageImpl.GetLayerList(), screenCoordinates, results, func );
 }
 
 } // namespace HitTestAlgorithm

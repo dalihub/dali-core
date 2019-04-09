@@ -98,6 +98,13 @@ enum Type
 
 } //namespace FilterMode
 
+/**
+ * @brief WrapMode for textures.
+ *
+ * @details Wrap mode determines how texture is sampled when texture coordinates are outside
+ * of the typical 0 to 1 range.
+ * @SINCE_1_0.0
+ */
 namespace WrapMode
 {
 /**

@@ -19,7 +19,6 @@
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/system-overlay.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
@@ -28,8 +27,6 @@
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/common/system-overlay-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -405,7 +402,7 @@ void GetCameraClippingPlane( RenderTask& renderTask, float& nearClippingPlane, f
  * Hit test a RenderTask
  */
 bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
-                        Stage& stage,
+                        const Vector2& sceneSize,
                         LayerList& layers,
                         RenderTask& renderTask,
                         Vector2 screenCoordinates,
@@ -452,7 +449,6 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
         HitActor hit;
         bool overlayHit = false;
         bool layerConsumesHit = false;
-        const Vector2& stageSize = stage.GetSize();
 
         for( int32_t i = layers.GetLayerCount() - 1; i >= 0 && !( hit.actor ); --i )
         {
@@ -460,7 +456,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
           overlayHit = false;
 
           // Ensure layer is touchable (also checks whether ancestors are also touchable)
-          if( IsActuallyHittable( *layer, screenCoordinates, stageSize, hitCheck ) )
+          if( IsActuallyHittable( *layer, screenCoordinates, sceneSize, hitCheck ) )
           {
             // Always hit-test the source actor; otherwise test whether the layer is below the source actor in the hierarchy
             if( sourceActorDepth == static_cast<uint32_t>( i ) )
@@ -527,7 +523,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
 /**
  * Iterate through the RenderTaskList and perform hit testing.
  *
- * @param[in] stage The stage the tests will be performed in
+ * @param[in] sceneSize The scene size the tests will be performed in
  * @param[in] layers The list of layers to test
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
@@ -535,7 +531,7 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
  * @param[in] onScreen True to test on-screen, false to test off-screen
  * @return True if we have a hit, false otherwise
  */
-bool HitTestRenderTaskList( Stage& stage,
+bool HitTestRenderTaskList( const Vector2& sceneSize,
                             LayerList& layers,
                             RenderTaskList& taskList,
                             const Vector2& screenCoordinates,
@@ -557,7 +553,7 @@ bool HitTestRenderTaskList( Stage& stage,
       continue;
     }
 
-    if( HitTestRenderTask( exclusives, stage, layers, renderTask, screenCoordinates, results, hitCheck ) )
+    if( HitTestRenderTask( exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck ) )
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
       return true; // don't bother checking off screen tasks
@@ -570,7 +566,7 @@ bool HitTestRenderTaskList( Stage& stage,
 /**
  * Iterate through the RenderTaskList and perform hit testing for both on-screen and off-screen.
  *
- * @param[in] stage The stage the tests will be performed in
+ * @param[in] sceneSize The scene size the tests will be performed in
  * @param[in] layers The list of layers to test
  * @param[in] taskList The list of render tasks
  * @param[out] results Ray information calculated by the camera
@@ -578,7 +574,7 @@ bool HitTestRenderTaskList( Stage& stage,
  * @param[in] onScreen True to test on-screen, false to test off-screen
  * @return True if we have a hit, false otherwise
  */
-bool HitTestForEachRenderTask( Stage& stage,
+bool HitTestForEachRenderTask( const Vector2& sceneSize,
                                LayerList& layers,
                                RenderTaskList& taskList,
                                const Vector2& screenCoordinates,
@@ -589,8 +585,8 @@ bool HitTestForEachRenderTask( Stage& stage,
 
   // Check on-screen tasks before off-screen ones.
   // Hit test order should be reverse of draw order (see ProcessRenderTasks() where off-screen tasks are drawn first).
-  if( HitTestRenderTaskList( stage, layers, taskList, screenCoordinates, results, hitCheck, true  ) ||
-      HitTestRenderTaskList( stage, layers, taskList, screenCoordinates, results, hitCheck, false ) )
+  if( HitTestRenderTaskList( sceneSize, layers, taskList, screenCoordinates, results, hitCheck, true  ) ||
+      HitTestRenderTaskList( sceneSize, layers, taskList, screenCoordinates, results, hitCheck, false ) )
   {
     // Found hit.
     result = true;
@@ -605,16 +601,13 @@ HitTestInterface::~HitTestInterface()
 {
 }
 
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
+bool HitTest( const Vector2& sceneSize, RenderTaskList& taskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
   bool wasHit( false );
-  // Hit-test the regular on-stage actors
-  RenderTaskList& taskList = stage.GetRenderTaskList();
-  LayerList& layerList = stage.GetLayerList();
-
+  // Hit-test the regular on-scene actors
   Results hitTestResults;
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  if( HitTestForEachRenderTask( stage, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  if( HitTestForEachRenderTask( sceneSize, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;
@@ -623,47 +616,33 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
   return wasHit;
 }
 
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
 {
   bool wasHit( false );
 
-  // Hit-test the system-overlay actors first
-  SystemOverlay* systemOverlay = stage.GetSystemOverlayInternal();
-
-  if( systemOverlay )
-  {
-    RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
-    LayerList& overlayLayerList = systemOverlay->GetLayerList();
-
-    wasHit = HitTestForEachRenderTask( stage, overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
-  }
-
-  // Hit-test the regular on-stage actors
+  // Hit-test the regular on-scene actors
   if( !wasHit )
   {
-    RenderTaskList& taskList = stage.GetRenderTaskList();
-    LayerList& layerList = stage.GetLayerList();
-
-    wasHit = HitTestForEachRenderTask( stage, layerList, taskList, screenCoordinates, results, hitTestInterface );
+    wasHit = HitTestForEachRenderTask( sceneSize, layerList, renderTaskList, screenCoordinates, results, hitTestInterface );
   }
   return wasHit;
 }
 
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results )
 {
   ActorTouchableCheck actorTouchableCheck;
-  return HitTest( stage, screenCoordinates, results, actorTouchableCheck );
+  return HitTest( sceneSize, renderTaskList, layerList, screenCoordinates, results, actorTouchableCheck );
 }
 
-bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, RenderTask& renderTask, const Vector2& screenCoordinates,
               Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
   bool wasHit( false );
   Results hitTestResults;
 
-  const Vector< RenderTaskList::Exclusive >& exclusives = stage.GetRenderTaskList().GetExclusivesList();
+  const Vector< RenderTaskList::Exclusive >& exclusives = renderTaskList.GetExclusivesList();
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  if( HitTestRenderTask( exclusives, stage, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  if( HitTestRenderTask( exclusives, sceneSize, layerList, renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;

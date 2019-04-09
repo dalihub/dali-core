@@ -7,9 +7,9 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/trace.cpp \
    $(platform_abstraction_src_dir)/profiling.cpp \
    $(platform_abstraction_src_dir)/input-options.cpp \
-   $(platform_abstraction_src_dir)/system-overlay.cpp \
    $(platform_abstraction_src_dir)/lockless-buffer.cpp \
    $(platform_abstraction_src_dir)/render-task-list-integ.cpp \
+   $(platform_abstraction_src_dir)/scene.cpp \
    $(platform_abstraction_src_dir)/events/event.cpp \
    $(platform_abstraction_src_dir)/events/gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/hover-event-integ.cpp \
@@ -37,9 +37,11 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/gesture-manager.h \
    $(platform_abstraction_src_dir)/render-controller.h \
    $(platform_abstraction_src_dir)/platform-abstraction.h \
-   $(platform_abstraction_src_dir)/system-overlay.h \
+   $(platform_abstraction_src_dir)/processor-interface.h \
    $(platform_abstraction_src_dir)/lockless-buffer.h \
-   $(platform_abstraction_src_dir)/render-task-list-integ.h
+   $(platform_abstraction_src_dir)/render-task-list-integ.h \
+   $(platform_abstraction_src_dir)/scene.h \
+   $(platform_abstraction_src_dir)/render-surface.h
 
 platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/event.h \

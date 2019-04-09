@@ -30,6 +30,7 @@ namespace Internal
 {
 
 class Layer;
+class LayerList;
 
 /**
  * This namespace is provided for application developers to do hit test for the actors.
@@ -93,13 +94,26 @@ protected:
 };
 
 /**
- * @copydoc Dali::HitTestAlgorithm::HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
+ * Hit test specific to a given scene.
+ *
+ * @param[in] sceneSize The size of the scene.
+ * @param[in] renderTaskList The render task list of the scene.
+ * @param[in] layerList The layer list of the scene.
+ * @param[in] screenCoordinates The screen coordinates.
+ * @param[out] results The results of the hit-test.
+ * @param[in] func The function to use in the hit-test algorithm.
+ * @return true if something was hit
+ *
+ * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates,
+              Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
 
 /**
  * Given screen coordinates, this method returns the hit actor & the local coordinates relative to the actor etc.
- * @param[in] stage The stage.
+ * @param[in] sceneSize The size of the scene.
+ * @param[in] renderTaskList The render task list of the scene.
+ * @param[in] layerList The layer list of the scene.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] hitTestInterface Used to determine whether the actor is hit or whether we walk down its hierarchy
@@ -107,8 +121,7 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  *
  * <h3>Hit Test Algorithm:</h3>
  *
- * - The system overlay RenderTaskList is hit-tested first.
- * - If no hit then the regular RenderTaskList is used to hit test the on stage actors.
+ * - The regular RenderTaskList is used to hit test the on scene actors.
  * - The bulk of the hit test algorithm is described in Dali::Actor.
  * - In each RenderTask's its viewing parameters (the view and projection matrices, and the viewport)
  *   are used to build a picking ray into the scene which is used for our ray tests when hit testing
@@ -120,31 +133,36 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  * @note Currently, we prefer a child hit over a parent (regardless of the distance from the
  *       camera) unless the parent is a RenderableActor but this is subject to change.
  */
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface );
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates,
+              Results& results, HitTestInterface& hitTestInterface );
 
 /**
  * Default HitTest where we check if a touch is required.
  *
- * @param[in] stage The stage.
+ * @param[in] sceneSize The size of the scene.
+ * @param[in] renderTaskList The render task list of the scene.
+ * @param[in] layerList The layer list of the scene.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @return true if something was hit
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results );
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results );
 
 /**
  * Hit test specific to a given RenderTask
  *
- * @param[in] stage The stage.
+ * @param[in] sceneSize The size of the scene.
+ * @param[in] renderTaskList The render task list of the scene.
+ * @param[in] layerList The layer list of the scene.
  * @param[in] renderTask The render task for hit test
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] func The function to use in the hit-test algorithm.
  * @return true if something was hit
  */
-bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
+bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, RenderTask& renderTask, const Vector2& screenCoordinates,
               Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
 
 

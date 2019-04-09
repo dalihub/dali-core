@@ -29,7 +29,7 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/gesture-manager.h>
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 
@@ -101,9 +101,8 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 
 } // unnamed namespace
 
-PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager )
+PanGestureProcessor::PanGestureProcessor( Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager )
 : GestureProcessor( Gesture::Pan ),
-  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mCurrentPanEmitters(),
@@ -123,7 +122,7 @@ PanGestureProcessor::~PanGestureProcessor()
   mSceneObject = NULL; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
 }
 
-void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent )
+void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEvent& panEvent )
 {
   switch( panEvent.state )
   {
@@ -133,7 +132,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( mStage, panEvent.currentPosition, hitTestResults ) )
+      if( HitTest( scene, panEvent.currentPosition, hitTestResults ) )
       {
         SetActor( &GetImplementation( hitTestResults.actor ) );
         mPossiblePanPosition = panEvent.currentPosition;
@@ -150,7 +149,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
         // it can be told when the gesture ends as well.
 
         HitTestAlgorithm::Results hitTestResults;
-        HitTest( mStage, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
+        HitTest( scene, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {

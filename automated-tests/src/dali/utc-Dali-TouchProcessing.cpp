@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/touch-data-devel.h>
 
 using namespace Dali;
 
@@ -1168,47 +1168,6 @@ int UtcDaliTouchActorUnStaged(void)
   END_TEST;
 }
 
-int UtcDaliTouchSystemOverlayActor(void)
-{
-  TestApplication application;
-  Dali::Integration::Core& core( application.GetCore() );
-  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-
-  Dali::RenderTaskList overlayRenderTaskList = Integration::RenderTaskList::New();
-  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
-  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
-  Integration::RenderTaskList::CreateTask( overlayRenderTaskList, overlayRootActor, overlayCameraActor );
-  systemOverlay.SetOverlayRenderTasks( overlayRenderTaskList );
-
-  // Create an actor and add it to the system overlay.
-  Actor systemActor = Actor::New();
-  systemActor.SetSize(100.0f, 100.0f);
-  systemActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  systemOverlay.Add( systemActor );
-
-  // Create an actor and add it to the stage as per normal, same position and size as systemActor
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  // Connect to the touch signals.
-  SignalData data;
-  TouchEventFunctor functor( data );
-  systemActor.TouchedSignal().Connect( &application, functor );
-  actor.TouchedSignal().Connect( &application, functor );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Emit a down signal, the system overlay is drawn last so is at the top, should hit the systemActor.
-  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( systemActor == data.touchedActor );
-  END_TEST;
-}
-
 int UtcDaliTouchLayerConsumesTouch(void)
 {
   TestApplication application;
@@ -1601,4 +1560,42 @@ int UtcDaliTouchInterruptedDifferentConsumer(void)
   rootData.Reset();
 
   END_TEST;
+}
+
+int UtcDaliTouchDataConvert(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touch signal
+  SignalData data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  Vector2 screenCoordiantes(10.0f, 10.0f);
+  Vector2 localCoordinates;
+  actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordiantes.x, screenCoordiantes.y);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordiantes));
+  Dali::TouchData touchData = Dali::DevelTouchData::Convert(data.touchEvent);
+
+  DALI_TEST_EQUALS( 1u, touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordiantes, touchData.GetScreenPosition(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, touchData.GetLocalPosition(0), 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, touchData.GetState(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor, touchData.GetHitActor(0), TEST_LOCATION );
+
+  data.Reset();
+
+  END_TEST;
+
 }

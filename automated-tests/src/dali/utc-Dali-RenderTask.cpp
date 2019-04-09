@@ -286,41 +286,6 @@ bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool 
   return result;
 }
 
-// The functor to be used in the hit-test algorithm to check whether the actor is hittable.
-bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType type)
-{
-  bool hittable = false;
-
-  switch (type)
-  {
-    case Dali::HitTestAlgorithm::CHECK_ACTOR:
-    {
-      // Check whether the actor is visible and not fully transparent.
-      if( actor.IsVisible()
-          && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
-      {
-
-        hittable = true;
-      }
-      break;
-    }
-    case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
-    {
-      if( actor.IsVisible() ) // Actor is visible, if not visible then none of its children are visible.
-      {
-        hittable = true;
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  return hittable;
-}
-
 } // unnamed namespace
 
 
@@ -670,11 +635,16 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   // Check that the actor1 was rendered
   const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
-  DALI_TEST_EQUALS( boundTextures.size(), 1u, TEST_LOCATION );
+  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 0 ), TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    DALI_TEST_EQUALS( boundTextures[0], 8u/*unique to actor1*/, TEST_LOCATION );
+    int c = 0;
+    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
+    if( boundTextures.size() > 1 )
+    {
+      DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
+    }
   }
 
   BufferImage img2 = BufferImage::New( 1,1 );
@@ -693,12 +663,17 @@ int UtcDaliRenderTaskSetExclusive(void)
   application.Render();
 
   // Check that the actors were rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 2u, TEST_LOCATION );
+  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 1 ), TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    DALI_TEST_EQUALS( boundTextures[0], 9u/*unique to actor2*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( boundTextures[1], 8u/*unique to actor1*/, TEST_LOCATION );
+    int c = 0;
+    DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor2*/, TEST_LOCATION );
+    if( boundTextures.size() > 2 )
+    {
+      DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor1*/, TEST_LOCATION );
+    }
+    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
   BufferImage img3 = BufferImage::New( 1,1 );
@@ -717,13 +692,18 @@ int UtcDaliRenderTaskSetExclusive(void)
   application.Render();
 
   // Check that the actors were rendered
-  DALI_TEST_EQUALS( boundTextures.size(), 3u, TEST_LOCATION );
+  DALI_TEST_GREATER( boundTextures.size(), static_cast<std::vector<GLuint>::size_type>( 2 ), TEST_LOCATION );
 
   if ( boundTextures.size() )
   {
-    DALI_TEST_EQUALS( boundTextures[0], 10u/*unique to actor3*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( boundTextures[1], 9u/*unique to actor2*/, TEST_LOCATION );
-    DALI_TEST_EQUALS( boundTextures[2], 8u/*unique to actor1*/, TEST_LOCATION );
+    int c = 0;
+    DALI_TEST_EQUALS( boundTextures[c++], 10u/*unique to actor3*/, TEST_LOCATION );
+    if( boundTextures.size() > 3 )
+    {
+      DALI_TEST_EQUALS( boundTextures[c++], 10u/*unique to actor2*/, TEST_LOCATION );
+    }
+    DALI_TEST_EQUALS( boundTextures[c++], 9u/*unique to actor2*/, TEST_LOCATION );
+    DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
   // Both actors are now connected to the root node
@@ -1139,9 +1119,9 @@ int UtcDaliRenderTaskGetFrameBufferN(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  // By default render-tasks do not render off-screen
+  // A scene creates frame buffer by default
   FrameBuffer frameBuffer = task.GetFrameBuffer();
-  DALI_TEST_CHECK( !frameBuffer );
+  DALI_TEST_CHECK( frameBuffer );
 
   END_TEST;
 }
@@ -1914,7 +1894,7 @@ int UtcDaliRenderTaskContinuous01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
@@ -1952,7 +1932,7 @@ int UtcDaliRenderTaskContinuous02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
@@ -1992,7 +1972,7 @@ int UtcDaliRenderTaskContinuous03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2030,7 +2010,7 @@ int UtcDaliRenderTaskContinuous04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2061,7 +2041,7 @@ int UtcDaliRenderTaskOnce01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
 
@@ -2099,7 +2079,7 @@ int UtcDaliRenderTaskOnce02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2147,7 +2127,7 @@ int UtcDaliRenderTaskOnce03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2192,7 +2172,7 @@ int UtcDaliRenderTaskOnce04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2244,7 +2224,7 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2274,7 +2254,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2318,7 +2298,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2355,7 +2335,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
@@ -2410,7 +2390,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   Actor rootActor = Actor::New();
   Stage::GetCurrent().Add( rootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
@@ -2450,7 +2430,7 @@ int UtcDaliRenderTaskOnceChain01(void)
   Actor defaultRootActor = Actor::New(); // Root for default RT
   Stage::GetCurrent().Add( defaultRootActor );
 
-  CameraActor offscreenCameraActor = CameraActor::New();
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
   Actor firstRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(firstRootActor);
@@ -2495,78 +2475,6 @@ int UtcDaliRenderTaskProperties(void)
   task.GetPropertyIndices( indices );
   DALI_TEST_CHECK( indices.Size() );
   DALI_TEST_EQUALS( indices.Size(), task.GetPropertyCount(), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void)
-{
-  TestApplication application;
-  tet_infoline("Testing RenderTask::SetScreenToFrameBufferMappingActor ");
-
-  Stage stage = Stage::GetCurrent();
-  Size stageSize = stage.GetSize();
-  Actor mappingActor = Actor::New();
-  Vector2 scale( 0.6f, 0.75f);
-  Vector2 offset( stageSize.x*0.1f, stageSize.y*0.15f);
-  mappingActor.SetSize( stageSize * scale );
-  mappingActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mappingActor.SetPosition( offset.x, offset.y );
-  stage.Add( mappingActor );
-
-  Actor offscreenActor = Actor::New();
-  offscreenActor.SetSize( stageSize );
-  offscreenActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  stage.Add( offscreenActor );
-
-  RenderTaskList taskList = stage.GetRenderTaskList();
-  RenderTask renderTask = taskList.CreateTask();
-  FrameBufferImage frameBufferImage =  FrameBufferImage::New(stageSize.width*scale.x, stageSize.height*scale.y, Pixel::A8);
-  renderTask.SetSourceActor( offscreenActor );
-  renderTask.SetExclusive( true );
-  renderTask.SetInputEnabled( true );
-  renderTask.SetTargetFrameBuffer( frameBufferImage );
-  renderTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
-  renderTask.SetScreenToFrameBufferMappingActor( mappingActor );
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-  application.Render();
-  application.SendNotification();
-
-  Vector2 screenCoordinates( stageSize.x * 0.05f, stageSize.y * 0.05f );
-  Dali::HitTestAlgorithm::Results results;
-  DALI_TEST_CHECK( !results.actor );
-  DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
-  // miss expected, results not changed
-  DALI_TEST_CHECK( false == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
-  DALI_TEST_CHECK( !results.actor );
-  DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
-
-  screenCoordinates.x = stageSize.x * 0.265f;
-  screenCoordinates.y = stageSize.y * 0.33f;
-  results.actor = Actor();
-  results.actorCoordinates = Vector2::ZERO;
-  // hit expected, results changed
-  DALI_TEST_CHECK( true == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
-  DALI_TEST_CHECK( results.actor  == offscreenActor );
-  DALI_TEST_EQUALS( (screenCoordinates-offset)/scale , results.actorCoordinates, 0.1f, TEST_LOCATION );
-
-  screenCoordinates.x = stageSize.x * 0.435f;
-  screenCoordinates.y = stageSize.y * 0.52f;
-  // hit expected, results changed
-  DALI_TEST_CHECK( true == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
-  DALI_TEST_CHECK( results.actor  == offscreenActor );
-  const Vector2 expectedCoordinates = (screenCoordinates-offset)/scale;
-  DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
-
-  screenCoordinates.x = stageSize.x * 0.65f;
-  screenCoordinates.y = stageSize.y * 0.95f;
-  // miss expected, results not changed
-  DALI_TEST_CHECK( false == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
-  DALI_TEST_CHECK( results.actor  == offscreenActor );
-  DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
   END_TEST;
 }
 

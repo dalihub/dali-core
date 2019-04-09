@@ -1,8 +1,8 @@
-#ifndef __DALI_SET_H__
-#define __DALI_SET_H__
+#ifndef DALI_SET_WRAPPER_H
+#define DALI_SET_WRAPPER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,16 @@
  *
  */
 
-
-// EXTERNAL INCLUDES
-
 #ifndef HIDE_DALI_INTERNALS
 
-# include <set>
+#include <set>
 
 #else
+
+// Ensure that default visibility is used with any class that is used as an exception type
+#include <memory>
+#include <new>
+#include <stdexcept>
 
 #if defined(__clang__)
 
@@ -43,23 +45,20 @@
 
 #else
 
+#include <bits/c++config.h>
+#include <bits/stl_tree.h>
+#undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ ("hidden")))
+#include <set>
+#undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY`
 
-// ensure that default visibility is used with any class that is used as an exception type
-# include <memory>
-# include <new>
-# include <stdexcept>
+#endif // #ifdef __clang__
 
+#endif // #ifndef HIDE_DALI_INTERNALS
 
-# include <bits/c++config.h>
-# include <bits/stl_tree.h>
-# undef _GLIBCXX_VISIBILITY_ATTR
-# define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
-# include <set>
-# undef _GLIBCXX_VISIBILITY_ATTR
-# define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
-
-#endif //ifdef __clang__
-
-#endif //ifndef HIDE_DALI_INTERNALS
-
-#endif /* __DALI_SET_H__ */
+#endif // DALI_SET_WRAPPER_H

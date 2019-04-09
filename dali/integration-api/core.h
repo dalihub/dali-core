@@ -29,6 +29,9 @@
 namespace Dali
 {
 
+class Layer;
+class RenderTaskList;
+
 namespace Internal
 {
 class Core;
@@ -44,8 +47,9 @@ namespace Integration
 class Core;
 class GestureManager;
 class PlatformAbstraction;
+class Processor;
 class RenderController;
-class SystemOverlay;
+class RenderSurface;
 struct Event;
 struct TouchData;
 
@@ -178,22 +182,6 @@ private:
   bool needsPostRender  :1;  ///< True if post-render is required to be run.
 };
 
-/**
- * Interface to enable classes to be processed after the event loop. Classes are processed
- * in the order they are registered.
- */
-class DALI_CORE_API Processor
-{
-public:
-  /**
-   * @brief Run the processor
-   */
-  virtual void Process() = 0;
-
-protected:
-  virtual ~Processor() { }
-};
-
 
 /**
  * Integration::Core is used for integration with the native windowing system.
@@ -262,34 +250,17 @@ public:
   ~Core();
 
   /**
+   * Initialize the core
+   */
+  void Initialize();
+
+  /**
    * Notify the Core that the render surface has been resized.
    * The Core will use the surface size for camera calculations, and to set the viewport.
    * Multi-threading note: this method should be called from the main thread
-   * @param[in] width The new surface width.
-   * @param[in] height The new surface height.
+   * @param[in] surface The resized surface
    */
-  void SurfaceResized( uint32_t width, uint32_t height );
-
-  /**
-   * Notify the Core about the top margin size.
-   * Available stage size is reduced by this size.
-   * The stage is located below the size at the top of the display
-   * It is mainly useful for indicator in mobile device
-   * @param[in] margin margin size
-   */
-  void SetTopMargin( uint32_t margin );
-
-  // Core setters
-
-  /**
-   * Notify the Core about the display's DPI values.
-   * This should be done after the display is initialized and a Core instance is created.
-   * The Core will use the DPI values for font rendering.
-   * Multi-threading note: this method should be called from the main thread
-   * @param[in] dpiHorizontal Horizontal DPI value.
-   * @param[in] dpiVertical   Vertical DPI value.
-   */
-  void SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical );
+  void SurfaceResized( Integration::RenderSurface* surface );
 
   // Core Lifecycle
 
@@ -359,14 +330,6 @@ public:
    * Multi-threading note: this method should be called from the update thread only
    */
   void GraphicsShutdown();
-
-  // System-level overlay
-
-  /**
-   * Use the SystemOverlay to draw content for system-level indicators, dialogs etc.
-   * @return The SystemOverlay.
-   */
-  SystemOverlay& GetSystemOverlay();
 
   /**
    * @brief Register a processor

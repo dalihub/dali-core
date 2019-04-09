@@ -31,7 +31,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 
 namespace Dali
 {
@@ -72,9 +72,8 @@ void EmitTapSignal(
 
 } // unnamed namespace
 
-TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
+TapGestureProcessor::TapGestureProcessor( Integration::GestureManager& gestureManager)
 : GestureProcessor( Gesture::Tap ),
-  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mMinTapsRequired( 1 ),
@@ -90,7 +89,7 @@ TapGestureProcessor::~TapGestureProcessor()
 {
 }
 
-void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent )
+void TapGestureProcessor::Process( Scene& scene, const Integration::TapGestureEvent& tapEvent )
 {
   switch ( tapEvent.state )
   {
@@ -98,7 +97,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
     {
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
-      if ( HitTest( mStage, tapEvent.point, hitTestResults ) )
+      if ( HitTest( scene, tapEvent.point, hitTestResults ) )
       {
         SetActor( &GetImplementation( hitTestResults.actor ) );
         mCurrentTapActor.SetActor( GetCurrentGesturedActor() );
@@ -117,7 +116,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
     {
       // Ensure that we're processing a hit on the current actor and that we've already processed a touch down
       HitTestAlgorithm::Results hitTestResults;
-      if ( GetCurrentGesturedActor() && HitTest( mStage, tapEvent.point, hitTestResults ) && mPossibleProcessed )
+      if ( GetCurrentGesturedActor() && HitTest( scene, tapEvent.point, hitTestResults ) && mPossibleProcessed )
       {
         // Check that this actor is still the one that was used for the last touch down ?
         if ( mCurrentTapActor.GetActor() == &GetImplementation( hitTestResults.actor ) )

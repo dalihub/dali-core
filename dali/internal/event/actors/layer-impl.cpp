@@ -26,7 +26,8 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
@@ -87,7 +88,7 @@ LayerPtr Layer::New()
   // create node, nodes are owned by UpdateManager
   SceneGraph::Layer* layerNode = SceneGraph::Layer::New();
   OwnerPointer< SceneGraph::Node > transferOwnership( layerNode );
-  AddNodeMessage( Stage::GetCurrent()->GetUpdateManager(), transferOwnership );
+  AddNodeMessage( EventThreadServices::Get().GetUpdateManager(), transferOwnership );
   LayerPtr layer( new Layer( Actor::LAYER, *layerNode ) );
 
   // Second-phase construction
@@ -257,10 +258,9 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
     // Convert mClippingBox to GL based coordinates (from bottom-left)
     ClippingBox clippingBox( mClippingBox );
 
-    StagePtr stage = Stage::GetCurrent();
-    if( stage )
+    if( mScene )
     {
-      clippingBox.y = static_cast<int32_t>( stage->GetSize().height ) - clippingBox.y - clippingBox.height;
+      clippingBox.y = static_cast<int32_t>( mScene->GetSize().height ) - clippingBox.y - clippingBox.height;
 
       // layerNode is being used in a separate thread; queue a message to set the value
       SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
@@ -323,7 +323,6 @@ void Layer::OnStageConnectionInternal()
     DALI_ASSERT_DEBUG( NULL == mLayerList );
 
     // Find the ordered layer-list
-    // This is different for Layers added via Integration::GetSystemOverlay()
     for ( Actor* parent = mParent; parent != NULL; parent = parent->GetParent() )
     {
       if( parent->IsLayer() )

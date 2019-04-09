@@ -41,7 +41,6 @@ class Layer;
  * An ordered list of layers.
  * Layers are not owned by the LayerList; each layer is responsible for registering & unregistering.
  * This is used by the Stage, to keep track of layer depths.
- * A separate LayerList is maintained for actors added via the SystemOverlay::Add().
  */
 class LayerList
 {

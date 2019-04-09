@@ -62,26 +62,26 @@ GestureDetector::~GestureDetector()
   }
 }
 
-void GestureDetector::Attach(Actor& actor)
+void GestureDetector::Attach( Actor& actor )
 {
-  if ( !IsAttached(actor) )
+  if ( !IsAttached( actor) )
   {
     // Register with EventProcessor if first actor being added
-    if ( mAttachedActors.empty() )
+    if( mAttachedActors.empty() )
     {
-      mGestureEventProcessor.AddGestureDetector(this);
+      mGestureEventProcessor.AddGestureDetector( this );
     }
 
-    mAttachedActors.push_back(&actor);
+    mAttachedActors.push_back( &actor );
 
     // We need to observe the actor's destruction
-    actor.AddObserver(*this);
+    actor.AddObserver( *this );
 
     // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
     actor.GetGestureData().AddGestureDetector( *this );
 
     // Notification for derived classes
-    OnActorAttach(actor);
+    OnActorAttach( actor );
   }
 }
 

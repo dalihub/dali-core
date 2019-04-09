@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -60,7 +59,7 @@ RenderTaskPtr RenderTaskList::CreateTask()
 
 RenderTaskPtr RenderTaskList::CreateTask( Actor* sourceActor, CameraActor* cameraActor)
 {
-  RenderTaskPtr task = RenderTask::New( sourceActor, cameraActor, *mSceneObject );
+  RenderTaskPtr task = RenderTask::New( sourceActor, cameraActor, *this );
 
   mTasks.push_back( task );
 
@@ -71,7 +70,9 @@ void RenderTaskList::RemoveTask( Internal::RenderTask& task )
 {
   for ( RenderTaskContainer::iterator iter = mTasks.begin(); mTasks.end() != iter; ++iter )
   {
-    if ( iter->Get() == &task )
+    RenderTask *ptr = iter->Get();
+
+    if ( ptr == &task )
     {
       const SceneGraph::RenderTask& sceneObject = task.GetRenderTaskSceneObject();
 
@@ -82,7 +83,7 @@ void RenderTaskList::RemoveTask( Internal::RenderTask& task )
 
       for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
       {
-        if ( exclusiveIt->renderTaskPtr == iter->Get() )
+        if ( exclusiveIt->renderTaskPtr == ptr )
         {
           mExclusives.Erase( exclusiveIt );
           break;
@@ -135,7 +136,7 @@ void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
 }
 
 RenderTaskList::RenderTaskList()
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mDefaults( *Stage::GetCurrent() ),
   mSceneObject( nullptr )
 {
@@ -195,6 +196,11 @@ void RenderTaskList::RecoverFromContextLoss()
       item->SetRefreshRate( Dali::RenderTask::REFRESH_ONCE );
     }
   }
+}
+
+const SceneGraph::RenderTaskList& RenderTaskList::GetSceneObject() const
+{
+  return *mSceneObject;
 }
 
 } // namespace Internal

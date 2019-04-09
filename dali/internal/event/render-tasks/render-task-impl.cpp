@@ -32,7 +32,6 @@
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 #if defined(DEBUG_ENABLED)
@@ -71,14 +70,17 @@ SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoCon
 
 } // Unnamed namespace
 
-RenderTaskPtr RenderTask::New( Actor* sourceActor, CameraActor* cameraActor, SceneGraph::RenderTaskList& parentSceneObject )
+RenderTaskPtr RenderTask::New( Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList )
 {
   // create scene object first so it's guaranteed to exist for the event side
   auto sceneObject = SceneGraph::RenderTask::New();
-  OwnerPointer< SceneGraph::RenderTask > transferOwnership( sceneObject );
+
   // pass the pointer to base for message passing
-  RenderTaskPtr task( new RenderTask( sceneObject ) );
+  RenderTaskPtr task( new RenderTask( sceneObject, renderTaskList ) );
+
   // transfer scene object ownership to update manager
+  const SceneGraph::RenderTaskList& parentSceneObject = renderTaskList.GetSceneObject();
+  OwnerPointer< SceneGraph::RenderTask > transferOwnership( sceneObject );
   AddTaskMessage( task->GetEventThreadServices(), parentSceneObject, transferOwnership );
 
   // Set the default source & camera actors
@@ -100,12 +102,9 @@ void RenderTask::SetSourceActor( Actor* actor )
   {
     SetSourceNodeMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr );
   }
+
   // set the actor on exclusive container for hit testing
-  const Stage* stage = Stage::GetCurrent();
-  if ( stage )
-  {
-    stage->GetRenderTaskList().SetExclusive( this, mExclusive );
-  }
+  mRenderTaskList.SetExclusive( this, mExclusive );
 }
 
 Actor* RenderTask::GetSourceActor() const
@@ -119,11 +118,7 @@ void RenderTask::SetExclusive( bool exclusive )
   {
     mExclusive = exclusive;
 
-    const Stage* stage = Stage::GetCurrent();
-    if ( stage )
-    {
-      stage->GetRenderTaskList().SetExclusive( this, exclusive );
-    }
+    mRenderTaskList.SetExclusive( this, exclusive );
 
     // scene object is being used in a separate thread; queue a message to set the value
     SetExclusiveMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), mExclusive );
@@ -156,6 +151,9 @@ void RenderTask::SetCameraActor( CameraActor* cameraActor )
   {
     SetCameraMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), nullptr, nullptr );
   }
+
+  // set the actor on exclusive container for hit testing
+  mRenderTaskList.SetExclusive( this, mExclusive );
 }
 
 CameraActor* RenderTask::GetCameraActor() const
@@ -487,6 +485,11 @@ const SceneGraph::RenderTask& RenderTask::GetRenderTaskSceneObject() const
   return *static_cast<const SceneGraph::RenderTask*>( mUpdateObject );
 }
 
+RenderTaskList& RenderTask::GetRenderTaskList() const
+{
+  return mRenderTaskList;
+}
+
 /********************************************************************************
  ********************************   PROPERTY METHODS   **************************
  ********************************************************************************/
@@ -529,7 +532,6 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
 
   switch ( index )
   {
-
     case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       value = mViewportPosition;
@@ -567,7 +569,6 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue( Property::Index inde
 
   switch ( index )
   {
-
     case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       value = GetCurrentViewportPosition();
@@ -755,11 +756,12 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-RenderTask::RenderTask( const SceneGraph::RenderTask* sceneObject )
+RenderTask::RenderTask( const SceneGraph::RenderTask* sceneObject, RenderTaskList& renderTaskList )
 : Object( sceneObject ),
   mSourceActor( nullptr ),
   mCameraActor( nullptr ),
   mInputMappingActor(),
+  mRenderTaskList( renderTaskList ),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),
   mViewportPosition( Vector2::ZERO ),
   mViewportSize( Vector2::ZERO ),

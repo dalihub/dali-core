@@ -37,6 +37,7 @@ namespace Internal
 {
 
 class Stage;
+class Scene;
 
 namespace SceneGraph
 {
@@ -60,11 +61,10 @@ public:
 
   /**
    * Create a pan gesture processor.
-   * @param[in] stage The stage.
    * @param[in] gestureManager The gesture manager
    * @param[in] updateManager The Update Manager
    */
-  PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager );
+  PanGestureProcessor( Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager );
 
   /**
    * Destructor
@@ -75,9 +75,10 @@ public: // To be called by GestureEventProcessor
 
   /**
    * This method is called whenever a pan gesture event occurs.
+   * @param[in] scene The scene the pan gesture event occurs in.
    * @param[in] panEvent The event that has occurred.
    */
-  void Process( const Integration::PanGestureEvent& panEvent );
+  void Process( Scene& scene, const Integration::PanGestureEvent& panEvent );
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -280,7 +281,6 @@ private:
 
 private:
 
-  Stage& mStage;
   Integration::GestureManager& mGestureManager;
   PanGestureDetectorContainer mGestureDetectors;
   GestureDetectorContainer mCurrentPanEmitters;

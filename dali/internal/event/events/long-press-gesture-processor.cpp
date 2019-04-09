@@ -29,7 +29,7 @@
 #include <dali/integration-api/gesture-manager.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
@@ -98,9 +98,8 @@ struct IsNotAttachedFunctor
 
 } // unnamed namespace
 
-LongPressGestureProcessor::LongPressGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
+LongPressGestureProcessor::LongPressGestureProcessor( Integration::GestureManager& gestureManager)
 : GestureProcessor( Gesture::LongPress ),
-  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mCurrentEmitters(),
@@ -115,7 +114,7 @@ LongPressGestureProcessor::~LongPressGestureProcessor()
 {
 }
 
-void LongPressGestureProcessor::Process( const Integration::LongPressGestureEvent& longPressEvent )
+void LongPressGestureProcessor::Process( Scene& scene, const Integration::LongPressGestureEvent& longPressEvent )
 {
   switch ( longPressEvent.state )
   {
@@ -125,7 +124,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( mStage, longPressEvent.point, hitTestResults ) )
+      if( HitTest( scene, longPressEvent.point, hitTestResults ) )
       {
         SetActor( &GetImplementation( hitTestResults.actor ) );
       }
@@ -138,7 +137,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
       if ( currentGesturedActor )
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTest( mStage, longPressEvent.point, hitTestResults );
+        HitTest( scene, longPressEvent.point, hitTestResults );
 
         if ( hitTestResults.actor && ( currentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
         {

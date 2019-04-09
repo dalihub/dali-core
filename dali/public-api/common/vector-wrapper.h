@@ -1,8 +1,8 @@
-#ifndef __VECTOR_WRAPPER_H__
-#define __VECTOR_WRAPPER_H__
+#ifndef DALI_VECTOR_WRAPPER_H
+#define DALI_VECTOR_WRAPPER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,13 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstddef>
-
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-
 #ifndef HIDE_DALI_INTERNALS
 
 #include <vector>
 
 #else
 
-// ensure that default visibility is used with any class that is used as an exception type
+// Ensure that default visibility is used with any class that is used as an exception type
 #include <memory>
 #include <new>
 #include <stdexcept>
@@ -53,13 +47,17 @@
 
 #include <bits/c++config.h>
 #undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
 #define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ ("hidden")))
 #include <vector>
 #undef _GLIBCXX_VISIBILITY_ATTR
+#undef _GLIBCXX_VISIBILITY
 #define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY`
 
-#endif //ifdef __clang__
+#endif // #ifdef __clang__
 
-#endif //ifndef HIDE_DALI_INTERNALS
+#endif // #ifndef HIDE_DALI_INTERNALS
 
-#endif /* __VECTOR_WRAPPER__H__ */
+#endif // DALI_VECTOR_WRAPPER_H
