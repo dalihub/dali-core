@@ -8,6 +8,7 @@ SET( SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-data-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/texture-set-image.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/nine-patch-image.cpp
@@ -33,6 +34,7 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/animation/path-constrainer.h
   ${CMAKE_CURRENT_SOURCE_DIR}/animation/animation-devel.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/bitwise-enum.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/circular-queue.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/hash.h
   ${CMAKE_CURRENT_SOURCE_DIR}/common/map-wrapper.h
@@ -42,6 +44,7 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-data-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.h
   ${CMAKE_CURRENT_SOURCE_DIR}/images/native-image-interface-extension.h

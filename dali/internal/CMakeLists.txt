@@ -127,8 +127,10 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/update/gestures/pan-gesture-profiling.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/gestures/scene-graph-pan-gesture.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/queue/update-message-queue.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/frame-callback-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/render-instruction-processor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/render-task-processor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/scene-graph-frame-callback.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/transform-manager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/update-algorithms.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/update/manager/update-manager.cpp
