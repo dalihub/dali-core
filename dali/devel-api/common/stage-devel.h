@@ -79,7 +79,7 @@ DALI_CORE_API Rendering GetRenderingBehavior( Dali::Stage stage );
  * @note If the rootActor is destroyed, then the callback is automatically removed
  * @see FrameCallbackInterface
  */
-DALI_IMPORT_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor );
+DALI_CORE_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback, Actor rootActor );
 
 /**
  * @brief Removes the specified FrameCallbackInterface implementation from being called on every frame.
@@ -90,7 +90,7 @@ DALI_IMPORT_API void AddFrameCallback( Dali::Stage stage, FrameCallbackInterface
  * @note This function will block if the FrameCallbackInterface::Update method is being processed in the update-thread.
  * @note If the callback implementation has already been removed, then this is a no-op.
  */
-DALI_IMPORT_API void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback );
+DALI_CORE_API void RemoveFrameCallback( Dali::Stage stage, FrameCallbackInterface& frameCallback );
 
 } // namespace DevelStage
 
