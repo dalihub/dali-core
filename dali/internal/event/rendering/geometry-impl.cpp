@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/common/stage-impl.h>
+
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -88,7 +88,7 @@ const SceneGraph::Geometry* Geometry::GetRenderObject() const
 }
 
 Geometry::Geometry()
-: mEventThreadServices( *Stage::GetCurrent() ),
+: mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mType(Dali::Geometry::TRIANGLES)
 {

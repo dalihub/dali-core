@@ -38,7 +38,7 @@ namespace Internal
 {
 
 struct ActorObserver;
-class Stage;
+class Scene;
 
 /**
  * <h3>Multi-Hover Event Processing:</h3>
@@ -54,9 +54,9 @@ public:
 
   /**
    * Create an event processor.
-   * @param[in] stage The stage.
+   * @param[in] scene The scene the event processor belongs to.
    */
-  HoverEventProcessor( Stage& stage );
+  HoverEventProcessor( Scene& scene );
 
   /**
    * Non-virtual destructor; HoverEventProcessor is not a base class
@@ -77,7 +77,7 @@ private:
   // Undefined
   HoverEventProcessor& operator=(const HoverEventProcessor& rhs);
 
-  Stage& mStage; ///< Used to deliver touch events
+  Scene& mScene; ///< Reference to the scene
   ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
   ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
   ActorObserver mHoverStartConsumedActor; ///< Stores the hover-start consumed actor

@@ -22,7 +22,7 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/internal/event/events/key-event-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
 namespace Dali
@@ -31,8 +31,8 @@ namespace Dali
 namespace Internal
 {
 
-KeyEventProcessor::KeyEventProcessor(Stage& stage)
-: mStage(stage)
+KeyEventProcessor::KeyEventProcessor( Scene& scene )
+: mScene( scene )
 {
 }
 
@@ -40,23 +40,17 @@ KeyEventProcessor::~KeyEventProcessor()
 {
 }
 
-void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
+void KeyEventProcessor::ProcessKeyEvent( const Integration::KeyEvent& event )
 {
   KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
-
   GetImplementation( &keyEvent )->SetLogicalKey( event.logicalKey );
   GetImplementation( &keyEvent )->SetCompose( event.compose );
   GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
   GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
   GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
 
-  // Emit the key event signal from stage.
-  bool consumed = mStage.EmitKeyEventGeneratedSignal( keyEvent );
-
-  if( !consumed )
-  {
-    mStage.EmitKeyEventSignal(keyEvent);
-  }
+  // Emit the key event signal from the scene.
+  mScene.EmitKeyEventSignal( keyEvent );
 }
 
 } // namespace Internal

@@ -215,6 +215,7 @@ public:
   /**
    * @brief Constructor registers the type creation function.
    *
+   * @SINCE_1_4.0
    * @param[in] registerType the type info for the type to be registered
    * @param[in] baseType the base type info of registerType
    * @param[in] f registerType instance creation function

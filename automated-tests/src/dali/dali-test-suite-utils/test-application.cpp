@@ -55,18 +55,19 @@ void TestApplication::Initialize()
                                         Integration::DepthBufferAvailable::FALSE,
                                         Integration::StencilBufferAvailable::FALSE );
 
-  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
-  mCore->SetDpi( mDpi.x, mDpi.y );
-
   Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
   Dali::Integration::Log::InstallLogFunction(logFunction);
 
-  Dali::Integration::Trace::LogContextFunction logContextFunction(&TestApplication::LogContext);
-  Dali::Integration::Trace::InstallLogContextFunction( logContextFunction );
+  mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
+  mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
+  mScene.SetSurface( *mRenderSurface );
 
-  Dali::Integration::Trace::LogContext( true, "Test" );
+  mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
+
+  mCore->SurfaceResized( mRenderSurface );
 
   mCore->SceneCreated();
+  mCore->Initialize();
 }
 
 TestApplication::~TestApplication()
@@ -138,19 +139,6 @@ void TestApplication::ProcessEvent(const Integration::Event& event)
 void TestApplication::SendNotification()
 {
   mCore->ProcessEvents();
-}
-
-void TestApplication::SetSurfaceWidth( uint32_t width, uint32_t height )
-{
-  mSurfaceWidth = width;
-  mSurfaceHeight = height;
-
-  mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
-}
-
-void TestApplication::SetTopMargin( uint32_t margin )
-{
-  mCore->SetTopMargin( margin );
 }
 
 void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* location )

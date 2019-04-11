@@ -246,7 +246,7 @@ public:
   /**
    * @brief Get mouse device's button value (ex: right/left button)
    *
-   * @SINCE_1_3.31
+   * @SINCE_1_3_31
    * @param[in] point The point required
    * @return The mouse button value
    */

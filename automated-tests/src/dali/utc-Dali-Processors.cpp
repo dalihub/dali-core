@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/processor-interface.h>
 
 using namespace Dali;
 
@@ -26,6 +27,7 @@ using namespace Dali;
 class TestProcessor : public Integration::Processor
 {
 public:
+
   TestProcessor()
   : processRun(false)
   {
@@ -63,6 +65,56 @@ int UtcDaliCoreProcessorP(void)
   application.SendNotification();
   tet_infoline("Test that the processor has not been executed again:");
   DALI_TEST_CHECK( testProcessor.processRun == false );
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessorMultipleP(void)
+{
+  TestApplication application;
+
+  TestProcessor testProcessor1;
+  TestProcessor testProcessor2;
+  TestProcessor testProcessor3;
+
+  Integration::Core& core = application.GetCore();
+  core.RegisterProcessor( testProcessor1 );
+
+  tet_infoline("Test that the processor has not been executed yet:");
+  DALI_TEST_CHECK( testProcessor1.processRun == false );
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processor has been executed:");
+  DALI_TEST_CHECK( testProcessor1.processRun );
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+
+  core.RegisterProcessor( testProcessor2 );
+  core.RegisterProcessor( testProcessor3 );
+
+  tet_infoline("Test that the processors have not been executed yet:");
+  DALI_TEST_CHECK( testProcessor1.processRun == false );
+  DALI_TEST_CHECK( testProcessor2.processRun == false );
+  DALI_TEST_CHECK( testProcessor3.processRun == false );
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have been executed:");
+  DALI_TEST_CHECK( testProcessor1.processRun );
+  DALI_TEST_CHECK( testProcessor2.processRun );
+  DALI_TEST_CHECK( testProcessor3.processRun );
+
+  // Clear down for next part of test
+  testProcessor2.processRun = false;
+
+  core.UnregisterProcessor( testProcessor2 );
+  application.SendNotification();
+  tet_infoline("Test that the unregistered processor has not been executed again but others have");
+  DALI_TEST_CHECK( testProcessor1.processRun );
+  DALI_TEST_CHECK( testProcessor2.processRun == false );
+  DALI_TEST_CHECK( testProcessor3.processRun );
 
   END_TEST;
 }

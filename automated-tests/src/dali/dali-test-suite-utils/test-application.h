@@ -23,6 +23,8 @@
 #include "test-gesture-manager.h"
 #include "test-render-controller.h"
 #include "test-graphics-controller.h"
+#include "test-render-surface.h"
+#include <dali/integration-api/scene.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/integration-api/core.h>
@@ -68,8 +70,6 @@ public:
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
-  void SetSurfaceWidth( uint32_t width, unsigned height );
-  void SetTopMargin( uint32_t margin );
   bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
   uint32_t GetUpdateStatus();
   bool UpdateOnly( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
@@ -82,6 +82,10 @@ public:
     mLoggingEnabled = enabled;
   }
 
+  Integration::Scene GetScene() const
+  {
+    return mScene;
+  }
 private:
   void DoUpdate( uint32_t intervalMilliseconds, const char* location=NULL );
 
@@ -90,12 +94,13 @@ protected:
   std::unique_ptr<Test::GraphicsController> mGraphicsController;
   TestRenderController                mRenderController;
   TestGestureManager                  mGestureManager;
+  TestRenderSurface*        mRenderSurface;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;
 
   Integration::Core* mCore;
-
+  Dali::Integration::Scene mScene;
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;
   uint32_t mFrame;

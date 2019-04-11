@@ -17,12 +17,16 @@
 
 // CLASS HEADER
 #include <dali/integration-api/core.h>
+#include <dali/integration-api/render-surface.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 
 
@@ -58,19 +62,14 @@ Core::~Core()
   delete mImpl;
 }
 
-void Core::SurfaceResized(uint32_t width, uint32_t height)
+void Core::Initialize()
 {
-  mImpl->SurfaceResized(width, height);
+  mImpl->Initialize();
 }
 
-void Core::SetTopMargin( uint32_t margin )
+void Core::SurfaceResized( Integration::RenderSurface* surface )
 {
-  mImpl->SetTopMargin(margin);
-}
-
-void Core::SetDpi( uint32_t dpiHorizontal, uint32_t dpiVertical)
-{
-  mImpl->SetDpi(dpiHorizontal, dpiVertical);
+  mImpl->SurfaceResized(surface);
 }
 
 void Core::SceneCreated()
@@ -113,11 +112,6 @@ void Core::Render( RenderStatus& status, bool forceClear )
 void Core::GraphicsShutdown()
 {
   mImpl->GraphicsShutdown();
-}
-
-SystemOverlay& Core::GetSystemOverlay()
-{
-  return mImpl->GetSystemOverlay();
 }
 
 void Core::RegisterProcessor( Processor& processor )

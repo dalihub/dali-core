@@ -18,6 +18,8 @@
  *
  */
 
+#include <vector>
+
 namespace Dali
 {
 
@@ -29,7 +31,7 @@ struct WheelEvent;
 namespace Internal
 {
 
-class Stage;
+class Scene;
 
 /**
  *  WheelEventProcessor receives the wheel events from the Dali Event processor.
@@ -46,7 +48,7 @@ public:
   /**
    * Create a wheel event processor.
    */
-  WheelEventProcessor(Stage& stage);
+  WheelEventProcessor( Scene& scenes );
 
   /**
    * Non-virtual destructor; WheelEventProcessor is not a base class
@@ -69,7 +71,7 @@ private:
 
 private:
 
-  Stage& mStage;               ///< Used to deliver the wheel events
+  Scene& mScene;               ///< Used to deliver the wheel events
 };
 
 } // namespace Internal

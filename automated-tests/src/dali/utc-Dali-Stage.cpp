@@ -591,7 +591,8 @@ int UtcDaliStageGetDpiP2(void)
   TestApplication application; // Initializes core DPI to default values
 
   // Test that setting core DPI explicitly also sets up the Stage's DPI.
-  application.GetCore().SetDpi( 200, 180 );
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.SetDpi( Vector2(200.0f, 180.0f) );
 
   Stage stage = Stage::GetCurrent();
   Vector2 dpi = stage.GetDpi();

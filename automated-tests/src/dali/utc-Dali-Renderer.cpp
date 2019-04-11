@@ -21,7 +21,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/images/texture-set-image.h>
-#include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <cstdio>
 #include <string>
@@ -3005,18 +3004,6 @@ int UtcDaliRendererRenderingBehavior(void)
   updateStatus = application.GetUpdateStatus();
 
   DALI_TEST_CHECK( !( updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING ) );
-
-  // For test coverage
-  Dali::Integration::Core& core( application.GetCore() );
-  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
-
-  Dali::RenderTaskList additionalRenderTaskList = Integration::RenderTaskList::New();
-  Dali::Actor overlayRootActor = systemOverlay.GetDefaultRootActor();
-  Dali::CameraActor overlayCameraActor = systemOverlay.GetDefaultCameraActor();
-
-  // Render and check the update status
-  application.SendNotification();
-  application.Render();
 
   END_TEST;
 }

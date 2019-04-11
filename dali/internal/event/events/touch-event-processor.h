@@ -38,7 +38,7 @@ namespace Internal
 {
 
 class Actor;
-class Stage;
+class Scene;
 struct ActorObserver;
 
 /**
@@ -55,9 +55,9 @@ public:
 
   /**
    * Create an event processor.
-   * @param[in] stage The stage.
+   * @param[in] scene The scene the event processor belongs to.
    */
-  TouchEventProcessor( Stage& stage );
+  TouchEventProcessor( Scene& scene );
 
   /**
    * Non-virtual destructor; TouchEventProcessor is not a base class
@@ -78,6 +78,10 @@ private:
   // Undefined
   TouchEventProcessor& operator=(const TouchEventProcessor& rhs);
 
+private:
+
+  Scene& mScene; ///< Used to deliver touch events
+
   /**
    * Called by some actor-observers when the observed actor is disconnected.
    *
@@ -85,9 +89,6 @@ private:
    */
   void OnObservedActorDisconnected( Actor* actor );
 
-private:
-
-  Stage& mStage; ///< Used to deliver touch events
   ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
   ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
   ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor

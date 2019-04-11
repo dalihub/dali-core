@@ -37,6 +37,7 @@ namespace Internal
 {
 
 class Stage;
+class Scene;
 
 /**
  * Long Press Gesture Event Processing:
@@ -51,10 +52,9 @@ public:
 
   /**
    * Create a long press gesture processor.
-   * @param[in] stage The stage.
    * @param[in] gestureManager The gesture manager.
    */
-  LongPressGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager );
+  LongPressGestureProcessor( Integration::GestureManager& gestureManager );
 
   /**
    * Non-virtual destructor; LongPressGestureProcessor is not a base class
@@ -65,9 +65,10 @@ public: // To be called by GestureEventProcessor
 
   /**
    * This method is called whenever a long press gesture event occurs.
+   * @param[in] scene The scene the long press gesture event occurs in.
    * @param[in] longPressEvent The event that has occurred.
    */
-  void Process( const Integration::LongPressGestureEvent& longPressEvent );
+  void Process( Scene& scene, const Integration::LongPressGestureEvent& longPressEvent );
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -124,7 +125,6 @@ private:
 
 private:
 
-  Stage& mStage;
   Integration::GestureManager& mGestureManager;
   LongPressGestureDetectorContainer mGestureDetectors;
 

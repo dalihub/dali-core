@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_STAGE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ struct Vector2;
 
 namespace Integration
 {
-class SystemOverlay;
 class RenderController;
 }
 
@@ -58,41 +57,28 @@ class AnimationPlaylist;
 class PropertyNotificationManager;
 class Layer;
 class LayerList;
-class SystemOverlay;
 class CameraActor;
 class RenderTaskList;
+class Scene;
 
 /**
  * Implementation of Stage
  */
-class Stage : public BaseObject, public RenderTaskDefaults, public EventThreadServices
+class Stage : public BaseObject, public RenderTaskDefaults, public ConnectionTracker
 {
 public:
 
   /**
    * Create the stage
-   * @param[in] playlist for animations
-   * @param[in] propertyNotificationManager
    * @param[in] updateManager
-   * @param[in] notificationManager
-   * @param[in] renderController
    */
-  static StagePtr New( AnimationPlaylist& playlist,
-                       PropertyNotificationManager& propertyNotificationManager,
-                       SceneGraph::UpdateManager& updateManager,
-                       NotificationManager& notificationManager,
-                       Integration::RenderController& renderController );
+  static StagePtr New( SceneGraph::UpdateManager& updateManager );
 
   /**
    * Initialize the stage.
-   * @param[in] renderToFbo Whether to render into a Frame Buffer Object.
+   * @param[in] scene The default scene (for main window).
    */
-  void Initialize( bool renderToFbo );
-
-  /**
-   * Uninitialize the stage.
-   */
-  void Uninitialize();
+  void Initialize( Scene& scene );
 
   /**
    * @copydoc Dali::Stage::GetCurrent()
@@ -116,18 +102,6 @@ public:
    */
   Layer& GetRootActor();
 
-  /**
-   * Returns the animation playlist.
-   * @return reference to the animation playlist.
-   */
-  AnimationPlaylist& GetAnimationPlaylist();
-
-  /**
-   * Returns the property notification manager.
-   * @return reference to the property notification manager.
-   */
-  PropertyNotificationManager& GetPropertyNotificationManager();
-
   // Root actor accessors
 
   /**
@@ -141,22 +115,6 @@ public:
   void Remove( Actor& actor );
 
   /**
-   * Used to calculate the size of the stage and indirectly, the root actor.
-   * @param [in] width  The new surface width.
-   * @param [in] height The new surface height.
-   */
-  void SurfaceResized( float width, float height );
-
-  /**
-   * Sets the top margin size.
-   * Available stage size is reduced by this size.
-   * The stage is located below the size at the top of the display
-   * initial size is zero before it is assigned
-   * @param[in] margin margin size
-   */
-  void SetTopMargin( uint32_t margin );
-
-  /**
    * Returns the size of the Stage in pixels as a Vector.
    * The x component will be the width of the Stage in pixels
    * The y component will be the height of the Stage in pixels
@@ -168,16 +126,6 @@ public:
    * @copydoc Dali::Stage::GetRenderTaskList()
    */
   RenderTaskList& GetRenderTaskList() const;
-
-  /**
-   * Create a default camera actor
-   */
-  void CreateDefaultCameraActor();
-
-  /**
-   * Set position of default camera for current stage size
-   */
-  void SetDefaultCameraPosition();
 
   /**
    * From RenderTaskDefaults; retrieve the default root actor.
@@ -214,40 +162,6 @@ public:
    */
   LayerList& GetLayerList();
 
-  // System-level overlay actors
-
-  /**
-   * @copydoc Dali::Integration::Core::GetSystemOverlay()
-   */
-  Integration::SystemOverlay& GetSystemOverlay();
-
-  /**
-   * Retrieve the internal implementation of the SystemOverlay.
-   * @return The implementation, or NULL if this has never been requested from Integration API.
-   */
-  SystemOverlay* GetSystemOverlayInternal();
-
-  // Keyboard stuff
-
-  /**
-   * As one virtual keyboard per stage, the stage will hold a pointer to the Actor currently
-   * set to receive keyboard input.
-   * @param[in] actor to receive keyboard input
-   */
-  void SetKeyboardFocusActor( Actor* actor );
-
-  /**
-   * Get the actor that is currently set to receive keyboard inputs
-   * @return Pointer to the actor set to receive keyboard inputs.
-   */
-  Actor* GetKeyboardFocusActor() const;
-
-  /**
-   * Removes the given actor from keyboard focus so it will no longer receive key events from keyboard.
-   * @param [in] actor which should be removed from focus.
-   */
-  void RemoveActorFromKeyFocus( Actor* actor );
-
   // Misc
 
   /**
@@ -266,17 +180,6 @@ public:
   Vector2 GetDpi() const;
 
   /**
-   * Sets horizontal and vertical pixels per inch value that is used by the display
-   * @param[in] dpi Horizontal and vertical dpi value
-   */
-  void SetDpi( Vector2 dpi );
-
-  NotificationManager& GetNotificationManager()
-  {
-    return mNotificationManager;
-  }
-
-  /**
    * @copydoc Dali::Stage::KeepRendering()
    */
   void KeepRendering( float durationSeconds );
@@ -290,6 +193,31 @@ public:
    * @copydoc Dali::DevelStage::GetRenderingBehavior()
    */
   DevelStage::Rendering GetRenderingBehavior() const;
+
+  /**
+   * Callback for Internal::Scene EventProcessingFinished signal
+   */
+  void OnEventProcessingFinished();
+
+  /**
+   * Callback for Internal::Scene KeyEventSignal signal
+   */
+  void OnKeyEvent( const Dali::KeyEvent& event );
+
+  /**
+   * Callback for Internal::Scene TouchedEventSignal signal
+   */
+  void OnTouchedEvent( const Dali::TouchEvent& touch );
+
+  /**
+   * Callback for Internal::Scene TouchSignal signal
+   */
+  void OnTouchEvent( const Dali::TouchData& touch );
+
+  /**
+   * Callback for Internal::Scene WheelEventSignal signal
+   */
+  void OnWheelEvent( const Dali::WheelEvent& event );
 
   /**
    * Used by the EventProcessor to emit key event signals.
@@ -395,69 +323,12 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-public: // Implementation of EventThreadServices
-
-  /**
-   * @copydoc EventThreadServices::RegisterObject
-   */
-  virtual void RegisterObject( BaseObject* object);
-
-  /**
-   * @copydoc EventThreadServices::UnregisterObject
-   */
-  virtual void UnregisterObject( BaseObject* object);
-
-  /**
-   * @copydoc EventThreadServices::GetUpdateManager
-   */
-  virtual SceneGraph::UpdateManager& GetUpdateManager();
-
-  /**
-   * @copydoc EventThreadServices::GetRenderController
-   */
-  virtual Integration::RenderController& GetRenderController();
-
-  /**
-   * @copydoc EventThreadServices::ReserveMessageSlot
-   */
-  virtual uint32_t* ReserveMessageSlot( uint32_t size, bool updateScene );
-
-  /**
-   * @copydoc EventThreadServices::GetEventBufferIndex
-   */
-  virtual BufferIndex GetEventBufferIndex() const;
-
-  /**
-   * @copydoc EventThreadServices::ForceNextUpdate
-   */
-  virtual void ForceNextUpdate();
-
-  /**
-   * @copydoc EventThreadServices::IsNextUpdateForced
-   */
-  virtual bool IsNextUpdateForced();
-
-  /**
-   * Request that the depth tree is rebuilt
-   */
-  void RequestRebuildDepthTree();
-
-  /**
-   * Rebuilds the depth tree at the end of the event frame if
-   * it was requested this frame.
-   */
-  void RebuildDepthTree();
-
 private:
 
   /**
    * Protected constructor; see also Stage::New()
    */
-  Stage( AnimationPlaylist& playlist,
-         PropertyNotificationManager& propertyNotificationManager,
-         SceneGraph::UpdateManager& updateManager,
-         NotificationManager& notificationManager,
-         Integration::RenderController& renderController );
+  Stage( SceneGraph::UpdateManager& updateManager );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -466,41 +337,9 @@ private:
 
 private:
 
-  // For 'Fire and forget' animation support
-  AnimationPlaylist& mAnimationPlaylist;
-
-  PropertyNotificationManager& mPropertyNotificationManager;
-
   SceneGraph::UpdateManager& mUpdateManager;
 
-  NotificationManager& mNotificationManager;
-
-  Integration::RenderController& mRenderController;
-
-  // The stage-size may be less than surface-size (reduced by top-margin)
-  Vector2 mSize;
-  Vector2 mSurfaceSize;
-
-  // Cached for public GetBackgroundColor()
-  Vector4 mBackgroundColor;
-
-  LayerPtr mRootLayer;
-
-  // Ordered list of currently on-stage layers
-  OwnerPointer<LayerList> mLayerList;
-
-  IntrusivePtr<CameraActor> mDefaultCamera;
-
-  uint32_t mTopMargin;
-  Vector2 mDpi;
-
-  // The object registry
-  ObjectRegistryPtr mObjectRegistry;
-
-  // The list of render-tasks
-  IntrusivePtr<RenderTaskList> mRenderTaskList;
-
-  Integration::SystemOverlay* mSystemOverlay; ///< SystemOverlay stage access
+  IntrusivePtr<Scene> mScene;
 
   // The key event signal
   Dali::Stage::KeyEventSignalType                 mKeyEventSignal;
@@ -522,10 +361,6 @@ private:
   Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
 
   DevelStage::Rendering mRenderingBehavior; ///< The rendering behavior
-
-  bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
-  bool mForceNextUpdate:1; ///< True if the next rendering is really required.
-  bool mRenderToFbo:1;     ///< Whether to render to a Frame Buffer Object.
 };
 
 } // namespace Internal
