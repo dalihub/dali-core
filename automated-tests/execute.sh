@@ -77,9 +77,8 @@ fi
 rm -f tct*core-tests.xml
 
 # Clean up old coverage data
-if [ -d ../build/tizen ] ; then
-    rm -f ../build/tizen/dali/.libs/*.gcda
-fi
+[ -d ../build/tizen ] && rm -f ../build/tizen/dali/.libs/*.gcda
+[ -d ../build/tizen-cmake ] && find ../build/tizen-cmake/ -name \*.gcda -exec rm {} \;
 
 find build \( -name "*.gcda" \) -exec rm '{}' \;
 
