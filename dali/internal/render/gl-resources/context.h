@@ -1635,7 +1635,11 @@ public:
   {
     // check if its same as already set
     Rect<int> newViewport( x, y, width, height );
-    if( mViewPort != newViewport )
+
+    // Temporarily disable the viewport caching, as the implementation of GLES driver in Tizen platform
+    // share a global viewport between multiple contexts, therefore glViewport has to be called every
+    // time after glBindFramebuffer regardless of the same vewport size in the same context.
+//    if( mViewPort != newViewport )
     {
       // set new one
       LOG_GL("Viewport %d %d %d %d\n", x, y, width, height);
