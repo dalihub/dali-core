@@ -4,6 +4,7 @@ SET(SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/core.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/debug.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/trace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/profiling.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/input-options.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.cpp
@@ -29,6 +30,7 @@ SET(INTEGRATION_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/core-enumerations.h
   ${CMAKE_CURRENT_SOURCE_DIR}/context-notifier.h
   ${CMAKE_CURRENT_SOURCE_DIR}/debug.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/trace.h
   ${CMAKE_CURRENT_SOURCE_DIR}/profiling.h
   ${CMAKE_CURRENT_SOURCE_DIR}/input-options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.h
@@ -40,10 +42,11 @@ SET(INTEGRATION_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/gesture-manager.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-controller.h
   ${CMAKE_CURRENT_SOURCE_DIR}/platform-abstraction.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/processor-interface.h
   ${CMAKE_CURRENT_SOURCE_DIR}/lockless-buffer.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-task-list-integ.h
   ${CMAKE_CURRENT_SOURCE_DIR}/scene.h
-
+  ${CMAKE_CURRENT_SOURCE_DIR}/render-surface.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/event.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-event.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/gesture-requests.h

@@ -586,16 +586,23 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   {
     instruction.mFrameBuffer->Bind( *mImpl->currentContext );
   }
+  else
+  {
+    mImpl->currentContext->BindFramebuffer( GL_FRAMEBUFFER, 0u );
+  }
 
-  mImpl->currentContext->Viewport( surfaceRect.x,
-                            surfaceRect.y,
-                            surfaceRect.width,
-                            surfaceRect.height );
+  if ( surfaceFrameBuffer )
+  {
+    mImpl->currentContext->Viewport( surfaceRect.x,
+                              surfaceRect.y,
+                              surfaceRect.width,
+                              surfaceRect.height );
 
-  mImpl->currentContext->ClearColor( backgroundColor.r,
-                              backgroundColor.g,
-                              backgroundColor.b,
-                              backgroundColor.a );
+    mImpl->currentContext->ClearColor( backgroundColor.r,
+                                backgroundColor.g,
+                                backgroundColor.b,
+                                backgroundColor.a );
+  }
 
   // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
   // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
