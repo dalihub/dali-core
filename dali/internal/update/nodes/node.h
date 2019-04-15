@@ -182,6 +182,7 @@ public:
    */
   void SetClippingMode( const ClippingMode::Type clippingMode )
   {
+    SetPropertyDirty( true );
     mClippingMode = clippingMode;
   }
 
@@ -313,6 +314,7 @@ public:
    */
   void SetDirtyFlag( NodePropertyFlags flag )
   {
+    SetPropertyDirty( true );
     mDirtyFlags |= flag;
   }
 
@@ -321,6 +323,7 @@ public:
    */
   void SetAllDirtyFlags()
   {
+    SetPropertyDirty( true );
     mDirtyFlags = NodePropertyFlags::ALL;
   }
 
@@ -684,6 +687,7 @@ public:
    */
   void SetDrawMode( const DrawMode::Type& drawMode )
   {
+    SetPropertyDirty( true );
     mDrawMode = drawMode;
   }
 
@@ -720,6 +724,7 @@ public:
    */
   void SetDepthIndex( uint32_t depthIndex )
   {
+    SetPropertyDirty( true );
     mDepthIndex = depthIndex;
   }
 
@@ -764,6 +769,40 @@ public:
   {
     return mCulled[bufferIndex];
   }
+
+  /**
+ * @Is component changed
+ * @Return true if component is changed else false
+ */
+  bool IsComponentChanged() const
+  {
+    return (mTransformId != INVALID_TRANSFORM_ID) &&
+           (mTransformManager->IsComponentChanged( mTransformId ));
+  }
+
+  /**
+   * Retrieve the update size hint of the node
+   * @return A vector3 describing the update size hint
+   */
+  void GetUpdateSizeHint( BufferIndex bufferIndex, Vector3& updateSizeHint ) const
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID )
+    {
+      mTransformManager->GetUpdateSizeHint( mTransformId, updateSizeHint );
+    }
+  }
+
+  /**
+   * Set whether partial update needs to run following a render.
+   * @param[in] value Set to true if an partial update is required to be run
+   */
+  virtual void SetPropertyDirty( bool value );
+
+  /**
+   * Query the property status following rendering of a frame.
+   * @return True if the property has changed
+   */
+  virtual bool IsPropertyDirty() const;
 
 public:
   /**
@@ -877,6 +916,7 @@ public: // Default properties
   TransformManagerPropertyVector3    mPosition;               ///< Local transform; distance between parent-origin & anchor-point
   TransformManagerPropertyQuaternion mOrientation;            ///< Local transform; rotation relative to parent node
   TransformManagerPropertyVector3    mScale;                  ///< Local transform; scale relative to parent node
+  TransformManagerPropertyVector3    mUpdateSizeHint;         ///< Local transform; update size hint is provided for partial update
 
   AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>           mCulled;                 ///< True if the node is culled. This is not animatable. It is just double-buffered.
