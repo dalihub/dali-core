@@ -121,15 +121,6 @@ struct HashedName
   size_t hash;
 };
 
-const HashedName UNIFORM_MODEL_MATRIX{      "uModelMatrix",      CalculateHash( std::string("uModelMatrix") ) };
-const HashedName UNIFORM_MVP_MATRIX{        "uMvpMatrix",        CalculateHash( std::string("uMvpMatrix") ) };
-const HashedName UNIFORM_VIEW_MATRIX{       "uViewMatrix",       CalculateHash( std::string("uViewMatrix") ) };
-const HashedName UNIFORM_MODEL_VIEW_MATRIX{ "uModelView",        CalculateHash( std::string("uModelView") ) };
-const HashedName UNIFORM_NORMAL_MATRIX{     "uNormalMatrix",     CalculateHash( std::string("uNormalMatrix") ) };
-const HashedName UNIFORM_PROJECTION_MATRIX{ "uProjection",       CalculateHash( std::string("uProjection") ) };
-const HashedName UNIFORM_SIZE{              "uSize",             CalculateHash( std::string("uSize") ) };
-const HashedName UNIFORM_COLOR{             "uColor",            CalculateHash( std::string("uColor") ) };
-
 constexpr Graphics::StencilOp ConvertStencilOp( StencilOperation::Type stencilOp )
 {
   switch( stencilOp )
@@ -160,6 +151,21 @@ constexpr Graphics::CompareOp ConvertStencilFunc( StencilFunction::Type stencilF
     case StencilFunction::ALWAYS: return Graphics::CompareOp::ALWAYS;
   }
   return {};
+}
+
+/**
+ * Helper function writing data to the DALi shader default uniforms
+ */
+template<class T>
+bool WriteDefaultUniform( Renderer* renderer, GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, Shader::DefaultUniformIndex defaultUniformIndex, const T& data )
+{
+  auto info = renderer->GetShader().GetDefaultUniform( defaultUniformIndex );
+  if( info )
+  {
+    renderer->WriteUniform( ubo, bindings, *info, data );
+    return true;
+  }
+  return false;
 }
 
 }
@@ -546,19 +552,23 @@ void GraphicsAlgorithms::RecordRenderItemList(
       Matrix mvp, mvp2;
       Matrix::Multiply(mvp, item.mModelMatrix, viewProjection);
       Matrix::Multiply(mvp2, mvp, CLIP_MATRIX);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MODEL_MATRIX.name, UNIFORM_MODEL_MATRIX.hash, item.mModelMatrix);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MVP_MATRIX.name, UNIFORM_MVP_MATRIX.hash, mvp2);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_VIEW_MATRIX.name, UNIFORM_VIEW_MATRIX.hash, *viewMatrix);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_MODEL_VIEW_MATRIX.name, UNIFORM_MODEL_VIEW_MATRIX.hash, item.mModelViewMatrix);
 
-      Matrix3 uNormalMatrix( item.mModelViewMatrix );
-      uNormalMatrix.Invert();
-      uNormalMatrix.Transpose();
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_MATRIX, item.mModelMatrix );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MVP_MATRIX, mvp2 );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::VIEW_MATRIX, *viewMatrix );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::MODEL_VIEW_MATRIX, item.mModelViewMatrix );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::PROJECTION_MATRIX, vulkanProjectionMatrix );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::SIZE, item.mSize );
+      WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::COLOR, color );
 
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_NORMAL_MATRIX.name, UNIFORM_NORMAL_MATRIX.hash, uNormalMatrix);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_PROJECTION_MATRIX.name, UNIFORM_PROJECTION_MATRIX.hash, vulkanProjectionMatrix);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_SIZE.name, UNIFORM_SIZE.hash, item.mSize);
-      renderer->WriteUniform( *ubo, *bindings, UNIFORM_COLOR.name, UNIFORM_COLOR.hash, color );
+      // Update normal matrix only when used in the shader
+      if( renderer->GetShader().GetDefaultUniform( Shader::DefaultUniformIndex::NORMAL_MATRIX ) )
+      {
+        Matrix3 uNormalMatrix( item.mModelViewMatrix );
+        uNormalMatrix.Invert();
+        uNormalMatrix.Transpose();
+        WriteDefaultUniform( renderer, *ubo, *bindings, Shader::DefaultUniformIndex::NORMAL_MATRIX, uNormalMatrix );
+      }
     }
 
     commandList.push_back(&cmd);

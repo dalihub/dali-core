@@ -31,6 +31,25 @@ namespace Internal
 namespace SceneGraph
 {
 
+/**
+ * List of all default uniforms used for quicker lookup
+ */
+namespace
+{
+
+std::array<size_t, 8> DEFAULT_UNIFORM_HASHTABLE = {
+  CalculateHash( std::string("uModelMatrix") ),
+  CalculateHash( std::string("uMvpMatrix") ),
+  CalculateHash( std::string("uViewMatrix") ),
+  CalculateHash( std::string("uModelView") ),
+  CalculateHash( std::string("uNormalMatrix") ),
+  CalculateHash( std::string("uProjection") ),
+  CalculateHash( std::string("uSize") ),
+  CalculateHash( std::string("uColor") )
+};
+
+}
+
 Shader::Shader( Dali::Shader::Hint::Value& hints )
 : mGraphicsController( nullptr ),
   mGraphicsShader( nullptr ),
@@ -104,6 +123,9 @@ void Shader::BuildReflection()
 {
   if( mGraphicsShader )
   {
+    mReflectionDefaultUniforms.clear();
+    mReflectionDefaultUniforms.resize( DEFAULT_UNIFORM_HASHTABLE.size() );
+
     auto uniformBlockCount = mGraphicsShader->GetUniformBlockCount();
 
     // add uniform block fields
@@ -115,10 +137,21 @@ void Shader::BuildReflection()
       // for each member store data
       for( const auto& item : uboInfo.members )
       {
-        mReflection.emplace_back( ReflectionUniformInfo{ CalculateHash( item.name ), false, mGraphicsShader, item } );
+        auto hashValue = CalculateHash( item.name );
+        mReflection.emplace_back( ReflectionUniformInfo{ hashValue, false, mGraphicsShader, item } );
 
         // update buffer index
         mReflection.back().uniformInfo.bufferIndex = i;
+
+        // Update default uniforms
+        for( auto i = 0u; i < DEFAULT_UNIFORM_HASHTABLE.size(); ++i )
+        {
+          if( hashValue == DEFAULT_UNIFORM_HASHTABLE[i] )
+          {
+            mReflectionDefaultUniforms[i] = mReflection.back();
+            break;
+          }
+        }
       }
     }
 
@@ -181,6 +214,27 @@ bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::S
     }
   }
   return false;
+}
+
+bool Shader::GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::ShaderDetails::UniformInfo& out ) const
+{
+  auto& value = mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
+  if( !value.graphicsShader )
+  {
+    return false;
+  }
+  out = value.uniformInfo;
+  return true;
+}
+
+const Graphics::ShaderDetails::UniformInfo* Shader::GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const
+{
+  const auto value = &mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
+  if( !value->graphicsShader )
+  {
+    return nullptr;
+  }
+  return &value->uniformInfo;
 }
 
 } // namespace SceneGraph
