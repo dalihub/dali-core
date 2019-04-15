@@ -267,6 +267,10 @@ void Scene::SetBackgroundColor(Vector4 color)
   if( mSurface )
   {
     mSurface->SetBackgroundColor( color );
+
+    //@todo: find better way of doing it
+    mRenderTaskList->GetTasks()[0]->SetClearEnabled( true );
+    mRenderTaskList->GetTasks()[0]->SetClearColor( color );
   }
 }
 
