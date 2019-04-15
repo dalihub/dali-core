@@ -86,7 +86,7 @@ ADD_COMPILE_OPTIONS( -std=c++11 -gdwarf-4 )
 ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 ADD_COMPILE_OPTIONS( -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
 
-IF( ENABLE_COVERAGE OR $ENV{CXXFLAGS} MATCHES --coverage )
+IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
   ADD_COMPILE_OPTIONS( --coverage )
   SET(ENABLE_COVERAGE ON)
   SET(COVERAGE --coverage)
