@@ -355,6 +355,17 @@ void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::Re
   }
 }
 
+void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const void* data, uint32_t size )
+{
+  if( !mShader->GetGfxObject() )
+  {
+    // Invalid pipeline
+    return;
+  }
+
+  ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
+}
+
 bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
                                      GraphicsBuffer& ubo,
                                      std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
@@ -416,23 +427,15 @@ bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
   {
     // Convert uniform name into hash value
     auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
-    bool uniformFound = false;
 
     // test for array ( special case )
     // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
-    int arrayIndex = 0;
-    auto arrayLeftBracket = uniformMap->uniformName.find('[');
-    if (arrayLeftBracket != std::string::npos)
-    {
-      arrayIndex = std::atoi(&(uniformMap->uniformName.c_str()[arrayLeftBracket + 1]));
-      DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "UNIFORM NAME: " << uniformMap->uniformName << ", index: " << arrayIndex );
-      std::string uniformName = uniformMap->uniformName.substr(0, arrayLeftBracket);
-      uniformFound = mShader->GetUniform( uniformName, CalculateHash( uniformName ), uniformInfo );
-    }
-    else
-    {
-      uniformFound = mShader->GetUniform( uniformMap->uniformName, uniformMap->uniformNameHash, uniformInfo );
-    }
+    int arrayIndex = uniformMap->arrayIndex;
+
+    auto uniformFound = mShader->GetUniform( uniformMap->uniformName,
+                                             uniformMap->uniformNameHashNoArray ?
+                                             uniformMap->uniformNameHashNoArray :
+                                             uniformMap->uniformNameHash, uniformInfo );
 
     if( uniformFound )
     {
