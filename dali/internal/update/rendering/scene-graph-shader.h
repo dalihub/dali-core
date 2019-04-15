@@ -49,6 +49,21 @@ class Shader : public PropertyOwner, public UniformMap::Observer
 public:
 
   /**
+   * Indices of default uniforms
+   */
+  enum class DefaultUniformIndex
+  {
+    MODEL_MATRIX = 0,
+    MVP_MATRIX,
+    VIEW_MATRIX,
+    MODEL_VIEW_MATRIX,
+    NORMAL_MATRIX,
+    PROJECTION_MATRIX,
+    SIZE,
+    COLOR
+  };
+
+  /**
    * Devel constructor
    * @param hints
    */
@@ -117,6 +132,21 @@ public:
    */
   bool GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const;
 
+  /**
+   * Retrieves default uniform
+   * @param[in] defaultUniformIndex index of the uniform
+   * @param[out] outputUniformInfo the reference to UniformInfo object
+   * @return True is uniform found, false otherwise
+   */
+  bool GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::ShaderDetails::UniformInfo& outputUniformInfo ) const;
+
+  /**
+   * Retrievs default uniform
+   * @param[in] defaultUniformIndex index of the uniform
+   * @return Valid pointer to the UniformInfo object or nullptr
+   */
+  const Graphics::ShaderDetails::UniformInfo* GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const;
+
 public: // Messages
   /**
    * Set the shader data into the graphics API.
@@ -147,6 +177,18 @@ public: // UniformMap::Observer
 private:
 
   /**
+   * Struct ReflectionUniformInfo
+   * Contains details of a single uniform buffer field and/or sampler.
+   */
+  struct ReflectionUniformInfo
+  {
+    size_t                               hashValue { 0 };
+    bool                                 hasCollision { false };
+    Graphics::Shader*                    graphicsShader { nullptr };
+    Graphics::ShaderDetails::UniformInfo uniformInfo {};
+  };
+
+  /**
    * Build optimized shader reflection of uniforms
    */
   void BuildReflection();
@@ -158,21 +200,10 @@ private: // Data
   Dali::Shader::Hint::Value       mHints; ///< Hints for the shader
   ConnectionChangePropagator      mConnectionObservers; ///< Watch for connection changes
 
-  /**
-   * Struct ReflectionUniformInfo
-   * Contains details of a single uniform buffer field and/or sampler.
-   */
-  struct ReflectionUniformInfo
-  {
-    size_t                               hashValue;
-    bool                                 hasCollision;
-    Graphics::Shader*                    graphicsShader;
-    Graphics::ShaderDetails::UniformInfo uniformInfo;
-  };
-
   using UniformReflectionContainer = std::vector< ReflectionUniformInfo >;
 
-  UniformReflectionContainer                     mReflection; ///< Contains reflection build per shader
+  UniformReflectionContainer      mReflection; ///< Contains reflection build per shader
+  UniformReflectionContainer      mReflectionDefaultUniforms; ///< Contains default uniforms
 };
 
 

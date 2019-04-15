@@ -47,15 +47,31 @@ public:
    */
   UniformPropertyMapping( const std::string& theUniformName, const PropertyInputImpl* thePropertyPtr )
   : propertyPtr( thePropertyPtr ),
-    uniformName( theUniformName ),
-    uniformNameHash( Dali::CalculateHash( theUniformName ) )
+    uniformNameHashNoArray( 0 )
   {
+    arrayIndex = 0;
+
+    // Look for array index closing bracket
+    auto pos = theUniformName.rfind( "]" );
+
+    // If found, extract the array index and store it
+    if( pos != std::string::npos )
+    {
+      auto pos0 = theUniformName.rfind( "[", pos );
+      arrayIndex = atoi( theUniformName.c_str() + pos0 + 1 );
+      // Calculate hash from name without array index
+      uniformNameHashNoArray = Dali::CalculateHash( theUniformName.substr( 0, pos0 ) );
+    }
+    uniformName = theUniformName;
+    uniformNameHash = Dali::CalculateHash( theUniformName );
   }
 
   UniformPropertyMapping()
-  : propertyPtr( NULL ),
-    uniformName( "" ),
-    uniformNameHash( 0 )
+    : propertyPtr( NULL ),
+      uniformName( "" ),
+      uniformNameHash( 0 ),
+      uniformNameHashNoArray( 0 ),
+      arrayIndex( 0 )
   {
   }
 
@@ -63,6 +79,8 @@ public:
   const PropertyInputImpl* propertyPtr;
   std::string uniformName;
   Hash uniformNameHash;
+  Hash uniformNameHashNoArray;
+  int32_t arrayIndex;
 };
 
 /**
