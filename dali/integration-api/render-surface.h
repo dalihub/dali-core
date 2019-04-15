@@ -189,6 +189,18 @@ public:
    */
   virtual Integration::StencilBufferAvailable GetStencilBufferRequired() = 0;
 
+  /**
+   * @brief Sets currentframe updated/damaged rects
+   * @return
+   */
+  virtual Rect<int32_t> SetDamagedRect( const Rect<int32_t>& damagedRectArray ) = 0;
+
+  /**
+   * @brief Gets buffer age
+   * @return current buffer age
+   */
+  virtual int32_t GetBufferAge() = 0;
+
 private:
 
   /**

@@ -63,7 +63,8 @@ public:
   : mNextFree( 0 ),
     mClippingBox( NULL ),
     mSourceLayer( NULL ),
-    mHasColorRenderItems( false )
+    mHasColorRenderItems( false ),
+    mPartialUpdateEnabled( false )
   {
   }
 
@@ -258,6 +259,24 @@ public:
     return mHasColorRenderItems;
   }
 
+  /**
+   * Enable/Disable Partial update dirty flag
+   * @param[in] true to mark dirty else false
+   */
+  void SetPartialUpdateEnabled( bool value )
+  {
+    mPartialUpdateEnabled = value;
+  }
+
+  /**
+   * Get Partial update dirty flag
+   * @return true if dirty else false
+   */
+  bool IsPartialUpdateEnabled() const
+  {
+    return mPartialUpdateEnabled;
+  }
+
 private:
 
   /*
@@ -272,6 +291,7 @@ private:
   ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;              ///< The originating layer where the renderers are from
   bool         mHasColorRenderItems : 1;  ///< True if list contains color render items
+  bool         mPartialUpdateEnabled : 1; //< True if partial update is needed.
 
 };
 
