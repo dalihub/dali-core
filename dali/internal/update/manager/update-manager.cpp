@@ -1157,10 +1157,7 @@ uint32_t UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
 
 void UpdateManager::SetBackgroundColor( const Vector4& color )
 {
-  auto taskList = mImpl->taskLists[0];
-  taskList->GetTasks()[0]->SetClearEnabled( true );
-  taskList->GetTasks()[0]->SetClearColor( 0, color );
-  taskList->GetTasks()[0]->SetClearColor( 1, color );
+  // not in use
 }
 
 void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
