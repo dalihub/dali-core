@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_VALUE_H__
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,12 +170,28 @@ public:
   Value( Property::Array& arrayValue );
 
   /**
+   * @brief Creates an array property value.
+   *
+   * @SINCE_1_4.16
+   * @param[in] arrayValue An r-value array
+   */
+  Value( Property::Array&& arrayValue );
+
+  /**
    * @brief Creates a map property value.
    *
    * @SINCE_1_0.0
-   * @param[in] mapValue An array
+   * @param[in] mapValue A map
    */
   Value( Property::Map& mapValue );
+
+  /**
+   * @brief Creates a map property value.
+   *
+   * @SINCE_1_4.16
+   * @param[in] mapValue An r-value map
+   */
+  Value( Property::Map&& mapValue );
 
   /**
    * @brief Creates an extents property value.
@@ -202,6 +218,14 @@ public:
   Value( const Value& value );
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_4.16
+   * @param[in] value The property value to move from
+   */
+  Value( Value&& value );
+
+  /**
    * @brief Assigns a property value.
    *
    * @SINCE_1_0.0
@@ -209,6 +233,15 @@ public:
    * @return a reference to this
    */
   Value& operator=( const Value& value );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_4.16
+   * @param[in] value The property value to move from
+   * @return a reference to this
+   */
+  Value& operator=( Value&& value );
 
   /**
    * @brief Non-virtual destructor.

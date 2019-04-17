@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,12 @@ Property::Map::Map( const Property::Map& other )
   mImpl->mIndexValueContainer = other.mImpl->mIndexValueContainer;
 }
 
+Property::Map::Map( Property::Map&& other )
+: mImpl( other.mImpl )
+{
+  other.mImpl = nullptr;
+}
+
 Property::Map::~Map()
 {
   delete mImpl;
@@ -62,31 +68,37 @@ Property::Map::~Map()
 
 Property::Map::SizeType Property::Map::Count() const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   return mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size();
 }
 
 bool Property::Map::Empty() const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   return mImpl->mStringValueContainer.empty() && mImpl->mIndexValueContainer.empty();
 }
 
 void Property::Map::Insert( const char* key, const Value& value )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   mImpl->mStringValueContainer.push_back( std::make_pair( key, value ) );
 }
 
 void Property::Map::Insert( const std::string& key, const Value& value )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   mImpl->mStringValueContainer.push_back( std::make_pair( key, value ) );
 }
 
 void Property::Map::Insert( Property::Index key, const Value& value )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   mImpl->mIndexValueContainer.push_back( std::make_pair( key, value ) );
 }
 
 Property::Value& Property::Map::GetValue( SizeType position ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
   DALI_ASSERT_ALWAYS( position < ( numStringKeys + numIndexKeys ) && "position out-of-bounds" );
@@ -105,6 +117,7 @@ const std::string& Property::Map::GetKey( SizeType position ) const
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n" );
 
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   DALI_ASSERT_ALWAYS( position < numStringKeys && "position out-of-bounds" );
 
@@ -113,6 +126,8 @@ const std::string& Property::Map::GetKey( SizeType position ) const
 
 Property::Key Property::Map::GetKeyAt( SizeType position ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
   DALI_ASSERT_ALWAYS( position < ( numStringKeys + numIndexKeys ) && "position out-of-bounds" );
@@ -133,6 +148,8 @@ StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPair() is deprecated and will be removed from next release.\n" );
 
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
 
   DALI_ASSERT_ALWAYS( position < ( numStringKeys ) && "position out-of-bounds" );
@@ -142,6 +159,8 @@ StringValuePair& Property::Map::GetPair( SizeType position ) const
 
 KeyValuePair Property::Map::GetKeyValue( SizeType position ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
 
@@ -163,6 +182,8 @@ KeyValuePair Property::Map::GetKeyValue( SizeType position ) const
 
 Property::Value* Property::Map::Find( const char* key ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -180,6 +201,8 @@ Property::Value* Property::Map::Find( const std::string& key ) const
 
 Property::Value* Property::Map::Find( Property::Index key ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -202,6 +225,8 @@ Property::Value* Property::Map::Find( Property::Index indexKey, const std::strin
 
 Property::Value* Property::Map::Find( const std::string& key, Property::Type type ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if( (iter->second.GetType() == type) && (iter->first == key) )
@@ -214,6 +239,8 @@ Property::Value* Property::Map::Find( const std::string& key, Property::Type typ
 
 Property::Value* Property::Map::Find( Property::Index key, Property::Type type ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
   {
     if( (iter->second.GetType() == type) && (iter->first == key) )
@@ -226,12 +253,16 @@ Property::Value* Property::Map::Find( Property::Index key, Property::Type type )
 
 void Property::Map::Clear()
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   mImpl->mStringValueContainer.clear();
   mImpl->mIndexValueContainer.clear();
 }
 
 void Property::Map::Merge( const Property::Map& from )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   // Ensure we're not attempting to merge with ourself
   if ( this != &from )
   {
@@ -257,6 +288,8 @@ void Property::Map::Merge( const Property::Map& from )
 
 const Property::Value& Property::Map::operator[]( const std::string& key ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( StringValueContainer::const_iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -270,6 +303,8 @@ const Property::Value& Property::Map::operator[]( const std::string& key ) const
 
 Property::Value& Property::Map::operator[]( const std::string& key )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( StringValueContainer::iterator iter = mImpl->mStringValueContainer.begin(), endIter = mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -285,6 +320,8 @@ Property::Value& Property::Map::operator[]( const std::string& key )
 
 const Property::Value& Property::Map::operator[]( Property::Index key ) const
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( IndexValueContainer::const_iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -298,6 +335,8 @@ const Property::Value& Property::Map::operator[]( Property::Index key ) const
 
 Property::Value& Property::Map::operator[]( Property::Index key )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
   for ( IndexValueContainer::iterator iter = mImpl->mIndexValueContainer.begin(), endIter = mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
   {
     if ( iter->first == key )
@@ -313,12 +352,23 @@ Property::Value& Property::Map::operator[]( Property::Index key )
 
 Property::Map& Property::Map::operator=( const Property::Map& other )
 {
+  DALI_ASSERT_DEBUG( mImpl && "Cannot use an object previously used as an r-value" );
+
+  if( this != &other )
+  {
+    mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
+    mImpl->mIndexValueContainer = other.mImpl->mIndexValueContainer;
+  }
+  return *this;
+}
+
+Property::Map& Property::Map::operator=( Property::Map&& other )
+{
   if( this != &other )
   {
     delete mImpl;
-    mImpl = new Impl;
-    mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
-    mImpl->mIndexValueContainer = other.mImpl->mIndexValueContainer;
+    mImpl = other.mImpl;
+    other.mImpl = nullptr;
   }
   return *this;
 }
@@ -327,25 +377,28 @@ std::ostream& operator<<( std::ostream& stream, const Property::Map& map )
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  int32_t count = 0;
-  // Output the String-Value pairs
-  for ( StringValueContainer::iterator iter = map.mImpl->mStringValueContainer.begin(), endIter = map.mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
+  if ( map.mImpl )
   {
-    if( count++ > 0 )
+    int32_t count = 0;
+    // Output the String-Value pairs
+    for ( StringValueContainer::iterator iter = map.mImpl->mStringValueContainer.begin(), endIter = map.mImpl->mStringValueContainer.end(); iter != endIter; ++iter )
     {
-      stream<<", ";
+      if( count++ > 0 )
+      {
+        stream<<", ";
+      }
+      stream<< iter->first << ":"<<iter->second;
     }
-    stream<< iter->first << ":"<<iter->second;
-  }
 
-  // Output the Index-Value pairs
-  for ( IndexValueContainer::iterator iter = map.mImpl->mIndexValueContainer.begin(), endIter = map.mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
-  {
-    if( count++ > 0 )
+    // Output the Index-Value pairs
+    for ( IndexValueContainer::iterator iter = map.mImpl->mIndexValueContainer.begin(), endIter = map.mImpl->mIndexValueContainer.end(); iter != endIter; ++iter )
     {
-      stream<<", ";
+      if( count++ > 0 )
+      {
+        stream<<", ";
+      }
+      stream<< iter->first << ":"<<iter->second;
     }
-    stream<< iter->first << ":"<<iter->second;
   }
 
   stream << "}";

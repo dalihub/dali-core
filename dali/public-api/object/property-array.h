@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_ARRAY_H__
-#define __DALI_PROPERTY_ARRAY_H__
+#ifndef DALI_PROPERTY_ARRAY_H
+#define DALI_PROPERTY_ARRAY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,15 @@ public:
    * @param[in] other The Array to copy from
    */
   Array( const Array& other );
+
+  /**
+   * @brief Move Constructor.
+   *
+   * @SINCE_1_4.17
+   * @param[in] other The Array to move from
+   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   */
+  Array( Array&& other );
 
   /**
    * @brief Non-virtual destructor.
@@ -197,6 +206,18 @@ public:
   Array& operator=( const Array& other );
 
   /**
+   * @brief Move Assignment Operator.
+   *
+   * @SINCE_1_4.17
+   * @param[in] other The array to copy from
+   *
+   * @return The moved array.
+   *
+   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   */
+  Array& operator=( Array&& other );
+
+  /**
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
@@ -222,4 +243,4 @@ DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Ar
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_ARRAY_H__
+#endif // DALI_PROPERTY_ARRAY_H

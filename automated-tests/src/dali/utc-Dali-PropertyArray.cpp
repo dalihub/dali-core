@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -278,3 +278,100 @@ int UtcDaliPropertyArrayOstream02(void)
 
   END_TEST;
 }
+
+int UtcDaliPropertyArrayCopyConstructor(void)
+{
+  Property::Array array1;
+  array1.PushBack( 0 );
+  array1.PushBack( 1 );
+  array1.PushBack( 2 );
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+
+  Property::Array array2( array1 );
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, array2.Size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayAssignmentOperator(void)
+{
+  Property::Array array1;
+  array1.PushBack( 0 );
+  array1.PushBack( 1 );
+  array1.PushBack( 2 );
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+
+  Property::Array array2;
+  array2.PushBack( 4 );
+  DALI_TEST_EQUALS( 1u, array2.Size(), TEST_LOCATION );
+
+  array2 = array1;
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3u, array2.Size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayMoveConstructor(void)
+{
+  Property::Array array1;
+  array1.PushBack( 0 );
+  array1.PushBack( 1 );
+  array1.PushBack( 2 );
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+
+  Property::Array array2( std::move( array1 ) );
+  DALI_TEST_EQUALS( 3u, array2.Size(), TEST_LOCATION );
+
+  // Calling any methods on array1 will debug assert
+  const char * exceptionMessage = "Cannot use an object previously used as an r-value";
+  DALI_TEST_ASSERTION( array1.Count(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.PushBack( Property::Value() ),                exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Count(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Clear(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Reserve( 1 ),                                 exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Resize( 1 ),                                  exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Capacity(),                                   exceptionMessage );
+  DALI_TEST_ASSERTION( array1[ 0 ],                                         exceptionMessage );
+  DALI_TEST_ASSERTION( const_cast< const Property::Array& >( array1 )[ 0 ], exceptionMessage );
+  DALI_TEST_ASSERTION( Property::Array temp; array1 = temp,                 exceptionMessage );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayMoveAssignmentOperator(void)
+{
+  Property::Array array1;
+  array1.PushBack( 0 );
+  array1.PushBack( 1 );
+  array1.PushBack( 2 );
+  DALI_TEST_EQUALS( 3u, array1.Size(), TEST_LOCATION );
+
+  Property::Array array2;
+  array2.PushBack( 4 );
+  DALI_TEST_EQUALS( 1u, array2.Size(), TEST_LOCATION );
+
+  array2 = std::move( array1 );
+  DALI_TEST_EQUALS( 3u, array2.Size(), TEST_LOCATION );
+
+  // Calling any methods on array1 will debug assert
+  const char * exceptionMessage = "Cannot use an object previously used as an r-value";
+  DALI_TEST_ASSERTION( array1.Count(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.PushBack( Property::Value() ),                exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Count(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Clear(),                                      exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Reserve( 1 ),                                 exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Resize( 1 ),                                  exceptionMessage );
+  DALI_TEST_ASSERTION( array1.Capacity(),                                   exceptionMessage );
+  DALI_TEST_ASSERTION( array1[ 0 ],                                         exceptionMessage );
+  DALI_TEST_ASSERTION( const_cast< const Property::Array& >( array1 )[ 0 ], exceptionMessage );
+  DALI_TEST_ASSERTION( Property::Array temp; array1 = temp,                 exceptionMessage );
+
+  // Self assignemnt
+  array2 = std::move( array2 );
+  DALI_TEST_EQUALS( 3u, array2.Size(), TEST_LOCATION ); // still works, no debug assert
+
+  END_TEST;
+}
+
