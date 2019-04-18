@@ -21,7 +21,6 @@ OPTION(ENABLE_DEBUG          "Enable Debug" OFF)
 OPTION(ENABLE_BACKTRACE      "Enable Backtrace" OFF)
 OPTION(ENABLE_LOCK_BACKTRACE "Enable" OFF)
 OPTION(ENABLE_COVERAGE       "Coverage" OFF)
-SET(GLES_VERSION 20 CACHE INTEGER "Gles Version")
 
 # Set up compiler definitions
 
@@ -33,7 +32,6 @@ ELSE()
 ENDIF()
 
 ADD_DEFINITIONS(-DPLATFORM_TIZEN -DDALI_COMPILATION)
-ADD_DEFINITIONS(-DDALI_GLES_VERSION=${GLES_VERSION})
 ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
 
 IF("${ARCH}" STREQUAL "arm")
@@ -88,7 +86,7 @@ ADD_COMPILE_OPTIONS( -std=c++11 -gdwarf-4 )
 ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 ADD_COMPILE_OPTIONS( -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
 
-IF( ENABLE_COVERAGE OR $ENV{CXXFLAGS} MATCHES --coverage )
+IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
   ADD_COMPILE_OPTIONS( --coverage )
   SET(ENABLE_COVERAGE ON)
   SET(COVERAGE --coverage)

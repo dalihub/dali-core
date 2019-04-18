@@ -29,7 +29,7 @@ script:
   - autoreconf --install
   - export CXXFLAGS="--coverage "
   - export LD_LIBRARY_PATH=/usr/local/lib
-  - ./configure --enable-profile=UBUNTU --enable-gles=20 --enable-debug
+  - ./configure --enable-profile=UBUNTU --enable-debug
   - make -j7
   - sudo make install
   - popd
