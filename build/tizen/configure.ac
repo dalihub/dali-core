@@ -57,12 +57,6 @@ AC_ARG_ENABLE([lock_backtrace],
               [enable_lock_backtrace=$enableval],
               [enable_lock_backtrace=no])
 
-AC_ARG_ENABLE([gles],
-              [AC_HELP_STRING([--enable-gles],
-                              [Specify the OpenGL ES version for backwards compatibility])],
-              [enable_gles=$enableval],
-              [enable_gles=30])
-
 AC_ARG_ENABLE([cxx03_abi],
               [AC_HELP_STRING([--enable-cxx03-abi],
                               [Specify abi for the build])],
@@ -81,8 +75,6 @@ AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
 if test "x$enable_cxx03_abi" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
 fi
-
-DALI_CFLAGS="$DALI_CFLAGS -DDALI_GLES_VERSION=${enable_gles}"
 
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
@@ -152,7 +144,6 @@ Configuration
   Data Dir (Read Only):             $dataReadOnlyDir
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
-  OpenGL ES version:                $enable_gles
   C++03 ABI:                        $enable_cxx03_abi
   Rename so file:                   $enable_rename_so
 "

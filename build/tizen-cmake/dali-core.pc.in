@@ -1,7 +1,7 @@
 prefix=@PREFIX@
 exec_prefix=@EXEC_PREFIX@
 apiversion=@DALI_VERSION@
-libdir=@LIBDIR@
+libdir=@LIB_DIR@
 includedir=@DEV_INCLUDE_PATH@
 
 Name: DALi 3D Engine

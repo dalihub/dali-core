@@ -561,16 +561,17 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   {
     surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
 
-#if DALI_GLES_VERSION >= 30
-    Context* surfaceContext = surfaceFrameBuffer->GetContext();
-    if ( mImpl->currentContext != surfaceContext )
+    if ( mImpl->currentContext->IsSurfacelessContextSupported() )
     {
-      // Switch the correct context if rendering to a surface
-      mImpl->currentContext = surfaceContext;
-      // Clear the current cached program when the context is switched
-      mImpl->programController.ClearCurrentProgram();
+      Context* surfaceContext = surfaceFrameBuffer->GetContext();
+      if ( mImpl->currentContext != surfaceContext )
+      {
+        // Switch the correct context if rendering to a surface
+        mImpl->currentContext = surfaceContext;
+        // Clear the current cached program when the context is switched
+        mImpl->programController.ClearCurrentProgram();
+      }
     }
-#endif
 
     surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
     backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
@@ -586,16 +587,23 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   {
     instruction.mFrameBuffer->Bind( *mImpl->currentContext );
   }
+  else
+  {
+    mImpl->currentContext->BindFramebuffer( GL_FRAMEBUFFER, 0u );
+  }
 
-  mImpl->currentContext->Viewport( surfaceRect.x,
-                            surfaceRect.y,
-                            surfaceRect.width,
-                            surfaceRect.height );
+  if ( surfaceFrameBuffer )
+  {
+    mImpl->currentContext->Viewport( surfaceRect.x,
+                              surfaceRect.y,
+                              surfaceRect.width,
+                              surfaceRect.height );
 
-  mImpl->currentContext->ClearColor( backgroundColor.r,
-                              backgroundColor.g,
-                              backgroundColor.b,
-                              backgroundColor.a );
+    mImpl->currentContext->ClearColor( backgroundColor.r,
+                                backgroundColor.g,
+                                backgroundColor.b,
+                                backgroundColor.a );
+  }
 
   // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
   // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers

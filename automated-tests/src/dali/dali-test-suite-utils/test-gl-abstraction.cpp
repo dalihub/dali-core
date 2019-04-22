@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,16 @@ void TestGlAbstraction::PreRender()
 
 void TestGlAbstraction::PostRender()
 {
+}
+
+bool TestGlAbstraction::IsSurfacelessContextSupported() const
+{
+  return true;
+}
+
+bool TestGlAbstraction::TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const
+{
+  return ( ( imageGlFormat == GL_RGB ) && ( textureGlFormat == GL_RGBA ) );
 }
 
 } // Namespace dali

@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_CONTEXT_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,22 @@ public:
    * All Shader, Program, Uniform and Attribute related calls are not here, Program class
    * handles them and optimizes any program related state changes
    ****************************************************************************************/
+
+  /**
+   * Wrapper for IsSurfacelessContextSupported of Dali::Integration::GlAbstraction
+   */
+  bool IsSurfacelessContextSupported() const
+  {
+    return mGlAbstraction.IsSurfacelessContextSupported();
+  }
+
+  /**
+   * Wrapper for TextureRequiresConverting of Dali::Integration::GlAbstraction
+   */
+  bool TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const
+  {
+    return mGlAbstraction.TextureRequiresConverting( imageGlFormat, textureGlFormat, isSubImage );
+  }
 
   /**
    * Wrapper for OpenGL ES 2.0 glActiveTexture()
@@ -1635,7 +1651,11 @@ public:
   {
     // check if its same as already set
     Rect<int> newViewport( x, y, width, height );
-    if( mViewPort != newViewport )
+
+    // Temporarily disable the viewport caching, as the implementation of GLES driver in Tizen platform
+    // share a global viewport between multiple contexts, therefore glViewport has to be called every
+    // time after glBindFramebuffer regardless of the same vewport size in the same context.
+//    if( mViewPort != newViewport )
     {
       // set new one
       LOG_GL("Viewport %d %d %d %d\n", x, y, width, height);
