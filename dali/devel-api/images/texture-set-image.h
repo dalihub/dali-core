@@ -38,6 +38,14 @@ class TextureSet;
  */
 DALI_CORE_API void TextureSetImage( TextureSet textureSet, size_t index, Image image );
 
+/**
+ * @brief Get the image at the specified position index.
+ * @param[in] textureSet The TextureSet to use
+ * @param[in] index The position in the TextureSet that the image will be set
+ * @return A handle to the image at the the specified position
+ */
+DALI_CORE_API Image TextureGetImage( TextureSet textureSet, size_t index );
+
 } //namespace Dali
 
 #endif // DALI_TEXTURE_SET_IMAGE_H
