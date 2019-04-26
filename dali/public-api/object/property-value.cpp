@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,11 +53,6 @@ inline bool IsIntegerType( Property::Type type )
 
 struct Property::Value::Impl
 {
-  Impl()
-  : type( Property::NONE ),
-    integerValue( 0 )
-  { }
-
   Impl( bool booleanValue )
   : type( Property::BOOLEAN ),
     integerValue( booleanValue )
@@ -113,7 +108,7 @@ struct Property::Value::Impl
     quaternionValue.ToAxisAngle( angleAxisValue->axis, angleAxisValue->angle );
   }
 
-  Impl(const std::string& stringValue)
+  Impl( const std::string& stringValue )
   : type( Property::STRING ),
     stringValue( new std::string( stringValue ) )
   {
@@ -131,15 +126,33 @@ struct Property::Value::Impl
   {
   }
 
+  Impl( Property::Array&& arrayValue )
+  : type( Property::ARRAY ),
+    arrayValue( new Property::Array( std::move( arrayValue ) ) )
+  {
+  }
+
   Impl( const Property::Map& mapValue )
   : type( Property::MAP ),
     mapValue( new Property::Map( mapValue ) )
   {
   }
 
+  Impl( Property::Map&& mapValue )
+  : type( Property::MAP ),
+    mapValue( new Property::Map( std::move( mapValue ) ) )
+  {
+  }
+
   Impl( const Extents& extentsValue )
   : type( Property::EXTENTS ),
     extentsValue( new Extents( extentsValue ) )
+  {
+  }
+
+  Impl( const std::initializer_list< KeyValuePair >& values )
+  : type( Property::MAP ),
+    mapValue( new Property::Map( values ) )
   {
   }
 
@@ -245,7 +258,7 @@ private:
 };
 
 Property::Value::Value()
-: mImpl( NULL )
+: mImpl( nullptr )
 {
 }
 
@@ -310,9 +323,9 @@ Property::Value::Value( const std::string& stringValue )
 }
 
 Property::Value::Value( const char* stringValue )
-: mImpl( NULL )
+: mImpl( nullptr )
 {
-  if( stringValue ) // string constructor is undefined with NULL pointer
+  if( stringValue ) // string constructor is undefined with nullptr
   {
     mImpl = new Impl( std::string(stringValue) );
   }
@@ -327,8 +340,18 @@ Property::Value::Value( Property::Array& arrayValue )
 {
 }
 
+Property::Value::Value( Property::Array&& arrayValue )
+: mImpl( new Impl( std::move( arrayValue ) ) )
+{
+}
+
 Property::Value::Value( Property::Map& mapValue )
 : mImpl( new Impl( mapValue ) )
+{
+}
+
+Property::Value::Value( Property::Map&& mapValue )
+: mImpl( new Impl( std::move( mapValue ) ) )
 {
 }
 
@@ -337,8 +360,13 @@ Property::Value::Value( const Extents& extentsValue )
 {
 }
 
+Property::Value::Value( const std::initializer_list< KeyValuePair >& values )
+: mImpl( new Impl( values ) )
+{
+}
+
 Property::Value::Value( Type type )
-: mImpl( NULL )
+: mImpl( nullptr )
 {
   switch (type)
   {
@@ -414,17 +442,23 @@ Property::Value::Value( Type type )
     }
     case Property::NONE:
     {
-      mImpl = new Impl();
+      // No need to create an Impl
       break;
     }
   }
 }
 
 Property::Value::Value( const Property::Value& value )
-: mImpl( NULL )
+: mImpl( nullptr )
 {
   // reuse assignment operator
   operator=( value );
+}
+
+Property::Value::Value( Property::Value&& value )
+: mImpl( value.mImpl )
+{
+  value.mImpl = nullptr;
 }
 
 Property::Value& Property::Value::operator=( const Property::Value& value )
@@ -438,7 +472,7 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
   if( !value.mImpl )
   {
     delete mImpl;
-    mImpl = NULL;
+    mImpl = nullptr;
     return *this;
   }
   // first check if the type is the same, no need to change impl, just assign
@@ -517,14 +551,14 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
         break;
       }
       case Property::NONE:
-      { // mImpl will be NULL, there's no way to get to this case
+      { // mImpl will be a nullptr, there's no way to get to this case
       }
     }
   }
   else
   {
     // different type, release old impl and create new
-    Impl* newImpl( NULL );
+    Impl* newImpl( nullptr );
     switch ( value.mImpl->type )
     {
       case Property::BOOLEAN:
@@ -598,11 +632,23 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
         break;
       }
       case Property::NONE:
-      { // NULL value will be used for "empty" value
+      { // nullptr value will be used for "empty" value
       }
     }
     delete mImpl;
     mImpl = newImpl;
+  }
+
+  return *this;
+}
+
+Property::Value& Property::Value::operator=( Property::Value&& value )
+{
+  if( this != &value )
+  {
+    delete mImpl;
+    mImpl = value.mImpl;
+    value.mImpl = nullptr;
   }
 
   return *this;
@@ -821,7 +867,7 @@ bool Property::Value::Get( Property::Map& mapValue ) const
 
 Property::Array* Property::Value::GetArray() const
 {
-  Property::Array* array = NULL;
+  Property::Array* array = nullptr;
   if( mImpl && (mImpl->type == ARRAY) ) // type cannot change in mImpl so array is allocated
   {
     array = mImpl->arrayValue;
@@ -831,7 +877,7 @@ Property::Array* Property::Value::GetArray() const
 
 Property::Map* Property::Value::GetMap() const
 {
-  Property::Map* map = NULL;
+  Property::Map* map = nullptr;
   if( mImpl && (mImpl->type == MAP) ) // type cannot change in mImpl so map is allocated
   {
     map = mImpl->mapValue;
@@ -940,15 +986,13 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
         break;
       }
       case Dali::Property::NONE:
-      {
-        stream << "undefined type";
-        break;
+      { // mImpl will be a nullptr, there's no way to get to this case
       }
     }
   }
   else
   {
-    stream << "empty type";
+    stream << "undefined type";
   }
   return stream;
 }

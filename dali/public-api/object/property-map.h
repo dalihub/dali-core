@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_MAP_H__
-#define __DALI_PROPERTY_MAP_H__
+#ifndef DALI_PROPERTY_MAP_H
+#define DALI_PROPERTY_MAP_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <sstream>
+#include <initializer_list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -55,12 +56,29 @@ public:
   Map();
 
   /**
+   * @brief Constructor from initializer_list.
+   *
+   * @SINCE_1_4.17
+   * @param[in] values An initializer_list of pairs of index and value.
+   */
+  Map( const std::initializer_list< KeyValuePair >& values );
+
+  /**
    * @brief Copy Constructor.
    *
    * @SINCE_1_0.0
    * @param[in] other The Map to copy from
    */
   Map( const Map& other );
+
+  /**
+   * @brief Move Constructor.
+   *
+   * @SINCE_1_4.17
+   * @param[in] other The Map to move from
+   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   */
+  Map( Map&& other );
 
   /**
    * @brief Non-virtual destructor.
@@ -360,6 +378,18 @@ public:
   Map& operator=( const Map& other );
 
   /**
+   * @brief Move Assignment Operator.
+   *
+   * @SINCE_1_4.17
+   * @param[in] other The map to move from
+   *
+   * @return The moved map
+   *
+   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   */
+  Map& operator=( Map&& other );
+
+  /**
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
@@ -385,4 +415,4 @@ DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Ma
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_MAP_H__
+#endif // DALI_PROPERTY_MAP_H
