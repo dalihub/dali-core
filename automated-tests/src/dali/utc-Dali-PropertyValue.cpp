@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -506,6 +506,61 @@ int UtcDaliPropertyValueCopyConstructorMapP(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueMoveConstructor(void)
+{
+  Property::Value value1( Vector4::ONE );
+  DALI_TEST_EQUALS( Property::VECTOR4, value1.GetType(), TEST_LOCATION );
+
+  Vector4 valueVector;
+  DALI_TEST_EQUALS( true, value1.Get( valueVector ), TEST_LOCATION ); // Able to convert
+  DALI_TEST_EQUALS( valueVector, Vector4::ONE, TEST_LOCATION );
+
+  Property::Value value2( std::move( value1 ) );
+  DALI_TEST_EQUALS( Property::NONE, value1.GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value1.Get( valueVector ), TEST_LOCATION ); // Unable to convert, but no crash either
+  DALI_TEST_EQUALS( Property::VECTOR4, value2.GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value2.Get( valueVector ), TEST_LOCATION ); // Able to convert
+  DALI_TEST_EQUALS( valueVector, Vector4::ONE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyValueMoveConstructorArray(void)
+{
+  Property::Array array;
+  array.PushBack( 1 );
+  array.PushBack( 2 );
+  array.PushBack( 3 );
+  DALI_TEST_EQUALS( 3u, array.Size(), TEST_LOCATION );
+
+  Property::Value value( std::move( array ) );
+  DALI_TEST_ASSERTION( array.Size(), "Cannot use an object previously used as an r-value" ); // Our local variable should become invalid
+
+  Property::Array* arrayPtr = value.GetArray();
+  DALI_TEST_CHECK( arrayPtr );
+  DALI_TEST_EQUALS( 3u, arrayPtr->Size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyValueMoveConstructorMap(void)
+{
+  Property::Map map;
+  map[ 1 ] = 1;
+  map[ 2 ] = 2;
+  map[ 3 ] = 3;
+  DALI_TEST_EQUALS( 3u, map.Count(), TEST_LOCATION );
+
+  Property::Value value( std::move( map ) );
+  DALI_TEST_ASSERTION( map.Count(), "Cannot use an object previously used as an r-value" ); // Our local variable should become invalid
+
+  Property::Map* mapPtr = value.GetMap();
+  DALI_TEST_CHECK( mapPtr );
+  DALI_TEST_EQUALS( 3u, mapPtr->Count(), TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliPropertyValueAssignmentSelfP(void)
 {
   Property::Value value;
@@ -709,6 +764,38 @@ int UtcDaliPropertyValueAssignmentOperatorExtentsP(void)
   Extents copyExtents;
   copy.Get(copyExtents);
   DALI_TEST_CHECK( Extents( 4, 3, 2, 1 ) == copyExtents );
+  END_TEST;
+}
+
+int UtcDaliPropertyValueMoveAssignmentOperator(void)
+{
+  Property::Value value1( Vector4::ONE );
+  DALI_TEST_EQUALS( Property::VECTOR4, value1.GetType(), TEST_LOCATION );
+
+  Vector4 valueVector;
+  DALI_TEST_EQUALS( true, value1.Get( valueVector ), TEST_LOCATION ); // Able to convert
+  DALI_TEST_EQUALS( valueVector, Vector4::ONE, TEST_LOCATION );
+
+  Property::Value value2;
+  value2 = std::move( value1 );
+  DALI_TEST_EQUALS( Property::NONE, value1.GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value1.Get( valueVector ), TEST_LOCATION ); // Unable to convert, but no crash either
+  DALI_TEST_EQUALS( Property::VECTOR4, value2.GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value2.Get( valueVector ), TEST_LOCATION ); // Able to convert
+  DALI_TEST_EQUALS( valueVector, Vector4::ONE, TEST_LOCATION );
+
+  // Change to another value type
+  value2 = std::move( Property::Value( 1.0f ) );
+  DALI_TEST_EQUALS( false, value2.Get( valueVector ), TEST_LOCATION ); // Should not be able to convert to a Vector4 now
+  float valueFloat;
+  DALI_TEST_EQUALS( true, value2.Get( valueFloat ), TEST_LOCATION ); // Should be able to convert to a float now
+  DALI_TEST_EQUALS( valueFloat, 1.0f, TEST_LOCATION );
+
+  // Ensure self assignment doesn't do anything silly
+  value2 = std::move( value2 );
+  DALI_TEST_EQUALS( true, value2.Get( valueFloat ), TEST_LOCATION );
+  DALI_TEST_EQUALS( valueFloat, 1.0f, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1177,7 +1264,7 @@ int UtcDaliPropertyValueOutputStream(void)
     Property::Value empty;
     std::ostringstream stream;
     stream << empty;
-    DALI_TEST_EQUALS( stream.str(), "empty type", TEST_LOCATION );
+    DALI_TEST_EQUALS( stream.str(), "undefined type", TEST_LOCATION );
   }
 
   {

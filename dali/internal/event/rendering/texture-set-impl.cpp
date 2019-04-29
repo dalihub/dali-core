@@ -86,6 +86,39 @@ Texture* TextureSet::GetTexture( uint32_t index ) const
   return result;
 }
 
+void TextureSet::SetImage( uint32_t index, ImagePtr image )
+{
+  Texture* texture( NULL );
+  if( image )
+  {
+    uint32_t textureCount = static_cast<uint32_t>( mImages.size() );
+    if( index >= textureCount )
+    {
+      mImages.resize(index + 1);
+    }
+    mImages[index] = image;
+
+    texture = image->GetTexture();
+  }
+
+  SetTexture( index, texture );
+}
+
+Image* TextureSet::GetImage( uint32_t index ) const
+{
+  Image* result( NULL );
+  if( index < mImages.size() )
+  {
+    result = mImages[index].Get();
+  }
+  else
+  {
+    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage\n");
+  }
+
+  return result;
+}
+
 void TextureSet::SetSampler( uint32_t index, SamplerPtr sampler )
 {
   uint32_t samplerCount = static_cast<uint32_t>( mSamplers.size() );

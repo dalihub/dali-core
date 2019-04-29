@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_VALUE_H__
-#define __DALI_PROPERTY_VALUE_H__
+#ifndef DALI_PROPERTY_VALUE_H
+#define DALI_PROPERTY_VALUE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <iosfwd>
+#include <utility>
+#include <initializer_list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
@@ -40,6 +42,8 @@ struct Vector4;
 class Matrix3;
 class Matrix;
 struct Extents;
+
+typedef std::pair< Property::Key, Property::Value > KeyValuePair;
 
 /**
  * @brief A value-type representing a property value.
@@ -170,12 +174,36 @@ public:
   Value( Property::Array& arrayValue );
 
   /**
+   * @brief Creates an array property value.
+   *
+   * @SINCE_1_4.16
+   * @param[in] arrayValue An r-value array
+   */
+  Value( Property::Array&& arrayValue );
+
+  /**
    * @brief Creates a map property value.
    *
    * @SINCE_1_0.0
-   * @param[in] mapValue An array
+   * @param[in] mapValue A map
    */
   Value( Property::Map& mapValue );
+
+  /**
+   * @brief Creates a map property value.
+   *
+   * @SINCE_1_4.16
+   * @param[in] mapValue An r-value map
+   */
+  Value( Property::Map&& mapValue );
+
+  /**
+   * @brief Create a map property value from an initializer_list.
+   *
+   * @SINCE_1_4.16
+   * @param [in] values An initializer_list of pairs of index and value.
+   */
+  Value( const std::initializer_list< KeyValuePair >& values );
 
   /**
    * @brief Creates an extents property value.
@@ -202,6 +230,14 @@ public:
   Value( const Value& value );
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_4.16
+   * @param[in] value The property value to move from
+   */
+  Value( Value&& value );
+
+  /**
    * @brief Assigns a property value.
    *
    * @SINCE_1_0.0
@@ -209,6 +245,15 @@ public:
    * @return a reference to this
    */
   Value& operator=( const Value& value );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_4.16
+   * @param[in] value The property value to move from
+   * @return a reference to this
+   */
+  Value& operator=( Value&& value );
 
   /**
    * @brief Non-virtual destructor.
@@ -436,4 +481,4 @@ DALI_CORE_API std::ostream& operator<<( std::ostream& ouputStream, const Propert
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_VALUE_H__
+#endif // DALI_PROPERTY_VALUE_H

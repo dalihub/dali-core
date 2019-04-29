@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_KEY_H__
-#define __DALI_PROPERTY_KEY_H__
+#ifndef DALI_PROPERTY_KEY_H
+#define DALI_PROPERTY_KEY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,15 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The string key
    */
-  explicit Key( const std::string& key );
+  Key( const std::string& key );
+
+  /**
+   * @brief Constructor
+   * @SINCE_1_4.16
+   *
+   * @param[in] key The string key as a const char *
+   */
+  Key( const char * key );
 
   /**
    * @brief Constructor
@@ -66,7 +74,7 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The index key
    */
-  explicit Key( Property::Index key );
+  Key( Property::Index key );
 
   /**
    * @brief The equality operator
@@ -76,6 +84,14 @@ struct DALI_CORE_API Property::Key
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
   bool operator== (const std::string& rhs);
+
+  /**
+   * @brief Constructor
+   * @SINCE_1_4.16
+   *
+   * @param[in] key The string key as a const char *
+   */
+  bool operator== ( const char * key );
 
   /**
    * @brief The equality operator
@@ -103,6 +119,15 @@ struct DALI_CORE_API Property::Key
    * @return true if the key is not equal or not a string key
    */
   bool operator!= (const std::string& rhs);
+
+  /**
+   * @brief The inequality operator
+   * @SINCE_1_4.16
+   *
+   * @param[in] rhs A const char* key to compare against.
+   * @return true if the key is not equal or not a string key
+   */
+  bool operator!= ( const char* rhs );
 
   /**
    * @brief The inequality operator
@@ -139,4 +164,4 @@ DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Ke
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_KEY_H__
+#endif // DALI_PROPERTY_KEY_H

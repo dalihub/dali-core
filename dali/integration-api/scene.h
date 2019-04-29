@@ -26,11 +26,11 @@ namespace Dali
 {
 
 class Actor;
-class KeyEvent;
+struct KeyEvent;
 class Layer;
 class RenderTaskList;
 class TouchData;
-class WheelEvent;
+struct WheelEvent;
 
 namespace Internal DALI_INTERNAL
 {

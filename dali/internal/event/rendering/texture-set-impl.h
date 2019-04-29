@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/texture-set.h> // Dali::TextureSet
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/event/images/image-impl.h> // Dali::Internal::Image
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 #include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
@@ -65,6 +66,16 @@ public:
    * @copydoc Dali::TextureSet::GetTexture()
    */
   Texture* GetTexture( uint32_t index ) const;
+
+  /**
+   * @copydoc Dali::TextureSet::SetImage()
+   */
+  void SetImage( uint32_t index, ImagePtr image );
+
+  /**
+   * @copydoc Dali::TextureSet::GetImage()
+   */
+  Image* GetImage( uint32_t index ) const;
 
   /**
    * @copydoc Dali::TextureSet::SetSampler()
@@ -110,6 +121,7 @@ private: // unimplemented methods
 private: // Data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the update thread
   SceneGraph::TextureSet* mSceneObject;
+  std::vector<ImagePtr> mImages;
   std::vector<SamplerPtr> mSamplers;
   std::vector<TexturePtr> mTextures;
 };
