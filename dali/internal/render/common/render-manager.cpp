@@ -478,6 +478,10 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
       iter->OnRenderFinished();
     }
   }
+  else
+  {
+    DALI_LOG_RELEASE_INFO( "RenderManager::Render: Skip rendering [%d, %d, %d]\n", haveInstructions, mImpl->lastFrameWasRendered, forceClear );
+  }
 
   mImpl->UpdateTrackers();
 
