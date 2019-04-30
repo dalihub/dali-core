@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,24 +57,13 @@ AC_ARG_ENABLE([lock_backtrace],
               [enable_lock_backtrace=$enableval],
               [enable_lock_backtrace=no])
 
-AC_ARG_ENABLE([cxx03_abi],
-              [AC_HELP_STRING([--enable-cxx03-abi],
-                              [Specify abi for the build])],
-              [enable_cxx03_abi=$enableval],
-              [enable_cxx03_abi=no])
-
 AC_ARG_ENABLE([rename_so],
               [AC_HELP_STRING([--enable-rename-so],
                               [Specify whether so file is renamed or not])],
               [enable_rename_so=$enableval],
               [enable_rename_so=yes])
 
-AM_CONDITIONAL([ENABLE_CXX03_ABI], [test x$enable_cxx03_abi = xyes])
 AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
-
-if test "x$enable_cxx03_abi" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
-fi
 
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
@@ -122,15 +111,11 @@ AC_SUBST(DALI_LDFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
-AC_CONFIG_FILES([Makefile dali-core/Makefile])
-
-if test "x$enable_cxx03_abi" = "xyes"; then
-AC_CONFIG_FILES([dali-core-cxx03.pc])
-fi
-
-if test "x$enable_cxx03_abi" != "xyes"; then
-AC_CONFIG_FILES([dali-core.pc])
-fi
+AC_CONFIG_FILES([
+  Makefile
+  dali-core/Makefile
+  dali-core.pc
+])
 
 AC_OUTPUT
 
@@ -144,6 +129,5 @@ Configuration
   Data Dir (Read Only):             $dataReadOnlyDir
   Backtrace:                        $enable_backtrace
   ScopedLock Backtrace:             $enable_lock_backtrace
-  C++03 ABI:                        $enable_cxx03_abi
   Rename so file:                   $enable_rename_so
 "
