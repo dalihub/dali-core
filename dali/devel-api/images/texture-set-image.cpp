@@ -27,13 +27,22 @@ namespace Dali
 
 void TextureSetImage( TextureSet textureSet, size_t index, Image image )
 {
-  Internal::Texture* texture = NULL;
+  Internal::ImagePtr imagePointer( NULL );
   if( image )
   {
-    texture = GetImplementation( image ).GetTexture();
+    imagePointer = &GetImplementation( image );
   }
 
-  GetImplementation( textureSet ).SetTexture( static_cast<uint32_t>( index ), texture );
+  GetImplementation( textureSet ).SetImage( static_cast<uint32_t>( index ), imagePointer );
+}
+
+Image TextureGetImage( TextureSet textureSet, size_t index )
+{
+  // Get a pointer to the image implementation.
+  Internal::Image* imagePointer = GetImplementation( textureSet ).GetImage( static_cast<uint32_t>( index ) );
+
+  // Return a handle to the image.
+  return Dali::Image( imagePointer );
 }
 
 } // namespace Dali
