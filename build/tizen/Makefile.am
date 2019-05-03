@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,7 @@ SUBDIRS = dali-core
 
 pkgconfigdir = $(libdir)/pkgconfig
 
-if ENABLE_CXX03_ABI
-pkgconfig_DATA = dali-core-cxx03.pc
-else
 pkgconfig_DATA = dali-core.pc
-endif
-
 
 MAINTAINERCLEANFILES = \
     aclocal.m4 \

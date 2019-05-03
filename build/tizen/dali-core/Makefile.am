@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,23 +52,11 @@ DALI_CORE_LA_LIBADD = $(DALI_LDFLAGS) \
 dali_core_includes = \
         -I../../..
 
-if ENABLE_CXX03_ABI
-
-lib_LTLIBRARIES = libdali-core.la
-
-libdali_core_la_SOURCES = $(DALI_CORE_LA_SOURCES)
-libdali_core_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
-libdali_core_la_LIBADD = $(DALI_CORE_LA_LIBADD)
-
-else
-
 lib_LTLIBRARIES = libdali-core-cxx11.la
 
 libdali_core_cxx11_la_SOURCES = $(DALI_CORE_LA_SOURCES)
 libdali_core_cxx11_la_CXXFLAGS = $(DALI_CORE_LA_CXXFLAGS)
 libdali_core_cxx11_la_LIBADD = $(DALI_CORE_LA_LIBADD)
-
-endif
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
@@ -158,22 +146,6 @@ linker_test_CXXFLAGS = \
   $(dali_core_includes) \
   $(DALI_CFLAGS)
 
-if ENABLE_CXX03_ABI
-
-linker_test_DEPENDENCIES = libdali-core.la
-linker_test_LDADD = \
-  libdali-core.la
-
-if ENABLE_RENAME_SO
-#rename
-install: install-am
-	rm -rf $(libdir)/libdali-core.so
-	rm -rf $(libdir)/libdali-core-cxx03.so
-	ln -s $(libdir)/libdali-core.so.0.0.* $(libdir)/libdali-core-cxx03.so
-endif
-
-else
-
 linker_test_DEPENDENCIES = libdali-core-cxx11.la
 linker_test_LDADD = \
   libdali-core-cxx11.la
@@ -186,4 +158,3 @@ install: install-am
 	ln -s $(libdir)/libdali-core-cxx11.so.0.0.* $(libdir)/libdali-core.so
 endif
 
-endif
