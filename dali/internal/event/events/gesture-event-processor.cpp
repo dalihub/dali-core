@@ -42,10 +42,6 @@ GestureEventProcessor::GestureEventProcessor( SceneGraph::UpdateManager& updateM
   mPinchGestureProcessor(),
   mTapGestureProcessor(),
   mRenderController( renderController ),
-  mLongPressDetectorCount(0),
-  mPanDetectorCount(0),
-  mPinchDetectorCount(0),
-  mTapDetectorCount(0),
   envOptionMinimumPanDistance(-1),
   envOptionMinimumPanEvents(-1)
 {
@@ -57,22 +53,10 @@ GestureEventProcessor::~GestureEventProcessor()
 
 void GestureEventProcessor::ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event)
 {
-  if( mLongPressDetectorCount > 0 )
-  {
-    mLongPressGestureProcessor.ProcessTouch(scene, event);
-  }
-  if( mPanDetectorCount > 0 )
-  {
-    mPanGestureProcessor.ProcessTouch(scene, event);
-  }
-  if( mPinchDetectorCount > 0 )
-  {
-    mPinchGestureProcessor.ProcessTouch(scene, event);
-  }
-  if( mTapDetectorCount > 0 )
-  {
-    mTapGestureProcessor.ProcessTouch(scene, event);
-  }
+  mLongPressGestureProcessor.ProcessTouch(scene, event);
+  mPanGestureProcessor.ProcessTouch(scene, event);
+  mPinchGestureProcessor.ProcessTouch(scene, event);
+  mTapGestureProcessor.ProcessTouch(scene, event);
 }
 
 void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)
@@ -83,7 +67,6 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.AddGestureDetector(longPress, scene);
-      mLongPressDetectorCount++;
       break;
     }
 
@@ -91,7 +74,6 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.AddGestureDetector(pan, scene, envOptionMinimumPanDistance, envOptionMinimumPanEvents);
-      mPanDetectorCount++;
       break;
     }
 
@@ -99,7 +81,6 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.AddGestureDetector(pinch, scene);
-      mPinchDetectorCount++;
       break;
     }
 
@@ -107,7 +88,6 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.AddGestureDetector(tap, scene);
-      mTapDetectorCount++;
       break;
     }
   }
@@ -121,7 +101,6 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.RemoveGestureDetector(longPress);
-      mLongPressDetectorCount--;
       break;
     }
 
@@ -129,7 +108,6 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.RemoveGestureDetector(pan);
-      mPanDetectorCount--;
       break;
     }
 
@@ -137,7 +115,6 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.RemoveGestureDetector(pinch);
-      mPinchDetectorCount--;
       break;
     }
 
@@ -145,7 +122,6 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.RemoveGestureDetector(tap);
-      mTapDetectorCount--;
       break;
     }
   }

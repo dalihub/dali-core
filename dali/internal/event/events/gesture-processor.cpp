@@ -85,7 +85,10 @@ GestureProcessor::~GestureProcessor()
 
 void GestureProcessor::ProcessTouch( Scene& scene, const Integration::TouchEvent& event )
 {
-  mGestureRecognizer->SendEvent(scene, event);
+  if( mGestureRecognizer )
+  {
+    mGestureRecognizer->SendEvent(scene, event);
+  }
 }
 
 void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors )

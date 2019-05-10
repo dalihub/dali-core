@@ -273,11 +273,6 @@ private:
   TapGestureProcessor mTapGestureProcessor;
   Integration::RenderController& mRenderController;
 
-  uint32_t mLongPressDetectorCount;
-  uint32_t mPanDetectorCount;
-  uint32_t mPinchDetectorCount;
-  uint32_t mTapDetectorCount;
-
   int32_t envOptionMinimumPanDistance;
   int32_t envOptionMinimumPanEvents;
 };
