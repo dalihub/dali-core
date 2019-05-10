@@ -114,7 +114,7 @@ public:
    * @pre The actor has been initialized.
    * @pre The actor does not have a parent.
    */
-  void Add(Actor& actor);
+  void Add(Actor actor);
 
   /**
    * @brief Removes a child Actor from the Scene.
@@ -123,7 +123,7 @@ public:
    * @param[in] actor The child
    * @pre The actor has been added to the stage.
    */
-  void Remove(Actor& actor);
+  void Remove(Actor actor);
 
   /**
    * @brief Returns the size of the Scene in pixels as a Vector.
@@ -192,6 +192,12 @@ public:
    * @return The render surface
    */
   Integration::RenderSurface* GetSurface() const;
+
+  /**
+   * @brief Retrieve the Scene that the given actor belongs to.
+   * @return The Scene.
+   */
+  static Integration::Scene Get( Actor actor );
 
   /**
    * This function is called when an event is queued.

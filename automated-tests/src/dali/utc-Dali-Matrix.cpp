@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,19 +38,24 @@ void utc_dali_matrix_cleanup(void)
 
 int UtcDaliMatrixConstructor01P(void)
 {
-  Matrix m2(false);
+  // State of memory cannot be guaranteed, so use
+  // a buffer in a known state to check for changes
+  char buffer[sizeof(Matrix)];
 
-  bool initialised = true;
+  memset(buffer, 1, sizeof(Matrix));
+
+  Matrix* m2 = new(&buffer) Matrix(false);
+  bool initialisation_occured = false;
   {
-    float* els = m2.AsFloat();
+    float* els = m2->AsFloat();
     for(size_t idx=0; idx<16; ++idx, ++els)
     {
-      if(*els != 0.0f)
-        initialised = false;
+      if(*els == 0.0f)
+        initialisation_occured = true;
     }
   }
 
-  DALI_TEST_EQUALS(initialised, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(initialisation_occured, false, TEST_LOCATION);
 
   END_TEST;
 }
