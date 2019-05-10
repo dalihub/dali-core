@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/events/gesture-event.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
-#include <dali/integration-api/events/pinch-gesture-event.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
@@ -46,8 +41,7 @@ namespace // unnamed namespace
 {
 
 static const std::size_t MAX_MESSAGE_SIZE = std::max( sizeof(Integration::TouchEvent),
-                                                      std::max( sizeof(Integration::KeyEvent),
-                                                                std::max( sizeof(Integration::WheelEvent), sizeof(Integration::GestureEvent) ) ) );
+                                                      std::max( sizeof(Integration::KeyEvent), sizeof(Integration::WheelEvent) ) );
 
 static const std::size_t INITIAL_MIN_CAPACITY = 4;
 
@@ -140,71 +134,6 @@ void EventProcessor::QueueEvent( const Event& event )
 
       break;
     }
-
-    case Event::Gesture:
-    {
-      QueueGestureEvent( static_cast<const Integration::GestureEvent&>(event) );
-      break;
-    }
-
-  }
-}
-
-void EventProcessor::QueueGestureEvent(const Integration::GestureEvent& event)
-{
-  switch( event.gestureType )
-  {
-    case Gesture::Pinch:
-    {
-      typedef Integration::PinchGestureEvent DerivedType;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new (slot) DerivedType( static_cast<const DerivedType&>(event) );
-
-      break;
-    }
-
-    case Gesture::Pan:
-    {
-      typedef Integration::PanGestureEvent DerivedType;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new (slot) DerivedType( static_cast<const DerivedType&>(event) );
-
-      break;
-    }
-
-    case Gesture::Tap:
-    {
-      typedef Integration::TapGestureEvent DerivedType;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new (slot) DerivedType( static_cast<const DerivedType&>(event) );
-
-      break;
-    }
-
-    case Gesture::LongPress:
-    {
-      typedef Integration::LongPressGestureEvent DerivedType;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new (slot) DerivedType( static_cast<const DerivedType&>(event) );
-
-      break;
-    }
   }
 }
 
@@ -224,6 +153,7 @@ void EventProcessor::ProcessEvents()
       case Event::Touch:
       {
         mTouchEventProcessor.ProcessTouchEvent( static_cast<const Integration::TouchEvent&>(*event) );
+        mGestureEventProcessor.ProcessTouchEvent(mScene, static_cast<const Integration::TouchEvent&>(*event));
         break;
       }
 
@@ -244,13 +174,6 @@ void EventProcessor::ProcessEvents()
         mWheelEventProcessor.ProcessWheelEvent( static_cast<const Integration::WheelEvent&>(*event) );
         break;
       }
-
-      case Event::Gesture:
-      {
-        mGestureEventProcessor.ProcessGestureEvent( mScene, static_cast<const Integration::GestureEvent&>(*event) );
-        break;
-      }
-
     }
     // Call virtual destructor explictly; since delete will not be called after placement new
     event->~Event();

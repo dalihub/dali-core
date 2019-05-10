@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_MULTI_POINT_EVENT_H__
-#define __DALI_INTEGRATION_MULTI_POINT_EVENT_H__
+#ifndef DALI_INTEGRATION_MULTI_POINT_EVENT_H
+#define DALI_INTEGRATION_MULTI_POINT_EVENT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ protected:
    * Constructor
    * @param[in]  time  The time the event occurred.
    */
-  MultiPointEvent(Type eventType, unsigned long time);
+  MultiPointEvent(Type eventType, uint32_t time);
 
 public:
 
@@ -73,7 +73,7 @@ public:
   /**
    * @brief The time
    */
-  unsigned long time;
+  uint32_t time;
 
   // Convenience Methods
 
@@ -106,4 +106,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_MULTI_POINT_EVENT_H__
+#endif // DALI_INTEGRATION_MULTI_POINT_EVENT_H

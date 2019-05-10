@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ struct TouchEventCombiner::PointInfo
    * @param[in]  touchPoint  The point to add.
    * @param[in]  pointTime   The time of the point event.
    */
-  PointInfo( const Point& touchPoint, unsigned long pointTime )
+  PointInfo( const Point& touchPoint, uint32_t pointTime )
   : point( touchPoint ),
     time( pointTime )
   {
@@ -57,7 +57,7 @@ struct TouchEventCombiner::PointInfo
   // Data
 
   Point point;        ///< The point.
-  unsigned long time; ///< The time the point event took place.
+  uint32_t time; ///< The time the point event took place.
 };
 
 TouchEventCombiner::TouchEventCombiner()
@@ -66,14 +66,14 @@ TouchEventCombiner::TouchEventCombiner()
 {
 }
 
-TouchEventCombiner::TouchEventCombiner( unsigned long minMotionTime, float minMotionXDistance, float minMotionYDistance )
+TouchEventCombiner::TouchEventCombiner( uint32_t minMotionTime, float minMotionXDistance, float minMotionYDistance )
 : mMinMotionTime( minMotionTime ),
   mMinMotionDistance( minMotionXDistance, minMotionYDistance )
 {
   DALI_ASSERT_ALWAYS( minMotionXDistance >= 0.0f && minMotionYDistance >= 0.0f && "Negative values not allowed\n" );
 }
 
-TouchEventCombiner::TouchEventCombiner( unsigned long minMotionTime, Vector2 minMotionDistance )
+TouchEventCombiner::TouchEventCombiner( uint32_t minMotionTime, Vector2 minMotionDistance )
 : mMinMotionTime( minMotionTime ),
   mMinMotionDistance( minMotionDistance )
 {
@@ -84,7 +84,7 @@ TouchEventCombiner::~TouchEventCombiner()
 {
 }
 
-TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( const Point& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent )
+TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent )
 {
   TouchEventCombiner::EventDispatchType dispatchEvent( TouchEventCombiner::DispatchNone );
   const PointState::Type state = point.GetState();
@@ -210,7 +210,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
         {
           if ( deviceId == iter->point.GetDeviceId() )
           {
-            unsigned long timeDiff( time - iter->time );
+            uint32_t timeDiff( time - iter->time );
 
             if ( timeDiff < mMinMotionTime )
             {
@@ -266,7 +266,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
         {
           if ( iter->point.GetDeviceId() == deviceId )
           {
-            unsigned long timeDiff( time - iter->time );
+            uint32_t timeDiff( time - iter->time );
 
             if ( timeDiff < mMinMotionTime )
             {
@@ -343,7 +343,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
   return dispatchEvent;
 }
 
-void TouchEventCombiner::SetMinimumMotionTimeThreshold( unsigned long minTime )
+void TouchEventCombiner::SetMinimumMotionTimeThreshold( uint32_t minTime )
 {
   mMinMotionTime = minTime;
 }

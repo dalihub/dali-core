@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_GESTURE_PROCESSOR_H__
-#define __DALI_INTERNAL_GESTURE_PROCESSOR_H__
+#ifndef DALI_INTERNAL_GESTURE_PROCESSOR_H
+#define DALI_INTERNAL_GESTURE_PROCESSOR_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
+#include <dali/internal/event/events/gesture-recognizer.h>
 #include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
@@ -36,6 +37,26 @@ namespace Internal
  */
 class GestureProcessor : public Object::Observer
 {
+public:
+
+  /**
+   * Process the touch event in the attached recognizer
+   * @param[in] scene Scene.
+   * @param[in] event Touch event to process
+   */
+  void ProcessTouch( Scene& scene, const Integration::TouchEvent& event );
+
+  /**
+   * Returns whether any GestureDetector requires a Core::Update
+   * @return true if update required
+   */
+  inline bool NeedsUpdate()
+  {
+    bool updateRequired = mNeedsUpdate;
+    mNeedsUpdate = false;
+    return updateRequired;
+  }
+
 protected:
 
   // Construction & Destruction
@@ -161,6 +182,12 @@ private:
    */
   virtual void ObjectDestroyed(Object& object);
 
+
+protected:  //Data
+
+  GestureRecognizerPtr mGestureRecognizer;  ///< The gesture recognizer
+  bool   mNeedsUpdate;                 ///< Indicates if any GestureDetector requires a Core::Update
+
 private: // Data
 
   Gesture::Type mType;                 ///< Type of GestureProcessor
@@ -172,4 +199,4 @@ private: // Data
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_GESTURE_PROCESSOR_H__
+#endif // DALI_INTERNAL_GESTURE_PROCESSOR_H

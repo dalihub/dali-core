@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H__
+#ifndef DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H
+#define DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,14 @@
 namespace Dali
 {
 
-namespace Integration
-{
-class GestureManager;
-struct GestureEvent;
-struct LongPressGestureEvent;
-}
-
 namespace Internal
 {
 
 class Stage;
 class Scene;
+
+struct GestureEvent;
+struct LongPressGestureEvent;
 
 /**
  * Long Press Gesture Event Processing:
@@ -46,15 +42,14 @@ class Scene;
  * - Find the actor that requires a long-press at the long press position.
  * - Emit the gesture if the event satisfies the detector conditions.
  */
-class LongPressGestureProcessor : public GestureProcessor
+class LongPressGestureProcessor : public GestureProcessor, public RecognizerObserver<LongPressGestureEvent>
 {
 public:
 
   /**
    * Create a long press gesture processor.
-   * @param[in] gestureManager The gesture manager.
    */
-  LongPressGestureProcessor( Integration::GestureManager& gestureManager );
+  LongPressGestureProcessor();
 
   /**
    * Non-virtual destructor; LongPressGestureProcessor is not a base class
@@ -68,15 +63,16 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the long press gesture event occurs in.
    * @param[in] longPressEvent The event that has occurred.
    */
-  void Process( Scene& scene, const Integration::LongPressGestureEvent& longPressEvent );
+  void Process( Scene& scene, const LongPressGestureEvent& longPressEvent );
 
   /**
    * Adds a gesture detector to this gesture processor.
    * If this is the first gesture detector being added, then this method registers the required
    * gesture with the adaptor.
    * @param[in]  gestureDetector  The gesture detector being added.
+   * @param[in] scene The scene the long press gesture event occurs in.
    */
-  void AddGestureDetector( LongPressGestureDetector* gestureDetector );
+  void AddGestureDetector( LongPressGestureDetector* gestureDetector, Scene& scene );
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -125,8 +121,7 @@ private:
 
 private:
 
-  Integration::GestureManager& mGestureManager;
-  LongPressGestureDetectorContainer mGestureDetectors;
+  LongPressGestureDetectorContainer mLongPressGestureDetectors;
 
   GestureDetectorContainer mCurrentEmitters;
   RenderTaskPtr mCurrentRenderTask;
@@ -134,11 +129,11 @@ private:
   uint32_t mMinTouchesRequired;
   uint32_t mMaxTouchesRequired;
 
-  const Integration::LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
+  const LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H__
+#endif // DALI_INTERNAL_LONG_PRESS_GESTURE_EVENT_PROCESSOR_H

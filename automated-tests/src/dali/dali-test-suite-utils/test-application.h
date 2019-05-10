@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <test-platform-abstraction.h>
-#include "test-gesture-manager.h"
 #include "test-gl-sync-abstraction.h"
 #include "test-gl-abstraction.h"
 #include "test-render-controller.h"
@@ -68,7 +67,6 @@ public:
   TestRenderController& GetRenderController();
   TestGlAbstraction& GetGlAbstraction();
   TestGlSyncAbstraction& GetGlSyncAbstraction();
-  TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
   bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
@@ -96,7 +94,6 @@ protected:
   TestRenderController      mRenderController;
   TestGlAbstraction         mGlAbstraction;
   TestGlSyncAbstraction     mGlSyncAbstraction;
-  TestGestureManager        mGestureManager;
   TestRenderSurface*        mRenderSurface;
 
   Integration::UpdateStatus mStatus;

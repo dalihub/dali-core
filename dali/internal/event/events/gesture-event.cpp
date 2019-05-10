@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,25 @@
  */
 
 // CLASS HEADER
-#include <dali/integration-api/events/tap-gesture-event.h>
+#include <dali/internal/event/events/gesture-event.h>
 
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
-TapGestureEvent::TapGestureEvent( Gesture::State state )
-: GestureEvent(Gesture::Tap, state),
-  numberOfTaps(1),
-  numberOfTouches(1)
+GestureEvent::~GestureEvent()
 {
 }
 
-TapGestureEvent::~TapGestureEvent()
+GestureEvent::GestureEvent(Gesture::Type gesture, Gesture::State gestureState)
+: gestureType(gesture),
+  state(gestureState),
+  time(0)
 {
 }
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali

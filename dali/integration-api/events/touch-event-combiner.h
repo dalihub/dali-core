@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H__
-#define __DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H__
+#ifndef DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H
+#define DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public:
    * @param[in]  minMotionYDistance  The minimum distance a finger has to be moved between vertical motion events.
    * @note Will assert if any of the parameters is negative.
    */
-  TouchEventCombiner( unsigned long minMotionTime, float minMotionXDistance, float minMotionYDistance );
+  TouchEventCombiner( uint32_t minMotionTime, float minMotionXDistance, float minMotionYDistance );
 
   /**
    * Construction with parameters.
@@ -82,7 +82,7 @@ public:
    * @param[in]  minMotionDistance  A Vector2 representing the minimum distance a finger has to be moved between horizontal and vertical motion events.
    * @note Will assert if any of the parameters is negative.
    */
-  TouchEventCombiner( unsigned long minMotionTime, Vector2 minMotionDistance );
+  TouchEventCombiner( uint32_t minMotionTime, Vector2 minMotionDistance );
 
   /**
    * Non virtual destructor
@@ -105,13 +105,13 @@ public:
    *
    * @return true if the point is beyond the different thresholds set thus, should be sent to core, false otherwise.
    */
-  EventDispatchType GetNextTouchEvent( const Point& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent );
+  EventDispatchType GetNextTouchEvent( const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent );
 
   /**
    * Sets the minimum time (in ms) that should occur between motion events.
    * @param[in]  minTime  Minimum time between motion events.
    */
-  void SetMinimumMotionTimeThreshold( unsigned long minTime );
+  void SetMinimumMotionTimeThreshold( uint32_t minTime );
 
   /**
    * Sets the minimum distance a finger has to be moved (both X and Y) between motion events.
@@ -163,7 +163,7 @@ private:
   PointInfoContainer mPressedPoints; ///< A container of touched point and time.
   PointInfoContainer mHoveredPoints; ///< A container of hovered point and time.
 
-  unsigned long mMinMotionTime; ///< The minimum time that should elapse before considering a new motion event.
+  uint32_t mMinMotionTime; ///< The minimum time that should elapse before considering a new motion event.
   Vector2 mMinMotionDistance; ///< The minimum distance in the X and Y direction before considering a new motion event.
 };
 
@@ -171,4 +171,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H__
+#endif // DALI_INTEGRATION_TOUCH_EVENT_COMBINER_H

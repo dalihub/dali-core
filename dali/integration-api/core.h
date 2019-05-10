@@ -240,7 +240,6 @@ public:
                     PlatformAbstraction& platformAbstraction,
                     GlAbstraction& glAbstraction,
                     GlSyncAbstraction& glSyncAbstraction,
-                    GestureManager& gestureManager,
                     ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,

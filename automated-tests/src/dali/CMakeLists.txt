@@ -46,6 +46,7 @@ SET(TC_SOURCES
         utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGesture.cpp
         utc-Dali-LongPressGestureDetector.cpp
+        utc-Dali-LongPressGestureRecognizer.cpp
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
@@ -56,9 +57,11 @@ SET(TC_SOURCES
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
+        utc-Dali-PanGestureRecognizer.cpp
         utc-Dali-Path.cpp
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
+        utc-Dali-PinchGestureRecognizer.cpp
         utc-Dali-Pixel.cpp
         utc-Dali-PixelData.cpp
         utc-Dali-Processors.cpp
@@ -86,6 +89,7 @@ SET(TC_SOURCES
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
+        utc-Dali-TapGestureRecognizer.cpp
         utc-Dali-Texture.cpp
         utc-Dali-TextureSet.cpp
         utc-Dali-Thread.cpp
@@ -110,7 +114,7 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-custom-actor.cpp
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
-        dali-test-suite-utils/test-gesture-manager.cpp
+        dali-test-suite-utils/test-gesture-generator.cpp
         dali-test-suite-utils/test-gl-abstraction.cpp
         dali-test-suite-utils/test-gl-sync-abstraction.cpp
         dali-test-suite-utils/test-native-image.cpp

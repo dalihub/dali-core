@@ -31,13 +31,13 @@ namespace Internal
 
 namespace
 {
-thread_local ThreadLocalStorage* threadLocal = NULL;
+thread_local ThreadLocalStorage* threadLocal = nullptr;
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
 : mCore( core )
 {
-  DALI_ASSERT_ALWAYS( threadLocal == NULL && "Cannot create more than one ThreadLocalStorage object" );
+  DALI_ASSERT_ALWAYS( threadLocal == nullptr && "Cannot create more than one ThreadLocalStorage object" );
 
   threadLocal = this;
 }
@@ -48,7 +48,7 @@ ThreadLocalStorage::~ThreadLocalStorage()
 
 void ThreadLocalStorage::Remove()
 {
-  threadLocal = NULL;
+  threadLocal = nullptr;
 }
 
 ThreadLocalStorage& ThreadLocalStorage::Get()
@@ -61,7 +61,7 @@ ThreadLocalStorage& ThreadLocalStorage::Get()
 bool ThreadLocalStorage::Created()
 {
   // see if the TLS has been set yet
-  return (threadLocal != NULL);
+  return (threadLocal != nullptr);
 }
 
 ThreadLocalStorage* ThreadLocalStorage::GetInternal()

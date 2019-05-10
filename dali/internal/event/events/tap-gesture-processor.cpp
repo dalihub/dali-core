@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,13 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
-#include <dali/integration-api/gesture-manager.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/tap-gesture-recognizer.h>
+#include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/events/tap-gesture-event.h>
 
 namespace Dali
 {
@@ -52,7 +53,7 @@ namespace
 void EmitTapSignal(
   Actor* actor,
   const GestureDetectorContainer& gestureDetectors,
-  const Integration::TapGestureEvent& tapEvent,
+  const TapGestureEvent& tapEvent,
   Vector2 localPoint)
 {
   TapGesture tap;
@@ -72,10 +73,9 @@ void EmitTapSignal(
 
 } // unnamed namespace
 
-TapGestureProcessor::TapGestureProcessor( Integration::GestureManager& gestureManager)
+TapGestureProcessor::TapGestureProcessor()
 : GestureProcessor( Gesture::Tap ),
-  mGestureManager( gestureManager ),
-  mGestureDetectors(),
+  mTapGestureDetectors(),
   mMinTapsRequired( 1 ),
   mMaxTapsRequired( 1 ),
   mMinTouchesRequired( 1 ),
@@ -89,7 +89,7 @@ TapGestureProcessor::~TapGestureProcessor()
 {
 }
 
-void TapGestureProcessor::Process( Scene& scene, const Integration::TapGestureEvent& tapEvent )
+void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent )
 {
   switch ( tapEvent.state )
   {
@@ -155,11 +155,11 @@ void TapGestureProcessor::Process( Scene& scene, const Integration::TapGestureEv
   }
 }
 
-void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetector )
+void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetector, Scene& scene )
 {
-  bool firstRegistration(mGestureDetectors.empty());
+  bool firstRegistration(mTapGestureDetectors.empty());
 
-  mGestureDetectors.push_back(gestureDetector);
+  mTapGestureDetectors.push_back(gestureDetector);
 
   const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
   const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
@@ -176,12 +176,14 @@ void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetecto
     mMaxTapsRequired = maxTapsRequired;
     mMinTouchesRequired = mMaxTouchesRequired = touchesRequired;
 
-    Integration::TapGestureRequest request;
+    TapGestureRequest request;
     request.minTaps = mMinTapsRequired;
     request.maxTaps = mMaxTapsRequired;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
-    mGestureManager.Register(request);
+
+    Size size = scene.GetSize();
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request));
   }
   else
   {
@@ -199,12 +201,13 @@ void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetecto
     if ( (minTaps != mMinTapsRequired)||(maxTaps != mMaxTapsRequired) ||
          (minTouches != mMinTouchesRequired)||(maxTouches != mMaxTouchesRequired) )
     {
-      Integration::TapGestureRequest request;
+      TapGestureRequest request;
       request.minTaps = mMinTapsRequired = minTaps;
       request.maxTaps = mMaxTapsRequired = maxTaps;
       request.minTouches = mMinTouchesRequired = minTouches;
       request.maxTouches = mMaxTouchesRequired = maxTouches;
-      mGestureManager.Update(request);
+
+      mGestureRecognizer->Update(request);
     }
   }
 }
@@ -212,16 +215,15 @@ void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetecto
 void TapGestureProcessor::RemoveGestureDetector( TapGestureDetector* gestureDetector )
 {
   // Find detector ...
-  TapGestureDetectorContainer::iterator endIter = std::remove( mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mGestureDetectors.end() );
+  TapGestureDetectorContainer::iterator endIter = std::remove( mTapGestureDetectors.begin(), mTapGestureDetectors.end(), gestureDetector );
+  DALI_ASSERT_DEBUG( endIter != mTapGestureDetectors.end() );
 
   // ... and remove it
-  mGestureDetectors.erase( endIter, mGestureDetectors.end() );
+  mTapGestureDetectors.erase( endIter, mTapGestureDetectors.end() );
 
-  if ( mGestureDetectors.empty() )
+  if ( mTapGestureDetectors.empty() )
   {
-    Integration::GestureRequest request(Gesture::Tap);
-    mGestureManager.Unregister(request);
+    mGestureRecognizer.Detach();
 
     ResetActor();
   }
@@ -233,7 +235,7 @@ void TapGestureProcessor::RemoveGestureDetector( TapGestureDetector* gestureDete
 
 void TapGestureProcessor::GestureDetectorUpdated( TapGestureDetector* gestureDetector )
 {
-  DALI_ASSERT_DEBUG(find(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector) != mGestureDetectors.end());
+  DALI_ASSERT_DEBUG(find(mTapGestureDetectors.begin(), mTapGestureDetectors.end(), gestureDetector) != mTapGestureDetectors.end());
 
   const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
   const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
@@ -245,14 +247,14 @@ void TapGestureProcessor::GestureDetectorUpdated( TapGestureDetector* gestureDet
 
 void TapGestureProcessor::UpdateDetection()
 {
-  DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
+  DALI_ASSERT_DEBUG(!mTapGestureDetectors.empty());
 
   unsigned int minTaps = UINT_MAX;
   unsigned int maxTaps = 0;
   unsigned int minTouches = UINT_MAX;
   unsigned int maxTouches = 0;
 
-  for ( TapGestureDetectorContainer::iterator iter = mGestureDetectors.begin(), endIter = mGestureDetectors.end(); iter != endIter; ++iter )
+  for ( TapGestureDetectorContainer::iterator iter = mTapGestureDetectors.begin(), endIter = mTapGestureDetectors.end(); iter != endIter; ++iter )
   {
     TapGestureDetector* detector(*iter);
 
@@ -272,12 +274,13 @@ void TapGestureProcessor::UpdateDetection()
   if ( (minTaps != mMinTapsRequired)||(maxTaps != mMaxTapsRequired) ||
        (minTouches != mMinTouchesRequired)||(maxTouches != mMaxTouchesRequired) )
   {
-    Integration::TapGestureRequest request;
+    TapGestureRequest request;
     request.minTaps = mMinTapsRequired = minTaps;
     request.maxTaps = mMaxTapsRequired = maxTaps;
     request.minTouches = mMinTouchesRequired = minTouches;
     request.maxTouches = mMaxTouchesRequired = maxTouches;
-    mGestureManager.Update(request);
+
+    mGestureRecognizer->Update(request);
   }
 }
 
