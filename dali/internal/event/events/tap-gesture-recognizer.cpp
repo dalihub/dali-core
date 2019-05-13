@@ -132,8 +132,8 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         else if (pointState == PointState::DOWN)
         {
           const Vector2& screen( point.GetScreenPosition() );
-          Vector2 distanceDelta(abs(mTouchPosition.x - screen.x),
-                                abs(mTouchPosition.y - screen.y));
+          Vector2 distanceDelta(std::abs(mTouchPosition.x - screen.x),
+                                std::abs(mTouchPosition.y - screen.y));
 
           uint32_t timeDelta = event.time - mLastTapTime;
 
@@ -211,8 +211,8 @@ void TapGestureRecognizer::EmitSingleTap( uint32_t time, const Integration::Poin
 {
   TapGestureEvent event( Gesture::Started );
   const Vector2& screen( point.GetScreenPosition() );
-  Vector2 distanceDelta(abs(mTouchPosition.x - screen.x),
-                        abs(mTouchPosition.y - screen.y));
+  Vector2 distanceDelta(std::abs(mTouchPosition.x - screen.x),
+                        std::abs(mTouchPosition.y - screen.y));
 
   if (distanceDelta.x > MAXIMUM_MOTION_ALLOWED ||
       distanceDelta.y > MAXIMUM_MOTION_ALLOWED )

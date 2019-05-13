@@ -50,11 +50,11 @@ PanGestureRecognizer::PanGestureRecognizer( Observer& observer, Vector2 screenSi
   mObserver( observer ),
   mState( Clear ),
   mThresholdAdjustmentsRemaining( 0 ),
-  mThresholdTotalAdjustments( MINIMUM_MOTION_DISTANCE_BEFORE_PAN * MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO ),
+  mThresholdTotalAdjustments( static_cast<unsigned int>( MINIMUM_MOTION_DISTANCE_BEFORE_PAN * MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO ) ),
   mPrimaryTouchDownTime( 0 ),
   mMinimumTouchesRequired( request.minTouches ),
   mMaximumTouchesRequired( request.maxTouches ),
-  mMinimumDistanceSquared( MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED ),
+  mMinimumDistanceSquared( static_cast<unsigned int>( MINIMUM_MOTION_DISTANCE_BEFORE_PAN_SQUARED ) ),
   mMinimumMotionEvents( MINIMUM_MOTION_EVENTS_BEFORE_PAN ),
   mMotionEvents( 0 )
 {
