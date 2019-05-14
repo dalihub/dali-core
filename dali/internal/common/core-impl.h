@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ namespace Integration
 class Processor;
 class RenderController;
 class PlatformAbstraction;
-class GestureManager;
 class GlAbstraction;
 class GlSyncAbstraction;
 class UpdateStatus;
@@ -84,7 +83,6 @@ public:
         Integration::PlatformAbstraction& platform,
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
-        Integration::GestureManager& gestureManager,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,

@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__
+#ifndef DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H
+#define DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,15 @@
 namespace Dali
 {
 
-namespace Integration
-{
-class GestureManager;
-struct GestureEvent;
-struct TapGestureEvent;
-}
-
 namespace Internal
 {
 
 class Scene;
 class Stage;
 class Actor;
+
+struct GestureEvent;
+struct TapGestureEvent;
 
 /**
  * Tap Gesture Event Processing:
@@ -47,7 +43,7 @@ class Actor;
  * - Find the actor that requires a tap where the tap occurred.
  * - Emit the gesture if the tap gesture event satisfies the detector conditions.
  */
-class TapGestureProcessor : public GestureProcessor
+class TapGestureProcessor : public GestureProcessor, public RecognizerObserver<TapGestureEvent>
 {
 public:
 
@@ -55,7 +51,7 @@ public:
    * Create a tap gesture processor.
    * @param[in] gestureManager The gesture manager.
    */
-  TapGestureProcessor( Integration::GestureManager& gestureManager );
+  TapGestureProcessor();
 
   /**
    * Non-virtual destructor; TapGestureProcessor is not a base class
@@ -69,7 +65,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
    */
-  void Process( Scene& scene, const Integration::TapGestureEvent& tapEvent);
+  void Process( Scene& scene, const TapGestureEvent& event);
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -77,7 +73,7 @@ public: // To be called by GestureEventProcessor
    * gesture with the adaptor.
    * @param[in]  gestureDetector  The gesture detector being added.
    */
-  void AddGestureDetector(TapGestureDetector* gestureDetector);
+  void AddGestureDetector(TapGestureDetector* gestureDetector, Scene& scene);
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -126,8 +122,7 @@ private:
 
 private:
 
-  Integration::GestureManager& mGestureManager;
-  TapGestureDetectorContainer mGestureDetectors;
+  TapGestureDetectorContainer mTapGestureDetectors;
 
   unsigned int mMinTapsRequired;
   unsigned int mMaxTapsRequired;
@@ -135,7 +130,7 @@ private:
   unsigned int mMaxTouchesRequired;
 
   ActorObserver mCurrentTapActor; ///< Observer for the current gesture actor
-  const Integration::TapGestureEvent* mCurrentTapEvent; ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
+  const TapGestureEvent* mCurrentTapEvent; ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
   bool mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 };
 
@@ -143,4 +138,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__
+#endif // DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pinch-gesture-event.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
@@ -120,22 +119,6 @@ struct TouchEventFunctor
     return false;
   }
 };
-
-// Generate a PinchGestureEvent to send to Core
-Integration::PinchGestureEvent GeneratePinch(
-    Gesture::State state,
-    float scale,
-    float speed,
-    Vector2 centerpoint)
-{
-  Integration::PinchGestureEvent pinch(state);
-
-  pinch.scale = scale;
-  pinch.speed = speed;
-  pinch.centerPoint = centerpoint;
-
-  return pinch;
-}
 
 } // anon namespace
 
@@ -262,17 +245,23 @@ int UtcDaliPinchGestureSignalReceptionNegative(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do a pinch outside actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 45.0f, Vector2(112.0f, 112.0f)));
+  TestStartPinch( application,  Vector2( 112.0f, 62.0f ), Vector2( 112.0f, 162.0f ),
+                                Vector2( 112.0f, 100.0f ), Vector2( 112.0f, 124.0f ), 100 );
+
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Continue pinch into actor's area - we should still not receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 4.5f, 95.0f, Vector2(20.0f, 20.0f)));
+  TestContinuePinch( application, Vector2( 112.0f, 100.0f ), Vector2( 112.0f, 124.0f ),
+                                  Vector2( 5.0f, 5.0f ), Vector2( 35.0f, 35.0f ), 200 );
+
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Stop pinching - we should still not receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(12.0f, 12.0f)));
+  TestEndPinch( application,  Vector2( 6.0f, 6.0f ), Vector2( 18.0f, 18.0f ),
+                              Vector2( 10.0f, 8.0f ), Vector2( 14.0f, 16.0f ), 300 );
+
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -298,38 +287,42 @@ int UtcDaliPinchGestureSignalReceptionDownMotionLeave(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 20.0f)));
+  TestStartPinch( application,  Vector2( 5.0f, 20.0f ), Vector2( 35.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.666f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(66.666f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 90.0f, Vector2(21.0f, 20.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 17.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 400 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(5.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(90.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.2666f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(80.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(21.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Pan Gesture leaves actor's area - we should still receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 15.5f, Vector2(320.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 17.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                                  Vector2( 300.0f, 10.0f ), Vector2( 340.0f, 10.0f ), 1000 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(15.5f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.333f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(213.333f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(320.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Gesture ends - we would receive a finished state
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 15.2f, 12.1f, Vector2(310.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 300.0f, 10.0f ), Vector2( 340.0f, 10.0f ),
+                              Vector2( 305.0f, 10.0f ), Vector2( 315.0f, 10.0f ), 1500);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(15.2f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(12.1f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.333f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(600.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(310.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
   END_TEST;
 }
@@ -355,70 +348,33 @@ int UtcDaliPinchGestureSignalReceptionDownMotionUp(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pinch within the actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 20.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.555f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(106.667f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Continue the pinch within the actor's area - we should still receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(5.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(25.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.277f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(66.666f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Gesture ends within actor's area - we would receive a finished state
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(5.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(25.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliPinchGestureSignalReceptionCancelled(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  SignalData data;
-  GestureReceivedFunctor functor(data);
-
-  PinchGestureDetector detector = PinchGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Start pinch within the actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 20.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-
-
-  // Continue the pinch within the actor's area - we should still receive the signal
-  data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-
-  // The gesture is cancelled
-  data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Cancelled, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
   END_TEST;
 }
 
@@ -443,20 +399,23 @@ int UtcDaliPinchGestureSignalReceptionDetach(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pinch within the actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 20.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
 
 
   // Continue the pinch within the actor's area - we should still receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
 
   // Gesture ends within actor's area
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
 
@@ -465,9 +424,7 @@ int UtcDaliPinchGestureSignalReceptionDetach(void)
 
   // Ensure we are no longer signalled
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 20.0f)));
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestGeneratePinch(  application );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -493,13 +450,15 @@ int UtcDaliPinchGestureSignalReceptionDetachWhilePinching(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pinch within the actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
 
   // Continue the pinch within the actor's area - we should still receive the signal
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
 
@@ -508,7 +467,8 @@ int UtcDaliPinchGestureSignalReceptionDetachWhilePinching(void)
 
   // Gesture ends within actor's area
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -545,13 +505,15 @@ int UtcDaliPinchGestureSignalReceptionActorDestroyedWhilePinching(void)
     detector.Attach(actor);
 
     // Start pinch within the actor's area
-    application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+    TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
 
     // Continue the pinch within the actor's area - we should still receive the signal
     data.Reset();
-    application.ProcessEvent(GeneratePinch(Gesture::Continuing, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+    TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                    Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
 
@@ -567,7 +529,8 @@ int UtcDaliPinchGestureSignalReceptionActorDestroyedWhilePinching(void)
 
   // Gesture ends within the area where the actor used to be
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 25.0f, Vector2(20.0f, 20.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -593,13 +556,15 @@ int UtcDaliPinchGestureSignalReceptionRotatedActor(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do an entire pinch, only check finished value
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Rotate actor again and render and notify
   actor.SetOrientation(Dali::Degree(180.0f), Vector3::ZAXIS);
@@ -607,13 +572,15 @@ int UtcDaliPinchGestureSignalReceptionRotatedActor(void)
   application.Render();
 
   // Do an entire pinch, only check finished value
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 2100 );
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 3000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Rotate actor again and render and notify
   actor.SetOrientation(Dali::Degree(270.0f), Vector3::ZAXIS);
@@ -621,13 +588,15 @@ int UtcDaliPinchGestureSignalReceptionRotatedActor(void)
   application.Render();
 
   // Do an entire pinch, only check finished value
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 4100 );
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 5000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(10.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -665,14 +634,16 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do an entire pan, only check finished value - hits child area but parent should still receive it
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pinchedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(5.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
 
   // Attach child and generate same touch points to yield same results
   // (Also proves that you can detach and then re-attach another actor)
@@ -680,14 +651,16 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
   detector.Detach(parent);
 
   // Do an entire pan, only check finished value
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 2100 );
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 3000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pinchedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(5.0f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(50.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.055f, data.receivedGesture.scale, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(160.0f, data.receivedGesture.speed, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -719,13 +692,15 @@ int UtcDaliPinchGestureSignalReceptionAttachDetachMany(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pinch within second actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(120.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 102.0f, 20.0f ), Vector2( 138.0f, 20.0f ),
+                                    Vector2( 110.0f, 20.0f ), Vector2( 130.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pinchedActor, TEST_LOCATION);
 
   // Pinch moves into first actor's area - second actor should receive the pinch
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 110.0f, 20.0f ), Vector2( 130.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pinchedActor, TEST_LOCATION);
 
@@ -734,7 +709,8 @@ int UtcDaliPinchGestureSignalReceptionAttachDetachMany(void)
 
   // Gesture ends within actor's area
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(120.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 119.0f, 20.0f ), Vector2( 121.0f, 20.0f ), 3000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -760,12 +736,14 @@ int UtcDaliPinchGestureSignalReceptionActorBecomesUntouchable(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pinch in actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Pan continues within actor's area
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 5.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor become invisible - actor should not receive the next pinch
@@ -777,7 +755,8 @@ int UtcDaliPinchGestureSignalReceptionActorBecomesUntouchable(void)
 
   // Gesture ends within actor's area
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 5.0f, 50.0f, Vector2(10.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 3000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -820,14 +799,16 @@ int UtcDaliPinchGestureSignalReceptionMultipleDetectorsOnActor(void)
   secondDetector.Attach(actor2);
 
   // Pinch in actor's area - both detector's functors should be called
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
   // Pinch continues in actor's area - both detector's functors should be called
   firstData.Reset();
   secondData.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
@@ -835,14 +816,16 @@ int UtcDaliPinchGestureSignalReceptionMultipleDetectorsOnActor(void)
   firstDetector.Detach(actor);
   firstData.Reset();
   secondData.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
   // New pinch on actor, only secondDetector has actor attached
   firstData.Reset();
   secondData.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 1500 );
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
@@ -850,66 +833,10 @@ int UtcDaliPinchGestureSignalReceptionMultipleDetectorsOnActor(void)
   secondDetector.Detach(actor);
   firstData.Reset();
   secondData.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 2000 );
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, secondData.functorCalled, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliPinchGestureSignalReceptionMultipleStarted(void)
-{
-  // Should handle two started events gracefully.
-
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  SignalData data;
-  GestureReceivedFunctor functor(data);
-
-  PinchGestureDetector detector = PinchGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Start pan in actor's area
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-
-  // Send another start in actor's area
-  data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-
-  // Add a child actor to overlap actor and send another start in actor's area
-  Actor child = Actor::New();
-  child.SetSize(100.0f, 100.0f);
-  child.SetAnchorPoint(AnchorPoint::CENTER);
-  child.SetParentOrigin(ParentOrigin::CENTER);
-  actor.Add(child);
-
-  TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Send another start in actor's area
-  data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-
-  // Send another start in actor's area
-  data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
 
@@ -943,75 +870,10 @@ int UtcDaliPinchGestureSignalReceptionEnsureCorrectSignalling(void)
   application.Render();
 
   // Start pan in actor1's area, only data1 should be set
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliPinchGestureEmitIncorrectStateClear(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Attach actor to detector
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  PinchGestureDetector detector = PinchGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect( &application, functor );
-
-  // Try a Clear state
-  try
-  {
-    application.ProcessEvent(GeneratePinch(Gesture::Clear, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-    tet_result(TET_FAIL);
-  }
-  catch ( Dali::DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "Incorrect state", TEST_LOCATION );
-  }
-  END_TEST;
-}
-
-int UtcDaliPinchGestureEmitIncorrectStatePossible(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Attach actor to detector
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  PinchGestureDetector detector = PinchGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect( &application, functor );
-
-  // Try a Possible state
-  try
-  {
-    application.ProcessEvent(GeneratePinch(Gesture::Possible, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
-    tet_result(TET_FAIL);
-  }
-  catch ( Dali::DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "Incorrect state", TEST_LOCATION );
-  }
   END_TEST;
 }
 
@@ -1039,10 +901,12 @@ int UtcDaliPinchGestureActorUnstaged(void)
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit signals
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1061,13 +925,16 @@ int UtcDaliPinchGestureActorUnstaged(void)
   stateToUnstage = Gesture::Continuing;
 
   // Emit signals
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1086,13 +953,16 @@ int UtcDaliPinchGestureActorUnstaged(void)
   stateToUnstage = Gesture::Finished;
 
   // Emit signals
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   tet_result( TET_PASS ); // If we get here then we have handled actor stage removal gracefully.
   END_TEST;
@@ -1134,7 +1004,8 @@ int UtcDaliPinchGestureActorStagedAndDestroyed(void)
   // position, we should still not be signalled.
 
   // Emit signals
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1150,17 +1021,20 @@ int UtcDaliPinchGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Continue signal emission
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Here we delete an actor in started, we should not receive any subsequent signalling.
 
   // Emit signals
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 1500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1176,10 +1050,12 @@ int UtcDaliPinchGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Continue signal emission
-  application.ProcessEvent(GeneratePinch(Gesture::Continuing, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestContinuePinch( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 2000 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  application.ProcessEvent(GeneratePinch(Gesture::Finished, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 3000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -1211,13 +1087,11 @@ int UtcDaliPinchGestureLayerConsumesTouch(void)
   application.SendNotification();
   application.Render();
 
-  Vector2 screenCoords( 50.0f, 50.0f );
-  float scale ( 10.0f );
-  float speed ( 50.0f );
-
   // Emit signals, should receive
-  application.ProcessEvent( GeneratePinch( Gesture::Started, scale, speed, screenCoords ) );
-  application.ProcessEvent( GeneratePinch( Gesture::Finished, scale, speed, screenCoords ) );
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1229,8 +1103,10 @@ int UtcDaliPinchGestureLayerConsumesTouch(void)
   application.Render();
 
   // Emit the same signals again, should not receive
-  application.ProcessEvent( GeneratePinch( Gesture::Started, scale, speed, screenCoords ) );
-  application.ProcessEvent( GeneratePinch( Gesture::Finished, scale, speed, screenCoords ) );
+  TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 1500 );
+  TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                              Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 2000);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 

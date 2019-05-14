@@ -324,6 +324,23 @@ int UtcDaliSceneGetLayer(void)
   END_TEST;
 }
 
+int UtcDaliSceneGet(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::Get");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( Dali::Integration::Scene() == Dali::Integration::Scene::Get( actor ) );
+
+  scene.Add( actor );
+
+  DALI_TEST_CHECK( scene == Dali::Integration::Scene::Get( actor ) );
+
+  END_TEST;
+}
+
 int UtcDaliSceneEventProcessingFinishedP(void)
 {
   TestApplication application;

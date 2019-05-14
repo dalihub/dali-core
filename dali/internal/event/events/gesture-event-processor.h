@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
+#ifndef DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H
+#define DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ struct Gesture;
 
 namespace Integration
 {
-struct GestureEvent;
-class GestureManager;
+
 class RenderController;
 }
 
@@ -65,7 +64,7 @@ public:
    * @param[in] gestureManager The gesture manager
    * @param[in] renderController The render controller
    */
-  GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::GestureManager& gestureManager, Integration::RenderController& renderController );
+  GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController );
 
   /**
    * Non-virtual destructor; GestureProcessor is not a base class
@@ -75,10 +74,11 @@ public:
 public: // To be called by EventProcessor
 
   /**
-   * This function is called by Core whenever a gesture event occurs.
-   * @param[in] event The event that has occurred.
+   * This function is called by Core whenever a touch event occurs
+   * @param[in] scene The scene
+   * @param[in] event The event that has occurred
    */
-  void ProcessGestureEvent( Scene& scene, const Integration::GestureEvent& event );
+  void ProcessTouchEvent( Scene& scene, const Integration::TouchEvent& event);
 
 public: // To be called by gesture detectors
 
@@ -86,7 +86,7 @@ public: // To be called by gesture detectors
    * This method adds the specified gesture detector to the relevant gesture processor.
    * @param[in]  gestureDetector  The gesture detector to add
    */
-  void AddGestureDetector(GestureDetector* gestureDetector);
+  void AddGestureDetector(GestureDetector* gestureDetector, Scene& scene);
 
   /**
    * This method removes the specified gesture detector from the relevant gesture processor.
@@ -99,12 +99,6 @@ public: // To be called by gesture detectors
    * @param[in]  gestureDetector  The gesture detector that has been updated.
    */
   void GestureDetectorUpdated(GestureDetector* gestureDetector);
-
-  /**
-   * This method is called by GestureDetectors on Started or Continue state events.
-   * Status is queried and reset by Core in ProcessEvents
-   */
-  void SetUpdateRequired();
 
   /**
    * Called by GestureDetectors to set the gesture properties in the update thread.
@@ -237,6 +231,27 @@ public: // Called by Core
    */
   void SetPanGestureMultitapSmoothingRange( int32_t value );
 
+  /**
+   * @brief Sets the minimum distance required to start a pan event
+   *
+   * @param[in] value Distance in pixels
+   */
+  void SetPanGestureMinimumDistance( int32_t value );
+
+  /**
+   * @brief Sets the minimum number of touch events required to start a pan
+   *
+   * @param[in] value Number of touch events
+   */
+  void SetPanGestureMinimumPanEvents( int32_t value );
+
+  /**
+   * @brief Sets the minimum distance required to start a pinch event
+   *
+   * @param[in] value Distance in pixels
+   */
+  void SetPinchGestureMinimumDistance( float value);
+
 public: // needed for PanGesture
 
   /**
@@ -252,19 +267,18 @@ private:
 
 private:
 
-  Integration::GestureManager& mGestureManager;
-
   LongPressGestureProcessor mLongPressGestureProcessor;
   PanGestureProcessor mPanGestureProcessor;
   PinchGestureProcessor mPinchGestureProcessor;
   TapGestureProcessor mTapGestureProcessor;
   Integration::RenderController& mRenderController;
 
-  bool mUpdateRequired;     ///< set to true by gesture detectors if they require a Core::Update
+  int32_t envOptionMinimumPanDistance;
+  int32_t envOptionMinimumPanEvents;
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
+#endif // DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H

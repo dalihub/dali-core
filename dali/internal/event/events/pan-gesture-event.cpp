@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,26 @@
  */
 
 // CLASS HEADER
-#include <dali/integration-api/events/gesture-event.h>
+#include <dali/internal/event/events/pan-gesture-event.h>
 
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
-GestureEvent::~GestureEvent()
-{
-}
 
-GestureEvent::GestureEvent(Gesture::Type gesture, Gesture::State gestureState)
-: Event(Gesture),
-  gestureType(gesture),
-  state(gestureState),
-  time(0)
+PanGestureEvent::PanGestureEvent(Gesture::State state)
+: GestureEvent(Gesture::Pan, state),
+  timeDelta(0),
+  numberOfTouches(1)
 {
 }
 
-} // namespace Integration
+PanGestureEvent::~PanGestureEvent()
+{
+}
+
+} // namespace Internal
 
 } // namespace Dali

@@ -64,12 +64,12 @@ Scene& Scene::operator=( const Scene& rhs )
   return *this;
 }
 
-void Scene::Add( Actor& actor )
+void Scene::Add( Actor actor )
 {
   GetImplementation(*this).Add( GetImplementation(actor) );
 }
 
-void Scene::Remove( Actor& actor )
+void Scene::Remove( Actor actor )
 {
   GetImplementation(*this).Remove( GetImplementation(actor) );
 }
@@ -117,6 +117,11 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
 Integration::RenderSurface* Scene::GetSurface() const
 {
   return GetImplementation(*this).GetSurface();
+}
+
+Integration::Scene Scene::Get( Actor actor )
+{
+  return Dali::Integration::Scene( &GetImplementation( actor ).GetScene() );
 }
 
 void Scene::QueueEvent( const Integration::Event& event )

@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_PINCH_GESTURE_EVENT_H__
-#define __DALI_INTEGRATION_PINCH_GESTURE_EVENT_H__
+#ifndef DALI_INTERNAL_EVENT_PINCH_GESTURE_EVENT_H
+#define DALI_INTERNAL_EVENT_PINCH_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/events/gesture-event.h>
+#include <dali/internal/event/events/gesture-event.h>
 #include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
 /**
@@ -38,7 +38,7 @@ namespace Integration
  * - Finished:   If after a pinch, the user lifts their finger(s).
  * - Cancelled:  If there is a system interruption.
  */
-struct DALI_CORE_API PinchGestureEvent : public GestureEvent
+struct PinchGestureEvent : public GestureEvent
 {
   // Construction & Destruction
 
@@ -76,4 +76,4 @@ struct DALI_CORE_API PinchGestureEvent : public GestureEvent
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_PINCH_GESTURE_EVENT_H__
+#endif // DALI_INTERNAL_EVENT_PINCH_GESTURE_EVENT_H

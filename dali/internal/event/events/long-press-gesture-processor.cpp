@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "long-press-gesture-processor.h"
+#include <dali/internal/event/events/long-press-gesture-processor.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -25,12 +25,13 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/long-press-gesture.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
-#include <dali/integration-api/gesture-manager.h>
+#include <dali/internal/event/events/long-press-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/events/long-press-gesture-recognizer.h>
+#include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
 {
@@ -51,7 +52,7 @@ namespace
 void EmitLongPressSignal(
     Actor* actor,
     const GestureDetectorContainer& gestureDetectors,
-    const Integration::LongPressGestureEvent& longPressEvent,
+    const LongPressGestureEvent& longPressEvent,
     Vector2 localPoint)
 {
   LongPressGesture longPress(longPressEvent.state);
@@ -98,10 +99,9 @@ struct IsNotAttachedFunctor
 
 } // unnamed namespace
 
-LongPressGestureProcessor::LongPressGestureProcessor( Integration::GestureManager& gestureManager)
+LongPressGestureProcessor::LongPressGestureProcessor()
 : GestureProcessor( Gesture::LongPress ),
-  mGestureManager( gestureManager ),
-  mGestureDetectors(),
+  mLongPressGestureDetectors(),
   mCurrentEmitters(),
   mCurrentRenderTask(),
   mMinTouchesRequired( 1 ),
@@ -114,7 +114,7 @@ LongPressGestureProcessor::~LongPressGestureProcessor()
 {
 }
 
-void LongPressGestureProcessor::Process( Scene& scene, const Integration::LongPressGestureEvent& longPressEvent )
+void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEvent& longPressEvent )
 {
   switch ( longPressEvent.state )
   {
@@ -204,6 +204,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const Integration::LongPr
       DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
       break;
     }
+
     case Gesture::Clear:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
@@ -212,21 +213,24 @@ void LongPressGestureProcessor::Process( Scene& scene, const Integration::LongPr
   }
 }
 
-void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* gestureDetector )
+void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* gestureDetector, Scene& scene )
 {
-  bool firstRegistration(mGestureDetectors.empty());
+  bool firstRegistration(mLongPressGestureDetectors.empty());
 
-  mGestureDetectors.push_back(gestureDetector);
+  mLongPressGestureDetectors.push_back(gestureDetector);
 
   if (firstRegistration)
   {
     mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
     mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
 
-    Integration::LongPressGestureRequest request;
+    LongPressGestureRequest request;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
-    mGestureManager.Register( request );
+
+    Size size = scene.GetSize();
+
+    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request));
   }
   else
   {
@@ -237,16 +241,15 @@ void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* ge
 void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector* gestureDetector )
 {
   // Find detector ...
-  LongPressGestureDetectorContainer::iterator endIter = std::remove( mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mGestureDetectors.end() );
+  LongPressGestureDetectorContainer::iterator endIter = std::remove( mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector );
+  DALI_ASSERT_DEBUG( endIter != mLongPressGestureDetectors.end() );
 
   // ... and remove it
-  mGestureDetectors.erase( endIter, mGestureDetectors.end() );
+  mLongPressGestureDetectors.erase( endIter, mLongPressGestureDetectors.end() );
 
-  if ( mGestureDetectors.empty() )
+  if ( mLongPressGestureDetectors.empty() )
   {
-    Integration::GestureRequest request( Gesture::LongPress );
-    mGestureManager.Unregister(request);
+    mGestureRecognizer.Detach();
   }
   else
   {
@@ -256,19 +259,19 @@ void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector*
 
 void LongPressGestureProcessor::GestureDetectorUpdated( LongPressGestureDetector* gestureDetector )
 {
-  DALI_ASSERT_DEBUG( find( mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector ) != mGestureDetectors.end() );
+  DALI_ASSERT_DEBUG( find( mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector ) != mLongPressGestureDetectors.end() );
 
   UpdateDetection();
 }
 
 void LongPressGestureProcessor::UpdateDetection()
 {
-  DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
+  DALI_ASSERT_DEBUG(!mLongPressGestureDetectors.empty());
 
   unsigned int minimumRequired = UINT_MAX;
   unsigned int maximumRequired = 0;
 
-  for ( LongPressGestureDetectorContainer::iterator iter = mGestureDetectors.begin(), endIter = mGestureDetectors.end(); iter != endIter; ++iter )
+  for ( LongPressGestureDetectorContainer::iterator iter = mLongPressGestureDetectors.begin(), endIter = mLongPressGestureDetectors.end(); iter != endIter; ++iter )
   {
     LongPressGestureDetector* current(*iter);
 
@@ -293,10 +296,10 @@ void LongPressGestureProcessor::UpdateDetection()
     mMinTouchesRequired = minimumRequired;
     mMaxTouchesRequired = maximumRequired;
 
-    Integration::LongPressGestureRequest request;
+    LongPressGestureRequest request;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
-    mGestureManager.Update(request);
+    mGestureRecognizer->Update(request);
   }
 }
 

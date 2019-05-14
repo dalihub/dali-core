@@ -47,7 +47,6 @@ void TestApplication::Initialize()
                                         mPlatformAbstraction,
                                         mGlAbstraction,
                                         mGlSyncAbstraction,
-                                        mGestureManager,
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
@@ -139,11 +138,6 @@ TestGlAbstraction& TestApplication::GetGlAbstraction()
 TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
 {
   return mGlSyncAbstraction;
-}
-
-TestGestureManager& TestApplication::GetGestureManager()
-{
-  return mGestureManager;
 }
 
 void TestApplication::ProcessEvent(const Integration::Event& event)

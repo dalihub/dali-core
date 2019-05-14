@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,6 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/internal/event/common/type-info-impl.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/events/pinch-gesture-event.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 
@@ -81,70 +77,6 @@ struct GestureReceivedFunctor
 
   SignalData& signalData;
 };
-
-// Generate a LongPressGestureEvent to send to Core
-Integration::LongPressGestureEvent GenerateLongPress(
-    Gesture::State state,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::LongPressGestureEvent longPress( state );
-
-  longPress.numberOfTouches = numberOfTouches;
-  longPress.point = point;
-
-  return longPress;
-}
-
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    Vector2 previousPosition,
-    Vector2 currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1,
-    unsigned int time = 1u)
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-  pan.time = time;
-
-  return pan;
-}
-// Generate a PinchGestureEvent to send to Core
-Integration::PinchGestureEvent GeneratePinch(
-    Gesture::State state,
-    float scale,
-    float speed,
-    Vector2 centerpoint)
-{
-  Integration::PinchGestureEvent pinch(state);
-
-  pinch.scale = scale;
-  pinch.speed = speed;
-  pinch.centerPoint = centerpoint;
-
-  return pinch;
-}
-// Generate a TapGestureEvent to send to Core
-Integration::TapGestureEvent GenerateTap(
-    Gesture::State state,
-    unsigned int numberOfTaps,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::TapGestureEvent tap( state );
-
-  tap.numberOfTaps = numberOfTaps;
-  tap.numberOfTouches = numberOfTouches;
-  tap.point = point;
-
-  return tap;
-}
 
 //
 // Create function as Init function called
@@ -2158,9 +2090,9 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
   application.Render();
 
   // Emit gesture
-  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
-  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  TestGenerateLongPress( application, 50.0f, 10.0f );
+  TestEndLongPress( application, 50.0f, 10.0f );
+
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -2196,9 +2128,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
   application.Render();
 
   // Emit gesture
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  TestGenerateMiniPan( application );
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -2234,7 +2164,8 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
   application.Render();
 
   // Emit gesture
-  application.ProcessEvent(GeneratePinch(Gesture::Started, 10.0f, 50.0f, Vector2(20.0f, 10.0f)));
+  TestGeneratePinch( application );
+
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -2270,8 +2201,8 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   application.Render();
 
   // Emit gesture
-  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  TestGenerateTap( application, 50.0, 10.0, 100 );
+
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;
 }

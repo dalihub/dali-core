@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_GESTURE_DETECTOR_H__
-#define __DALI_INTERNAL_GESTURE_DETECTOR_H__
+#ifndef DALI_INTERNAL_GESTURE_DETECTOR_H
+#define DALI_INTERNAL_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,9 +104,9 @@ public:
   }
 
   /**
-   * Checks if the specified actor is still attached.
+   * Checks if the specified actor is still attached or pending attachment.
    * @param[in]  actor  The actor to check.
-   * @return true, if the actor is attached, false otherwise.
+   * @return true, if the actor is attached or pending, false otherwise.
    */
   bool IsAttached(Actor& actor) const;
 
@@ -135,7 +135,7 @@ private:
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(Object& object) {}
+  virtual void SceneObjectAdded(Object& object);
 
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
@@ -171,6 +171,7 @@ protected:
 
   Gesture::Type                 mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
+  GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
 };
 
@@ -198,4 +199,4 @@ inline const Internal::GestureDetector& GetImplementation(const Dali::GestureDet
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_GESTURE_DETECTOR_H__
+#endif // DALI_INTERNAL_GESTURE_DETECTOR_H

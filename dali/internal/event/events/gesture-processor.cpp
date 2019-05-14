@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,10 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
 
 
 GestureProcessor::GestureProcessor( Gesture::Type type )
-: mType( type ),
-  mCurrentGesturedActor( NULL ),
+: mGestureRecognizer(),
+  mNeedsUpdate( false ),
+  mType( type ),
+  mCurrentGesturedActor( nullptr ),
   mGesturedActorDisconnected( false )
 {
 }
@@ -79,6 +81,14 @@ GestureProcessor::GestureProcessor( Gesture::Type type )
 GestureProcessor::~GestureProcessor()
 {
   ResetActor();
+}
+
+void GestureProcessor::ProcessTouch( Scene& scene, const Integration::TouchEvent& event )
+{
+  if( mGestureRecognizer )
+  {
+    mGestureRecognizer->SendEvent(scene, event);
+  }
 }
 
 void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors )
@@ -195,14 +205,14 @@ void GestureProcessor::ResetActor()
   if ( mCurrentGesturedActor )
   {
     mCurrentGesturedActor->RemoveObserver( *this );
-    mCurrentGesturedActor = NULL;
+    mCurrentGesturedActor = nullptr;
     mGesturedActorDisconnected = false;
   }
 }
 
 Actor* GestureProcessor::GetCurrentGesturedActor()
 {
-  return mGesturedActorDisconnected ? NULL : mCurrentGesturedActor;
+  return mGesturedActorDisconnected ? nullptr : mCurrentGesturedActor;
 }
 
 void GestureProcessor::SceneObjectRemoved(Object& object)
@@ -225,7 +235,7 @@ void GestureProcessor::ObjectDestroyed(Object& object)
     // Inform deriving classes.
     OnGesturedActorStageDisconnection();
 
-    mCurrentGesturedActor = NULL;
+    mCurrentGesturedActor = nullptr;
   }
 }
 

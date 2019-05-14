@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_INPUT_OPTIONS_H__
-#define __DALI_INTEGRATION_INPUT_OPTIONS_H__
+#ifndef DALI_INTEGRATION_INPUT_OPTIONS_H
+#define DALI_INTEGRATION_INPUT_OPTIONS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,9 +143,28 @@ DALI_CORE_API void SetPanGestureTwoPointAccelerationBias( float value );
  */
 DALI_CORE_API void SetPanGestureMultitapSmoothingRange( int value );
 
+/**
+ * @brief Sets the minimum distance required to start a pan gesture
+ *
+ * @param[in] value Distance to move
+ */
+DALI_CORE_API void SetPanGestureMinimumDistance( int value );
 
+/**
+ * @brief Sets the minimum number of touch events to start a pan
+ *
+ * @param[in] value Number of pan events
+ */
+DALI_CORE_API void SetPanGestureMinimumPanEvents( int value );
+
+/**
+ * @brief Sets the minimum distance required to start a pinch gesture
+ *
+ * @param[in] value Distance to move in pixels
+ */
+DALI_CORE_API void SetPinchGestureMinimumDistance( float value );
 } // namespace Integration
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_INPUT_OPTIONS_H__
+#endif // DALI_INTEGRATION_INPUT_OPTIONS_H

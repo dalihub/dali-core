@@ -102,6 +102,24 @@ void SetPanGestureMultitapSmoothingRange( int value )
   eventProcessor.SetPanGestureMultitapSmoothingRange( value );
 }
 
+void SetPanGestureMinimumDistance( int value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureMinimumDistance( value );
+}
+
+void SetPanGestureMinimumPanEvents( int value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureMinimumPanEvents( value );
+}
+
+void SetPinchGestureMinimumDistance( float value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPinchGestureMinimumDistance( value );
+}
+
 
 } // namespace Integration
 
