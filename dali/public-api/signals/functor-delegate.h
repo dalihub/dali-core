@@ -1,8 +1,8 @@
-#ifndef __DALI_FUNCTOR_DELEGATE_H__
-#define __DALI_FUNCTOR_DELEGATE_H__
+#ifndef DALI_FUNCTOR_DELEGATE_H
+#define DALI_FUNCTOR_DELEGATE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,4 +152,4 @@ public: // Data for deriving classes & Dispatchers
  */
 } // namespace DALI
 
-#endif // __DALI_FUNCTOR_DELEGATE_H__
+#endif // DALI_FUNCTOR_DELEGATE_H

@@ -1,5 +1,5 @@
-#ifndef __DALI_TEST_APPLICATION_H__
-#define __DALI_TEST_APPLICATION_H__
+#ifndef DALI_TEST_APPLICATION_H
+#define DALI_TEST_APPLICATION_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -114,4 +114,4 @@ protected:
 
 } // Dali
 
-#endif
+#endif // DALI_TEST_APPLICATION_H

@@ -1,8 +1,8 @@
-#ifndef __TEST_GL_SYNC_ABSTRACTION_H__
-#define __TEST_GL_SYNC_ABSTRACTION_H__
+#ifndef TEST_GL_SYNC_ABSTRACTION_H
+#define TEST_GL_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,4 +120,4 @@ private:
 
 } // Dali
 
-#endif // __TEST_GL_SYNC_ABSTRACTION_H__
+#endif // TEST_GL_SYNC_ABSTRACTION_H

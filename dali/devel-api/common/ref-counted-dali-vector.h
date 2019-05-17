@@ -1,8 +1,8 @@
-#ifndef __REF_COUNTED_DALI_VECTOR_H__
-#define __REF_COUNTED_DALI_VECTOR_H__
+#ifndef REF_COUNTED_DALI_VECTOR_H
+#define REF_COUNTED_DALI_VECTOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,4 +70,4 @@ private:
 
 } // namespace Dali
 
-#endif /* __REF_COUNTED_DALI_VECTOR_H__ */
+#endif // REF_COUNTED_DALI_VECTOR_H

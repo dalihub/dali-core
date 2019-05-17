@@ -1,8 +1,8 @@
-#ifndef __DALI_QUATERNION_H__
-#define __DALI_QUATERNION_H__
+#ifndef DALI_QUATERNION_H
+#define DALI_QUATERNION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -490,4 +490,4 @@ template <> struct TypeTraits< Quaternion > : public BasicTypes< Quaternion > { 
  */
 } // namespace Dali
 
-#endif // __DALI_QUATERNION_H__
+#endif // DALI_QUATERNION_H

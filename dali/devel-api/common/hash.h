@@ -1,8 +1,8 @@
-#ifndef __DALI_HASH__
-#define __DALI_HASH__
+#ifndef DALI_HASH
+#define DALI_HASH
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,4 +50,4 @@ DALI_CORE_API std::size_t CalculateHash( const std::string& string1, const std::
 
 } // namespace Dali
 
-#endif // __DALI_HASH__
+#endif // DALI_HASH

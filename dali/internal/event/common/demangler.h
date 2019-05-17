@@ -1,8 +1,8 @@
-#ifndef __DALI_DEMANGLER_H__
-#define __DALI_DEMANGLER_H__
+#ifndef DALI_DEMANGLER_H
+#define DALI_DEMANGLER_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,8 @@ std::vector<std::string> DemangleNestedNames(const char *typeIdName);
  */
 const std::string DemangleClassName(const char *typeIdName);
 
-}
+} // namespace Internal
 
-}
+} // namespace Dali
 
-
-#endif // header
+#endif // DALI_DEMANGLER_H

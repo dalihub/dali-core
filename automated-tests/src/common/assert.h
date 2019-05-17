@@ -1,5 +1,5 @@
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
+#ifndef ASSERT_H
+#define ASSERT_H
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -79,4 +79,4 @@
         return 1; \
     }
 
-#endif //  _ASSERT_H_
+#endif // ASSERT_H

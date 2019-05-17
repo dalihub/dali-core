@@ -1,8 +1,8 @@
-#ifndef __DALI_TIME_PERIOD_H__
-#define __DALI_TIME_PERIOD_H__
+#ifndef DALI_TIME_PERIOD_H
+#define DALI_TIME_PERIOD_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,4 +66,4 @@ struct DALI_CORE_API TimePeriod
  */
 } // namespace Dali
 
-#endif // __DALI_TIME_PERIOD_H__
+#endif // DALI_TIME_PERIOD_H

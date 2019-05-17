@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_HELPER_DEVEL_H__
-#define __DALI_PROPERTY_HELPER_DEVEL_H__
+#ifndef DALI_PROPERTY_HELPER_DEVEL_H
+#define DALI_PROPERTY_HELPER_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,4 +122,4 @@
 #define DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex ) \
   DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, DALI_TOKEN_PASTE( Devel, objectType ), text, enumIndex, baseEnumIndex, componentIndex )
 
-#endif // __DALI_PROPERTY_HELPER_DEVEL_H__
+#endif // DALI_PROPERTY_HELPER_DEVEL_H

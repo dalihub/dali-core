@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_TYPE_ABSTRACTION_H__
-#define __DALI_INTERNAL_TYPE_ABSTRACTION_H__
+#ifndef DALI_INTERNAL_TYPE_ABSTRACTION_H
+#define DALI_INTERNAL_TYPE_ABSTRACTION_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,4 +97,4 @@ template <class U> struct ParameterType< const U& > {};
 
 } //namespace Dali
 
-#endif // __DALI_INTERNAL_TYPE_ABSTRACTION_H__
+#endif // DALI_INTERNAL_TYPE_ABSTRACTION_H

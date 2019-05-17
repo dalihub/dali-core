@@ -1,5 +1,5 @@
-#ifndef _TESTCASE_H_
-#define _TESTCASE_H_
+#ifndef TESTCASE_H
+#define TESTCASE_H
 
 /* pointer to startup/cleanup functions */
 typedef void (*void_fun_ptr)(void);
@@ -15,4 +15,4 @@ typedef struct testcase_s {
     void_fun_ptr cleanup;
 } testcase;
 
-#endif // _TESTCASE_H_
+#endif // TESTCASE_H

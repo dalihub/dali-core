@@ -1,8 +1,8 @@
-#ifndef __DALI_MATRIX3_H__
-#define __DALI_MATRIX3_H__
+#ifndef DALI_MATRIX3_H
+#define DALI_MATRIX3_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,4 +263,4 @@ template <> struct TypeTraits< Matrix3 > : public BasicTypes< Matrix3 > { enum {
  */
 } // namespace Dali
 
-#endif //__DALI_MATRIX3_H__
+#endif //DALI_MATRIX3_H

@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_H__
-#define __DALI_PROPERTY_H__
+#ifndef DALI_PROPERTY_H
+#define DALI_PROPERTY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,4 +172,4 @@ struct DALI_CORE_API Property
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_H__
+#endif // DALI_PROPERTY_H

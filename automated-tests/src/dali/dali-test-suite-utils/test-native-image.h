@@ -1,8 +1,8 @@
-#ifndef __TEST_NATIVE_IMAGE_H__
-#define __TEST_NATIVE_IMAGE_H__
+#ifndef TEST_NATIVE_IMAGE_H
+#define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,4 +100,4 @@ public:
 
 } // Dali
 
-#endif
+#endif // TEST_NATIVE_IMAGE_H
