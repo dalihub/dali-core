@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_GESTURE_REQUESTS_H__
-#define __DALI_INTEGRATION_GESTURE_REQUESTS_H__
+#ifndef DALI_INTERNAL_GESTURE_REQUESTS_H
+#define DALI_INTERNAL_GESTURE_REQUESTS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
 /**
  * This structure specifies the gesture type required (or no longer required) by Core.
  */
-struct DALI_CORE_API GestureRequest
+struct GestureRequest
 {
   // Creation & Destruction
 
@@ -57,7 +57,7 @@ struct DALI_CORE_API GestureRequest
 /**
  * This is used by Core when a pan gesture is required.
  */
-struct DALI_CORE_API PanGestureRequest : public GestureRequest
+struct PanGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -87,7 +87,7 @@ struct DALI_CORE_API PanGestureRequest : public GestureRequest
 /**
  * This is used by Core when a pinch gesture is required.
  */
-struct DALI_CORE_API PinchGestureRequest : public GestureRequest
+struct PinchGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -110,7 +110,7 @@ struct DALI_CORE_API PinchGestureRequest : public GestureRequest
 /**
  * This is used by Core when a tap gesture is required.
  */
-struct DALI_CORE_API TapGestureRequest : public GestureRequest
+struct TapGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -144,7 +144,7 @@ struct DALI_CORE_API TapGestureRequest : public GestureRequest
 /**
  * This is used by Core when a long press gesture is required.
  */
-struct DALI_CORE_API LongPressGestureRequest : public GestureRequest
+struct LongPressGestureRequest : public GestureRequest
 {
   // Creation & Destruction
 
@@ -171,8 +171,8 @@ struct DALI_CORE_API LongPressGestureRequest : public GestureRequest
   unsigned int maxTouches; ///< The maximum number of touch points required for a long press gesture.
 };
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_GESTURE_REQUESTS_H__
+#endif // DALI_INTERNAL_GESTURE_REQUESTS_H

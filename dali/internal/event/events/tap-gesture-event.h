@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_TAP_GESTURE_H__
-#define __DALI_INTEGRATION_TAP_GESTURE_H__
+#ifndef DALI_INTERNAL_EVENT_TAP_GESTURE_H
+#define DALI_INTERNAL_EVENT_TAP_GESTURE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/events/gesture-event.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/internal/event/events/gesture-event.h>
 
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
 /**
@@ -40,7 +40,7 @@ namespace Integration
  *
  * A Started state will be ignored if a Possible state does not precede it.
  */
-struct DALI_CORE_API TapGestureEvent : public GestureEvent
+struct TapGestureEvent : public GestureEvent
 {
   // Construction & Destruction
 
@@ -76,8 +76,8 @@ struct DALI_CORE_API TapGestureEvent : public GestureEvent
   Vector2 point;
 };
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_TAP_GESTURE_H__
+#endif // DALI_INTERNAL_EVENT_TAP_GESTURE_H

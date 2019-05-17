@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
-#define __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
+#ifndef DALI_INTEGRATION_PLATFORM_ABSTRACTION_H
+#define DALI_INTEGRATION_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/integration-api/resource-types.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
@@ -127,6 +128,20 @@ public:
    */
   virtual bool SaveShaderBinaryFile( const std::string& filename, const uint8_t * buffer, uint32_t numBytes ) const = 0;
 
+  /**
+   * Sets a callback to occur in the future
+   * @param[in] milliseconds number of milliseconds to wait until executing the callback
+   * @param[in] callback function to call when the timer expires
+   * @result    a timer reference ID, to be used for cancelling the timer
+   */
+  virtual uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback ) = 0;
+
+  /**
+   * Cancels a running timer
+   * @param[in] timerId the ID reference returned when the timer was started
+   */
+  virtual void CancelTimer ( uint32_t timerId ) = 0;
+
 protected:
 
   /**
@@ -140,4 +155,4 @@ protected:
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
+#endif // DALI_INTEGRATION_PLATFORM_ABSTRACTION_H

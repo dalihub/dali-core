@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
+#ifndef DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_PROCESSOR_H
+#define DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,13 @@
 namespace Dali
 {
 
-namespace Integration
-{
-class GestureManager;
-struct GestureEvent;
-struct PanGestureEvent;
-}
-
 namespace Internal
 {
 
 class Stage;
 class Scene;
+struct GestureEvent;
+struct PanGestureEvent;
 
 namespace SceneGraph
 {
@@ -55,7 +50,7 @@ class UpdateManager;
  * The above is only checked when our gesture starts.  We continue sending the pan gesture to the
  * same actor and detector until the pan ends or is cancelled.
  */
-class PanGestureProcessor : public GestureProcessor
+class PanGestureProcessor : public GestureProcessor, public RecognizerObserver<PanGestureEvent>
 {
 public:
 
@@ -64,7 +59,7 @@ public:
    * @param[in] gestureManager The gesture manager
    * @param[in] updateManager The Update Manager
    */
-  PanGestureProcessor( Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager );
+  PanGestureProcessor( SceneGraph::UpdateManager& updateManager );
 
   /**
    * Destructor
@@ -78,7 +73,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the pan gesture event occurs in.
    * @param[in] panEvent The event that has occurred.
    */
-  void Process( Scene& scene, const Integration::PanGestureEvent& panEvent );
+  void Process( Scene& scene, const PanGestureEvent& panEvent );
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -86,7 +81,7 @@ public: // To be called by GestureEventProcessor
    * gesture with the adaptor.
    * @param[in]  gestureDetector  The gesture detector being added.
    */
-  void AddGestureDetector( PanGestureDetector* gestureDetector );
+  void AddGestureDetector( PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents );
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -105,9 +100,10 @@ public: // To be called by GestureEventProcessor
   /**
    * Sets the pan gesture properties stored in the scene object directly,
    * @param[in]  pan  The pan gesture to override the properties with.
+   * @return true if Core::Update required
    * @note If we are already processing a normal pan, then this call is ignored.
    */
-  void SetPanGestureProperties( const PanGesture& pan );
+  bool SetPanGestureProperties( const PanGesture& pan );
 
   /**
    * Called to provide pan-gesture profiling information.
@@ -257,7 +253,7 @@ private:
    */
   void EmitPanSignal( Actor* actor,
                       const GestureDetectorContainer& gestureDetectors,
-                      const Integration::PanGestureEvent& panEvent,
+                      const PanGestureEvent& panEvent,
                       Vector2 localCurrent,
                       Gesture::State state,
                       RenderTaskPtr renderTask );
@@ -281,8 +277,7 @@ private:
 
 private:
 
-  Integration::GestureManager& mGestureManager;
-  PanGestureDetectorContainer mGestureDetectors;
+  PanGestureDetectorContainer mPanGestureDetectors;
   GestureDetectorContainer mCurrentPanEmitters;
   RenderTaskPtr mCurrentRenderTask;
   Vector2 mPossiblePanPosition;
@@ -293,7 +288,7 @@ private:
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.
 
-  const Integration::PanGestureEvent* mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
+  const PanGestureEvent* mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
   SceneGraph::PanGesture* mSceneObject; ///< Not owned, but we write to it directly
 };
 
@@ -301,4 +296,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
+#endif // DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_PROCESSOR_H

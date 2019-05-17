@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <dali/internal/event/events/pan-gesture-processor.h>
 
+#if defined(DEBUG_ENABLED)
+#include <sstream>
+#endif
+
 // EXTERNAL INCLUDES
 #include <algorithm>
 
@@ -26,12 +30,14 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/gesture-manager.h>
+#include <dali/internal/event/events/pan-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/event/events/multi-point-event-util.h>
+#include <dali/internal/event/events/pan-gesture-recognizer.h>
+#include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
 {
@@ -41,6 +47,21 @@ namespace Internal
 
 namespace // unnamed namespace
 {
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PAN_PROCESSOR" );
+
+const char * GESTURE_STATES[ 6 ] =
+{
+  "Clear",
+  "Started",
+  "Continuing",
+  "Finished",
+  "Cancelled",
+  "Possible"
+};
+
+#endif // defined(DEBUG_ENABLED)
 
 const unsigned long MAXIMUM_TIME_WITH_VALID_LAST_VELOCITY( 50u );
 
@@ -101,16 +122,15 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 
 } // unnamed namespace
 
-PanGestureProcessor::PanGestureProcessor( Integration::GestureManager& gestureManager, SceneGraph::UpdateManager& updateManager )
+PanGestureProcessor::PanGestureProcessor( SceneGraph::UpdateManager& updateManager )
 : GestureProcessor( Gesture::Pan ),
-  mGestureManager( gestureManager ),
-  mGestureDetectors(),
+  mPanGestureDetectors(),
   mCurrentPanEmitters(),
   mCurrentRenderTask(),
   mPossiblePanPosition(),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
-  mCurrentPanEvent( NULL ),
+  mCurrentPanEvent( nullptr ),
   mSceneObject( SceneGraph::PanGesture::New() ) // Create scene object to store pan information.
 {
   // Pass ownership to scene-graph; scene object lives for the lifecycle of UpdateManager
@@ -119,11 +139,21 @@ PanGestureProcessor::PanGestureProcessor( Integration::GestureManager& gestureMa
 
 PanGestureProcessor::~PanGestureProcessor()
 {
-  mSceneObject = NULL; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
+  mSceneObject = nullptr; // mSceneObject is owned and destroyed by update manager (there is only one of these for now)
 }
 
-void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEvent& panEvent )
+void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent )
 {
+#if defined(DEBUG_ENABLED)
+  DALI_LOG_TRACE_METHOD( gLogFilter );
+
+  DALI_LOG_INFO( gLogFilter, Debug::General, "    Pan Event\n");
+  DALI_LOG_INFO( gLogFilter, Debug::General, "      State: %s  Touches: %d  Time: %d  TimeDelta: %d\n",
+                                             GESTURE_STATES[panEvent.state], panEvent.numberOfTouches, panEvent.time, panEvent.timeDelta);
+  DALI_LOG_INFO( gLogFilter, Debug::General, "      Positions: Current: (%.0f, %.0f), Previous: (%.0f, %.0f)\n",
+                                             panEvent.currentPosition.x, panEvent.currentPosition.y, panEvent.previousPosition.x, panEvent.previousPosition.y);
+#endif
+
   switch( panEvent.state )
   {
     case Gesture::Possible:
@@ -143,6 +173,9 @@ void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEv
 
     case Gesture::Started:
     {
+      // Requires a core update
+      mNeedsUpdate = true;
+
       if ( GetCurrentGesturedActor() )
       {
         // The pan gesture should only be sent to the gesture detector which first received it so that
@@ -159,7 +192,7 @@ void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEv
           // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
           mCurrentPanEvent = &panEvent;
           ProcessAndEmit( hitTestResults );
-          mCurrentPanEvent = NULL;
+          mCurrentPanEvent = nullptr;
         }
         else
         {
@@ -171,6 +204,11 @@ void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEv
     }
 
     case Gesture::Continuing:
+    {
+      // Requires a core update
+      mNeedsUpdate = true;
+    }
+    // No break, Fallthrough
     case Gesture::Finished:
     case Gesture::Cancelled:
     {
@@ -231,21 +269,23 @@ void PanGestureProcessor::Process( Scene& scene, const Integration::PanGestureEv
   }
 }
 
-void PanGestureProcessor::AddGestureDetector( PanGestureDetector* gestureDetector )
+void PanGestureProcessor::AddGestureDetector( PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents )
 {
-  bool firstRegistration(mGestureDetectors.empty());
+  bool firstRegistration(mPanGestureDetectors.empty());
 
-  mGestureDetectors.push_back(gestureDetector);
+  mPanGestureDetectors.push_back(gestureDetector);
 
   if (firstRegistration)
   {
     mMinTouchesRequired = gestureDetector->GetMinimumTouchesRequired();
     mMaxTouchesRequired = gestureDetector->GetMaximumTouchesRequired();
 
-    Integration::PanGestureRequest request;
+    PanGestureRequest request;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
-    mGestureManager.Register(request);
+
+    Size size = scene.GetSize();
+    mGestureRecognizer = new PanGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const PanGestureRequest&>(request), minDistance, minPanEvents);
   }
   else
   {
@@ -269,16 +309,15 @@ void PanGestureProcessor::RemoveGestureDetector( PanGestureDetector* gestureDete
   }
 
   // Find the detector...
-  PanGestureDetectorContainer::iterator endIter = std::remove( mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector );
-  DALI_ASSERT_DEBUG( endIter != mGestureDetectors.end() );
+  PanGestureDetectorContainer::iterator endIter = std::remove( mPanGestureDetectors.begin(), mPanGestureDetectors.end(), gestureDetector );
+  DALI_ASSERT_DEBUG( endIter != mPanGestureDetectors.end() );
 
   // ...and remove it
-  mGestureDetectors.erase(endIter, mGestureDetectors.end());
+  mPanGestureDetectors.erase(endIter, mPanGestureDetectors.end());
 
-  if (mGestureDetectors.empty())
+  if (mPanGestureDetectors.empty())
   {
-    Integration::GestureRequest request(Gesture::Pan);
-    mGestureManager.Unregister(request);
+    mGestureRecognizer.Detach();
   }
   else
   {
@@ -288,12 +327,12 @@ void PanGestureProcessor::RemoveGestureDetector( PanGestureDetector* gestureDete
 
 void PanGestureProcessor::GestureDetectorUpdated( PanGestureDetector* gestureDetector )
 {
-  DALI_ASSERT_DEBUG(find(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector) != mGestureDetectors.end());
+  DALI_ASSERT_DEBUG(find(mPanGestureDetectors.begin(), mPanGestureDetectors.end(), gestureDetector) != mPanGestureDetectors.end());
 
   UpdateDetection();
 }
 
-void PanGestureProcessor::SetPanGestureProperties( const PanGesture& pan )
+bool PanGestureProcessor::SetPanGestureProperties( const PanGesture& pan )
 {
   // If we are currently processing a pan gesture then just ignore
   if ( mCurrentPanEmitters.empty() && mSceneObject )
@@ -301,7 +340,14 @@ void PanGestureProcessor::SetPanGestureProperties( const PanGesture& pan )
     // We update the scene object directly rather than sending a message.
     // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
     mSceneObject->AddGesture( pan );
+
+    if( Gesture::Started == pan.state || Gesture::Continuing == pan.state )
+    {
+      mNeedsUpdate = true;
+    }
   }
+
+  return mNeedsUpdate;
 }
 
 void PanGestureProcessor::EnableProfiling()
@@ -403,12 +449,12 @@ const SceneGraph::PanGesture& PanGestureProcessor::GetSceneObject() const
 
 void PanGestureProcessor::UpdateDetection()
 {
-  DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
+  DALI_ASSERT_DEBUG(!mPanGestureDetectors.empty());
 
   unsigned int minimumRequired = UINT_MAX;
   unsigned int maximumRequired = 0;
 
-  for ( PanGestureDetectorContainer::iterator iter = mGestureDetectors.begin(), endIter = mGestureDetectors.end(); iter != endIter; ++iter )
+  for ( PanGestureDetectorContainer::iterator iter = mPanGestureDetectors.begin(), endIter = mPanGestureDetectors.end(); iter != endIter; ++iter )
   {
     PanGestureDetector* detector(*iter);
 
@@ -433,16 +479,16 @@ void PanGestureProcessor::UpdateDetection()
     mMinTouchesRequired = minimumRequired;
     mMaxTouchesRequired = maximumRequired;
 
-    Integration::PanGestureRequest request;
+    PanGestureRequest request;
     request.minTouches = mMinTouchesRequired;
     request.maxTouches = mMaxTouchesRequired;
-    mGestureManager.Update(request);
+    mGestureRecognizer->Update(request);
   }
 }
 
 void PanGestureProcessor::EmitPanSignal( Actor* actor,
                                          const GestureDetectorContainer& gestureDetectors,
-                                         const Integration::PanGestureEvent& panEvent,
+                                         const PanGestureEvent& panEvent,
                                          Vector2 localCurrent,
                                          Gesture::State state,
                                          RenderTaskPtr renderTask )
@@ -503,6 +549,7 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
     }
 
     Dali::Actor actorHandle( actor );
+
     const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
     for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
     {

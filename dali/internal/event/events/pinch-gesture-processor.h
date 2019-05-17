@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
+#ifndef DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H
+#define DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,13 @@
 namespace Dali
 {
 
-namespace Integration
-{
-class GestureManager;
-struct GestureEvent;
-struct PinchGestureEvent;
-}
-
 namespace Internal
 {
 
 class Scene;
 class Stage;
+
+struct PinchGestureEvent;
 
 /**
  * Pinch Gesture Event Processing:
@@ -49,7 +44,7 @@ class Stage;
  * The above is only checked when our gesture starts. We continue sending the pinch gesture to this
  * detector until the pinch ends or is cancelled.
  */
-class PinchGestureProcessor : public GestureProcessor
+class PinchGestureProcessor : public GestureProcessor, public RecognizerObserver<PinchGestureEvent>
 {
 public:
 
@@ -57,7 +52,7 @@ public:
    * Create a pinch gesture processor.
    * @param[in] gestureManager The gesture manager
    */
-  PinchGestureProcessor( Integration::GestureManager& gestureManager );
+  PinchGestureProcessor();
 
   /**
    * Non-virtual destructor; PinchGestureProcessor is not a base class
@@ -67,11 +62,17 @@ public:
 public: // To be called by GestureEventProcessor
 
   /**
+   * This method sets the minimum distance to start a pinch
+   * @param[in] value The distance in pixels
+   */
+  void SetMinimumPinchDistance( float value );
+
+  /**
    * This method is called whenever a pinch gesture event occurs.
    * @param[in] scene The scene the pinch gesture event occurs in.
    * @param[in] pinchEvent The event that has occurred.
    */
-  void Process( Scene& scene, const Integration::PinchGestureEvent& pinchEvent );
+  void Process( Scene& scene, const PinchGestureEvent& pinchEvent );
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -79,7 +80,7 @@ public: // To be called by GestureEventProcessor
    * gesture with the adaptor.
    * @param[in]  gestureDetector  The gesture detector being added.
    */
-  void AddGestureDetector(PinchGestureDetector* gestureDetector);
+  void AddGestureDetector(PinchGestureDetector* gestureDetector, Scene& scene);
 
   /**
    * Removes the specified gesture detector from this gesture processor.  If, after removing this
@@ -122,16 +123,17 @@ private:
 
 private:
 
-  Integration::GestureManager& mGestureManager;
-  PinchGestureDetectorContainer mGestureDetectors;
+  PinchGestureDetectorContainer mPinchGestureDetectors;
   GestureDetectorContainer mCurrentPinchEmitters;
   RenderTaskPtr mCurrentRenderTask;
 
-  const Integration::PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
+  const PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
+
+  float mMinimumPinchDistance;
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
+#endif // DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H

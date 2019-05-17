@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_GESTURE_EVENT_H__
-#define __DALI_INTEGRATION_GESTURE_EVENT_H__
+#ifndef DALI_INTERNAL_EVENT_GESTURE_EVENT_H
+#define DALI_INTERNAL_EVENT_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
 /**
  * This is the abstract base structure for any gestures that the adaptor detects and wishes to send
  * to the Core.
  */
-struct DALI_CORE_API GestureEvent : public Event
+struct GestureEvent
 {
   // Destruction
 
@@ -56,7 +56,7 @@ struct DALI_CORE_API GestureEvent : public Event
   /**
    * The time the gesture took place.
    */
-  unsigned int time;
+  uint32_t time;
 
 protected:  // Constructors only to be used by derived structures.
 
@@ -68,8 +68,8 @@ protected:  // Constructors only to be used by derived structures.
   GestureEvent(Gesture::Type gesture, Gesture::State gestureState);
 };
 
-} // namespace Integration
+} // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_GESTURE_EVENT_H__
+#endif // DALI_INTERNAL_EVENT_GESTURE_EVENT_H
