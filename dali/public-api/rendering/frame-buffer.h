@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_rendering_effects
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -157,6 +161,9 @@ public:
   explicit DALI_INTERNAL FrameBuffer( Internal::FrameBuffer* pointer );
 };
 
+/**
+ * @}
+ */
 } //namespace Dali
 
 #endif // DALI_FRAMEBUFFER_H

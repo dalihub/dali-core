@@ -70,6 +70,10 @@
  *    <td>@ref dali_core_signals</td>
  *    <td>Classes for the signal and slot structure.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_core_size_negotiation</td>
+ *    <td>Classes for the size negotiation.</td>
+ * </tr>
  * </table>
  *
  * \ifnot show_tizen_feature
@@ -116,6 +120,9 @@
 
  *   @defgroup dali_core_signals Signal
  *   @brief Classes for the signal and slot structure.
+
+ *   @defgroup dali_core_size_negotiation Size Negotiation
+ *   @brief Classes for the size negotiation.
  * @}
  */
 
