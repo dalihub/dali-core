@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_rendering_effects
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -129,6 +133,9 @@ public:
   explicit DALI_INTERNAL Sampler( Internal::Sampler* pointer );
 };
 
+/**
+ * @}
+ */
 } //namespace Dali
 
 #endif // DALI_SAMPLER_H

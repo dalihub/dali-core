@@ -29,6 +29,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_rendering_effects
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -175,6 +179,9 @@ public:
   explicit DALI_INTERNAL Geometry( Internal::Geometry* pointer );
 };
 
+/**
+ * @}
+ */
 } //namespace Dali
 
 #endif // DALI_GEOMETRY_H

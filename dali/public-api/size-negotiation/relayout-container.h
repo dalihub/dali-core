@@ -24,6 +24,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_size_negotiation
+ * @{
+ */
 
 class RelayoutContainer;
 typedef RelayoutContainer* RelayoutContainerPtr;
@@ -61,6 +65,9 @@ public:
 
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // DALI_RELAYOUT_CONTAINER_H
