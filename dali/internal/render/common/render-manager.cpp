@@ -561,24 +561,32 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
 
   Render::SurfaceFrameBuffer* surfaceFrameBuffer = nullptr;
-  if ( ( instruction.mFrameBuffer != 0 ) && instruction.mFrameBuffer->IsSurfaceBacked() )
+  if ( instruction.mFrameBuffer != 0 )
   {
-    surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
-
-    if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+    if ( instruction.mFrameBuffer->IsSurfaceBacked() )
     {
-      Context* surfaceContext = surfaceFrameBuffer->GetContext();
-      if ( mImpl->currentContext != surfaceContext )
-      {
-        // Switch the correct context if rendering to a surface
-        mImpl->currentContext = surfaceContext;
-        // Clear the current cached program when the context is switched
-        mImpl->programController.ClearCurrentProgram();
-      }
-    }
+      surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
 
-    surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
-    backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
+      if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+      {
+        Context* surfaceContext = surfaceFrameBuffer->GetContext();
+        if ( mImpl->currentContext != surfaceContext )
+        {
+          // Switch the correct context if rendering to a surface
+          mImpl->currentContext = surfaceContext;
+          // Clear the current cached program when the context is switched
+          mImpl->programController.ClearCurrentProgram();
+        }
+      }
+
+      surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
+      backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
+    }
+    else
+    {
+      // Switch to shared context for off-screen buffer
+      mImpl->currentContext = &mImpl->context;
+    }
   }
 
   DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
