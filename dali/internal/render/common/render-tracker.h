@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_RENDER_RENDER_TRACKER_H
-#define __DALI_INTERNAL_RENDER_RENDER_TRACKER_H
+#ifndef DALI_INTERNAL_RENDER_RENDER_TRACKER_H
+#define DALI_INTERNAL_RENDER_RENDER_TRACKER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,4 +88,4 @@ private:
 } // Dali
 
 
-#endif // __DALI_INTERNAL_RENDER_RENDER_TRACKER_H
+#endif // DALI_INTERNAL_RENDER_RENDER_TRACKER_H

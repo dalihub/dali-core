@@ -1,8 +1,8 @@
-#ifndef __DALI_CALLBACK_H__
-#define __DALI_CALLBACK_H__
+#ifndef DALI_CALLBACK_H
+#define DALI_CALLBACK_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1784,4 +1784,4 @@ inline CallbackBase* MakeCallback( T& object, void(Base::*function)(void) )
  */
 } // namespace DALI
 
-#endif // __DALI_CALLBACK_H__
+#endif // DALI_CALLBACK_H

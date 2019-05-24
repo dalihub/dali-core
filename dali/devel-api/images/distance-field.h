@@ -1,8 +1,8 @@
-#ifndef __DALI_DISTANCE_FIELD_H__
-#define __DALI_DISTANCE_FIELD_H__
+#ifndef DALI_DISTANCE_FIELD_H
+#define DALI_DISTANCE_FIELD_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,4 +49,4 @@ DALI_CORE_API void GenerateDistanceFieldMap( const uint8_t* const imagePixels, c
 
 } //namespace Dali
 
-#endif // ifndef __DALI_DISTANCE_FIELD_H__
+#endif // DALI_DISTANCE_FIELD_H

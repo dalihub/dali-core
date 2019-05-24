@@ -1,5 +1,5 @@
-#ifndef __DALI_TAP_GESTURE_DETECTOR_H__
-#define __DALI_TAP_GESTURE_DETECTOR_H__
+#ifndef DALI_TAP_GESTURE_DETECTOR_H
+#define DALI_TAP_GESTURE_DETECTOR_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -219,4 +219,4 @@ public: // Not intended for Application developers
 
 } // namespace Dali
 
-#endif // __DALI_TAP_GESTURE_DETECTOR_H__
+#endif // DALI_TAP_GESTURE_DETECTOR_H

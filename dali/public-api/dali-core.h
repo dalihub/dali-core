@@ -1,8 +1,8 @@
-#ifndef __DALI_CORE_H__
-#define __DALI_CORE_H__
+#ifndef DALI_CORE_H
+#define DALI_CORE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,4 +135,4 @@
 
 #include <dali/public-api/dali-core-version.h>
 
-#endif // __DALI_CORE_H__
+#endif // DALI_CORE_H

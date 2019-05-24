@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_PROGRESS_VALUE_H__
-#define __DALI_INTERNAL_PROGRESS_VALUE_H__
+#ifndef DALI_INTERNAL_PROGRESS_VALUE_H
+#define DALI_INTERNAL_PROGRESS_VALUE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,4 +179,4 @@ inline void CubicInterpolate( AngleAxis& result, const AngleAxis& p0, const Angl
 
 } // namespace Dali
 
-#endif //__DALI_PROGRESS_VALUE_H__
+#endif // DALI_INTERNAL_PROGRESS_VALUE_H

@@ -1,5 +1,5 @@
-#ifndef __DALI_INTEGRATION_EVENT_H__
-#define __DALI_INTEGRATION_EVENT_H__
+#ifndef DALI_INTEGRATION_EVENT_H
+#define DALI_INTEGRATION_EVENT_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -70,4 +70,4 @@ protected: // Constructors only to be used by derived structures.
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_EVENT_H__
+#endif // DALI_INTEGRATION_EVENT_H

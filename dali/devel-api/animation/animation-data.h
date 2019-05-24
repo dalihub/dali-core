@@ -1,8 +1,8 @@
-#ifndef __DALI_ANIMATION_DATA_H__
-#define __DALI_ANIMATION_DATA_H__
+#ifndef DALI_ANIMATION_DATA_H
+#define DALI_ANIMATION_DATA_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,5 +108,5 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_ANIMATION_DATA_H__
+#endif // DALI_ANIMATION_DATA_H
 

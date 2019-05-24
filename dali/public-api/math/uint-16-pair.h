@@ -1,8 +1,8 @@
-#ifndef __DALI_UINT_16_PAIR_H__
-#define __DALI_UINT_16_PAIR_H__
+#ifndef DALI_UINT_16_PAIR_H
+#define DALI_UINT_16_PAIR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,4 +275,4 @@ template <> struct TypeTraits< Uint16Pair > : public BasicTypes< Uint16Pair > { 
  */
 } // namespace Dali
 
-#endif // __DALI_UINT_16_PAIR_H__
+#endif // DALI_UINT_16_PAIR_H

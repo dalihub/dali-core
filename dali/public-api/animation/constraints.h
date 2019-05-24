@@ -1,8 +1,8 @@
-#ifndef __DALI_CONSTRAINTS_H__
-#define __DALI_CONSTRAINTS_H__
+#ifndef DALI_CONSTRAINTS_H
+#define DALI_CONSTRAINTS_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,4 +251,4 @@ inline void LookAt( Dali::Quaternion& current, const Dali::PropertyInputContaine
  */
 } // namespace Dali
 
-#endif // __DALI_CONSTRAINTS_H__
+#endif // DALI_CONSTRAINTS_H
