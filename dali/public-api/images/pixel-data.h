@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_images
+ * @{
+ */
 
 namespace Internal
 {
@@ -140,7 +144,9 @@ public:
   explicit DALI_INTERNAL PixelData( Internal::PixelData* pointer );
 };
 
-
+/**
+ * @}
+ */
 } //namespace Dali
 
 #endif // DALI_PIXEL_DATA_H

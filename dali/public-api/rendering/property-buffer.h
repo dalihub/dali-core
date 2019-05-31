@@ -28,6 +28,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_rendering_effects
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -163,6 +167,9 @@ public:
   explicit DALI_INTERNAL PropertyBuffer( Internal::PropertyBuffer* pointer );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // DALI_PROPERTY_BUFFER_H
