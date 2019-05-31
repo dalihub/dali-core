@@ -121,7 +121,10 @@ void PinchGestureProcessor::SetMinimumPinchDistance( float value )
   if( mGestureRecognizer )
   {
     PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>(mGestureRecognizer.Get());
-    pinchRecognizer->SetMinimumPinchDistance(value);
+    if( pinchRecognizer )
+    {
+      pinchRecognizer->SetMinimumPinchDistance(value);
+    }
   }
 }
 
