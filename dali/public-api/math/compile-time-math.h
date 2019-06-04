@@ -1,8 +1,8 @@
-#ifndef __DALI_COMPILE_TIME_MATH_H__
-#define __DALI_COMPILE_TIME_MATH_H__
+#ifndef DALI_COMPILE_TIME_MATH_H
+#define DALI_COMPILE_TIME_MATH_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,4 +172,4 @@ struct Epsilon< 0 >
  */
 } // namespace Dali
 
-#endif // __DALI_COMPILE_TIME_MATH_H__
+#endif // DALI_COMPILE_TIME_MATH_H

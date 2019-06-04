@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_KEY_EVENT_H__
-#define __DALI_INTEGRATION_KEY_EVENT_H__
+#ifndef DALI_INTEGRATION_KEY_EVENT_H
+#define DALI_INTEGRATION_KEY_EVENT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,4 +153,4 @@ struct DALI_CORE_API KeyEvent : public Event
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_KEY_EVENT_H__
+#endif // DALI_INTEGRATION_KEY_EVENT_H

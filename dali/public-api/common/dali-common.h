@@ -1,8 +1,8 @@
-#ifndef __DALI_COMMON_H__
-#define __DALI_COMMON_H__
+#ifndef DALI_COMMON_H
+#define DALI_COMMON_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,4 +199,4 @@ public:
 #define DALI_ASSERT_DEBUG(cond)
 #endif
 
-#endif // __DALI_COMMON_H__
+#endif // DALI_COMMON_H

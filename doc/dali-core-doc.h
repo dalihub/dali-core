@@ -1,8 +1,8 @@
-#ifndef __DALI_DOC_H__
-#define __DALI_DOC_H__
+#ifndef DALI_DOC_H
+#define DALI_DOC_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,10 @@
  *    <td>@ref dali_core_signals</td>
  *    <td>Classes for the signal and slot structure.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_core_size_negotiation</td>
+ *    <td>Classes for the size negotiation.</td>
+ * </tr>
  * </table>
  *
  * \ifnot show_tizen_feature
@@ -116,7 +120,10 @@
 
  *   @defgroup dali_core_signals Signal
  *   @brief Classes for the signal and slot structure.
+
+ *   @defgroup dali_core_size_negotiation Size Negotiation
+ *   @brief Classes for the size negotiation.
  * @}
  */
 
-#endif  /* __DALI_DOC_H__ */
+#endif  /* DALI_DOC_H */

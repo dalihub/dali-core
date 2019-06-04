@@ -90,6 +90,7 @@ struct DALI_CORE_API Property::Key
    * @SINCE_1_4.16
    *
    * @param[in] key The string key as a const char *
+   * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
   bool operator== ( const char * key );
 

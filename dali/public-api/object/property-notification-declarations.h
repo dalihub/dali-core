@@ -1,8 +1,8 @@
-#ifndef __DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H__
-#define __DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H__
+#ifndef DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H
+#define DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,4 +42,4 @@ typedef Signal< void (PropertyNotification& source) > PropertyNotifySignalType;
  */
 } // namespace Dali
 
-#endif // __DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H__
+#endif // DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H

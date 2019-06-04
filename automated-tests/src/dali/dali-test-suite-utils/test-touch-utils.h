@@ -1,8 +1,8 @@
-#ifndef _TEST_TOUCH_UTILS_H_
-#define _TEST_TOUCH_UTILS_H_
+#ifndef TEST_TOUCH_UTILS_H
+#define TEST_TOUCH_UTILS_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,4 +78,4 @@ struct TouchEventDataFunctor
 
 } // namespace Dali
 
-#endif //  _TEST_TOUCH_UTILS_H_
+#endif // TEST_TOUCH_UTILS_H

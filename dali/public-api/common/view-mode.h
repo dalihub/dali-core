@@ -1,8 +1,8 @@
-#ifndef __DALI_VIEW_MODE_H__
-#define __DALI_VIEW_MODE_H__
+#ifndef DALI_VIEW_MODE_H
+#define DALI_VIEW_MODE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,4 +41,4 @@ enum ViewMode
  */
 } // namespace Dali
 
-#endif // __DALI_VIEW_MODE_H__
+#endif // DALI_VIEW_MODE_H

@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_NATIVE_IMAGE_H__
-#define __DALI_INTERNAL_NATIVE_IMAGE_H__
+#ifndef DALI_INTERNAL_NATIVE_IMAGE_H
+#define DALI_INTERNAL_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,4 +102,4 @@ inline const Internal::NativeImage& GetImplementation(const Dali::NativeImage& i
 }
 
 } // namespace Dali
-#endif // __DALI_INTERNAL_NATIVE_IMAGE_H__
+#endif // DALI_INTERNAL_NATIVE_IMAGE_H

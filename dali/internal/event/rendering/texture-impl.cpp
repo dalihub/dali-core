@@ -41,6 +41,10 @@ TexturePtr Texture::New( NativeImageInterface& nativeImageInterface )
 {
   TexturePtr texture( new Texture( &nativeImageInterface ) );
   texture->Initialize();
+
+  // Request event processing and update forcely.
+  texture->mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );
+  texture->mEventThreadServices.ForceNextUpdate();
   return texture;
 }
 

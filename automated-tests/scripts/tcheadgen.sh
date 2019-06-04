@@ -28,8 +28,8 @@ awk -F',' -v HEADER_NAME="$HEADER_NAME" '
         tc_array_counter = 0;
         tc_array_list[0] = "";
 
-print "#ifndef __" HEADER_NAME "__"
-print "#define __" HEADER_NAME "__"
+print "#ifndef " HEADER_NAME
+print "#define " HEADER_NAME
 print ""
 print "#include \"testcase.h\""
 print ""
@@ -67,7 +67,7 @@ print "    {" tc_array_list[i] "},"
 print "    {NULL, NULL}"
 print "};"
 print ""
-print "#endif // __" HEADER_NAME "__"
+print "#endif // " HEADER_NAME
 }' $TFILE > $FILE
 unlink $TFILE
 
