@@ -2700,6 +2700,52 @@ int UtcDaliRenderTaskViewportToLocal(void)
 
 }
 
+int UtcDaliRenderTaskOffscreenViewportToLocal(void)
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetPosition( 10.0f, 10.0f );
+  Stage::GetCurrent().Add( actor );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.CreateTask();
+
+  FrameBufferImage newFrameBuffer = FrameBufferImage::New( 10, 10 );
+  task.SetTargetFrameBuffer( newFrameBuffer );
+  task.SetSourceActor( actor );
+  task.SetScreenToFrameBufferMappingActor( actor );
+
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  Stage::GetCurrent().Add( offscreenCameraActor );
+  task.SetCameraActor( offscreenCameraActor );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  float localX;
+  float localY;
+
+  float rtLocalX;
+  float rtLocalY;
+
+  float screenX = 50.0f;
+  float screenY = 50.0f;
+
+  DALI_TEST_CHECK( actor.ScreenToLocal(localX, localY, screenX, screenY) );
+
+  DALI_TEST_CHECK( task.ViewportToLocal(actor, screenX, screenY, rtLocalX, rtLocalY ) );
+
+  DALI_TEST_EQUALS(localX, rtLocalX, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(localY, rtLocalY, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskRequiresSync(void)
 {
   TestApplication application;

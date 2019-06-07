@@ -57,6 +57,10 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_rendering_effects
+ * @{
+ */
 
 namespace Internal DALI_INTERNAL
 {
@@ -178,6 +182,9 @@ public:
   explicit DALI_INTERNAL Shader( Internal::Shader* effect );
 };
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // DALI_SHADER_H
