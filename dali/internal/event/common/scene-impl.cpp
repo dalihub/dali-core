@@ -63,6 +63,7 @@ Scene::Scene( const Size& size )
   mSize( size ),
   mSurfaceSize( Vector2::ZERO ),
   mDpi( Vector2::ZERO ),
+  mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
   mDepthTreeDirty( false ),
   mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
 {
@@ -198,34 +199,54 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
   mSurface = &surface;
   if ( mSurface )
   {
-    mSurfaceSize.width = static_cast<float>( mSurface->GetPositionSize().width );
-    mSurfaceSize.height = static_cast<float>( mSurface->GetPositionSize().height );
-
-    mSize.width = mSurfaceSize.width;
-    mSize.height = mSurfaceSize.height;
-
-    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-    mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
-
-    mRootLayer->SetSize( mSize.width, mSize.height );
-
-    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-    SetDefaultSurfaceRectMessage( updateManager, Rect<int32_t>( 0, 0, static_cast<int32_t>( mSurfaceSize.width ), static_cast<int32_t>( mSurfaceSize.height ) ) ); // truncated
-
     RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
-
-    // if single render task to screen then set its viewport parameters
-    if( 1 == mRenderTaskList->GetTaskCount() )
-    {
-      if( !defaultRenderTask->GetTargetFrameBuffer() )
-      {
-        defaultRenderTask->SetViewport( Viewport( 0, 0, static_cast<int32_t>( mSurfaceSize.width ), static_cast<int32_t>( mSurfaceSize.height ) ) ); // truncated
-      }
-    }
 
     mFrameBuffer = Dali::Internal::FrameBuffer::New( surface, Dali::FrameBuffer::Attachment::NONE );
     defaultRenderTask->SetFrameBuffer( mFrameBuffer );
+
+    SurfaceResized();
+  }
+}
+
+void Scene::SurfaceResized()
+{
+  if( mSurface )
+  {
+    const float fWidth = static_cast<float>( mSurface->GetPositionSize().width );
+    const float fHeight = static_cast<float>( mSurface->GetPositionSize().height );
+
+    if( ( fabsf( mSurfaceSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSurfaceSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
+    {
+      Rect<int32_t> newSize( 0, 0, static_cast<int32_t>( mSurface->GetPositionSize().width ), static_cast<int32_t>( mSurface->GetPositionSize().height ) );
+
+      mSurfaceSize.width = fWidth;
+      mSurfaceSize.height = fHeight;
+
+      mSize.width = mSurfaceSize.width;
+      mSize.height = mSurfaceSize.height;
+
+      // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
+      mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
+
+      mRootLayer->SetSize( mSize.width, mSize.height );
+
+      ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+      SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
+      SetDefaultSurfaceRectMessage( updateManager, newSize ); // truncated
+
+      RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
+
+      // if single render task to screen then set its viewport parameters
+      if( 1 == mRenderTaskList->GetTaskCount() )
+      {
+        if( !defaultRenderTask->GetTargetFrameBuffer() )
+        {
+          defaultRenderTask->SetViewport( newSize ); // truncated
+        }
+      }
+
+      defaultRenderTask->GetFrameBuffer()->SetSize( static_cast<uint32_t>( newSize.width ), static_cast<uint32_t>( newSize.height ) );
+    }
   }
 }
 
@@ -260,17 +281,19 @@ void Scene::RebuildDepthTree()
   }
 }
 
-void Scene::SetBackgroundColor(Vector4 color)
+void Scene::SetBackgroundColor( const Vector4& color )
 {
+  mBackgroundColor = color;
+
   if( mSurface )
   {
-    mSurface->SetBackgroundColor( color );
+    mRenderTaskList->GetTask( 0u )->GetFrameBuffer()->SetBackgroundColor( color );
   }
 }
 
 Vector4 Scene::GetBackgroundColor() const
 {
-  return mSurface ? mSurface->GetBackgroundColor() : DEFAULT_BACKGROUND_COLOR;
+  return mBackgroundColor;
 }
 
 void Scene::EmitKeyEventSignal(const KeyEvent& event)

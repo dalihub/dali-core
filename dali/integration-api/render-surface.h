@@ -183,18 +183,6 @@ public:
    */
   virtual Integration::StencilBufferAvailable GetStencilBufferRequired() = 0;
 
-  /**
-   * @brief Sets the background color of the surface.
-   * @param[in] color The new background color
-   */
-  virtual void SetBackgroundColor(Vector4 color) = 0;
-
-  /**
-   * @brief Gets the background color of the surface.
-   * @return The background color
-   */
-  virtual Vector4 GetBackgroundColor() = 0;
-
 private:
 
   /**
