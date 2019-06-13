@@ -55,6 +55,7 @@ class DALI_CORE_API Scene : public BaseHandle
 public:
   typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
   typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
+  typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
   typedef Signal< void (const Dali::TouchData&) > TouchSignalType; ///< Touch signal type
   typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< Touched signal type
 
@@ -252,6 +253,22 @@ public:
    * @return The signal to connect to
    */
   KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @brief The user would connect to this signal to get a KeyEvent when KeyEvent is generated.
+   *
+   * If the control already consumed key event, KeyEventProcessor do not need to Emit keyEvent.
+   * Therefore, KeyinputManager first checks whether KeyEvent is generated as KeyEventGeneratedSignal.
+   * After that keyEventProcessor must invoke KeyEvent only if KeyEventGeneratedSignal () is not consumed.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName(const KeyEvent& event);
+   * @endcode
+   *
+   * @return The return is true if KeyEvent is consumed, otherwise false.
+   */
+  KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
 
   /**
    * @brief This signal is emitted when the screen is touched and when the touch ends
