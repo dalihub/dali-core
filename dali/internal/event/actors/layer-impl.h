@@ -69,10 +69,9 @@ public:
   /**
    * Create a new root layer; this is typically owned by the stage.
    * @param[in] layerList The layer will be added to this ordered list.
-   * @param[in] manager The update manager to install a root node with.
    * @return A smart-pointer to the newly allocated Actor.
    */
-  static LayerPtr NewRoot( LayerList& layerList, SceneGraph::UpdateManager& manager );
+  static LayerPtr NewRoot( LayerList& layerList );
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize

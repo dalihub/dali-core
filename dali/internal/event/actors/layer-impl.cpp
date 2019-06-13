@@ -97,12 +97,12 @@ LayerPtr Layer::New()
   return layer;
 }
 
-LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager )
+LayerPtr Layer::NewRoot( LayerList& layerList )
 {
   // create node, nodes are owned by UpdateManager
   SceneGraph::Layer* rootLayer = SceneGraph::Layer::New();
   OwnerPointer< SceneGraph::Layer > transferOwnership( rootLayer );
-  InstallRootMessage( manager, transferOwnership );
+  InstallRootMessage( EventThreadServices::Get().GetUpdateManager(), transferOwnership );
 
   LayerPtr root( new Layer( Actor::ROOT_LAYER, *rootLayer ) );
 
@@ -139,6 +139,16 @@ void Layer::OnInitialize()
 
 Layer::~Layer()
 {
+  if ( mIsRoot )
+  {
+    // Guard to allow handle destruction after Core has been destroyed
+    if( EventThreadServices::IsCoreRunning() )
+    {
+      UninstallRootMessage( GetEventThreadServices().GetUpdateManager(), &GetSceneLayerOnStage() );
+
+      GetEventThreadServices().UnregisterObject( this );
+    }
+  }
 }
 
 unsigned int Layer::GetDepth() const

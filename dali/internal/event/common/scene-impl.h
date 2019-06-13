@@ -120,6 +120,11 @@ public:
   void SetSurface( Integration::RenderSurface& surface );
 
   /**
+   * @copydoc Dali::Integration::Scene::Discard
+   */
+  void Discard();
+
+  /**
    * Retrieve the render surface the scene is binded to.
    * @return The render surface.
    */

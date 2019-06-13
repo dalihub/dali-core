@@ -119,6 +119,11 @@ Integration::RenderSurface* Scene::GetSurface() const
   return GetImplementation(*this).GetSurface();
 }
 
+void Scene::Discard()
+{
+  GetImplementation(*this).Discard();
+}
+
 Integration::Scene Scene::Get( Actor actor )
 {
   return Dali::Integration::Scene( &GetImplementation( actor ).GetScene() );

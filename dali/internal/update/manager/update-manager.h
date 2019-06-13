@@ -151,13 +151,21 @@ public:
 
   /**
    * Installs a new layer as the root node.
-   * @pre The UpdateManager does not already have an installed root node.
    * @pre The layer is of derived Node type Layer.
    * @pre The layer does not have a parent.
    * @param[in] layer The new root node.
    * @post The node is owned by UpdateManager.
    */
   void InstallRoot( OwnerPointer<Layer>& layer );
+
+  /**
+   * Uninstalls the root node.
+   * @pre The layer is of derived Node type Layer.
+   * @pre The layer does not have a parent.
+   * @param[in] layer The root node.
+   * @post The node is owned by UpdateManager.
+   */
+  void UninstallRoot( Layer* layer );
 
   /**
    * Add a Node; UpdateManager takes ownership.
@@ -550,7 +558,7 @@ public:
    * @param[in] frameBuffer The framebuffer to add
    * The framebuffer will be owned by RenderManager
    */
-  void AddFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void AddFrameBuffer( OwnerPointer< Render::FrameBuffer >& frameBuffer );
 
   /**
    * Removes a FrameBuffer from the render manager
@@ -739,6 +747,20 @@ inline void InstallRootMessage( UpdateManager& manager, OwnerPointer<Layer>& roo
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::InstallRoot, root );
+}
+
+inline void UninstallRootMessage( UpdateManager& manager, const Layer* constRoot )
+{
+  // Scene graph thread can destroy this object.
+  Layer* root = const_cast< Layer* >( constRoot );
+
+  typedef MessageValue1< UpdateManager, Layer* > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::UninstallRoot, root );
 }
 
 inline void AddNodeMessage( UpdateManager& manager, OwnerPointer<Node>& node )
@@ -1336,15 +1358,15 @@ inline void GenerateMipmapsMessage( UpdateManager& manager, Render::Texture& tex
 }
 
 
-inline void AddFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
+inline void AddFrameBuffer( UpdateManager& manager, OwnerPointer< Render::FrameBuffer >& frameBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::FrameBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::FrameBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, &frameBuffer );
+  new (slot) LocalType( &manager, &UpdateManager::AddFrameBuffer, frameBuffer );
 }
 
 inline void RemoveFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer )
