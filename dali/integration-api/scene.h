@@ -200,7 +200,7 @@ public:
    *
    * @return The root layer
    */
-  void SetSurface( Integration::RenderSurface& surface );
+  void SetSurface( Integration::RenderSurface& surface, bool forceUpdate );
 
   /**
    * @brief Gets the rendering surface bound to the scene

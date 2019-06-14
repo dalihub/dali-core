@@ -86,9 +86,9 @@ void Core::RecoverFromContextLoss()
   mImpl->RecoverFromContextLoss();
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
+void Core::SurfaceResized( Integration::RenderSurface* surface, bool forceUpdate )
 {
-  mImpl->SurfaceResized(surface);
+  mImpl->SurfaceResized(surface, forceUpdate);
 }
 
 void Core::SurfaceDeleted( Integration::RenderSurface* surface )

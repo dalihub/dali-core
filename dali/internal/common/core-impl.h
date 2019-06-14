@@ -119,9 +119,9 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(Integration::RenderSurface*)
+   * @copydoc Dali::Integration::Core::SurfaceResized(Integration::RenderSurface*, bool)
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized( Integration::RenderSurface* surface, bool forceUpdate );
 
   /**
    * @copydoc Dali::Integration::Core::SurfaceDeleted(Integration::RenderSurface*)

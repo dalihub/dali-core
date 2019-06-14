@@ -291,8 +291,9 @@ public:
    * The Core will use the surface size for camera calculations, and to set the GL viewport.
    * Multi-threading note: this method should be called from the main thread
    * @param[in] surface The resized surface
+   * @param[in] forceUpate The flag is for update force
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized( Integration::RenderSurface* surface, bool fourceUpdate );
 
   /**
    * Notify the Core that the GL surface has been deleted.

@@ -191,13 +191,13 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
+void Core::SurfaceResized( Integration::RenderSurface* surface, bool forceUpdate )
 {
   for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
   {
     if( (*iter)->GetSurface() == surface )
     {
-      (*iter)->SurfaceResized();
+      (*iter)->SurfaceResized( forceUpdate );
     }
   }
 }

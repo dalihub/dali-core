@@ -119,9 +119,9 @@ Layer Scene::GetLayer( uint32_t depth ) const
   return GetImplementation(*this).GetLayer( depth );
 }
 
-void Scene::SetSurface( Integration::RenderSurface& surface )
+void Scene::SetSurface( Integration::RenderSurface& surface, bool forceUpdate )
 {
-  GetImplementation(*this).SetSurface( surface );
+  GetImplementation(*this).SetSurface( surface, forceUpdate );
 }
 
 Integration::RenderSurface* Scene::GetSurface() const

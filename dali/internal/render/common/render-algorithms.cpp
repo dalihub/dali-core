@@ -231,7 +231,7 @@ inline void SetupDepthBuffer( const RenderItem& item, Context& context, bool dep
  * @param[in]     item                     The current RenderItem about to be rendered
  * @param[in]     context                  The context
  */
-inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Context& context )
+inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Context& context, int orientation )
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t childStackDepth = mScissorStack.size() - 1u;
@@ -292,7 +292,30 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
     if( scissorEnabled )
     {
       ClippingBox useScissorBox( mScissorStack.back() );
-      context.Scissor( useScissorBox.x, useScissorBox.y, useScissorBox.width, useScissorBox.height );
+      GLint x = useScissorBox.x;
+      GLint y = useScissorBox.y;
+      if( orientation == 90 )
+      {
+        x = mViewportRectangle.height - (useScissorBox.y + useScissorBox.height);
+        y = useScissorBox.x;
+        context.Scissor( x, y, useScissorBox.height, useScissorBox.width );
+      }
+      else if( orientation == 180 )
+      {
+        x = mViewportRectangle.width - (useScissorBox.x + useScissorBox.width);
+        y = mViewportRectangle.height - (useScissorBox.y + useScissorBox.height);
+        context.Scissor( x, y, useScissorBox.width, useScissorBox.height );
+      }
+      else if( orientation == 270 )
+      {
+        x = useScissorBox.y;
+        y = mViewportRectangle.width - (useScissorBox.x + useScissorBox.width);
+        context.Scissor( x, y, useScissorBox.height, useScissorBox.width );
+      }
+      else
+      {
+        context.Scissor( x, y, useScissorBox.width, useScissorBox.height );
+      }
     }
   }
 }
@@ -302,7 +325,8 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item,
                                              bool& usedStencilBuffer,
                                              uint32_t& lastClippingDepth,
                                              uint32_t& lastClippingId,
-                                             Integration::StencilBufferAvailable stencilBufferAvailable )
+                                             Integration::StencilBufferAvailable stencilBufferAvailable,
+                                             int orientation )
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   const Renderer *renderer = item.mRenderer;
@@ -324,7 +348,7 @@ inline void RenderAlgorithms::SetupClipping( const RenderItem& item,
       // As both scissor and stencil clips can be nested, we may be simultaneously traversing up the scissor tree, requiring a scissor to be un-done. Whilst simultaneously adding a new stencil clip.
       // We process both based on our current and old clipping depths for each mode.
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
-      SetupScissorClipping( item, context );
+      SetupScissorClipping( item, context, orientation );
 
       if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE )
       {
@@ -389,7 +413,8 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  const Matrix& viewMatrix,
                                                  const Matrix& projectionMatrix,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
-                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
+                                                 int orientation )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -406,13 +431,45 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
   mViewportRectangle = context.GetViewport();
   mHasLayerScissor = false;
 
+  if( orientation == 90 || orientation == 270 )
+  {
+    int temp = mViewportRectangle.width;
+    mViewportRectangle.width = mViewportRectangle.height;
+    mViewportRectangle.height = temp;
+  }
+
   // Setup Scissor testing (for both viewport and per-node scissor)
   mScissorStack.clear();
   if( renderList.IsClipping() )
   {
     context.SetScissorTest( true );
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
-    context.Scissor( layerScissorBox.x, layerScissorBox.y, layerScissorBox.width, layerScissorBox.height );
+    GLint x = layerScissorBox.x;
+    GLint y = layerScissorBox.y;
+
+    if( orientation == 90 )
+    {
+      x = mViewportRectangle.height - (layerScissorBox.y + layerScissorBox.height);
+      y = layerScissorBox.x;
+      context.Scissor( x, y, layerScissorBox.height, layerScissorBox.width );
+    }
+    else if( orientation == 180 )
+    {
+      x = mViewportRectangle.width - (layerScissorBox.x + layerScissorBox.width);
+      y = mViewportRectangle.height - (layerScissorBox.y + layerScissorBox.height);
+      context.Scissor( x, y, layerScissorBox.width, layerScissorBox.height );
+    }
+    else if( orientation == 270 )
+    {
+      x = layerScissorBox.y;
+      y = mViewportRectangle.width - (layerScissorBox.x + layerScissorBox.width);
+      context.Scissor( x, y, layerScissorBox.height, layerScissorBox.width );
+    }
+    else
+    {
+      context.Scissor( x, y, layerScissorBox.width, layerScissorBox.height );
+    }
+
     mScissorStack.push_back( layerScissorBox );
     mHasLayerScissor = true;
   }
@@ -431,7 +488,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping( item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable );
+    SetupClipping( item, context, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, orientation );
 
     if( DALI_LIKELY( item.mRenderer ) )
     {
@@ -462,7 +519,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                                                  Context& context,
                                                  BufferIndex bufferIndex,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
-                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
+                                                 int orientation )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -490,7 +548,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                            *viewMatrix,
                            *projectionMatrix,
                             depthBufferAvailable,
-                            stencilBufferAvailable );
+                            stencilBufferAvailable,
+                            orientation );
       }
     }
   }

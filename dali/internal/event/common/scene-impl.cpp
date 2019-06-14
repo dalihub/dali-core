@@ -64,6 +64,7 @@ Scene::Scene( const Size& size )
   mSurfaceSize( Vector2::ZERO ),
   mDpi( Vector2::ZERO ),
   mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
+  mSurfaceOrientation( 0 ),
   mDepthTreeDirty( false ),
   mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
 {
@@ -196,7 +197,7 @@ Actor& Scene::GetDefaultRootActor()
   return *mRootLayer;
 }
 
-void Scene::SetSurface( Integration::RenderSurface& surface )
+void Scene::SetSurface( Integration::RenderSurface& surface, bool forceUpdate )
 {
   mSurface = &surface;
   if ( mSurface )
@@ -206,18 +207,22 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
     mFrameBuffer = Dali::Internal::FrameBuffer::New( surface, Dali::FrameBuffer::Attachment::NONE );
     defaultRenderTask->SetFrameBuffer( mFrameBuffer );
 
-    SurfaceResized();
+    SurfaceResized( forceUpdate );
   }
 }
 
-void Scene::SurfaceResized()
+void Scene::SurfaceResized( bool forceUpdate )
 {
   if( mSurface )
   {
     const float fWidth = static_cast<float>( mSurface->GetPositionSize().width );
     const float fHeight = static_cast<float>( mSurface->GetPositionSize().height );
+    const int orientation = mSurface->GetOrientation();
 
-    if( ( fabsf( mSurfaceSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSurfaceSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
+    if( ( fabsf( mSurfaceSize.width - fWidth ) > Math::MACHINE_EPSILON_1 )
+        || ( fabsf( mSurfaceSize.height - fHeight ) > Math::MACHINE_EPSILON_1 )
+        || ( orientation != mSurfaceOrientation )
+        || (forceUpdate) )
     {
       Rect<int32_t> newSize( 0, 0, static_cast<int32_t>( mSurface->GetPositionSize().width ), static_cast<int32_t>( mSurface->GetPositionSize().height ) );
 
@@ -227,14 +232,18 @@ void Scene::SurfaceResized()
       mSize.width = mSurfaceSize.width;
       mSize.height = mSurfaceSize.height;
 
+      mSurfaceOrientation = orientation;
+
       // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
       mDefaultCamera->SetPerspectiveProjection( mSurfaceSize );
+      mDefaultCamera->RotateProjection( mSurfaceOrientation );
 
       mRootLayer->SetSize( mSize.width, mSize.height );
 
       ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
       SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
       SetDefaultSurfaceRectMessage( updateManager, newSize ); // truncated
+      SetDefaultSurfaceOrientationMessage( updateManager, mSurfaceOrientation );
 
       RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
 

@@ -64,11 +64,11 @@ void TestApplication::Initialize()
 
   mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
   mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
-  mScene.SetSurface( *mRenderSurface );
+  mScene.SetSurface( *mRenderSurface, false );
 
   mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
 
-  mCore->SurfaceResized( mRenderSurface );
+  mCore->SurfaceResized( mRenderSurface, false );
 
   mCore->SceneCreated();
   mCore->Initialize();
