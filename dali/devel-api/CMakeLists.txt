@@ -8,7 +8,6 @@ SET( SOURCES ${SOURCES}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/key-event-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-data-devel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/images/texture-set-image.cpp
@@ -45,7 +44,6 @@ SET( DEVEL_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/common/stage-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/events/hit-test-algorithm.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/events/key-event-devel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/events/touch-data-devel.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/images/distance-field.h
