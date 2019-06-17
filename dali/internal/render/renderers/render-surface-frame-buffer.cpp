@@ -30,11 +30,7 @@ namespace Render
 SurfaceFrameBuffer::SurfaceFrameBuffer( Integration::RenderSurface* surface )
 : FrameBuffer(),
   mSurface( surface ),
-  mContext( nullptr ),
-  mWidth( mSurface->GetPositionSize().width ),
-  mHeight( mSurface->GetPositionSize().height ),
-  mBackgroundColor( 0.f, 0.f, 0.f, 1.f ),
-  mSizeChanged( false )
+  mContext( nullptr )
 {
 }
 
@@ -62,26 +58,23 @@ void SurfaceFrameBuffer::Initialize(Context& context)
 
 void SurfaceFrameBuffer::Bind( Context& context )
 {
-  mSurface->PreRender( mSizeChanged );
-
+  mSurface->PreRender( false );
   context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
 }
 
 uint32_t SurfaceFrameBuffer::GetWidth() const
 {
-  return mWidth;
+  return mSurface->GetPositionSize().width;
 }
 
 uint32_t SurfaceFrameBuffer::GetHeight() const
 {
-  return mHeight;
+  return mSurface->GetPositionSize().height;
 }
 
 void SurfaceFrameBuffer::PostRender()
 {
-  mSurface->PostRender( false, false, mSizeChanged );
-
-  mSizeChanged = false;
+  mSurface->PostRender( false, false, false );
 }
 
 Context* SurfaceFrameBuffer::GetContext()
@@ -101,19 +94,7 @@ Integration::StencilBufferAvailable SurfaceFrameBuffer::GetStencilBufferRequired
 
 Vector4 SurfaceFrameBuffer::GetBackgroundColor()
 {
-  return mBackgroundColor;
-}
-
-void SurfaceFrameBuffer::SetSize( uint32_t width, uint32_t height )
-{
-  mWidth = width;
-  mHeight = height;
-  mSizeChanged = true;
-}
-
-void SurfaceFrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  mBackgroundColor = color;
+  return mSurface->GetBackgroundColor();
 }
 
 } //Render

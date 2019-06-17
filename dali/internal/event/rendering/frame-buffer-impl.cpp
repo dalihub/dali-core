@@ -105,25 +105,6 @@ Texture* FrameBuffer::GetColorTexture()
   return mIsSurfaceBacked ? nullptr : mColor.Get();
 }
 
-void FrameBuffer::SetSize( uint32_t width, uint32_t height )
-{
-  mWidth = width;
-  mHeight = height;
-
-  if( mRenderObject->IsSurfaceBacked() )
-  {
-    SetFrameBufferSizeMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), width, height );
-  }
-}
-
-void FrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  if( mRenderObject->IsSurfaceBacked() )
-  {
-    SetFrameBufferBackgroundColorMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), color );
-  }
-}
-
 FrameBuffer::~FrameBuffer()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )

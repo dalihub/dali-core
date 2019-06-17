@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector4.h>
 
 namespace Dali
 {
@@ -148,20 +147,6 @@ public:
    * @return The horizontal and vertical DPI
    */
   Vector2 GetDpi() const;
-
-  /**
-   * @brief Sets the background color.
-   *
-   * @param[in] color The new background color
-   */
-  void SetBackgroundColor( const Vector4& color );
-
-  /**
-   * @brief Gets the background color of the render　surface.
-   *
-   * @return The background color
-   */
-  Vector4 GetBackgroundColor() const;
 
   /**
    * @brief Retrieves the list of render-tasks.
