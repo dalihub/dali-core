@@ -60,19 +60,19 @@ public:
      */
     enum Mask
     {
-      NONE          = 0,                          ///< No attachments are created initially             @SINCE_1_1.45
-      DEPTH         = 1 << 0,                     ///< Depth buffer is created                          @SINCE_1_1.45
-      STENCIL       = 1 << 1,                     ///< Stencil buffer is created                        @SINCE_1_1.45
-      DEPTH_STENCIL = DEPTH | STENCIL,            ///< Depth and stencil buffer will be created         @SINCE_1_1.45
-      COLOR         = 1 << 2,                     ///< Color texture will be created                    @SINCE_1_4.0
-      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer will be created   @SINCE_1_4.0
-      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer will be created @SINCE_1_4.0
-      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer will be created  @SINCE_1_4.0
+      NONE          = 0,                          ///< No attachments are created initially.         @SINCE_1_1.45
+      DEPTH         = 1 << 0,                     ///< Depth buffer is created.                      @SINCE_1_1.45
+      STENCIL       = 1 << 1,                     ///< Stencil buffer is created.                    @SINCE_1_1.45
+      DEPTH_STENCIL = DEPTH | STENCIL,            ///< Depth and stencil buffer are created.         @SINCE_1_1.45
+      COLOR         = 1 << 2,                     ///< Color texture is created.                     @SINCE_1_4.0
+      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer are created.   @SINCE_1_4.0
+      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer are created. @SINCE_1_4.0
+      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer are created.  @SINCE_1_4.0
     };
   };
 
   /**
-   * @brief Creates a new FrameBuffer with only COLOR texture attached on it
+   * @brief Creates a new FrameBuffer, which attaches only COLOR texture.
    *
    * @SINCE_1_4.0
    *
@@ -85,7 +85,7 @@ public:
   static FrameBuffer New( uint32_t width, uint32_t height );
 
   /**
-   * @brief Creates a new FrameBuffer with the specified attachments
+   * @brief Creates a new FrameBuffer with specific attachments.
    *
    * @SINCE_1_4.0
    *
