@@ -232,6 +232,7 @@ public:
   /**
    * @brief Move constructor.
    *
+   * A move constructor enables the resources owned by an rvalue object to be moved into an lvalue without copying.
    * @SINCE_1_4.16
    * @param[in] value The property value to move from
    */
