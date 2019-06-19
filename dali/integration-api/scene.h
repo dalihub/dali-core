@@ -194,6 +194,11 @@ public:
   Integration::RenderSurface* GetSurface() const;
 
   /**
+   * @brief Discards this Scene from the Core.
+   */
+  void Discard();
+
+  /**
    * @brief Retrieve the Scene that the given actor belongs to.
    * @return The Scene.
    */
