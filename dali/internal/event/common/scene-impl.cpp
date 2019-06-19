@@ -218,7 +218,7 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
     // if single render task to screen then set its viewport parameters
     if( 1 == mRenderTaskList->GetTaskCount() )
     {
-      if( !defaultRenderTask->GetTargetFrameBuffer() )
+      if( !defaultRenderTask->GetFrameBuffer() )
       {
         defaultRenderTask->SetViewport( Viewport( 0, 0, static_cast<int32_t>( mSurfaceSize.width ), static_cast<int32_t>( mSurfaceSize.height ) ) ); // truncated
       }

@@ -129,7 +129,7 @@ public:
   FrameBuffer( const FrameBuffer& handle );
 
   /**
-   * @brief Downcasts to a FrameBuffer.
+   * @brief Downcasts to a FrameBuffer.ama
    * If not, the returned handle is left uninitialized.
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object

@@ -22,7 +22,6 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
@@ -102,16 +101,6 @@ public:
    * @copydoc Dali::RenderTask::GetCameraActor()
    */
   CameraActor* GetCameraActor() const;
-
-  /**
-   * @copydoc Dali::RenderTask::SetTargetFrameBuffer()
-   */
-  void SetTargetFrameBuffer( FrameBufferImagePtr frameBuffer );
-
-  /**
-   * @copydoc Dali::RenderTask::GetTargetFrameBuffer
-   */
-  FrameBufferImage* GetTargetFrameBuffer() const;
 
   /**
     * @copydoc Dali::RenderTask::SetFrameBuffer()
@@ -364,7 +353,6 @@ private:
 
   uint32_t mRefreshOnceCounter;
 
-  FrameBufferImagePtr mFrameBufferImage;  ///< Optional off-screen render target.
   FrameBufferPtr  mFrameBuffer;
 
 

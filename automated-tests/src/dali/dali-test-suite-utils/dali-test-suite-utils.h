@@ -394,11 +394,6 @@ struct DefaultFunctionCoverage
 };
 
 
-// Helper to Create buffer image
-BufferImage CreateBufferImage();
-BufferImage CreateBufferImage(int32_t width, int32_t height, const Vector4& color);
-
-
 // Prepare a resource image to be loaded. Should be called before creating the ResourceImage
 void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat );
 

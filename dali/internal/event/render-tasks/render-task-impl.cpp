@@ -31,7 +31,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/projection.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
@@ -162,18 +161,6 @@ CameraActor* RenderTask::GetCameraActor() const
   return mCameraActor;
 }
 
-void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
-{
-  mFrameBufferImage = image;
-  FrameBuffer* frameBufferPtr( NULL );
-  if( image )
-  {
-    frameBufferPtr = image->GetFrameBuffer();
-  }
-
-  SetFrameBuffer( frameBufferPtr );
-}
-
 void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
   mFrameBuffer = frameBuffer;
@@ -189,11 +176,6 @@ void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 FrameBuffer* RenderTask::GetFrameBuffer() const
 {
   return mFrameBuffer.Get();
-}
-
-FrameBufferImage* RenderTask::GetTargetFrameBuffer() const
-{
-  return mFrameBufferImage.Get();
 }
 
 void RenderTask::SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction )
@@ -252,11 +234,11 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
 
   if( !GetRenderTaskSceneObject().GetViewportEnabled( bufferIndex ) )
   {
-    if ( mFrameBufferImage )
+    if ( mFrameBuffer )
     {
       viewPort.x = viewPort.y = 0;
-      viewPort.width = mFrameBufferImage->GetWidth();
-      viewPort.height = mFrameBufferImage->GetHeight();
+      viewPort.width = mFrameBuffer->GetRenderObject()->GetWidth();
+      viewPort.height = mFrameBuffer->GetRenderObject()->GetHeight();
     }
     else
     {
@@ -403,7 +385,7 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
   // the function should only be called for offscreen tasks
   Dali::Actor mappingActor = GetScreenToFrameBufferMappingActor();
 
-  if( mFrameBufferImage && mappingActor )
+  if( mFrameBuffer && mappingActor )
   {
     Internal::Actor* inputMappingActor = &GetImplementation( mappingActor );
     CameraActor* localCamera = GetCameraActor();
@@ -445,7 +427,7 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
       }
     }
   }
-  else if ( mFrameBufferImage && mScreenToFrameBufferFunction )
+  else if ( mFrameBuffer && mScreenToFrameBufferFunction )
   {
     inside = mScreenToFrameBufferFunction( screenCoords );
   }

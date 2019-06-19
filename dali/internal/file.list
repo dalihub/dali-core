@@ -75,13 +75,6 @@ internal_src_files = \
   $(internal_src_dir)/event/events/touch-event-processor.cpp \
   $(internal_src_dir)/event/images/bitmap-packed-pixel.cpp \
   $(internal_src_dir)/event/images/bitmap-compressed.cpp \
-  $(internal_src_dir)/event/images/image-impl.cpp \
-  $(internal_src_dir)/event/images/buffer-image-impl.cpp \
-  $(internal_src_dir)/event/images/frame-buffer-image-impl.cpp \
-  $(internal_src_dir)/event/images/encoded-buffer-image-impl.cpp \
-  $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
-  $(internal_src_dir)/event/images/resource-image-impl.cpp \
-  $(internal_src_dir)/event/images/native-image-impl.cpp \
   $(internal_src_dir)/event/images/pixel-data-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \

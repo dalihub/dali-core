@@ -191,7 +191,7 @@ void RenderTaskList::RecoverFromContextLoss()
   for ( auto&& item : mTasks )
   {
     // If the render target renders only once to an offscreen, re-render the render task
-    if( item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetTargetFrameBuffer() )
+    if( item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetFrameBuffer() )
     {
       item->SetRefreshRate( Dali::RenderTask::REFRESH_ONCE );
     }

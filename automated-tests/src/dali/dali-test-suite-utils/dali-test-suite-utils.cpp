@@ -328,30 +328,6 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-BufferImage CreateBufferImage(int32_t width, int32_t height, const Vector4& color)
-{
-  BufferImage image = BufferImage::New(width, height, Pixel::RGBA8888);
-
-  PixelBuffer* pixbuf = image.GetBuffer();
-
-  // Using a 4x4 image gives a better blend with the GL implementation
-  // than a 3x3 image
-  for(size_t i=0; i<16; i++)
-  {
-    pixbuf[i*4+0] = color.r*255;
-    pixbuf[i*4+1] = color.g*255;
-    pixbuf[i*4+2] = color.b*255;
-    pixbuf[i*4+3] = color.a*255;
-  }
-
-  return image;
-}
-
-BufferImage CreateBufferImage()
-{
-  return CreateBufferImage(4, 4, Color::WHITE);
-}
-
 void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat )
 {
   TestPlatformAbstraction& platform = application.GetPlatform();

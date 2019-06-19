@@ -25,9 +25,6 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/internal/common/image-attributes.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/images/resource-image-impl.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
-#include <dali/internal/event/images/buffer-image-impl.h>
 
 namespace Dali
 {
@@ -170,150 +167,6 @@ uint32_t FindEnumIndex( const char* value, const StringEnum* table, uint32_t tab
 }
 
 
-Image NewImage( const Property::Value& property )
-{
-  Image ret;
-
-  std::string filename;
-  Internal::ImageAttributes attributes = Internal::ImageAttributes::New();
-
-  const Property::Map* map = property.GetMap();
-  ImageType imageType = RESOURCE_IMAGE; // default to resource image
-  if( map )
-  {
-    // first check the type as it determines, which other parameters are needed
-    const Property::Value* value = map->Find( "type" );
-    if( value )
-    {
-      std::string type;
-      value->Get( type );
-      for( uint32_t i = 0; i < imageTypeCount; ++i )
-      {
-        if( 0 == type.compare( ImageTypeName[ i ] ) )
-        {
-          imageType = static_cast<ImageType>( i );
-          break;
-        }
-      }
-    }
-
-    // filename is only needed for resource images
-    if( RESOURCE_IMAGE == imageType )
-    {
-      const Property::Value* value = map->Find( "filename" );
-      if( value )
-      {
-        value->Get( filename );
-      }
-      // if empty file, no need to go further
-      if( filename.size() == 0 )
-      {
-        DALI_LOG_ERROR( "No filename\n" );
-        return Image();
-      }
-    }
-
-    // Width and height can be set individually. Dali derives the unspecified
-    // dimension from the aspect ratio of the raw image.
-    int32_t width = 0, height = 0;
-
-    value = map->Find( "width" );
-    if( value )
-    {
-      // handle floats and integer the same for json script
-      if( value->GetType() == Property::FLOAT )
-      {
-        width = static_cast<uint32_t>( value->Get<float>() );
-      }
-      else
-      {
-        value->Get( width );
-      }
-    }
-    value = map->Find( "height" );
-    if( value )
-    {
-      if( value->GetType() == Property::FLOAT )
-      {
-        height = static_cast<int32_t>( value->Get<float>() );
-      }
-      else
-      {
-        value->Get( height );
-      }
-    }
-    attributes.SetSize( width, height );
-
-    Pixel::Format pixelFormat = Pixel::RGBA8888;
-    value = map->Find( "pixelFormat" );
-    if( value )
-    {
-      std::string format;
-      value->Get( format );
-      GetEnumeration< Pixel::Format >( format.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT, pixelFormat );
-    }
-
-    value = map->Find( "fittingMode" );
-    if( value )
-    {
-      std::string fitting;
-      value->Get( fitting );
-      FittingMode::Type mode;
-      if( GetEnumeration< FittingMode::Type >( fitting.c_str(), IMAGE_FITTING_MODE_TABLE, IMAGE_FITTING_MODE_TABLE_COUNT, mode ) )
-      {
-        attributes.SetScalingMode( mode );
-      }
-    }
-
-    value = map->Find( "samplingMode" );
-    if( value )
-    {
-      std::string sampling;
-      value->Get( sampling );
-      SamplingMode::Type mode;
-      if( GetEnumeration< SamplingMode::Type >( sampling.c_str(), IMAGE_SAMPLING_MODE_TABLE, IMAGE_SAMPLING_MODE_TABLE_COUNT, mode ) )
-      {
-        attributes.SetFilterMode( mode );
-      }
-    }
-
-    value = map->Find( "orientation" );
-    if( value )
-    {
-      bool b = value->Get<bool>();
-      attributes.SetOrientationCorrection( b );
-    }
-
-    switch( imageType )
-    {
-      case RESOURCE_IMAGE :
-      {
-        ret = ResourceImage::New( filename, ImageDimensions( static_cast<uint32_t>( attributes.GetSize().x ), static_cast<uint32_t>( attributes.GetSize().y ) ),
-                                  attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
-        break;
-      }
-      case BUFFER_IMAGE :
-      {
-        ret = BufferImage::New( attributes.GetWidth(),
-                                attributes.GetHeight(),
-                                pixelFormat );
-        break;
-      }
-      case FRAME_BUFFER_IMAGE :
-      {
-        ret = FrameBufferImage::New( attributes.GetWidth(),
-                                     attributes.GetHeight(),
-                                     pixelFormat );
-        break;
-      }
-    }
-  }
-
-  return ret;
-
-} // Image NewImage( Property::Value map )
-
-
 Actor NewActor( const Property::Map& map )
 {
   BaseHandle handle;
@@ -413,44 +266,6 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
   }
 }
 
-void CreatePropertyMap( Image image, Property::Map& map )
-{
-  map.Clear();
-
-  if ( image )
-  {
-    std::string imageType( "ResourceImage" );
-
-    // Get Type - cannot use TypeRegistry as Image is not an Object and thus, not registered
-    BufferImage bufferImage = BufferImage::DownCast( image );
-    if ( bufferImage )
-    {
-      imageType = "BufferImage";
-      map[ "pixelFormat" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
-    }
-    else if ( FrameBufferImage::DownCast( image ) )
-    {
-      imageType = "FrameBufferImage";
-    }
-
-    map[ "type" ] = imageType;
-
-    ResourceImage resourceImage = ResourceImage::DownCast( image );
-    if( resourceImage )
-    {
-      map[ "filename" ] = resourceImage.GetUrl();
-    }
-
-    int32_t width( image.GetWidth() );
-    int32_t height( image.GetHeight() );
-
-    if ( width && height )
-    {
-      map[ "width" ] = width;
-      map[ "height" ] = height;
-    }
-  }
-}
 
 void NewAnimation( const Property::Map& map, Dali::AnimationData& outputAnimationData )
 {

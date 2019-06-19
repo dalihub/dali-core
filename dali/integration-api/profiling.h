@@ -53,9 +53,7 @@ DALI_CORE_API extern const std::size_t ANIMATION_MEMORY_SIZE;    ///< Total size
 DALI_CORE_API extern const std::size_t CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
 DALI_CORE_API extern const std::size_t ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
 DALI_CORE_API extern const std::size_t CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
-DALI_CORE_API extern const std::size_t IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
 DALI_CORE_API extern const std::size_t LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
-DALI_CORE_API extern const std::size_t IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
 
 DALI_CORE_API extern const std::size_t RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
 DALI_CORE_API extern const std::size_t GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects

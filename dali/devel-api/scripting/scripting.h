@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/devel-api/animation/animation-data.h>
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
@@ -253,28 +252,6 @@ const char * GetLinearEnumerationName( T value, const StringEnum* table, uint32_
 }
 
 /**
- * @brief Creates object with data from the property value map.
- *
- * @param[in] property The property value map with the following valid fields:
- * @code
- * "filename":      type std::string
- * "loadPolicy"     type std::string (enum)
- * "releasePolicy"  type std::string (enum)
- * "width"          type float
- * "height"         type float
- * "pixelFormat"    type std::string (enum)
- * "fittingMode"    type std::string (enum)
- * "samplingMode"   type std::string (enum)
- * "orientation"    type bool
- * "type"           type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
- * @endcode
- * Some fields are optional and some only pertain to a specific type.
- *
- * @return A pointer to a newly created object.
- */
-DALI_CORE_API Image NewImage( const Property::Value& property );
-
-/**
  * @brief Creates an actor with the date from the property value map.
  *
  * @param[in] map The property value map with the properties (and hierarchy) of the actor required
@@ -304,14 +281,6 @@ DALI_CORE_API Actor NewActor( const Property::Map& map );
  * @param[out] map This map is cleared and a property map of actor and its children is filled in
  */
 DALI_CORE_API void CreatePropertyMap( Actor actor, Property::Map& map );
-
-/**
- * @brief Creates a Property::Map from the image provided.
- *
- * @param[in]  image The image from which a Property::Map should be created
- * @param[out] map This map is cleared and a property map of the image is filled in
- */
-DALI_CORE_API void CreatePropertyMap( Image image, Property::Map& map );
 
 /**
  * @brief Creates description data required to create an Animation object from a property map.

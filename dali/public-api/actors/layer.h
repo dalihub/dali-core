@@ -26,7 +26,6 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/images/frame-buffer-image.h>
 
 namespace Dali
 {
