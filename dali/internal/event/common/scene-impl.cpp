@@ -89,11 +89,8 @@ Scene::~Scene()
     mRenderTaskList.Reset();
   }
 
-  if( ThreadLocalStorage::Created() )
-  {
-    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-    tls->RemoveScene( this );
-  }
+  // Discard this Scene from the Core
+  Discard();
 }
 
 void Scene::Initialize()
@@ -110,7 +107,7 @@ void Scene::Initialize()
   mLayerList = LayerList::New( updateManager );
 
   // The scene owns the default layer
-  mRootLayer = Layer::NewRoot( *mLayerList, updateManager );
+  mRootLayer = Layer::NewRoot( *mLayerList );
   mRootLayer->SetName("RootLayer");
   mRootLayer->SetScene( *this );
 
@@ -232,6 +229,15 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
 Integration::RenderSurface* Scene::GetSurface() const
 {
   return mSurface;
+}
+
+void Scene::Discard()
+{
+  if( ThreadLocalStorage::Created() )
+  {
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    tls->RemoveScene( this );
+  }
 }
 
 void Scene::RequestRebuildDepthTree()

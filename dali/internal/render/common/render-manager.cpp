@@ -303,16 +303,17 @@ void RenderManager::SetWrapMode( Render::Sampler* sampler, uint32_t rWrapMode, u
   sampler->mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
 }
 
-void RenderManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
+void RenderManager::AddFrameBuffer( OwnerPointer< Render::FrameBuffer >& frameBuffer )
 {
-  mImpl->frameBufferContainer.PushBack( frameBuffer );
-  if ( frameBuffer->IsSurfaceBacked() )
+  Render::FrameBuffer* frameBufferPtr = frameBuffer.Release();
+  mImpl->frameBufferContainer.PushBack( frameBufferPtr );
+  if ( frameBufferPtr->IsSurfaceBacked() )
   {
-    frameBuffer->Initialize( *mImpl->CreateSurfaceContext() );
+    frameBufferPtr->Initialize( *mImpl->CreateSurfaceContext() );
   }
   else
   {
-    frameBuffer->Initialize( mImpl->context );
+    frameBufferPtr->Initialize( mImpl->context );
   }
 }
 

@@ -2080,9 +2080,13 @@ Actor::~Actor()
   // Guard to allow handle destruction after Core has been destroyed
   if( EventThreadServices::IsCoreRunning() )
   {
-    DestroyNodeMessage( GetEventThreadServices().GetUpdateManager(), GetNode() );
+    // Root layer will destroy its node in its own destructor
+    if ( !mIsRoot )
+    {
+      DestroyNodeMessage( GetEventThreadServices().GetUpdateManager(), GetNode() );
 
-    GetEventThreadServices().UnregisterObject( this );
+      GetEventThreadServices().UnregisterObject( this );
+    }
   }
 
   // Cleanup optional gesture data

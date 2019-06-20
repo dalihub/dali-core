@@ -222,6 +222,7 @@ struct UpdateManager::Impl
     for( auto root : roots )
     {
       root->OnDestroy();
+      Node::Delete(root);
     }
 
     delete sceneController;
@@ -259,7 +260,7 @@ struct UpdateManager::Impl
 
   OwnerContainer<RenderTaskList*>      taskLists;                     ///< A container of scene graph render task lists
 
-  OwnerContainer<Layer*>               roots;                         ///< A container of root nodes (root is a layer). The layers are not stored in the node memory pool.
+  Vector<Layer*>                       roots;                         ///< A container of root nodes (root is a layer). The layers are not stored in the node memory pool.
 
   Vector<Node*>                        nodes;                         ///< A container of all instantiated nodes
 
@@ -340,6 +341,26 @@ void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer )
   rootLayer->CreateTransform( &mImpl->transformManager );
   rootLayer->SetRoot(true);
   mImpl->roots.PushBack( rootLayer );
+}
+
+void UpdateManager::UninstallRoot( Layer* layer )
+{
+  DALI_ASSERT_DEBUG( layer->IsLayer() );
+  DALI_ASSERT_DEBUG( layer->GetParent() == NULL );
+
+  for ( auto&& iter : mImpl->roots )
+  {
+    if( ( *iter ) == layer )
+    {
+      mImpl->roots.Erase( &iter );
+      break;
+    }
+  }
+
+  mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), layer );
+
+  // Notify the layer about impending destruction
+  layer->OnDestroy();
 }
 
 void UpdateManager::AddNode( OwnerPointer<Node>& node )
@@ -1278,9 +1299,9 @@ void UpdateManager::GenerateMipmaps( Render::Texture* texture )
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::GenerateMipmaps, texture );
 }
 
-void UpdateManager::AddFrameBuffer( Render::FrameBuffer* frameBuffer )
+void UpdateManager::AddFrameBuffer( OwnerPointer< Render::FrameBuffer >& frameBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::FrameBuffer* > DerivedType;
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::FrameBuffer > > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );

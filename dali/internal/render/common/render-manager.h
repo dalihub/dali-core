@@ -282,7 +282,7 @@ public:
    * Adds a framebuffer to the render manager
    * @param[in] frameBuffer The framebuffer to add
    */
-  void AddFrameBuffer( Render::FrameBuffer* frameBuffer );
+  void AddFrameBuffer( OwnerPointer< Render::FrameBuffer >& frameBuffer );
 
   /**
    * Removes a framebuffer from the render manager

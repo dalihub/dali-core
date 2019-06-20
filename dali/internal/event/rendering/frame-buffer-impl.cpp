@@ -76,7 +76,8 @@ void FrameBuffer::Initialize( Integration::RenderSurface* renderSurface )
     mRenderObject = new Render::TextureFrameBuffer( mWidth, mHeight, mAttachments );
   }
 
-  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  OwnerPointer< Render::FrameBuffer > transferOwnership( mRenderObject );
+  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer )
