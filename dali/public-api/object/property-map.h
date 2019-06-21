@@ -64,7 +64,7 @@ public:
   Map( const std::initializer_list< KeyValuePair >& values );
 
   /**
-   * @brief Copy Constructor.
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
    * @param[in] other The Map to copy from
@@ -72,11 +72,11 @@ public:
   Map( const Map& other );
 
   /**
-   * @brief Move Constructor.
+   * @brief Move constructor.
    *
    * @SINCE_1_4.17
    * @param[in] other The Map to move from
-   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
   Map( Map&& other );
 
@@ -368,7 +368,7 @@ public:
   Value& operator[]( Property::Index key );
 
   /**
-   * @brief Assignment Operator.
+   * @brief Assignment operator.
    *
    * @SINCE_1_0.0
    * @param[in] other The map to copy from
@@ -378,7 +378,7 @@ public:
   Map& operator=( const Map& other );
 
   /**
-   * @brief Move Assignment Operator.
+   * @brief Move assignment operator.
    *
    * @SINCE_1_4.17
    * @param[in] other The map to move from
