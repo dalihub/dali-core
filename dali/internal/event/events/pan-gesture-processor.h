@@ -56,7 +56,6 @@ public:
 
   /**
    * Create a pan gesture processor.
-   * @param[in] gestureManager The gesture manager
    * @param[in] updateManager The Update Manager
    */
   PanGestureProcessor( SceneGraph::UpdateManager& updateManager );
