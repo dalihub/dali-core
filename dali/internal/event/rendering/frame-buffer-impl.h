@@ -63,8 +63,8 @@ public:
   /**
    * @brief Create a new FrameBuffer
    *
-   * @param[in] renderSurface   The render surface
-   * @param[in] attachments     The attachments comprising the format of the FrameBuffer (bit-mask)
+   * @param[in] renderSurface  The render surface
+   * @param[in] attachments    The attachments comprising the format of the FrameBuffer (bit-mask)
    * @return A smart-pointer to the newly allocated Texture.
    */
   static FrameBufferPtr New( Dali::Integration::RenderSurface& renderSurface, Mask attachments );
@@ -90,19 +90,6 @@ public:
    * @copydoc Dali::FrameBuffer::GetColorTexture()
    */
   Texture* GetColorTexture();
-
-  /**
-   * @brief Sets the frame buffer size.
-   * @param[in] width The width size
-   * @param[in] height The height size
-   */
-  void SetSize( uint32_t width, uint32_t height );
-
-  /**
-   * @brief Sets the background color
-   * @param[in] color The new background color
-   */
-  void SetBackgroundColor( const Vector4& color );
 
 private: // implementation
 
