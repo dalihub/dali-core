@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7169,6 +7169,33 @@ int utcDaliActorCulled(void)
   DALI_TEST_EQUALS( propertyNotificationSignal, true, TEST_LOCATION );
   DALI_TEST_EQUALS( source.GetTargetProperty(), static_cast< int >( DevelActor::Property::CULLED ), TEST_LOCATION );
   DALI_TEST_EQUALS( source.GetTarget().GetProperty< bool >( source.GetTargetProperty() ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliEnsureRenderWhenRemovingLastRenderableActor(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  tet_infoline( "Ensure we clear the screen when the last actor is removed" );
+
+  Actor actor = CreateRenderableActor();
+  actor.SetSize( 100.0f, 100.0f );
+  stage.Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  auto& glAbstraction = application.GetGlAbstraction();
+  const auto clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION );
 
   END_TEST;
 }

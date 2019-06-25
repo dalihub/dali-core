@@ -76,7 +76,8 @@ void FrameBuffer::Initialize( Integration::RenderSurface* renderSurface )
     mRenderObject = new Render::TextureFrameBuffer( mWidth, mHeight, mAttachments );
   }
 
-  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+  OwnerPointer< Render::FrameBuffer > transferOwnership( mRenderObject );
+  AddFrameBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 }
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer )
@@ -103,6 +104,25 @@ void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, 
 Texture* FrameBuffer::GetColorTexture()
 {
   return mIsSurfaceBacked ? nullptr : mColor.Get();
+}
+
+void FrameBuffer::SetSize( uint32_t width, uint32_t height )
+{
+  mWidth = width;
+  mHeight = height;
+
+  if( mRenderObject->IsSurfaceBacked() )
+  {
+    SetFrameBufferSizeMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), width, height );
+  }
+}
+
+void FrameBuffer::SetBackgroundColor( const Vector4& color )
+{
+  if( mRenderObject->IsSurfaceBacked() )
+  {
+    SetFrameBufferBackgroundColorMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), color );
+  }
 }
 
 FrameBuffer::~FrameBuffer()

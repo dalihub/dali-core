@@ -120,6 +120,16 @@ public:
   void SetSurface( Integration::RenderSurface& surface );
 
   /**
+   * Notify the surface has been resized.
+   */
+  void SurfaceResized();
+
+  /**
+   * @copydoc Dali::Integration::Scene::Discard
+   */
+  void Discard();
+
+  /**
    * Retrieve the render surface the scene is binded to.
    * @return The render surface.
    */
@@ -154,10 +164,10 @@ public:
   void RebuildDepthTree();
 
   /**
-   * @brief Sets the background color of the render　surface.
+   * @brief Sets the background color of the render surface.
    * @param[in] color The new background color
    */
-  void SetBackgroundColor(Vector4 color);
+  void SetBackgroundColor( const Vector4& color );
 
   /**
    * @brief Gets the background color of the render　surface.
@@ -257,6 +267,8 @@ private:
   Size mSurfaceSize;
 
   Vector2 mDpi;
+
+  Vector4 mBackgroundColor;
 
   LayerPtr mRootLayer;
 

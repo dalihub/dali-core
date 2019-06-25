@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector4.h>
 
 namespace Dali
 {
@@ -149,6 +150,20 @@ public:
   Vector2 GetDpi() const;
 
   /**
+   * @brief Sets the background color.
+   *
+   * @param[in] color The new background color
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Gets the background color of the render　surface.
+   *
+   * @return The background color
+   */
+  Vector4 GetBackgroundColor() const;
+
+  /**
    * @brief Retrieves the list of render-tasks.
    *
    * @return A valid handle to a RenderTaskList
@@ -192,6 +207,11 @@ public:
    * @return The render surface
    */
   Integration::RenderSurface* GetSurface() const;
+
+  /**
+   * @brief Discards this Scene from the Core.
+   */
+  void Discard();
 
   /**
    * @brief Retrieve the Scene that the given actor belongs to.

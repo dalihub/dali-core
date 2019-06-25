@@ -197,7 +197,7 @@ void Core::SurfaceResized( Integration::RenderSurface* surface )
   {
     if( (*iter)->GetSurface() == surface )
     {
-      (*iter)->SetSurface( *surface );
+      (*iter)->SurfaceResized();
     }
   }
 }
