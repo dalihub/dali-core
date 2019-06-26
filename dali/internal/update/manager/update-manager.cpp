@@ -193,8 +193,7 @@ struct UpdateManager::Impl
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
     renderersAdded( false ),
-    surfaceRectChanged( false ),
-    nodeDisconnected( false )
+    surfaceRectChanged( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -300,7 +299,6 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
-  bool                                 nodeDisconnected;              ///< True if a node is disconnected in the current update
 
 private:
 
@@ -409,8 +407,6 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
 void UpdateManager::DisconnectNode( Node* node )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] DisconnectNode\n", node );
-
-  mImpl->nodeDisconnected = true;
 
   Node* parent = node->GetParent();
   DALI_ASSERT_ALWAYS( NULL != parent );
@@ -938,14 +934,14 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
                      "Update: numberOfRenderTasks(%d), taskListCount(%d), Render Instructions(%d)\n",
                      numberOfRenderTasks, taskListCount, mImpl->renderInstructions.Count( bufferIndex ) );
 
-      // If a node has been disconnected in this update and we do not have any instructions to send, then generate a dummy instruction to force another render
-      if( mImpl->nodeDisconnected && ( mImpl->renderInstructions.Count( bufferIndex ) == 0 ) )
+
+
+      // If any node is dirty, i.e. a property has changed or a child has been deleted, and we do not have any instructions to send, then generate a dummy instruction to force another render
+      if( ( mImpl->nodeDirtyFlags != NodePropertyFlags::NOTHING ) && ( mImpl->renderInstructions.Count( bufferIndex ) == 0 ) )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::General, "Node disconnected, creating dummy instruction\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::General, "Node flags dirty, creating dummy instruction\n" );
         mImpl->renderInstructions.GetNextInstruction( bufferIndex ); // This creates and adds an empty instruction. We do not need to modify it.
       }
-
-      mImpl->nodeDisconnected = false;
     }
   }
 
