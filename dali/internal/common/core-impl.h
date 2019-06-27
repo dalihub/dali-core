@@ -326,7 +326,8 @@ private:
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor;       ///< The gesture event processor
   Dali::Vector<Integration::Processor*>         mProcessors;                  ///< Registered processors (not owned)
 
-  std::vector<ScenePtr>                         mScenes;                      ///< A container of scenes that bound to a surface for rendering, owned by Core
+  using SceneContainer = std::vector<ScenePtr>;
+  SceneContainer                                mScenes;                      ///< A container of scenes that bound to a surface for rendering, owned by Core
 
   // The object registry
   ObjectRegistryPtr                             mObjectRegistry;
