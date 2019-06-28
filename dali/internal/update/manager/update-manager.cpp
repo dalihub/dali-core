@@ -71,12 +71,12 @@
 const uint32_t FRAME_COUNT_TRIGGER = 16;\
 if( mImpl->frameCounter >= FRAME_COUNT_TRIGGER )\
   {\
-    for( auto root : mImpl->roots )
+    for( auto&& scene : mImpl->scenes )
     {\
-      if ( NULL != root )\
+      if ( scene && scene->root )\
       {\
         mImpl->frameCounter = 0;\
-        PrintNodeTree( *root, mSceneGraphBuffers.GetUpdateBufferIndex(), "" );\
+        PrintNodeTree( *scene->root, mSceneGraphBuffers.GetUpdateBufferIndex(), "" );\
       }\
     }\
   }\
@@ -156,6 +156,25 @@ void SortSiblingNodesRecursively( Node& node )
  */
 struct UpdateManager::Impl
 {
+  // SceneInfo keeps the root node of the Scene, its scene graph render task list, and the list of Layer pointers sorted by depth
+  struct SceneInfo
+  {
+    SceneInfo( Layer* root )                             ///< Constructor
+    : root( root )
+    {
+    }
+
+    ~SceneInfo() = default;                                   ///< Default non-virtual destructor
+    SceneInfo( SceneInfo&& rhs ) = default;                   ///< Move constructor
+    SceneInfo& operator=( SceneInfo&& rhs ) = default;        ///< Move assignment operator
+    SceneInfo& operator=( const SceneInfo& rhs ) = delete;    ///< Assignment operator
+    SceneInfo( const SceneInfo& rhs ) = delete;               ///< Copy constructor
+
+    Layer* root{ nullptr };                                   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
+    OwnerPointer< RenderTaskList > taskList;                  ///< Scene graph render task list
+    SortedLayerPointers sortedLayerList;                      ///< List of Layer pointers sorted by depth (one list of sorted layers per root)
+  };
+
   Impl( NotificationManager& notificationManager,
         CompleteNotificationInterface& animationPlaylist,
         PropertyNotifier& propertyNotifier,
@@ -204,12 +223,15 @@ struct UpdateManager::Impl
   ~Impl()
   {
     // Disconnect render tasks from nodes, before destroying the nodes
-    for( auto taskList : taskLists )
+    for( auto&& scene : scenes )
     {
-      RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
-      for ( auto&& task : tasks )
+      if ( scene && scene->taskList )
       {
-        task->SetSourceNode( NULL );
+        RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
+        for ( auto&& task : tasks )
+        {
+          task->SetSourceNode( NULL );
+        }
       }
     }
 
@@ -223,11 +245,15 @@ struct UpdateManager::Impl
       Node::Delete(*iter);
     }
 
-    for( auto root : roots )
+    for( auto&& scene : scenes )
     {
-      root->OnDestroy();
-      Node::Delete(root);
+      if ( scene && scene->root )
+      {
+        scene->root->OnDestroy();
+        Node::Delete( scene->root );
+      }
     }
+    scenes.clear();
 
     delete sceneController;
   }
@@ -262,13 +288,10 @@ struct UpdateManager::Impl
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
 
-  OwnerContainer<RenderTaskList*>      taskLists;                     ///< A container of scene graph render task lists
-
-  Vector<Layer*>                       roots;                         ///< A container of root nodes (root is a layer). The layers are not stored in the node memory pool.
+  using SceneInfoPtr = std::unique_ptr< SceneInfo >;
+  std::vector< SceneInfoPtr >          scenes;                        ///< A container of SceneInfo.
 
   Vector<Node*>                        nodes;                         ///< A container of all instantiated nodes
-
-  std::vector<SortedLayerPointers>     sortedLayerLists;              ///< A container of lists of Layer pointers sorted by depth (one list of sorted layers per root)
 
   OwnerContainer< Camera* >            cameras;                       ///< A container of cameras
   OwnerContainer< PropertyOwner* >     customObjects;                 ///< A container of owned objects (with custom properties)
@@ -340,11 +363,17 @@ void UpdateManager::InstallRoot( OwnerPointer<Layer>& layer )
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG( std::find( mImpl->roots.begin(), mImpl->roots.end(), rootLayer ) == mImpl->roots.end() && "Root Node already installed" );
+  DALI_ASSERT_DEBUG( std::find_if( mImpl->scenes.begin(), mImpl->scenes.end(),
+                                   [rootLayer]( Impl::SceneInfoPtr& scene )
+                                   {
+                                     return scene && scene->root == rootLayer;
+                                   }
+                                 ) == mImpl->scenes.end() && "Root Node already installed" );
 
   rootLayer->CreateTransform( &mImpl->transformManager );
   rootLayer->SetRoot(true);
-  mImpl->roots.PushBack( rootLayer );
+
+  mImpl->scenes.emplace_back( new Impl::SceneInfo( rootLayer ) );
 }
 
 void UpdateManager::UninstallRoot( Layer* layer )
@@ -352,11 +381,11 @@ void UpdateManager::UninstallRoot( Layer* layer )
   DALI_ASSERT_DEBUG( layer->IsLayer() );
   DALI_ASSERT_DEBUG( layer->GetParent() == NULL );
 
-  for ( auto&& iter : mImpl->roots )
+  for (auto iter = mImpl->scenes.begin(); iter != mImpl->scenes.end(); ++iter)
   {
-    if( ( *iter ) == layer )
+    if( (*iter) && (*iter)->root == layer )
     {
-      mImpl->roots.Erase( &iter );
+      mImpl->scenes.erase( iter );
       break;
     }
   }
@@ -470,12 +499,20 @@ void UpdateManager::AddRenderTaskList( OwnerPointer<RenderTaskList>& taskList )
 {
   RenderTaskList* taskListPointer = taskList.Release();
   taskListPointer->SetRenderMessageDispatcher( &mImpl->renderMessageDispatcher );
-  mImpl->taskLists.PushBack( taskListPointer );
+
+  mImpl->scenes.back()->taskList = taskListPointer;
 }
 
 void UpdateManager::RemoveRenderTaskList( RenderTaskList* taskList )
 {
-  mImpl->taskLists.EraseObject( taskList );
+  for ( auto&& scene : mImpl->scenes )
+  {
+    if ( scene && scene->taskList == taskList )
+    {
+      scene->taskList.Reset();
+      break;
+    }
+  }
 }
 
 void UpdateManager::AddAnimation( OwnerPointer< SceneGraph::Animation >& animation )
@@ -731,12 +768,15 @@ void UpdateManager::ConstrainCustomObjects( BufferIndex bufferIndex )
 void UpdateManager::ConstrainRenderTasks( BufferIndex bufferIndex )
 {
   // Constrain render-tasks
-  for( auto taskList : mImpl->taskLists )
+  for ( auto&& scene : mImpl->scenes )
   {
-    RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
-    for ( auto&& task : tasks )
+    if ( scene && scene->taskList )
     {
-      ConstrainPropertyOwner( *task, bufferIndex );
+      RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
+      for ( auto&& task : tasks )
+      {
+        ConstrainPropertyOwner( *task, bufferIndex );
+      }
     }
   }
 }
@@ -802,13 +842,16 @@ void UpdateManager::UpdateNodes( BufferIndex bufferIndex )
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
-  for( auto&& rootLayer : mImpl->roots )
+  for ( auto&& scene : mImpl->scenes )
   {
-    // Prepare resources, update shaders, for each node
-    // And add the renderers to the sorted layers. Start from root, which is also a layer
-    mImpl->nodeDirtyFlags |= UpdateNodeTree( *rootLayer,
-                                            bufferIndex,
-                                            mImpl->renderQueue );
+    if ( scene && scene->root )
+    {
+      // Prepare resources, update shaders, for each node
+      // And add the renderers to the sorted layers. Start from root, which is also a layer
+      mImpl->nodeDirtyFlags |= UpdateNodeTree( *scene->root,
+                                              bufferIndex,
+                                              mImpl->renderQueue );
+    }
   }
 }
 
@@ -863,11 +906,17 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     ConstrainCustomObjects( bufferIndex );
 
     //Clear the lists of renderers from the previous update
-    for( auto sortedLayers : mImpl->sortedLayerLists )
+    for( auto&& scene : mImpl->scenes )
     {
-      for( auto&& layer : sortedLayers )
+      if ( scene )
       {
-        layer->ClearRenderables();
+        for( auto&& layer : scene->sortedLayerList )
+        {
+          if ( layer )
+          {
+            layer->ClearRenderables();
+          }
+        }
       }
     }
 
@@ -905,25 +954,26 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     if( mImpl->renderersAdded )
     {
       // Calculate how many render tasks we have in total
-      VectorBase::SizeType numberOfRenderTasks = 0;
-
-      const VectorBase::SizeType taskListCount = mImpl->taskLists.Count();
-      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
+      std::size_t numberOfRenderTasks = 0;
+      for (auto&& scene : mImpl->scenes )
       {
-        numberOfRenderTasks += mImpl->taskLists[index]->GetTasks().Count();
+        if ( scene && scene->taskList )
+        {
+          numberOfRenderTasks += scene->taskList->GetTasks().Count();
+        }
       }
 
       mImpl->renderInstructions.ResetAndReserve( bufferIndex,
                                                  static_cast<uint32_t>( numberOfRenderTasks ) );
 
-      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
+      for ( auto&& scene : mImpl->scenes )
       {
-        if ( NULL != mImpl->roots[index] )
+        if ( scene && scene->root && scene->taskList )
         {
           keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
-                                              *mImpl->taskLists[index],
-                                              *mImpl->roots[index],
-                                              mImpl->sortedLayerLists[index],
+                                              *scene->taskList,
+                                              *scene->root,
+                                              scene->sortedLayerList,
                                               mImpl->renderInstructions,
                                               renderToFboEnabled,
                                               isRenderingToFbo );
@@ -931,8 +981,8 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       }
 
       DALI_LOG_INFO( gLogFilter, Debug::General,
-                     "Update: numberOfRenderTasks(%d), taskListCount(%d), Render Instructions(%d)\n",
-                     numberOfRenderTasks, taskListCount, mImpl->renderInstructions.Count( bufferIndex ) );
+                     "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n",
+                     numberOfRenderTasks, mImpl->renderInstructions.Count( bufferIndex ) );
 
 
 
@@ -945,33 +995,36 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
     }
   }
 
-  for( auto taskList : mImpl->taskLists )
+  for ( auto&& scene : mImpl->scenes )
   {
-    RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
-
-    // check the countdown and notify
-    bool doRenderOnceNotify = false;
-    mImpl->renderTaskWaiting = false;
-    for ( auto&& renderTask : tasks )
+    if ( scene && scene->root && scene->taskList )
     {
-      renderTask->UpdateState();
+      RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
 
-      if( renderTask->IsWaitingToRender() &&
-          renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+      // check the countdown and notify
+      bool doRenderOnceNotify = false;
+      mImpl->renderTaskWaiting = false;
+      for ( auto&& renderTask : tasks )
       {
-        mImpl->renderTaskWaiting = true; // keep update/render threads alive
+        renderTask->UpdateState();
+
+        if( renderTask->IsWaitingToRender() &&
+            renderTask->ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
+        {
+          mImpl->renderTaskWaiting = true; // keep update/render threads alive
+        }
+
+        if( renderTask->HasRendered() )
+        {
+          doRenderOnceNotify = true;
+        }
       }
 
-      if( renderTask->HasRendered() )
+      if( doRenderOnceNotify )
       {
-        doRenderOnceNotify = true;
+        DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
+        mImpl->notificationManager.QueueCompleteNotification( scene->taskList->GetCompleteNotificationInterface() );
       }
-    }
-
-    if( doRenderOnceNotify )
-    {
-      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
-      mImpl->notificationManager.QueueCompleteNotification( taskList->GetCompleteNotificationInterface() );
     }
   }
 
@@ -1071,18 +1124,11 @@ void UpdateManager::SetRenderingBehavior( DevelStage::Rendering renderingBehavio
 
 void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, const Layer* rootLayer )
 {
-  const VectorBase::SizeType rootCount = mImpl->roots.Count();
-
-  // Make sure we reserve the correct size for the container so that
-  // we can save the sorted layers in the same order as the root layer
-  mImpl->sortedLayerLists.resize( rootCount );
-
-  for ( VectorBase::SizeType rootIndex = 0u; rootIndex < rootCount; rootIndex++ )
+  for ( auto&& scene : mImpl->scenes )
   {
-    Layer* root = mImpl->roots[rootIndex];
-    if ( root == rootLayer )
+    if ( scene && scene->root == rootLayer )
     {
-      mImpl->sortedLayerLists[rootIndex] = layers;
+      scene->sortedLayerList = layers;
       break;
     }
   }
@@ -1097,10 +1143,13 @@ void UpdateManager::SetDepthIndices( OwnerPointer< NodeDepths >& nodeDepths )
     iter.node->SetDepthIndex( iter.sortedDepth );
   }
 
-  for( auto root : mImpl->roots )
+  for ( auto&& scene : mImpl->scenes )
   {
-    // Go through node hierarchy and rearrange siblings according to depth-index
-    SortSiblingNodesRecursively( *root );
+    if ( scene )
+    {
+      // Go through node hierarchy and rearrange siblings according to depth-index
+      SortSiblingNodesRecursively( *scene->root );
+    }
   }
 }
 

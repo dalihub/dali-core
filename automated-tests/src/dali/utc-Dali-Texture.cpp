@@ -509,6 +509,8 @@ int UtcDaliTextureUpload05(void)
       out << GL_TEXTURE_2D <<", "<< 0u << ", " << width/2 << ", " <<  height/2 << ", " << width/2 << ", " <<  height/2;
       DALI_TEST_CHECK( callStack.FindMethodAndParams("CompressedTexSubImage2D", out.str().c_str() ) );
     }
+
+    application.GetGlAbstraction().ResetTextureCallStack();
   }
 
   END_TEST;
