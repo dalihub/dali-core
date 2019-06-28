@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -826,3 +826,48 @@ int UtcDaliSceneSignalWheelEventP(void)
   END_TEST;
 }
 
+int UtcDaliSceneEnsureEmptySceneCleared(void)
+{
+  tet_infoline( "Ensure we clear the newly added window" );
+
+  TestApplication application;
+
+  // Create a new scene and set the background colors of both the new and the main scenes
+  auto defaultScene = application.GetScene();
+  defaultScene.SetBackgroundColor( Color::WHITE );
+
+  auto newScene = Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  newScene.SetBackgroundColor( Color::RED );
+
+  // Need to create a renderable as we don't start rendering until we have at least one
+  // We don't need to add this to any scene
+  auto actor = CreateRenderableActor();
+
+  auto& glAbstraction = application.GetGlAbstraction();
+  auto clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 2, TEST_LOCATION );
+
+  // Add the actor to the main scene
+  defaultScene.Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Add another scene and set its background color, ensure we clear it to the appropriate color
+
+  auto thirdScene = Integration::Scene::New( Vector2( 200.0f, 200.0f ) );
+  thirdScene.SetBackgroundColor( Color::BLUE );
+
+  clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 3, TEST_LOCATION );
+
+  END_TEST;
+}

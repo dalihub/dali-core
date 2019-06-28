@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,6 +408,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
   renderTask.PrepareRenderInstruction( instruction, updateBufferIndex );
   bool viewMatrixHasNotChanged = !renderTask.ViewMatrixUpdated();
   bool isRenderListAdded = false;
+  bool isRootLayerDirty = false;
 
   const Matrix& viewMatrix = renderTask.GetViewMatrix( updateBufferIndex );
   SceneGraph::Camera& camera = renderTask.GetCamera();
@@ -419,6 +420,12 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
     const bool tryReuseRenderList( viewMatrixHasNotChanged && layer.CanReuseRenderers( &renderTask.GetCamera() ) );
     const bool isLayer3D = layer.GetBehavior() == Dali::Layer::LAYER_3D;
     RenderList* renderList = NULL;
+
+    if( layer.IsRoot() && ( layer.GetDirtyFlags() != NodePropertyFlags::NOTHING ) )
+    {
+      // If root-layer & dirty, i.e. a property has changed or a child has been deleted, then we need to ensure we render once more
+      isRootLayerDirty = true;
+    }
 
     if( !layer.colorRenderables.Empty() )
     {
@@ -468,7 +475,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
   // Inform the render instruction that all renderers have been added and this frame is complete.
   instruction.UpdateCompleted();
 
-  if( !isRenderListAdded && !instruction.mIsClearColorSet )
+  if( !isRenderListAdded && !instruction.mIsClearColorSet && !isRootLayerDirty )
   {
     instructions.DiscardCurrentInstruction( updateBufferIndex );
   }
