@@ -91,12 +91,16 @@ struct KeyEventReceivedFunctor
 struct TouchedSignalData
 {
   TouchedSignalData()
-  : functorCalled(false)
+  : functorCalled(false),
+    createNewScene(false),
+    newSceneCreated(false)
   {}
 
   void Reset()
   {
     functorCalled = false;
+    createNewScene = false;
+    newSceneCreated = false;
 
     receivedTouchEvent.points.clear();
     receivedTouchEvent.time = 0;
@@ -105,6 +109,8 @@ struct TouchedSignalData
   }
 
   bool functorCalled;
+  bool createNewScene;
+  bool newSceneCreated;
   TouchEvent receivedTouchEvent;
   TouchData receivedTouchData;
 };
@@ -132,6 +138,14 @@ struct TouchFunctor
   {
     signalData.functorCalled = true;
     signalData.receivedTouchData = touch;
+
+    if ( signalData.createNewScene )
+    {
+      Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+      DALI_TEST_CHECK( scene );
+
+      signalData.newSceneCreated = true;
+    }
   }
 
   void operator()()
@@ -383,6 +397,31 @@ int UtcDaliSceneDiscard(void)
   // Render and notify.
   application.SendNotification();
   application.Render(0);
+
+  END_TEST;
+}
+
+int UtcDaliSceneCreateNewSceneDuringCoreEventProcessing(void)
+{
+  TestApplication application;
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  TouchedSignalData data;
+  data.createNewScene = true;
+  TouchFunctor functor( data );
+  scene.TouchSignal().Connect( &application, functor );
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render();
+
+  GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, data.createNewScene, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, data.newSceneCreated, TEST_LOCATION );
+  data.Reset();
 
   END_TEST;
 }

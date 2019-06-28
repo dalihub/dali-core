@@ -50,6 +50,13 @@ namespace Internal
 namespace SceneGraph
 {
 
+#if defined(DEBUG_ENABLED)
+namespace
+{
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDER_MANAGER" );
+} // unnamed namespace
+#endif
+
 /**
  * Structure to contain internal data
  */
@@ -451,9 +458,17 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
   const uint32_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
   const bool haveInstructions = count > 0u;
 
+  DALI_LOG_INFO( gLogFilter, Debug::General,
+                 "Render: haveInstructions(%s) || mImpl->lastFrameWasRendered(%s) || forceClear(%s)\n",
+                 haveInstructions ? "true" : "false",
+                 mImpl->lastFrameWasRendered ? "true" : "false",
+                 forceClear ? "true" : "false" );
+
   // Only render if we have instructions to render, or the last frame was rendered (and therefore a clear is required).
   if( haveInstructions || mImpl->lastFrameWasRendered || forceClear )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::General, "Render: Processing\n" );
+
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender( true );
 

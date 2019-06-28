@@ -49,7 +49,6 @@ public:
 
   /**
    * Create a tap gesture processor.
-   * @param[in] gestureManager The gesture manager.
    */
   TapGestureProcessor();
 

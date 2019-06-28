@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,10 @@ mImpl->frameCounter++;
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gRenderTaskLogFilter;
+namespace
+{
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_UPDATE_MANAGER" );
+} // unnamed namespace
 #endif
 
 
@@ -369,6 +373,8 @@ void UpdateManager::AddNode( OwnerPointer<Node>& node )
 
   // Nodes must be sorted by pointer
   Node* rawNode = node.Release();
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] AddNode\n", rawNode );
+
   Vector<Node*>::Iterator begin = mImpl->nodes.Begin();
   for( Vector<Node*>::Iterator iter = mImpl->nodes.End()-1; iter >= begin; --iter )
   {
@@ -387,6 +393,8 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
   DALI_ASSERT_ALWAYS( NULL != node );
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
 
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] ConnectNode\n", node );
+
   parent->ConnectChild( node );
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
@@ -398,6 +406,8 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
 
 void UpdateManager::DisconnectNode( Node* node )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] DisconnectNode\n", node );
+
   Node* parent = node->GetParent();
   DALI_ASSERT_ALWAYS( NULL != parent );
   parent->SetDirtyFlag( NodePropertyFlags::CHILD_DELETED ); // make parent dirty so that render items dont get reused
@@ -415,6 +425,8 @@ void UpdateManager::DestroyNode( Node* node )
 {
   DALI_ASSERT_ALWAYS( NULL != node );
   DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should have been disconnected
+
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] DestroyNode\n", node );
 
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
@@ -573,6 +585,8 @@ void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
 
 void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer.Get() );
+
   renderer->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   mImpl->renderers.PushBack( renderer.Release() );
   mImpl->renderersAdded = true;
@@ -580,6 +594,8 @@ void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 
 void UpdateManager::RemoveRenderer( Renderer* renderer )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] RemoveRenderer\n", renderer );
+
   // Find the renderer and destroy it
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
   // Need to remove the render object as well
@@ -912,6 +928,19 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
                                               renderToFboEnabled,
                                               isRenderingToFbo );
         }
+      }
+
+      DALI_LOG_INFO( gLogFilter, Debug::General,
+                     "Update: numberOfRenderTasks(%d), taskListCount(%d), Render Instructions(%d)\n",
+                     numberOfRenderTasks, taskListCount, mImpl->renderInstructions.Count( bufferIndex ) );
+
+
+
+      // If any node is dirty, i.e. a property has changed or a child has been deleted, and we do not have any instructions to send, then generate a dummy instruction to force another render
+      if( ( mImpl->nodeDirtyFlags != NodePropertyFlags::NOTHING ) && ( mImpl->renderInstructions.Count( bufferIndex ) == 0 ) )
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::General, "Node flags dirty, creating dummy instruction\n" );
+        mImpl->renderInstructions.GetNextInstruction( bufferIndex ); // This creates and adds an empty instruction. We do not need to modify it.
       }
     }
   }

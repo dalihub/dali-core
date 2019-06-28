@@ -50,7 +50,6 @@ public:
 
   /**
    * Create a pinch gesture processor.
-   * @param[in] gestureManager The gesture manager
    */
   PinchGestureProcessor();
 

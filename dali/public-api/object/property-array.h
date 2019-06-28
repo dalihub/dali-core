@@ -59,7 +59,7 @@ public:
   Array( const std::initializer_list< Value >& values );
 
   /**
-   * @brief Copy Constructor.
+   * @brief Copy constructor.
    *
    * @SINCE_1_0.0
    * @param[in] other The Array to copy from
@@ -67,11 +67,12 @@ public:
   Array( const Array& other );
 
   /**
-   * @brief Move Constructor.
+   * @brief Move constructor.
    *
+   * A move constructor enables the resources owned by an r-value object to be moved into an l-value without copying.
    * @SINCE_1_4.17
    * @param[in] other The Array to move from
-   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
   Array( Array&& other );
 
@@ -205,7 +206,7 @@ public:
   Value& operator[]( SizeType index );
 
   /**
-   * @brief Assignment Operator.
+   * @brief Assignment operator.
    *
    * @SINCE_1_0.0
    * @param[in] other The array to copy from
@@ -215,14 +216,14 @@ public:
   Array& operator=( const Array& other );
 
   /**
-   * @brief Move Assignment Operator.
+   * @brief Move assignment operator.
    *
    * @SINCE_1_4.17
    * @param[in] other The array to copy from
    *
    * @return The moved array.
    *
-   * @note The other array is an r-value so becomes invalid and is no longer usable.
+   * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
   Array& operator=( Array&& other );
 

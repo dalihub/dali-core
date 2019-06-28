@@ -89,6 +89,16 @@ Vector2 Scene::GetDpi() const
   return GetImplementation(*this).GetDpi();
 }
 
+void Scene::SetBackgroundColor( const Vector4& color )
+{
+  GetImplementation(*this).SetBackgroundColor( color );
+}
+
+Vector4 Scene::GetBackgroundColor() const
+{
+  return GetImplementation(*this).GetBackgroundColor();
+}
+
 RenderTaskList Scene::GetRenderTaskList() const
 {
   return RenderTaskList( &GetImplementation(*this).GetRenderTaskList() );
