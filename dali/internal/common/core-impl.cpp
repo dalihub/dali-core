@@ -268,12 +268,8 @@ void Core::ProcessEvents()
   // Signal that any messages received will be flushed soon
   mUpdateManager->EventProcessingStarted();
 
-  // Scene could be added or removed while processing the events
-  // Copy the Scene container locally to avoid possibly invalid iterator
-  std::vector<ScenePtr> scenes = mScenes;
-
   // process events in all scenes
-  for( auto iter = scenes.begin(); iter != scenes.end(); ++iter )
+  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
   {
     (*iter)->ProcessEvents();
   }
@@ -281,7 +277,7 @@ void Core::ProcessEvents()
   mNotificationManager->ProcessMessages();
 
   // Emit signal here to inform listeners that event processing has finished.
-  for( auto iter = scenes.begin(); iter != scenes.end(); ++iter )
+  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
   {
     (*iter)->EmitEventProcessingFinishedSignal();
   }
@@ -293,7 +289,7 @@ void Core::ProcessEvents()
   mRelayoutController->Relayout();
 
   // Rebuild depth tree after event processing has finished
-  for( auto iter = scenes.begin(); iter != scenes.end(); ++iter )
+  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
   {
     (*iter)->RebuildDepthTree();
   }
