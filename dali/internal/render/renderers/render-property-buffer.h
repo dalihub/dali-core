@@ -175,7 +175,7 @@ public:
   template <typename T>
   inline T* GetDataTypedPtr()
   {
-    Dali::Vector< char >* data = mData.Release();
+    Dali::Vector< uint8_t >* data = mData.Release();
     mData = data;
     return reinterpret_cast<T*>( &data->operator[]( 0 ) );
   }
