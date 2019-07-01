@@ -41,7 +41,6 @@ class Core;
 namespace Integration
 {
 class Core;
-class GestureManager;
 class GlAbstraction;
 class GlSyncAbstraction;
 class PlatformAbstraction;
@@ -199,8 +198,6 @@ private:
  *
  * 6) Provide an implementation of the GlAbstraction interface, used to access OpenGL services.
  *
- * 7) Provide an implementation of the GestureManager interface, used to register gestures provided by the platform.
- *
  * Multi-threading notes:
  *
  * The Dali API methods are not reentrant.  If you access the API from multiple threads simultaneously, then the results
@@ -227,7 +224,6 @@ public:
    * @param[in] platformAbstraction The interface providing platform specific services.
    * @param[in] glAbstraction The interface providing OpenGL services.
    * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
-   * @param[in] gestureManager The interface providing gesture manager services.
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.

@@ -61,7 +61,6 @@ public:
   /**
    * Create a gesture event processor.
    * @param[in] updateManager The update manager
-   * @param[in] gestureManager The gesture manager
    * @param[in] renderController The render controller
    */
   GestureEventProcessor( SceneGraph::UpdateManager& updateManager, Integration::RenderController& renderController );

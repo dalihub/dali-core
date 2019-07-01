@@ -7199,3 +7199,30 @@ int utcDaliEnsureRenderWhenRemovingLastRenderableActor(void)
 
   END_TEST;
 }
+
+int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+
+  tet_infoline( "Ensure we clear the screen when the last actor is removed" );
+
+  Actor actor = CreateRenderableActor();
+  actor.SetSize( 100.0f, 100.0f );
+  stage.Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  auto& glAbstraction = application.GetGlAbstraction();
+  const auto clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  actor.SetVisible( false );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION );
+
+  END_TEST;
+}
