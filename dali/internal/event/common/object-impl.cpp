@@ -600,6 +600,19 @@ void Object::SetProperties( const Property::Map& properties )
   }
 }
 
+void Object::GetProperties( Property::Map& properties )
+{
+  properties.Clear();
+
+  Property::IndexContainer indexContainer;
+  GetPropertyIndices( indexContainer );
+
+  for( auto index : indexContainer )
+  {
+    properties[ index ] = GetProperty( index );
+  }
+}
+
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
   return RegisterProperty( name, Property::INVALID_KEY, propertyValue, accessMode );

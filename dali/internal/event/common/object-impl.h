@@ -220,6 +220,11 @@ public:
   void SetProperties( const Property::Map& properties );
 
   /**
+   * @copydoc Dali::DevelHandle::GetProperties()
+   */
+  void GetProperties( Property::Map& properties );
+
+  /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
   Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );

@@ -1715,3 +1715,64 @@ int UtcDaliHandleTemplateNew(void)
 
   END_TEST;
 }
+
+int UtcDaliHandleGetProperties(void)
+{
+  TestApplication application;
+
+  Handle handle = Actor::New();
+  DevelHandle::SetProperties(
+    handle,
+    Property::Map
+    {
+      { Actor::Property::SIZE, Vector3( 400.0f, 200.0f, 100.0f ) },
+      { Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER },
+      { Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER },
+      { Actor::Property::NAME, "Actor" },
+      { Actor::Property::LEAVE_REQUIRED, true },
+      { "color", Color::RED },
+    }
+  );
+
+  Property::Map map;
+  DevelHandle::GetProperties( handle, map );
+
+  // Get all the properties and ensure they match
+
+  DALI_TEST_EQUALS( handle.GetPropertyCount(), map.Count(), TEST_LOCATION );
+
+  for( auto position = 0u; position < map.Count(); ++position )
+  {
+    auto keyValuePair = map.GetKeyValue( position );
+    const auto& index = keyValuePair.first.indexKey;
+    const auto& value = keyValuePair.second;
+    auto handleValue = handle.GetProperty( index );
+
+    switch( value.GetType() )
+    {
+      case Property::NONE:       break;
+      case Property::BOOLEAN:    DALI_TEST_EQUALS( value.Get< bool >(), handleValue.Get< bool >(), TEST_LOCATION ); break;
+      case Property::FLOAT:      DALI_TEST_EQUALS( value.Get< float >(), handleValue.Get< float >(), TEST_LOCATION ); break;
+      case Property::INTEGER:    DALI_TEST_EQUALS( value.Get< int >(), handleValue.Get< int >(), TEST_LOCATION ); break;
+      case Property::VECTOR2:    DALI_TEST_EQUALS( value.Get< Vector2 >(), handleValue.Get< Vector2 >(), TEST_LOCATION ); break;
+      case Property::VECTOR3:    DALI_TEST_EQUALS( value.Get< Vector3 >(), handleValue.Get< Vector3 >(), TEST_LOCATION ); break;
+      case Property::VECTOR4:    DALI_TEST_EQUALS( value.Get< Vector4 >(), handleValue.Get< Vector4 >(), TEST_LOCATION ); break;
+      case Property::MATRIX3:    DALI_TEST_EQUALS( value.Get< Matrix3 >(), handleValue.Get< Matrix3 >(), TEST_LOCATION ); break;
+      case Property::MATRIX:     DALI_TEST_EQUALS( value.Get< Matrix >(), handleValue.Get< Matrix >(), TEST_LOCATION ); break;
+      case Property::RECTANGLE:  DALI_TEST_EQUALS( value.Get< Rect< int > >(), handleValue.Get< Rect< int > >(), TEST_LOCATION ); break;
+      case Property::ROTATION:   DALI_TEST_EQUALS( value.Get< Quaternion >(), handleValue.Get< Quaternion >(), TEST_LOCATION ); break;
+      case Property::STRING:     DALI_TEST_EQUALS( value.Get< std::string >(), handleValue.Get< std::string >(), TEST_LOCATION ); break;
+      case Property::ARRAY:      DALI_TEST_EQUALS( value.GetArray()->Count(), handleValue.GetArray()->Count(), TEST_LOCATION ); break;
+      case Property::MAP:        DALI_TEST_EQUALS( value.GetMap()->Count(), handleValue.GetMap()->Count(), TEST_LOCATION ); break;
+      case Property::EXTENTS:    DALI_TEST_EQUALS( value.Get< Extents >(), handleValue.Get< Extents >(), TEST_LOCATION ); break;
+    }
+  }
+
+  // Add a custom property and ensure the count goes up by one.
+  const auto countBefore = map.Count();
+  handle.RegisterProperty( "tempProperty", Color::GREEN );
+  DevelHandle::GetProperties( handle, map );
+  DALI_TEST_EQUALS( countBefore + 1, map.Count(), TEST_LOCATION );
+
+  END_TEST;
+}

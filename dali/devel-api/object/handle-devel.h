@@ -107,6 +107,16 @@ DALI_CORE_API Property::Index RegisterProperty( Handle handle, Property::Index k
 DALI_CORE_API void SetProperties( Handle handle, const Property::Map& properties );
 
 /**
+ * @brief Retrieves all the properties and the values for a handle.
+ *
+ * @param[in] handle The handle to retrieve properties from
+ * @param[out] properties A map which is populated with the index-value pairs
+ *
+ * @note The properties map will be cleared by this method first.
+ */
+DALI_CORE_API void GetProperties( Handle handle, Property::Map& properties );
+
+/**
  * @brief Set the type-info that the object is created by.
  *
  * @note This is particularly useful to link C# custom control with its correct type-info in the native side
