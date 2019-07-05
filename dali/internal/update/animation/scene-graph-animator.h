@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cmath>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
