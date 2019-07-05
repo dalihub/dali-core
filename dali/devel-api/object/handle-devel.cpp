@@ -49,6 +49,11 @@ void SetProperties( Handle handle, const Property::Map& properties )
   GetImplementation( handle ).SetProperties( properties );
 }
 
+void GetProperties( Handle handle, Property::Map& properties )
+{
+  GetImplementation( handle ).GetProperties( properties );
+}
+
 void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )
 {
   GetImplementation( handle ).SetTypeInfo( &GetImplementation( typeInfo ) );
