@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1664,5 +1664,54 @@ int UtcDaliHandlePropertySetSignal03(void)
   child.SetProperty( CHILD_PROPERTY, 29 );
   propertySetCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( propertySetCheck.mValue, Property::Value( 29 ), TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliHandlePropertySetProperties(void)
+{
+  TestApplication application;
+  const Vector3 actorSize( 10.0f, 20.0f, 30.0f );
+  const Vector3 anchorPoint( 1.0f, 0.5f, 0.0f );
+  const Vector4 color( 0.1f, 0.2, 0.3f, 0.4f );
+
+  Handle handle = Actor::New();
+  DevelHandle::SetProperties(
+    handle,
+    Property::Map
+    {
+      { Actor::Property::SIZE, actorSize },
+      { Actor::Property::ANCHOR_POINT, anchorPoint },
+      { "color", color },
+      { "invalid", Vector2::ZERO } // It should quietly ignore invalid data
+    }
+  );
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::SIZE ).Get< Vector3 >(), actorSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::ANCHOR_POINT ).Get< Vector3 >(), anchorPoint, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::COLOR ).Get< Vector4 >(), color, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliHandleTemplateNew(void)
+{
+  TestApplication application;
+  const Vector3 actorSize( 10.0f, 20.0f, 30.0f );
+  const Vector3 anchorPoint( 1.0f, 0.5f, 0.0f );
+  const Vector4 color( 0.1f, 0.2, 0.3f, 0.4f );
+
+  Handle handle = DevelHandle::New< Actor >(
+    Property::Map
+    {
+      { Actor::Property::SIZE, actorSize },
+      { Actor::Property::ANCHOR_POINT, anchorPoint },
+      { "color", color },
+      { "invalid", Vector2::ZERO } // It should quietly ignore invalid data
+    }
+  );
+
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::SIZE ).Get< Vector3 >(), actorSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::ANCHOR_POINT ).Get< Vector3 >(), anchorPoint, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetProperty( Actor::Property::COLOR ).Get< Vector4 >(), color, TEST_LOCATION );
+
   END_TEST;
 }
