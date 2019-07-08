@@ -30,6 +30,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/handle-devel.h>
@@ -212,6 +213,16 @@ public:
    * @copydoc Dali::Handle::RegisterProperty()
    */
   Property::Index RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue );
+
+  /**
+   * @copydoc Dali::DevelHandle::SetProperties()
+   */
+  void SetProperties( const Property::Map& properties );
+
+  /**
+   * @copydoc Dali::DevelHandle::GetProperties()
+   */
+  void GetProperties( Property::Map& properties );
 
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)

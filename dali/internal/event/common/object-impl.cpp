@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -579,6 +579,38 @@ Property::Index Object::RegisterProperty( const std::string& name, const Propert
 Property::Index Object::RegisterProperty( const std::string& name, Property::Index key, const Property::Value& propertyValue )
 {
   return RegisterProperty( name, key, propertyValue, Property::ANIMATABLE );
+}
+
+void Object::SetProperties( const Property::Map& properties )
+{
+  const auto count = properties.Count();
+  for( auto position = 0u; position < count; ++position )
+  {
+    // GetKeyAt and GetValue both return references which means no potential copying of maps/arrays.
+    // Iterating twice to get the value we want should still be fairly quick in a Property::Map.
+
+    const auto& key = properties.GetKeyAt( position );
+    const auto propertyIndex = ( key.type == Property::Key::INDEX ) ? key.indexKey : GetPropertyIndex( key.stringKey );
+
+    if( propertyIndex != Property::INVALID_INDEX )
+    {
+      const auto& value = properties.GetValue( position );
+      SetProperty( propertyIndex, value );
+    }
+  }
+}
+
+void Object::GetProperties( Property::Map& properties )
+{
+  properties.Clear();
+
+  Property::IndexContainer indexContainer;
+  GetPropertyIndices( indexContainer );
+
+  for( auto index : indexContainer )
+  {
+    properties[ index ] = GetProperty( index );
+  }
 }
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )

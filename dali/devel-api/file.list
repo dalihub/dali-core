@@ -9,6 +9,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/common/stage-devel.cpp \
   $(devel_api_src_dir)/events/hit-test-algorithm.cpp \
   $(devel_api_src_dir)/events/touch-data-devel.cpp \
+  $(devel_api_src_dir)/events/key-event-devel.cpp \
   $(devel_api_src_dir)/images/distance-field.cpp \
   $(devel_api_src_dir)/images/texture-set-image.cpp \
   $(devel_api_src_dir)/images/nine-patch-image.cpp \
@@ -20,6 +21,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/threading/conditional-wait.cpp \
   $(devel_api_src_dir)/threading/mutex.cpp \
   $(devel_api_src_dir)/threading/thread.cpp \
+  $(devel_api_src_dir)/threading/thread-pool.cpp \
   $(devel_api_src_dir)/update/frame-callback-interface.cpp \
   $(devel_api_src_dir)/update/update-proxy.cpp
 
@@ -47,7 +49,8 @@ devel_api_core_common_header_files = \
 
 devel_api_core_events_header_files = \
   $(devel_api_src_dir)/events/hit-test-algorithm.h \
-  $(devel_api_src_dir)/events/touch-data-devel.h
+  $(devel_api_src_dir)/events/touch-data-devel.h \
+  $(devel_api_src_dir)/events/key-event-devel.h
 
 devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/distance-field.h \
@@ -75,7 +78,8 @@ devel_api_core_scripting_header_files = \
 devel_api_core_threading_header_files = \
   $(devel_api_src_dir)/threading/conditional-wait.h \
   $(devel_api_src_dir)/threading/mutex.h \
-  $(devel_api_src_dir)/threading/thread.h
+  $(devel_api_src_dir)/threading/thread.h \
+  $(devel_api_src_dir)/threading/thread-pool.h
 
 devel_api_core_update_header_files = \
   $(devel_api_src_dir)/update/frame-callback-interface.h \

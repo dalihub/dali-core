@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/devel-api/events/key-event-devel.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -397,6 +398,17 @@ int UtcDaliKeyEventSetDeviceSubclass(void)
   KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
 
   DALI_TEST_EQUALS( event.GetDeviceSubclass(), Device::Subclass::NONE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliKeyEventSetLogicalKey(void)
+{
+  TestApplication application;
+
+  KeyEvent event(TEST_STRING_1,"i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down);
+
+  DALI_TEST_EQUALS( DevelKeyEvent::GetLogicalKey( event ), "", TEST_LOCATION );
 
   END_TEST;
 }

@@ -426,6 +426,63 @@ int UtcDaliSceneCreateNewSceneDuringCoreEventProcessing(void)
   END_TEST;
 }
 
+int UtcDaliSceneRootLayerAndSceneAlignment(void)
+{
+  TestApplication application;
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  DALI_TEST_CHECK( scene );
+
+  // One reference of scene kept here and the other one kept in the Core
+  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 2 );
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  // Keep the reference of the root layer handle so it will still be alive after the scene is deleted
+  Layer rootLayer = scene.GetRootLayer();
+  DALI_TEST_CHECK( rootLayer );
+  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 2 );
+
+  // Request to discard the scene from the Core
+  scene.Discard();
+  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 1 );
+
+  // Reset the scene handle
+  scene.Reset();
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  // At this point, the scene should have been automatically deleted
+  // To prove this, the ref count of the root layer handle should be decremented to 1
+  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
+
+  // Create a new Scene while the root layer of the deleted scene is still alive
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  DALI_TEST_CHECK( newScene );
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  // At this point, we have only one scene but two root layers
+  // The root layer of the deleted scene is still alive
+  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
+
+  // Delete the root layer of the deleted scene
+  rootLayer.Reset();
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
 int UtcDaliSceneEventProcessingFinishedP(void)
 {
   TestApplication application;
