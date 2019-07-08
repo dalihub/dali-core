@@ -125,6 +125,11 @@ public:
   void SurfaceResized();
 
   /**
+   * Notify the surface has been deleted.
+   */
+  void SurfaceDeleted();
+
+  /**
    * @copydoc Dali::Integration::Scene::Discard
    */
   void Discard();

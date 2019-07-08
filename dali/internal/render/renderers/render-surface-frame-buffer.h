@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <atomic>
+
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
@@ -96,6 +99,11 @@ public:
    */
   void SetBackgroundColor( const Vector4& color );
 
+  /**
+   * @copydoc Dali::Internal::FrameBuffer::MarkSurfaceAsInvalid()
+   */
+  void MarkSurfaceAsInvalid() { mIsSurfaceInvalid = true; };
+
 public:
 
   /**
@@ -136,6 +144,7 @@ private:
   uint32_t                    mHeight;
   Vector4                     mBackgroundColor;
   bool                        mSizeChanged;
+  std::atomic<bool>           mIsSurfaceInvalid; ///< This is set only from the event thread and read only from the render thread
 };
 
 // Messages for FrameBuffer

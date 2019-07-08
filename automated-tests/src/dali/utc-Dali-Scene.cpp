@@ -483,6 +483,44 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   END_TEST;
 }
 
+int UtcDaliSceneDeleteSurface(void)
+{
+  TestApplication application;
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  DALI_TEST_CHECK( scene );
+
+  // Create the render surface for the scene
+  TestRenderSurface* renderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, 480.0f, 800.0f ) );
+  scene.SetSurface( *renderSurface );
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  // Add a renderable actor to the scene
+  auto actor = CreateRenderableActor();
+  scene.Add( actor );
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  // Notify the Core that the render surface will be deleted.
+  application.GetCore().SurfaceDeleted( renderSurface );
+
+  // Delete the render surface
+  delete renderSurface;
+  renderSurface = nullptr;
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
 int UtcDaliSceneEventProcessingFinishedP(void)
 {
   TestApplication application;
