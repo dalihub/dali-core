@@ -1314,6 +1314,9 @@ void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
   EnsureRelayoutData();
 
   mRelayoutData->sizeSetPolicy = policy;
+
+  // Trigger relayout on this control
+  RelayoutRequest();
 }
 
 SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
