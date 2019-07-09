@@ -72,7 +72,7 @@ struct RenderManager::Impl
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         Integration::DepthBufferAvailable depthBufferAvailableParam,
         Integration::StencilBufferAvailable stencilBufferAvailableParam )
-  : context( glAbstraction ),
+  : context( glAbstraction, &surfaceContextContainer ),
     currentContext( &context ),
     glAbstraction( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),

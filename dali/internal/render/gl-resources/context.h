@@ -24,6 +24,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
@@ -64,13 +65,23 @@ public:
   static const unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 8 is guaranteed, which is more than DALi uses anyways
 
   /**
-   * Creates the Dali Context object.
+   * Creates the Dali Context object for surface rendering only.
    * This method does not create an OpenGL context i.e. that is done from outside dali-core.
    * @pre Context has not been created.
    * @exception Context already created.
    * @param glAbstraction the gl abstraction.
    */
   Context( Integration::GlAbstraction& glAbstraction );
+
+  /**
+   * Creates the Dali Context object for texture (and surface rendering if required).
+   * This method does not create an OpenGL context i.e. that is done from outside dali-core.
+   * @pre Context has not been created.
+   * @exception Context already created.
+   * @param glAbstraction the gl abstraction.
+   * @param contexts The list of surface contexts (for surface rendering)
+   */
+  Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts );
 
   /**
    * Destructor
@@ -120,6 +131,26 @@ public:
   void PrintGlString(const char* stringName, GLenum stringId)
   {
     DALI_LOG_INFO(Debug::Filter::gRender, Debug::General, "GL %s = %s\n", stringName, reinterpret_cast< const char * >( GetString( stringId ) ) );
+  }
+
+  void ResetBufferCache()
+  {
+    // reset the cached buffer id's
+    // fixes problem where some drivers will a generate a buffer with the
+    // same id, as the last deleted buffer id.
+    mBoundArrayBufferId = 0;
+    mBoundElementArrayBufferId = 0;
+    mBoundTransformFeedbackBufferId = 0;
+  }
+
+  void ResetTextureCache()
+  {
+    // reset the cached texture id's in case the driver re-uses them
+    // when creating new textures
+    for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
+    {
+       mBoundTextureId[ i ] = 0;
+    }
   }
 
   /****************************************************************************************
@@ -606,19 +637,26 @@ public:
    */
   void DeleteBuffers(GLsizei n, const GLuint* buffers)
   {
-    // @todo: this is to prevent mesh destructor from doing GL calls when DALi core is being deleted
-    // can be taken out once render manages either knows about meshes or gpubuffers and can tell them directly that context is lost
     if( this->IsGlContextCreated() )
     {
       LOG_GL("DeleteBuffers %d %p\n", n, buffers);
       CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteBuffers(n, buffers) );
     }
-    // reset the cached buffer id's
-    // fixes problem where some drivers will a generate a buffer with the
-    // same id, as the last deleted buffer id.
-    mBoundArrayBufferId = 0;
-    mBoundElementArrayBufferId = 0;
-    mBoundTransformFeedbackBufferId = 0;
+
+    ResetBufferCache();
+
+    // Need to reset the buffer cache in the surface contexts
+    // This will only be executed by the surfaceless context when there are contexts for surface rendering
+    if ( mSurfaceContexts )
+    {
+      for ( auto&& context : *mSurfaceContexts )
+      {
+        if ( context )
+        {
+          context->ResetBufferCache();
+        }
+      }
+    }
   }
 
   /**
@@ -658,11 +696,19 @@ public:
     LOG_GL("DeleteTextures %d %p\n", n, textures);
     CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteTextures(n, textures) );
 
-    // reset the cached texture id's incase the driver re-uses them
-    // when creating new textures
-    for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
+    ResetTextureCache();
+
+    // Need to reset the texture cache in the surface contexts
+    // This will only be executed by the surfaceless context when there are contexts for surface rendering
+    if ( mSurfaceContexts )
     {
-       mBoundTextureId[ i ] = 0;
+      for ( auto&& context : *mSurfaceContexts )
+      {
+        if ( context )
+        {
+          context->ResetTextureCache();
+        }
+      }
     }
   }
 
@@ -1782,6 +1828,8 @@ private: // Data
   bool mVertexAttributeCurrentState[ MAX_ATTRIBUTE_CACHE_SIZE ];   ///< Current state on the driver for Enable Vertex Attribute
 
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
+
+  OwnerContainer< Context* >* mSurfaceContexts;   ///< The pointer of the container of contexts for surface rendering
 };
 
 } // namespace Internal
