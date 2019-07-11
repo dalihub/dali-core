@@ -118,6 +118,11 @@ public:
   Context* GetContext();
 
   /**
+   * @brief Makes the graphics context current
+   */
+  void MakeContextCurrent();
+
+  /**
    * @brief Gets whether the depth buffer is required
    * @return TRUE if the depth buffer is required
    */

@@ -58,6 +58,7 @@ void TestApplication::CreateCore()
                                         mPlatformAbstraction,
                                         mGlAbstraction,
                                         mGlSyncAbstraction,
+                                        mGlContextHelperAbstraction,
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
@@ -154,6 +155,11 @@ TestGlAbstraction& TestApplication::GetGlAbstraction()
 TestGlSyncAbstraction& TestApplication::GetGlSyncAbstraction()
 {
   return mGlSyncAbstraction;
+}
+
+TestGlContextHelperAbstraction& TestApplication::GetGlContextHelperAbstraction()
+{
+  return mGlContextHelperAbstraction;
 }
 
 void TestApplication::ProcessEvent(const Integration::Event& event)

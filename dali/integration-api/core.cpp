@@ -25,6 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
+#include <dali/integration-api/gl-context-helper-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 
@@ -38,6 +39,7 @@ Core* Core::New( RenderController& renderController,
                  PlatformAbstraction& platformAbstraction,
                  GlAbstraction& glAbstraction,
                  GlSyncAbstraction& glSyncAbstraction,
+                 GlContextHelperAbstraction& glContextHelperAbstraction,
                  ResourcePolicy::DataRetention policy,
                  RenderToFrameBuffer renderToFboEnabled,
                  DepthBufferAvailable depthBufferAvailable,
@@ -48,6 +50,7 @@ Core* Core::New( RenderController& renderController,
                                         platformAbstraction,
                                         glAbstraction,
                                         glSyncAbstraction,
+                                        glContextHelperAbstraction,
                                         policy,
                                         renderToFboEnabled,
                                         depthBufferAvailable,

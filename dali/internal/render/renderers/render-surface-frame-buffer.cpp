@@ -111,6 +111,14 @@ Context* SurfaceFrameBuffer::GetContext()
   return mContext;
 }
 
+void SurfaceFrameBuffer::MakeContextCurrent()
+{
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->MakeContextCurrent();
+  }
+}
+
 Integration::DepthBufferAvailable SurfaceFrameBuffer::GetDepthBufferRequired()
 {
   return mSurface && !mIsSurfaceInvalid ? Integration::DepthBufferAvailable::FALSE : mSurface->GetDepthBufferRequired();

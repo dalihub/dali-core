@@ -22,6 +22,7 @@
 #include <test-platform-abstraction.h>
 #include "test-gl-sync-abstraction.h"
 #include "test-gl-abstraction.h"
+#include "test-gl-context-helper-abstraction.h"
 #include "test-render-controller.h"
 #include "test-render-surface.h"
 #include <dali/public-api/common/dali-common.h>
@@ -66,6 +67,7 @@ public:
   TestRenderController& GetRenderController();
   TestGlAbstraction& GetGlAbstraction();
   TestGlSyncAbstraction& GetGlSyncAbstraction();
+  TestGlContextHelperAbstraction& GetGlContextHelperAbstraction();
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
   bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
@@ -93,6 +95,7 @@ protected:
   TestRenderController      mRenderController;
   TestGlAbstraction         mGlAbstraction;
   TestGlSyncAbstraction     mGlSyncAbstraction;
+  TestGlContextHelperAbstraction mGlContextHelperAbstraction;
   TestRenderSurface*        mRenderSurface;
 
   Integration::UpdateStatus mStatus;

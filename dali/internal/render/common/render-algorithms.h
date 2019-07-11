@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,14 @@ class RenderAlgorithms
      * @param[in] bufferIndex            The current render buffer index (previous update buffer)
      * @param[in] depthBufferAvailable   Whether the depth buffer is available
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+     * @param[in] boundTextures          The textures bound for rendering
      */
     void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                    Context& context,
                                    BufferIndex bufferIndex,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable );
+                                   Integration::StencilBufferAvailable stencilBufferAvailable,
+                                   Vector<GLuint>& boundTextures );
 
   private:
 
@@ -113,6 +115,7 @@ class RenderAlgorithms
      * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
      * @param[in] depthBufferAvailable   Whether the depth buffer is available
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+     * @param[in] boundTextures          The textures bound for rendering
      */
     inline void ProcessRenderList( const Dali::Internal::SceneGraph::RenderList& renderList,
                                    Context& context,
@@ -120,7 +123,8 @@ class RenderAlgorithms
                                    const Matrix& viewMatrix,
                                    const Matrix& projectionMatrix,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable );
+                                   Integration::StencilBufferAvailable stencilBufferAvailable,
+                                   Vector<GLuint>& boundTextures );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );
