@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,16 @@ Property::Index GetPropertyIndex( const Handle& handle, Property::Key key )
 Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue )
 {
   return GetImplementation( handle ).RegisterProperty( name, key, propertyValue );
+}
+
+void SetProperties( Handle handle, const Property::Map& properties )
+{
+  GetImplementation( handle ).SetProperties( properties );
+}
+
+void GetProperties( Handle handle, Property::Map& properties )
+{
+  GetImplementation( handle ).GetProperties( properties );
 }
 
 void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )

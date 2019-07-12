@@ -7205,7 +7205,7 @@ int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
   TestApplication application;
   auto stage = Stage::GetCurrent();
 
-  tet_infoline( "Ensure we clear the screen when the last actor is removed" );
+  tet_infoline( "Ensure we clear the screen when the last actor is made invisible" );
 
   Actor actor = CreateRenderableActor();
   actor.SetSize( 100.0f, 100.0f );

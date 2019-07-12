@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,16 @@ public:
    * @param[in] color The new background color
    */
   void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Mark the render surface as invalid
+   *
+   * The render surface is maked as invalid when it is deleted.
+   *
+   * @note Only for FrameBuffer backed by a render surface.
+   * @return True if the FrameBuffer is backed by a render surface
+   */
+  void MarkSurfaceAsInvalid();
 
 private: // implementation
 

@@ -125,6 +125,15 @@ void FrameBuffer::SetBackgroundColor( const Vector4& color )
   }
 }
 
+void FrameBuffer::MarkSurfaceAsInvalid()
+{
+  if ( mIsSurfaceBacked )
+  {
+    Render::SurfaceFrameBuffer* renderObject = static_cast<Render::SurfaceFrameBuffer*>( mRenderObject );
+    renderObject->MarkSurfaceAsInvalid();
+  }
+}
+
 FrameBuffer::~FrameBuffer()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )

@@ -202,6 +202,18 @@ void Core::SurfaceResized( Integration::RenderSurface* surface )
   }
 }
 
+void Core::SurfaceDeleted( Integration::RenderSurface* surface )
+{
+  for( auto scene : mScenes )
+  {
+    if( scene->GetSurface() == surface )
+    {
+      scene->SurfaceDeleted();
+      break;
+    }
+  }
+}
+
 void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as

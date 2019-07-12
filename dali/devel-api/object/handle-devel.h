@@ -2,7 +2,7 @@
 #define DALI_HANDLE_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,24 @@ DALI_CORE_API Property::Index GetPropertyIndex( const Handle& handle, Property::
 DALI_CORE_API Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue );
 
 /**
+ * @brief Sets all the properties in the given property map.
+ *
+ * @param[in] handle The handle to set the properties on
+ * @param[in] properties The properties to set
+ */
+DALI_CORE_API void SetProperties( Handle handle, const Property::Map& properties );
+
+/**
+ * @brief Retrieves all the properties and the values for a handle.
+ *
+ * @param[in] handle The handle to retrieve properties from
+ * @param[out] properties A map which is populated with the index-value pairs
+ *
+ * @note The properties map will be cleared by this method first.
+ */
+DALI_CORE_API void GetProperties( Handle handle, Property::Map& properties );
+
+/**
  * @brief Set the type-info that the object is created by.
  *
  * @note This is particularly useful to link C# custom control with its correct type-info in the native side
@@ -131,6 +149,20 @@ using PropertySetSignalType = Signal< void( Handle& handle, Property::Index inde
  */
 DALI_CORE_API PropertySetSignalType& PropertySetSignal( Handle handle );
 
+/**
+ * @brief Template to create a derived handle and set properties on it.
+ *
+ * @tparam T The derived class to create
+ *
+ * @param[in] properties The properties to set
+ */
+template< typename T >
+DALI_INTERNAL T New( const Property::Map& properties )
+{
+  T handle = T::New();
+  SetProperties( handle, properties );
+  return handle;
+}
 
 } // namespace DevelHandle
 

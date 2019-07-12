@@ -93,6 +93,7 @@ SET(TC_SOURCES
         utc-Dali-Texture.cpp
         utc-Dali-TextureSet.cpp
         utc-Dali-Thread.cpp
+        utc-Dali-ThreadPool.cpp
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TouchDataProcessing.cpp

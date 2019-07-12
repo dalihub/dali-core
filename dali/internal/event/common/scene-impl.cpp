@@ -90,6 +90,11 @@ Scene::~Scene()
     mRenderTaskList.Reset();
   }
 
+  if ( mFrameBuffer )
+  {
+    mFrameBuffer.Reset();
+  }
+
   // Discard this Scene from the Core
   Discard();
 }
@@ -247,6 +252,15 @@ void Scene::SurfaceResized()
   }
 }
 
+void Scene::SurfaceDeleted()
+{
+  if ( mFrameBuffer )
+  {
+    // The frame buffer doesn't have a valid render surface any more.
+    mFrameBuffer->MarkSurfaceAsInvalid();
+  }
+}
+
 Integration::RenderSurface* Scene::GetSurface() const
 {
   return mSurface;
@@ -304,23 +318,42 @@ Vector4 Scene::GetBackgroundColor() const
 
 void Scene::EmitKeyEventSignal(const KeyEvent& event)
 {
-  mKeyEventSignal.Emit( event );
+  if ( !mKeyEventSignal.Empty() )
+  {
+    Dali::Integration::Scene handle( this );
+    mKeyEventSignal.Emit( event );
+  }
 }
 
 void Scene::EmitEventProcessingFinishedSignal()
 {
-  mEventProcessingFinishedSignal.Emit();
+  if ( !mEventProcessingFinishedSignal.Empty() )
+  {
+    Dali::Integration::Scene handle( this );
+    mEventProcessingFinishedSignal.Emit();
+  }
 }
 
 void Scene::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch )
 {
-  mTouchedSignal.Emit( touchEvent );
-  mTouchSignal.Emit( touch );
+  Dali::Integration::Scene handle( this );
+  if ( !mTouchedSignal.Empty() )
+  {
+    mTouchedSignal.Emit( touchEvent );
+  }
+  if ( !mTouchSignal.Empty() )
+  {
+    mTouchSignal.Emit( touch );
+  }
 }
 
 void Scene::EmitWheelEventSignal(const WheelEvent& event)
 {
-  mWheelEventSignal.Emit( event );
+  if ( !mWheelEventSignal.Empty() )
+  {
+    Dali::Integration::Scene handle( this );
+    mWheelEventSignal.Emit( event );
+  }
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()

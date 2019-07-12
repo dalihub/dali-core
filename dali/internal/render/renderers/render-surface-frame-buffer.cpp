@@ -34,7 +34,8 @@ SurfaceFrameBuffer::SurfaceFrameBuffer( Integration::RenderSurface* surface )
   mWidth( mSurface->GetPositionSize().width ),
   mHeight( mSurface->GetPositionSize().height ),
   mBackgroundColor( 0.f, 0.f, 0.f, 1.f ),
-  mSizeChanged( false )
+  mSizeChanged( false ),
+  mIsSurfaceInvalid( false )
 {
 }
 
@@ -43,6 +44,11 @@ SurfaceFrameBuffer::~SurfaceFrameBuffer()
 
 void SurfaceFrameBuffer::Destroy( Context& context )
 {
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->DestroySurface();
+    mSurface = nullptr;
+  }
 }
 
 void SurfaceFrameBuffer::GlContextDestroyed()
@@ -51,20 +57,33 @@ void SurfaceFrameBuffer::GlContextDestroyed()
   {
     mContext->GlContextDestroyed();
   }
+
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->DestroySurface();
+    mSurface = nullptr;
+  }
 }
 
 void SurfaceFrameBuffer::Initialize(Context& context)
 {
   mContext = &context;
   mContext->GlContextCreated();
-  mSurface->InitializeGraphics();
+
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->InitializeGraphics();
+  }
 }
 
 void SurfaceFrameBuffer::Bind( Context& context )
 {
-  mSurface->PreRender( mSizeChanged );
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->PreRender( mSizeChanged );
 
-  context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
+    context.BindFramebuffer( GL_FRAMEBUFFER, 0u );
+  }
 }
 
 uint32_t SurfaceFrameBuffer::GetWidth() const
@@ -79,7 +98,10 @@ uint32_t SurfaceFrameBuffer::GetHeight() const
 
 void SurfaceFrameBuffer::PostRender()
 {
-  mSurface->PostRender( false, false, mSizeChanged );
+  if ( mSurface && !mIsSurfaceInvalid )
+  {
+    mSurface->PostRender( false, false, mSizeChanged );
+  }
 
   mSizeChanged = false;
 }
@@ -91,12 +113,12 @@ Context* SurfaceFrameBuffer::GetContext()
 
 Integration::DepthBufferAvailable SurfaceFrameBuffer::GetDepthBufferRequired()
 {
-  return mSurface->GetDepthBufferRequired();
+  return mSurface && !mIsSurfaceInvalid ? Integration::DepthBufferAvailable::FALSE : mSurface->GetDepthBufferRequired();
 }
 
 Integration::StencilBufferAvailable SurfaceFrameBuffer::GetStencilBufferRequired()
 {
-  return mSurface->GetStencilBufferRequired();
+  return mSurface && !mIsSurfaceInvalid ? Integration::StencilBufferAvailable::TRUE : mSurface->GetStencilBufferRequired();
 }
 
 Vector4 SurfaceFrameBuffer::GetBackgroundColor()

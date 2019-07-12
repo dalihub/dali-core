@@ -294,6 +294,13 @@ public:
    */
   void SurfaceResized( Integration::RenderSurface* surface );
 
+  /**
+   * Notify the Core that the GL surface has been deleted.
+   * Multi-threading note: this method should be called from the main thread
+   * @param[in] surface The deleted surface
+   */
+  void SurfaceDeleted( Integration::RenderSurface* surface );
+
   // Core Lifecycle
 
   /**
