@@ -25,7 +25,6 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
-
 namespace Dali
 {
 
@@ -51,12 +50,7 @@ void KeyEventProcessor::ProcessKeyEvent( const Integration::KeyEvent& event )
   GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
 
   // Emit the key event signal from the scene.
-  bool consumed = mScene.EmitKeyEventGeneratedSignal( keyEvent );
-  if( !consumed )
-  {
-    mScene.EmitKeyEventSignal(keyEvent);
-  }
-
+  mScene.EmitKeyEventSignal( keyEvent );
 }
 
 } // namespace Internal
