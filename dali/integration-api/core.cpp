@@ -91,6 +91,11 @@ void Core::SurfaceResized( Integration::RenderSurface* surface )
   mImpl->SurfaceResized(surface);
 }
 
+void Core::SurfaceDeleted( Integration::RenderSurface* surface )
+{
+  mImpl->SurfaceDeleted(surface);
+}
+
 void Core::SceneCreated()
 {
   mImpl->SceneCreated();

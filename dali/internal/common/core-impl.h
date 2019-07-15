@@ -124,6 +124,11 @@ public:
   void SurfaceResized( Integration::RenderSurface* surface );
 
   /**
+   * @copydoc Dali::Integration::Core::SurfaceDeleted(Integration::RenderSurface*)
+   */
+  void SurfaceDeleted( Integration::RenderSurface* surface );
+
+  /**
    * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)
    */
   void SetMinimumFrameTimeInterval(uint32_t interval);

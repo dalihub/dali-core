@@ -983,15 +983,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       DALI_LOG_INFO( gLogFilter, Debug::General,
                      "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n",
                      numberOfRenderTasks, mImpl->renderInstructions.Count( bufferIndex ) );
-
-
-
-      // If any node is dirty, i.e. a property has changed or a child has been deleted, and we do not have any instructions to send, then generate a dummy instruction to force another render
-      if( ( mImpl->nodeDirtyFlags != NodePropertyFlags::NOTHING ) && ( mImpl->renderInstructions.Count( bufferIndex ) == 0 ) )
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::General, "Node flags dirty, creating dummy instruction\n" );
-        mImpl->renderInstructions.GetNextInstruction( bufferIndex ); // This creates and adds an empty instruction. We do not need to modify it.
-      }
     }
   }
 
