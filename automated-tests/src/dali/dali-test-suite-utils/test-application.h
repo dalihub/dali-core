@@ -40,13 +40,8 @@ public:
   static const uint32_t DEFAULT_SURFACE_WIDTH = 480;
   static const uint32_t DEFAULT_SURFACE_HEIGHT = 800;
 
-#ifdef _CPP11
   static constexpr uint32_t DEFAULT_HORIZONTAL_DPI = 220;
   static constexpr uint32_t DEFAULT_VERTICAL_DPI   = 217;
-#else
-  static const uint32_t DEFAULT_HORIZONTAL_DPI = 220;
-  static const uint32_t DEFAULT_VERTICAL_DPI   = 217;
-#endif
 
   static const uint32_t DEFAULT_RENDER_INTERVAL = 1;
 
@@ -56,9 +51,13 @@ public:
                    uint32_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    uint32_t horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                    uint32_t verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA);
+                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA,
+                   bool initialize = true );
 
   void Initialize();
+  void CreateCore();
+  void CreateScene();
+  void InitializeCore();
   virtual ~TestApplication();
   static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
   static void LogContext( bool start, const char* tag );

@@ -26,7 +26,8 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
                                   uint32_t surfaceHeight,
                                   uint32_t  horizontalDpi,
                                   uint32_t  verticalDpi,
-                                  ResourcePolicy::DataRetention policy)
+                                  ResourcePolicy::DataRetention policy,
+                                  bool initialize )
 : mCore( NULL ),
   mSurfaceWidth( surfaceWidth ),
   mSurfaceHeight( surfaceHeight ),
@@ -35,10 +36,20 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
-  Initialize();
+  if( initialize )
+  {
+    Initialize();
+  }
 }
 
 void TestApplication::Initialize()
+{
+  CreateCore();
+  CreateScene();
+  InitializeCore();
+}
+
+void TestApplication::CreateCore()
 {
   // We always need the first update!
   mStatus.keepUpdating = Integration::KeepUpdating::STAGE_KEEP_RENDERING;
@@ -61,15 +72,20 @@ void TestApplication::Initialize()
   Dali::Integration::Trace::InstallLogContextFunction( logContextFunction );
 
   Dali::Integration::Trace::LogContext( true, "Test" );
+}
 
+void TestApplication::CreateScene()
+{
   mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
   mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
   mScene.SetSurface( *mRenderSurface );
-
   mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
 
   mCore->SurfaceResized( mRenderSurface );
+}
 
+void TestApplication::InitializeCore()
+{
   mCore->SceneCreated();
   mCore->Initialize();
 }
