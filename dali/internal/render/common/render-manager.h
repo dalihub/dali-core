@@ -33,6 +33,7 @@ namespace Integration
 {
 class GlAbstraction;
 class GlSyncAbstraction;
+class GlContextHelperAbstraction;
 class RenderStatus;
 }
 
@@ -72,13 +73,15 @@ public:
 
   /**
    * Construct a new RenderManager.
-   * @param[in]  glAbstraction           The GL abstraction used for rendering.
-   * @param[in]  glSyncAbstraction       The GL sync abstraction used fence sync creation/deletion.
-   * @param[in]  depthBufferAvailable    Whether the depth buffer is available
-   * @param[in]  stencilBufferAvailable  Whether the stencil buffer is available
+   * @param[in]  glAbstraction              The GL abstraction used for rendering.
+   * @param[in]  glSyncAbstraction          The GL sync abstraction used fence sync creation/deletion.
+   * @param[in]  glContextHelperAbstraction The GL context helper abstraction for accessing GL context.
+   * @param[in]  depthBufferAvailable       Whether the depth buffer is available
+   * @param[in]  stencilBufferAvailable     Whether the stencil buffer is available
    */
   static RenderManager* New( Integration::GlAbstraction& glAbstraction,
                              Integration::GlSyncAbstraction& glSyncAbstraction,
+                             Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
                              Integration::DepthBufferAvailable depthBufferAvailable,
                              Integration::StencilBufferAvailable stencilBufferAvailable );
 

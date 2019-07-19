@@ -41,6 +41,7 @@ class RenderController;
 class PlatformAbstraction;
 class GlAbstraction;
 class GlSyncAbstraction;
+class GlContextHelperAbstraction;
 class UpdateStatus;
 class RenderStatus;
 class RenderSurface;
@@ -83,6 +84,7 @@ public:
         Integration::PlatformAbstraction& platform,
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
+        Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,

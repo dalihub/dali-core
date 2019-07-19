@@ -30,6 +30,7 @@ namespace Render
 TextureFrameBuffer::TextureFrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : FrameBuffer(),
   mId( 0u ),
+  mTextureId( 0u ),
   mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
   mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
   mWidth( width ),
@@ -83,22 +84,24 @@ void TextureFrameBuffer::AttachColorTexture( Context& context, Render::Texture* 
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 
+  mTextureId = texture->GetId();
+
   // Create a color attachment.
   if( texture->GetType() == TextureType::TEXTURE_2D )
   {
     if( !texture->IsNativeImage() )
     {
-      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetId(), mipmapLevel );
+      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureId, mipmapLevel );
     }
     else
     {
       // If it's a native image we need to use GL_TEXTURE_EXTERNAL_OES as the texture target parameter
-      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_EXTERNAL_OES, texture->GetId(), mipmapLevel );
+      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_EXTERNAL_OES, mTextureId, mipmapLevel );
     }
   }
   else
   {
-    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, texture->GetId(), mipmapLevel );
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mTextureId, mipmapLevel );
   }
 
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );

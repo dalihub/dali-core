@@ -43,6 +43,7 @@ namespace Integration
 class Core;
 class GlAbstraction;
 class GlSyncAbstraction;
+class GlContextHelperAbstraction;
 class PlatformAbstraction;
 class Processor;
 class RenderController;
@@ -224,6 +225,7 @@ public:
    * @param[in] platformAbstraction The interface providing platform specific services.
    * @param[in] glAbstraction The interface providing OpenGL services.
    * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
+   * @param[in] glContextHelperAbstraction The interface providing OpenGL context helper objects.
    * @param[in] policy The data retention policy. This depends on application setting
    * and platform support. Dali should honour this policy when deciding to discard
    * intermediate resource data.
@@ -236,6 +238,7 @@ public:
                     PlatformAbstraction& platformAbstraction,
                     GlAbstraction& glAbstraction,
                     GlSyncAbstraction& glSyncAbstraction,
+                    GlContextHelperAbstraction& glContextHelperAbstraction,
                     ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,

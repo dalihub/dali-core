@@ -33,6 +33,7 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/gl-abstraction.h \
    $(platform_abstraction_src_dir)/gl-defines.h \
    $(platform_abstraction_src_dir)/gl-sync-abstraction.h \
+   $(platform_abstraction_src_dir)/gl-context-helper-abstraction.h \
    $(platform_abstraction_src_dir)/render-controller.h \
    $(platform_abstraction_src_dir)/platform-abstraction.h \
    $(platform_abstraction_src_dir)/processor-interface.h \

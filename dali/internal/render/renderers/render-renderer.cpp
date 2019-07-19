@@ -342,7 +342,7 @@ void Renderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program
   }
 }
 
-bool Renderer::BindTextures( Context& context, Program& program )
+bool Renderer::BindTextures( Context& context, Program& program, Vector<GLuint>& boundTextures )
 {
   uint32_t textureUnit = 0;
   bool result = true;
@@ -355,6 +355,7 @@ bool Renderer::BindTextures( Context& context, Program& program )
     if( textures[i] )
     {
       result = textures[i]->Bind(context, textureUnit, samplers[i] );
+      boundTextures.PushBack( textures[i]->GetId() );
       if( result && program.GetSamplerUniformLocation( i, uniformLocation ) )
       {
         program.SetUniform1i( uniformLocation, textureUnit );
@@ -519,7 +520,8 @@ void Renderer::Render( Context& context,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
                        const Vector3& size,
-                       bool blend )
+                       bool blend,
+                       Vector<GLuint>& boundTextures )
 {
   // Get the program to use:
   Program* program = mRenderDataProvider->GetShader().GetProgram();
@@ -538,7 +540,7 @@ void Renderer::Render( Context& context,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  if( DALI_LIKELY( BindTextures( context, *program ) ) )
+  if( DALI_LIKELY( BindTextures( context, *program, boundTextures ) ) )
   {
     // Only set up and draw if we have textures and they are all valid
 

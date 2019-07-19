@@ -34,6 +34,7 @@ SET(INTEGRATION_API_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/gl-abstraction.h
   ${CMAKE_CURRENT_SOURCE_DIR}/gl-defines.h
   ${CMAKE_CURRENT_SOURCE_DIR}/gl-sync-abstraction.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/gl-context-helper-abstraction.h
   ${CMAKE_CURRENT_SOURCE_DIR}/render-controller.h
   ${CMAKE_CURRENT_SOURCE_DIR}/platform-abstraction.h
   ${CMAKE_CURRENT_SOURCE_DIR}/processor-interface.h
