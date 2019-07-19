@@ -610,6 +610,12 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     {
       surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
 
+      if ( !surfaceFrameBuffer->IsSurfaceValid() )
+      {
+        // Skip rendering the frame buffer if the render surface becomes invalid
+        return;
+      }
+
       if ( mImpl->currentContext->IsSurfacelessContextSupported() )
       {
         Context* surfaceContext = surfaceFrameBuffer->GetContext();
