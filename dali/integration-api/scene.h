@@ -202,6 +202,11 @@ public:
   void SetSurface( Integration::RenderSurface& surface );
 
   /**
+   * @brief Informs the scene that the set surface has been resized.
+   */
+  void SurfaceResized();
+
+  /**
    * @brief Gets the rendering surface bound to the scene
    *
    * @return The render surface

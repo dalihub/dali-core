@@ -289,15 +289,6 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * Notify the Core that the GL surface has been resized.
-   * This should be done at least once i.e. after the first call to ContextCreated().
-   * The Core will use the surface size for camera calculations, and to set the GL viewport.
-   * Multi-threading note: this method should be called from the main thread
-   * @param[in] surface The resized surface
-   */
-  void SurfaceResized( Integration::RenderSurface* surface );
-
-  /**
    * Notify the Core that the GL surface has been deleted.
    * Multi-threading note: this method should be called from the main thread
    * @param[in] surface The deleted surface

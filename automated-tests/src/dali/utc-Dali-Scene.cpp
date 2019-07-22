@@ -909,3 +909,59 @@ int UtcDaliSceneEnsureEmptySceneCleared(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneSurfaceResizedDefaultScene(void)
+{
+  tet_infoline( "Ensure resizing of the surface is handled properly" );
+
+  TestApplication application;
+
+  auto defaultScene = application.GetScene();
+  Integration::RenderSurface* defaultSurface = defaultScene.GetSurface();
+  DALI_TEST_CHECK( defaultSurface );
+
+  // Ensure stage size matches the surface size
+  auto stage = Stage::GetCurrent();
+  DALI_TEST_EQUALS( stage.GetSize(), Vector2( defaultSurface->GetPositionSize().width, defaultSurface->GetPositionSize().height ), TEST_LOCATION );
+
+  // Resize the surface and inform the scene accordingly
+  Vector2 newSize( 1000.0f, 2000.0f );
+  DALI_TEST_CHECK( stage.GetSize() != newSize );
+  defaultSurface->MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
+  defaultScene.SurfaceResized();
+
+  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceResizedAdditionalScene(void)
+{
+  tet_infoline( "Ensure resizing of the surface is handled properly on additional scenes" );
+
+  TestApplication application;
+  Vector2 originalSurfaceSize( 500.0f, 1000.0f );
+
+  auto scene = Integration::Scene::New( Vector2::ZERO );
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, originalSurfaceSize.width, originalSurfaceSize.height ) );
+  scene.SetSurface( surface );
+
+  // Ensure stage size does NOT match the surface size
+  auto stage = Stage::GetCurrent();
+  const auto stageSize = stage.GetSize();
+  DALI_TEST_CHECK( stageSize != originalSurfaceSize );
+  DALI_TEST_EQUALS( originalSurfaceSize, scene.GetSize(), TEST_LOCATION );
+
+  // Resize the surface and inform the scene accordingly
+  Vector2 newSize( 1000.0f, 2000.0f );
+  DALI_TEST_CHECK( stage.GetSize() != newSize );
+  surface.MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
+  scene.SurfaceResized();
+
+  // Ensure the stage hasn't been resized
+  DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( scene.GetSize(), newSize, TEST_LOCATION );
+
+  END_TEST;
+}
