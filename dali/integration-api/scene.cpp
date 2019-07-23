@@ -29,9 +29,9 @@ namespace Dali
 namespace Integration
 {
 
-Scene Scene::New( const Size& size )
+Scene Scene::New( Integration::RenderSurface& surface )
 {
-  Internal::ScenePtr internal = Internal::Scene::New( size );
+  Internal::ScenePtr internal = Internal::Scene::New( surface );
   return Scene( internal.Get() );
 }
 

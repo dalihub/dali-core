@@ -78,8 +78,7 @@ void TestApplication::CreateCore()
 void TestApplication::CreateScene()
 {
   mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
-  mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
-  mScene.SetSurface( *mRenderSurface );
+  mScene = Dali::Integration::Scene::New( *mRenderSurface );
   mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
 }
 
