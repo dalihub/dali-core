@@ -44,7 +44,7 @@ SurfaceFrameBuffer::~SurfaceFrameBuffer()
 
 void SurfaceFrameBuffer::Destroy( Context& context )
 {
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->DestroySurface();
     mSurface = nullptr;
@@ -58,7 +58,7 @@ void SurfaceFrameBuffer::GlContextDestroyed()
     mContext->GlContextDestroyed();
   }
 
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->DestroySurface();
     mSurface = nullptr;
@@ -70,7 +70,7 @@ void SurfaceFrameBuffer::Initialize(Context& context)
   mContext = &context;
   mContext->GlContextCreated();
 
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->InitializeGraphics();
   }
@@ -78,7 +78,7 @@ void SurfaceFrameBuffer::Initialize(Context& context)
 
 void SurfaceFrameBuffer::Bind( Context& context )
 {
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->PreRender( mSizeChanged );
 
@@ -98,7 +98,7 @@ uint32_t SurfaceFrameBuffer::GetHeight() const
 
 void SurfaceFrameBuffer::PostRender()
 {
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->PostRender( false, false, mSizeChanged );
   }
@@ -113,20 +113,10 @@ Context* SurfaceFrameBuffer::GetContext()
 
 void SurfaceFrameBuffer::MakeContextCurrent()
 {
-  if ( mSurface && !mIsSurfaceInvalid )
+  if ( IsSurfaceValid() )
   {
     mSurface->MakeContextCurrent();
   }
-}
-
-Integration::DepthBufferAvailable SurfaceFrameBuffer::GetDepthBufferRequired()
-{
-  return mSurface && !mIsSurfaceInvalid ? Integration::DepthBufferAvailable::FALSE : mSurface->GetDepthBufferRequired();
-}
-
-Integration::StencilBufferAvailable SurfaceFrameBuffer::GetStencilBufferRequired()
-{
-  return mSurface && !mIsSurfaceInvalid ? Integration::StencilBufferAvailable::TRUE : mSurface->GetStencilBufferRequired();
 }
 
 Vector4 SurfaceFrameBuffer::GetBackgroundColor()
@@ -144,6 +134,11 @@ void SurfaceFrameBuffer::SetSize( uint32_t width, uint32_t height )
 void SurfaceFrameBuffer::SetBackgroundColor( const Vector4& color )
 {
   mBackgroundColor = color;
+}
+
+bool SurfaceFrameBuffer::IsSurfaceValid() const
+{
+  return mSurface && !mIsSurfaceInvalid;
 }
 
 } //Render

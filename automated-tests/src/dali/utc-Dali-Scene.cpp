@@ -434,8 +434,16 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
   DALI_TEST_CHECK( scene );
 
+  // Create the render surface for the scene
+  TestRenderSurface* renderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, 480.0f, 800.0f ) );
+  scene.SetSurface( *renderSurface );
+
   // One reference of scene kept here and the other one kept in the Core
   DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 2 );
+
+  // Add a renderable actor to the scene
+  auto actor = CreateRenderableActor();
+  scene.Add( actor );
 
   // Render and notify.
   application.SendNotification();
