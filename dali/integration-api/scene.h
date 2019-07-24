@@ -200,12 +200,12 @@ public:
    *
    * @return The root layer
    */
-  void SetSurface( Integration::RenderSurface& surface );
+  void SetSurface( Integration::RenderSurface& surface, bool forceUpdate );
 
   /**
    * @brief Informs the scene that the set surface has been resized.
    */
-  void SurfaceResized();
+  void SurfaceResized( bool forceUpdate );
 
   /**
    * @brief Gets the rendering surface bound to the scene

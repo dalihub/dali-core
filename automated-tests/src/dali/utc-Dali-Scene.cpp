@@ -493,7 +493,7 @@ int UtcDaliSceneDeleteSurface(void)
 
   // Create the render surface for the scene
   TestRenderSurface* renderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, 480.0f, 800.0f ) );
-  scene.SetSurface( *renderSurface );
+  scene.SetSurface( *renderSurface, false );
 
   // Render and notify.
   application.SendNotification();
@@ -928,7 +928,7 @@ int UtcDaliSceneSurfaceResizedDefaultScene(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
   defaultSurface->MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
-  defaultScene.SurfaceResized();
+  defaultScene.SurfaceResized( false );
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
@@ -957,7 +957,7 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
   surface.MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
-  scene.SurfaceResized();
+  scene.SurfaceResized( false );
 
   // Ensure the stage hasn't been resized
   DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
