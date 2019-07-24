@@ -91,9 +91,16 @@ public:
    */
   void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
+  /**
+   * @brief Get the id of the texture binded to this frame buffer
+   * @return The texture id
+   */
+  GLuint GetTextureId() { return mTextureId; };
+
 private:
 
   GLuint mId;
+  GLuint mTextureId;
   GLuint mDepthBuffer;
   GLuint mStencilBuffer;
   uint32_t mWidth;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,7 +389,8 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  const Matrix& viewMatrix,
                                                  const Matrix& projectionMatrix,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
-                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
+                                                 Vector<GLuint>& boundTextures )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -447,7 +448,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
       // Render the item.
       item.mRenderer->Render( context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
-                              viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque );
+                              viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures );
     }
   }
 }
@@ -462,7 +463,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                                                  Context& context,
                                                  BufferIndex bufferIndex,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
-                                                 Integration::StencilBufferAvailable stencilBufferAvailable )
+                                                 Integration::StencilBufferAvailable stencilBufferAvailable,
+                                                 Vector<GLuint>& boundTextures )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -490,7 +492,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                            *viewMatrix,
                            *projectionMatrix,
                             depthBufferAvailable,
-                            stencilBufferAvailable );
+                            stencilBufferAvailable,
+                            boundTextures );
       }
     }
   }

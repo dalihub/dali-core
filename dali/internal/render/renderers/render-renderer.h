@@ -350,6 +350,7 @@ public:
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
+   * @param[in] boundTextures The textures bound for rendering
    */
   void Render( Context& context,
                BufferIndex bufferIndex,
@@ -359,7 +360,8 @@ public:
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
                const Vector3& size,
-               bool blend );
+               bool blend,
+               Vector<GLuint>& boundTextures );
 
   /**
    * Write the renderer's sort attributes to the passed in reference
@@ -407,9 +409,10 @@ private:
    * Bind the textures and setup the samplers
    * @param[in] context The GL context
    * @param[in] program The shader program
+   * @param[in] boundTextures The textures bound for rendering
    * @return False if create or bind failed, true if success.
    */
-  bool BindTextures( Context& context, Program& program );
+  bool BindTextures( Context& context, Program& program, Vector<GLuint>& boundTextures );
 
 private:
 

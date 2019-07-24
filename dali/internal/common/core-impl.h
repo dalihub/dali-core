@@ -41,6 +41,7 @@ class RenderController;
 class PlatformAbstraction;
 class GlAbstraction;
 class GlSyncAbstraction;
+class GlContextHelperAbstraction;
 class UpdateStatus;
 class RenderStatus;
 class RenderSurface;
@@ -83,6 +84,7 @@ public:
         Integration::PlatformAbstraction& platform,
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
+        Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,
@@ -117,11 +119,6 @@ public:
    * @copydoc Dali::Integration::Core::RecoverFromContextLoss()
    */
   void RecoverFromContextLoss();
-
-  /**
-   * @copydoc Dali::Integration::Core::SurfaceResized(Integration::RenderSurface*)
-   */
-  void SurfaceResized( Integration::RenderSurface* surface );
 
   /**
    * @copydoc Dali::Integration::Core::SurfaceDeleted(Integration::RenderSurface*)
