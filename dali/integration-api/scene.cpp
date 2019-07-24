@@ -164,6 +164,11 @@ Scene::KeyEventSignalType& Scene::KeyEventSignal()
   return GetImplementation(*this).KeyEventSignal();
 }
 
+Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal()
+{
+  return GetImplementation(*this).KeyEventGeneratedSignal();
+}
+
 Scene::TouchSignalType& Scene::TouchSignal()
 {
   return GetImplementation(*this).TouchSignal();
