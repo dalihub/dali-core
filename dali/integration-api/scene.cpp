@@ -29,9 +29,9 @@ namespace Dali
 namespace Integration
 {
 
-Scene Scene::New( const Size& size )
+Scene Scene::New( Integration::RenderSurface& surface )
 {
-  Internal::ScenePtr internal = Internal::Scene::New( size );
+  Internal::ScenePtr internal = Internal::Scene::New( surface );
   return Scene( internal.Get() );
 }
 
@@ -122,6 +122,11 @@ Layer Scene::GetLayer( uint32_t depth ) const
 void Scene::SetSurface( Integration::RenderSurface& surface )
 {
   GetImplementation(*this).SetSurface( surface );
+}
+
+void Scene::SurfaceResized()
+{
+  GetImplementation( *this ).SurfaceResized();
 }
 
 Integration::RenderSurface* Scene::GetSurface() const

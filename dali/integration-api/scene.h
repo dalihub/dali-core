@@ -61,11 +61,11 @@ public:
   /**
    * @brief Create an initialized Scene handle.
    *
-   * @param[in] size The size of the scene in pixels as a Vector
+   * @param[in] surface Binds this rendering surface to this scene
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New( const Size& size );
+  static Scene New( Integration::RenderSurface& surface );
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -200,6 +200,11 @@ public:
    * @return The root layer
    */
   void SetSurface( Integration::RenderSurface& surface );
+
+  /**
+   * @brief Informs the scene that the set surface has been resized.
+   */
+  void SurfaceResized();
 
   /**
    * @brief Gets the rendering surface bound to the scene

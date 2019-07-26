@@ -194,17 +194,6 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
-{
-  for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
-  {
-    if( (*iter)->GetSurface() == surface )
-    {
-      (*iter)->SurfaceResized();
-    }
-  }
-}
-
 void Core::SurfaceDeleted( Integration::RenderSurface* surface )
 {
   for( auto scene : mScenes )
