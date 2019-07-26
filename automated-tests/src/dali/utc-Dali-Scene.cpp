@@ -25,6 +25,7 @@
 #include <dali/integration-api/events/wheel-event-integ.h>
 
 #include <dali-test-suite-utils.h>
+#include <mesh-builder.h>
 
 // Internal headers are allowed here
 
@@ -941,6 +942,138 @@ int UtcDaliSceneSurfaceResizedDefaultScene(void)
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
+{
+  tet_infoline( "Ensure resizing of the surface & viewport is handled properly" );
+
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& callStack = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace( true );
+
+  // Initial scene setup
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  // Render before resizing surface
+  application.SendNotification();
+  application.Render(0);
+  glAbstraction.ResetViewportCallStack();
+
+  auto defaultScene = application.GetScene();
+  Integration::RenderSurface* defaultSurface = defaultScene.GetSurface();
+  DALI_TEST_CHECK( defaultSurface );
+
+  // Ensure stage size matches the surface size
+  auto stage = Stage::GetCurrent();
+  DALI_TEST_EQUALS( stage.GetSize(), Vector2( defaultSurface->GetPositionSize().width, defaultSurface->GetPositionSize().height ), TEST_LOCATION );
+
+  // Resize the surface and inform the scene accordingly
+  Vector2 newSize( 1000.0f, 2000.0f );
+  std::string viewportParams( "0, 0, 1000, 2000" ); // to match newSize
+  DALI_TEST_CHECK( stage.GetSize() != newSize );
+  defaultSurface->MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
+  defaultScene.SurfaceResized();
+
+  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+
+  // Render after resizing surface
+  application.SendNotification();
+  application.Render(0);
+
+  // Check that the viewport is handled properly
+  DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("Viewport", viewportParams ) );
+
+  END_TEST;
+}
+
+int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
+{
+  tet_infoline( "Ensure resizing of the surface & viewport is handled properly" );
+
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& callStack = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace( true );
+
+  // Initial scene setup
+  auto stage = Stage::GetCurrent();
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  int testWidth = 400;
+  int testHeight = 400;
+  actor.SetSize(testWidth, testHeight);
+  stage.Add(actor);
+
+  CameraActor offscreenCameraActor = CameraActor::New( Size( testWidth, testHeight ) );
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  FrameBuffer newFrameBuffer = FrameBuffer::New( testWidth, testHeight, FrameBuffer::Attachment::NONE );
+
+  RenderTask newTask = stage.GetRenderTaskList().CreateTask();
+  newTask.SetCameraActor( offscreenCameraActor );
+  newTask.SetSourceActor( actor );
+  newTask.SetFrameBuffer( newFrameBuffer );
+  newTask.SetViewportPosition( Vector2(0, 0) );
+  newTask.SetViewportSize( Vector2(testWidth, testHeight) );
+
+  // Render before resizing surface
+  application.SendNotification();
+  application.Render(0);
+  glAbstraction.ResetViewportCallStack();
+
+  Rect<int32_t> initialViewport = newTask.GetViewport();
+  int initialWidth = initialViewport.width;
+  int initialHeight = initialViewport.height;
+  DALI_TEST_EQUALS( initialWidth, testWidth, TEST_LOCATION );
+  DALI_TEST_EQUALS( initialHeight, testHeight, TEST_LOCATION );
+
+  auto defaultScene = application.GetScene();
+  Integration::RenderSurface* defaultSurface = defaultScene.GetSurface();
+  DALI_TEST_CHECK( defaultSurface );
+
+  // Ensure stage size matches the surface size
+  DALI_TEST_EQUALS( stage.GetSize(), Vector2( defaultSurface->GetPositionSize().width, defaultSurface->GetPositionSize().height ), TEST_LOCATION );
+
+  // Resize the surface and inform the scene accordingly
+  Vector2 newSize( 800.0f, 480.0f );
+  std::string viewportParams( "0, 0, 800, 480" ); // to match newSize
+  DALI_TEST_CHECK( stage.GetSize() != newSize );
+  defaultSurface->MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
+  defaultScene.SurfaceResized();
+
+  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+
+  // Render after resizing surface
+  application.SendNotification();
+  application.Render(0);
+
+  // Check that the viewport is handled properly
+  DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("Viewport", viewportParams ) );
+
+  // Second render-task should not be affected
+  Rect<int32_t> viewport = newTask.GetViewport();
+  int width = viewport.width;
+  int height = viewport.height;
+  DALI_TEST_EQUALS( width, testWidth, TEST_LOCATION );
+  DALI_TEST_EQUALS( height, testHeight, TEST_LOCATION );
 
   END_TEST;
 }

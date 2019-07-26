@@ -1436,6 +1436,10 @@ public:
 
   inline void Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
   {
+    std::string commaString(", ");
+    std::string params( std::to_string(x) + commaString + std::to_string(y) + commaString + std::to_string(width) + commaString + std::to_string(height) );
+
+    mViewportTrace.PushCall("Viewport", params);
   }
 
   /* OpenGL ES 3.0 */
@@ -1974,6 +1978,11 @@ public: // TEST FUNCTIONS
   inline void ResetSetUniformCallStack() { mSetUniformTrace.Reset(); }
   inline TraceCallStack& GetSetUniformTrace() { return mSetUniformTrace; }
 
+  //Methods for Viewport verification
+  inline void EnableViewportCallTrace(bool enable) { mViewportTrace.Enable(enable); }
+  inline void ResetViewportCallStack() { mViewportTrace.Reset(); }
+  inline TraceCallStack& GetViewportTrace() { return mViewportTrace; }
+
   template <typename T>
   inline bool GetUniformValue( const char* name, T& value ) const
   {
@@ -2209,6 +2218,7 @@ private:
   TraceCallStack mStencilFunctionTrace;
   TraceCallStack mScissorTrace;
   TraceCallStack mSetUniformTrace;
+  TraceCallStack mViewportTrace;
 
   // Shaders & Uniforms
   GLuint mLastShaderIdUsed;
