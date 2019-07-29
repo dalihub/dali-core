@@ -141,7 +141,8 @@ struct TouchFunctor
 
     if ( signalData.createNewScene )
     {
-      Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+      TestRenderSurface* surface = new TestRenderSurface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) ); // This is a leak, but we need to keep the surface alive till the end
+      Dali::Integration::Scene scene = Dali::Integration::Scene::New( *surface );
       DALI_TEST_CHECK( scene );
 
       signalData.newSceneCreated = true;
@@ -361,7 +362,8 @@ int UtcDaliSceneDiscard(void)
   tet_infoline("Testing Dali::Scene::Discard");
 
   // Create a new Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New( surface );
   DALI_TEST_CHECK( scene );
 
   // One reference of scene kept here and the other one kept in the Core
@@ -431,11 +433,16 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   TestApplication application;
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New( surface );
   DALI_TEST_CHECK( scene );
 
   // One reference of scene kept here and the other one kept in the Core
   DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 2 );
+
+  // Add a renderable actor to the scene
+  auto actor = CreateRenderableActor();
+  scene.Add( actor );
 
   // Render and notify.
   application.SendNotification();
@@ -462,7 +469,8 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
 
   // Create a new Scene while the root layer of the deleted scene is still alive
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  TestRenderSurface surface2( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New( surface2 );
   DALI_TEST_CHECK( newScene );
 
   // Render and notify.
@@ -487,13 +495,12 @@ int UtcDaliSceneDeleteSurface(void)
 {
   TestApplication application;
 
-  // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
-  DALI_TEST_CHECK( scene );
-
   // Create the render surface for the scene
   TestRenderSurface* renderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, 480.0f, 800.0f ) );
-  scene.SetSurface( *renderSurface );
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New( *renderSurface );
+  DALI_TEST_CHECK( scene );
 
   // Render and notify.
   application.SendNotification();
@@ -874,7 +881,8 @@ int UtcDaliSceneEnsureEmptySceneCleared(void)
   auto defaultScene = application.GetScene();
   defaultScene.SetBackgroundColor( Color::WHITE );
 
-  auto newScene = Integration::Scene::New( Vector2( 480.0f, 800.0f ) );
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  auto newScene = Integration::Scene::New( surface );
   newScene.SetBackgroundColor( Color::RED );
 
   // Need to create a renderable as we don't start rendering until we have at least one
@@ -897,7 +905,8 @@ int UtcDaliSceneEnsureEmptySceneCleared(void)
 
   // Add another scene and set its background color, ensure we clear it to the appropriate color
 
-  auto thirdScene = Integration::Scene::New( Vector2( 200.0f, 200.0f ) );
+  TestRenderSurface surface2( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  auto thirdScene = Integration::Scene::New( surface2 );
   thirdScene.SetBackgroundColor( Color::BLUE );
 
   clearCountBefore = glAbstraction.GetClearCountCalled();
@@ -943,9 +952,8 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   TestApplication application;
   Vector2 originalSurfaceSize( 500.0f, 1000.0f );
 
-  auto scene = Integration::Scene::New( Vector2::ZERO );
   TestRenderSurface surface( PositionSize( 0.0f, 0.0f, originalSurfaceSize.width, originalSurfaceSize.height ) );
-  scene.SetSurface( surface );
+  auto scene = Integration::Scene::New( surface );
 
   // Ensure stage size does NOT match the surface size
   auto stage = Stage::GetCurrent();
@@ -962,6 +970,34 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   // Ensure the stage hasn't been resized
   DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
   DALI_TEST_EQUALS( scene.GetSize(), newSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetSurface(void)
+{
+  tet_infoline( "Scene::SetSurface test" );
+
+  TestApplication application;
+
+  // Create a scene with a surface and ensure the size and surface is set correctly on the scene
+  Vector2 surfaceSize( 480.0f, 800.0f );
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, surfaceSize.width, surfaceSize.height ) );
+  auto scene = Integration::Scene::New( surface );
+  DALI_TEST_EQUALS( scene.GetSize(), surfaceSize, TEST_LOCATION );
+  DALI_TEST_CHECK( scene.GetSurface() == &surface );
+
+  // Create a new surface and set that on the scene
+  Vector2 newSurfaceSize( 1000.0f, 1000.0f );
+  TestRenderSurface newSurface( PositionSize( 0.0f, 0.0f, newSurfaceSize.width, newSurfaceSize.height ) );
+  scene.SetSurface( newSurface );
+  DALI_TEST_EQUALS( scene.GetSize(), newSurfaceSize, TEST_LOCATION );
+  DALI_TEST_CHECK( scene.GetSurface() == &newSurface );
+
+  // Ensure setting the same surface again doesn't have any side effects
+  scene.SetSurface( newSurface );
+  DALI_TEST_EQUALS( scene.GetSize(), newSurfaceSize, TEST_LOCATION );
+  DALI_TEST_CHECK( scene.GetSurface() == &newSurface );
 
   END_TEST;
 }

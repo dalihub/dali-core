@@ -104,6 +104,13 @@ public:
    */
   void MarkSurfaceAsInvalid() { mIsSurfaceInvalid = true; };
 
+  /**
+   * @brief Gets whether the render surface in this frame buffer is valid or not
+   * @note The render surface becomes invalid when it is deleted in the event thread
+   * @return Whether the render surface is valid or not
+   */
+  bool IsSurfaceValid() const;
+
 public:
 
   /**
@@ -121,18 +128,6 @@ public:
    * @brief Makes the graphics context current
    */
   void MakeContextCurrent();
-
-  /**
-   * @brief Gets whether the depth buffer is required
-   * @return TRUE if the depth buffer is required
-   */
-  Integration::DepthBufferAvailable GetDepthBufferRequired();
-
-  /**
-   * @brief Gets whether the stencil buffer is required
-   * @return TRUE if the stencil buffer is required
-   */
-  Integration::StencilBufferAvailable GetStencilBufferRequired();
 
   /**
    * @brief Gets the background color of the surface.

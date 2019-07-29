@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New( const Size& size );
+  static ScenePtr New( Integration::RenderSurface& surface );
 
   /**
    * virtual destructor
@@ -251,12 +251,12 @@ public:
 private:
 
   // Constructor
-  Scene( const Size& size );
+  Scene();
 
   /**
    * Second-phase constructor.
    */
-  void Initialize();
+  void Initialize( Integration::RenderSurface& surface );
 
   // Undefined
   Scene(const Scene&) = delete;
@@ -267,9 +267,7 @@ private:
 private:
   Integration::RenderSurface* mSurface;
 
-  // The scene-size may be different with the surface-size
   Size mSize;
-  Size mSurfaceSize;
 
   Vector2 mDpi;
 
