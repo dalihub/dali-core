@@ -187,6 +187,13 @@ public:
   void EmitKeyEventSignal(const KeyEvent& event);
 
   /**
+   * Used by the KeyEventProcessor to emit KeyEventGenerated signals.
+   * @param[in] event The key event.
+   * @return The return is true if KeyEvent is consumed, otherwise false.
+   */
+  bool EmitKeyEventGeneratedSignal(const KeyEvent& event);
+
+  /**
    * Emits the event processing finished signal.
    *
    * @see Dali::Scene::SignalEventProcessingFinished()
@@ -210,6 +217,11 @@ public:
    * @copydoc Integration::Scene::KeyEventSignal()
    */
   Integration::Scene::KeyEventSignalType& KeyEventSignal();
+
+    /**
+   * @copydoc Integration::Scene::KeyEventGeneratedSignal()
+   */
+  Integration::Scene::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
 
   /**
    * @copydoc Integration::Scene::SignalEventProcessingFinished()
@@ -292,6 +304,7 @@ private:
 
   // The key event signal
   Integration::Scene::KeyEventSignalType mKeyEventSignal;
+  Integration::Scene::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
 
   // The event processing finished signal
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;

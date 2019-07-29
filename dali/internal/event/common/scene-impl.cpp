@@ -329,6 +329,12 @@ void Scene::EmitKeyEventSignal(const KeyEvent& event)
   }
 }
 
+bool Scene::EmitKeyEventGeneratedSignal(const KeyEvent& event)
+{
+  // Emit the KeyEventGenerated signal when KeyEvent is generated
+  return mKeyEventGeneratedSignal.Emit( event );
+}
+
 void Scene::EmitEventProcessingFinishedSignal()
 {
   if ( !mEventProcessingFinishedSignal.Empty() )
@@ -363,6 +369,11 @@ void Scene::EmitWheelEventSignal(const WheelEvent& event)
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
 {
   return mKeyEventSignal;
+}
+
+Integration::Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal()
+{
+  return mKeyEventGeneratedSignal;
 }
 
 Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
