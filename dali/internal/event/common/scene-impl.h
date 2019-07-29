@@ -117,12 +117,12 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::SetSurface
    */
-  void SetSurface( Integration::RenderSurface& surface, bool forceUpdate );
+  void SetSurface( Integration::RenderSurface& surface );
 
   /**
    * Notify the surface has been resized.
    */
-  void SurfaceResized( bool forceUpdate );
+  void SurfaceResized();
 
   /**
    * Notify the surface has been deleted.
@@ -286,9 +286,6 @@ private:
   Vector2 mDpi;
 
   Vector4 mBackgroundColor;
-
-  // The SurfaceOrientation
-  int mSurfaceOrientation;
 
   LayerPtr mRootLayer;
 
