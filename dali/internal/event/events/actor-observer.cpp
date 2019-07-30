@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,8 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ACT
 }
 
 ActorObserver::ActorObserver()
-: mActor ( NULL ),
-  mActorDisconnected( false ),
-  mRemoveCallback( NULL )
+: ActorObserver( NULL )
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
 ActorObserver::ActorObserver( CallbackBase* callback )
@@ -46,6 +43,7 @@ ActorObserver::ActorObserver( CallbackBase* callback )
   mActorDisconnected( false ),
   mRemoveCallback( callback )
 {
+  DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
 ActorObserver::~ActorObserver()
@@ -56,7 +54,27 @@ ActorObserver::~ActorObserver()
   delete mRemoveCallback;
 }
 
-Actor* ActorObserver::GetActor()
+ActorObserver::ActorObserver( ActorObserver&& other )
+: ActorObserver( other.mRemoveCallback )
+{
+  SetActor( other.mActor );
+  mActorDisconnected = other.mActorDisconnected;
+  other.ResetActor();
+}
+
+ActorObserver& ActorObserver::operator=( ActorObserver&& other )
+{
+  if( this != &other )
+  {
+    SetActor( other.mActor );
+    mActorDisconnected = other.mActorDisconnected;
+    mRemoveCallback = other.mRemoveCallback;
+    other.ResetActor();
+  }
+  return *this;
+}
+
+Actor* ActorObserver::GetActor() const
 {
   return mActorDisconnected ? NULL : mActor;
 }

@@ -64,13 +64,31 @@ public:
    */
   ~ActorObserver();
 
+  // Movable.
+
+  /**
+   *
+   */
+  ActorObserver( ActorObserver&& other );
+
+  /**
+   *
+   */
+  ActorObserver& operator=( ActorObserver&& other );
+
+  // Not copyable
+
+  ActorObserver( const ActorObserver& ) = delete;   ///< Deleted copy constructor.
+  ActorObserver& operator=( const ActorObserver& ) = delete;   ///< Deleted copy assignment operator.
+
+
   // Methods
 
   /**
    * Return the stored Actor pointer.
    * @return The Actor pointer.
    */
-  Actor* GetActor();
+  Actor* GetActor() const;
 
   /**
    * Assignment operator.
@@ -83,12 +101,6 @@ public:
    * Resets the set actor and disconnects any connected signals.
    */
   void ResetActor();
-
-private:
-
-  // Undefined
-  ActorObserver( const ActorObserver& );
-  ActorObserver& operator=( const ActorObserver& );
 
 private:
 

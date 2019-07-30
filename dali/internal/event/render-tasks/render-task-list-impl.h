@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_RENDER_TASK_LIST_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
+#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {
@@ -54,8 +55,10 @@ public:
   struct Exclusive
   {
     RenderTask* renderTaskPtr;        ///< Pointer for comparison with current rendertask.
-    Actor* actorPtr;                  ///< Pointer for comparison with current actor.
+    ActorObserver actor;              ///< For comparison with current actor.
   };
+
+  using ExclusivesContainer = std::vector< Exclusive >;
 
   /**
    * Create a RenderTaskList.
@@ -108,7 +111,7 @@ public:
    *
    * @return [description]
    */
-  const Vector< Exclusive >& GetExclusivesList() const
+  const ExclusivesContainer& GetExclusivesList() const
   {
     return mExclusives;
   }
@@ -164,7 +167,7 @@ private:
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 
   RenderTaskContainer mTasks;           ///< Reference counted render-tasks
-  Vector< Exclusive > mExclusives;      ///< List of rendertasks with exclusively owned source actors.
+  ExclusivesContainer mExclusives;      ///< List of rendertasks with exclusively owned source actors.
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,14 +127,14 @@ struct ActorTouchableCheck : public HitTestInterface
  */
 bool IsActorExclusiveToAnotherRenderTask( const Actor& actor,
                                           const RenderTask& renderTask,
-                                          const Vector< RenderTaskList::Exclusive >& exclusives )
+                                          const RenderTaskList::ExclusivesContainer& exclusives )
 
 {
-  if( exclusives.Size() )
+  if( exclusives.size() )
   {
-    for( Vector< RenderTaskList::Exclusive >::Iterator exclusiveIt = exclusives.Begin(); exclusives.End() != exclusiveIt; ++exclusiveIt )
+    for( const auto& exclusive : exclusives )
     {
-      if( ( exclusiveIt->renderTaskPtr != &renderTask ) && ( exclusiveIt->actorPtr == &actor ) )
+      if( ( exclusive.renderTaskPtr != &renderTask ) && ( exclusive.actor.GetActor() == &actor ) )
       {
         return true;
       }
@@ -154,7 +154,7 @@ bool IsActorExclusiveToAnotherRenderTask( const Actor& actor,
  */
 HitActor HitTestWithinLayer( Actor& actor,
                              const RenderTask& renderTask,
-                             const Vector< RenderTaskList::Exclusive >& exclusives,
+                             const RenderTaskList::ExclusivesContainer& exclusives,
                              const Vector4& rayOrigin,
                              const Vector4& rayDir,
                              float& nearClippingPlane,
@@ -404,7 +404,7 @@ void GetCameraClippingPlane( RenderTask& renderTask, float& nearClippingPlane, f
 /**
  * Hit test a RenderTask
  */
-bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
+bool HitTestRenderTask( const RenderTaskList::ExclusivesContainer& exclusives,
                         Stage& stage,
                         LayerList& layers,
                         RenderTask& renderTask,
@@ -545,7 +545,7 @@ bool HitTestRenderTaskList( Stage& stage,
 {
   RenderTaskList::RenderTaskContainer& tasks = taskList.GetTasks();
   RenderTaskList::RenderTaskContainer::reverse_iterator endIter = tasks.rend();
-  const Vector< RenderTaskList::Exclusive >& exclusives = taskList.GetExclusivesList();
+  const auto& exclusives = taskList.GetExclusivesList();
 
   for( RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter )
   {
@@ -661,9 +661,8 @@ bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordin
   bool wasHit( false );
   Results hitTestResults;
 
-  const Vector< RenderTaskList::Exclusive >& exclusives = stage.GetRenderTaskList().GetExclusivesList();
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  if( HitTestRenderTask( exclusives, stage, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  if( HitTestRenderTask( stage.GetRenderTaskList().GetExclusivesList(), stage, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;

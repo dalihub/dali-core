@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,11 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
 
       mTasks.erase( iter );
 
-      for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
+      for ( auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt )
       {
         if ( exclusiveIt->renderTaskPtr == &taskImpl )
         {
-          mExclusives.Erase( exclusiveIt );
+          mExclusives.erase( exclusiveIt );
           break;
         }
       }
@@ -123,18 +123,18 @@ Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
 void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
 {
   // Check to see if this rendertask has an entry?
-  for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
+  for ( auto exclusiveIt = mExclusives.begin(); exclusiveIt != mExclusives.end(); ++exclusiveIt )
   {
     if ( exclusiveIt->renderTaskPtr == task )
     {
       if ( !exclusive )
       {
-        mExclusives.Erase( exclusiveIt );
+        mExclusives.erase( exclusiveIt );
         break;
       }
       else
       {
-        exclusiveIt->actorPtr = task->GetSourceActor();
+        exclusiveIt->actor.SetActor( task->GetSourceActor() );
         exclusive = false;
         break;
       }
@@ -144,8 +144,8 @@ void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
   {
     Exclusive exclusiveSlot;
     exclusiveSlot.renderTaskPtr = task;
-    exclusiveSlot.actorPtr = task->GetSourceActor();
-    mExclusives.PushBack( exclusiveSlot );
+    exclusiveSlot.actor.SetActor( task->GetSourceActor() );
+    mExclusives.emplace_back( std::move( exclusiveSlot ) );
   }
 }
 
