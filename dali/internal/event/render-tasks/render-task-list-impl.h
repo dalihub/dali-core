@@ -24,6 +24,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {
@@ -59,8 +60,10 @@ public:
   struct Exclusive
   {
     RenderTask* renderTaskPtr;        ///< Pointer for comparison with current rendertask.
-    Actor* actorPtr;                  ///< Pointer for comparison with current actor.
+    ActorObserver actor;              ///< For comparison with current actor.
   };
+
+  using ExclusivesContainer = std::vector< Exclusive >;
 
   /**
    * Create a RenderTaskList.
@@ -121,7 +124,7 @@ public:
    *
    * @return [description]
    */
-  const Vector< Exclusive >& GetExclusivesList() const
+  const ExclusivesContainer& GetExclusivesList() const
   {
     return mExclusives;
   }
@@ -178,7 +181,7 @@ private:
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 
   RenderTaskContainer mTasks;           ///< Reference counted render-tasks
-  Vector< Exclusive > mExclusives;      ///< List of rendertasks with exclusively owned source actors.
+  ExclusivesContainer mExclusives;      ///< List of rendertasks with exclusively owned source actors.
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,22 +149,6 @@ bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerLis
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
 bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results );
-
-/**
- * Hit test specific to a given RenderTask
- *
- * @param[in] sceneSize The size of the scene.
- * @param[in] renderTaskList The render task list of the scene.
- * @param[in] layerList The layer list of the scene.
- * @param[in] renderTask The render task for hit test
- * @param[in] screenCoordinates The screen coordinates.
- * @param[out] results The results of the hit-test.
- * @param[in] func The function to use in the hit-test algorithm.
- * @return true if something was hit
- */
-bool HitTest( const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, RenderTask& renderTask, const Vector2& screenCoordinates,
-              Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
-
 
 } // namespace HitTestAlgorithm
 

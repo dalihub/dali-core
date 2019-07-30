@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -757,6 +757,12 @@ int UtcDaliRenderTaskSetExclusive(void)
     // Test that task 2 renders actor2
     DALI_TEST_CHECK( boundTextures[2] == 9u );
   }
+
+  // Create a renderable actor and replace the source actor in task2
+  auto actor4 = CreateRenderableActor();
+  task2.SetSourceActor( actor3 );
+  DALI_TEST_EQUALS( actor3, task2.GetSourceActor(), TEST_LOCATION );
+
   END_TEST;
 }
 

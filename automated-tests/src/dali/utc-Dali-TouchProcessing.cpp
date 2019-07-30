@@ -1004,6 +1004,37 @@ int UtcDaliTouchOffscreenRenderTasks(void)
   END_TEST;
 }
 
+int UtcDaliTouchRenderTaskWithExclusiveActor(void)
+{
+  TestApplication application;
+  auto stage = Stage::GetCurrent();
+  auto stageSize( stage.GetSize() );
+
+  auto actor = CreateRenderableActor();
+  actor.SetSize( stageSize.x, stageSize.y );
+  stage.Add( actor );
+
+  auto renderTask = stage.GetRenderTaskList().CreateTask();
+  renderTask.SetSourceActor( actor );
+  renderTask.SetExclusive( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit a down signal
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliTouchMultipleRenderableActors(void)
 {
   TestApplication application;
