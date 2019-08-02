@@ -64,13 +64,41 @@ public:
    */
   ~ActorObserver();
 
+  // Movable
+
+  /**
+   * Move constructor.
+   *
+   * @param[in] other The object to move the data from
+   *
+   * @note The other's actor is appropriately disconnected.
+   * @note Ownership of callback is passed onto this class.
+   */
+  ActorObserver( ActorObserver&& other );
+
+  /**
+   * Move assignment operator.
+   *
+   * @param[in] other The object to move the data from
+   *
+   * @note The other's actor is appropriately disconnected.
+   * @note Ownership of callback is passed onto this class.
+   */
+  ActorObserver& operator=( ActorObserver&& other );
+
+  // Not copyable
+
+  ActorObserver( const ActorObserver& ) = delete;   ///< Deleted copy constructor.
+  ActorObserver& operator=( const ActorObserver& ) = delete;   ///< Deleted copy assignment operator.
+
   // Methods
 
   /**
    * Return the stored Actor pointer.
    * @return The Actor pointer.
+   * @note Returns nullptr while the observed actor is not on the scene.
    */
-  Actor* GetActor();
+  Actor* GetActor() const;
 
   /**
    * Assignment operator.
@@ -86,33 +114,26 @@ public:
 
 private:
 
-  // Undefined
-  ActorObserver( const ActorObserver& );
-  ActorObserver& operator=( const ActorObserver& );
-
-private:
-
   /**
-   * This will never get called as we do not observe objects that have not been added to the scene.
+   * This will be called if an actor is added to the scene.
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(Object& object) { }
+  virtual void SceneObjectAdded( Object& object );
 
   /**
-   * This will be called when the actor is removed from the stage, we should clear and stop
-   * observing it.
+   * This will be called when the actor is removed from the scene.
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved(Object& object);
+  virtual void SceneObjectRemoved( Object& object );
 
   /**
    * This will be called when the actor is destroyed. We should clear the actor.
    * No need to stop observing as the object is being destroyed anyway.
    * @see Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed(Object& object);
+  virtual void ObjectDestroyed( Object& object );
 
 private:
   Actor* mActor;                 ///< Raw pointer to an Actor.
