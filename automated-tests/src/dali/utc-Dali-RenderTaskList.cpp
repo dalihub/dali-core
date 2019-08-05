@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,29 @@ int UtcDaliRenderTaskListRemoveTask(void)
   DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
 
   taskList.RemoveTask( newTask );
+  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListRemoveTaskWithExclusiveActor(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTaskList::RemoveTask() which has an exclusive actor set");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+
+  RenderTask newTask = taskList.CreateTask();
+  DALI_TEST_CHECK( 2u == taskList.GetTaskCount() );
+
+  auto actor = CreateRenderableActor();
+  newTask.SetSourceActor( actor );
+  newTask.SetExclusive( true );
+  DALI_TEST_EQUALS( actor, newTask.GetSourceActor(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, newTask.IsExclusive(), TEST_LOCATION );
+  taskList.RemoveTask( newTask );
+
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,31 +34,48 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ACT
 }
 
 ActorObserver::ActorObserver()
-: mActor ( NULL ),
-  mActorDisconnected( false ),
-  mRemoveCallback( NULL )
+: ActorObserver( nullptr )
 {
-  DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
 ActorObserver::ActorObserver( CallbackBase* callback )
-: mActor ( NULL ),
+: mActor ( nullptr ),
   mActorDisconnected( false ),
   mRemoveCallback( callback )
 {
+  DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
 ActorObserver::~ActorObserver()
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
-  SetActor( NULL );
+  SetActor( nullptr );
 
   delete mRemoveCallback;
 }
 
-Actor* ActorObserver::GetActor()
+ActorObserver::ActorObserver( ActorObserver&& other )
+: ActorObserver( nullptr )
 {
-  return mActorDisconnected ? NULL : mActor;
+  operator=( std::move( other ) );
+}
+
+ActorObserver& ActorObserver::operator=( ActorObserver&& other )
+{
+  if( this != &other )
+  {
+    SetActor( other.mActor );
+    mActorDisconnected = other.mActorDisconnected;
+    mRemoveCallback = other.mRemoveCallback;
+    other.ResetActor();
+    other.mRemoveCallback = nullptr;
+  }
+  return *this;
+}
+
+Actor* ActorObserver::GetActor() const
+{
+  return mActorDisconnected ? nullptr : mActor;
 }
 
 void ActorObserver::SetActor( Actor* actor )
@@ -88,7 +105,17 @@ void ActorObserver::ResetActor()
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
     mActor->RemoveObserver( *this );
-    mActor = NULL;
+    mActor = nullptr;
+    mActorDisconnected = false;
+  }
+}
+
+void ActorObserver::SceneObjectAdded( Object& object )
+{
+  DALI_LOG_TRACE_METHOD( gLogFilter );
+
+  if ( mActor == &object )
+  {
     mActorDisconnected = false;
   }
 }
@@ -116,7 +143,7 @@ void ActorObserver::ObjectDestroyed(Object& object)
   if ( mActor == &object )
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
-    mActor = NULL;
+    mActor = nullptr;
   }
 }
 

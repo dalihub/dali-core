@@ -225,7 +225,7 @@ void Scene::SurfaceResized()
 
     if( ( fabsf( mSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
     {
-      Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( surfacePositionSize.width ), static_cast< int32_t >( surfacePositionSize.height ) );
+      Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( surfacePositionSize.width ), static_cast< int32_t >( surfacePositionSize.height ) ); // truncated
 
       mSize.width = fWidth;
       mSize.height = fHeight;
@@ -237,19 +237,11 @@ void Scene::SurfaceResized()
 
       ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
       SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-      SetDefaultSurfaceRectMessage( updateManager, newSize ); // truncated
+      SetDefaultSurfaceRectMessage( updateManager, newSize );
 
+      // set default render-task viewport parameters
       RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
-
-      // if single render task to screen then set its viewport parameters
-      if( 1 == mRenderTaskList->GetTaskCount() )
-      {
-        if( !defaultRenderTask->GetTargetFrameBuffer() )
-        {
-          defaultRenderTask->SetViewport( newSize ); // truncated
-        }
-      }
-
+      defaultRenderTask->SetViewport( newSize );
       defaultRenderTask->GetFrameBuffer()->SetSize( static_cast<uint32_t>( newSize.width ), static_cast<uint32_t>( newSize.height ) );
     }
   }
