@@ -63,7 +63,6 @@ Scene::Scene()
   mSize(), // Don't set the proper value here, this will be set when the surface is set later
   mDpi(),
   mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
-  mSurfaceOrientation( 0 ),
   mDepthTreeDirty( false ),
   mEventProcessor( *this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor() )
 {
@@ -212,39 +211,33 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
     mFrameBuffer = Dali::Internal::FrameBuffer::New( surface, Dali::FrameBuffer::Attachment::NONE );
     defaultRenderTask->SetFrameBuffer( mFrameBuffer );
 
-    SurfaceResized( false );
+    SurfaceResized();
   }
 }
 
-void Scene::SurfaceResized( bool forceUpdate )
+void Scene::SurfaceResized()
 {
   if( mSurface )
   {
     const PositionSize surfacePositionSize = mSurface->GetPositionSize();
     const float fWidth = static_cast< float >( surfacePositionSize.width );
     const float fHeight = static_cast< float >( surfacePositionSize.height );
-    const int orientation = mSurface->GetOrientation();
 
-    if( ( ( fabsf( mSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
-            || ( orientation != mSurfaceOrientation )
-            || ( forceUpdate ) )
+    if( ( fabsf( mSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
     {
       Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( surfacePositionSize.width ), static_cast< int32_t >( surfacePositionSize.height ) );
 
       mSize.width = fWidth;
       mSize.height = fHeight;
-      mSurfaceOrientation = orientation;
 
       // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
       mDefaultCamera->SetPerspectiveProjection( mSize );
-      mDefaultCamera->RotateProjection( mSurfaceOrientation );
 
       mRootLayer->SetSize( mSize.width, mSize.height );
 
       ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
       SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
       SetDefaultSurfaceRectMessage( updateManager, newSize ); // truncated
-      SetDefaultSurfaceOrientationMessage( updateManager, mSurfaceOrientation );
 
       RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
 
