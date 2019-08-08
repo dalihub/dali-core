@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2897,9 +2897,10 @@ int UtcDaliRendererOpacityAnimation(void)
   DALI_TEST_CHECK( value.Get( opacity ) );
   DALI_TEST_EQUALS( opacity, 0.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
+  // Need to clear the animation before setting the property as the animation value is baked and will override any previous setters
+  animation.Clear();
   renderer.SetProperty( DevelRenderer::Property::OPACITY, 0.1f );
 
-  animation.Clear();
   animation.AnimateBy( Property( renderer, DevelRenderer::Property::OPACITY ), 0.5f );
   animation.Play();
 
@@ -2909,6 +2910,7 @@ int UtcDaliRendererOpacityAnimation(void)
   value = renderer.GetProperty( DevelRenderer::Property::OPACITY );
   DALI_TEST_CHECK( value.Get( opacity ) );
   DALI_TEST_EQUALS( opacity, 0.6f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( opacity, renderer.GetCurrentProperty( DevelRenderer::Property::OPACITY ).Get< float >(), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
   END_TEST;
 }
