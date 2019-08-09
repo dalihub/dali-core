@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,7 +319,7 @@ void Animation::Play()
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects();
+  NotifyObjects( Notify::USE_TARGET_VALUE );
 
   SendFinalProgressNotificationMessage();
 
@@ -336,7 +336,7 @@ void Animation::PlayFrom( float progress )
 
     mState = Dali::Animation::PLAYING;
 
-    NotifyObjects();
+    NotifyObjects( Notify::USE_TARGET_VALUE );
 
     SendFinalProgressNotificationMessage();
 
@@ -357,7 +357,7 @@ void Animation::PlayAfter( float delaySeconds )
 
   mState = Dali::Animation::PLAYING;
 
-  NotifyObjects();
+  NotifyObjects( Notify::USE_TARGET_VALUE );
 
   SendFinalProgressNotificationMessage();
 
@@ -371,6 +371,9 @@ void Animation::Pause()
 
   // mAnimation is being used in a separate thread; queue a Pause message
   PauseAnimationMessage( mEventThreadServices, *mAnimation );
+
+  // Notify the objects with the _paused_, i.e. current values
+  NotifyObjects( Notify::FORCE_CURRENT_VALUE );
 }
 
 Dali::Animation::State Animation::GetState() const
@@ -384,11 +387,23 @@ void Animation::Stop()
 
   // mAnimation is being used in a separate thread; queue a Stop message
   StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
+
+  // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
+  if( mEndAction == EndAction::Bake )
+  {
+    NotifyObjects( Notify::USE_CURRENT_VALUE );
+  }
 }
 
 void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
+
+  // Only notify the objects with the current values if the end action is set to BAKE
+  if( mEndAction == EndAction::Bake )
+  {
+    NotifyObjects( Notify::USE_CURRENT_VALUE );
+  }
 
   // Remove all the connectors
   mConnectors.Clear();
@@ -1073,12 +1088,17 @@ bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues
   return ( ( lhs.timePeriod.delaySeconds + lhs.timePeriod.durationSeconds ) < ( rhs.timePeriod.delaySeconds + rhs.timePeriod.durationSeconds ) );
 }
 
-void Animation::NotifyObjects()
+void Animation::NotifyObjects( Animation::Notify notifyValueType )
 {
-  if( mEndAction != EndAction::Discard ) // If the animation is discarded, then we do not want to change the target values
+  // If the animation is discarded, then we do not want to change the target values unless we want to force the current values
+  if( mEndAction != EndAction::Discard || notifyValueType == Notify::FORCE_CURRENT_VALUE )
   {
     // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
-    std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+    // Only do this if we're using the target value
+    if( notifyValueType == Notify::USE_TARGET_VALUE )
+    {
+      std::stable_sort( mConnectorTargetValues.begin(), mConnectorTargetValues.end(), CompareConnectorEndTimes );
+    }
 
     // Loop through all connector target values sorted by increasing end time
     ConnectorTargetValuesContainer::const_iterator iter = mConnectorTargetValues.begin();
@@ -1090,7 +1110,12 @@ void Animation::NotifyObjects()
       Object* object = connector->GetObject();
       if( object )
       {
-        object->NotifyPropertyAnimation( *this, connector->GetPropertyIndex(), iter->targetValue, iter->animatorType );
+        const auto propertyIndex = connector->GetPropertyIndex();
+        object->NotifyPropertyAnimation(
+          *this,
+          propertyIndex,
+          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->targetValue : object->GetCurrentProperty( propertyIndex ),
+          iter->animatorType );
       }
     }
   }
