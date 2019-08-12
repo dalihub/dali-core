@@ -50,7 +50,12 @@ void KeyEventProcessor::ProcessKeyEvent( const Integration::KeyEvent& event )
   GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
 
   // Emit the key event signal from the scene.
-  mScene.EmitKeyEventSignal( keyEvent );
+  bool consumed = mScene.EmitKeyEventGeneratedSignal( keyEvent );
+  if( !consumed )
+  {
+    mScene.EmitKeyEventSignal(keyEvent);
+  }
+
 }
 
 } // namespace Internal

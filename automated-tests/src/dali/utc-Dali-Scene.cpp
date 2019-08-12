@@ -190,6 +190,50 @@ struct WheelEventReceivedFunctor
   WheelEventSignalData& signalData;
 };
 
+// Stores data that is populated in the KeyEventGeneratedSignal callback and will be read by the TET cases
+struct KeyEventGeneratedSignalData
+{
+  KeyEventGeneratedSignalData()
+  : functorCalled(false)
+  {}
+
+  void Reset()
+  {
+    functorCalled = false;
+
+    receivedKeyEvent.keyModifier = 0;
+    receivedKeyEvent.keyPressedName.clear();
+    receivedKeyEvent.keyPressed.clear();
+  }
+
+  bool functorCalled;
+  KeyEvent receivedKeyEvent;
+};
+
+// Functor that sets the data when called
+struct KeyEventGeneratedReceivedFunctor
+{
+  KeyEventGeneratedReceivedFunctor( KeyEventGeneratedSignalData& data )
+  : signalData( data )
+  {}
+
+  bool operator()( const KeyEvent& keyEvent )
+  {
+    signalData.functorCalled = true;
+    signalData.receivedKeyEvent = keyEvent;
+
+    return true;
+  }
+
+  bool operator()()
+  {
+    signalData.functorCalled = true;
+    return true;
+  }
+
+  KeyEventGeneratedSignalData& signalData;
+};
+
 void GenerateTouch( TestApplication& application, PointState::Type state, const Vector2& screenPosition )
 {
   Integration::TouchEvent touchEvent;
@@ -1132,5 +1176,58 @@ int UtcDaliSceneSetSurface(void)
   DALI_TEST_EQUALS( scene.GetSize(), newSurfaceSize, TEST_LOCATION );
   DALI_TEST_CHECK( scene.GetSurface() == &newSurface );
 
+  END_TEST;
+}
+
+int UtcDaliSceneKeyEventGeneratedSignalP(void)
+{
+  TestApplication application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventGeneratedSignalData data;
+  KeyEventGeneratedReceivedFunctor functor( data );
+  scene.KeyEventGeneratedSignal().Connect( &application, functor );
+
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::Up, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent( event2 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent( event3 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+
+  data.Reset();
+
+  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent( event4 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
   END_TEST;
 }
