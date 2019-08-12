@@ -490,6 +490,13 @@ private:
     Animation::Type animatorType;
   };
 
+  enum class Notify
+  {
+    USE_CURRENT_VALUE,   ///< Set the current value for the property
+    USE_TARGET_VALUE,    ///< Set the animator's target value for the property
+    FORCE_CURRENT_VALUE, ///< Set the current value for the property even if the end action is to discard
+  };
+
 private:
 
   /**
@@ -502,8 +509,9 @@ private:
 
   /**
    * Notifies all the objects whose properties are being animated.
+   * @param[in] notifyValueType Whether we should set the current or target value
    */
-  void NotifyObjects();
+  void NotifyObjects( Notify notifyValueType );
 
   /**
    * Sends message to SceneGraph with final progress value
