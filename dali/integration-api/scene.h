@@ -205,7 +205,7 @@ public:
   /**
    * @brief Informs the scene that the set surface has been resized.
    */
-  void SurfaceResized( bool forceUpdate );
+  void SurfaceResized();
 
   /**
    * @brief Gets the rendering surface bound to the scene
