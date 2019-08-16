@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,7 @@ enum Type
    * @brief Returns the screen position of the Actor
    * @details Name "screenPosition", type Property::VECTOR2. Read-only
    * @note This assumes default camera and default render-task and the Z position is ZERO.
+   * @note The last known frame is used for the calculation. May not match a position value just set.
    */
   SCREEN_POSITION = INHERIT_LAYOUT_DIRECTION + 3,
 
