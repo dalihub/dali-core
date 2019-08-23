@@ -61,6 +61,9 @@ SET( EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
 # from root/build/tizen, get back to root
 SET(ROOT_SRC_DIR ${CMAKE_SOURCE_DIR}/../..)
 
+# Make sure the path is absolute
+GET_FILENAME_COMPONENT(ROOT_SRC_DIR ${ROOT_SRC_DIR} ABSOLUTE)
+
 # Set up the include dir
 SET( INCLUDE_DIR $ENV{includedir} )
 IF( NOT INCLUDE_DIR )
@@ -84,7 +87,14 @@ CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 #ADD_COMPILE_OPTIONS( -std=c++11 -ggdb )
 ADD_COMPILE_OPTIONS( -std=c++11 -gdwarf-4 )
 ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
-ADD_COMPILE_OPTIONS( -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
+
+# TODO: Clang is a lot more strict with warnings, we should address
+# those issues at some point.
+IF( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+  ADD_COMPILE_OPTIONS( -Werror )
+ENDIF()
+
+ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
 
 IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
   ADD_COMPILE_OPTIONS( --coverage )
@@ -101,15 +111,25 @@ SET(PACKAGE_DOXY_SRC_DIR "${ROOT_SRC_DIR}/doc")
 
 SET(SOURCES "")
 
+# Run sources update script automatically
+EXECUTE_PROCESS( COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/update-file-lists.sh
+                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
+
 # could use INCLUDE to get the source lists a different way;
 # would then need to specify a build folder somehow...
-ADD_SUBDIRECTORY( ${SOURCE_DIR}/internal dali/internal )
-ADD_SUBDIRECTORY( ${SOURCE_DIR}/integration-api dali/integration-api )
-ADD_SUBDIRECTORY( ${SOURCE_DIR}/public-api dali/public-api )
-ADD_SUBDIRECTORY( ${SOURCE_DIR}/devel-api dali/devel-api )
+INCLUDE( ${ROOT_SRC_DIR}/dali/internal/file-list.cmake )
+INCLUDE( ${ROOT_SRC_DIR}/dali/integration-api/file-list.cmake )
+INCLUDE( ${ROOT_SRC_DIR}/dali/public-api/file-list.cmake )
+INCLUDE( ${ROOT_SRC_DIR}/dali/devel-api/file-list.cmake )
+
 ADD_SUBDIRECTORY( ${PACKAGE_DOXY_SRC_DIR} doc )
 
-ADD_LIBRARY( ${name} SHARED ${SOURCES} )
+SET(LIBTYPE SHARED)
+IF(DEFINED STATIC)
+  SET(LIBTYPE STATIC)
+ENDIF()
+
+ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
 
 TARGET_LINK_LIBRARIES( ${name}
   -lpthread
@@ -141,9 +161,9 @@ MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST STRIP_PREFIX REPLACE_PREFIX)
 ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 
 # Install headers using lists defined by ADD_SUBDIRECTORY
-INSTALL_HEADERS_WITH_DIRECTORY(PUBLIC_API_HEADERS ${SOURCE_DIR} "dali")
-INSTALL_HEADERS_WITH_DIRECTORY(DEVEL_API_HEADERS ${SOURCE_DIR} "dali")
-INSTALL_HEADERS_WITH_DIRECTORY(INTEGRATION_API_HEADERS ${SOURCE_DIR} "dali")
+INSTALL_HEADERS_WITH_DIRECTORY(PUBLIC_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
+INSTALL_HEADERS_WITH_DIRECTORY(DEVEL_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
+INSTALL_HEADERS_WITH_DIRECTORY(INTEGRATION_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
 INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dali/doc" )
 
 IF(UNIX)
