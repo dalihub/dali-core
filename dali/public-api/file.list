@@ -1,235 +1,275 @@
-#
-# Add public-api source files here
-#
-
-public_api_src_files = \
-  $(public_api_src_dir)/actors/actor.cpp \
-  $(public_api_src_dir)/actors/camera-actor.cpp \
-  $(public_api_src_dir)/actors/custom-actor.cpp \
-  $(public_api_src_dir)/actors/custom-actor-impl.cpp \
-  $(public_api_src_dir)/actors/layer.cpp \
-  $(public_api_src_dir)/animation/animation.cpp \
-  $(public_api_src_dir)/animation/alpha-function.cpp \
-  $(public_api_src_dir)/animation/constraint.cpp \
-  $(public_api_src_dir)/animation/constraint-source.cpp \
-  $(public_api_src_dir)/animation/key-frames.cpp \
-  $(public_api_src_dir)/animation/linear-constrainer.cpp \
-  $(public_api_src_dir)/animation/path.cpp \
-  $(public_api_src_dir)/animation/time-period.cpp \
-  $(public_api_src_dir)/common/constants.cpp \
-  $(public_api_src_dir)/common/dali-common.cpp \
-  $(public_api_src_dir)/common/dali-vector.cpp \
-  $(public_api_src_dir)/common/extents.cpp \
-  $(public_api_src_dir)/common/stage.cpp \
-  $(public_api_src_dir)/events/gesture.cpp \
-  $(public_api_src_dir)/events/gesture-detector.cpp \
-  $(public_api_src_dir)/events/hover-event.cpp \
-  $(public_api_src_dir)/events/key-event.cpp \
-  $(public_api_src_dir)/events/long-press-gesture.cpp \
-  $(public_api_src_dir)/events/long-press-gesture-detector.cpp \
-  $(public_api_src_dir)/events/wheel-event.cpp \
-  $(public_api_src_dir)/events/pan-gesture.cpp \
-  $(public_api_src_dir)/events/pan-gesture-detector.cpp \
-  $(public_api_src_dir)/events/pinch-gesture.cpp \
-  $(public_api_src_dir)/events/pinch-gesture-detector.cpp \
-  $(public_api_src_dir)/events/tap-gesture.cpp \
-  $(public_api_src_dir)/events/tap-gesture-detector.cpp \
-  $(public_api_src_dir)/events/touch-point.cpp \
-  $(public_api_src_dir)/events/touch-event.cpp \
-  $(public_api_src_dir)/events/touch-data.cpp \
-  $(public_api_src_dir)/images/image.cpp \
-  $(public_api_src_dir)/images/pixel.cpp \
-  $(public_api_src_dir)/images/pixel-data.cpp \
-  $(public_api_src_dir)/images/buffer-image.cpp \
-  $(public_api_src_dir)/images/frame-buffer-image.cpp \
-  $(public_api_src_dir)/images/encoded-buffer-image.cpp \
-  $(public_api_src_dir)/images/resource-image.cpp \
-  $(public_api_src_dir)/images/native-image.cpp \
-  $(public_api_src_dir)/math/compile-time-math.cpp \
-  $(public_api_src_dir)/math/degree.cpp \
-  $(public_api_src_dir)/math/matrix.cpp \
-  $(public_api_src_dir)/math/matrix3.cpp \
-  $(public_api_src_dir)/math/quaternion.cpp \
-  $(public_api_src_dir)/math/vector2.cpp \
-  $(public_api_src_dir)/math/vector3.cpp \
-  $(public_api_src_dir)/math/vector4.cpp \
-  $(public_api_src_dir)/object/any.cpp \
-  $(public_api_src_dir)/object/base-handle.cpp \
-  $(public_api_src_dir)/object/handle.cpp \
-  $(public_api_src_dir)/object/base-object.cpp \
-  $(public_api_src_dir)/object/object-registry.cpp \
-  $(public_api_src_dir)/object/property.cpp \
-  $(public_api_src_dir)/object/property-array.cpp \
-  $(public_api_src_dir)/object/property-conditions.cpp \
-  $(public_api_src_dir)/object/property-input.cpp \
-  $(public_api_src_dir)/object/property-key.cpp \
-  $(public_api_src_dir)/object/property-map.cpp \
-  $(public_api_src_dir)/object/property-notification.cpp \
-  $(public_api_src_dir)/object/property-types.cpp \
-  $(public_api_src_dir)/object/property-value.cpp \
-  $(public_api_src_dir)/object/ref-object.cpp \
-  $(public_api_src_dir)/render-tasks/render-task.cpp \
-  $(public_api_src_dir)/render-tasks/render-task-list.cpp \
-  $(public_api_src_dir)/rendering/frame-buffer.cpp \
-  $(public_api_src_dir)/rendering/geometry.cpp \
-  $(public_api_src_dir)/rendering/property-buffer.cpp \
-  $(public_api_src_dir)/rendering/texture.cpp \
-  $(public_api_src_dir)/rendering/texture-set.cpp \
-  $(public_api_src_dir)/rendering/renderer.cpp \
-  $(public_api_src_dir)/rendering/sampler.cpp \
-  $(public_api_src_dir)/rendering/shader.cpp \
-  $(public_api_src_dir)/signals/callback.cpp \
-  $(public_api_src_dir)/signals/connection-tracker.cpp \
-  $(public_api_src_dir)/signals/connection-tracker-interface.cpp \
-  $(public_api_src_dir)/signals/signal-slot-connections.cpp \
-  $(public_api_src_dir)/signals/signal-slot-observers.cpp \
-  $(public_api_src_dir)/signals/base-signal.cpp \
-  $(public_api_src_dir)/signals/functor-delegate.cpp \
-  $(public_api_src_dir)/object/type-info.cpp \
-  $(public_api_src_dir)/object/type-registry.cpp \
-  $(public_api_src_dir)/object/weak-handle.cpp \
-  $(public_api_src_dir)/dali-core-version.cpp
-
+# Set the source directory
+SET( public_api_src_dir ${ROOT_SRC_DIR}/dali/public-api )
 
 #
-# Add public header files here
+SET( public_api_src_files
+  ${public_api_src_dir}/actors/actor.cpp
+  ${public_api_src_dir}/actors/camera-actor.cpp
+  ${public_api_src_dir}/actors/custom-actor.cpp
+  ${public_api_src_dir}/actors/custom-actor-impl.cpp
+  ${public_api_src_dir}/actors/layer.cpp
+  ${public_api_src_dir}/animation/animation.cpp
+  ${public_api_src_dir}/animation/alpha-function.cpp
+  ${public_api_src_dir}/animation/constraint.cpp
+  ${public_api_src_dir}/animation/constraint-source.cpp
+  ${public_api_src_dir}/animation/key-frames.cpp
+  ${public_api_src_dir}/animation/linear-constrainer.cpp
+  ${public_api_src_dir}/animation/path.cpp
+  ${public_api_src_dir}/animation/time-period.cpp
+  ${public_api_src_dir}/common/constants.cpp
+  ${public_api_src_dir}/common/dali-common.cpp
+  ${public_api_src_dir}/common/dali-vector.cpp
+  ${public_api_src_dir}/common/extents.cpp
+  ${public_api_src_dir}/common/stage.cpp
+  ${public_api_src_dir}/events/gesture.cpp
+  ${public_api_src_dir}/events/gesture-detector.cpp
+  ${public_api_src_dir}/events/hover-event.cpp
+  ${public_api_src_dir}/events/key-event.cpp
+  ${public_api_src_dir}/events/long-press-gesture.cpp
+  ${public_api_src_dir}/events/long-press-gesture-detector.cpp
+  ${public_api_src_dir}/events/wheel-event.cpp
+  ${public_api_src_dir}/events/pan-gesture.cpp
+  ${public_api_src_dir}/events/pan-gesture-detector.cpp
+  ${public_api_src_dir}/events/pinch-gesture.cpp
+  ${public_api_src_dir}/events/pinch-gesture-detector.cpp
+  ${public_api_src_dir}/events/tap-gesture.cpp
+  ${public_api_src_dir}/events/tap-gesture-detector.cpp
+  ${public_api_src_dir}/events/touch-point.cpp
+  ${public_api_src_dir}/events/touch-event.cpp
+  ${public_api_src_dir}/events/touch-data.cpp
+  ${public_api_src_dir}/images/image.cpp
+  ${public_api_src_dir}/images/pixel.cpp
+  ${public_api_src_dir}/images/pixel-data.cpp
+  ${public_api_src_dir}/images/buffer-image.cpp
+  ${public_api_src_dir}/images/frame-buffer-image.cpp
+  ${public_api_src_dir}/images/encoded-buffer-image.cpp
+  ${public_api_src_dir}/images/resource-image.cpp
+  ${public_api_src_dir}/images/native-image.cpp
+  ${public_api_src_dir}/math/compile-time-math.cpp
+  ${public_api_src_dir}/math/degree.cpp
+  ${public_api_src_dir}/math/matrix.cpp
+  ${public_api_src_dir}/math/matrix3.cpp
+  ${public_api_src_dir}/math/quaternion.cpp
+  ${public_api_src_dir}/math/vector2.cpp
+  ${public_api_src_dir}/math/vector3.cpp
+  ${public_api_src_dir}/math/vector4.cpp
+  ${public_api_src_dir}/object/any.cpp
+  ${public_api_src_dir}/object/base-handle.cpp
+  ${public_api_src_dir}/object/handle.cpp
+  ${public_api_src_dir}/object/base-object.cpp
+  ${public_api_src_dir}/object/object-registry.cpp
+  ${public_api_src_dir}/object/property.cpp
+  ${public_api_src_dir}/object/property-array.cpp
+  ${public_api_src_dir}/object/property-conditions.cpp
+  ${public_api_src_dir}/object/property-input.cpp
+  ${public_api_src_dir}/object/property-key.cpp
+  ${public_api_src_dir}/object/property-map.cpp
+  ${public_api_src_dir}/object/property-notification.cpp
+  ${public_api_src_dir}/object/property-types.cpp
+  ${public_api_src_dir}/object/property-value.cpp
+  ${public_api_src_dir}/object/ref-object.cpp
+  ${public_api_src_dir}/render-tasks/render-task.cpp
+  ${public_api_src_dir}/render-tasks/render-task-list.cpp
+  ${public_api_src_dir}/rendering/frame-buffer.cpp
+  ${public_api_src_dir}/rendering/geometry.cpp
+  ${public_api_src_dir}/rendering/property-buffer.cpp
+  ${public_api_src_dir}/rendering/texture.cpp
+  ${public_api_src_dir}/rendering/texture-set.cpp
+  ${public_api_src_dir}/rendering/renderer.cpp
+  ${public_api_src_dir}/rendering/sampler.cpp
+  ${public_api_src_dir}/rendering/shader.cpp
+  ${public_api_src_dir}/signals/callback.cpp
+  ${public_api_src_dir}/signals/connection-tracker.cpp
+  ${public_api_src_dir}/signals/connection-tracker-interface.cpp
+  ${public_api_src_dir}/signals/signal-slot-connections.cpp
+  ${public_api_src_dir}/signals/signal-slot-observers.cpp
+  ${public_api_src_dir}/signals/base-signal.cpp
+  ${public_api_src_dir}/signals/functor-delegate.cpp
+  ${public_api_src_dir}/object/type-info.cpp
+  ${public_api_src_dir}/object/type-registry.cpp
+  ${public_api_src_dir}/object/weak-handle.cpp
+  ${public_api_src_dir}/dali-core-version.cpp
+)
+
 #
+SET( public_api_header_files
+  ${public_api_src_dir}/dali-core.h
+  ${public_api_src_dir}/dali-core-version.h
+)
 
-public_api_header_files = \
-  $(public_api_src_dir)/dali-core.h \
-  $(public_api_src_dir)/dali-core-version.h
 
-public_api_core_actors_header_files =  \
-  $(public_api_src_dir)/actors/actor.h \
-  $(public_api_src_dir)/actors/actor-enumerations.h \
-  $(public_api_src_dir)/actors/camera-actor.h \
-  $(public_api_src_dir)/actors/custom-actor.h \
-  $(public_api_src_dir)/actors/custom-actor-impl.h \
-  $(public_api_src_dir)/actors/draw-mode.h \
-  $(public_api_src_dir)/actors/layer.h \
-  $(public_api_src_dir)/actors/sampling.h
+SET( public_api_core_actors_header_files
+  ${public_api_src_dir}/actors/actor.h
+  ${public_api_src_dir}/actors/actor-enumerations.h
+  ${public_api_src_dir}/actors/camera-actor.h
+  ${public_api_src_dir}/actors/custom-actor.h
+  ${public_api_src_dir}/actors/custom-actor-impl.h
+  ${public_api_src_dir}/actors/draw-mode.h
+  ${public_api_src_dir}/actors/layer.h
+  ${public_api_src_dir}/actors/sampling.h
+)
 
-public_api_core_animation_header_files = \
-  $(public_api_src_dir)/animation/alpha-function.h \
-  $(public_api_src_dir)/animation/animation.h \
-  $(public_api_src_dir)/animation/constraint.h \
-  $(public_api_src_dir)/animation/constraints.h \
-  $(public_api_src_dir)/animation/constraint-source.h \
-  $(public_api_src_dir)/animation/key-frames.h \
-  $(public_api_src_dir)/animation/linear-constrainer.h \
-  $(public_api_src_dir)/animation/path.h \
-  $(public_api_src_dir)/animation/time-period.h
 
-public_api_core_common_header_files = \
-  $(public_api_src_dir)/common/compile-time-assert.h \
-  $(public_api_src_dir)/common/constants.h \
-  $(public_api_src_dir)/common/dali-common.h \
-  $(public_api_src_dir)/common/dali-vector.h \
-  $(public_api_src_dir)/common/extents.h \
-  $(public_api_src_dir)/common/intrusive-ptr.h \
-  $(public_api_src_dir)/common/loading-state.h \
-  $(public_api_src_dir)/common/stage.h \
-  $(public_api_src_dir)/common/type-traits.h \
-  $(public_api_src_dir)/common/vector-wrapper.h \
-  $(public_api_src_dir)/common/view-mode.h
+SET( public_api_core_animation_header_files
+  ${public_api_src_dir}/animation/alpha-function.h
+  ${public_api_src_dir}/animation/animation.h
+  ${public_api_src_dir}/animation/constraint.h
+  ${public_api_src_dir}/animation/constraints.h
+  ${public_api_src_dir}/animation/constraint-source.h
+  ${public_api_src_dir}/animation/key-frames.h
+  ${public_api_src_dir}/animation/linear-constrainer.h
+  ${public_api_src_dir}/animation/path.h
+  ${public_api_src_dir}/animation/time-period.h
+)
 
-public_api_core_events_header_files = \
-  $(public_api_src_dir)/events/device.h \
-  $(public_api_src_dir)/events/gesture.h \
-  $(public_api_src_dir)/events/gesture-detector.h \
-  $(public_api_src_dir)/events/hover-event.h \
-  $(public_api_src_dir)/events/key-event.h \
-  $(public_api_src_dir)/events/long-press-gesture.h \
-  $(public_api_src_dir)/events/long-press-gesture-detector.h \
-  $(public_api_src_dir)/events/wheel-event.h \
-  $(public_api_src_dir)/events/pan-gesture.h \
-  $(public_api_src_dir)/events/pan-gesture-detector.h \
-  $(public_api_src_dir)/events/pinch-gesture.h \
-  $(public_api_src_dir)/events/pinch-gesture-detector.h \
-  $(public_api_src_dir)/events/point-state.h \
-  $(public_api_src_dir)/events/tap-gesture.h \
-  $(public_api_src_dir)/events/tap-gesture-detector.h \
-  $(public_api_src_dir)/events/touch-point.h \
-  $(public_api_src_dir)/events/touch-event.h \
-  $(public_api_src_dir)/events/touch-data.h \
-  $(public_api_src_dir)/events/mouse-button.h
 
-public_api_core_images_header_files = \
-  $(public_api_src_dir)/images/buffer-image.h \
-  $(public_api_src_dir)/images/encoded-buffer-image.h \
-  $(public_api_src_dir)/images/frame-buffer-image.h \
-  $(public_api_src_dir)/images/image.h \
-  $(public_api_src_dir)/images/image-operations.h \
-  $(public_api_src_dir)/images/pixel.h \
-  $(public_api_src_dir)/images/pixel-data.h \
-  $(public_api_src_dir)/images/resource-image.h \
-  $(public_api_src_dir)/images/native-image.h \
-  $(public_api_src_dir)/images/native-image-interface.h
+SET( public_api_core_common_header_files
+  ${public_api_src_dir}/common/compile-time-assert.h
+  ${public_api_src_dir}/common/constants.h
+  ${public_api_src_dir}/common/dali-common.h
+  ${public_api_src_dir}/common/dali-vector.h
+  ${public_api_src_dir}/common/extents.h
+  ${public_api_src_dir}/common/intrusive-ptr.h
+  ${public_api_src_dir}/common/loading-state.h
+  ${public_api_src_dir}/common/stage.h
+  ${public_api_src_dir}/common/type-traits.h
+  ${public_api_src_dir}/common/vector-wrapper.h
+  ${public_api_src_dir}/common/view-mode.h
+)
 
-public_api_core_math_header_files = \
-  $(public_api_src_dir)/math/angle-axis.h \
-  $(public_api_src_dir)/math/compile-time-math.h \
-  $(public_api_src_dir)/math/degree.h \
-  $(public_api_src_dir)/math/math-utils.h \
-  $(public_api_src_dir)/math/matrix.h \
-  $(public_api_src_dir)/math/matrix3.h \
-  $(public_api_src_dir)/math/quaternion.h \
-  $(public_api_src_dir)/math/radian.h \
-  $(public_api_src_dir)/math/random.h \
-  $(public_api_src_dir)/math/rect.h \
-  $(public_api_src_dir)/math/uint-16-pair.h \
-  $(public_api_src_dir)/math/vector2.h \
-  $(public_api_src_dir)/math/vector3.h \
-  $(public_api_src_dir)/math/vector4.h \
-  $(public_api_src_dir)/math/viewport.h
 
-public_api_core_object_header_files = \
-  $(public_api_src_dir)/object/any.h \
-  $(public_api_src_dir)/object/base-handle.h \
-  $(public_api_src_dir)/object/base-object.h \
-  $(public_api_src_dir)/object/handle.h \
-  $(public_api_src_dir)/object/object-registry.h \
-  $(public_api_src_dir)/object/property-array.h \
-  $(public_api_src_dir)/object/property-conditions.h \
-  $(public_api_src_dir)/object/property-index-ranges.h \
-  $(public_api_src_dir)/object/property-input.h \
-  $(public_api_src_dir)/object/property-key.h \
-  $(public_api_src_dir)/object/property-map.h \
-  $(public_api_src_dir)/object/property-notification-declarations.h \
-  $(public_api_src_dir)/object/property-notification.h \
-  $(public_api_src_dir)/object/property-types.h \
-  $(public_api_src_dir)/object/property-value.h \
-  $(public_api_src_dir)/object/property.h \
-  $(public_api_src_dir)/object/ref-object.h \
-  $(public_api_src_dir)/object/type-info.h \
-  $(public_api_src_dir)/object/type-registry.h \
-  $(public_api_src_dir)/object/type-registry-helper.h \
-  $(public_api_src_dir)/object/weak-handle.h
+SET( public_api_core_events_header_files
+  ${public_api_src_dir}/events/device.h
+  ${public_api_src_dir}/events/gesture.h
+  ${public_api_src_dir}/events/gesture-detector.h
+  ${public_api_src_dir}/events/hover-event.h
+  ${public_api_src_dir}/events/key-event.h
+  ${public_api_src_dir}/events/long-press-gesture.h
+  ${public_api_src_dir}/events/long-press-gesture-detector.h
+  ${public_api_src_dir}/events/wheel-event.h
+  ${public_api_src_dir}/events/pan-gesture.h
+  ${public_api_src_dir}/events/pan-gesture-detector.h
+  ${public_api_src_dir}/events/pinch-gesture.h
+  ${public_api_src_dir}/events/pinch-gesture-detector.h
+  ${public_api_src_dir}/events/point-state.h
+  ${public_api_src_dir}/events/tap-gesture.h
+  ${public_api_src_dir}/events/tap-gesture-detector.h
+  ${public_api_src_dir}/events/touch-point.h
+  ${public_api_src_dir}/events/touch-event.h
+  ${public_api_src_dir}/events/touch-data.h
+  ${public_api_src_dir}/events/mouse-button.h
+)
 
-public_api_core_render_tasks_header_files = \
-  $(public_api_src_dir)/render-tasks/render-task.h \
-  $(public_api_src_dir)/render-tasks/render-task-list.h
 
-public_api_core_rendering_header_files = \
-  $(public_api_src_dir)/rendering/frame-buffer.h \
-  $(public_api_src_dir)/rendering/geometry.h \
-  $(public_api_src_dir)/rendering/property-buffer.h \
-  $(public_api_src_dir)/rendering/texture.h \
-  $(public_api_src_dir)/rendering/texture-set.h \
-  $(public_api_src_dir)/rendering/renderer.h \
-  $(public_api_src_dir)/rendering/sampler.h \
-  $(public_api_src_dir)/rendering/shader.h
+SET( public_api_core_images_header_files
+  ${public_api_src_dir}/images/buffer-image.h
+  ${public_api_src_dir}/images/encoded-buffer-image.h
+  ${public_api_src_dir}/images/frame-buffer-image.h
+  ${public_api_src_dir}/images/image.h
+  ${public_api_src_dir}/images/image-operations.h
+  ${public_api_src_dir}/images/pixel.h
+  ${public_api_src_dir}/images/pixel-data.h
+  ${public_api_src_dir}/images/resource-image.h
+  ${public_api_src_dir}/images/native-image.h
+  ${public_api_src_dir}/images/native-image-interface.h
+)
 
-public_api_core_size_negotiation_header_files = \
-  $(public_api_src_dir)/size-negotiation/relayout-container.h
 
-public_api_core_signals_header_files = \
-  $(public_api_src_dir)/signals/base-signal.h \
-  $(public_api_src_dir)/signals/callback.h \
-  $(public_api_src_dir)/signals/connection-tracker-interface.h \
-  $(public_api_src_dir)/signals/connection-tracker.h \
-  $(public_api_src_dir)/signals/dali-signal.h \
-  $(public_api_src_dir)/signals/functor-delegate.h \
-  $(public_api_src_dir)/signals/signal-slot-connections.h \
-  $(public_api_src_dir)/signals/signal-slot-observers.h \
-  $(public_api_src_dir)/signals/slot-delegate.h
+SET( public_api_core_math_header_files
+  ${public_api_src_dir}/math/angle-axis.h
+  ${public_api_src_dir}/math/compile-time-math.h
+  ${public_api_src_dir}/math/degree.h
+  ${public_api_src_dir}/math/math-utils.h
+  ${public_api_src_dir}/math/matrix.h
+  ${public_api_src_dir}/math/matrix3.h
+  ${public_api_src_dir}/math/quaternion.h
+  ${public_api_src_dir}/math/radian.h
+  ${public_api_src_dir}/math/random.h
+  ${public_api_src_dir}/math/rect.h
+  ${public_api_src_dir}/math/uint-16-pair.h
+  ${public_api_src_dir}/math/vector2.h
+  ${public_api_src_dir}/math/vector3.h
+  ${public_api_src_dir}/math/vector4.h
+  ${public_api_src_dir}/math/viewport.h
+)
+
+
+SET( public_api_core_object_header_files
+  ${public_api_src_dir}/object/any.h
+  ${public_api_src_dir}/object/base-handle.h
+  ${public_api_src_dir}/object/base-object.h
+  ${public_api_src_dir}/object/handle.h
+  ${public_api_src_dir}/object/object-registry.h
+  ${public_api_src_dir}/object/property-array.h
+  ${public_api_src_dir}/object/property-conditions.h
+  ${public_api_src_dir}/object/property-index-ranges.h
+  ${public_api_src_dir}/object/property-input.h
+  ${public_api_src_dir}/object/property-key.h
+  ${public_api_src_dir}/object/property-map.h
+  ${public_api_src_dir}/object/property-notification-declarations.h
+  ${public_api_src_dir}/object/property-notification.h
+  ${public_api_src_dir}/object/property-types.h
+  ${public_api_src_dir}/object/property-value.h
+  ${public_api_src_dir}/object/property.h
+  ${public_api_src_dir}/object/ref-object.h
+  ${public_api_src_dir}/object/type-info.h
+  ${public_api_src_dir}/object/type-registry.h
+  ${public_api_src_dir}/object/type-registry-helper.h
+  ${public_api_src_dir}/object/weak-handle.h
+)
+
+
+SET( public_api_core_render_tasks_header_files
+  ${public_api_src_dir}/render-tasks/render-task.h
+  ${public_api_src_dir}/render-tasks/render-task-list.h
+)
+
+
+SET( public_api_core_rendering_header_files
+  ${public_api_src_dir}/rendering/frame-buffer.h
+  ${public_api_src_dir}/rendering/geometry.h
+  ${public_api_src_dir}/rendering/property-buffer.h
+  ${public_api_src_dir}/rendering/texture.h
+  ${public_api_src_dir}/rendering/texture-set.h
+  ${public_api_src_dir}/rendering/renderer.h
+  ${public_api_src_dir}/rendering/sampler.h
+  ${public_api_src_dir}/rendering/shader.h
+)
+
+
+SET( public_api_core_size_negotiation_header_files
+  ${public_api_src_dir}/size-negotiation/relayout-container.h
+)
+
+
+SET( public_api_core_signals_header_files
+  ${public_api_src_dir}/signals/base-signal.h
+  ${public_api_src_dir}/signals/callback.h
+  ${public_api_src_dir}/signals/connection-tracker-interface.h
+  ${public_api_src_dir}/signals/connection-tracker.h
+  ${public_api_src_dir}/signals/dali-signal.h
+  ${public_api_src_dir}/signals/functor-delegate.h
+  ${public_api_src_dir}/signals/signal-slot-connections.h
+  ${public_api_src_dir}/signals/signal-slot-observers.h
+  ${public_api_src_dir}/signals/slot-delegate.h
+)
+
+
+SET( SOURCES ${SOURCES}
+  ${public_api_src_files}
+)
+
+SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
+  ${public_api_header_files}
+  ${public_api_core_actors_header_files}
+  ${public_api_core_animation_header_files}
+  ${public_api_core_common_header_files}
+  ${public_api_core_events_header_files}
+  ${public_api_core_images_header_files}
+  ${public_api_core_math_header_files}
+  ${public_api_core_object_header_files}
+  ${public_api_core_render_tasks_header_files}
+  ${public_api_core_rendering_header_files}
+  ${public_api_core_size_negotiation_header_files}
+  ${public_api_core_signals_header_files}
+)
