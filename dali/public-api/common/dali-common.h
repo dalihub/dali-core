@@ -23,9 +23,9 @@
 /*
  * Definitions for shared library support.
  *
- * If a library is configured with --enable-exportall or --enable-debug
+ * If a library is built with -DENABLE_EXPORTALL=ON or -DENABLE_DEBUG=ON
  * then HIDE_DALI_INTERNALS is not defined, and nothing is hidden.
- * If it is configured without these options (the default), then HIDE_INTERNALS
+ * If it is built without these options (the default), then HIDE_INTERNALS
  * is defined when building the library, visibility is automatically hidden, and the explicit
  * defines below come into use.
  * When building a library that uses DALI, HIDE_DALI_INTERNALS.
