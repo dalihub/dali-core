@@ -982,7 +982,7 @@ int UtcDaliSceneSurfaceResizedDefaultScene(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
   defaultSurface->MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
-  defaultScene.SurfaceResized( false );
+  defaultScene.SurfaceResized();
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
@@ -1130,11 +1130,7 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   Vector2 originalSurfaceSize( 500.0f, 1000.0f );
 
   TestRenderSurface surface( PositionSize( 0.0f, 0.0f, originalSurfaceSize.width, originalSurfaceSize.height ) );
-<<<<<<< HEAD
   auto scene = Integration::Scene::New( surface );
-=======
-  scene.SetSurface( surface, false );
->>>>>>> e6df4fb... Support Client and Screen Rotation
 
   // Ensure stage size does NOT match the surface size
   auto stage = Stage::GetCurrent();
@@ -1146,7 +1142,7 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
   surface.MoveResize( PositionSize( 0, 0, newSize.width, newSize.height ) );
-  scene.SurfaceResized( false );
+  scene.SurfaceResized();
 
   // Ensure the stage hasn't been resized
   DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
