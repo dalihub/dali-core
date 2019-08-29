@@ -10,7 +10,6 @@ Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
-BuildRequires:  lcov
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
 

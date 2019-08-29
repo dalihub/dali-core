@@ -168,63 +168,67 @@ INSTALL_HEADERS_WITH_DIRECTORY(DEVEL_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
 INSTALL_HEADERS_WITH_DIRECTORY(INTEGRATION_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
 INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dali/doc" )
 
-IF(UNIX)
-  # Define custom rules for coverage
-  SET(COVERAGE_DIR .cov)
-  SET(COVERAGE_OUTPUT_DIR doc/coverage)
+IF( UNIX )
+  FIND_PROGRAM( LCOV_BIN "lcov" )
+  IF( LCOV_BIN )
 
-  # lcov prior to 1.10 doesn't have -rc option; this and subsequent version don't output
-  # branch coverage. Determine the lcov version, and enable branch coverage accordingly.
-  EXECUTE_PROCESS( COMMAND bash -c "lcov --version | cut -d' ' -f4" OUTPUT_VARIABLE LCOV_VERSION )
-  STRING( REPLACE "." ";" LCOV_VLIST ${LCOV_VERSION})
-  IF( NOT $<VERSION_LESS:${LCOV_VERSION},"1.10"> )
-    SET(LCOV_OPTS --rc lcov_branch_coverage=1)
-  ENDIF()
+    # Define custom rules for coverage
+    SET(COVERAGE_DIR .cov)
+    SET(COVERAGE_OUTPUT_DIR doc/coverage)
 
-  ADD_CUSTOM_TARGET( rename_cov_data ./rename-cov-data )
+    # lcov prior to 1.10 doesn't have -rc option; this and subsequent version don't output
+    # branch coverage. Determine the lcov version, and enable branch coverage accordingly.
+    EXECUTE_PROCESS( COMMAND bash -c "${LCOV_BIN} --version | cut -d' ' -f4" OUTPUT_VARIABLE LCOV_VERSION )
+    STRING( REPLACE "." ";" LCOV_VLIST ${LCOV_VERSION})
+    IF( NOT $<VERSION_LESS:${LCOV_VERSION},"1.10"> )
+      SET(LCOV_OPTS --rc lcov_branch_coverage=1)
+    ENDIF()
 
-  ADD_CUSTOM_TARGET( cov_data lcov ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
-          COMMAND lcov ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"public-api/shader-effects/*\" \"*/image-actor*\" -o dali.info )
+    ADD_CUSTOM_TARGET( rename_cov_data ./rename-cov-data )
 
-  ADD_CUSTOM_TARGET( coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
-    DEPENDS cov_data )
+    ADD_CUSTOM_TARGET( cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
+      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"public-api/shader-effects/*\" \"*/image-actor*\" -o dali.info )
 
-  ADD_CUSTOM_TARGET( reset_coverage @lcov -z --directory `pwd` )
+    ADD_CUSTOM_TARGET( coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
+      DEPENDS cov_data )
 
-  # Define custom rule for distclean
-  ADD_CUSTOM_TARGET( distclean @echo cleaning for source distribution )
-  ADD_CUSTOM_COMMAND(
-        DEPENDS clean
-        COMMENT "distribution clean"
-        COMMAND find
-        ARGS    .
-        -not -name config.cmake -and \(
-        -name tester.c -or
-        -name Testing -or
-        -name CMakeFiles -or
-        -name doc -or
-        -name cmake.depends -or
-        -name cmake.check_depends -or
-        -name CMakeCache.txt -or
-        -name cmake.check_cache -or
-        -name *.cmake -or
-        -name Makefile -or
-        -name core -or
-        -name core.* -or
-        -name gmon.out -or
-        -name install_manifest.txt -or
-        -name *.pc -or
-        -name *.gcov -or
-        -name *.gcno -or
-        -name *.gcda -or
-        -name *~ -or
-        -name libdali*.so* \)
-        | grep -v TC | xargs rm -rf
-        TARGET  distclean
-        VERBATIM
-        )
+    ADD_CUSTOM_TARGET( reset_coverage @${LCOV_BIN} -z --directory `pwd` )
 
-ENDIF(UNIX)
+    # Define custom rule for distclean
+    ADD_CUSTOM_TARGET( distclean @echo cleaning for source distribution )
+    ADD_CUSTOM_COMMAND(
+          DEPENDS clean
+          COMMENT "distribution clean"
+          COMMAND find
+          ARGS    .
+          -not -name config.cmake -and \(
+          -name tester.c -or
+          -name Testing -or
+          -name CMakeFiles -or
+          -name doc -or
+          -name cmake.depends -or
+          -name cmake.check_depends -or
+          -name CMakeCache.txt -or
+          -name cmake.check_cache -or
+          -name *.cmake -or
+          -name Makefile -or
+          -name core -or
+          -name core.* -or
+          -name gmon.out -or
+          -name install_manifest.txt -or
+          -name *.pc -or
+          -name *.gcov -or
+          -name *.gcno -or
+          -name *.gcda -or
+          -name *~ -or
+          -name libdali*.so* \)
+          | grep -v TC | xargs rm -rf
+          TARGET  distclean
+          VERBATIM
+          )
+
+  ENDIF( LCOV_BIN )
+ENDIF( UNIX )
 
 # Linker Test
 SET( DALI_TEST_SUITE_DIR ${ROOT_SRC_DIR}/automated-tests/src/dali/dali-test-suite-utils )
