@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    DALi 3D Engine
-Version:    1.4.34
+Version:    1.4.35
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -9,6 +9,7 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
 
@@ -48,16 +49,6 @@ Integration development package for DALi 3D Engine - headers for integrating wit
 %prep
 %setup -q
 
-#Use TZ_PATH when tizen version is 3.x
-
-%if "%{tizen_version_major}" == "2"
-%define dali_data_rw_dir /opt/usr/share/dali/
-%define dali_data_ro_dir /usr/share/dali/
-%else
-%define dali_data_rw_dir %TZ_SYS_SHARE/dali/
-%define dali_data_ro_dir %TZ_SYS_RO_SHARE/dali/
-%endif
-
 %define dev_include_path %{_includedir}
 
 ##############################
@@ -79,49 +70,21 @@ LDFLAGS+=" --coverage "
 
 libtoolize --force
 cd %{_builddir}/%{name}-%{version}/build/tizen
-autoreconf --install
-DALI_DATA_RW_DIR="%{dali_data_rw_dir}"
-DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
-export DALI_DATA_RW_DIR
-export DALI_DATA_RO_DIR
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
 LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 
-./configure \
-      --program-prefix=%{?_program_prefix} \
-      --prefix=%{_prefix} \
-      --exec-prefix=%{_exec_prefix} \
-      --bindir=%{_bindir} \
-      --sbindir=%{_sbindir} \
-      --sysconfdir=%{_sysconfdir} \
-      --datadir=%{_datadir} \
-      --includedir=%{_includedir} \
-      --libdir=%{_libdir} \
-      --libexecdir=%{_libexecdir} \
-      --localstatedir=%{_localstatedir} \
-      --sharedstatedir=%{_sharedstatedir} \
-      --mandir=%{_mandir} \
+cmake \
 %if 0%{?enable_debug}
-      --enable-debug \
+      -DCMAKE_BUILD_TYPE=Debug \
 %endif
 %if 0%{?enable_trace}
-      --enable-trace \
+      -DENABLE_TRACE=ON \
 %endif
-      --infodir=%{_infodir} \
-      --enable-rename-so=no
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}
 
 make %{?jobs:-j%jobs}
-
-pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
-popd
-
-pushd %{buildroot}%{_libdir}
-for FILE in libdali-core-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
-mv pkgconfig/dali-core.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-core.pc
-popd
 
 ##############################
 # Installation
@@ -131,21 +94,14 @@ rm -rf %{buildroot}
 cd build/tizen
 
 pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+%make_install
 
-for FILE in libdali-*.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
-mv dali-core.pc %{buildroot}%{_libdir}/pkgconfig/dali-core.pc
-popd
-
-#############################
-#rename
-#############################
+# Create links to ensure linking with cxx11 library is preserved
 pushd  %{buildroot}%{_libdir}
-rm -rf libdali-core.so
-rm -rf libdali-core-cxx11.so
-ln -s libdali-core-cxx11.so.0.0.* libdali-core.so
+ln -sf libdali-core.so libdali-core-cxx11.so
+ln -sf libdali-core.so libdali-core-cxx11.so.0
+ln -sf libdali-core.so libdali-core-cxx11.so.0.0.0
 popd
-
 
 ##############################
 # Post Install
@@ -172,8 +128,8 @@ exit 0
 %manifest dali.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-core-cxx11.so.*
-%{_libdir}/libdali-core.so
+%{_libdir}/libdali-core-cxx11.so*
+%{_libdir}/libdali-core.so*
 %license LICENSE
 
 %files devel
