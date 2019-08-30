@@ -372,15 +372,15 @@ bool CameraActor::GetInvertYAxis() const
 
 void CameraActor::SetPerspectiveProjection( const Size& size )
 {
-  if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
-  {
-    // Not allowed to set the canvas size to be 0.
-    DALI_LOG_ERROR( "Canvas size can not be 0\n" );
-    return;
-  }
-
   float width = size.width;
   float height = size.height;
+
+  if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
+  {
+    Size stageSize = Dali::Stage::GetCurrent().GetSize();
+    width = stageSize.width;
+    height = stageSize.height;
+  }
 
   float nearClippingPlane;
   float farClippingPlane;
