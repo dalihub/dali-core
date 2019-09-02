@@ -62,9 +62,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 } // unnamed namespace
 #endif
 
-const int partialUpdateMargin = 4u;
-const float partialUpdateRatio = 0.8f; // If the partial update area exceeds 80%, change to full update.
-
 /**
  * Structure to contain internal data
  */
@@ -74,8 +71,7 @@ struct RenderManager::Impl
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         Integration::DepthBufferAvailable depthBufferAvailableParam,
-        Integration::StencilBufferAvailable stencilBufferAvailableParam,
-        Integration::PartialUpdateAvailable partialUpdateAvailableParam )
+        Integration::StencilBufferAvailable stencilBufferAvailableParam )
   : context( glAbstraction, &surfaceContextContainer ),
     currentContext( &context ),
     glAbstraction( glAbstraction ),
@@ -96,7 +92,6 @@ struct RenderManager::Impl
     programController( glAbstraction ),
     depthBufferAvailable( depthBufferAvailableParam ),
     stencilBufferAvailable( stencilBufferAvailableParam ),
-    partialUpdateAvailable( partialUpdateAvailableParam ),
     defaultSurfaceOrientation( 0 )
   {
      // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
@@ -176,7 +171,6 @@ struct RenderManager::Impl
 
   Integration::DepthBufferAvailable         depthBufferAvailable;     ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable       stencilBufferAvailable;   ///< Whether the stencil buffer is available
-  Integration::PartialUpdateAvailable       partialUpdateAvailable;   ///< Whether the partial update is available
 
   std::unique_ptr<Dali::ThreadPool>         threadPool;               ///< The thread pool
   Vector<GLuint>                            boundTextures;            ///< The textures bound for rendering
@@ -189,16 +183,14 @@ RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
                                    Integration::GlSyncAbstraction& glSyncAbstraction,
                                    Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Integration::PartialUpdateAvailable partialUpdateAvailable )
+                                   Integration::StencilBufferAvailable stencilBufferAvailable )
 {
   RenderManager* manager = new RenderManager;
   manager->mImpl = new Impl( glAbstraction,
                              glSyncAbstraction,
                              glContextHelperAbstraction,
                              depthBufferAvailable,
-                             stencilBufferAvailable,
-                             partialUpdateAvailable );
+                             stencilBufferAvailable );
   return manager;
 }
 
@@ -600,69 +592,10 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
   DALI_PRINT_RENDER_END();
 }
 
-bool GetDamagedRect( Rect<int32_t> &viewportRect, RenderInstruction& instruction, Rect<int32_t> &damagedRect )
-{
-  // merge bounding
-  int dx1 = viewportRect.width, dx2 = 0, dy1 = viewportRect.height, dy2 = 0;
-  int checkWidth = static_cast<int>( static_cast<float>( viewportRect.width ) * partialUpdateRatio );
-  int checkHeight = static_cast<int>( static_cast<float>( viewportRect.height ) * partialUpdateRatio );
-  Rect<int32_t> screenRect;
-
-  bool isPartialUpdate = false;
-
-  const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
-  // Iterate through each render list.
-
-  for( RenderListContainer::SizeType index = 0; index < renderListCount; ++index )
-  {
-    const RenderList* renderList = instruction.GetRenderList( index );
-
-    if( renderList && !renderList->IsEmpty() && renderList->IsPartialUpdateEnabled() )
-    {
-      const std::size_t itemCount = renderList->Count();
-      for( uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex )
-      {
-        const RenderItem& item = renderList->GetItem( itemIndex );
-
-        if( item.mPartialUpdateEnabled )
-        {
-          isPartialUpdate = true;
-
-          screenRect = item.CalculateViewportSpaceAABB( viewportRect.width, viewportRect.height, true );
-
-          dx1 = std::min( screenRect.x, dx1 );
-          dx2 = std::max( screenRect.x + screenRect.width, dx2);
-          dy1 = std::min( screenRect.y, dy1 );
-          dy2 = std::max( screenRect.y + screenRect.height, dy2 );
-
-          if( ( dx2 - dx1 )  > checkWidth && ( dy2 - dy1 ) > checkHeight )
-          {
-            return false;
-          }
-        }
-      }
-    }
-  }
-
-  if( isPartialUpdate )
-  {
-    damagedRect.x = dx1 - partialUpdateMargin;
-    damagedRect.y = dy1 - partialUpdateMargin;
-    damagedRect.width = dx2 - dx1 + ( 2 * partialUpdateMargin );
-    damagedRect.height = dy2 - dy1 + ( 2 * partialUpdateMargin );
-  }
-
-  return isPartialUpdate;
-}
-
 void RenderManager::DoRender( RenderInstruction& instruction )
 {
   Rect<int32_t> viewportRect;
   Vector4   clearColor;
-  bool isPartialUpdate = false;
-  Rect<int32_t> damagedRect;
-  Rect<int32_t> mergedRect;
-  Dali::ClippingBox scissorBox;
 
   if ( instruction.mIsClearColorSet )
   {
@@ -678,7 +611,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   Vector4 backgroundColor = mImpl->backgroundColor;
   Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
   Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-  Integration::PartialUpdateAvailable partialUpdateAvailable = mImpl->partialUpdateAvailable;
 
   Render::SurfaceFrameBuffer* surfaceFrameBuffer = nullptr;
   if ( instruction.mFrameBuffer != 0 )
@@ -744,62 +676,25 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->currentContext->BindFramebuffer( GL_FRAMEBUFFER, 0u );
   }
 
-
-  if( surfaceFrameBuffer &&
-      partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE )
-  {
-    const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
-    // Iterate through each render list.
-    if( surfaceFrameBuffer->IsPartialUpdateEnabled() )
-    {
-      isPartialUpdate = GetDamagedRect( surfaceRect, instruction, damagedRect ) ;
-    }
-
-    if( !isPartialUpdate )
-    {
-      damagedRect = surfaceRect;
-    }
-
-    mergedRect = surfaceFrameBuffer->SetDamagedRect( damagedRect );
-
-    if( mergedRect.IsEmpty() )
-    {
-      isPartialUpdate = false;
-    }
-    else
-    {
-      scissorBox.x = mergedRect.x;
-      scissorBox.y = mergedRect.y;
-      scissorBox.width = mergedRect.width;
-      scissorBox.height = mergedRect.height;
-    }
-  }
-
   if ( surfaceFrameBuffer )
   {
-      mImpl->currentContext->Viewport( surfaceRect.x,
-                                surfaceRect.y,
-                                surfaceRect.width,
-                                surfaceRect.height );
+    mImpl->currentContext->Viewport( surfaceRect.x,
+                              surfaceRect.y,
+                              surfaceRect.width,
+                              surfaceRect.height );
 
-
-      mImpl->currentContext->ClearColor( backgroundColor.r,
-                                  backgroundColor.g,
-                                  backgroundColor.b,
-                                  backgroundColor.a );
+    mImpl->currentContext->ClearColor( backgroundColor.r,
+                                backgroundColor.g,
+                                backgroundColor.b,
+                                backgroundColor.a );
   }
 
   // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
   // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
   // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
   // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-  mImpl->currentContext->SetScissorTest( false );
 
-  if( isPartialUpdate )
-  {
-    mImpl->currentContext->SetScissorTest( true );
-    mImpl->currentContext->Scissor( scissorBox.x, scissorBox.y, scissorBox.width, scissorBox.height );
-  }
+  mImpl->currentContext->SetScissorTest( false );
 
   GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
 
@@ -819,12 +714,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   }
 
   mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-
-  if( isPartialUpdate )
-  {
-    mImpl->currentContext->SetScissorTest( false );
-  }
-
 
   if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
@@ -897,14 +786,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
 
     // Clear the viewport area only
     mImpl->currentContext->SetScissorTest( true );
-    if( isPartialUpdate )
-    {
-      mImpl->currentContext->Scissor( scissorBox.x, scissorBox.y, scissorBox.width, scissorBox.height );
-    }
-    else
-    {
-      mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
-    }
+    mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
     mImpl->currentContext->ColorMask( true );
     mImpl->currentContext->Clear( GL_COLOR_BUFFER_BIT , Context::CHECK_CACHED_VALUES );
     mImpl->currentContext->SetScissorTest( false );
@@ -920,8 +802,7 @@ void RenderManager::DoRender( RenderInstruction& instruction )
       depthBufferAvailable,
       stencilBufferAvailable,
       mImpl->boundTextures,
-      surfaceOrientation,
-      scissorBox );
+      surfaceOrientation );
 
   // Synchronise the FBO/Texture access when there are multiple contexts
   if ( mImpl->currentContext->IsSurfacelessContextSupported() )
