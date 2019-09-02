@@ -24,6 +24,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/common/view-mode.h>
 #include <dali/integration-api/core-enumerations.h>
+#include <vector>
 
 namespace Dali
 {
@@ -188,6 +189,18 @@ public:
    * @return TRUE if the stencil buffer is required
    */
   virtual Integration::StencilBufferAvailable GetStencilBufferRequired() = 0;
+
+  /**
+   * @brief Sets currentframe updated/damaged rects
+   * @return
+   */
+  virtual Rect<int32_t> SetDamagedRect( Rect<int32_t> damagedRectArray ) = 0;
+
+  /**
+   * @brief Gets buffer age
+   * @return current buffer age
+   */
+  virtual int32_t GetBufferAge() = 0;
 
 private:
 

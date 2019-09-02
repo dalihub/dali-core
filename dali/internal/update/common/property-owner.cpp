@@ -171,7 +171,15 @@ void PropertyOwner::RemoveUniformMapObserver( UniformMap::Observer& observer )
   mUniformMaps.RemoveObserver( observer );
 }
 
+void PropertyOwner::SetPropertyDirty( bool value )
+{
+  mPropertyDirty = value;
+}
 
+bool PropertyOwner::IsPropertyDirty() const
+{
+  return mPropertyDirty;
+}
 
 } // namespace SceneGraph
 

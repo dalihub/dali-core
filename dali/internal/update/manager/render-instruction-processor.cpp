@@ -33,6 +33,7 @@
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/common/math.h>
 
 namespace
 {
@@ -161,8 +162,8 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 {
   bool inside( true );
   Node* node = renderable.mNode;
-
-  if( cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
+  bool isModifiesGeometryHint = false;
+  if( cull && renderable.mRenderer && !( isModifiesGeometryHint = renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) ) )
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
     inside = ( boundingSphere.w > Math::MACHINE_EPSILON_1000 ) &&
@@ -180,10 +181,15 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       item.mNode = renderable.mNode;
       item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
       item.mDepthIndex = 0;
+      item.mPartialUpdateEnabled = false;
 
-      if(!isLayer3d)
+      if( !isLayer3d )
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();
+      }
+      if( isLayer3d || isModifiesGeometryHint )
+      {
+        renderList.SetPartialUpdateEnabled( false );
       }
 
       if( DALI_LIKELY( renderable.mRenderer ) )
@@ -191,6 +197,11 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
         item.mRenderer =   &renderable.mRenderer->GetRenderer();
         item.mTextureSet =  renderable.mRenderer->GetTextures();
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
+
+        if( FaceCullingMode::NONE != renderable.mRenderer->GetFaceCullingMode() )
+        {
+          renderList.SetPartialUpdateEnabled( false );
+        }
       }
       else
       {
@@ -201,13 +212,27 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
 
       Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
-    }
 
-     node->SetCulled( updateBufferIndex, false );
+      if( DALI_LIKELY( item.mRenderer ) && renderList.IsPartialUpdateEnabled() )
+      {
+        if( node->IsPropertyDirty() || node->IsComponentChanged() )
+        {
+          item.mPartialUpdateEnabled = true;
+
+          item.mUpdateSizeHint = item.mSize;
+          Vector3 updateSizeHint = node->GetUpdateSizeHint( updateBufferIndex );
+          if( updateSizeHint != Vector3::ZERO )
+          {
+            item.mUpdateSizeHint = updateSizeHint;
+          }
+        }
+      }
+    }
+    node->SetCulled( updateBufferIndex, false );
   }
   else
   {
-     node->SetCulled( updateBufferIndex, true );
+    node->SetCulled( updateBufferIndex, true );
   }
 }
 
@@ -434,6 +459,10 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
       if( !SetupRenderList( renderables, layer, instruction, tryReuseRenderList, &renderList ) )
       {
         renderList->SetHasColorRenderItems( true );
+        if( !isLayer3D )
+        {
+          renderList->SetPartialUpdateEnabled( true );
+        }
         AddRenderersToRenderList( updateBufferIndex,
                                   *renderList,
                                   renderables,
@@ -456,6 +485,10 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
       if( !SetupRenderList( renderables, layer, instruction, tryReuseRenderList, &renderList ) )
       {
         renderList->SetHasColorRenderItems( false );
+        if( !isLayer3D )
+        {
+          renderList->SetPartialUpdateEnabled( true );
+        }
         AddRenderersToRenderList( updateBufferIndex,
                                   *renderList,
                                   renderables,
