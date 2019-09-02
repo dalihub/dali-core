@@ -82,7 +82,9 @@ cmake \
 %if 0%{?enable_trace}
       -DENABLE_TRACE=ON \
 %endif
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}
+      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+      -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}
 
 make %{?jobs:-j%jobs}
 
