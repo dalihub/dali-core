@@ -1,0 +1,34 @@
+#!/bin/bash
+COVERAGE_DIR=.cov
+[[ -d ${COVERAGE_DIR} ]] || mkdir ${COVERAGE_DIR}
+rm -f ${COVERAGE_DIR}/*
+
+COVERAGE_EXTENSIONS="
+  gcda
+  gcno
+"
+
+SOURCE_EXTENSIONS="
+ c
+ cpp
+"
+
+for covExt in $COVERAGE_EXTENSIONS
+do
+  # Move into .cov directory
+  for file in `find -name *.${covExt}`
+  do
+    cp $file ${COVERAGE_DIR}
+  done
+
+  # strip source extensions liks .cpp as that's the format expected by patch-coverage.pl
+  for srcExt in $SOURCE_EXTENSIONS
+  do
+    for file in `find ${COVERAGE_DIR} -name *.${srcExt}.${covExt}`
+    do
+      name=`echo $file | sed "s/.${srcExt}.${covExt}//g"`
+      mv $file $name.${covExt}
+    done
+  done
+
+done

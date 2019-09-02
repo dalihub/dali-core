@@ -63,10 +63,14 @@ To build the repository enter the 'build/tizen' folder:
 
          $ cd dali-core/build/tizen
 
-Then run the following commands:
+Then run the following command to set up the build:
 
-         $ autoreconf --install
-         $ ./configure --prefix=$DESKTOP_PREFIX
+         $ cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX .
+
+If a Debug build is required, then add -DCMAKE_BUILD_TYPE=Debug
+
+To build run:
+
          $ make install -j8
 
 ### Building and executing test cases
