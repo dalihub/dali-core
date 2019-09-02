@@ -123,6 +123,24 @@ void TestEnumStrings(
 
 } // anon namespace
 
+int UtcDaliValueFromEnum(void)
+{
+  enum class T {
+    None, V1 = 1, V2 = 2
+  };
+
+  Property::Value v1 = T::V1;
+  Property::Value v2 = T::V2;
+
+  T t = T::None;
+  DALI_TEST_CHECK( v1.Get<T>() == T::V1 );
+  DALI_TEST_CHECK( v2.Get<T>() == T::V2 );
+  DALI_TEST_CHECK( v1.Get(t) && t == T::V1 );
+  DALI_TEST_CHECK( v2.Get(t) && t == T::V2 );
+
+  END_TEST;
+}
+
 int UtcDaliScriptingNewImageNegative01(void)
 {
   // Invalid filename
