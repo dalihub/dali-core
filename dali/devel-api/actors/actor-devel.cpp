@@ -25,6 +25,11 @@ namespace Dali
 namespace DevelActor
 {
 
+Rect<> CalculateScreenExtents( Actor actor )
+{
+  return GetImplementation( actor ).CalculateScreenExtents();
+}
+
 VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor )
 {
   return GetImplementation( actor ).VisibilityChangedSignal();

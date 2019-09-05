@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -159,6 +160,14 @@ typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChanged
  * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's only linked with Actor::Property::VISIBLE.
  */
 DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor );
+
+/**
+ * Calculates screen position and size.
+ *
+ * @return pair of two values, position of top-left corner on screen and size respectively.
+ */
+DALI_CORE_API Rect<> CalculateScreenExtents( Actor actor );
+
 
 
 typedef Signal< void (Actor) > ChildChangedSignalType; ///< Called when the actor has a child added or removed

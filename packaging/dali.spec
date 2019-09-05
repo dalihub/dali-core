@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    DALi 3D Engine
-Version:    1.4.35
+Version:    1.4.36
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -82,7 +82,9 @@ cmake \
 %if 0%{?enable_trace}
       -DENABLE_TRACE=ON \
 %endif
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}
+      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+      -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}
 
 make %{?jobs:-j%jobs}
 

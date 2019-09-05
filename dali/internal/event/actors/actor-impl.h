@@ -250,6 +250,13 @@ public:
   }
 
   /**
+   * Calculates screen position and size.
+   *
+   * @return pair of two values, position of top-left corner on screen and size respectively.
+   */
+  Rect<> CalculateScreenExtents( ) const;
+
+  /**
    * Sets the size of an actor.
    * This does not interfere with the actors scale factor.
    * @param [in] width  The new width.
