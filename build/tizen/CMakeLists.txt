@@ -139,8 +139,14 @@ ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
 
+# pthread required due to gcc issue
+FIND_LIBRARY(PTHREAD pthread)
+IF(PTHREAD)
+  SET(OPTIONAL_LIBS ${OPTIONAL_LIBS} -lpthread)
+ENDIF()
+
 TARGET_LINK_LIBRARIES( ${name}
-  -lpthread
+  ${OPTIONAL_LIBS}
   ${COVERAGE}
 )
 
