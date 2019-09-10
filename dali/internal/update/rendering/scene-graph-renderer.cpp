@@ -143,7 +143,6 @@ Renderer::Renderer()
   mDepthTestMode( DepthTestMode::AUTO ),
   mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
-  mDirty( false ),
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
@@ -182,7 +181,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
   }
   else
   {
-    mDirty = true;
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
     {
       CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
@@ -217,7 +215,6 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendFlag != 0 )
   {
-    mDirty = true;
     if( mResendFlag & RESEND_GEOMETRY )
     {
       typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
@@ -398,7 +395,6 @@ void Renderer::SetGeometry( Render::Geometry* geometry )
 void Renderer::SetDepthIndex( int depthIndex )
 {
   mDepthIndex = depthIndex;
-  mDirty = true;
 }
 
 void Renderer::SetFaceCullingMode( FaceCullingMode::Type faceCullingMode )
@@ -415,7 +411,6 @@ FaceCullingMode::Type Renderer::GetFaceCullingMode() const
 void Renderer::SetBlendMode( BlendMode::Type blendingMode )
 {
   mBlendMode = blendingMode;
-  mDirty = true;
 }
 
 BlendMode::Type Renderer::GetBlendMode() const
@@ -588,7 +583,6 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
 
 void Renderer::BakeOpacity( BufferIndex updateBufferIndex, float opacity )
 {
-  mDirty = true;
   mOpacity.Bake( updateBufferIndex, opacity );
 }
 
@@ -600,7 +594,6 @@ float Renderer::GetOpacity( BufferIndex updateBufferIndex ) const
 void Renderer::SetRenderingBehavior( DevelRenderer::Rendering::Type renderingBehavior )
 {
   mRenderingBehavior = renderingBehavior;
-  mDirty = true;
 }
 
 DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
@@ -619,6 +612,7 @@ void Renderer::ConnectToSceneGraph( SceneController& sceneController, BufferInde
 
   mRenderer = Render::Renderer::New( mRenderDataProvider, mGeometry, mBlendBitmask, GetBlendColor(), static_cast< FaceCullingMode::Type >( mFaceCullingMode ),
                                          mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters );
+
   OwnerPointer< Render::Renderer > transferOwnership( mRenderer );
   mSceneController->GetRenderMessageDispatcher().AddRenderer( transferOwnership );
 }
@@ -656,7 +650,6 @@ void Renderer::UpdateTextureSet()
       mRenderDataProvider->mTextures.clear();
       mRenderDataProvider->mSamplers.clear();
     }
-    mDirty = true;
   }
 }
 
@@ -760,46 +753,6 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
   {
     mShader = NULL;
   }
-}
-
-void Renderer::SetDirty( bool value )
-{
-  mDirty = value;
-  if( mShader )
-  {
-    mShader->SetPropertyDirty( value );
-  }
-}
-
-bool Renderer::IsDirty() const
-{
-  bool ret = false;
-  if( mShader )
-  {
-    ret = mShader->IsPropertyDirty();
-  }
-
-  // check native image
-  if( mTextureSet )
-  {
-    uint32_t textureCount = mTextureSet->GetTextureCount();
-
-    if(textureCount > 0)
-    {
-      Dali::Internal::Render::Texture* texture;
-      for( uint32_t i = 0; i<textureCount; ++i )
-      {
-        texture = const_cast<Dali::Internal::SceneGraph::TextureSet *>(mTextureSet)->GetTexture(i);
-        if( texture && texture->IsNativeImage() )
-        {
-          ret = true;
-          break;
-        }
-      }
-    }
-  }
-
-  return ret | mDirty;
 }
 
 } // namespace SceneGraph
