@@ -3472,6 +3472,15 @@ bool Actor::DoAction( BaseObject* object, const std::string& actionName, const P
   return done;
 }
 
+Rect<> Actor::CalculateScreenExtents( ) const
+{
+  auto screenPosition = GetCurrentScreenPosition();
+  Vector3 size = GetCurrentSize() * GetCurrentWorldScale();
+  Vector3 anchorPointOffSet = size * ( mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
+  Vector2 position = Vector2( screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y );
+  return { position.x, position.y, size.x, size.y };
+}
+
 bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& value ) const
 {
   bool valueSet = true;

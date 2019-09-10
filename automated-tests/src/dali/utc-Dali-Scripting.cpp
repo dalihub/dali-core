@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,24 @@ void TestEnumStrings(
 
 
 } // anon namespace
+
+int UtcDaliValueFromEnum(void)
+{
+  enum class T {
+    None, V1 = 1, V2 = 2
+  };
+
+  Property::Value v1 = T::V1;
+  Property::Value v2 = T::V2;
+
+  T t = T::None;
+  DALI_TEST_CHECK( v1.Get<T>() == T::V1 );
+  DALI_TEST_CHECK( v2.Get<T>() == T::V2 );
+  DALI_TEST_CHECK( v1.Get(t) && t == T::V1 );
+  DALI_TEST_CHECK( v2.Get(t) && t == T::V2 );
+
+  END_TEST;
+}
 
 int UtcDaliScriptingNewImageNegative01(void)
 {
@@ -584,7 +602,7 @@ int UtcDaliScriptingNewActorChildren(void)
   map[ "position" ] = Vector3::XAXIS;
 
   Property::Map child1Map;
-  child1Map[ "type" ] = "CameraActor";
+  child1Map[ "type" ] = "Layer";
   child1Map[ "position" ] = Vector3::YAXIS;
 
   Property::Array childArray;
@@ -604,7 +622,7 @@ int UtcDaliScriptingNewActorChildren(void)
 
   Actor child1 = handle.GetChildAt(0);
   DALI_TEST_CHECK( child1 );
-  DALI_TEST_CHECK( CameraActor::DownCast( child1 ) );
+  DALI_TEST_CHECK( Layer::DownCast( child1 ) );
   DALI_TEST_EQUALS( child1.GetCurrentPosition(), Vector3::YAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
 

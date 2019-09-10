@@ -199,6 +199,15 @@ void CameraActor::OnInitialize()
   AddCameraMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphCameraOwner );
 }
 
+void CameraActor::OnStageConnectionInternal()
+{
+  // If the canvas size has not been set, then use the size of the scene we've been added to to set up the perspective projection
+  if( ( mCanvasSize.width < Math::MACHINE_EPSILON_1000 ) || ( mCanvasSize.height < Math::MACHINE_EPSILON_1000 ) )
+  {
+    SetPerspectiveProjection( GetScene().GetSize() );
+  }
+}
+
 void CameraActor::SetTarget( const Vector3& target )
 {
   if( target != mTarget ) // using range epsilon
@@ -372,15 +381,26 @@ bool CameraActor::GetInvertYAxis() const
 
 void CameraActor::SetPerspectiveProjection( const Size& size )
 {
+  mCanvasSize = size;
+
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
-    // Not allowed to set the canvas size to be 0.
-    DALI_LOG_ERROR( "Canvas size can not be 0\n" );
-    return;
+    // If the size given is invalid, i.e. ZERO, then check if we've been added to a scene
+    if( OnStage() )
+    {
+      // We've been added to a scene already, set the canvas size to the scene's size
+      mCanvasSize = GetScene().GetSize();
+    }
+    else
+    {
+      // We've not been added to a scene yet, so just return.
+      // We'll set the canvas size when we get added to a scene later
+      return;
+    }
   }
 
-  float width = size.width;
-  float height = size.height;
+  float width = mCanvasSize.width;
+  float height = mCanvasSize.height;
 
   float nearClippingPlane;
   float farClippingPlane;

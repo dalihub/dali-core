@@ -1247,6 +1247,21 @@ int UtcDaliPropertyValueGetExtentsP(void)
   END_TEST;
 }
 
+int UtcDaliPropertyValueEnum(void)
+{
+  enum class E { zero, e };
+  Property::Value value( E::e );
+  DALI_TEST_EQUALS( static_cast<int>(E::e), static_cast<int>(value.Get<E>()), TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(E::e), value.Get<int>(), TEST_LOCATION );
+  E result;
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(E::e), static_cast<int>(result), TEST_LOCATION );
+  int result2;
+  DALI_TEST_EQUALS( true, value.Get( result2 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(E::e), result2, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliPropertyValueOutputStream(void)
 {
   TestApplication application;

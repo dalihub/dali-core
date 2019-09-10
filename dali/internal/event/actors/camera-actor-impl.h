@@ -234,14 +234,19 @@ private:
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
+  /**
+   * @copydoc Dali::Internal::Actor::OnStageConnectionInternal()
+   */
+  void OnStageConnectionInternal() override;
 
 private: // Data
 
   const SceneGraph::Camera* mSceneObject; ///< Not owned
 
   Vector3            mTarget;
+  Vector2            mCanvasSize;
   Dali::Camera::Type mType;
   Dali::Camera::ProjectionMode mProjectionMode;
   float              mFieldOfView;
