@@ -327,9 +327,10 @@ public:
   /**
    * Renders the results of the previous "update" traversal.
    * @param[out] status contains the rendering flags.
-   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
+   * @param[in] forceClear Force the Clear on the framebuffer even if nothing is rendered.
+   * @param[in] uploadOnly Upload the resource only without rendering.
    */
-  void Render( Integration::RenderStatus& status, bool forceClear );
+  void Render( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
 
 private:
 
