@@ -135,7 +135,8 @@ public:
   /**
    * @brief Creates a CameraActor object.
    *
-   * @note No default camera perspective projection is set by this method. @see SetPerspectiveProjection().
+   * @note Sets the default camera perspective projection for the size of the scene this is added to. @see SetPerspectiveProjection().
+   * @note When this actor gets added to a scene, then it's Z position will be modified according to the required perspective projection.
    *
    * @SINCE_1_0.0
    * @return The newly created camera actor
@@ -336,7 +337,8 @@ public:
    * @SINCE_1_0.0
    * @param[in] size The canvas size
    * @pre The canvas size must be greater than zero.
-   *
+   * @note If either of the values of size is 0.0f, then we use the default perspective projection for the size of the scene this actor is added to.
+   * @note This modifies the Z position property of this actor as well.
    */
   void SetPerspectiveProjection( const Size& size );
 

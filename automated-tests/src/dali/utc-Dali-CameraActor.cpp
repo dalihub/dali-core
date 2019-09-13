@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,6 +174,47 @@ int UtcDaliCameraActorNewP(void)
   actor.Reset();
 
   DALI_TEST_CHECK( !actor );
+  END_TEST;
+}
+
+int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
+{
+  TestApplication application;
+  tet_infoline( "Test the perspective projection of a camera actor is set appropriately when not passing in a size" );
+
+  CameraActor actor = CameraActor::New();
+  DALI_TEST_CHECK( actor );
+
+  // All the properties should still be the default values
+  // Defaults taken from scene-graph-camera.cpp
+  DALI_TEST_EQUALS( 4.0f/3.0f, actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 45.0f*(Math::PI/180.0f), actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 800.0f, actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 3.0f * 800.0f, actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.0f, actor.GetProperty( Actor::Property::POSITION_Z ).Get< float >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+
+  // Add it to the stage, then the values should be updated to reflect a 480.0f by 800.0f scene (default stage size)
+  Stage::GetCurrent().Add( actor );
+
+  DALI_TEST_EQUALS( 0.6f, actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.489957f, actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 800.0f, actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 4895.0f, actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 1600.0f, actor.GetProperty( Actor::Property::POSITION_Z ).Get< float >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+
+  // Ensure the values stay the same after update/render
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0.6f, actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.489957f, actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 800.0f, actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 4895.0f, actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 1600.0f, actor.GetProperty( Actor::Property::POSITION_Z ).Get< float >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -795,6 +836,30 @@ int UtcDaliCameraActorSetPerspectiveProjectionP(void)
   actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get( value );
   DALI_TEST_EQUALS( 4245.f, value, FLOAT_EPSILON, TEST_LOCATION );
 
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+
+  // Ensure these values persist after adding to the stage and an update/render pass
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get( value );
+  DALI_TEST_EQUALS( 0.666666f, value, FLOAT_EPSILON, TEST_LOCATION );
+  actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get( value );
+  DALI_TEST_EQUALS( 0.489957f, value, FLOAT_EPSILON, TEST_LOCATION );
+  actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get( value );
+  DALI_TEST_EQUALS( 150.f, value, FLOAT_EPSILON, TEST_LOCATION );
+  actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get( value );
+  DALI_TEST_EQUALS( 4245.f, value, FLOAT_EPSILON, TEST_LOCATION );
+
+  // Call method with a ZERO size, this should reset the perspective projection using the size of the scene we've been added to
+  actor.SetPerspectiveProjection( Vector2::ZERO );
+
+  DALI_TEST_EQUALS( 0.6f, actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.489957f, actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 800.0f, actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 4895.0f, actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( 1600.0f, actor.GetProperty( Actor::Property::POSITION_Z ).Get< float >(), TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   END_TEST;
