@@ -92,8 +92,7 @@ SET( CORE_PKG_CFG_FILE dali-core.pc )
 CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 
 # Set up compiler flags and warnings
-#ADD_COMPILE_OPTIONS( -std=c++11 -ggdb )
-ADD_COMPILE_OPTIONS( -std=c++11 -gdwarf-4 )
+ADD_COMPILE_OPTIONS( -std=c++11 )
 ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 
 # TODO: Clang is a lot more strict with warnings, we should address
