@@ -89,6 +89,7 @@ enum TransformManagerProperty
   TRANSFORM_PROPERTY_WORLD_SCALE,
   TRANSFORM_PROPERTY_WORLD_ORIENTATION,
   TRANSFORM_PROPERTY_WORLD_MATRIX,
+  TRANSFORM_PROPERTY_UPDATE_SIZE_HINT,
   TRANSFORM_PROPERTY_COUNT,
 };
 
@@ -336,12 +337,27 @@ public:
   const Vector4& GetBoundingSphere( TransformId id ) const;
 
   /**
+   * Component of node is changed or not
+   * @param[in] id Id of the transform component
+   * @return true if Component box is changed else false.
+   */
+  bool IsComponentChanged( TransformId id );
+
+  /**
    * Get the world matrix and size of a given component
    * @param[in] id Id of the transform component
    * @param[out] The world matrix of the component
    * @param[out] size size of the component
    */
   void GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const;
+
+  /**
+   * Get the update size hint,
+   * @param[in] id Id of the transform component
+   * @return The update size hint of the component
+   */
+  const Vector3& GetUpdateSizeHint( TransformId id ) const;
+
 
   /**
    * @brief Sets the boolean which states whether the position should use the anchor-point on the given transform component.
@@ -383,6 +399,7 @@ private:
   Vector< Vector3 > mSize;                                                ///< Size of the components
   Vector< TransformId > mParent;                                          ///< Parent of the components
   Vector< Matrix > mWorld;                                                ///< Local to world transform of the components
+  Vector< Matrix > mPrevWorld;                                            ///< Local to world transform of the components in last frame
   Vector< Matrix > mLocal;                                                ///< Local to parent space transform of the components
   Vector< Vector4 > mBoundingSpheres;                                     ///< Bounding spheres. xyz is the center and w is the radius
   Vector< TransformComponentAnimatable > mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
@@ -390,6 +407,9 @@ private:
   Vector< bool > mComponentDirty;                                         ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
   Vector< bool > mLocalMatrixDirty;                                       ///< 1u if the local matrix has been updated in this frame, 0 otherwise
   Vector< SOrderItem > mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
+  Vector< bool> mComponentChanged;                                        ///< Component is changed or not
+  Vector< Vector3 > mUpdateSizeHint;                                      ///< BoundingBox of the components
+  Vector< Vector3 > mUpdateSizeHintBase;                                     ///< Base value for the boundingBox of the components
   bool mReorder;                                                          ///< Flag to determine if the components have to reordered in the next Update
 };
 

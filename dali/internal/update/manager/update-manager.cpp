@@ -426,6 +426,8 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
 
   parent->ConnectChild( node );
 
+  parent->SetPropertyDirty( true );
+
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if( mImpl->frameCallbackProcessor )
   {
@@ -632,6 +634,8 @@ void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 void UpdateManager::RemoveRenderer( Renderer* renderer )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] RemoveRenderer\n", renderer );
+
+  renderer->SetDirty( true );
 
   // Find the renderer and destroy it
   EraseUsingDiscardQueue( mImpl->renderers, renderer, mImpl->discardQueue, mSceneGraphBuffers.GetUpdateBufferIndex() );
