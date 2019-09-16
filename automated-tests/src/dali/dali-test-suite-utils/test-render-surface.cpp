@@ -117,4 +117,14 @@ Vector4 TestRenderSurface::GetBackgroundColor()
   return mBackgroundColor;
 }
 
+Rect<int32_t> TestRenderSurface::SetDamagedRect( const Rect<int32_t>& damagedRectArray )
+{
+  return damagedRectArray;
+}
+
+int32_t TestRenderSurface::GetBufferAge()
+{
+  return 0;
+}
+
 } // Namespace dali

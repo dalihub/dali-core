@@ -135,6 +135,24 @@ public:
    */
   Vector4 GetBackgroundColor();
 
+  /**
+   * @brief Sets currentframe updated/damaged rects
+   * @return merged update rects
+   */
+  Rect<int32_t> SetDamagedRect( const Rect<int32_t>& damagedRect );
+
+  /**
+   * @brief Gets whether partial update is required for partial update
+   * @return whether partial update or not
+   */
+  bool IsPartialUpdateEnabled() const;
+
+  /**
+   * @brief Sets whether partial update is required for partial update
+   * @param[in] value whether partial update or not
+   */
+  void SetPartialUpdateEnabled( bool value );
+
 private:
 
   Integration::RenderSurface* mSurface;   ///< The render surface
@@ -144,7 +162,9 @@ private:
   uint32_t                    mHeight;
   Vector4                     mBackgroundColor;
   bool                        mSizeChanged;
+  bool                        mBackgroundColorChanged;
   std::atomic<bool>           mIsSurfaceInvalid; ///< This is set only from the event thread and read only from the render thread
+  bool                        mPartialUpdateEnabled; ///< This value is whether partial update is required
 };
 
 // Messages for FrameBuffer
@@ -168,6 +188,17 @@ inline void SetFrameBufferBackgroundColorMessage( SceneGraph::UpdateManager& upd
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( surfaceFrameBuffer, &SurfaceFrameBuffer::SetBackgroundColor, color );
+}
+
+inline void SetFrameBufferPartialUpdateMessage( SceneGraph::UpdateManager& updateManager, SurfaceFrameBuffer* surfaceFrameBuffer, bool value )
+{
+  typedef MessageValue1< SurfaceFrameBuffer, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = updateManager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( surfaceFrameBuffer, &SurfaceFrameBuffer::SetPartialUpdateEnabled, value );
 }
 
 } // namespace Render
