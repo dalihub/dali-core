@@ -43,8 +43,7 @@ Core* Core::New( RenderController& renderController,
                  ResourcePolicy::DataRetention policy,
                  RenderToFrameBuffer renderToFboEnabled,
                  DepthBufferAvailable depthBufferAvailable,
-                 StencilBufferAvailable stencilBufferAvailable,
-                 PartialUpdateAvailable partialUpdateAvailable )
+                 StencilBufferAvailable stencilBufferAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -55,8 +54,7 @@ Core* Core::New( RenderController& renderController,
                                         policy,
                                         renderToFboEnabled,
                                         depthBufferAvailable,
-                                        stencilBufferAvailable,
-                                        partialUpdateAvailable );
+                                        stencilBufferAvailable );
 
   return instance;
 }
