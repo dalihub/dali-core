@@ -459,7 +459,7 @@ ProgramCache* RenderManager::GetProgramCache()
   return &(mImpl->programController);
 }
 
-void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
+void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, bool uploadOnly )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -486,8 +486,11 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
   {
     DALI_LOG_INFO( gLogFilter, Debug::General, "Render: Processing\n" );
 
-    // Mark that we will require a post-render step to be performed (includes swap-buffers).
-    status.SetNeedsPostRender( true );
+    if ( !uploadOnly )
+    {
+      // Mark that we will require a post-render step to be performed (includes swap-buffers).
+      status.SetNeedsPostRender( true );
+    }
 
     // Switch to the shared context
     if ( mImpl->currentContext != &mImpl->context )
@@ -539,23 +542,26 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear )
       }
     }
 
-    for( uint32_t i = 0; i < count; ++i )
+    if ( !uploadOnly )
     {
-      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+      for( uint32_t i = 0; i < count; ++i )
+      {
+        RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
 
-      DoRender( instruction );
-    }
+        DoRender( instruction );
+      }
 
-    if ( mImpl->currentContext->IsSurfacelessContextSupported() )
-    {
-      mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-    }
+      if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+      {
+        mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+      }
 
-    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-    for ( auto&& context : mImpl->surfaceContextContainer )
-    {
-      context->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+      for ( auto&& context : mImpl->surfaceContextContainer )
+      {
+        context->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+      }
     }
 
     //Notify RenderGeometries that rendering has finished
