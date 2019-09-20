@@ -89,15 +89,7 @@ void TextureFrameBuffer::AttachColorTexture( Context& context, Render::Texture* 
   // Create a color attachment.
   if( texture->GetType() == TextureType::TEXTURE_2D )
   {
-    if( !texture->IsNativeImage() )
-    {
-      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureId, mipmapLevel );
-    }
-    else
-    {
-      // If it's a native image we need to use GL_TEXTURE_EXTERNAL_OES as the texture target parameter
-      context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_EXTERNAL_OES, mTextureId, mipmapLevel );
-    }
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->GetTarget(), mTextureId, mipmapLevel );
   }
   else
   {
