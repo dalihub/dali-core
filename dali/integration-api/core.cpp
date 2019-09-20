@@ -119,9 +119,9 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
   mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }
 
-void Core::Render( RenderStatus& status, bool forceClear )
+void Core::Render( RenderStatus& status, bool forceClear, bool uploadOnly )
 {
-  mImpl->Render( status, forceClear );
+  mImpl->Render( status, forceClear, uploadOnly );
 }
 
 void Core::RegisterProcessor( Processor& processor )
