@@ -88,8 +88,7 @@ public:
         ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,
-        Integration::StencilBufferAvailable stencilBufferAvailable,
-        Integration::PartialUpdateAvailable partialUpdateAvailable );
+        Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Destructor

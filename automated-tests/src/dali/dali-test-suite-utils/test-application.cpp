@@ -63,8 +63,7 @@ void TestApplication::CreateCore()
                                         mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
-                                        Integration::StencilBufferAvailable::TRUE,
-                                        Integration::PartialUpdateAvailable::FALSE );
+                                        Integration::StencilBufferAvailable::TRUE );
 
   mCore->ContextCreated();
 
