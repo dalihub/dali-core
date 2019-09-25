@@ -1130,8 +1130,11 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   Vector2 originalSurfaceSize( 500.0f, 1000.0f );
 
   TestRenderSurface surface( PositionSize( 0.0f, 0.0f, originalSurfaceSize.width, originalSurfaceSize.height ) );
-
+<<<<<<< HEAD
   auto scene = Integration::Scene::New( surface );
+=======
+  scene.SetSurface( surface, false );
+>>>>>>> e6df4fb... Support Client and Screen Rotation
 
   // Ensure stage size does NOT match the surface size
   auto stage = Stage::GetCurrent();
