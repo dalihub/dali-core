@@ -108,15 +108,24 @@ public:
    * Retrieve wheter the texture has an alpha channel
    * @return True if the texture has alpha channel, false otherwise
    */
-  bool HasAlphaChannel();
+  bool HasAlphaChannel() const;
 
   /**
    * Get the id of the texture
    * @return Id of the texture
    */
-  GLuint GetId()
+  GLuint GetId() const
   {
     return mId;
+  }
+
+  /**
+   * Get the target to which the texture is bound
+   * @return target to which the texture is bound
+   */
+  GLuint GetTarget() const
+  {
+    return mTarget;
   }
 
   /**

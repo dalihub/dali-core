@@ -912,7 +912,7 @@ void Texture::ApplySampler( Context& context, Render::Sampler* sampler )
   }
 }
 
-bool Texture::HasAlphaChannel()
+bool Texture::HasAlphaChannel() const
 {
   return mHasAlpha;
 }
