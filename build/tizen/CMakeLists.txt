@@ -32,7 +32,6 @@ ELSE()
   MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
 ENDIF()
 
-ADD_DEFINITIONS(-DPLATFORM_TIZEN -DDALI_COMPILATION)
 ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
 
 IF("${ARCH}" STREQUAL "arm")
@@ -61,7 +60,7 @@ SET( PREFIX ${CMAKE_INSTALL_PREFIX})
 SET( EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 # from root/build/tizen, get back to root
-SET(ROOT_SRC_DIR ${CMAKE_SOURCE_DIR}/../..)
+SET(ROOT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 # Make sure the path is absolute
 GET_FILENAME_COMPONENT(ROOT_SRC_DIR ${ROOT_SRC_DIR} ABSOLUTE)
@@ -88,7 +87,7 @@ ENDIF()
 # Requires the following variables to be setup:
 # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
 SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
-SET( CORE_PKG_CFG_FILE dali-core.pc )
+SET( CORE_PKG_CFG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/dali-core.pc )
 CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 
 # Set up compiler flags and warnings
@@ -160,7 +159,7 @@ SET_TARGET_PROPERTIES( ${name}
 INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 
 # Install the pkg-config file
-INSTALL( FILES ${CMAKE_BINARY_DIR}/${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
+INSTALL( FILES ${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
 
 # macro for installing headers by replacing prefix. (TODO, investigate
 # if there is a CMAKE way of doing this automatically)
@@ -179,6 +178,9 @@ INSTALL_HEADERS_WITH_DIRECTORY(DEVEL_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
 INSTALL_HEADERS_WITH_DIRECTORY(INTEGRATION_API_HEADERS ${ROOT_SRC_DIR}/dali "dali")
 INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dali/doc" )
 
+# The DALI_CORE_PREFIX must be set if this CMakeLists.txt is executed
+# from the top-level CMake script using ADD_SUBDIRECTORY() to avoid
+# target names duplication with other DALi modules.
 IF( UNIX )
   FIND_PROGRAM( LCOV_BIN "lcov" )
   IF( LCOV_BIN )
@@ -195,20 +197,20 @@ IF( UNIX )
       SET(LCOV_OPTS --rc lcov_branch_coverage=1)
     ENDIF()
 
-    ADD_CUSTOM_TARGET( rename_cov_data ./rename-cov-data )
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}rename_cov_data ./rename-cov-data )
 
-    ADD_CUSTOM_TARGET( cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
       COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"public-api/shader-effects/*\" \"*/image-actor*\" -o dali.info )
 
-    ADD_CUSTOM_TARGET( coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
       DEPENDS cov_data )
 
-    ADD_CUSTOM_TARGET( reset_coverage @${LCOV_BIN} -z --directory `pwd` )
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}reset_coverage @${LCOV_BIN} -z --directory `pwd` )
 
     # Define custom rule for distclean
-    ADD_CUSTOM_TARGET( distclean @echo cleaning for source distribution )
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}distclean @echo cleaning for source distribution )
     ADD_CUSTOM_COMMAND(
-          DEPENDS clean
+          DEPENDS ${DALI_CORE_PREFIX}clean
           COMMENT "distribution clean"
           COMMAND find
           ARGS    .
@@ -234,7 +236,7 @@ IF( UNIX )
           -name *~ -or
           -name libdali*.so* \)
           | grep -v TC | xargs rm -rf
-          TARGET  distclean
+          TARGET  ${DALI_CORE_PREFIX}distclean
           VERBATIM
           )
 
@@ -243,7 +245,7 @@ ENDIF( UNIX )
 
 # Linker Test
 SET( DALI_TEST_SUITE_DIR ${ROOT_SRC_DIR}/automated-tests/src/dali/dali-test-suite-utils )
-SET( LINKER_TEST_NAME linker-test )
+SET( LINKER_TEST_NAME ${DALI_CORE_PREFIX}linker-test )
 SET( LINKER_TEST_SOURCES
   linker-test.cpp
   ${DALI_TEST_SUITE_DIR}/test-application.cpp

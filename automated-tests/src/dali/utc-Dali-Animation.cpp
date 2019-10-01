@@ -13454,3 +13454,42 @@ int UtcDaliAnimationPausePropertyValue(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationPlayFromWithLoopCount(void)
+{
+  TestApplication application;
+
+  auto actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  auto animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), 100.0f );
+  animation.SetLoopCount( 2 );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1001 );
+
+  // One loop completed
+
+  application.Render( 2005 );
+  application.SendNotification();
+
+  // 2 loops should have completed
+  DALI_TEST_EQUALS( animation.GetCurrentLoop(), 2u, TEST_LOCATION );
+
+  // Another render needs to occur after all the loops end
+  application.SendNotification();
+  application.Render( 1000 );
+
+  // Stop the animation and use PlayFrom, previously we got an Assert here
+  animation.Stop();
+  animation.PlayFrom( 0.5f );
+
+  application.SendNotification();
+  application.Render( 1000 );
+
+  DALI_TEST_EQUALS( animation.GetState(), Animation::PLAYING, TEST_LOCATION );
+
+  END_TEST;
+}
