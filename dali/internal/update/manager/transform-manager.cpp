@@ -106,10 +106,6 @@ TransformId TransformManager::CreateTransform()
     mSizeBase.PushBack(Vector3(0.0f,0.0f,0.0f));
     mComponentDirty.PushBack(false);
     mLocalMatrixDirty.PushBack(false);
-    mComponentChanged.PushBack(false);
-    mPrevWorld.PushBack(Matrix::IDENTITY);
-    mUpdateSizeHint.PushBack(Vector3(0.0f,0.0f,0.0f));
-    mUpdateSizeHintBase.PushBack(Vector3(0.0f,0.0f,0.0f));
   }
   else
   {
@@ -127,10 +123,6 @@ TransformId TransformManager::CreateTransform()
     mSizeBase[mComponentCount] = Vector3(0.0f,0.0f,0.0f);
     mComponentDirty[mComponentCount] = false;
     mLocalMatrixDirty[mComponentCount] = false;
-    mComponentChanged[mComponentCount] = false;
-    mPrevWorld[mComponentCount].SetIdentity();
-    mUpdateSizeHint[mComponentCount] = Vector3(0.0f,0.0f,0.0f);
-    mUpdateSizeHintBase[mComponentCount] = Vector3(0.0f,0.0f,0.0f);
   }
 
   mComponentCount++;
@@ -154,10 +146,6 @@ void TransformManager::RemoveTransform(TransformId id)
   mComponentDirty[index] = mComponentDirty[mComponentCount];
   mLocalMatrixDirty[index] = mLocalMatrixDirty[mComponentCount];
   mBoundingSpheres[index] = mBoundingSpheres[mComponentCount];
-  mComponentChanged[index] = mComponentChanged[mComponentCount];
-  mPrevWorld[index] = mPrevWorld[mComponentCount];
-  mUpdateSizeHint[index] = mUpdateSizeHint[mComponentCount];
-  mUpdateSizeHintBase[index] = mUpdateSizeHintBase[mComponentCount];
 
   TransformId lastItemId = mComponentId[mComponentCount];
   mIds[ lastItemId ] = index;
@@ -227,6 +215,7 @@ void TransformManager::SetInheritOrientation( TransformId id, bool inherit )
   {
     mInheritanceMode[ index ] &= ~INHERIT_ORIENTATION;
   }
+
   mComponentDirty[index] = true;
 }
 
@@ -237,7 +226,6 @@ void TransformManager::ResetToBaseValue()
     memcpy( &mTxComponentAnimatable[0], &mTxComponentAnimatableBaseValue[0], sizeof(TransformComponentAnimatable)*mComponentCount );
     memcpy( &mSize[0], &mSizeBase[0], sizeof(Vector3)*mComponentCount );
     memset( &mLocalMatrixDirty[0], false, sizeof(bool)*mComponentCount );
-    memcpy( &mUpdateSizeHint[0], &mUpdateSizeHintBase[0], sizeof(Vector3)*mComponentCount );
   }
 }
 
@@ -258,8 +246,6 @@ void TransformManager::Update()
   const Vector3 topLeft( 0.0f, 0.0f, 0.5f );
   for( unsigned int i(0); i<mComponentCount; ++i )
   {
-    mPrevWorld[i] = mWorld[i];
-
     if( DALI_LIKELY( mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID ) )
     {
       const TransformId& parentIndex = mIds[mParent[i] ];
@@ -336,17 +322,7 @@ void TransformManager::Update()
     mBoundingSpheres[i] = mWorld[i].GetTranslation();
     mBoundingSpheres[i].w = Length( centerToEdgeWorldSpace );
 
-    mComponentChanged[i] = false;
-
-    // Due to parent transformation child transformation could be changed
-    if( mComponentDirty[i] ||
-        mPrevWorld[i] != mWorld[i] )
-    {
-      mComponentChanged[i] = true;
-    }
-
     mComponentDirty[i] = false;
-
   }
 }
 
@@ -364,10 +340,6 @@ void TransformManager::SwapComponents( unsigned int i, unsigned int j )
   std::swap( mComponentDirty[i], mComponentDirty[j] );
   std::swap( mBoundingSpheres[i], mBoundingSpheres[j] );
   std::swap( mWorld[i], mWorld[j] );
-  std::swap( mComponentChanged[i], mComponentChanged[j] );
-  std::swap( mPrevWorld[i], mPrevWorld[j] );
-  std::swap( mUpdateSizeHint[i], mUpdateSizeHint[j] );
-  std::swap( mUpdateSizeHintBase[i], mUpdateSizeHintBase[j] );
 
   mIds[ mComponentId[i] ] = i;
   mIds[ mComponentId[j] ] = j;
@@ -437,12 +409,6 @@ Vector3& TransformManager::GetVector3PropertyValue( TransformId id, TransformMan
       mComponentDirty[ index ] = true;
       return mSize[ index ];
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      TransformId index( mIds[id] );
-      mComponentDirty[ index ] = true;
-      return mUpdateSizeHint[ index ];
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -475,10 +441,6 @@ const Vector3& TransformManager::GetVector3PropertyValue( TransformId id, Transf
     {
       return mSize[ mIds[id] ];
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      return mUpdateSizeHint[ mIds[id] ];
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -510,10 +472,6 @@ const float& TransformManager::GetVector3PropertyComponentValue(TransformId id, 
     case TRANSFORM_PROPERTY_SIZE:
     {
       return mSize[ mIds[id] ][component];
-    }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      return mUpdateSizeHint[ mIds[id] ][component];
     }
     default:
     {
@@ -555,11 +513,6 @@ void TransformManager::SetVector3PropertyValue( TransformId id, TransformManager
       mSize[ index ] = value;
       break;
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ] = value;
-      break;
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -597,11 +550,6 @@ void TransformManager::SetVector3PropertyComponentValue( TransformId id, Transfo
     case TRANSFORM_PROPERTY_SIZE:
     {
       mSize[ index ][component] = value;
-      break;
-    }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ][component] = value;
       break;
     }
     default:
@@ -643,11 +591,6 @@ void TransformManager::BakeVector3PropertyValue( TransformId id, TransformManage
       mSize[ index ] = mSizeBase[index] = value;
       break;
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ] = mUpdateSizeHintBase[index] = value;
-      break;
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -685,11 +628,6 @@ void TransformManager::BakeRelativeVector3PropertyValue( TransformId id, Transfo
     case TRANSFORM_PROPERTY_SIZE:
     {
       mSize[ index ] = mSizeBase[index] = mSize[ index ] + value;
-      break;
-    }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ] = mUpdateSizeHintBase[index] = mUpdateSizeHint[ index ] + value;
       break;
     }
     default:
@@ -731,11 +669,6 @@ void TransformManager::BakeMultiplyVector3PropertyValue( TransformId id, Transfo
       mSize[ index ] = mSizeBase[index] = mSize[ index ] * value;
       break;
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ] = mUpdateSizeHintBase[index] = mUpdateSizeHint[ index ] * value;
-      break;
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -773,11 +706,6 @@ void TransformManager::BakeVector3PropertyComponentValue( TransformId id, Transf
     case TRANSFORM_PROPERTY_SIZE:
     {
       mSize[ index ][component] = mSizeBase[index][component] = value;
-      break;
-    }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ][component] = mUpdateSizeHintBase[index][component] = value;
       break;
     }
     default:
@@ -819,11 +747,6 @@ void TransformManager::BakeXVector3PropertyValue( TransformId id, TransformManag
       mSize[ index ].x = mSizeBase[index].x = value;
       break;
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ].x = mUpdateSizeHintBase[index].x = value;
-      break;
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -863,11 +786,6 @@ void TransformManager::BakeYVector3PropertyValue( TransformId id, TransformManag
       mSize[ index ].y = mSizeBase[index].y = value;
       break;
     }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ].y = mUpdateSizeHintBase[index].y = value;
-      break;
-    }
     default:
     {
       DALI_ASSERT_ALWAYS(false);
@@ -905,11 +823,6 @@ void TransformManager::BakeZVector3PropertyValue( TransformId id, TransformManag
     case TRANSFORM_PROPERTY_SIZE:
     {
       mSize[ index ].z = mSizeBase[index].z = value;
-      break;
-    }
-    case TRANSFORM_PROPERTY_UPDATE_SIZE_HINT:
-    {
-      mUpdateSizeHint[ index ].z = mUpdateSizeHintBase[index].z = value;
       break;
     }
     default:
@@ -957,21 +870,11 @@ const Vector4& TransformManager::GetBoundingSphere( TransformId id ) const
   return mBoundingSpheres[ mIds[id] ];
 }
 
-bool TransformManager::IsComponentChanged( TransformId id )
-{
-  return mComponentChanged[ mIds[id]];
-}
-
 void TransformManager::GetWorldMatrixAndSize( TransformId id, Matrix& worldMatrix, Vector3& size ) const
 {
   TransformId index = mIds[id];
   worldMatrix = mWorld[index];
   size = mSize[index];
-}
-
-const Vector3& TransformManager::GetUpdateSizeHint( TransformId id ) const
-{
-  return mUpdateSizeHint[ mIds[id] ];
 }
 
 void TransformManager::SetPositionUsesAnchorPoint( TransformId id, bool value )
