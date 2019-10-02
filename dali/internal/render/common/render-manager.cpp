@@ -577,7 +577,8 @@ void RenderManager::DoRender( RenderInstruction& instruction )
       mImpl->context,
       mImpl->renderBufferIndex,
       mImpl->depthBufferAvailable,
-      mImpl->stencilBufferAvailable );
+      mImpl->stencilBufferAvailable,
+      mImpl->defaultSurfaceOrientation );
 
   if( instruction.mRenderTracker && ( instruction.mFrameBuffer != NULL ) )
   {

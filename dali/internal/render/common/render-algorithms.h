@@ -63,7 +63,8 @@ class RenderAlgorithms
                                    Context& context,
                                    BufferIndex bufferIndex,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable );
+                                   Integration::StencilBufferAvailable stencilBufferAvailable,
+                                   int orientation);
 
   private:
 
@@ -86,7 +87,7 @@ class RenderAlgorithms
      * @param[in] item     The current RenderItem (about to be rendered)
      * @param[in] context  The current Context
      */
-    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context );
+    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context, int orientation );
 
     /**
      * @brief Set up the clipping based on the specified clipping settings.
@@ -102,7 +103,8 @@ class RenderAlgorithms
                                bool& usedStencilBuffer,
                                uint32_t& lastClippingDepth,
                                uint32_t& lastClippingId,
-                               Integration::StencilBufferAvailable stencilBufferAvailable );
+                               Integration::StencilBufferAvailable stencilBufferAvailable,
+                               int orientation );
 
     /**
      * @brief Process a render-list.
@@ -120,7 +122,8 @@ class RenderAlgorithms
                                    const Matrix& viewMatrix,
                                    const Matrix& projectionMatrix,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable );
+                                   Integration::StencilBufferAvailable stencilBufferAvailable,
+                                   int orientation );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );
