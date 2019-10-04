@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -60,6 +61,11 @@ public:
 protected:
 
   // Construction & Destruction
+
+  /**
+   * Protected constructor.  Cannot create an instance of GestureProcessor
+   */
+  GestureProcessor( DevelGesture::Type type );
 
   /**
    * Protected constructor.  Cannot create an instance of GestureProcessor
@@ -190,7 +196,7 @@ protected:  //Data
 
 private: // Data
 
-  Gesture::Type mType;                 ///< Type of GestureProcessor
+  DevelGesture::Type mType;            ///< Type of GestureProcessor
   Actor* mCurrentGesturedActor;        ///< The current actor that has been gestured.
   bool   mGesturedActorDisconnected:1; ///< Indicates whether the gestured actor has been disconnected from the scene
 };

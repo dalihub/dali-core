@@ -103,6 +103,26 @@ void TestGenerateTap( TestApplication& application, float x = 20.0f, float y = 2
  */
 void TestGenerateTwoPointTap( TestApplication& application, float x1, float y1, float x2, float y2, uint32_t time_down );
 
+/**
+ * Produces a rotation gesture.
+ */
+void TestGenerateRotation( TestApplication& application );
+
+/**
+ * Produces the gesture started event of a rotation, using 4 touches, 50ms apart, starting with 1, ending at 2
+ */
+void TestStartRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time );
+
+/**
+ * Produces a gesture continuing event of a rotation, using 4 touches, 50ms apart, starting with 1, ending at 2
+ */
+void TestContinueRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time );
+
+/**
+ * Produces a gesture finished event of a rotation, using 2 touches, 50ms apart
+ */
+void TestEndRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time );
+
 } // namespace Dali
 
 #endif // DALI_TEST_GESTURE_GENERATOR_H

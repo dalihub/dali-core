@@ -23,6 +23,7 @@
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/devel-api/events/rotation-gesture-detector.h>
 
 using namespace Dali;
 
@@ -2165,6 +2166,43 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
 
   // Emit gesture
   TestGeneratePinch( application );
+
+  DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRotationGestureDetectorTypeRegistry(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "RotationGestureDetector" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  RotationGestureDetector detector = RotationGestureDetector::DownCast( handle );
+  DALI_TEST_CHECK( detector );
+
+  // Attach actor to detector
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.Attach(actor);
+
+  // Connect to signal through type
+  handle.ConnectSignal( &application, "rotationDetected",  functor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit gesture
+  TestGenerateRotation( application );
 
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;

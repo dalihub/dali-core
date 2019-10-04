@@ -71,6 +71,9 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-event.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-processor.cpp
   ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-recognizer.cpp
+  ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-detector-impl.cpp
+  ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-processor.cpp
+  ${internal_src_dir}/event/events/rotation-gesture/rotation-gesture-recognizer.cpp
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-event.cpp
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-processor.cpp

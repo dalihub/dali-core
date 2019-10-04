@@ -98,7 +98,7 @@ public:
    * Retrieves the type of GestureDetector
    * @return The GestureDetector Type
    */
-  Gesture::Type GetType() const
+  DevelGesture::Type GetType() const
   {
     return mType;
   }
@@ -118,7 +118,12 @@ protected: // Creation & Destruction
    * @param pointer to the scene object, nullptr if none
    * by default GestureDetectors don't have our own scene object
    */
-  GestureDetector(Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject  = nullptr );
+  GestureDetector( DevelGesture::Type type, const SceneGraph::PropertyOwner* sceneObject  = nullptr );
+
+  /**
+   * @copydoc GestureDetector( DevelGesture::Type, const SceneGraph::PropertyOwner* )
+   */
+  GestureDetector( Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject  = nullptr );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -169,7 +174,7 @@ private:
 
 protected:
 
-  Gesture::Type                 mType;                  ///< The gesture detector will detect this type of gesture.
+  DevelGesture::Type            mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
   GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
