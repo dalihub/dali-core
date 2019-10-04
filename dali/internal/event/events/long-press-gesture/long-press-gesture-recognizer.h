@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
-#include <dali/internal/event/events/long-press-gesture-event.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 
 namespace Dali
 {

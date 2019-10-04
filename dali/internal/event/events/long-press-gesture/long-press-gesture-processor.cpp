@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/long-press-gesture-processor.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -25,12 +25,12 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/long-press-gesture.h>
-#include <dali/internal/event/events/long-press-gesture-event.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/long-press-gesture-recognizer.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali

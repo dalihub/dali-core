@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
-#include <dali/internal/event/events/pinch-gesture-event.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 
 namespace Dali
 {

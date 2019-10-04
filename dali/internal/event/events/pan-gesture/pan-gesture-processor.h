@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/pan-gesture-detector-impl.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 

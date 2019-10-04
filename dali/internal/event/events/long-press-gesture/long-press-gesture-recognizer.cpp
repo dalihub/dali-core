@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/long-press-gesture-recognizer.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>

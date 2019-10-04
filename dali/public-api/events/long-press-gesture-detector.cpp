@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali/public-api/events/long-press-gesture-detector.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/long-press-gesture-detector-impl.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-detector-impl.h>
 
 namespace Dali
 {
