@@ -21,10 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
-#include <dali/internal/event/events/long-press-gesture-processor.h>
-#include <dali/internal/event/events/pan-gesture-processor.h>
-#include <dali/internal/event/events/pinch-gesture-processor.h>
-#include <dali/internal/event/events/tap-gesture-processor.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-processor.h>
 
 namespace Dali
 {

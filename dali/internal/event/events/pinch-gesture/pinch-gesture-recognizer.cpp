@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/pinch-gesture-recognizer.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>
@@ -24,7 +24,7 @@
 #include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
 
-#include <dali/internal/event/events/pinch-gesture-event.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/common/scene-impl.h>
 

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/pan-gesture-processor.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
 
 #if defined(DEBUG_ENABLED)
 #include <sstream>
@@ -30,13 +30,13 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/internal/event/events/pan-gesture-event.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
-#include <dali/internal/event/events/pan-gesture-recognizer.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali

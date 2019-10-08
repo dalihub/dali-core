@@ -16,10 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/pinch-gesture-event.h>
-
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 
 namespace Dali
 {
@@ -27,15 +24,13 @@ namespace Dali
 namespace Internal
 {
 
-PinchGestureEvent::PinchGestureEvent(Gesture::State state)
-: GestureEvent(Gesture::Pinch, state),
-  scale(0.0f),
-  speed(0.0f),
-  centerPoint()
+LongPressGestureEvent::LongPressGestureEvent( Gesture::State state )
+: GestureEvent( Gesture::LongPress, state ),
+  numberOfTouches(1)
 {
 }
 
-PinchGestureEvent::~PinchGestureEvent()
+LongPressGestureEvent::~LongPressGestureEvent()
 {
 }
 
