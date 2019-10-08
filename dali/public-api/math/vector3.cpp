@@ -97,16 +97,6 @@ Vector3& Vector3::operator*=(const Quaternion& rhs)
   return *this;
 }
 
-// Temporary fix, Will be removed later, Fix Emul crash issue
-#ifndef _ARCH_ARM_
-#undef fabsf
-float fabsf(float value)
-{
-  if (value < 0) return -value;
-  return value;
-}
-#endif
-
 bool Vector3::operator==(const Vector3& rhs) const
 {
   if (fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x) )
