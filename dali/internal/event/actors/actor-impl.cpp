@@ -214,7 +214,6 @@ DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali:
 DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
 DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
 DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true, Dali::DevelActor::Property::CULLED )
-DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, true, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -2719,12 +2718,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
-    {
-      SetUpdateSizeHint( property.Get< Vector2 >() );
-      break;
-    }
-
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -3983,12 +3976,6 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
       break;
     }
 
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
-    {
-      value = GetUpdateSizeHint();
-      break;
-    }
-
     default:
     {
       // Must be an event-side only property
@@ -4736,19 +4723,6 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
   }
 
   return FLT_MAX;  // Default
-}
-
-void Actor::SetUpdateSizeHint( const Vector2& updateSizeHint )
-{
-  // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodeTransformPropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &SceneGraph::TransformManagerPropertyHandler<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f ) );
-}
-
-Vector2 Actor::GetUpdateSizeHint() const
-{
-  // node is being used in a separate thread; copy the value from the previous update
-  Vector3 updateSizeHint = GetNode().GetUpdateSizeHint( GetEventThreadServices().GetEventBufferIndex() );
-  return Vector2( updateSizeHint.width, updateSizeHint.height );
 }
 
 Object* Actor::GetParentObject() const

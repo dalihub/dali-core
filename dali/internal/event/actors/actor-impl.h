@@ -1228,18 +1228,6 @@ public:
   float GetMaximumSize( Dimension::Type dimension ) const;
 
   /**
-   * @brief Sets the update size hint of an actor for partial update.
-   * @param [in] updateSizeHint The new updateSizeHint.
-   */
-  void SetUpdateSizeHint( const Vector2& updateSizeHint );
-
-  /**
-   * @brief Return the update size hint of actor
-   * @return Return the update size hint
-   */
-  Vector2 GetUpdateSizeHint() const;
-
-  /**
    * @copydoc Dali::Actor::AddRenderer()
    */
   uint32_t AddRenderer( Renderer& renderer );
