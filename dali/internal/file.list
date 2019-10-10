@@ -55,26 +55,26 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/gesture-processor.cpp
   ${internal_src_dir}/event/events/hit-test-algorithm-impl.cpp
   ${internal_src_dir}/event/events/hover-event-processor.cpp
-  ${internal_src_dir}/event/events/long-press-gesture-detector-impl.cpp
-  ${internal_src_dir}/event/events/long-press-gesture-event.cpp
-  ${internal_src_dir}/event/events/long-press-gesture-processor.cpp
-  ${internal_src_dir}/event/events/long-press-gesture-recognizer.cpp
   ${internal_src_dir}/event/events/wheel-event-processor.cpp
   ${internal_src_dir}/event/events/multi-point-event-util.cpp
-  ${internal_src_dir}/event/events/pan-gesture-detector-impl.cpp
-  ${internal_src_dir}/event/events/pan-gesture-event.cpp
-  ${internal_src_dir}/event/events/pan-gesture-processor.cpp
-  ${internal_src_dir}/event/events/pan-gesture-recognizer.cpp
-  ${internal_src_dir}/event/events/pinch-gesture-detector-impl.cpp
-  ${internal_src_dir}/event/events/pinch-gesture-event.cpp
-  ${internal_src_dir}/event/events/pinch-gesture-processor.cpp
-  ${internal_src_dir}/event/events/pinch-gesture-recognizer.cpp
-  ${internal_src_dir}/event/events/tap-gesture-detector-impl.cpp
-  ${internal_src_dir}/event/events/tap-gesture-event.cpp
-  ${internal_src_dir}/event/events/tap-gesture-processor.cpp
-  ${internal_src_dir}/event/events/tap-gesture-recognizer.cpp
   ${internal_src_dir}/event/events/touch-data-impl.cpp
   ${internal_src_dir}/event/events/touch-event-processor.cpp
+  ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-detector-impl.cpp
+  ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-event.cpp
+  ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-processor.cpp
+  ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-recognizer.cpp
+  ${internal_src_dir}/event/events/pan-gesture/pan-gesture-detector-impl.cpp
+  ${internal_src_dir}/event/events/pan-gesture/pan-gesture-event.cpp
+  ${internal_src_dir}/event/events/pan-gesture/pan-gesture-processor.cpp
+  ${internal_src_dir}/event/events/pan-gesture/pan-gesture-recognizer.cpp
+  ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-detector-impl.cpp
+  ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-event.cpp
+  ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-processor.cpp
+  ${internal_src_dir}/event/events/pinch-gesture/pinch-gesture-recognizer.cpp
+  ${internal_src_dir}/event/events/tap-gesture/tap-gesture-detector-impl.cpp
+  ${internal_src_dir}/event/events/tap-gesture/tap-gesture-event.cpp
+  ${internal_src_dir}/event/events/tap-gesture/tap-gesture-processor.cpp
+  ${internal_src_dir}/event/events/tap-gesture/tap-gesture-recognizer.cpp
   ${internal_src_dir}/event/images/bitmap-packed-pixel.cpp
   ${internal_src_dir}/event/images/bitmap-compressed.cpp
   ${internal_src_dir}/event/images/image-impl.cpp

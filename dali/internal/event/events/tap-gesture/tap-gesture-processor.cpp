@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/tap-gesture-processor.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-processor.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -30,9 +30,9 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/events/tap-gesture-recognizer.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
-#include <dali/internal/event/events/tap-gesture-event.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
 namespace Dali
 {

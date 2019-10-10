@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/tap-gesture-detector-impl.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
-#include "actor-observer.h"
+#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/pinch-gesture-processor.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -25,11 +25,11 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/internal/event/events/pinch-gesture-event.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/pinch-gesture-recognizer.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/tap-gesture-recognizer.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>

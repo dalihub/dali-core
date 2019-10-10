@@ -24,7 +24,6 @@
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/integration-api/profiling.h>
 #include <dali/integration-api/input-options.h>
-#include <dali/internal/event/events/pan-gesture-event.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
 

@@ -23,7 +23,6 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
-#include <dali/internal/event/events/long-press-gesture-event.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
 

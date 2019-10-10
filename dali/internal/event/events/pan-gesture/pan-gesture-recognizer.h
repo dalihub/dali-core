@@ -25,7 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
-#include <dali/internal/event/events/pan-gesture-event.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 
 namespace Dali
 {

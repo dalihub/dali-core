@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/pan-gesture-recognizer.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-recognizer.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>
@@ -27,7 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/events/pan-gesture-event.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 #include <dali/internal/event/events/gesture-requests.h>
 namespace Dali
 {

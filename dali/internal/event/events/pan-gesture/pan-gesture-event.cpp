@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/tap-gesture-event.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 
 namespace Dali
 {
@@ -24,14 +24,15 @@ namespace Dali
 namespace Internal
 {
 
-TapGestureEvent::TapGestureEvent( Gesture::State state )
-: GestureEvent(Gesture::Tap, state),
-  numberOfTaps(1),
+
+PanGestureEvent::PanGestureEvent(Gesture::State state)
+: GestureEvent(Gesture::Pan, state),
+  timeDelta(0),
   numberOfTouches(1)
 {
 }
 
-TapGestureEvent::~TapGestureEvent()
+PanGestureEvent::~PanGestureEvent()
 {
 }
 
