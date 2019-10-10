@@ -48,9 +48,10 @@ public:
   /**
    * Constructor
    * @param[in] screenSize The size of the screen.
+   * @param[in] screenDpi The dpi value of the screen
    * @param[in] minimumPinchDistance in pixels
    */
-  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, float minimumPinchDistance);
+  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance);
 
   /**
    * Virtual destructor.
@@ -97,6 +98,8 @@ private:
 
   State mState; ///< The current state of the detector.
   std::vector<Integration::TouchEvent> mTouchEvents; ///< The touch events since initial touch down.
+
+  float mDefaultMinimumDistanceDelta; ///< The default value of the mMinimumDistanceDelta.
 
   float mMinimumDistanceDelta; ///< The minimum distance before a pinch is applicable.
 
