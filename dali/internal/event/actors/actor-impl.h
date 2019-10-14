@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -1388,8 +1389,9 @@ public:
   /**
    * Queries whether the actor requires the gesture type.
    * @param[in] type The gesture type.
+   * @return True if the gesture is required, false otherwise.
    */
-  bool IsGestureRequred( Gesture::Type type ) const;
+  bool IsGestureRequred( DevelGesture::Type type ) const;
 
   // Signals
 

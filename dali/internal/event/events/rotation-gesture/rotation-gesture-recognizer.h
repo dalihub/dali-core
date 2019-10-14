@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_EVENT_PINCH_GESTURE_RECOGNIZER_H
-#define DALI_INTERNAL_EVENT_PINCH_GESTURE_RECOGNIZER_H
+#ifndef DALI_INTERNAL_EVENT_ROTATION_GESTURE_RECOGNIZER_H
+#define DALI_INTERNAL_EVENT_ROTATION_GESTURE_RECOGNIZER_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-recognizer.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 
 namespace Dali
 {
@@ -37,49 +37,45 @@ namespace Internal
 {
 
 /**
- * When given a set of touch events, this detector attempts to determine if a pinch gesture has taken place.
+ * When given a set of touch events, this detector attempts to determine if a rotation gesture has taken place.
  */
-class PinchGestureRecognizer : public GestureRecognizer
+class RotationGestureRecognizer : public GestureRecognizer
 {
 public:
 
-  using Observer = RecognizerObserver<PinchGestureEvent>;
+  using Observer = RecognizerObserver< RotationGestureEvent >;
 
   /**
    * Constructor
-   * @param[in] screenSize The size of the screen.
-   * @param[in] screenDpi The dpi value of the screen
-   * @param[in] minimumPinchDistance in pixels
+   * @param[in] observer   The observer to send gesture too when it's detected
    */
-  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance);
+  RotationGestureRecognizer( Observer& observer );
 
   /**
    * Virtual destructor.
    */
-  virtual ~PinchGestureRecognizer();
+  virtual ~RotationGestureRecognizer() = default;
 
 public:
-
-  void SetMinimumPinchDistance(float value);
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
-  virtual void SendEvent(const Integration::TouchEvent& event);
+  virtual void SendEvent( const Integration::TouchEvent& event );
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  virtual void Update(const GestureRequest& request);
+  virtual void Update( const GestureRequest& request ) { /* Nothing to do */ }
 
 private:
 
   /**
-   * Emits the pinch gesture event to the core.
-   * @param[in]  state         The state of the pinch (whether it's starting, continuing or finished).
+   * Emits the rotation gesture event to the core.
+   * @param[in]  state         The state of the rotation (whether it's starting, continuing or finished).
    * @param[in]  currentEvent  The latest touch event.
    */
-  void SendPinch(Gesture::State state, const Integration::TouchEvent& currentEvent);
+  void SendRotation( Gesture::State state, const Integration::TouchEvent& currentEvent );
 
 private:
 
@@ -97,17 +93,13 @@ private:
   };
 
   State mState; ///< The current state of the detector.
-  std::vector<Integration::TouchEvent> mTouchEvents; ///< The touch events since initial touch down.
+  std::vector< Integration::TouchEvent > mTouchEvents; ///< The touch events since initial touch down.
 
-  float mDefaultMinimumDistanceDelta; ///< The default value of the mMinimumDistanceDelta.
-
-  float mMinimumDistanceDelta; ///< The minimum distance before a pinch is applicable.
-
-  float mStartingDistance; ///< The distance between the two touch points when the pinch is first detected.
+  float mStartingAngle; ///< The angle between the two touch points when the rotation is first detected.
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_EVENT_PINCH_GESTURE_RECOGNIZER_H
+#endif // DALI_INTERNAL_EVENT_ROTATION_GESTURE_RECOGNIZER_H

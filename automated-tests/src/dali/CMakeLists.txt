@@ -79,6 +79,8 @@ SET(TC_SOURCES
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
+        utc-Dali-RotationGesture.cpp
+        utc-Dali-RotationGestureDetector.cpp
         utc-Dali-Sampler.cpp
         utc-Dali-Scene.cpp
         utc-Dali-Scripting.cpp
