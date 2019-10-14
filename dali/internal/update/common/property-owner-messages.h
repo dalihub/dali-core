@@ -108,7 +108,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mSceneObject->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -188,7 +187,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mSceneObject->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
