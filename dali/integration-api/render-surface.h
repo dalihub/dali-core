@@ -48,6 +48,12 @@ class GraphicsInterface;
  */
 typedef Dali::Rect<int> PositionSize;
 
+/**
+ * @brief The Rect of partial updated area
+ */
+typedef Dali::Rect<int32_t> DamagedRect;
+
+
 namespace Integration
 {
 
@@ -188,6 +194,18 @@ public:
    * @return TRUE if the stencil buffer is required
    */
   virtual Integration::StencilBufferAvailable GetStencilBufferRequired() = 0;
+
+  /**
+   * @brief Sets currentframe updated/damaged rects
+   * @return The Rect of partial updated area
+   */
+  virtual void SetDamagedRect( const DamagedRect& damagedRect, DamagedRect& mergedRect ) = 0;
+
+  /**
+   * @brief Gets buffer age
+   * @return current buffer age
+   */
+  virtual int32_t GetBufferAge() = 0;
 
 private:
 

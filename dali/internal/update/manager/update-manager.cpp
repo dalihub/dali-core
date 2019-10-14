@@ -426,6 +426,8 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
 
   parent->ConnectChild( node );
 
+  parent->SetPropertyDirty( true );
+
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if( mImpl->frameCallbackProcessor )
   {
