@@ -56,15 +56,6 @@ enum class StencilBufferAvailable
   TRUE
 };
 
-/**
- * @brief Enumerations to specify whether the partial update is available.
- */
-enum class PartialUpdateAvailable
-{
-  FALSE = 0,
-  TRUE
-};
-
 } // namespace Integration
 
 } // namespace Dali
