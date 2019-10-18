@@ -41,8 +41,13 @@ namespace
  */
 struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
 {
-  GestureHitTestCheck( Gesture::Type type )
+  GestureHitTestCheck( DevelGesture::Type type )
   : mType( type )
+  {
+  }
+
+  GestureHitTestCheck( Gesture::Type type )
+  : GestureHitTestCheck( static_cast< DevelGesture::Type >( type ) )
   {
   }
 
@@ -63,13 +68,13 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  Gesture::Type mType;
+  DevelGesture::Type mType;
 };
 
 } // unnamed namespace
 
 
-GestureProcessor::GestureProcessor( Gesture::Type type )
+GestureProcessor::GestureProcessor( DevelGesture::Type type )
 : mGestureRecognizer(),
   mNeedsUpdate( false ),
   mType( type ),
@@ -77,6 +82,12 @@ GestureProcessor::GestureProcessor( Gesture::Type type )
   mGesturedActorDisconnected( false )
 {
 }
+
+GestureProcessor::GestureProcessor( Gesture::Type type )
+: GestureProcessor( static_cast< DevelGesture::Type >( type ) )
+{
+}
+
 
 GestureProcessor::~GestureProcessor()
 {

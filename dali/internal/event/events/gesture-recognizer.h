@@ -23,6 +23,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-event.h>
 
 namespace Dali
@@ -56,6 +57,7 @@ public:
 class GestureRecognizer : public RefObject
 {
 public:
+
   /**
    * Called when it gets a touch event.  The gesture recognizer should
    * evaluate this event along with previously received events to determine
@@ -74,25 +76,49 @@ public:
    * Returns the type of gesture detector.
    * @return Type of gesture detector.
    */
-  Gesture::Type GetType() const { return mType; }
+  DevelGesture::Type GetType() const { return mType; }
 
-  void SendEvent(Scene& scene, const Integration::TouchEvent& event)
+  /**
+   * Called when we get a touch event.
+   * @param[in]  scene  The scene the touch event has occurred on
+   * @param[in]  event  The latest touch event
+   */
+  void SendEvent( Scene& scene, const Integration::TouchEvent& event )
   {
     mScene = &scene;
-    SendEvent(event);
+    SendEvent( event );
   }
 
 protected:
 
   /**
-   * Protected Constructor.  Should only be able to create derived class objects.
+   * Protected Constructor. Should only be able to create derived class objects.
    * @param[in]  screenSize    The size of the screen.
    * @param[in]  detectorType  The type of gesture detector.
    */
+  GestureRecognizer( Vector2 screenSize, DevelGesture::Type detectorType )
+  : mScreenSize( screenSize ),
+    mType( detectorType ),
+    mScene( nullptr )
+  {
+  }
+
+  /**
+   * copydoc GestureRecognizer( Vector2, DevelGesture::Type )
+   */
   GestureRecognizer( Vector2 screenSize, Gesture::Type detectorType )
-  : mScreenSize(screenSize),
-    mType(detectorType),
-    mScene(nullptr)
+  : GestureRecognizer( screenSize, static_cast< DevelGesture::Type >( detectorType ) )
+  {
+  }
+
+  /**
+   * Protected Constructor. Should only be able to create derived class objects.
+   *
+   * Use this constructor with the screen size is not used in the dereived class.
+   * @param[in]  detectorType  The type of gesture detector.
+   */
+  GestureRecognizer( DevelGesture::Type detectorType )
+  : GestureRecognizer( Vector2::ZERO, detectorType )
   {
   }
 
@@ -103,7 +129,7 @@ protected:
 
 protected:
   Vector2 mScreenSize;
-  Gesture::Type mType;
+  DevelGesture::Type mType;
   Scene* mScene;
 };
 

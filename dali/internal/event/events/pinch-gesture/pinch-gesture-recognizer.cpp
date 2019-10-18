@@ -42,7 +42,8 @@ namespace
 const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED = 4;
 const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4;
 
-const float MINIMUM_DISTANCE_DELTA_DIVISOR = 85.0f;
+const float MINIMUM_DISTANCE_IN_MILLIINCH = 45.0f; // This value is used for measuring minimum pinch distance in pixel.
+const float MINIMUM_DISTANCE_IN_PIXEL = 10.0f; // This value is for devices that do not provide a valid dpi value. (assumes 220dpi)
 
 inline float GetDistance(const Integration::Point& point1, const Integration::Point& point2)
 {
@@ -55,13 +56,24 @@ inline Vector2 GetCenterPoint(const Integration::Point& point1, const Integratio
   return Vector2(point1.GetScreenPosition() + point2.GetScreenPosition()) * 0.5f;
 }
 
+inline bool IsValidDpi( const Vector2& dpi )
+{
+  return dpi.x > 0.f && dpi.y > 0.f;
+}
+
+inline float GetDefaultMinimumPinchDistance( const Vector2& dpi )
+{
+  return IsValidDpi( dpi ) ? ( ( MINIMUM_DISTANCE_IN_MILLIINCH * std::min( dpi.x, dpi.y ) ) / 1000.f ) : MINIMUM_DISTANCE_IN_PIXEL;
+}
+
 } // unnamed namespace
 
-PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, float minimumPinchDistance )
+PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance )
 : GestureRecognizer( screenSize, Gesture::Pinch ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),
+  mDefaultMinimumDistanceDelta( GetDefaultMinimumPinchDistance( screenDpi ) ),
   mStartingDistance( 0.0f )
 {
   SetMinimumPinchDistance( minimumPinchDistance );
@@ -73,7 +85,7 @@ PinchGestureRecognizer::~PinchGestureRecognizer()
 
 void PinchGestureRecognizer::SetMinimumPinchDistance(float value)
 {
-  mMinimumDistanceDelta = value >= 0.0f ? value : (mScreenSize.height / MINIMUM_DISTANCE_DELTA_DIVISOR);
+  mMinimumDistanceDelta = value >= 0.0f ? value : mDefaultMinimumDistanceDelta;
 }
 
 void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)

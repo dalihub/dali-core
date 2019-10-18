@@ -11,6 +11,8 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/common/hash.cpp
   ${devel_api_src_dir}/common/stage-devel.cpp
   ${devel_api_src_dir}/events/hit-test-algorithm.cpp
+  ${devel_api_src_dir}/events/rotation-gesture.cpp
+  ${devel_api_src_dir}/events/rotation-gesture-detector.cpp
   ${devel_api_src_dir}/events/touch-data-devel.cpp
   ${devel_api_src_dir}/events/key-event-devel.cpp
   ${devel_api_src_dir}/images/distance-field.cpp
@@ -57,7 +59,10 @@ SET( devel_api_core_common_header_files
 
 
 SET( devel_api_core_events_header_files
+  ${devel_api_src_dir}/events/gesture-devel.h
   ${devel_api_src_dir}/events/hit-test-algorithm.h
+  ${devel_api_src_dir}/events/rotation-gesture.h
+  ${devel_api_src_dir}/events/rotation-gesture-detector.h
   ${devel_api_src_dir}/events/touch-data-devel.h
   ${devel_api_src_dir}/events/key-event-devel.h
 )

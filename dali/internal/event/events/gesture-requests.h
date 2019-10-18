@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture.h>
+#include <dali/devel-api/events/gesture-devel.h>
 
 namespace Dali
 {
@@ -38,20 +39,27 @@ struct GestureRequest
    * Default Constructor
    * @param[in]  typeRequired  The gesture type required
    */
-  GestureRequest(Gesture::Type typeRequired) : type(typeRequired)
+  GestureRequest( DevelGesture::Type typeRequired )
+  : type( typeRequired )
+  {
+  }
+
+  /**
+   * @copydoc GestureRequest( DevelGesture::Type )
+   */
+  GestureRequest( Gesture::Type typeRequired )
+  : GestureRequest( static_cast< DevelGesture::Type >( typeRequired ) )
   {
   }
 
   /**
    * Virtual destructor
    */
-  virtual ~GestureRequest()
-  {
-  }
+  virtual ~GestureRequest() = default;
 
   // Data Members
 
-  Gesture::Type type; ///< The type of gesture required.
+  DevelGesture::Type type; ///< The type of gesture required.
 };
 
 /**
@@ -82,29 +90,6 @@ struct PanGestureRequest : public GestureRequest
 
   unsigned int minTouches; ///< The minimum number of touch points required for a pan gesture.
   unsigned int maxTouches; ///< The maximum number of touch points required for a pan gesture.
-};
-
-/**
- * This is used by Core when a pinch gesture is required.
- */
-struct PinchGestureRequest : public GestureRequest
-{
-  // Creation & Destruction
-
-  /**
-   * Default Constructor
-   */
-  PinchGestureRequest()
-  : GestureRequest(Gesture::Pinch)
-  {
-  }
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~PinchGestureRequest()
-  {
-  }
 };
 
 /**

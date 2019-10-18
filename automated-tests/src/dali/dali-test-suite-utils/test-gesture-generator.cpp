@@ -161,4 +161,36 @@ void TestGenerateTwoPointTap( TestApplication& application, float x1, float y1, 
   application.ProcessEvent( GenerateDoubleTouch( PointState::UP, Vector2( x1, y1 ), PointState::UP, Vector2( x2, y2 ), time_down + 20 ) );
 }
 
+void TestGenerateRotation( TestApplication& application )
+{
+  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 25.0f, 95.0f ), 160 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 30.0f, 100.0f ), 170 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 35.0f, 105.0f ), 180 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 40.0f, 110.0f ), 190 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), PointState::UP, Vector2( 45.0f, 115.0f ), 200 ) );
+}
+
+void TestStartRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time )
+{
+  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, a1, PointState::DOWN, b1, time ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a2, PointState::MOTION, b2, time + 50 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a2, PointState::MOTION, b2, time + 100 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a2, PointState::MOTION, b2, time + 150 ) );
+}
+
+void TestContinueRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time )
+{
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a1, PointState::MOTION, b1, time ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a1, PointState::MOTION, b1, time + 50 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a2, PointState::MOTION, b2, time + 100 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a2, PointState::MOTION, b2, time +150 ) );
+}
+
+void TestEndRotation( TestApplication& application, Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, uint32_t time )
+{
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, a1, PointState::MOTION, b1, time ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::UP, a2, PointState::UP, b2, time +50 ) );
+}
+
 } // namespace Dali

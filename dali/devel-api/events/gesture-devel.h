@@ -1,3 +1,6 @@
+#ifndef DALI_GESTURE_DEVEL_H
+#define DALI_GESTURE_DEVEL_H
+
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
@@ -15,30 +18,30 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/internal/event/events/gesture-event.h>
+#include <dali/public-api/events/gesture.h>
 
 namespace Dali
 {
 
-namespace Internal
+namespace DevelGesture
 {
 
-GestureEvent::~GestureEvent()
+/**
+ * @copydoc Dali::Gesture::Type
+ */
+enum Type
 {
-}
+  Pinch      = Gesture::Pinch,
+  Pan        = Gesture::Pan,
+  Tap        = Gesture::Tap,
+  LongPress  = Gesture::LongPress,
 
-GestureEvent::GestureEvent( DevelGesture::Type gesture, Gesture::State gestureState )
-: gestureType( gesture ),
-  state( gestureState ),
-  time( 0 )
-{
-}
+  // Devel Gesture Types
+  Rotation   = 1 << 4, ///< When the user rotates two fingers around a particular ares of the screen.
+};
 
-GestureEvent::GestureEvent(Gesture::Type gesture, Gesture::State gestureState)
-: GestureEvent( static_cast< DevelGesture::Type >( gesture ), gestureState )
-{
-}
-} // namespace Internal
+} // namespace DevelGesture
 
 } // namespace Dali
+
+#endif // DALI_GESTURE_DEVEL_H

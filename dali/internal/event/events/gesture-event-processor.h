@@ -24,6 +24,7 @@
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-processor.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-processor.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-processor.h>
 
 namespace Dali
@@ -270,6 +271,7 @@ private:
   PanGestureProcessor mPanGestureProcessor;
   PinchGestureProcessor mPinchGestureProcessor;
   TapGestureProcessor mTapGestureProcessor;
+  RotationGestureProcessor mRotationGestureProcessor;
   Integration::RenderController& mRenderController;
 
   int32_t envOptionMinimumPanDistance;
