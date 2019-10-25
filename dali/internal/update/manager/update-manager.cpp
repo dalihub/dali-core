@@ -693,6 +693,13 @@ void UpdateManager::ResetProperties( BufferIndex bufferIndex )
     mImpl->propertyResetters.EraseObject( elementPtr );
   }
 
+  // Clear all root nodes dirty flags
+  for( auto& scene : mImpl->scenes )
+  {
+    auto root = scene->root;
+    root->ResetDirtyFlags( bufferIndex );
+  }
+
   // Clear node dirty flags
   Vector<Node*>::Iterator iter = mImpl->nodes.Begin()+1;
   Vector<Node*>::Iterator endIter = mImpl->nodes.End();
