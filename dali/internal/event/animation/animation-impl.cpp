@@ -1114,8 +1114,8 @@ void Animation::NotifyObjects( Animation::Notify notifyValueType )
         object->NotifyPropertyAnimation(
           *this,
           propertyIndex,
-          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->targetValue : object->GetCurrentProperty( propertyIndex ),
-          iter->animatorType );
+          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->targetValue  : object->GetCurrentProperty( propertyIndex ),
+          ( notifyValueType == Notify::USE_TARGET_VALUE ) ? iter->animatorType : Animation::TO ); // If we're setting the current value, then use TO as we want to set, not adjust, the current value
       }
     }
   }

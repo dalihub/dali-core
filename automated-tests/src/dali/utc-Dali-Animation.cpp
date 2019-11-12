@@ -13493,3 +13493,38 @@ int UtcDaliAnimationPlayFromWithLoopCount(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationCombineToAndByWithStop(void)
+{
+  tet_infoline( "Ensure the Y Position is not modified when animating the X position using AnimateTo and AnimateBy");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetPosition( 100.0f, 100.0f );
+  Stage::GetCurrent().Add( actor );
+
+  auto animation = Animation::New( 1.0f );
+  const float origY = actor.GetProperty( Actor::Property::POSITION_Y ).Get< float >();
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION ), Vector3( 150.0f, origY, 0.0f ), TimePeriod( 1.0f ) );
+  animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Vector3( -30.0f, 0.0f, 0.0f ), TimePeriod( 1.0f, 1.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 500 );
+
+  application.SendNotification();
+  application.Render( 500 );
+
+  application.SendNotification();
+  application.Render( 500 );
+
+  // Stop and clear the animation using the current values
+  animation.Stop();
+  animation.Clear();
+
+  // Check the y position, it should be the same as before
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::POSITION_Y).Get< float >(), origY, TEST_LOCATION );
+
+  END_TEST;
+}
