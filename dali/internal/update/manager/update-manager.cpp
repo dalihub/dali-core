@@ -183,7 +183,8 @@ struct UpdateManager::Impl
         RenderManager& renderManager,
         RenderQueue& renderQueue,
         SceneGraphBuffers& sceneGraphBuffers,
-        RenderTaskProcessor& renderTaskProcessor )
+        RenderTaskProcessor& renderTaskProcessor,
+        bool partialUpdateAvailable )
   : renderMessageDispatcher( renderManager, renderQueue, sceneGraphBuffers ),
     notificationManager( notificationManager ),
     transformManager(),
@@ -212,7 +213,8 @@ struct UpdateManager::Impl
     previousUpdateScene( false ),
     renderTaskWaiting( false ),
     renderersAdded( false ),
-    surfaceRectChanged( false )
+    surfaceRectChanged( false ),
+    partialUpdateAvailable( partialUpdateAvailable )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
@@ -322,6 +324,7 @@ struct UpdateManager::Impl
   bool                                 renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool                                 renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool                                 surfaceRectChanged;            ///< True if the default surface rect is changed
+  bool                                 partialUpdateAvailable;        ///< Whether the partial update is available
 
 private:
 
@@ -336,7 +339,8 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderController& controller,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
-                              RenderTaskProcessor& renderTaskProcessor )
+                              RenderTaskProcessor& renderTaskProcessor,
+                              bool partialUpdateAvailable )
   : mImpl(NULL)
 {
   mImpl = new Impl( notificationManager,
@@ -347,7 +351,8 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                     renderManager,
                     renderQueue,
                     mSceneGraphBuffers,
-                    renderTaskProcessor );
+                    renderTaskProcessor,
+                    partialUpdateAvailable );
 
 }
 
@@ -411,6 +416,7 @@ void UpdateManager::AddNode( OwnerPointer<Node>& node )
     {
       mImpl->nodes.Insert((iter+1), rawNode );
       rawNode->CreateTransform( &mImpl->transformManager );
+      rawNode->SetPartialUpdateAvailable( mImpl->partialUpdateAvailable );
       return;
     }
   }
@@ -425,6 +431,8 @@ void UpdateManager::ConnectNode( Node* parent, Node* node )
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] ConnectNode\n", node );
 
   parent->ConnectChild( node );
+
+  parent->SetPropertyDirty( true );
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if( mImpl->frameCallbackProcessor )
