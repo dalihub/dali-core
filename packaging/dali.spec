@@ -12,9 +12,6 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
-Provides: libdali-core-cxx11.so
-Provides: libdali-core-cxx11.so.0
-Provides: libdali-core-cxx11.so.0.0.0
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
