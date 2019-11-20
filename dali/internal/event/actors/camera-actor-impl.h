@@ -195,13 +195,6 @@ public:
    */
   const SceneGraph::Camera* GetCamera() const;
 
-  /**
-   * Rotate the projection.
-   * It is used in case that the target buffer direction is different from the window direction.
-   * @param [in] rotationAngle The rotation angle
-   */
-  void RotateProjection( int rotationAngle );
-
 public: // properties
 
   /**
