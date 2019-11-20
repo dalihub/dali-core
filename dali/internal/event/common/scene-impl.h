@@ -122,7 +122,7 @@ public:
   /**
    * Notify the surface has been resized.
    */
-  void SurfaceResized();
+  void SurfaceResized( bool forceUpdate );
 
   /**
    * Notify the surface has been deleted.
@@ -284,6 +284,9 @@ private:
   Vector2 mDpi;
 
   Vector4 mBackgroundColor;
+
+  // The SurfaceOrientation
+  int mSurfaceOrientation;
 
   LayerPtr mRootLayer;
 
