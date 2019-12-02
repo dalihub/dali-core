@@ -128,15 +128,6 @@ enum Type
    * @note True means that the actor is out of the view frustum.
    */
   CULLED = INHERIT_LAYOUT_DIRECTION + 5,
-
-  /**
-   * @brief Sets the update size hint of the actor.
-   * @details Name "updateSizeHint", type Property::VECTOR2.
-   * @note When this value is set, the update area is determined by this value when a partial update.
-   *       By default, render item size is used for partial update.
-   *       It is scaled but not animated.
-   */
-  UPDATE_SIZE_HINT = INHERIT_LAYOUT_DIRECTION + 6,
 };
 
 } // namespace Property
