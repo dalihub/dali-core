@@ -46,13 +46,11 @@ RenderItem::RenderItem()
 : mModelMatrix( false ),
   mModelViewMatrix( false ),
   mSize(),
-  mUpdateSizeHint(),
   mRenderer( NULL ),
   mNode( NULL ),
   mTextureSet( NULL ),
   mDepthIndex( 0 ),
-  mIsOpaque( true ),
-  mPartialUpdateEnabled( false )
+  mIsOpaque( true )
 {
 }
 
@@ -61,22 +59,11 @@ RenderItem::~RenderItem()
 }
 
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight, const bool useUpdateSizeHint ) const
+ClippingBox RenderItem::CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const
 {
   // Calculate extent vector of the AABB:
-  float halfActorX;
-  float halfActorY;
-  if( useUpdateSizeHint )
-  {
-    halfActorX = mUpdateSizeHint.x * 0.5f;
-    halfActorY = mUpdateSizeHint.y * 0.5f;
-  }
-  else
-  {
-    halfActorX = mSize.x * 0.5f;
-    halfActorY = mSize.y * 0.5f;
-  }
-
+  const float halfActorX = mSize.x * 0.5f;
+  const float halfActorY = mSize.y * 0.5f;
 
   // To transform the actor bounds to screen-space, We do a fast, 2D version of a matrix multiply optimized for 2D quads.
   // This reduces float multiplications from 64 (16 * 4) to 12 (4 * 3).

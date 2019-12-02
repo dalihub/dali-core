@@ -87,7 +87,6 @@ Node::Node()
   mPosition( TRANSFORM_PROPERTY_POSITION ),                                       // Zero initialized by default
   mOrientation(),                                                                 // Initialized to identity by default
   mScale( TRANSFORM_PROPERTY_SCALE ),
-  mUpdateSizeHint( TRANSFORM_PROPERTY_UPDATE_SIZE_HINT ),
   mVisible( true ),
   mCulled( false ),
   mColor( Color::WHITE ),
@@ -111,12 +110,10 @@ Node::Node()
   mClippingMode( ClippingMode::DISABLED ),
   mIsRoot( false ),
   mIsLayer( false ),
-  mPositionUsesAnchorPoint( true ),
-  mPartialUpdateAvailable( false )
+  mPositionUsesAnchorPoint( true )
 {
   mUniformMapChanged[0] = 0u;
   mUniformMapChanged[1] = 0u;
-  mPropertyDirty = true;
 
 #ifdef DEBUG_ENABLED
   gNodeCount++;
@@ -156,7 +153,6 @@ void Node::CreateTransform( SceneGraph::TransformManager* transformManager )
   //Initialize all the animatable properties
   mPosition.Initialize( transformManager, mTransformId );
   mScale.Initialize( transformManager, mTransformId );
-  mUpdateSizeHint.Initialize( transformManager, mTransformId );
   mOrientation.Initialize( transformManager, mTransformId );
   mSize.Initialize( transformManager, mTransformId );
   mParentOrigin.Initialize( transformManager, mTransformId );
@@ -287,23 +283,15 @@ void Node::AddRenderer( Renderer* renderer )
   }
 
   mRenderer.PushBack( renderer );
-  SetPropertyDirty( true );
 }
-
 
 void Node::RemoveRenderer( const Renderer* renderer )
 {
-  Node *parent = mIsRoot ? NULL : GetParent();
   RendererContainer::SizeType rendererCount( mRenderer.Size() );
   for( RendererContainer::SizeType i = 0; i < rendererCount; ++i )
   {
     if( mRenderer[i] == renderer )
     {
-      if( parent != NULL )
-      {
-        parent->mPropertyDirty = true;
-      }
-      SetPropertyDirty( true );
       mRenderer.Erase( mRenderer.Begin()+i);
       return;
     }
@@ -343,9 +331,6 @@ NodePropertyFlags Node::GetInheritedDirtyFlags( NodePropertyFlags parentFlags ) 
 void Node::ResetDirtyFlags( BufferIndex updateBufferIndex )
 {
   mDirtyFlags = NodePropertyFlags::NOTHING;
-
-  SetPropertyDirty( false );
-
 }
 
 void Node::SetParent( Node& parentNode )
@@ -386,48 +371,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex )
   {
     mTransformManager->SetParent( mTransformId, INVALID_TRANSFORM_ID );
   }
-}
-void Node::SetPartialUpdateAvailable( bool value )
-{
-  mPartialUpdateAvailable = value;
-}
-
-bool Node::IsPartialUpdateAvailable() const
-{
-  return mPartialUpdateAvailable;
-}
-
-void Node::SetPropertyDirty( bool value )
-{
-  if( mPartialUpdateAvailable )
-  {
-    mPropertyDirty = value;
-
-    const NodeIter endIter = mChildren.End();
-    for ( NodeIter iter = mChildren.Begin(); iter != endIter; ++iter )
-    {
-      Node* current = *iter;
-      current->SetPropertyDirty( value );
-    }
-  }
-}
-
-bool Node::IsPropertyDirty() const
-{
-  if( mPartialUpdateAvailable )
-  {
-    if( !mPropertyDirty )
-    {
-      for( auto&& existingRenderer : mRenderer )
-      {
-        if( existingRenderer->IsDirty() )
-        {
-          return true;
-        }
-      }
-    }
-  }
-  return mPropertyDirty;
 }
 
 } // namespace SceneGraph
