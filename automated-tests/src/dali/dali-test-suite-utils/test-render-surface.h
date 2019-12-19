@@ -53,6 +53,11 @@ public:
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical );
 
   /**
+   * @copydoc Dali::Integration::RenderSurface::GetOrientation
+   */
+  virtual int GetOrientation() const;
+
+  /**
    * @copydoc Dali::Integration::RenderSurface::InitializeGraphics
    */
   virtual void InitializeGraphics();
