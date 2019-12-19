@@ -65,9 +65,10 @@ struct RenderItem
    *
    * @param[in]    viewportWidth     The width of the viewport to calculate for
    * @param[in]    viewportHeight    The height of the viewport to calculate for
+   * @param[in]    useUpdateSizeHint Set to true if you want to use update size hint instead of item size
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  ClippingBox CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const;
+  ClippingBox CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight, const bool useUpdateSizeHint = false ) const;
 
   /**
    * Overriden delete operator.
@@ -79,11 +80,13 @@ struct RenderItem
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
   Vector3           mSize;
+  Vector3           mUpdateSizeHint;
   Render::Renderer* mRenderer;
   Node*             mNode;
   const void*       mTextureSet;        //< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque:1;
+  bool              mPartialUpdateEnabled:1;
 
 private:
 
