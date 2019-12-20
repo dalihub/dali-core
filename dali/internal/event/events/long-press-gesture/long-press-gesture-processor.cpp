@@ -42,6 +42,8 @@ namespace Internal
 namespace
 {
 
+const unsigned long DEFAULT_MINIMUM_HOLDING_TIME = 500u;
+
 /**
  * Creates a LongPressGesture and asks the specified detector to emit its detected signal.
  * @param[in]  actor             The actor on which the long press gesture has occurred.
@@ -106,7 +108,8 @@ LongPressGestureProcessor::LongPressGestureProcessor()
   mCurrentRenderTask(),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
-  mCurrentLongPressEvent( NULL )
+  mCurrentLongPressEvent( NULL ),
+  mMinimumHoldingTime( DEFAULT_MINIMUM_HOLDING_TIME )
 {
 }
 
@@ -230,7 +233,7 @@ void LongPressGestureProcessor::AddGestureDetector( LongPressGestureDetector* ge
 
     Size size = scene.GetSize();
 
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request));
+    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), mMinimumHoldingTime );
   }
   else
   {
@@ -262,6 +265,28 @@ void LongPressGestureProcessor::GestureDetectorUpdated( LongPressGestureDetector
   DALI_ASSERT_DEBUG( find( mLongPressGestureDetectors.begin(), mLongPressGestureDetectors.end(), gestureDetector ) != mLongPressGestureDetectors.end() );
 
   UpdateDetection();
+}
+
+void LongPressGestureProcessor::SetMinimumHoldingTime( uint32_t time )
+{
+  if( time > 0u && mMinimumHoldingTime != time )
+  {
+    mMinimumHoldingTime = time;
+
+    if( mGestureRecognizer )
+    {
+      LongPressGestureRecognizer* longPressRecognizer = dynamic_cast<LongPressGestureRecognizer*>( mGestureRecognizer.Get() );
+      if( longPressRecognizer )
+      {
+        longPressRecognizer->SetMinimumHoldingTime( time );
+      }
+    }
+  }
+}
+
+uint32_t LongPressGestureProcessor::GetMinimumHoldingTime() const
+{
+  return mMinimumHoldingTime;
 }
 
 void LongPressGestureProcessor::UpdateDetection()

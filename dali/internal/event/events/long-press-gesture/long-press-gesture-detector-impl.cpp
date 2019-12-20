@@ -173,6 +173,11 @@ void LongPressGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
+uint32_t LongPressGestureDetector::GetMinimumHoldingTime() const
+{
+  return mGestureEventProcessor.GetLongPressMinimumHoldingTime();
+}
+
 } // namespace Internal
 
 } // namespace Dali

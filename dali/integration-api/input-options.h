@@ -163,6 +163,14 @@ DALI_CORE_API void SetPanGestureMinimumPanEvents( int value );
  * @param[in] value Distance to move in pixels
  */
 DALI_CORE_API void SetPinchGestureMinimumDistance( float value );
+
+/**
+ * @brief Sets the minimum holding time required to be recognized as a long press gesture
+ *
+ * @param[in] value The time value in milliseconds
+ */
+DALI_CORE_API void SetLongPressMinimumHoldingTime( unsigned int value );
+
 } // namespace Integration
 
 } // namespace Dali
