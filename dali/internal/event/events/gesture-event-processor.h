@@ -252,6 +252,18 @@ public: // Called by Core
    */
   void SetPinchGestureMinimumDistance( float value);
 
+  /**
+   * @brief Sets the minimum holding time required to be recognized as a long press gesture
+   *
+   * @param[in] value The time value in milliseconds
+   */
+  void SetLongPressMinimumHoldingTime( uint32_t value );
+
+  /**
+   * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
+   */
+  uint32_t GetLongPressMinimumHoldingTime() const;
+
 public: // needed for PanGesture
 
   /**

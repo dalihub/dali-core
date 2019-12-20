@@ -88,6 +88,18 @@ public: // To be called by GestureEventProcessor
    */
   void GestureDetectorUpdated(LongPressGestureDetector* gestureDetector);
 
+  /**
+   * @brief This method sets the minimum holding time required to be recognized as a long press gesture
+   *
+   * @param[in] value The time value in milliseconds
+   */
+  void SetMinimumHoldingTime( uint32_t time );
+
+  /**
+   * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
+   */
+  uint32_t GetMinimumHoldingTime() const;
+
 private:
 
   // Undefined
@@ -130,6 +142,8 @@ private:
   uint32_t mMaxTouchesRequired;
 
   const LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
+
+  uint32_t mMinimumHoldingTime;
 };
 
 } // namespace Internal
