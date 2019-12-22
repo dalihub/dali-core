@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,13 @@
 
 namespace Dali
 {
+
+namespace
+{
+
+const uint32_t INITIAL_FRAMEBUFFER_STATE = 0u;
+
+}
 
 namespace Internal
 {
@@ -120,11 +127,11 @@ void FrameBufferStateCache::FrameBuffersCreated( GLsizei count, const GLuint* co
     {
       DALI_LOG_ERROR("FrameBuffer already exists%d \n", id );
       // reset its state
-      state->mState = GetInitialFrameBufferState();
+      state->mState = INITIAL_FRAMEBUFFER_STATE;
       continue;
     }
 
-    FrameBufferState newFrameBuffer( frameBuffers[i], GetInitialFrameBufferState() );
+    FrameBufferState newFrameBuffer( frameBuffers[i] );
     mFrameBufferStates.PushBack( newFrameBuffer );
   }
 }
@@ -212,12 +219,6 @@ void FrameBufferStateCache::DeleteFrameBuffer( GLuint frameBufferId )
  }
  DALI_LOG_ERROR("FrameBuffer not found %d \n", frameBufferId);
 }
-
-unsigned int FrameBufferStateCache::GetInitialFrameBufferState()
-{
-  return COLOR_BUFFER_CLEAN | DEPTH_BUFFER_CLEAN | STENCIL_BUFFER_CLEAN;
-}
-
 
 } // namespace Internal
 

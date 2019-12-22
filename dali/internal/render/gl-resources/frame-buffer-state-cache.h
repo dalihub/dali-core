@@ -111,9 +111,9 @@ private:
     /**
      * Constructor
      */
-    FrameBufferState( GLuint id, unsigned int state)
+    FrameBufferState( GLuint id )
     :mId( id ),
-    mState( state )
+    mState( 0 )
     {
     }
     GLuint mId;           ///< Frame buffer id
@@ -141,12 +141,6 @@ private:
    * @param[in] frameBufferId frame buffer id
    */
   void DeleteFrameBuffer( GLuint frameBufferId );
-
-  /**
-   * @brief Get the default state of a frame buffer, before it's used
-   * @return initial state
-   */
-  unsigned int GetInitialFrameBufferState();
 
   FrameBufferStateCache( const FrameBufferStateCache& );            ///< undefined copy constructor
 
