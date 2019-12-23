@@ -1038,6 +1038,9 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   if( keepRendererRendering )
   {
     keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
+
+    // Set dirty flags for next frame to continue rendering
+    mImpl->nodeDirtyFlags |= RenderableUpdateFlags;
   }
 
   // tell the update manager that we're done so the queue can be given to event thread
