@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/radian.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/property-notification-manager.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -68,7 +69,8 @@ PropertyNotification::PropertyNotification( UpdateManager& updateManager,
   mComponentIndex( componentIndex ),
   mCondition( condition ),
   mNotifyMode( Dali::PropertyNotification::NotifyOnTrue ),
-  mNotifyResult( false )
+  mNotifyResult( false ),
+  mCompare( false )
 {
   const Internal::PropertyCondition& conditionImpl = GetImplementation( condition );
 
@@ -100,6 +102,18 @@ PropertyNotification::PropertyNotification( UpdateManager& updateManager,
         mPropertyType = Property::FLOAT;
       }
     }
+
+  // In Size Property case, swapping components occurs sometimes.
+  // To cover swapping components, previous and current components should be compared.
+  if( mObjectPropertyIndex == Dali::Actor::Property::SIZE
+      && mObject->GetPropertyType(mObjectPropertyIndex) == Property::VECTOR3 )
+  {
+    mCompare = true;
+    for( int i = 0; i < 3; ++i )
+    {
+      mRawConditionArgs.PushBack( 0.0f );
+    }
+  }
 
     // all objects always have scene object
     CreateSceneObject();
@@ -206,7 +220,8 @@ void PropertyNotification::CreateSceneObject()
                                                                    mComponentIndex,
                                                                    GetImplementation( mCondition ).type,
                                                                    mRawConditionArgs,
-                                                                   mNotifyMode );
+                                                                   mNotifyMode,
+                                                                   mCompare );
     OwnerPointer< SceneGraph::PropertyNotification > transferOwnership( const_cast<SceneGraph::PropertyNotification*>( mPropertyNotification ) );
     AddPropertyNotificationMessage( mUpdateManager, transferOwnership );
   }
