@@ -161,8 +161,13 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       mCurrentPanEmitters.clear();
       ResetActor();
 
-      // It's only possible on touch-down, which is the position we want to hit-test against when the pan actually starts
-      mPossiblePanPosition = panEvent.currentPosition;
+      HitTestAlgorithm::Results hitTestResults;
+      if( HitTest( scene, panEvent.currentPosition, hitTestResults ) )
+      {
+        SetActor( &GetImplementation( hitTestResults.actor ) );
+        mPossiblePanPosition = panEvent.currentPosition;
+      }
+
       break;
     }
 
@@ -179,7 +184,7 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
         HitTestAlgorithm::Results hitTestResults;
         HitTest( scene, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
 
-        if ( hitTestResults.actor )
+        if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
