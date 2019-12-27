@@ -132,7 +132,6 @@ public:
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
-   * @param[in] partialUpdateAvailble whether the partial update is available 
    */
   UpdateManager( NotificationManager& notificationManager,
                  CompleteNotificationInterface& animationPlaylist,
@@ -141,8 +140,7 @@ public:
                  Integration::RenderController& controller,
                  RenderManager& renderManager,
                  RenderQueue& renderQueue,
-                 RenderTaskProcessor& renderTaskProcessor,
-                 bool partialUpdateAvailable );
+                 RenderTaskProcessor& renderTaskProcessor );
 
   /**
    * Destructor.
