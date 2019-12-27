@@ -380,18 +380,6 @@ public:
    */
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
-  /**
-   * Enable/Disable Partial update dirty flag
-   * @param[in] true to mark dirty else false
-   */
-  void SetDirty( bool value );
-
-  /**
-   * Get Partial update dirty flag
-   * @return true if dirty else false
-   */
-  bool IsDirty() const;
-
 public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
@@ -485,7 +473,6 @@ private:
 
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool                         mDirty:1;                          ///< Required for marking it dirty in case of partial update.
 
 public:
 
