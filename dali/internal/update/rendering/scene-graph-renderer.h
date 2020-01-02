@@ -482,7 +482,6 @@ private:
   DepthWriteMode::Type         mDepthWriteMode:3;                 ///< Local copy of the depth write mode
   DepthTestMode::Type          mDepthTestMode:3;                  ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type mRenderingBehavior:2;            ///< The rendering behavior
-
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                         mDirty:1;                          ///< Required for marking it dirty in case of partial update.
