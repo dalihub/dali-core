@@ -112,7 +112,8 @@ enum Flags
   RESEND_STENCIL_OPERATION_ON_FAIL   = 1 << 15,
   RESEND_STENCIL_OPERATION_ON_Z_FAIL = 1 << 16,
   RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 17,
-  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18
+  RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18,
+  RESEND_SHADER                      = 1 << 19,
 };
 
 } // Anonymous namespace
@@ -341,6 +342,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
     }
 
+    if( mResendFlag & RESEND_SHADER )
+    {
+      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetShaderChanged, true );
+    }
+
     mResendFlag = 0;
   }
 }
@@ -373,7 +381,7 @@ void Renderer::SetShader( Shader* shader )
   mShader = shader;
   mShader->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mResendFlag |= RESEND_GEOMETRY;
+  mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
 
   if( mRenderDataProvider )
   {
