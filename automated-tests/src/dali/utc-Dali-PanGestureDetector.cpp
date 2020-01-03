@@ -1104,6 +1104,128 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureSignalReceptionAttachActorAfterDown(void)
+{
+  // This test checks to ensure a pan is possible after attaching an actor after a down (possible) event
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Gesture possible in actor's area (using long-press)
+  uint32_t time = 100;
+  TestStartLongPress( application, 10.0f, 20.0f, time );
+  time += TestGetFrameInterval();
+
+  // Attach actor to detector
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+
+  // Start a pan, initially it'll only be possible, we shouldn't receive it
+  TestMovePan( application, Vector2( 10.0f, 20.0f ), time );
+  time += TestGetFrameInterval();
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  // Now the pan truly starts, we should receive a signal
+  TestMovePan( application, Vector2( 26.0f, 20.0f ), time );
+  time += TestGetFrameInterval();
+  TestMovePan( application, Vector2( 32.0f, 32.0f ), time );
+  time += TestGetFrameInterval();
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  // Finish the pan, we should still receive a signal
+  data.Reset();
+  TestEndPan( application, Vector2( 32.0f, 32.0f ), time );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureSignalReceptionAttachActorAfterDownAfterInitialPanToAnotherActor(void)
+{
+  // This test checks to ensure a pan is possible after attaching an actor after a down (possible) event even if another
+  // pan actor was there before (parent)
+
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  parent.SetSize(100.0f, 100.0f);
+  parent.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( parent );
+
+  Actor child = Actor::New();
+  child.SetSize(100.0f, 100.0f);
+  child.SetAnchorPoint(AnchorPoint::CENTER);
+  child.SetParentOrigin(ParentOrigin::CENTER);
+  parent.Add( child );
+
+  // Create detector for parent and attach
+  SignalData parentData;
+  GestureReceivedFunctor parentFunctor( parentData );
+  PanGestureDetector parentDetector = PanGestureDetector::New();
+  parentDetector.DetectedSignal().Connect( &application, parentFunctor );
+  parentDetector.Attach( parent );
+
+  // Create detector for child but do not attach
+  SignalData childData;
+  GestureReceivedFunctor childFunctor( childData );
+  PanGestureDetector childDetector = PanGestureDetector::New();
+  childDetector.DetectedSignal().Connect( &application, childFunctor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Do a full pan in both actors' area, only the parent's functor should be called
+  uint32_t time = 100;
+  TestStartPan( application, Vector2( 10.0f, 20.0f ), Vector2( 26.0f, 20.0f ), time );
+  DALI_TEST_EQUALS( parentData.functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+  TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
+  DALI_TEST_EQUALS( parentData.functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Gesture possible in both actors' area (using long-press), no functors called
+  TestStartLongPress( application, 10.0f, 20.0f, time );
+  time += TestGetFrameInterval();
+  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+
+  // Attach the child as well now
+  childDetector.Attach( child );
+
+  // Now the pan truly starts, we should receive a signal for the child only
+  TestMovePan( application, Vector2( 26.0f, 20.0f ), time );
+  time += TestGetFrameInterval();
+  TestMovePan( application, Vector2( 32.0f, 32.0f ), time );
+  time += TestGetFrameInterval();
+  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( childData.functorCalled, true, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Finish the pan, again only the child should still receive a signal
+  TestEndPan( application, Vector2( 32.0f, 32.0f ), time );
+  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( childData.functorCalled, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
 {
   TestApplication application;
@@ -1125,7 +1247,6 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   detector.DetectedSignal().Connect( &application, functor );
 
   // Gesture possible in actor's area.
-//  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   uint32_t time = 100;
   TestStartLongPress( application, 10.0f, 20.0f, time );
   time += TestGetFrameInterval();
@@ -1139,7 +1260,7 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit Started event, we should not receive the pan.
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
   TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
   time += TestGetFrameInterval();
@@ -1159,14 +1280,15 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit Started event, we should be receiving the pan now.
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
   TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
   time += TestGetFrameInterval();
 
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
-  // Normal long press in actor's area for completeness.
+  // Normal pan in actor's area for completeness.
+  data.Reset();
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
   TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
