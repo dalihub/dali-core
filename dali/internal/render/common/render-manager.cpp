@@ -800,7 +800,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   if( surfaceFrameBuffer &&
       partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE )
   {
-    const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
     // Iterate through each render list.
     if( surfaceFrameBuffer->IsPartialUpdateEnabled() )
     {
