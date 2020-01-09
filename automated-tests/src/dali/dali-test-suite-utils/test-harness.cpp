@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <map>
 #include <cstring>
 #include <testcase.h>
+#include <fcntl.h>
 
 namespace TestHarness
 {
@@ -39,6 +40,20 @@ const char* basename(const char* path)
   }
   if(slash != NULL) ++slash;
   return slash;
+}
+
+void SuppressLogOutput()
+{
+  // Close stdout and stderr to suppress the log output
+  close(STDOUT_FILENO); // File descriptor number for stdout is 1
+  close(STDERR_FILENO); // File descriptor number for stderr is 2
+
+  // The POSIX specification requires that /dev/null must be provided,
+  // The open function always chooses the lowest unused file descriptor
+  // It is sufficient for stdout to be writable.
+  open("/dev/null", O_WRONLY); // Redirect file descriptor number 1 (i.e. stdout) to /dev/null
+  // When stderr is opened it must be both readable and writable.
+  open("/dev/null", O_RDWR); // Redirect file descriptor number 2 (i.e. stderr) to /dev/null
 }
 
 int32_t RunTestCase( struct ::testcase_s& testCase )
@@ -78,8 +93,7 @@ int32_t RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressO
   {
     if( suppressOutput )
     {
-      close(STDOUT_FILENO);
-      close(STDERR_FILENO);
+      SuppressLogOutput();
     }
     else
     {
@@ -222,8 +236,7 @@ int32_t RunAllInParallel(  const char* processName, ::testcase tc_array[], bool 
       int32_t pid = fork();
       if( pid == 0 ) // Child process
       {
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
+        SuppressLogOutput();
         exit( RunTestCase( tc_array[nextTestCase] ) );
       }
       else if(pid == -1)
