@@ -2,7 +2,7 @@
 #define DALI_COMMON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,6 +197,13 @@ public:
 #define DALI_ASSERT_DEBUG(cond) DALI_ASSERT_ALWAYS(cond)
 #else
 #define DALI_ASSERT_DEBUG(cond)
+#endif
+
+/// Use DALI_FALLTHROUGH in switch statements where one case is supposed to fall through into another case
+#if __has_cpp_attribute(fallthrough)
+#define DALI_FALLTHROUGH [[fallthrough]]
+#else
+#define DALI_FALLTHROUGH
 #endif
 
 #endif // DALI_COMMON_H

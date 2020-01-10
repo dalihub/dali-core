@@ -371,6 +371,13 @@ public:
    */
   void SetSortAttributes( BufferIndex bufferIndex, SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes ) const;
 
+  /**
+   * Sets the flag indicating whether shader changed.
+   *
+   * @param[in] value True if shader changed
+   */
+  void SetShaderChanged( bool value );
+
 private:
 
   struct UniformIndexMap;
@@ -444,6 +451,8 @@ private:
   DepthTestMode::Type          mDepthTestMode:3;            ///< The depth test mode
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool                         mShaderChanged:1;            ///< Flag indicating the shader changed and uniform maps have to be updated
+
 
 };
 
