@@ -112,7 +112,6 @@ struct RenderManager::Impl
     renderQueue(),
     instructions(),
     renderAlgorithms(),
-    backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     frameCount( 0u ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
@@ -181,8 +180,6 @@ struct RenderManager::Impl
   // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
   RenderInstructionContainer                instructions;
   Render::RenderAlgorithms                  renderAlgorithms;        ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
-
-  Vector4                                   backgroundColor;         ///< The glClear color used at the beginning of each frame.
 
   uint32_t                                  frameCount;              ///< The current frame count
   BufferIndex                               renderBufferIndex;       ///< The index of the buffer to read from; this is opposite of the "update" buffer
@@ -286,11 +283,6 @@ void RenderManager::SetShaderSaver( ShaderSaver& upstream )
 RenderInstructionContainer& RenderManager::GetRenderInstructionContainer()
 {
   return mImpl->instructions;
-}
-
-void RenderManager::SetBackgroundColor( const Vector4& color )
-{
-  mImpl->backgroundColor = color;
 }
 
 void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
@@ -727,7 +719,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
 
   Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
   int surfaceOrientation = mImpl->defaultSurfaceOrientation;
-  Vector4 backgroundColor = mImpl->backgroundColor;
   Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
   Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
   Integration::PartialUpdateAvailable partialUpdateAvailable = mImpl->partialUpdateAvailable;
@@ -760,7 +751,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
       }
 
       surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
-      backgroundColor = surfaceFrameBuffer->GetBackgroundColor();
     }
     else
     {
@@ -828,32 +818,16 @@ void RenderManager::DoRender( RenderInstruction& instruction )
 
   if ( surfaceFrameBuffer )
   {
-      mImpl->currentContext->Viewport( surfaceRect.x,
-                                surfaceRect.y,
-                                surfaceRect.width,
-                                surfaceRect.height );
-
-
-      mImpl->currentContext->ClearColor( backgroundColor.r,
-                                  backgroundColor.g,
-                                  backgroundColor.b,
-                                  backgroundColor.a );
+    mImpl->currentContext->Viewport( surfaceRect.x,
+                              surfaceRect.y,
+                              surfaceRect.width,
+                              surfaceRect.height );
   }
 
   // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
   // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
   // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
   // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-  if( isPartialUpdate )
-  {
-    mImpl->currentContext->SetScissorTest( true );
-    mImpl->currentContext->Scissor( scissorBox.x, scissorBox.y, scissorBox.width, scissorBox.height );
-  }
-  else
-  {
-    mImpl->currentContext->SetScissorTest( false );
-  }
-
   GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
 
   mImpl->currentContext->ColorMask( true );
@@ -870,14 +844,6 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     mImpl->currentContext->StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
     clearMask |= GL_STENCIL_BUFFER_BIT;
   }
-
-  mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-
-  if( isPartialUpdate )
-  {
-    mImpl->currentContext->SetScissorTest( false );
-  }
-
 
   if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
   {
@@ -932,6 +898,17 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     }
   }
 
+  bool clearFullFrameRect = true;
+  if( instruction.mFrameBuffer != 0 )
+  {
+    Viewport frameRect( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
+    clearFullFrameRect = ( frameRect == viewportRect );
+  }
+  else
+  {
+    clearFullFrameRect = ( surfaceRect == viewportRect );
+  }
+
   if ( surfaceOrientation == 90 || surfaceOrientation == 270 )
   {
     int temp = viewportRect.width;
@@ -940,15 +917,13 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   }
 
   mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+  mImpl->currentContext->ClearColor( clearColor.r,
+                                     clearColor.g,
+                                     clearColor.b,
+                                     clearColor.a );
 
-  if ( instruction.mIsClearColorSet )
+  if( instruction.mIsClearColorSet && !clearFullFrameRect )
   {
-    mImpl->currentContext->ClearColor( clearColor.r,
-                                       clearColor.g,
-                                       clearColor.b,
-                                       clearColor.a );
-
-    // Clear the viewport area only
     mImpl->currentContext->SetScissorTest( true );
     if( isPartialUpdate )
     {
@@ -959,9 +934,13 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     {
       mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
     }
-    mImpl->currentContext->ColorMask( true );
-    mImpl->currentContext->Clear( GL_COLOR_BUFFER_BIT , Context::CHECK_CACHED_VALUES );
+    mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
     mImpl->currentContext->SetScissorTest( false );
+  }
+  else
+  {
+    mImpl->currentContext->SetScissorTest( false );
+    mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
   }
 
   // Clear the list of bound textures

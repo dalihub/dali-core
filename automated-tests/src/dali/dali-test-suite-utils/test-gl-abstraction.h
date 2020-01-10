@@ -275,6 +275,15 @@ public:
 
   inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
   {
+    mLastClearColor.r = red;
+    mLastClearColor.g = green;
+    mLastClearColor.b = blue;
+    mLastClearColor.a = alpha;
+  }
+
+  inline const Vector4& GetLastClearColor() const
+  {
+    return mLastClearColor;
   }
 
   inline void ClearDepthf(GLclampf depth)
@@ -2182,6 +2191,7 @@ private:
   ShaderSourceMap mShaderSources;
   GLuint     mLastShaderCompiled;
   GLbitfield mLastClearBitMask;
+  Vector4 mLastClearColor;
   unsigned int mClearCount;
 
   Vector4 mLastBlendColor;

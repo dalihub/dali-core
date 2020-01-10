@@ -922,25 +922,47 @@ int UtcDaliSceneEnsureEmptySceneCleared(void)
 
   TestApplication application;
 
-  // Create a new scene and set the background colors of both the new and the main scenes
-  auto defaultScene = application.GetScene();
-  defaultScene.SetBackgroundColor( Color::WHITE );
-
-  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
-  auto newScene = Integration::Scene::New( surface );
-  newScene.SetBackgroundColor( Color::RED );
-
-  // Need to create a renderable as we don't start rendering until we have at least one
-  // We don't need to add this to any scene
-  auto actor = CreateRenderableActor();
-
   auto& glAbstraction = application.GetGlAbstraction();
   auto clearCountBefore = glAbstraction.GetClearCountCalled();
 
   application.SendNotification();
   application.Render();
 
+  // No actor, no rendering at all
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::TRANSPARENT, TEST_LOCATION );
+
+  // Need to create a renderable as we don't start rendering until we have at least one
+  // We don't need to add this to any scene
+  auto actor = CreateRenderableActor();
+
+  application.SendNotification();
+  application.Render();
+
+  // Default background color
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLACK, TEST_LOCATION );
+
+  // Create a new scene and set the background colors of both the new and the main scenes
+  auto defaultScene = application.GetScene();
+  defaultScene.SetBackgroundColor( Color::WHITE );
+
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::WHITE, TEST_LOCATION );
+
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  auto newScene = Integration::Scene::New( surface );
+  newScene.SetBackgroundColor( Color::RED );
+
+  application.SendNotification();
+  application.Render();
+
+  // + 2 clear for 2 scenes
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::RED, TEST_LOCATION );
 
   // Add the actor to the main scene
   defaultScene.Add( actor );
@@ -948,18 +970,21 @@ int UtcDaliSceneEnsureEmptySceneCleared(void)
   application.SendNotification();
   application.Render();
 
-  // Add another scene and set its background color, ensure we clear it to the appropriate color
+  // + 2 clear for 2 scenes
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::RED, TEST_LOCATION );
 
+  // Add another scene and set its background color, ensure we clear it to the appropriate color
+  // + 3 clear for 3 scenes
   TestRenderSurface surface2( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
   auto thirdScene = Integration::Scene::New( surface2 );
   thirdScene.SetBackgroundColor( Color::BLUE );
 
-  clearCountBefore = glAbstraction.GetClearCountCalled();
-
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 9, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1230,5 +1255,66 @@ int UtcDaliSceneKeyEventGeneratedSignalP(void)
   DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.keyPressedName );
   DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.keyPressed );
   DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
+  END_TEST;
+}
+
+int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
+{
+  tet_infoline( "Ensure we keep background color when the scene surface is replaced " );
+
+  TestApplication application;
+
+  // Create a new scene and set the background color of the main scene
+  auto defaultScene = application.GetScene();
+  defaultScene.SetBackgroundColor( Color::BLUE );
+
+  // Need to create a renderable as we don't start rendering until we have at least one
+  // We don't need to add this to any scene
+  auto actor = CreateRenderableActor();
+
+  auto& glAbstraction = application.GetGlAbstraction();
+  auto clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+
+  TestRenderSurface surface( PositionSize( 0.0f, 0.0f, 480.0f, 800.0f ) );
+  defaultScene.SetSurface( surface );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+
+  // Check when the main render task viewport is set the clear color is clipped using scissors
+  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  scissorTrace.Enable( true );
+  enabledDisableTrace.Enable( true );
+
+  defaultScene.GetRenderTaskList().GetTask( 0 ).SetViewport( Viewport( 0.0f, 0.0f, 100.0f, 100.0f ) );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check scissor test was enabled.
+  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) ); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+
+  // Check the scissor was set, and the coordinates are correct.
+  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", "0, 700, 100, 100" ) );
+
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+
+  scissorTrace.Enable( false );
+  scissorTrace.Reset();
+
+  enabledDisableTrace.Enable( false );
+  enabledDisableTrace.Reset();
+
   END_TEST;
 }

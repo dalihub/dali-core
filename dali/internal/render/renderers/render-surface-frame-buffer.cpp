@@ -33,9 +33,7 @@ SurfaceFrameBuffer::SurfaceFrameBuffer( Integration::RenderSurface* surface )
   mContext( nullptr ),
   mWidth( mSurface->GetPositionSize().width ),
   mHeight( mSurface->GetPositionSize().height ),
-  mBackgroundColor( 0.f, 0.f, 0.f, 1.f ),
   mSizeChanged( false ),
-  mBackgroundColorChanged( false ),
   mIsSurfaceInvalid( false ),
   mPartialUpdateEnabled( true )
 {
@@ -106,7 +104,6 @@ void SurfaceFrameBuffer::PostRender()
   }
 
   mSizeChanged = false;
-  mBackgroundColorChanged = false;
   mPartialUpdateEnabled = true;
 }
 
@@ -131,22 +128,11 @@ void SurfaceFrameBuffer::MakeContextCurrent()
   }
 }
 
-Vector4 SurfaceFrameBuffer::GetBackgroundColor()
-{
-  return mBackgroundColor;
-}
-
 void SurfaceFrameBuffer::SetSize( uint32_t width, uint32_t height )
 {
   mWidth = width;
   mHeight = height;
   mSizeChanged = true;
-}
-
-void SurfaceFrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  mBackgroundColor = color;
-  mBackgroundColorChanged = true;
 }
 
 bool SurfaceFrameBuffer::IsSurfaceValid() const
@@ -159,7 +145,7 @@ bool SurfaceFrameBuffer::IsPartialUpdateEnabled() const
   bool ret = false;
   if ( IsSurfaceValid() )
   {
-    ret = mSurface->GetBufferAge() && ( mPartialUpdateEnabled && !( mSizeChanged || mBackgroundColorChanged ) );
+    ret = mSurface->GetBufferAge() && ( mPartialUpdateEnabled && !mSizeChanged );
   }
   return ret;
 }

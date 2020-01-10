@@ -117,14 +117,6 @@ void FrameBuffer::SetSize( uint32_t width, uint32_t height )
   }
 }
 
-void FrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  if( mRenderObject->IsSurfaceBacked() )
-  {
-    SetFrameBufferBackgroundColorMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), color );
-  }
-}
-
 void FrameBuffer::MarkSurfaceAsInvalid()
 {
   if ( mIsSurfaceBacked )
