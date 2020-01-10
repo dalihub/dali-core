@@ -122,12 +122,6 @@ public:
 
   // The following methods should be called via RenderQueue messages
 
-  /**
-   * Set the background color i.e. the glClear color used at the beginning of each frame.
-   * @param[in] color The new background color.
-   */
-  void SetBackgroundColor( const Vector4& color );
-
   /*
    * Set the frame time delta (time elapsed since the last frame.
    * @param[in] deltaTime the delta time

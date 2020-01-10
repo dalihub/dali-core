@@ -1089,17 +1089,6 @@ uint32_t UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
   return keepUpdatingRequest;
 }
 
-void UpdateManager::SetBackgroundColor( const Vector4& color )
-{
-  typedef MessageValue1< RenderManager, Vector4 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetBackgroundColor, color );
-}
-
 void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
 {
   mImpl->surfaceRectChanged = true;

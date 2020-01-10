@@ -99,12 +99,6 @@ public:
   void SetSize( uint32_t width, uint32_t height );
 
   /**
-   * @brief Sets the background color
-   * @param[in] color The new background color
-   */
-  void SetBackgroundColor( const Vector4& color );
-
-  /**
    * @brief Mark the render surface as invalid
    *
    * The render surface is maked as invalid when it is deleted.

@@ -594,12 +594,6 @@ public:
                    bool isRenderingToFbo );
 
   /**
-   * Set the background color i.e. the glClear color used at the beginning of each frame.
-   * @param[in] color The new background color.
-   */
-  void SetBackgroundColor(const Vector4& color);
-
-  /**
    * Set the default surface rect.
    * @param[in] rect The rect value representing the surface.
    */
@@ -1006,17 +1000,6 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, const_cast<Shader*>( &shader ), shaderData, modifiesGeometry );
-}
-
-inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
-{
-  typedef MessageValue1< UpdateManager, Vector4 > LocalType;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetBackgroundColor, color );
 }
 
 inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int32_t>& rect  )

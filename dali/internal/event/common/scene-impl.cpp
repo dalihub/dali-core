@@ -303,7 +303,8 @@ void Scene::SetBackgroundColor( const Vector4& color )
 
   if( mSurface )
   {
-    mRenderTaskList->GetTask( 0u )->GetFrameBuffer()->SetBackgroundColor( color );
+    mRenderTaskList->GetTask( 0u )->SetClearColor( color );
+    mRenderTaskList->GetTask( 0u )->SetClearEnabled( true );
   }
 }
 
