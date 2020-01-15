@@ -21,6 +21,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/images/pixel-data-devel.cpp
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
+  ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
   ${devel_api_src_dir}/scripting/scripting.cpp
   ${devel_api_src_dir}/signals/signal-delegate.cpp
   ${devel_api_src_dir}/threading/conditional-wait.cpp
@@ -86,6 +87,7 @@ SET( devel_api_core_object_header_files
 
 
 SET( devel_api_core_rendering_header_files
+  ${devel_api_src_dir}/rendering/frame-buffer-devel.h
   ${devel_api_src_dir}/rendering/renderer-devel.h
 )
 

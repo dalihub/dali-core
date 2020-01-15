@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
 namespace Dali
@@ -84,27 +85,35 @@ public:
 
   /**
    * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
-   * param[in] context The GL context
+   * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
+   * @note A maximum of Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS are supported.
    */
   void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
-   * @brief Get the id of the texture binded to this frame buffer
-   * @return The texture id
+   * @brief Get the number of textures bound to this frame buffer as color attachments.
+   * @return The number of color attachments.
    */
-  GLuint GetTextureId() { return mTextureId; };
+  uint8_t GetColorAttachmentCount() const { return mColorAttachmentCount; }
+
+  /**
+   * @brief Get the id (OpenGL handle) of the texture bound to this frame buffer as color attachment @a index.
+   * @return The texture id.
+   */
+  GLuint GetTextureId(uint8_t index) { return mTextureId[index]; };
 
 private:
 
   GLuint mId;
-  GLuint mTextureId;
+  GLuint mTextureId[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
   GLuint mDepthBuffer;
   GLuint mStencilBuffer;
   uint32_t mWidth;
   uint32_t mHeight;
+  uint8_t mColorAttachmentCount;
 };
 
 
