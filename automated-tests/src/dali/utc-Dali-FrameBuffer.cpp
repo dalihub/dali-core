@@ -45,7 +45,7 @@ int UtcDaliFrameBufferNew01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
@@ -65,7 +65,7 @@ int UtcDaliFrameBufferNew02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
@@ -85,7 +85,7 @@ int UtcDaliFrameBufferNew03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
@@ -105,7 +105,7 @@ int UtcDaliFrameBufferNew04(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
@@ -133,7 +133,7 @@ int UtcDaliFrameBufferNew06(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
@@ -148,7 +148,7 @@ int UtcDaliFrameBufferNewWithColor01(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
@@ -164,7 +164,7 @@ int UtcDaliFrameBufferNewWithColor02(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
@@ -180,7 +180,7 @@ int UtcDaliFrameBufferNewWithColor03(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
@@ -196,7 +196,7 @@ int UtcDaliFrameBufferNewWithColor04(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_STENCIL );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
@@ -212,7 +212,7 @@ int UtcDaliFrameBufferNewWithColor05(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::COLOR_DEPTH_STENCIL );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   // check that texture is not empty handle
@@ -289,7 +289,7 @@ int UtcDaliFrameBufferAttachColorTexture01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
@@ -312,7 +312,7 @@ int UtcDaliFrameBufferAttachColorTexture02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
@@ -335,7 +335,7 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
@@ -355,9 +355,34 @@ int UtcDaliFrameBufferAttachColorTexture04(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachColorTexture05(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+
+  // N.B. it doesn't make sense per se, however the OGL standard doesn't seem to forbid attaching the same texture to different slots.
+  for (int i = 0; i < Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
+  {
+    frameBuffer.AttachColorTexture( texture );
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
   END_TEST;
 }
@@ -388,6 +413,53 @@ int UtcDaliFrameBufferGetColorTexture02(void)
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferGetColorTexture03(void)
+{ // FrameBuffer::GetColorTexture() and GetColorTexture(0) are equivalent
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture, 0u, 1u );
+
+  DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
+  DALI_TEST_EQUALS(frameBuffer.GetColorTexture(0), texture, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferGetColorTexture04(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  Texture textures[] = {
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+      Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height ),
+  };
+
+  for (auto& t: textures)
+  {
+    frameBuffer.AttachColorTexture( t, 0u, 1u );
+  }
+
+  for (unsigned int i = 0; i < std::extent<decltype(textures)>::value; ++i)
+  {
+    DALI_TEST_EQUALS(frameBuffer.GetColorTexture(i), textures[i], TEST_LOCATION);
+  }
 
   END_TEST;
 }

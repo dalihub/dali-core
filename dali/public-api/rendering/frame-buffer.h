@@ -72,6 +72,11 @@ public:
   };
 
   /**
+   * @brief Maximum number of color attachments supported.
+   */
+  static constexpr uint8_t MAX_COLOR_ATTACHMENTS = 8;
+
+  /**
    * @brief Creates a new FrameBuffer, which attaches only COLOR texture.
    *
    * @SINCE_1_4.0
@@ -149,6 +154,8 @@ public:
   /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.
    * @note This causes a color attachment to be added.
+   * @note Repeated calls to this method add textures as subsequent color attachments.
+   * @note A maximum of 8 color attachments are supported.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
@@ -160,6 +167,8 @@ public:
   /**
    * @brief Attach a texture to the framebuffer for color rendering.
    * @note This causes a color attachment to be added.
+   * @note Repeated calls to this method add textures as subsequent color attachments.
+   * @note A maximum of 8 color attachments are supported.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
@@ -171,12 +180,22 @@ public:
   void AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
-   * @brief Gets the color texture used as output in the FrameBuffer.
+   * @brief Gets the first color texture used as output in the FrameBuffer.
    *
    * @SINCE_1_1.43
    * @returns A handle to the texture used as color output, or an uninitialized handle
    */
-  Texture GetColorTexture();
+  Texture GetColorTexture() const;
+
+  /**
+   * @brief Gets the color texture at the given @a index used as output in the FrameBuffer.
+   * @note A maximum of 8 color attachments are supported. Passing an invalid index will return
+   * an uninitialized handle.
+   *
+   * @SINCE_1_1.43
+   * @returns A handle to the texture used as color output, or an uninitialized handle
+   */
+  Texture GetColorTexture(uint8_t index) const;
 
 public:
 

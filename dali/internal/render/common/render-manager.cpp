@@ -655,7 +655,10 @@ void RenderManager::DoRender( RenderInstruction& instruction )
     {
       // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
       Render::TextureFrameBuffer* textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( instruction.mFrameBuffer );
-      mImpl->textureDependencyList.PushBack( textureFrameBuffer->GetTextureId() );
+      for (unsigned int i0 = 0, i1 = textureFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
+      {
+        mImpl->textureDependencyList.PushBack( textureFrameBuffer->GetTextureId(i0) );
+      }
     }
   }
   else

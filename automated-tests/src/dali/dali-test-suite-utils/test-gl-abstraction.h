@@ -252,9 +252,9 @@ public:
     return mCheckFramebufferStatusResult;
   }
 
-  inline GLenum CheckFramebufferColorAttachment()
+  inline GLuint CheckFramebufferColorAttachmentCount()
   {
-    return mFramebufferColorAttached;
+    return mFramebufferColorAttachmentCount;
   }
 
   inline GLenum CheckFramebufferDepthAttachment()
@@ -584,9 +584,14 @@ public:
     mFramebufferStatus |= 4;
 
     //We check 4 attachment colors
-    if ((attachment == GL_COLOR_ATTACHMENT0) || (attachment == GL_COLOR_ATTACHMENT1) || (attachment == GL_COLOR_ATTACHMENT2)  || (attachment == GL_COLOR_ATTACHMENT4))
+    if ((attachment >= GL_COLOR_ATTACHMENT0) && (attachment < GL_COLOR_ATTACHMENT0 + Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS))
     {
-      mFramebufferColorAttached = true;
+      uint8_t mask = 1 << (attachment - GL_COLOR_ATTACHMENT0);
+      if ((mFrameBufferColorStatus & mask) == 0)
+      {
+        mFrameBufferColorStatus |= mask;
+        ++mFramebufferColorAttachmentCount;
+      }
     }
   }
 
@@ -2178,9 +2183,10 @@ private:
   GLenum     mActiveTextureUnit;
   GLenum     mCheckFramebufferStatusResult;
   GLint      mFramebufferStatus;
-  GLenum     mFramebufferColorAttached;
   GLenum     mFramebufferDepthAttached;
   GLenum     mFramebufferStencilAttached;
+  GLuint     mFramebufferColorAttachmentCount;
+  GLuint     mFrameBufferColorStatus;
   GLint      mNumBinaryFormats;
   GLint      mBinaryFormats;
   GLint      mProgramBinaryLength;
