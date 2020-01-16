@@ -51,6 +51,8 @@ Building dali core:
 
 Note, you __must__ use a local build and not a distributed build, and you __must__ also build with debug enabled to allow *DALI_ASSERT_DEBUG* to trigger on wrong behaviour ( Which should always be a test case failure! )
 
+Further note that, for the following, your gcov version must match the version of the compiler.
+
 Building the tests
 ------------------
 
@@ -174,7 +176,7 @@ If you are adding test cases to existing files, then all you need to do is creat
       END_TEST;
     }
 
-Note that **there must be no extra whitespace in the method signature** (i.e., it must violate our coding convention and follow __exactly__ this pattern: `int UtcDaliMyTestcaseName(void)`), as it's parsed by an awk script to auto-generate the testcase arrays in the main header file.
+Note that **the parentheses in the method signature must not be empty** (i.e., it must violate our coding convention and follow __exactly__ this pattern: `int UtcDaliMyTestcaseName(void)`), as it's parsed by an awk script to auto-generate the testcase arrays in the main header file. Neither may any comments on the same line contain empty parentheses.
 
 You can contine to use the TET api, e.g. `tet_infoline`, `tet_result` and our test check methods `DALI_TEST_CHECK`, `DALI_TEST_EQUALS`, etc.
 
