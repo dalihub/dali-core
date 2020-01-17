@@ -1,7 +1,7 @@
 # Set the source directory
 SET( platform_abstraction_src_dir ${ROOT_SRC_DIR}/dali/integration-api )
 
-# Add platform abstraction headers here
+# Add platform abstraction source files here
 SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/bitmap.cpp
    ${platform_abstraction_src_dir}/core.cpp

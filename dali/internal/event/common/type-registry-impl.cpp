@@ -19,11 +19,11 @@
 #include <dali/internal/event/common/type-registry-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/internal/event/common/demangler.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -38,8 +38,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TYP
 
 namespace Dali
 {
-
-extern std::string Demangle(const char* symbol);
 
 namespace Internal
 {

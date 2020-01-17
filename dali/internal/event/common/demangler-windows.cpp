@@ -1,6 +1,3 @@
-#ifndef DALI_DEMANGLER_H
-#define DALI_DEMANGLER_H
-
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
@@ -18,8 +15,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <string>
+// FILE HEADER
+#include <dali/internal/event/common/demangler.h>
 
 namespace Dali
 {
@@ -27,15 +24,26 @@ namespace Dali
 namespace Internal
 {
 
-/**
- * @brief Demangle a nested typeid name to its class name.
- * @param[in] typeIdName The type id name string to demangle.
- * @returns the class name ie "Actor" or an empty string
- */
-const std::string DemangleClassName(const char *typeIdName);
+const std::string DemangleClassName(const char *typeIdName)
+{
+  std::string name = typeIdName;
+  int index = name.find_last_of(' ');
+
+  if( 0 <= index )
+  {
+    name = name.substr( index + 1, name.size() - index );
+  }
+
+  index = name.find_last_of(':');
+
+  if( 0 <= index )
+  {
+    name = name.substr(index + 1, name.size() - index);
+  }
+
+  return name;
+}
 
 } // namespace Internal
 
 } // namespace Dali
-
-#endif // DALI_DEMANGLER_H

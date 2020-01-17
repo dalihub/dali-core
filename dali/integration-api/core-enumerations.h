@@ -23,6 +23,9 @@
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/resource-policies.h>
 
+#undef FALSE
+#undef TRUE
+
 namespace Dali
 {
 
