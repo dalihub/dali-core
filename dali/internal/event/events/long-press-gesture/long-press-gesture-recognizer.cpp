@@ -39,18 +39,18 @@ namespace
 {
 // TODO: Set these according to DPI
 const float MAXIMUM_MOTION_ALLOWED = 60.0f;
-// TODO: Set this time according to system setting (vconf)
-const unsigned long LONG_PRESS_TIME = 500u;
+
 } // unnamed namespace
 
-LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request )
+LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime )
 : GestureRecognizer( screenSize, Gesture::LongPress ),
   mObserver( observer ),
   mState( Clear ),
   mMinimumTouchesRequired( request.minTouches ),
   mMaximumTouchesRequired( request.maxTouches ),
   mTouchTime( 0 ),
-  mTimerId( 0 )
+  mTimerId( 0 ),
+  mMinimumHoldingTime( minimumHoldingTime )
 {
 }
 
@@ -77,7 +77,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
         mTouchTime = event.time;
 
-        mTimerId = platformAbstraction.StartTimer(GetSystemValue(), MakeCallback( this, &LongPressGestureRecognizer::TimerCallback));
+        mTimerId = platformAbstraction.StartTimer( mMinimumHoldingTime, MakeCallback( this, &LongPressGestureRecognizer::TimerCallback ) );
 
         // A long press gesture may be possible, tell Core about this and change state to Touched.
         mState = Touched;
@@ -186,6 +186,12 @@ void LongPressGestureRecognizer::Update(const GestureRequest& request)
   mMaximumTouchesRequired = longPress.maxTouches;
 }
 
+void LongPressGestureRecognizer::SetMinimumHoldingTime( uint32_t time )
+{
+  mMinimumHoldingTime = time;
+}
+
+
 bool LongPressGestureRecognizer::TimerCallback()
 {
   EmitGesture(Gesture::Started);
@@ -217,7 +223,7 @@ void LongPressGestureRecognizer::EmitGesture(Gesture::State state)
     longPress.time = mTouchTime;
     if ( state != Gesture::Possible )
     {
-      longPress.time += GetSystemValue();
+      longPress.time += mMinimumHoldingTime;
     }
 
     if( mScene )
@@ -228,11 +234,6 @@ void LongPressGestureRecognizer::EmitGesture(Gesture::State state)
       mObserver.Process(*mScene, longPress);
     }
   }
-}
-
-int LongPressGestureRecognizer::GetSystemValue()
-{
-  return LONG_PRESS_TIME;
 }
 
 } // namespace Internal
