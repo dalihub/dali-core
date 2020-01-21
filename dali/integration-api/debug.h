@@ -142,7 +142,7 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for global warning level messages
  */
-#define DALI_LOG_WARNING(format, ...)   Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, __PRETTY_FUNCTION__, ## __VA_ARGS__)
+#define DALI_LOG_WARNING(format, ...)   Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, ASSERT_LOCATION, ## __VA_ARGS__)
 
 
 #else // DEBUG_ENABLED
@@ -354,10 +354,10 @@ public:
 
 
 #define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...)                 \
-  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, __PRETTY_FUNCTION__, ## __VA_ARGS__)
+  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, ASSERT_LOCATION, ## __VA_ARGS__)
 
 #define DALI_LOG_TRACE_METHOD(filter)                                      \
-  Dali::Integration::Log::TraceObj debugTraceObj(filter, __PRETTY_FUNCTION__)
+  Dali::Integration::Log::TraceObj debugTraceObj(filter, ASSERT_LOCATION)
 
 
 #else // DEBUG_ENABLED

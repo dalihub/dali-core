@@ -1,0 +1,11 @@
+# Set the source directory
+SET( internal_src_dir ${ROOT_SRC_DIR}/dali/internal )
+
+# Add internal unix source files here
+SET( internal_unix_src_files
+  ${internal_src_dir}/event/common/demangler-unix.cpp
+)
+
+SET( SOURCES ${SOURCES}
+  ${internal_unix_src_files}
+)
