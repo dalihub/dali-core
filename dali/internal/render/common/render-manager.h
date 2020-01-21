@@ -83,8 +83,7 @@ public:
                              Integration::GlSyncAbstraction& glSyncAbstraction,
                              Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
                              Integration::DepthBufferAvailable depthBufferAvailable,
-                             Integration::StencilBufferAvailable stencilBufferAvailable,
-                             Integration::PartialUpdateAvailable partialUpdateAvailable );
+                             Integration::StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor; not intended as a base class
