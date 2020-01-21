@@ -64,6 +64,7 @@ void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
 {
   if( mSortFunction != function )
   {
+    SetPropertyDirty( true );
     // is a custom sort function used
     if( function != Internal::Layer::ZValue )
     {
@@ -84,21 +85,25 @@ void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
 void Layer::SetClipping(bool enabled)
 {
   mIsClipping = enabled;
+  SetPropertyDirty( true );
 }
 
 void Layer::SetClippingBox(const Dali::ClippingBox& box)
 {
   mClippingBox.Set(box.x, box.y, box.width, box.height);
+  SetPropertyDirty( true );
 }
 
 void Layer::SetBehavior( Dali::Layer::Behavior behavior )
 {
   mBehavior = behavior;
+  SetPropertyDirty( true );
 }
 
 void Layer::SetDepthTestDisabled( bool disable )
 {
   mDepthTestDisabled = disable;
+  SetPropertyDirty( true );
 }
 
 bool Layer::IsDepthTestDisabled() const

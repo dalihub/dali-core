@@ -232,6 +232,7 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] depthBufferAvailable Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+   * @param[in] partialUpdateAvailble whether the partial update is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -242,7 +243,8 @@ public:
                     ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,
-                    StencilBufferAvailable stencilBufferAvailable );
+                    StencilBufferAvailable stencilBufferAvailable,
+                    PartialUpdateAvailable partialUpdateAvailable );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
