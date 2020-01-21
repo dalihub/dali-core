@@ -107,7 +107,7 @@ IF( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
   ADD_COMPILE_OPTIONS( -Werror )
 ENDIF()
 
-ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wno-class-memaccess -Wno-cast-function-type )
+ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
 
 IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
   ADD_COMPILE_OPTIONS( --coverage )
