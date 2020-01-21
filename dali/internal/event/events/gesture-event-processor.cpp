@@ -321,6 +321,16 @@ void GestureEventProcessor::SetPinchGestureMinimumDistance( float value)
   mPinchGestureProcessor.SetMinimumPinchDistance( value );
 }
 
+void GestureEventProcessor::SetLongPressMinimumHoldingTime( uint32_t value )
+{
+  mLongPressGestureProcessor.SetMinimumHoldingTime( value );
+}
+
+uint32_t GestureEventProcessor::GetLongPressMinimumHoldingTime() const
+{
+  return mLongPressGestureProcessor.GetMinimumHoldingTime();
+}
+
 const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()
 {
   return mPanGestureProcessor;

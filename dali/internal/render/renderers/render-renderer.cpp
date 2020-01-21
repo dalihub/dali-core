@@ -145,7 +145,8 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mDepthWriteMode( depthWriteMode ),
   mDepthTestMode( depthTestMode ),
   mUpdateAttributesLocation( true ),
-  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled )
+  mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
+  mShaderChanged( false )
 {
   if( blendingBitmask != 0u )
   {
@@ -216,8 +217,12 @@ void Renderer::SetUniforms( BufferIndex bufferIndex, const SceneGraph::NodeDataP
 
   if( uniformMapDataProvider.GetUniformMapChanged( bufferIndex ) ||
       node.GetUniformMapChanged(bufferIndex) ||
-      mUniformIndexMap.Count() == 0)
+      mUniformIndexMap.Count() == 0 ||
+      mShaderChanged )
   {
+    // Reset shader pointer
+    mShaderChanged = false;
+
     const SceneGraph::CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
     const SceneGraph::CollectedUniformMap& uniformMapNode = node.GetUniformMap( bufferIndex );
 
@@ -584,6 +589,11 @@ void Renderer::SetSortAttributes( BufferIndex bufferIndex,
 {
   sortAttributes.shader = &( mRenderDataProvider->GetShader() );
   sortAttributes.geometry = mGeometry;
+}
+
+void Renderer::SetShaderChanged( bool value )
+{
+  mShaderChanged = value;
 }
 
 } // namespace SceneGraph

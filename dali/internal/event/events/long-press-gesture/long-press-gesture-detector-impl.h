@@ -97,6 +97,11 @@ public:
    */
   unsigned int GetMaximumTouchesRequired() const;
 
+  /**
+   * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
+   */
+  uint32_t GetMinimumHoldingTime() const;
+
 public:
 
   /**

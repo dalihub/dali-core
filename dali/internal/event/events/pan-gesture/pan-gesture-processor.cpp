@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +167,6 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
         SetActor( &GetImplementation( hitTestResults.actor ) );
         mPossiblePanPosition = panEvent.currentPosition;
       }
-
       break;
     }
 
@@ -176,29 +175,33 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       // Requires a core update
       mNeedsUpdate = true;
 
-      if ( GetCurrentGesturedActor() )
+      // The pan gesture should only be sent to the gesture detector which first received it so that
+      // it can be told when the gesture ends as well.
+
+      HitTestAlgorithm::Results hitTestResults;
+      HitTest( scene, panEvent.previousPosition, hitTestResults ); // Hit Test previous position
+
+      if ( hitTestResults.actor )
       {
-        // The pan gesture should only be sent to the gesture detector which first received it so that
-        // it can be told when the gesture ends as well.
-
-        HitTestAlgorithm::Results hitTestResults;
-        HitTest( scene, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
-
-        if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
+        // If the current hit actor is different from the one we touched down on then set accordingly & update initial pan position
+        if( &GetImplementation( hitTestResults.actor ) != GetCurrentGesturedActor() )
         {
-          // Record the current render-task for Screen->Actor coordinate conversions
-          mCurrentRenderTask = hitTestResults.renderTask;
+          mPossiblePanPosition = panEvent.previousPosition;
+          SetActor( &GetImplementation( hitTestResults.actor ) );
+        }
 
-          // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
-          mCurrentPanEvent = &panEvent;
-          ProcessAndEmit( hitTestResults );
-          mCurrentPanEvent = nullptr;
-        }
-        else
-        {
-          ResetActor();
-          mCurrentPanEmitters.clear();
-        }
+        // Record the current render-task for Screen->Actor coordinate conversions
+        mCurrentRenderTask = hitTestResults.renderTask;
+
+        // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
+        mCurrentPanEvent = &panEvent;
+        ProcessAndEmit( hitTestResults );
+        mCurrentPanEvent = nullptr;
+      }
+      else
+      {
+        ResetActor();
+        mCurrentPanEmitters.clear();
       }
       break;
     }
@@ -207,8 +210,10 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
     {
       // Requires a core update
       mNeedsUpdate = true;
+
+      DALI_FALLTHROUGH;
     }
-    // No break, Fallthrough
+
     case Gesture::Finished:
     case Gesture::Cancelled:
     {

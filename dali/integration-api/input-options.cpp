@@ -120,6 +120,12 @@ void SetPinchGestureMinimumDistance( float value )
   eventProcessor.SetPinchGestureMinimumDistance( value );
 }
 
+void SetLongPressMinimumHoldingTime( unsigned int value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetLongPressMinimumHoldingTime( value );
+}
+
 
 } // namespace Integration
 
