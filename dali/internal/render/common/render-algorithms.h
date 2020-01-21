@@ -65,8 +65,7 @@ class RenderAlgorithms
                                    BufferIndex bufferIndex,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures,
-                                   int orientation);
+                                   Vector<GLuint>& boundTextures );
 
   private:
 
@@ -89,7 +88,7 @@ class RenderAlgorithms
      * @param[in] item     The current RenderItem (about to be rendered)
      * @param[in] context  The current Context
      */
-    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context, int orientation );
+    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context );
 
     /**
      * @brief Set up the clipping based on the specified clipping settings.
@@ -105,8 +104,7 @@ class RenderAlgorithms
                                bool& usedStencilBuffer,
                                uint32_t& lastClippingDepth,
                                uint32_t& lastClippingId,
-                               Integration::StencilBufferAvailable stencilBufferAvailable,
-                               int orientation );
+                               Integration::StencilBufferAvailable stencilBufferAvailable );
 
     /**
      * @brief Process a render-list.
@@ -126,8 +124,7 @@ class RenderAlgorithms
                                    const Matrix& projectionMatrix,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures,
-                                   int orientation );
+                                   Vector<GLuint>& boundTextures );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );
