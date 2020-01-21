@@ -67,6 +67,18 @@ public: // To be called by GestureEventProcessor
   void SetMinimumPinchDistance( float value );
 
   /**
+   * Sets the minimum touch events required before a pinch can be started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEvents( uint32_t value );
+
+  /**
+   * Sets the minimum touch events required after a pinch started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEventsAfterStart( uint32_t value );
+
+  /**
    * This method is called whenever a pinch gesture event occurs.
    * @param[in] scene The scene the pinch gesture event occurs in.
    * @param[in] pinchEvent The event that has occurred.
@@ -129,6 +141,8 @@ private:
   const PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
 
   float mMinimumPinchDistance;
+  uint32_t mMinimumTouchEvents;
+  uint32_t mMinimumTouchEventsAfterStart;
 };
 
 } // namespace Internal

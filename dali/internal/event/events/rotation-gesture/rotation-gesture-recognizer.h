@@ -48,8 +48,10 @@ public:
   /**
    * Constructor
    * @param[in] observer   The observer to send gesture too when it's detected
+   * @param[in] minimumTouchEvents The number of touch events required
+   * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
    */
-  RotationGestureRecognizer( Observer& observer );
+  RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart );
 
   /**
    * Virtual destructor.
@@ -67,6 +69,18 @@ public:
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
   virtual void Update( const GestureRequest& request ) { /* Nothing to do */ }
+
+  /**
+   * Sets the minimum touch events required before a rotation can be started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEvents( uint32_t value );
+
+  /**
+   * Sets the minimum touch events required after a rotation started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEventsAfterStart( uint32_t value );
 
 private:
 
@@ -96,6 +110,10 @@ private:
   std::vector< Integration::TouchEvent > mTouchEvents; ///< The touch events since initial touch down.
 
   float mStartingAngle; ///< The angle between the two touch points when the rotation is first detected.
+
+  uint32_t mMinimumTouchEvents; ///< The minimum touch events required before a rotation can be started.
+
+  uint32_t mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a rotation started.
 };
 
 } // namespace Internal

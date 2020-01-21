@@ -41,6 +41,8 @@ namespace Internal
 
 namespace
 {
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED = 4u;
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
 /**
  * Creates a RotationGesture and asks the specified detector to emit its detected signal.
@@ -103,7 +105,9 @@ RotationGestureProcessor::RotationGestureProcessor()
 : GestureProcessor( DevelGesture::Rotation ),
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
-  mCurrentRotationEvent( nullptr )
+  mCurrentRotationEvent( nullptr ),
+  mMinimumTouchEvents( MINIMUM_TOUCH_EVENTS_REQUIRED ),
+  mMinimumTouchEventsAfterStart( MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
 {
 }
 
@@ -196,7 +200,7 @@ void RotationGestureProcessor::AddGestureDetector( RotationGestureDetector* gest
 
   if (createRecognizer)
   {
-    mGestureRecognizer = new RotationGestureRecognizer( *this );
+    mGestureRecognizer = new RotationGestureRecognizer( *this, mMinimumTouchEvents, mMinimumTouchEventsAfterStart );
   }
 }
 
@@ -225,6 +229,40 @@ void RotationGestureProcessor::RemoveGestureDetector( RotationGestureDetector* g
   if (mRotationGestureDetectors.empty())
   {
     mGestureRecognizer.Detach();
+  }
+}
+
+void RotationGestureProcessor::SetMinimumTouchEvents( uint32_t value )
+{
+  if( value > 1u && mMinimumTouchEvents != value )
+  {
+    mMinimumTouchEvents = value;
+
+    if( mGestureRecognizer )
+    {
+      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>( mGestureRecognizer.Get() );
+      if( rotationRecognizer )
+      {
+        rotationRecognizer->SetMinimumTouchEvents( value );
+      }
+    }
+  }
+}
+
+void RotationGestureProcessor::SetMinimumTouchEventsAfterStart( uint32_t value )
+{
+  if( value > 1u && mMinimumTouchEventsAfterStart != value )
+  {
+    mMinimumTouchEventsAfterStart = value;
+
+    if( mGestureRecognizer )
+    {
+      RotationGestureRecognizer* rotationRecognizer = dynamic_cast<RotationGestureRecognizer*>( mGestureRecognizer.Get() );
+      if( rotationRecognizer )
+      {
+        rotationRecognizer->SetMinimumTouchEventsAfterStart( value );
+      }
+    }
   }
 }
 

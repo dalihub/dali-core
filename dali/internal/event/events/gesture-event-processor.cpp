@@ -321,6 +321,26 @@ void GestureEventProcessor::SetPinchGestureMinimumDistance( float value)
   mPinchGestureProcessor.SetMinimumPinchDistance( value );
 }
 
+void GestureEventProcessor::SetPinchGestureMinimumTouchEvents( uint32_t value )
+{
+  mPinchGestureProcessor.SetMinimumTouchEvents( value );
+}
+
+void GestureEventProcessor::SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value )
+{
+  mPinchGestureProcessor.SetMinimumTouchEventsAfterStart( value );
+}
+
+void GestureEventProcessor::SetRotationGestureMinimumTouchEvents( uint32_t value )
+{
+  mRotationGestureProcessor.SetMinimumTouchEvents( value );
+}
+
+void GestureEventProcessor::SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value )
+{
+  mRotationGestureProcessor.SetMinimumTouchEventsAfterStart( value );
+}
+
 void GestureEventProcessor::SetLongPressMinimumHoldingTime( uint32_t value )
 {
   mLongPressGestureProcessor.SetMinimumHoldingTime( value );

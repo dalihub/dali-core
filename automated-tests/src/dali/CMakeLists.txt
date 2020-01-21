@@ -81,6 +81,7 @@ SET(TC_SOURCES
         utc-Dali-ResourceImage.cpp
         utc-Dali-RotationGesture.cpp
         utc-Dali-RotationGestureDetector.cpp
+        utc-Dali-RotationGestureRecognizer.cpp
         utc-Dali-Sampler.cpp
         utc-Dali-Scene.cpp
         utc-Dali-Scripting.cpp
