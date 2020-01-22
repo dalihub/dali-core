@@ -4651,8 +4651,15 @@ void Actor::SetPreferredSize( const Vector2& size )
 {
   EnsureRelayoutData();
 
-  SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
-  SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
+  if( size.width > 0.0f )
+  {
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
+  }
+
+  if( size.height > 0.0f )
+  {
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
+  }
 
   mRelayoutData->preferredSize = size;
 
