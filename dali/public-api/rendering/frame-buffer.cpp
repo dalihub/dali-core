@@ -108,9 +108,15 @@ void FrameBuffer::AttachColorTexture( Texture& texture, uint32_t mipmapLevel, ui
   }
 }
 
-Texture FrameBuffer::GetColorTexture()
+Texture FrameBuffer::GetColorTexture() const
 {
-  Internal::Texture* texturePtr = GetImplementation(*this).GetColorTexture();
+  Internal::Texture* texturePtr = GetImplementation(*this).GetColorTexture(0);
+  return Dali::Texture( texturePtr );
+}
+
+Texture FrameBuffer::GetColorTexture(uint8_t index) const
+{
+  Internal::Texture* texturePtr = GetImplementation(*this).GetColorTexture(index);
   return Dali::Texture( texturePtr );
 }
 

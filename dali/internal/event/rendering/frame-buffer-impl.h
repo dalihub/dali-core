@@ -89,7 +89,7 @@ public:
   /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
    */
-  Texture* GetColorTexture();
+  Texture* GetColorTexture(uint8_t index) const;
 
   /**
    * @brief Sets the frame buffer size.
@@ -136,10 +136,11 @@ private: // data
   Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
   Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
-  TexturePtr mColor;
+  TexturePtr mColor[Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS];
   uint32_t mWidth;
   uint32_t mHeight;
   Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
+  uint8_t mColorAttachmentCount;
 
   bool mIsSurfaceBacked:1;
 
