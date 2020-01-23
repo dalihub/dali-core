@@ -33,7 +33,6 @@ SurfaceFrameBuffer::SurfaceFrameBuffer( Integration::RenderSurface* surface )
   mContext( nullptr ),
   mWidth( mSurface->GetPositionSize().width ),
   mHeight( mSurface->GetPositionSize().height ),
-  mBackgroundColor( 0.f, 0.f, 0.f, 1.f ),
   mSizeChanged( false ),
   mIsSurfaceInvalid( false )
 {
@@ -119,21 +118,11 @@ void SurfaceFrameBuffer::MakeContextCurrent()
   }
 }
 
-Vector4 SurfaceFrameBuffer::GetBackgroundColor()
-{
-  return mBackgroundColor;
-}
-
 void SurfaceFrameBuffer::SetSize( uint32_t width, uint32_t height )
 {
   mWidth = width;
   mHeight = height;
   mSizeChanged = true;
-}
-
-void SurfaceFrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  mBackgroundColor = color;
 }
 
 bool SurfaceFrameBuffer::IsSurfaceValid() const

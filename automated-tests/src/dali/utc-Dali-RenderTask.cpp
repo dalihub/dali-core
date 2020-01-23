@@ -1641,13 +1641,13 @@ int UtcDaliRenderTaskSetClearEnabledP(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
-  DALI_TEST_CHECK( !task.GetClearEnabled() ); // defaults to false
-
-  task.SetClearEnabled( true );
-  DALI_TEST_EQUALS( task.GetClearEnabled(), true, TEST_LOCATION );
+  DALI_TEST_CHECK( task.GetClearEnabled() ); // defaults to true
 
   task.SetClearEnabled( false );
   DALI_TEST_EQUALS( task.GetClearEnabled(), false, TEST_LOCATION );
+
+  task.SetClearEnabled( true );
+  DALI_TEST_EQUALS( task.GetClearEnabled(), true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1679,7 +1679,7 @@ int UtcDaliRenderTaskGetClearEnabledP(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
-  DALI_TEST_CHECK( !task.GetClearEnabled() ); // defaults to false
+  DALI_TEST_CHECK( task.GetClearEnabled() ); // defaults to true
   END_TEST;
 }
 

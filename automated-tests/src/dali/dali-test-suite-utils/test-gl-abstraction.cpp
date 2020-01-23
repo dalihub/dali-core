@@ -58,6 +58,7 @@ void TestGlAbstraction::Initialize()
 
   mLastShaderCompiled = 0;
   mLastClearBitMask = 0;
+  mLastClearColor = Color::TRANSPARENT;
   mClearCount = 0;
 
   mLastBlendEquationRgb   = 0;
@@ -131,3 +132,4 @@ bool BlendDisabled(const Dali::TraceCallStack& callStack)
   bool blendEnabled = callStack.FindMethodAndParams( "Disable", out.str() );
   return blendEnabled;
 }
+

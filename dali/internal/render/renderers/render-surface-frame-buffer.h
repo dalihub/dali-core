@@ -94,12 +94,6 @@ public:
   void SetSize( uint32_t width, uint32_t height );
 
   /**
-   * @brief Sets the background color.
-   * @param[in] color The new background color
-   */
-  void SetBackgroundColor( const Vector4& color );
-
-  /**
    * @copydoc Dali::Internal::FrameBuffer::MarkSurfaceAsInvalid()
    */
   void MarkSurfaceAsInvalid() { mIsSurfaceInvalid = true; };
@@ -129,12 +123,6 @@ public:
    */
   void MakeContextCurrent();
 
-  /**
-   * @brief Gets the background color of the surface.
-   * @return The background color
-   */
-  Vector4 GetBackgroundColor();
-
 private:
 
   Integration::RenderSurface* mSurface;   ///< The render surface
@@ -142,7 +130,6 @@ private:
 
   uint32_t                    mWidth;
   uint32_t                    mHeight;
-  Vector4                     mBackgroundColor;
   bool                        mSizeChanged;
   std::atomic<bool>           mIsSurfaceInvalid; ///< This is set only from the event thread and read only from the render thread
 };
@@ -157,17 +144,6 @@ inline void SetFrameBufferSizeMessage( SceneGraph::UpdateManager& updateManager,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( surfaceFrameBuffer, &SurfaceFrameBuffer::SetSize, width, height );
-}
-
-inline void SetFrameBufferBackgroundColorMessage( SceneGraph::UpdateManager& updateManager, SurfaceFrameBuffer* surfaceFrameBuffer, const Vector4& color )
-{
-  typedef MessageValue1< SurfaceFrameBuffer, Vector4 > LocalType;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = updateManager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( surfaceFrameBuffer, &SurfaceFrameBuffer::SetBackgroundColor, color );
 }
 
 } // namespace Render
