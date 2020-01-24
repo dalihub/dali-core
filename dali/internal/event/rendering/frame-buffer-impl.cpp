@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, 
     {
       DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
     }
-    else if ( mColorAttachmentCount >= Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS )
+    else if ( mColorAttachmentCount >= Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS )
     {
       DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Exceeded maximum supported color attachments.\n" );
     }

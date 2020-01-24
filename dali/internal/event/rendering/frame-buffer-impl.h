@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
@@ -136,7 +137,7 @@ private: // data
   Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
   Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
-  TexturePtr mColor[Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS];
+  TexturePtr mColor[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
   uint32_t mWidth;
   uint32_t mHeight;
   Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask

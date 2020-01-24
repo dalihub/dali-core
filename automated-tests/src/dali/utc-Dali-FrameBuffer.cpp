@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 
 using namespace Dali;
 
@@ -372,7 +373,7 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
 
   // N.B. it doesn't make sense per se, however the OGL standard doesn't seem to forbid attaching the same texture to different slots.
-  for (int i = 0; i < Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
+  for (int i = 0; i < Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
   {
     frameBuffer.AttachColorTexture( texture );
   }
@@ -380,7 +381,7 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
@@ -428,7 +429,7 @@ int UtcDaliFrameBufferGetColorTexture03(void)
   frameBuffer.AttachColorTexture( texture, 0u, 1u );
 
   DALI_TEST_EQUALS(frameBuffer.GetColorTexture(), texture, TEST_LOCATION);
-  DALI_TEST_EQUALS(frameBuffer.GetColorTexture(0), texture, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorTexture(frameBuffer, 0), texture, TEST_LOCATION);
 
   END_TEST;
 }
@@ -458,7 +459,7 @@ int UtcDaliFrameBufferGetColorTexture04(void)
 
   for (unsigned int i = 0; i < std::extent<decltype(textures)>::value; ++i)
   {
-    DALI_TEST_EQUALS(frameBuffer.GetColorTexture(i), textures[i], TEST_LOCATION);
+    DALI_TEST_EQUALS(DevelFrameBuffer::GetColorTexture(frameBuffer, i), textures[i], TEST_LOCATION);
   }
 
   END_TEST;

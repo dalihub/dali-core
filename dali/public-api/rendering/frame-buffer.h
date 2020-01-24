@@ -2,7 +2,7 @@
 #define DALI_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,11 +70,6 @@ public:
       COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer are created.  @SINCE_1_4.0
     };
   };
-
-  /**
-   * @brief Maximum number of color attachments supported.
-   */
-  static constexpr uint8_t MAX_COLOR_ATTACHMENTS = 8;
 
   /**
    * @brief Creates a new FrameBuffer, which attaches only COLOR texture.
@@ -185,17 +180,7 @@ public:
    * @SINCE_1_1.43
    * @returns A handle to the texture used as color output, or an uninitialized handle
    */
-  Texture GetColorTexture() const;
-
-  /**
-   * @brief Gets the color texture at the given @a index used as output in the FrameBuffer.
-   * @note A maximum of 8 color attachments are supported. Passing an invalid index will return
-   * an uninitialized handle.
-   *
-   * @SINCE_1_1.43
-   * @returns A handle to the texture used as color output, or an uninitialized handle
-   */
-  Texture GetColorTexture(uint8_t index) const;
+  Texture GetColorTexture();
 
 public:
 

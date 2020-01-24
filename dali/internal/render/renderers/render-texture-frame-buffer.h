@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
 namespace Dali
@@ -107,7 +108,7 @@ public:
 private:
 
   GLuint mId;
-  GLuint mTextureId[Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS];
+  GLuint mTextureId[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
   GLuint mDepthBuffer;
   GLuint mStencilBuffer;
   uint32_t mWidth;
