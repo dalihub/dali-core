@@ -46,9 +46,10 @@ void TestGlAbstraction::Initialize()
   mActiveTextureUnit = 0;
   mCheckFramebufferStatusResult = 0;
   mFramebufferStatus = 0;
-  mFramebufferColorAttached = 0;
   mFramebufferDepthAttached = 0;
   mFramebufferStencilAttached = 0;
+  mFramebufferColorAttachmentCount = 0;
+  mFrameBufferColorStatus = 0;
   mNumBinaryFormats = 0;
   mBinaryFormats = 0;
   mProgramBinaryLength = 0;
@@ -58,6 +59,7 @@ void TestGlAbstraction::Initialize()
 
   mLastShaderCompiled = 0;
   mLastClearBitMask = 0;
+  mLastClearColor = Color::TRANSPARENT;
   mClearCount = 0;
 
   mLastBlendEquationRgb   = 0;
@@ -131,3 +133,4 @@ bool BlendDisabled(const Dali::TraceCallStack& callStack)
   bool blendEnabled = callStack.FindMethodAndParams( "Disable", out.str() );
   return blendEnabled;
 }
+

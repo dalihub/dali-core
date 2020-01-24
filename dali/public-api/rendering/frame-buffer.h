@@ -2,7 +2,7 @@
 #define DALI_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,8 @@ public:
   /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.
    * @note This causes a color attachment to be added.
+   * @note Repeated calls to this method add textures as subsequent color attachments.
+   * @note A maximum of 8 color attachments are supported.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
@@ -160,6 +162,8 @@ public:
   /**
    * @brief Attach a texture to the framebuffer for color rendering.
    * @note This causes a color attachment to be added.
+   * @note Repeated calls to this method add textures as subsequent color attachments.
+   * @note A maximum of 8 color attachments are supported.
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
@@ -171,7 +175,7 @@ public:
   void AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
-   * @brief Gets the color texture used as output in the FrameBuffer.
+   * @brief Gets the first color texture used as output in the FrameBuffer.
    *
    * @SINCE_1_1.43
    * @returns A handle to the texture used as color output, or an uninitialized handle

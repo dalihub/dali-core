@@ -26,15 +26,30 @@ namespace Internal
 {
 namespace Render
 {
+namespace
+{
+const GLenum COLOR_ATTACHMENTS[] =
+{
+    GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3,
+    GL_COLOR_ATTACHMENT4,
+    GL_COLOR_ATTACHMENT5,
+    GL_COLOR_ATTACHMENT6,
+    GL_COLOR_ATTACHMENT7,
+};
+}
 
 TextureFrameBuffer::TextureFrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : FrameBuffer(),
   mId( 0u ),
-  mTextureId( 0u ),
+  mTextureId{ 0u },
   mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
   mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
   mWidth( width ),
-  mHeight( height )
+  mHeight( height ),
+  mColorAttachmentCount( 0u )
 {
 }
 
@@ -84,17 +99,23 @@ void TextureFrameBuffer::AttachColorTexture( Context& context, Render::Texture* 
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 
-  mTextureId = texture->GetId();
+  const GLuint textureId = texture->GetId();
+  mTextureId[mColorAttachmentCount] = textureId;
 
   // Create a color attachment.
+  const GLenum iAttachment = COLOR_ATTACHMENTS[mColorAttachmentCount];
   if( texture->GetType() == TextureType::TEXTURE_2D )
   {
-    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->GetTarget(), mTextureId, mipmapLevel );
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, iAttachment, texture->GetTarget(), textureId, mipmapLevel );
   }
   else
   {
-    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mTextureId, mipmapLevel );
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, iAttachment, GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, textureId, mipmapLevel );
   }
+
+  ++mColorAttachmentCount;
+  context.DrawBuffers(mColorAttachmentCount, COLOR_ATTACHMENTS);
+  DALI_ASSERT_DEBUG(context.CheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }

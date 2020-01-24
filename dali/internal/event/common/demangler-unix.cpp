@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,11 @@
  *
  */
 
-//
-// gcc and clang minimal demangling
-// Both follow Itanium C++ ABI
-//
-// We only decode namespaces and class typeid names for simplicity as its all we need.
-//
-// From http://mentorembedded.github.io/cxx-abi/abi.html#mangling-structure
-//
-// <nested-name> ::= N [<CV-qualifiers>] <prefix> <unqualified-name> E
-//     ::= N [<CV-qualifiers>] <template-prefix> <template-args> E
-//
-// <prefix> ::= <prefix> <unqualified-name>
-//     ::= <template-prefix> <template-args>
-//          ::= <template-param>
-//          ::= <decltype>
-//     ::= # empty
-//     ::= <substitution>
-//          ::= <prefix> <data-member-prefix>
-//
-// <template-prefix> ::= <prefix> <template unqualified-name>
-//                   ::= <template-param>
-//                   ::= <substitution>
-// <unqualified-name> ::= <operator-name>
-//                    ::= <ctor-dtor-name>
-//                    ::= <source-name>
-//                    ::= <unnamed-type-name>
-//
-// <source-name> ::= <positive length number> <identifier>
-// <number> ::= [n] <non-negative decimal integer>
-// <identifier> ::= <unqualified source code identifier>
-//
-// So for example
-//
-// Dali::Internal::Actor would be
-//
-//   N4Dali8Internal5ActorE
-//
-
-// CLASS HEADER
+// FILE HEADER
 #include <dali/internal/event/common/demangler.h>
+
+// INTERNAL HEADERS
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace
 {
@@ -98,21 +63,17 @@ size_t GetNumberOfCharacters(const std::string& s, const size_t& start, int& res
   return i - start;
 }
 
-} // anon namespace
-
-
-namespace Dali
-{
-
-namespace Internal
-{
-
-#if defined(__clang__) || defined(__GNUC__)
-
-// Demangle class name mangled according to the Itanium C++ ABI
-// Returns demangled names ie "N4Dali8Internal5ActorE" is ["Dali","Internal","Actor"]
+/**
+ * @brief Demangle a nested typeid name into its component parts.
+ * A nested type name is one containing namespaces and class names only.
+ *   eg DemangleNestedNames(typeid(Dali::Actor).name());
+ * @param[in] typeIdName The type id name string to demangle.
+ * @returns the demangled list of names ie ["Dali","Actor"] or an empty list
+ */
 std::vector<std::string> DemangleNestedNames(const char *typeIdName)
 {
+  // Demangle class name mangled according to the Itanium C++ ABI
+  // Returns demangled names ie "N4Dali8Internal5ActorE" is ["Dali","Internal","Actor"]
   std::vector<std::string> ret;
 
   const std::string mangledName(typeIdName);
@@ -143,10 +104,13 @@ std::vector<std::string> DemangleNestedNames(const char *typeIdName)
   return ret;
 }
 
-#else
-# error Unsupported Compiler
-#endif
+} // anon namespace
 
+namespace Dali
+{
+
+namespace Internal
+{
 
 const std::string DemangleClassName(const char *typeIdName)
 {

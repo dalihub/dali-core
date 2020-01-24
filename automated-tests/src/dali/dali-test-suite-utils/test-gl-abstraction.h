@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
@@ -252,9 +253,9 @@ public:
     return mCheckFramebufferStatusResult;
   }
 
-  inline GLenum CheckFramebufferColorAttachment()
+  inline GLuint CheckFramebufferColorAttachmentCount()
   {
-    return mFramebufferColorAttached;
+    return mFramebufferColorAttachmentCount;
   }
 
   inline GLenum CheckFramebufferDepthAttachment()
@@ -275,6 +276,15 @@ public:
 
   inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
   {
+    mLastClearColor.r = red;
+    mLastClearColor.g = green;
+    mLastClearColor.b = blue;
+    mLastClearColor.a = alpha;
+  }
+
+  inline const Vector4& GetLastClearColor() const
+  {
+    return mLastClearColor;
   }
 
   inline void ClearDepthf(GLclampf depth)
@@ -575,9 +585,14 @@ public:
     mFramebufferStatus |= 4;
 
     //We check 4 attachment colors
-    if ((attachment == GL_COLOR_ATTACHMENT0) || (attachment == GL_COLOR_ATTACHMENT1) || (attachment == GL_COLOR_ATTACHMENT2)  || (attachment == GL_COLOR_ATTACHMENT4))
+    if ((attachment >= GL_COLOR_ATTACHMENT0) && (attachment < GL_COLOR_ATTACHMENT0 + Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS))
     {
-      mFramebufferColorAttached = true;
+      uint8_t mask = 1 << (attachment - GL_COLOR_ATTACHMENT0);
+      if ((mFrameBufferColorStatus & mask) == 0)
+      {
+        mFrameBufferColorStatus |= mask;
+        ++mFramebufferColorAttachmentCount;
+      }
     }
   }
 
@@ -2169,9 +2184,10 @@ private:
   GLenum     mActiveTextureUnit;
   GLenum     mCheckFramebufferStatusResult;
   GLint      mFramebufferStatus;
-  GLenum     mFramebufferColorAttached;
   GLenum     mFramebufferDepthAttached;
   GLenum     mFramebufferStencilAttached;
+  GLuint     mFramebufferColorAttachmentCount;
+  GLuint     mFrameBufferColorStatus;
   GLint      mNumBinaryFormats;
   GLint      mBinaryFormats;
   GLint      mProgramBinaryLength;
@@ -2182,6 +2198,7 @@ private:
   ShaderSourceMap mShaderSources;
   GLuint     mLastShaderCompiled;
   GLbitfield mLastClearBitMask;
+  Vector4 mLastClearColor;
   unsigned int mClearCount;
 
   Vector4 mLastBlendColor;

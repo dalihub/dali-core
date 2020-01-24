@@ -1,0 +1,11 @@
+# Set the source directory
+SET( internal_src_dir ${ROOT_SRC_DIR}/dali/internal )
+
+# Add internal windows source files here
+SET( internal_windows_src_files
+  ${internal_src_dir}/event/common/demangler-windows.cpp
+)
+
+SET( SOURCES ${SOURCES}
+  ${internal_windows_src_files}
+)

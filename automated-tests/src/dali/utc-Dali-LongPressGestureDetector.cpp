@@ -20,7 +20,9 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
 
@@ -956,6 +958,39 @@ int UtcDaliLongPressGestureLayerConsumesTouch(void)
   TestEndLongPress( application, 50.0f, 50.0f );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
+{
+  TestApplication application;
+
+  const uint32_t kMinumumHolding1 = 5000;
+  const uint32_t kMinumumHolding2 = 3000;
+
+  Integration::SetLongPressMinimumHoldingTime( kMinumumHolding1 );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( actor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  DALI_TEST_EQUALS( DevelLongPressGestureDetector::GetMinimumHoldingTime( detector ), kMinumumHolding1, TEST_LOCATION );
+
+  Integration::SetLongPressMinimumHoldingTime( kMinumumHolding2 );
+  DALI_TEST_EQUALS( DevelLongPressGestureDetector::GetMinimumHoldingTime( detector ), kMinumumHolding2, TEST_LOCATION );
 
   END_TEST;
 }

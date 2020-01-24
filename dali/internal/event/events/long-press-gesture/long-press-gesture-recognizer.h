@@ -56,8 +56,9 @@ public:
    * @param[in] coreEventInterface Used to send events to Core.
    * @param[in] screenSize  The size of the screen.
    * @param[in] request     The long press gesture request.
+   * @param[in] minimumHoldingTime The minimum holding time required in milliseconds.
    */
-  LongPressGestureRecognizer( Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request );
+  LongPressGestureRecognizer( Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime );
 
   /**
    * Virtual destructor.
@@ -76,6 +77,13 @@ public:
    */
   virtual void Update(const GestureRequest& request);
 
+  /**
+   * @brief This method sets the minimum holding time required to be recognized as a long press gesture
+   *
+   * @param[in] value The time value in milliseconds
+   */
+  void SetMinimumHoldingTime( uint32_t time );
+
 private:
 
   /**
@@ -89,12 +97,6 @@ private:
    * @param[in] state The state of this gesture event.
    */
   void EmitGesture(Gesture::State state);
-
-  /**
-   * Get current system setting value for tap and hold gesture
-   * @return system value for tap and hold gesture [ms]
-   */
-  int GetSystemValue();
 
 private:
 
@@ -121,6 +123,8 @@ private:
   uint32_t mTouchTime;               ///< The time we first pressed down.
 
   uint32_t mTimerId;
+
+  uint32_t mMinimumHoldingTime;
 };
 
 } // namespace Internal
