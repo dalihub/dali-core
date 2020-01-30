@@ -34,21 +34,22 @@ OPTION(ENABLE_LINK_TEST      "Enable the link test" ON)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   FIND_PACKAGE( dali-windows-dependencies REQUIRED )
-  FIND_PATH( SYSTEM_INCLUDE_DIR "dali-windows-dependencies.h" )
 ENDIF()
+
+SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
 
 # Set up compiler definitions
 
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
-  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Debug )
   SET( ENABLE_DEBUG ON )
-ELSE()
-  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
 ENDIF()
 
 IF( ENABLE_DEBUG )
+  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Debug )
   ADD_DEFINITIONS( "-DDEBUG_ENABLED" )
   SET( ENABLE_EXPORTALL ON )
+ELSE()
+  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
 ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
@@ -67,10 +68,6 @@ ELSEIF( UNIX )
 
   IF("${ARCH}" STREQUAL "arm")
     ADD_DEFINITIONS("-DTARGET")
-  ENDIF()
-
-  IF( NOT ${ENABLE_EXPORTALL} )
-    ADD_DEFINITIONS( "-fvisibility=hidden" )
   ENDIF()
 
 ENDIF()
@@ -107,17 +104,21 @@ IF( NOT INCLUDE_DIR )
 ENDIF()
 
 # Set up the lib dir
-IF( SET_VCPKG_INSTALL_PREFIX )
+SET( LIB_DIR $ENV{libdir} )
+IF( NOT LIB_DIR )
+  SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
+ENDIF()
+IF( NOT LIB_DIR )
   SET( LIB_DIR ${PREFIX}/lib )
+ENDIF()
+
+# Set up the bin dir
+SET( BIN_DIR $ENV{bindir} )
+IF( NOT BIN_DIR )
+  SET( BIN_DIR ${CMAKE_INSTALL_BINDIR} )
+ENDIF()
+IF( NOT BIN_DIR )
   SET( BIN_DIR ${PREFIX}/bin )
-ELSE()
-  SET( LIB_DIR $ENV{libdir} )
-  IF( NOT LIB_DIR )
-    SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
-  ENDIF()
-  IF( NOT LIB_DIR )
-    SET( LIB_DIR ${PREFIX}/lib )
-  ENDIF()
 ENDIF()
 
 IF( ENABLE_PKG_CONFIGURE )
@@ -133,6 +134,7 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
 
   ADD_COMPILE_OPTIONS( /FIdali-windows-dependencies.h ) # Adds missing definitions.
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
+  ADD_COMPILE_OPTIONS( /wd4251 )                        # Ignores warning C4251: "'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'"
 
 ELSEIF( UNIX )
 
@@ -154,11 +156,16 @@ ELSEIF( UNIX )
     SET(COVERAGE --coverage)
   ENDIF()
 
+  IF( NOT ${ENABLE_EXPORTALL} )
+    ADD_COMPILE_OPTIONS( "-fvisibility=hidden" )
+  ENDIF()
+
 ENDIF()
 
 INCLUDE_DIRECTORIES(
   ${ROOT_SRC_DIR}
-  ${SYSTEM_INCLUDE_DIR}
+  ${VCPKG_INCLUDE_DIR}
+  ${INCLUDE_DIR}
 )
 
 SET(SOURCE_DIR "${ROOT_SRC_DIR}/dali")
@@ -208,8 +215,13 @@ SET_TARGET_PROPERTIES( ${name}
   CLEAN_DIRECT_OUPUT 1
 )
 
-# Install the library so file and symlinks
 IF( INSTALL_CMAKE_MODULES )
+  IF( ENABLE_DEBUG )
+    SET( BIN_DIR "${BIN_DIR}/debug" )
+    SET( LIB_DIR "${LIB_DIR}/debug" )
+  ENDIF()
+
+  # Install the library files.
   INSTALL( TARGETS ${name}
     EXPORT ${name}-targets
     LIBRARY DESTINATION ${LIB_DIR}
@@ -217,6 +229,7 @@ IF( INSTALL_CMAKE_MODULES )
     RUNTIME DESTINATION ${BIN_DIR}
   )
 
+  # Install the cmake modules.
   INSTALL(
     EXPORT ${name}-targets
     NAMESPACE ${name}::
@@ -229,7 +242,13 @@ IF( INSTALL_CMAKE_MODULES )
     include(\${CMAKE_CURRENT_LIST_DIR}/${name}-targets.cmake)
   ")
   INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name} )
+
+  # Install the pdb file.
+  IF( ENABLE_DEBUG )
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
+  ENDIF()
 ELSE()
+  # Install the library so file and symlinks.
   INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 ENDIF()
 
