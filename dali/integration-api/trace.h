@@ -198,7 +198,7 @@ namespace                                                                       
  * Used for function tracing. It logs tracing of the fuction from start to end.
  */
 #define DALI_TRACE_FUNCTION( filter ) \
-  Dali::Integration::Trace::Tracer logTraceFunction( filter, __PRETTY_FUNCTION__ );
+  Dali::Integration::Trace::Tracer logTraceFunction( filter, ASSERT_LOCATION );
 
 /**
  * Used for scope tracing. It logs tracing around a scope.

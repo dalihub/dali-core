@@ -169,7 +169,11 @@ public:
  * @SINCE_1_0.0
  */
 #if defined(DEBUG_ENABLED)
+#if defined(WIN32)
+#define ASSERT_LOCATION __FUNCSIG__
+#else
 #define ASSERT_LOCATION __PRETTY_FUNCTION__
+#endif
 #else
 #define ASSERT_LOCATION NULL
 #endif

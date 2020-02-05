@@ -1,8 +1,5 @@
-#ifndef DALI_DEMANGLER_H
-#define DALI_DEMANGLER_H
-
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +15,24 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <string>
+// HEADER
+#include <dali/devel-api/rendering/frame-buffer-devel.h>
+
+// INTERNAL INCLUDES
+#include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
 
 namespace Dali
 {
 
-namespace Internal
+namespace DevelFrameBuffer
 {
 
-/**
- * @brief Demangle a nested typeid name to its class name.
- * @param[in] typeIdName The type id name string to demangle.
- * @returns the class name ie "Actor" or an empty string
- */
-const std::string DemangleClassName(const char *typeIdName);
+Texture GetColorTexture( const FrameBuffer frameBuffer, uint8_t index )
+{
+  Internal::Texture* texturePtr = GetImplementation( frameBuffer ).GetColorTexture(index);
+  return Dali::Texture( texturePtr );
+}
 
-} // namespace Internal
+} // namespace DevelFrameBuffer
 
 } // namespace Dali
-
-#endif // DALI_DEMANGLER_H

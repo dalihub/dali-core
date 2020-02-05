@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,11 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
 FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
-  mColor( NULL ),
+  mColor{ nullptr },
   mWidth( width ),
   mHeight( height ),
   mAttachments( attachments ),
+  mColorAttachmentCount( 0 ),
   mIsSurfaceBacked( false )
 {
 }
@@ -88,22 +89,28 @@ void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, 
   }
   else
   {
-    if( ( texture->GetWidth() / ( 1u << mipmapLevel ) == mWidth ) &&
-        ( texture->GetHeight() / ( 1u << mipmapLevel ) == mHeight ) )
+    if( ( texture->GetWidth() / ( 1u << mipmapLevel ) != mWidth ) ||
+        ( texture->GetHeight() / ( 1u << mipmapLevel ) != mHeight ) )
     {
-      mColor = texture;
-      AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
+      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
+    }
+    else if ( mColorAttachmentCount >= Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS )
+    {
+      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Exceeded maximum supported color attachments.\n" );
     }
     else
     {
-      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
+      mColor[mColorAttachmentCount] = texture;
+      ++mColorAttachmentCount;
+
+      AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
     }
   }
 }
 
-Texture* FrameBuffer::GetColorTexture()
+Texture* FrameBuffer::GetColorTexture(uint8_t index) const
 {
-  return mIsSurfaceBacked ? nullptr : mColor.Get();
+  return ( mIsSurfaceBacked || index >= mColorAttachmentCount ) ? nullptr : mColor[index].Get();
 }
 
 void FrameBuffer::SetSize( uint32_t width, uint32_t height )
@@ -114,14 +121,6 @@ void FrameBuffer::SetSize( uint32_t width, uint32_t height )
   if( mRenderObject->IsSurfaceBacked() )
   {
     SetFrameBufferSizeMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), width, height );
-  }
-}
-
-void FrameBuffer::SetBackgroundColor( const Vector4& color )
-{
-  if( mRenderObject->IsSurfaceBacked() )
-  {
-    SetFrameBufferBackgroundColorMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), color );
   }
 }
 

@@ -13,6 +13,7 @@
          * [NON-SMACK Targets](#non-smack-targets)
          * [SMACK enabled Targets](#smack-enabled-targets)
          * [DEBUG Builds](#debug-builds)
+      * [3. Building for MS Windows](#3-building-for-ms-windows)
 
 # Build Instructions
 
@@ -91,3 +92,13 @@ See the README.md in dali-core/automated-tests.
 
          $ gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
 
+## 3. Building for MS Windows
+
+Third party dependencies are built using vcpkg. Instructions on how to install vcpkg can be found in the
+vcpkg-script folder in the windows-dependencies repository.
+
+- Download the windows-dependencies repository from DaliHub
+
+         $ git clone https://github.com/dalihub/windows-dependencies.git
+
+- Read the README.md and vcpkg-script/Readme.md files for more instructions on how to install and build the third-party dependencies.
