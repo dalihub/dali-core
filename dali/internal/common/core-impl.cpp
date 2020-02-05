@@ -89,8 +89,7 @@ Core::Core( RenderController& renderController,
             ResourcePolicy::DataRetention dataRetentionPolicy,
             Integration::RenderToFrameBuffer renderToFboEnabled,
             Integration::DepthBufferAvailable depthBufferAvailable,
-            Integration::StencilBufferAvailable stencilBufferAvailable,
-            Integration::PartialUpdateAvailable partialUpdateAvailable )
+            Integration::StencilBufferAvailable stencilBufferAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
   mProcessingEvent(false),
@@ -110,7 +109,7 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, glContextHelperAbstraction, depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, glContextHelperAbstraction, depthBufferAvailable, stencilBufferAvailable );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
@@ -123,8 +122,7 @@ Core::Core( RenderController& renderController,
                                        renderController,
                                       *mRenderManager,
                                        renderQueue,
-                                      *mRenderTaskProcessor,
-                                       partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE );
+                                      *mRenderTaskProcessor );
 
   mRenderManager->SetShaderSaver( *mUpdateManager );
 
