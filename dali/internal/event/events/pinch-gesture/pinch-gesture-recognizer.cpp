@@ -39,9 +39,6 @@ namespace Internal
 
 namespace
 {
-const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED = 4;
-const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4;
-
 const float MINIMUM_DISTANCE_IN_MILLIINCH = 45.0f; // This value is used for measuring minimum pinch distance in pixel.
 const float MINIMUM_DISTANCE_IN_PIXEL = 10.0f; // This value is for devices that do not provide a valid dpi value. (assumes 220dpi)
 
@@ -68,13 +65,15 @@ inline float GetDefaultMinimumPinchDistance( const Vector2& dpi )
 
 } // unnamed namespace
 
-PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance )
+PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
 : GestureRecognizer( screenSize, Gesture::Pinch ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),
   mDefaultMinimumDistanceDelta( GetDefaultMinimumPinchDistance( screenDpi ) ),
-  mStartingDistance( 0.0f )
+  mStartingDistance( 0.0f ),
+  mMinimumTouchEvents( minimumTouchEvents ),
+  mMinimumTouchEventsAfterStart( minimumTouchEventsAfterStart )
 {
   SetMinimumPinchDistance( minimumPinchDistance );
 }
@@ -129,7 +128,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           mTouchEvents.push_back(event);
 
           // We can only determine a pinch after a certain number of touch points have been collected.
-          if (mTouchEvents.size() >= MINIMUM_TOUCH_EVENTS_REQUIRED)
+          if( mTouchEvents.size() >= mMinimumTouchEvents )
           {
             const Integration::Point& firstPoint1 = mTouchEvents[0].points[0];
             const Integration::Point& firstPoint2 = mTouchEvents[0].points[1];
@@ -142,7 +141,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             if (fabsf(distanceChanged) > mMinimumDistanceDelta)
             {
               // Remove the first few events from the vector otherwise values are exaggerated
-              mTouchEvents.erase(mTouchEvents.begin(), mTouchEvents.end() - MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START);
+              mTouchEvents.erase( mTouchEvents.begin(), mTouchEvents.end() - mMinimumTouchEvents );
 
               if ( !mTouchEvents.empty() )
               {
@@ -197,7 +196,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           mTouchEvents.push_back(event);
 
-          if (mTouchEvents.size() >= MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START)
+          if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
           {
             // Send pinch continuing
             SendPinch(Gesture::Continuing, event);
@@ -265,6 +264,16 @@ void PinchGestureRecognizer::SendPinch(Gesture::State state, const Integration::
 
     mObserver.Process(*mScene, gesture);
   }
+}
+
+void PinchGestureRecognizer::SetMinimumTouchEvents( uint32_t value )
+{
+  mMinimumTouchEvents = value;
+}
+
+void PinchGestureRecognizer::SetMinimumTouchEventsAfterStart( uint32_t value )
+{
+  mMinimumTouchEventsAfterStart = value;
 }
 
 } // namespace Internal

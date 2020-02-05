@@ -253,6 +253,34 @@ public: // Called by Core
   void SetPinchGestureMinimumDistance( float value);
 
   /**
+   * @brief Sets the minimum touch events required before a pinch can be started
+   *
+   * @param[in] value The number of touch events
+   */
+  void SetPinchGestureMinimumTouchEvents( uint32_t value );
+
+  /**
+   * @brief Sets the minimum touch events required after a pinch started
+   *
+   * @param[in] value The number of touch events
+   */
+  void SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value );
+
+  /**
+   * @brief Sets the minimum touch events required before a rotation can be started
+   *
+   * @param[in] value The number of touch events
+   */
+  void SetRotationGestureMinimumTouchEvents( uint32_t value );
+
+  /**
+   * @brief Sets the minimum touch events required after a rotation started
+   *
+   * @param[in] value The number of touch events
+   */
+  void SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value );
+
+  /**
    * @brief Sets the minimum holding time required to be recognized as a long press gesture
    *
    * @param[in] value The time value in milliseconds

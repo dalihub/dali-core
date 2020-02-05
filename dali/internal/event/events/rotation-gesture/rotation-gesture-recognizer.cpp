@@ -40,8 +40,6 @@ namespace Internal
 
 namespace
 {
-const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED = 4;
-const unsigned int MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4;
 
 inline float GetAngle( const Integration::Point& point1, const Integration::Point& point2 )
 {
@@ -57,12 +55,14 @@ inline Vector2 GetCenterPoint( const Integration::Point& point1, const Integrati
 
 } // unnamed namespace
 
-RotationGestureRecognizer::RotationGestureRecognizer( Observer& observer )
+RotationGestureRecognizer::RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
 : GestureRecognizer( DevelGesture::Rotation ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),
-  mStartingAngle( 0.0f )
+  mStartingAngle( 0.0f ),
+  mMinimumTouchEvents( minimumTouchEvents ),
+  mMinimumTouchEventsAfterStart( minimumTouchEventsAfterStart )
 {
 }
 
@@ -107,10 +107,10 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
           mTouchEvents.push_back( event );
 
           // We can only determine a rotation after a certain number of touch points have been collected.
-          if( mTouchEvents.size() >= MINIMUM_TOUCH_EVENTS_REQUIRED )
+          if( mTouchEvents.size() >= mMinimumTouchEvents )
           {
             // Remove the first few events from the vector otherwise values are exaggerated
-            mTouchEvents.erase( mTouchEvents.begin(), mTouchEvents.end() - MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START );
+            mTouchEvents.erase( mTouchEvents.begin(), mTouchEvents.end() - mMinimumTouchEvents );
 
             if( !mTouchEvents.empty() )
             {
@@ -165,7 +165,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
         {
           mTouchEvents.push_back( event );
 
-          if( mTouchEvents.size() >= MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
+          if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
           {
             // Send rotation continuing
             SendRotation( Gesture::Continuing, event );
@@ -177,6 +177,16 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
       break;
     }
   }
+}
+
+void RotationGestureRecognizer::SetMinimumTouchEvents( uint32_t value )
+{
+  mMinimumTouchEvents = value;
+}
+
+void RotationGestureRecognizer::SetMinimumTouchEventsAfterStart( uint32_t value )
+{
+  mMinimumTouchEventsAfterStart = value;
 }
 
 void RotationGestureRecognizer::SendRotation( Gesture::State state, const Integration::TouchEvent& currentEvent )

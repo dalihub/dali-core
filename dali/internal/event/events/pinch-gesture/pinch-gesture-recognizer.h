@@ -50,8 +50,10 @@ public:
    * @param[in] screenSize The size of the screen.
    * @param[in] screenDpi The dpi value of the screen
    * @param[in] minimumPinchDistance in pixels
+   * @param[in] minimumTouchEvents The number of touch events required
+   * @param[in] minimumTouchEventsAfterStart The number of touch events required after a gesture started
    */
-  PinchGestureRecognizer(Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance);
+  PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart );
 
   /**
    * Virtual destructor.
@@ -61,6 +63,18 @@ public:
 public:
 
   void SetMinimumPinchDistance(float value);
+
+  /**
+   * Sets the minimum touch events required before a pinch can be started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEvents( uint32_t value );
+
+  /**
+   * Sets the minimum touch events required after a pinch started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEventsAfterStart( uint32_t value );
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
@@ -104,6 +118,10 @@ private:
   float mMinimumDistanceDelta; ///< The minimum distance before a pinch is applicable.
 
   float mStartingDistance; ///< The distance between the two touch points when the pinch is first detected.
+
+  uint32_t mMinimumTouchEvents; ///< The minimum touch events required before a pinch can be started.
+
+  uint32_t mMinimumTouchEventsAfterStart; ///< The minimum touch events required after a pinch started.
 };
 
 } // namespace Internal
