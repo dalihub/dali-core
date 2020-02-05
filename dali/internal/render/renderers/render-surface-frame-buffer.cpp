@@ -34,7 +34,8 @@ SurfaceFrameBuffer::SurfaceFrameBuffer( Integration::RenderSurface* surface )
   mWidth( mSurface->GetPositionSize().width ),
   mHeight( mSurface->GetPositionSize().height ),
   mSizeChanged( false ),
-  mIsSurfaceInvalid( false )
+  mIsSurfaceInvalid( false ),
+  mPartialUpdateEnabled( true )
 {
 }
 
@@ -103,6 +104,15 @@ void SurfaceFrameBuffer::PostRender()
   }
 
   mSizeChanged = false;
+  mPartialUpdateEnabled = true;
+}
+
+void SurfaceFrameBuffer::SetDamagedRect( const Dali::DamagedRect& damagedRect, Dali::DamagedRect& mergedRect )
+{
+  if ( IsSurfaceValid() )
+  {
+    mSurface->SetDamagedRect( damagedRect, mergedRect );
+  }
 }
 
 Context* SurfaceFrameBuffer::GetContext()
@@ -128,6 +138,21 @@ void SurfaceFrameBuffer::SetSize( uint32_t width, uint32_t height )
 bool SurfaceFrameBuffer::IsSurfaceValid() const
 {
   return mSurface && !mIsSurfaceInvalid;
+}
+
+bool SurfaceFrameBuffer::IsPartialUpdateEnabled() const
+{
+  bool ret = false;
+  if ( IsSurfaceValid() )
+  {
+    ret = mSurface->GetBufferAge() && ( mPartialUpdateEnabled && !mSizeChanged );
+  }
+  return ret;
+}
+
+void SurfaceFrameBuffer::SetPartialUpdateEnabled( bool value )
+{
+  mPartialUpdateEnabled = value;
 }
 
 } //Render
