@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {
@@ -163,6 +164,34 @@ DALI_CORE_API void SetPanGestureMinimumPanEvents( int value );
  * @param[in] value Distance to move in pixels
  */
 DALI_CORE_API void SetPinchGestureMinimumDistance( float value );
+
+/**
+ * @brief Sets the minimum touch events required before a pinch can be started
+ *
+ * @param[in] value The number of touch events
+ */
+DALI_CORE_API void SetPinchGestureMinimumTouchEvents( uint32_t value );
+
+/**
+ * @brief Sets the minimum touch events required after a pinch started
+ *
+ * @param[in] value The number of touch events
+ */
+DALI_CORE_API void SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value );
+
+/**
+ * @brief Sets the minimum touch events required before a rotation can be started
+ *
+ * @param[in] value The number of touch events
+ */
+DALI_CORE_API void SetRotationGestureMinimumTouchEvents( uint32_t value );
+
+/**
+ * @brief Sets the minimum touch events required after a rotation started
+ *
+ * @param[in] value The number of touch events
+ */
+DALI_CORE_API void SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value );
 
 /**
  * @brief Sets the minimum holding time required to be recognized as a long press gesture

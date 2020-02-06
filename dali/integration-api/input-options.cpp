@@ -120,6 +120,30 @@ void SetPinchGestureMinimumDistance( float value )
   eventProcessor.SetPinchGestureMinimumDistance( value );
 }
 
+void SetPinchGestureMinimumTouchEvents( uint32_t value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPinchGestureMinimumTouchEvents( value );
+}
+
+void SetPinchGestureMinimumTouchEventsAfterStart( uint32_t value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPinchGestureMinimumTouchEventsAfterStart( value );
+}
+
+void SetRotationGestureMinimumTouchEvents( uint32_t value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetRotationGestureMinimumTouchEvents( value );
+}
+
+void SetRotationGestureMinimumTouchEventsAfterStart( uint32_t value )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetRotationGestureMinimumTouchEventsAfterStart( value );
+}
+
 void SetLongPressMinimumHoldingTime( unsigned int value )
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();

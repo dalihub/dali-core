@@ -87,6 +87,18 @@ public: // To be called by GestureEventProcessor
    */
   void RemoveGestureDetector( RotationGestureDetector* gestureDetector );
 
+  /**
+   * Sets the minimum touch events required before a rotation can be started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEvents( uint32_t value );
+
+  /**
+   * Sets the minimum touch events required after a rotation started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumTouchEventsAfterStart( uint32_t value );
+
 private:
 
   // GestureProcessor overrides
@@ -113,6 +125,9 @@ private:
   RenderTaskPtr mCurrentRenderTask;
 
   const RotationGestureEvent* mCurrentRotationEvent; ///< Pointer to current RotationEvent, used when calling ProcessAndEmit()
+
+  uint32_t mMinimumTouchEvents;
+  uint32_t mMinimumTouchEventsAfterStart;
 };
 
 } // namespace Internal

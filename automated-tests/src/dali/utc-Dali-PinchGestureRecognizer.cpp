@@ -650,3 +650,94 @@ int UtcDaliPinchGestureRecognizerLongDistance04(void)
 
   END_TEST;
 }
+
+int UtcDaliPinchGestureRecognizerMinimumTouchEvents(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( actor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach( actor );
+
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Case 1
+  // 2 touch events make a gesture begin
+  Integration::SetPinchGestureMinimumTouchEvents( 2 );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 90.0f, 90.0f ), 160 ) );
+
+  DALI_TEST_EQUALS( Gesture::Started, data.receivedGesture.state, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Case 2
+  // 4 touch events make a gesture begin
+  Integration::SetPinchGestureMinimumTouchEvents( 4 );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 90.0f, 90.0f ), 160 ) );
+
+  // Check the gesture is not detected unlike previous case
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPinchGestureRecognizerMinimumTouchEventsAfterStart(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector = PinchGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( actor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach( actor );
+
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Case 1
+  // > 2 touch events make a gesture begin
+  // > 4 touch events generate gestures after begin
+  Integration::SetPinchGestureMinimumTouchEvents(2);
+  Integration::SetPinchGestureMinimumTouchEventsAfterStart(6);
+
+  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 90.0f, 90.0f ), 160 ) );
+
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 170 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 180 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 190 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 200 ) );
+  // > Test : not enough touch events to make the gesture state "Continuing"
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 210 ) );
+  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 220 ) );
+  // > Test : 6 touch events after start make the gesture state "Continuing"
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
+
+  END_TEST;
+}

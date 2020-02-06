@@ -40,6 +40,8 @@ namespace Internal
 
 namespace
 {
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED = 4u;
+const uint32_t MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START = 4u;
 
 /**
  * Creates a PinchGesture and asks the specified detector to emit its detected signal.
@@ -106,7 +108,9 @@ PinchGestureProcessor::PinchGestureProcessor()
   mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
   mCurrentPinchEvent(NULL),
-  mMinimumPinchDistance(-1.0f)
+  mMinimumPinchDistance(-1.0f),
+  mMinimumTouchEvents( MINIMUM_TOUCH_EVENTS_REQUIRED ),
+  mMinimumTouchEventsAfterStart( MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
 {
 }
 
@@ -124,6 +128,40 @@ void PinchGestureProcessor::SetMinimumPinchDistance( float value )
     if( pinchRecognizer )
     {
       pinchRecognizer->SetMinimumPinchDistance(value);
+    }
+  }
+}
+
+void PinchGestureProcessor::SetMinimumTouchEvents( uint32_t value )
+{
+  if( value > 1u && mMinimumTouchEvents != value )
+  {
+    mMinimumTouchEvents = value;
+
+    if( mGestureRecognizer )
+    {
+      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>( mGestureRecognizer.Get() );
+      if( pinchRecognizer )
+      {
+        pinchRecognizer->SetMinimumTouchEvents( value );
+      }
+    }
+  }
+}
+
+void PinchGestureProcessor::SetMinimumTouchEventsAfterStart( uint32_t value )
+{
+  if( value > 1u && mMinimumTouchEventsAfterStart != value )
+  {
+    mMinimumTouchEventsAfterStart = value;
+
+    if( mGestureRecognizer )
+    {
+      PinchGestureRecognizer* pinchRecognizer = dynamic_cast<PinchGestureRecognizer*>( mGestureRecognizer.Get() );
+      if( pinchRecognizer )
+      {
+        pinchRecognizer->SetMinimumTouchEventsAfterStart( value );
+      }
     }
   }
 }
@@ -222,7 +260,7 @@ void PinchGestureProcessor::AddGestureDetector( PinchGestureDetector* gestureDet
   if (createRecognizer)
   {
     Size size = scene.GetSize();
-    mGestureRecognizer = new PinchGestureRecognizer( *this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance );
+    mGestureRecognizer = new PinchGestureRecognizer( *this, Vector2(size.width, size.height), scene.GetDpi(), mMinimumPinchDistance, mMinimumTouchEventsAfterStart, mMinimumTouchEventsAfterStart );
   }
 }
 

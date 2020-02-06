@@ -759,22 +759,26 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   }
 
   mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-  mImpl->currentContext->ClearColor( clearColor.r,
-                                     clearColor.g,
-                                     clearColor.b,
-                                     clearColor.a );
 
-  if( instruction.mIsClearColorSet && !clearFullFrameRect )
+  if( instruction.mIsClearColorSet )
   {
-    mImpl->currentContext->SetScissorTest( true );
-    mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
-    mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-    mImpl->currentContext->SetScissorTest( false );
-  }
-  else
-  {
-    mImpl->currentContext->SetScissorTest( false );
-    mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+    mImpl->currentContext->ClearColor( clearColor.r,
+                                       clearColor.g,
+                                       clearColor.b,
+                                       clearColor.a );
+
+    if( !clearFullFrameRect )
+    {
+      mImpl->currentContext->SetScissorTest( true );
+      mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
+      mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+      mImpl->currentContext->SetScissorTest( false );
+    }
+    else
+    {
+      mImpl->currentContext->SetScissorTest( false );
+      mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+    }
   }
 
   // Clear the list of bound textures
