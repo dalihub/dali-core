@@ -205,7 +205,7 @@ public:
     // false + false does not change value, true + false does not either
     if( delta && !mValue[bufferIndex] )
     {
-      mValue[bufferIndex] += delta;
+      mValue[bufferIndex] = delta;
 
       OnSet();
     }
@@ -274,7 +274,7 @@ public:
    */
   void BakeRelative(BufferIndex bufferIndex, bool delta)
   {
-    mValue[bufferIndex] += delta;
+    mValue[bufferIndex] = mValue[bufferIndex] || delta;
     mBaseValue = mValue[bufferIndex];
 
     OnBake();
