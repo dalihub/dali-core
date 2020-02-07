@@ -390,7 +390,9 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  const Matrix& projectionMatrix,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
                                                  Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                 Vector<GLuint>& boundTextures )
+                                                 Vector<GLuint>& boundTextures,
+                                                 const RenderInstruction& instruction
+                                                 )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -448,7 +450,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
       // Render the item.
       item.mRenderer->Render( context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
-                              viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures );
+                              viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction ); // Added instruction for reflection effect
     }
   }
 }
@@ -493,7 +495,9 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                            *projectionMatrix,
                             depthBufferAvailable,
                             stencilBufferAvailable,
-                            boundTextures );
+                            boundTextures,
+                            instruction //added for reflection effect
+                            );
       }
     }
   }

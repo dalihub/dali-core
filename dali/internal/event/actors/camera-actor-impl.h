@@ -53,6 +53,15 @@ public:
   static CameraActorPtr New( const Size& size );
 
   /**
+   * Sets the reflection plane for the camera
+   *
+   * @param[in] plane Plane parameters
+   *
+   * @note plane.xyz are normal vector of the plane.
+   */
+  void SetReflectByPlane( const Vector4& plane );
+
+  /**
    * @copydoc Dali::CameraActor::SetTargetPosition
    */
   void SetTarget( const Vector3& targetPosition );

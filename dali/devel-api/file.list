@@ -39,6 +39,7 @@ SET( devel_api_core_actors_header_files
   ${devel_api_src_dir}/actors/actor-devel.h
   ${devel_api_src_dir}/actors/custom-actor-devel.h
   ${devel_api_src_dir}/actors/layer-devel.h
+  ${devel_api_src_dir}/actors/camera-actor-devel.h
 )
 
 
