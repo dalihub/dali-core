@@ -167,13 +167,17 @@ inline float GetRangedEpsilon( float a, float b )
  * @param[in] value the value to compare
  * @return true if the value is equal to zero
  */
+#if __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 inline bool EqualsZero( float value )
 {
   return value == 0.0f;
 }
+#if __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 /**
  * @brief Helper function to compare equality of two floating point values.

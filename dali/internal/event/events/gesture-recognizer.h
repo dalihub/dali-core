@@ -36,7 +36,7 @@ struct TouchEvent;
 
 namespace Internal
 {
-class GestureRequest;
+struct GestureRequest;
 class Scene;
 
 template< typename T>

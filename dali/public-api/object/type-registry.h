@@ -37,7 +37,7 @@ namespace Internal DALI_INTERNAL
 {
 class TypeRegistry;
 }
-class DefaultPropertyMetadata;
+struct DefaultPropertyMetadata;
 
 /**
  * @brief The TypeRegistry allows registration of type instance creation functions.
