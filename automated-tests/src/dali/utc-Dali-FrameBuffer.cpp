@@ -468,7 +468,7 @@ int UtcDaliFrameBufferGetColorTexture04(void)
 int UtcDaliFramebufferContextLoss(void)
 {
   tet_infoline("UtcDaliFramebufferContextLoss\n");
-  TestApplication application; // Default config: DALI_DISCARDS_ALL_DATA
+  TestApplication application;
 
   //Create the texture
   unsigned int width(64);

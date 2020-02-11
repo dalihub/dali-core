@@ -2,7 +2,7 @@
 #define DALI_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@ public:
                    uint32_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    uint32_t horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                    uint32_t verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA,
                    bool initialize = true );
 
   void Initialize();
@@ -110,7 +109,6 @@ protected:
 
   struct { uint32_t x; uint32_t y; } mDpi;
   uint32_t mLastVSyncTime;
-  ResourcePolicy::DataRetention mDataRetentionPolicy;
   static bool mLoggingEnabled;
 };
 
