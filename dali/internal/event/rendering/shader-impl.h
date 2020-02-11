@@ -106,6 +106,23 @@ private:
 
   Internal::ShaderDataPtr mShaderData;
 
+public:
+
+  /**
+   * @copydoc Dali::Shader::GetShaderVersionPrefix()
+   */
+  static std::string GetShaderVersionPrefix();
+
+  /**
+   * @copydoc Dali::Shader::GetVertexShaderPrefix()
+   */
+  static std::string GetVertexShaderPrefix();
+
+  /**
+   * @copydoc Dali::Shader::GetFragmentShaderPrefix()
+   */
+  static std::string GetFragmentShaderPrefix();
+
 };
 
 } // namespace Internal

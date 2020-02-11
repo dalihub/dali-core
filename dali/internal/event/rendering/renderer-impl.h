@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,19 +123,19 @@ public:
                     BlendFactor::Type& srcFactorAlpha, BlendFactor::Type& destFactorAlpha ) const;
 
   /**
-   * @copydoc Dali::Renderer::SetBlendEquation()
+   * @brief Set same Blend Equation for the RGB and alpha
    */
-  void SetBlendEquation( BlendEquation::Type equationRgba );
+  void SetBlendEquation( DevelBlendEquation::Type equationRgba );
 
   /**
-   * @copydoc Dali::Renderer::SetBlendEquation()
+   * @brief Set Blend Equation separately for the RGB and alpha
    */
-  void SetBlendEquation( BlendEquation::Type equationRgb, BlendEquation::Type equationAlpha );
+  void SetBlendEquation( DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha );
 
   /**
-   * @copydoc Dali::Renderer::GetBlendEquation()
+   * @brief Get Blend Equation of rgb and alpha
    */
-  void GetBlendEquation( BlendEquation::Type& equationRgb, BlendEquation::Type& equationAlpha ) const;
+  void GetBlendEquation( DevelBlendEquation::Type& equationRgb, DevelBlendEquation::Type& equationAlpha ) const;
 
   /**
    * @copydoc Dali::Renderer::SetIndexedDrawFirstElement
@@ -160,6 +160,13 @@ public:
    * @return True is alpha is pre-multiplied, false otherwise.
    */
   bool IsPreMultipliedAlphaEnabled() const;
+
+  /**
+   * @brief Query whether Blend Equation Advanced is used in this renderer
+   *
+   * @return True is Blend Equation Advanced is used, false otherwise.
+   */
+  bool IsAdvancedBlendEquationApplied() const;
 
   /**
    * @brief Get the scene graph object

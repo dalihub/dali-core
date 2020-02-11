@@ -19,6 +19,7 @@
  */
 
 #include <stdint.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 /*
  * This file is based on gl3.h, the following licence is included for conformance.
@@ -116,6 +117,36 @@ public:
    * @Return true current gles support surfaceless context
    */
   virtual bool IsSurfacelessContextSupported() const = 0;
+
+  /**
+   * Returns current gles can support advanced blend equation
+   * @Return true current gles support advanced blend equation
+   */
+  virtual bool IsAdvancedBlendEquationSupported() = 0;
+
+  /**
+   * Returns current gles can support the blend equation
+   * @Return true current gles support the blend equation
+   */
+  virtual bool IsBlendEquationSupported( DevelBlendEquation::Type blendEquation ) = 0;
+
+  /**
+   * Returns shader prefix of shading language version.
+   * @Return shader prefix of shading language version.
+   */
+  virtual std::string GetShaderVersionPrefix() = 0;
+
+  /**
+   * Returns vertex shader prefix including shading language version.
+   * @Return vertex shader prefix including shading language version.
+   */
+  virtual std::string GetVertexShaderPrefix() = 0;
+
+  /**
+   * Returns fragment shader prefix including shading language version and extension information.
+   * @Return fragment shader prefix including shading language version and extension information.
+   */
+  virtual std::string GetFragmentShaderPrefix() = 0;
 
   /**
    * Determine whether to convert pixel format or not.
@@ -382,6 +413,7 @@ public:
   virtual void           TexStorage2D (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) = 0;
   virtual void           TexStorage3D (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth) = 0;
   virtual void           GetInternalformativ (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params) = 0;
+  virtual void           BlendBarrier (void) = 0;
   // clang-format on
 };
 

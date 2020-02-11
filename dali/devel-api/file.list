@@ -9,6 +9,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/animation/animation-devel.cpp
   ${devel_api_src_dir}/animation/path-constrainer.cpp
   ${devel_api_src_dir}/common/addon-binder.cpp
+  ${devel_api_src_dir}/common/capabilities.cpp
   ${devel_api_src_dir}/common/hash.cpp
   ${devel_api_src_dir}/common/singleton-service.cpp
   ${devel_api_src_dir}/common/stage-devel.cpp
@@ -64,6 +65,7 @@ SET( devel_api_core_animation_header_files
 SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/addon-binder.h
   ${devel_api_src_dir}/common/bitwise-enum.h
+  ${devel_api_src_dir}/common/capabilities.h
   ${devel_api_src_dir}/common/circular-queue.h
   ${devel_api_src_dir}/common/hash.h
   ${devel_api_src_dir}/common/singleton-service.h

@@ -1241,6 +1241,16 @@ public:
    */
   void RemoveRenderer( uint32_t index );
 
+  /**
+   * Set BlendEquation at each renderer that added on this Actor.
+   */
+  void SetBlendEquation( DevelBlendEquation::Type blendEquation );
+
+  /**
+   * @brief Get Blend Equation that applied to this Actor
+   */
+  DevelBlendEquation::Type GetBlendEquation() const;
+
 public:
 
   /**
@@ -2071,6 +2081,8 @@ protected:
   DrawMode::Type mDrawMode                         : 3; ///< Cached: How the actor and its children should be drawn
   ColorMode mColorMode                             : 3; ///< Cached: Determines whether mWorldColor is inherited
   ClippingMode::Type mClippingMode                 : 3; ///< Cached: Determines which clipping mode (if any) to use.
+  DevelBlendEquation::Type mBlendEquation          : 16;///< Cached: Determines which blend equation will be used to render renderers.
+  bool mIsBlendEquationSet                         : 1; ///< Flag to identify whether the Blend equation is set
 
 private:
 

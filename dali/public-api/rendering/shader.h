@@ -187,6 +187,33 @@ public:
    */
   Shader& operator=(Shader&& rhs);
 
+  /**
+   * @brief Get shader preprocessor of shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_1_9.36
+   * @return shader preprocessor string.
+   */
+  static std::string GetShaderVersionPrefix();
+
+  /**
+   * @brief Get vertex shader preprocessor that includes shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_1_9.36
+   * @return Vertex shader preprocessor string.
+   */
+  static std::string GetVertexShaderPrefix();
+
+  /**
+   * @brief Get fragment shader preprocessor that includes shading language version.
+   * @note This can potentially block until GL has been initialized
+   * when the first time any DALi application is launched in the system.
+   * @SINCE_1_9.36
+   * @return Fragment shader preprocessor string.
+   */
+  static std::string GetFragmentShaderPrefix();
+
 public:
   /**
    * @brief This constructor is used by Dali New() methods.

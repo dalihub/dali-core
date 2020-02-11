@@ -223,6 +223,23 @@ Shader::~Shader()
   }
 }
 
+std::string Shader::GetShaderVersionPrefix()
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.GetShaderVersionPrefix();
+}
+
+std::string Shader::GetVertexShaderPrefix()
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.GetVertexShaderPrefix();
+}
+
+std::string Shader::GetFragmentShaderPrefix()
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.GetFragmentShaderPrefix();
+}
 
 } // namespace Internal
 } // namespace Dali

@@ -61,6 +61,16 @@ public:
 
   bool IsSurfacelessContextSupported() const override;
 
+  bool IsAdvancedBlendEquationSupported() override;
+
+  bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) override;
+
+  std::string GetShaderVersionPrefix();
+
+  std::string GetVertexShaderPrefix();
+
+  std::string GetFragmentShaderPrefix();
+
   bool TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const override;
 
   /* OpenGL ES 2.0 */
@@ -1886,6 +1896,10 @@ public:
   }
 
   inline void GetInternalformativ(GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params) override
+  {
+  }
+
+  inline void BlendBarrier(void)
   {
   }
 
