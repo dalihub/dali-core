@@ -149,10 +149,6 @@ void Scene::Add(Actor& actor)
 void Scene::Remove(Actor& actor)
 {
   mRootLayer->Remove( actor );
-  if( mSurface )
-  {
-    mRenderTaskList->GetTask( 0u )->GetFrameBuffer()->SetPartialUpdateEnabled( false );
-  }
 }
 
 Size Scene::GetSize() const
