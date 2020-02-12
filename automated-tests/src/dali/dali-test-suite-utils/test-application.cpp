@@ -60,7 +60,8 @@ void TestApplication::CreateCore()
                                         mGlContextHelperAbstraction,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
-                                        Integration::StencilBufferAvailable::TRUE );
+                                        Integration::StencilBufferAvailable::TRUE,
+                                        Integration::PartialUpdateAvailable::FALSE );
 
   mCore->ContextCreated();
 
