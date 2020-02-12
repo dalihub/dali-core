@@ -2770,3 +2770,45 @@ int UtcDaliRenderTaskRequiresSync(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskSetClearEnabled(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliRenderTaskSetClearEnabled");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Actor renderableActor = CreateRenderableActorSuccess( application, "aFile.jpg" );
+  Stage::GetCurrent().Add( renderableActor );
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Actor sourceActor = CreateRenderableActorSuccess( application, "aFile.jpg" );
+  Stage::GetCurrent().Add( sourceActor );
+
+  RenderTask newTask = CreateRenderTask( application, offscreenCameraActor, rootActor, sourceActor, RenderTask::REFRESH_ALWAYS, false );
+
+  DALI_TEST_EQUALS( gl.GetClearCountCalled(), 0, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // glClear should be called twice - default task and the new task.
+  DALI_TEST_EQUALS( gl.GetClearCountCalled(), 2, TEST_LOCATION );
+
+  newTask.SetClearEnabled( false );
+
+  application.SendNotification();
+  application.Render();
+
+  // The count should increase by 1 - default task only.
+  DALI_TEST_EQUALS( gl.GetClearCountCalled(), 3, TEST_LOCATION );
+
+  END_TEST;
+}

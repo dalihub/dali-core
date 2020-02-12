@@ -25,7 +25,7 @@
 namespace Dali
 {
 
-class RotationGesture;
+struct RotationGesture;
 
 namespace Internal
 {

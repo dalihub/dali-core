@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,6 @@ public:
         Integration::GlAbstraction& glAbstraction,
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
-        ResourcePolicy::DataRetention dataRetentionPolicy,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,
         Integration::StencilBufferAvailable stencilBufferAvailable );
