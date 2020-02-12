@@ -600,12 +600,6 @@ public:
   void SetDefaultSurfaceRect( const Rect<int>& rect );
 
   /**
-   * Set the default surface orientation.
-   * @param[in] orientation The orientation value representing the surface.
-   */
-  void SetDefaultSurfaceOrientation( int orientation );
-
-  /**
    * @copydoc Dali::Stage::KeepRendering()
    */
   void KeepRendering( float durationSeconds );
@@ -1017,17 +1011,6 @@ inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceRect, rect );
-}
-
-inline void SetDefaultSurfaceOrientationMessage( UpdateManager& manager, int orientation  )
-{
-  typedef MessageValue1< UpdateManager, int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceOrientation, orientation );
 }
 
 inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )

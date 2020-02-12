@@ -124,9 +124,9 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
   GetImplementation(*this).SetSurface( surface );
 }
 
-void Scene::SurfaceResized( bool forceUpdate )
+void Scene::SurfaceResized()
 {
-  GetImplementation( *this ).SurfaceResized( forceUpdate );
+  GetImplementation( *this ).SurfaceResized();
 }
 
 Integration::RenderSurface* Scene::GetSurface() const
