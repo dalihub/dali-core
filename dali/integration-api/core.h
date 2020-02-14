@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -226,9 +225,6 @@ public:
    * @param[in] glAbstraction The interface providing OpenGL services.
    * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
    * @param[in] glContextHelperAbstraction The interface providing OpenGL context helper objects.
-   * @param[in] policy The data retention policy. This depends on application setting
-   * and platform support. Dali should honour this policy when deciding to discard
-   * intermediate resource data.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] depthBufferAvailable Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
@@ -239,7 +235,6 @@ public:
                     GlAbstraction& glAbstraction,
                     GlSyncAbstraction& glSyncAbstraction,
                     GlContextHelperAbstraction& glContextHelperAbstraction,
-                    ResourcePolicy::DataRetention policy,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,
                     StencilBufferAvailable stencilBufferAvailable );

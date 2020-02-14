@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2020 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -266,6 +266,12 @@ sub get_coverage
                 if(index( $source_file, $file ) > 0 )
                 {
                     $gcovfile = $coverage_file;
+                    # Some header files do not produce an equivalent gcov file so we shouldn't parse them
+                    if(($source_file =~ /\.h$/) && (! -e $gcovfile))
+                    {
+                        print "Omitting Header: $source_file\n" if $debug;
+                        $gcovfile = ""
+                    }
                     last;
                 }
             }

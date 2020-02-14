@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
                                   uint32_t surfaceHeight,
                                   uint32_t  horizontalDpi,
                                   uint32_t  verticalDpi,
-                                  ResourcePolicy::DataRetention policy,
                                   bool initialize )
 : mRenderSurface( NULL ),
   mCore( NULL ),
@@ -34,8 +33,7 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
   mDpi{ horizontalDpi, verticalDpi },
-  mLastVSyncTime(0u),
-  mDataRetentionPolicy( policy )
+  mLastVSyncTime(0u)
 {
   if( initialize )
   {
@@ -60,7 +58,6 @@ void TestApplication::CreateCore()
                                         mGlAbstraction,
                                         mGlSyncAbstraction,
                                         mGlContextHelperAbstraction,
-                                        mDataRetentionPolicy,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
                                         Integration::StencilBufferAvailable::TRUE );

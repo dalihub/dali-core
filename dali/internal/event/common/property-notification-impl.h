@@ -196,6 +196,7 @@ private:
   RawArgumentContainer         mRawConditionArgs;             ///< The Raw Condition args. (float type)
   NotifyMode                   mNotifyMode;                   ///< The current notification mode.
   bool                         mNotifyResult;                 ///< The result of the last condition check that caused a signal emit
+  bool                         mCompare;                      ///< The flag of comparing previous property's raw value and current.
 };
 
 } // namespace Internal

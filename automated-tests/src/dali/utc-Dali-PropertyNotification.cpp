@@ -168,7 +168,9 @@ int UtcDaliAddPropertyNotification(void)
   Actor actor = Actor::New();
 
   PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X, GreaterThanCondition(100.0f));
+  PropertyNotification notification2 = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ));
   DALI_TEST_CHECK( notification );
+  DALI_TEST_CHECK( notification2 );
   END_TEST;
 }
 
@@ -279,6 +281,18 @@ int UtcDaliAddPropertyNotificationEventSidePropertyN(void)
   {
     DALI_TEST_ASSERT( e, "Property notification added to event side only property", TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliAddPropertyNotificationSize(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliAddPropertyNotificationSize");
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ));
+  DALI_TEST_CHECK( notification );
   END_TEST;
 }
 
@@ -744,6 +758,46 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationSetSizeResultP(void)
+{
+  TestApplication application;
+  bool notifyResult;
+  tet_infoline(" UtcDaliPropertyNotificationSetSizeResultP");
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ) );
+  notification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+  gCallBackCalled = false;
+  notification.NotifySignal().Connect( &TestCallback );
+
+  actor.SetSize(100.0f, 100.0f);
+
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+
+  notifyResult = notification.GetNotifyResult();
+
+  DALI_TEST_EQUALS( notifyResult, true, TEST_LOCATION );
+
+  gCallBackCalled = false;
+
+  actor.SetSize(200.0f, 200.0f);
+
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+
+  notifyResult = notification.GetNotifyResult();
+
+  DALI_TEST_EQUALS( notifyResult, true, TEST_LOCATION );
+
   END_TEST;
 }
 

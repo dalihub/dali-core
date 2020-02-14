@@ -37,6 +37,9 @@ namespace
 const int32_t ARGINDEX_REF_VALUE = 0;
 const int32_t ARGINDEX_STEP_SIZE = 1;
 const int32_t ARGINDEX_CURRENT_STEP = 2;
+const int32_t ARGINDEX_FIRST_VALUE = 3;
+const int32_t ARGINDEX_SECOND_VALUE = 4;
+const int32_t ARGINDEX_THIRD_VALUE = 5;
 
 } // namespace
 
@@ -81,6 +84,21 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
   return function;
 }
 
+ConditionFunction Step::GetCompareFunction( Property::Type valueType )
+{
+    ConditionFunction function = NULL;
+    if( valueType == Property::VECTOR3 )
+    {
+      function = EvalAndCompareVector3;
+    }
+    else
+    {
+      function = GetFunction( valueType );
+    }
+
+    return function;
+}
+
 bool Step::Evaluate( const float propertyValue, PropertyNotification::RawArgumentContainer& arg )
 {
   const float refValue = arg[ARGINDEX_REF_VALUE];
@@ -111,6 +129,7 @@ bool Step::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::Ra
   const float propertyValue = value.GetFloat();
   return Evaluate( propertyValue, arg );
 }
+
 bool Step::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float propertyValue = value.GetVector2().LengthSquared();
@@ -123,7 +142,26 @@ bool Step::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::
   return Evaluate( propertyValue, arg );
 }
 
-bool Step::EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+bool Step::EvalAndCompareVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  float propertyValue = value.GetVector3().LengthSquared();
+  bool result = Evaluate( propertyValue, arg );
+  if( result == false )
+  {
+    if( ( fabsf( arg[ARGINDEX_FIRST_VALUE] - value.GetVector3().x ) > Math::MACHINE_EPSILON_1 )
+        || ( fabsf( arg[ARGINDEX_SECOND_VALUE] - value.GetVector3().y ) > Math::MACHINE_EPSILON_1 )
+        || ( fabsf( arg[ARGINDEX_THIRD_VALUE] - value.GetVector3().z ) > Math::MACHINE_EPSILON_1 ) )
+    {
+      result = true;
+    }
+  }
+  arg[ARGINDEX_FIRST_VALUE] = value.GetVector3().x;
+  arg[ARGINDEX_SECOND_VALUE] = value.GetVector3().y;
+  arg[ARGINDEX_THIRD_VALUE] = value.GetVector3().z;
+  return result;
+}
+
+bool Step::EvalVector4( const  Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float propertyValue = value.GetVector4().LengthSquared();
   return Evaluate( propertyValue, arg );

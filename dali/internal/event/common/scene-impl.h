@@ -35,7 +35,7 @@ namespace Dali
 namespace Integration
 {
 
-class Event;
+struct Event;
 
 }
 

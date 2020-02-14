@@ -65,6 +65,7 @@ public:
    * @param[in] condition The condition type (e.g. LessThan, GreaterThan...)
    * @param[in] arguments The arguments which accompany the condition.
    * @param[in] notifyMode The notification mode setting
+   * @param[in] compare The flag of comparing the previous and current data.
    * @return A new PropertyNotification object.
    */
   static PropertyNotification* New(Object& object,
@@ -73,7 +74,8 @@ public:
                                    int componentIndex,
                                    ConditionType condition,
                                    RawArgumentContainer& arguments,
-                                   NotifyMode notifyMode);
+                                   NotifyMode notifyMode,
+                                   bool compare);
 
   /**
    * Virtual destructor
@@ -121,7 +123,8 @@ protected:
                        int componentIndex,
                        ConditionType condition,
                        RawArgumentContainer& arguments,
-                       NotifyMode notifyMode);
+                       NotifyMode notifyMode,
+                       bool compare);
 
 private:
 

@@ -204,10 +204,12 @@ public:
 #endif
 
 /// Use DALI_FALLTHROUGH in switch statements where one case is supposed to fall through into another case
-#if __has_cpp_attribute(fallthrough)
-#define DALI_FALLTHROUGH [[fallthrough]]
-#else
 #define DALI_FALLTHROUGH
+#if __GNUC__
+#if __has_cpp_attribute(fallthrough)
+#undef DALI_FALLTHROUGH
+#define DALI_FALLTHROUGH [[fallthrough]]
+#endif
 #endif
 
 #endif // DALI_COMMON_H

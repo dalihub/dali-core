@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RESOURCE_POLICIES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,6 @@ namespace Dali
 {
 namespace ResourcePolicy
 {
-
-/**
- * The data retention policy describes how dali should retain resource data.
- */
-enum DataRetention
-{
-  DALI_RETAINS_ALL_DATA,  // retains all data e.g. bitmaps
-  DALI_DISCARDS_ALL_DATA, // discards all data (expects application to regenerate UI on context loss)
-};
 
 /**
  * The discardable policy determines if a resource can be discarded.
