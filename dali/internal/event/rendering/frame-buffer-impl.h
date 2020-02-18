@@ -109,12 +109,6 @@ public:
    */
   void MarkSurfaceAsInvalid();
 
-  /**
-   * @brief Sets whether to enable partial update.
-   * @param[in] value whether partial update or not
-   */
-  void SetPartialUpdateEnabled( bool value );
-
 private: // implementation
 
   /**
