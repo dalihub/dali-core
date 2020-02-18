@@ -55,6 +55,14 @@ public:
    */
   static ConditionFunction GetFunction( Property::Type valueType );
 
+  /**
+   * @return function pointer to the correct condition function, based on
+   * the type of value being examined.
+   *
+   * This function pointer is to compare previous and current components for the swapping case.
+   */
+  static ConditionFunction GetCompareFunction( Property::Type valueType );
+
 private:
 
   static bool Evaluate( const float propertyValue, PropertyNotification::RawArgumentContainer& arg );
@@ -92,6 +100,17 @@ private:
   static bool EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
+   * Checks if Vector3.Length() is Outside
+   *
+   * If previous Vector3.Lenght() and current are same, the raw datas are checked with comparing these values.
+   *
+   * @param[in] value The value being examined.
+   * @param[in] arg The supplied arguments for the condition.
+   * @return Condition result (true if condition met, false if not)
+   */
+  static bool EvalAndCompareVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+
+  /**
    * Checks if Vector4.Length() is Outside
    * @param[in] value The value being examined.
    * @param[in] arg The supplied arguments for the condition.
@@ -106,7 +125,6 @@ private:
    * @return Condition result (true if condition met, false if not)
    */
   static bool EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
-
 };
 
 } // namespace SceneGraph

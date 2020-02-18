@@ -39,9 +39,10 @@ PropertyNotification* PropertyNotification::New(Object& object,
                                                 int componentIndex,
                                                 ConditionType condition,
                                                 RawArgumentContainer& arguments,
-                                                NotifyMode notifyMode)
+                                                NotifyMode notifyMode,
+                                                bool compare)
 {
-  return new PropertyNotification( object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode );
+  return new PropertyNotification( object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode, compare );
 }
 
 
@@ -51,7 +52,8 @@ PropertyNotification::PropertyNotification(Object& object,
                                            int componentIndex,
                                            ConditionType condition,
                                            RawArgumentContainer& arguments,
-                                           NotifyMode notifyMode)
+                                           NotifyMode notifyMode,
+                                           bool compare)
 : mObject(&object),
   mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
@@ -89,7 +91,14 @@ PropertyNotification::PropertyNotification(Object& object,
     }
     case PropertyCondition::Step:
     {
-      mConditionFunction = Step::GetFunction(mPropertyType);
+      if( compare == true )
+      {
+        mConditionFunction = Step::GetCompareFunction(mPropertyType);
+      }
+      else
+      {
+        mConditionFunction = Step::GetFunction(mPropertyType);
+      }
       break;
     }
     case PropertyCondition::VariableStep:
@@ -147,8 +156,8 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
   }
 
   if( mValid != currentValid
-      || (currentValid && ((mConditionType == PropertyCondition::Step)
-                        || (mConditionType == PropertyCondition::VariableStep))) )
+      || ( currentValid && ( ( mConditionType == PropertyCondition::Step )
+                        || ( mConditionType == PropertyCondition::VariableStep ) ) ) )
   {
     mValid = currentValid;
     //  means don't notify so notifyRequired stays false
