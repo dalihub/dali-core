@@ -586,18 +586,6 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, 
 
         DoRender( instruction );
       }
-
-      if ( mImpl->currentContext->IsSurfacelessContextSupported() )
-      {
-        mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-      }
-
-      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-      for ( auto&& context : mImpl->surfaceContextContainer )
-      {
-        context->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-      }
     }
 
     //Notify RenderGeometries that rendering has finished
@@ -1039,6 +1027,12 @@ void RenderManager::DoRender( RenderInstruction& instruction )
   else
   {
     mImpl->currentContext->Flush();
+  }
+
+  if( instruction.mFrameBuffer && instruction.mFrameBuffer->IsSurfaceBacked() )
+  {
+    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
   }
 }
 
