@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/common/scene-graph-scene.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
@@ -48,18 +49,18 @@ const Vector4 DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f); // Default backg
 
 } //Unnamed namespace
 
-ScenePtr Scene::New( Integration::RenderSurface& surface )
+ScenePtr Scene::New( Size size )
 {
   ScenePtr scene = new Scene;
 
   // Second-phase construction
-  scene->Initialize( surface );
+  scene->Initialize( size );
 
   return scene;
 }
 
 Scene::Scene()
-: mSurface( nullptr ),
+: mSceneObject( nullptr ),
   mSize(), // Don't set the proper value here, this will be set when the surface is set later
   mDpi(),
   mBackgroundColor( DEFAULT_BACKGROUND_COLOR ),
@@ -70,6 +71,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+  if( EventThreadServices::IsCoreRunning() && mSceneObject )
+  {
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    RemoveSceneMessage( tls->GetUpdateManager(), *mSceneObject );
+  }
+
   if( mDefaultCamera )
   {
     // its enough to release the handle so the object is released
@@ -89,16 +96,11 @@ Scene::~Scene()
     mRenderTaskList.Reset();
   }
 
-  if ( mFrameBuffer )
-  {
-    mFrameBuffer.Reset();
-  }
-
   // No need to discard this Scene from Core, as Core stores an intrusive_ptr to this scene
   // When this destructor is called, the scene has either already been removed from Core or Core has already been destroyed
 }
 
-void Scene::Initialize( Integration::RenderSurface& surface )
+void Scene::Initialize( Size size )
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -124,9 +126,7 @@ void Scene::Initialize( Integration::RenderSurface& surface )
   // Create the default camera actor first; this is needed by the RenderTaskList
   // The default camera attributes and position is such that children of the default layer,
   // can be positioned at (0,0) and be at the top-left of the viewport.
-  const PositionSize positionSize = surface.GetPositionSize();
-  const Vector2 surfaceSize( static_cast< float >( positionSize.width ), static_cast< float >( positionSize.height ) );
-  mDefaultCamera = CameraActor::New( surfaceSize );
+  mDefaultCamera = CameraActor::New( size );
   mDefaultCamera->SetParentOrigin(ParentOrigin::CENTER);
   Add(*(mDefaultCamera.Get()));
 
@@ -136,8 +136,12 @@ void Scene::Initialize( Integration::RenderSurface& surface )
   // Create the default render-task
   mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
 
-  // Set the surface
-  SetSurface( surface );
+  SurfaceResized( size.width, size.height );
+
+  // Create scene graph object
+  mSceneObject = new SceneGraph::Scene();
+  OwnerPointer< SceneGraph::Scene > transferOwnership( const_cast< SceneGraph::Scene* >( mSceneObject ) );
+  AddSceneMessage( updateManager, transferOwnership );
 }
 
 void Scene::Add(Actor& actor)
@@ -200,66 +204,37 @@ Actor& Scene::GetDefaultRootActor()
   return *mRootLayer;
 }
 
-void Scene::SetSurface( Integration::RenderSurface& surface )
+void Scene::SurfaceResized( float width, float height )
 {
-  if( mSurface != &surface )
+  if( ( fabsf( mSize.width - width ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - height ) > Math::MACHINE_EPSILON_1 ) )
   {
-    mSurface = &surface;
+    Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( width ), static_cast< int32_t >( height ) ); // truncated
 
+    mSize.width = width;
+    mSize.height = height;
+
+    // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
+    mDefaultCamera->SetPerspectiveProjection( mSize );
+
+    mRootLayer->SetSize( mSize.width, mSize.height );
+
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
+    SetDefaultSurfaceRectMessage( updateManager, newSize );
+
+    // set default render-task viewport parameters
     RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
-
-    mFrameBuffer = Dali::Internal::FrameBuffer::New( surface, Dali::FrameBuffer::Attachment::NONE );
-    defaultRenderTask->SetFrameBuffer( mFrameBuffer );
-
-    SurfaceResized();
+    defaultRenderTask->SetViewport( newSize );
   }
 }
 
-void Scene::SurfaceResized()
+void Scene::SurfaceReplaced()
 {
-  if( mSurface )
+  if ( mSceneObject )
   {
-    const PositionSize surfacePositionSize = mSurface->GetPositionSize();
-    const float fWidth = static_cast< float >( surfacePositionSize.width );
-    const float fHeight = static_cast< float >( surfacePositionSize.height );
-
-    if( ( fabsf( mSize.width - fWidth ) > Math::MACHINE_EPSILON_1 ) || ( fabsf( mSize.height - fHeight ) > Math::MACHINE_EPSILON_1 ) )
-    {
-      Rect< int32_t > newSize( 0, 0, static_cast< int32_t >( surfacePositionSize.width ), static_cast< int32_t >( surfacePositionSize.height ) ); // truncated
-
-      mSize.width = fWidth;
-      mSize.height = fHeight;
-
-      // Calculates the aspect ratio, near and far clipping planes, field of view and camera Z position.
-      mDefaultCamera->SetPerspectiveProjection( mSize );
-
-      mRootLayer->SetSize( mSize.width, mSize.height );
-
-      ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-      SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-      SetDefaultSurfaceRectMessage( updateManager, newSize );
-
-      // set default render-task viewport parameters
-      RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
-      defaultRenderTask->SetViewport( newSize );
-      defaultRenderTask->GetFrameBuffer()->SetSize( static_cast<uint32_t>( newSize.width ), static_cast<uint32_t>( newSize.height ) );
-    }
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    SurfaceReplacedMessage( tls->GetUpdateManager(), *mSceneObject );
   }
-}
-
-void Scene::SurfaceDeleted()
-{
-  mSurface = nullptr;
-  if ( mFrameBuffer )
-  {
-    // The frame buffer doesn't have a valid render surface any more.
-    mFrameBuffer->MarkSurfaceAsInvalid();
-  }
-}
-
-Integration::RenderSurface* Scene::GetSurface() const
-{
-  return mSurface;
 }
 
 void Scene::Discard()
@@ -301,16 +276,18 @@ void Scene::SetBackgroundColor( const Vector4& color )
 {
   mBackgroundColor = color;
 
-  if( mSurface )
-  {
-    mRenderTaskList->GetTask( 0u )->SetClearColor( color );
-    mRenderTaskList->GetTask( 0u )->SetClearEnabled( true );
-  }
+  mRenderTaskList->GetTask( 0u )->SetClearColor( color );
+  mRenderTaskList->GetTask( 0u )->SetClearEnabled( true );
 }
 
 Vector4 Scene::GetBackgroundColor() const
 {
   return mBackgroundColor;
+}
+
+SceneGraph::Scene* Scene::GetSceneObject() const
+{
+  return mSceneObject;
 }
 
 void Scene::EmitKeyEventSignal(const KeyEvent& event)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/renderers/render-texture-frame-buffer.h>
+#include <dali/internal/render/renderers/render-frame-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/renderers/render-texture.h>
@@ -41,9 +41,8 @@ const GLenum COLOR_ATTACHMENTS[] =
 };
 }
 
-TextureFrameBuffer::TextureFrameBuffer( uint32_t width, uint32_t height, Mask attachments )
-: FrameBuffer(),
-  mId( 0u ),
+FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
+: mId( 0u ),
   mTextureId{ 0u },
   mDepthBuffer( attachments & Dali::FrameBuffer::Attachment::DEPTH ),
   mStencilBuffer( attachments & Dali::FrameBuffer::Attachment::STENCIL ),
@@ -53,10 +52,11 @@ TextureFrameBuffer::TextureFrameBuffer( uint32_t width, uint32_t height, Mask at
 {
 }
 
-TextureFrameBuffer::~TextureFrameBuffer()
-{}
+FrameBuffer::~FrameBuffer()
+{
+}
 
-void TextureFrameBuffer::Destroy( Context& context )
+void FrameBuffer::Destroy( Context& context )
 {
   if( mId )
   {
@@ -64,12 +64,12 @@ void TextureFrameBuffer::Destroy( Context& context )
   }
 }
 
-void TextureFrameBuffer::GlContextDestroyed()
+void FrameBuffer::GlContextDestroyed()
 {
   mId = 0u;
 }
 
-void TextureFrameBuffer::Initialize(Context& context)
+void FrameBuffer::Initialize(Context& context)
 {
   context.GenFramebuffers( 1, &mId );
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
@@ -95,7 +95,7 @@ void TextureFrameBuffer::Initialize(Context& context)
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-void TextureFrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
+void FrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 
@@ -120,17 +120,17 @@ void TextureFrameBuffer::AttachColorTexture( Context& context, Render::Texture* 
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-void TextureFrameBuffer::Bind( Context& context )
+void FrameBuffer::Bind( Context& context )
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );
 }
 
-uint32_t TextureFrameBuffer::GetWidth() const
+uint32_t FrameBuffer::GetWidth() const
 {
   return mWidth;
 }
 
-uint32_t TextureFrameBuffer::GetHeight() const
+uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
 }

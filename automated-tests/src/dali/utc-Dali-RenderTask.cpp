@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1183,9 +1183,9 @@ int UtcDaliRenderTaskGetFrameBufferN(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  // A scene creates frame buffer by default
+  // By default render-tasks do not render off-screen
   FrameBuffer frameBuffer = task.GetFrameBuffer();
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK( !frameBuffer );
 
   END_TEST;
 }

@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ namespace Internal DALI_INTERNAL
 namespace Integration
 {
 
-class RenderSurface;
 struct Event;
 
 /**
@@ -62,11 +61,11 @@ public:
   /**
    * @brief Create an initialized Scene handle.
    *
-   * @param[in] surface Binds this rendering surface to this scene
+   * @param[in] size The size of the set surface for this scene
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New( Integration::RenderSurface& surface );
+  static Scene New( Size size );
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -196,23 +195,17 @@ public:
   Layer GetLayer( uint32_t depth ) const;
 
   /**
-   * @brief Binds the rendering surface to the scene
-   *
-   * @return The root layer
-   */
-  void SetSurface( Integration::RenderSurface& surface );
-
-  /**
    * @brief Informs the scene that the set surface has been resized.
+   *
+   * @param[in] width The new width of the set surface
+   * @param[in] height The new height of the set surface
    */
-  void SurfaceResized();
+  void SurfaceResized( float width, float height );
 
   /**
-   * @brief Gets the rendering surface bound to the scene
-   *
-   * @return The render surface
+   * @brief Informs the scene that the surface has been replaced.
    */
-  Integration::RenderSurface* GetSurface() const;
+  void SurfaceReplaced();
 
   /**
    * @brief Discards this Scene from the Core.

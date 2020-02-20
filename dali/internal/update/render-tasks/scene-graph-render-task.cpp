@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -361,7 +361,7 @@ const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
   return mCamera->GetProjectionMatrix( bufferIndex );
 }
 
-void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
+RenderInstruction& RenderTask::PrepareRenderInstruction( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( nullptr != mCamera );
 
@@ -370,10 +370,10 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
   Viewport viewport;
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
-  instruction.Reset( mCamera,
-                     GetFrameBuffer(),
-                     viewportSet ? &viewport : nullptr,
-                     mClearEnabled ? &GetClearColor( updateBufferIndex ) : nullptr );
+  mRenderInstruction[updateBufferIndex].Reset( mCamera,
+                                               GetFrameBuffer(),
+                                               viewportSet ? &viewport : nullptr,
+                                               mClearEnabled ? &GetClearColor( updateBufferIndex ) : nullptr );
 
   if( mRequiresSync &&
       mRefreshRate == Dali::RenderTask::REFRESH_ONCE )
@@ -384,13 +384,15 @@ void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, Buffe
       mRenderSyncTracker = new Render::RenderTracker();
       mRenderMessageDispatcher->AddRenderTracker( *mRenderSyncTracker );
     }
-    instruction.mRenderTracker = mRenderSyncTracker;
+    mRenderInstruction[updateBufferIndex].mRenderTracker = mRenderSyncTracker;
   }
   else
   {
     // no sync needed, texture FBOs are "ready" the same frame they are rendered to
-    instruction.mRenderTracker = nullptr;
+    mRenderInstruction[updateBufferIndex].mRenderTracker = nullptr;
   }
+
+  return mRenderInstruction[updateBufferIndex];
 }
 
 bool RenderTask::ViewMatrixUpdated()
