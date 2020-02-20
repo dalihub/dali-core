@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ class GlAbstraction;
 class GlSyncAbstraction;
 class GlContextHelperAbstraction;
 class RenderStatus;
+class Scene;
 }
 
 struct Vector4;
@@ -62,6 +63,7 @@ class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
 class PropertyBufferDataProvider;
+class Scene;
 
 /**
  * RenderManager is responsible for rendering the result of the previous "update", which
@@ -113,12 +115,6 @@ public:
    * @note This should be called during core initialisation if shader binaries are to be used.
    */
   void SetShaderSaver( ShaderSaver& upstream );
-
-  /**
-   * Retrieve the render instructions; these should be set during each "update" traversal.
-   * @return The render instruction container.
-   */
-  RenderInstructionContainer& GetRenderInstructionContainer();
 
   // The following methods should be called via RenderQueue messages
 
@@ -297,6 +293,24 @@ public:
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
+   * Initializes a Scene to the render manager
+   * @param[in] scene The Scene to initialize
+   */
+  void InitializeScene( SceneGraph::Scene* scene );
+
+  /**
+   * Uninitializes a Scene to the render manager
+   * @param[in] scene The Scene to uninitialize
+   */
+  void UninitializeScene( SceneGraph::Scene* scene );
+
+  /**
+   * This is called when the surface of the scene has been replaced.
+   * @param[in] scene The scene.
+   */
+  void SurfaceReplaced( SceneGraph::Scene* scene );
+
+  /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the
    * tracker. The lifetime of the tracker is related to the lifetime of the tracked
    * object, usually an offscreen render task.
@@ -316,23 +330,45 @@ public:
    */
   ProgramCache* GetProgramCache();
 
-  // This method should be called from Core::Render()
+  // This method should be called from Core::PreRender()
 
   /**
-   * Renders the results of the previous "update" traversal.
-   * @param[out] status contains the rendering flags.
-   * @param[in] forceClear Force the Clear on the framebuffer even if nothing is rendered.
-   * @param[in] uploadOnly Upload the resource only without rendering.
+   * This is called before rendering any scene in the next frame. This method should be preceded
+   * by a call up Update.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[out] status showing whether update is required to run.
+   * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void Render( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+  void PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+
+  // This method should be called from Core::RenderScene()
+
+  /**
+   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * This method should be called twice. The first pass to render off-screen frame buffers if any,
+   * and the second pass to render the surface.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] scene The scene to be rendered.
+   * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
+   */
+  void RenderScene( Integration::Scene& scene, bool renderToFbo );
+
+  // This method should be called from Core::PostRender()
+
+  /**
+   * This is called after rendering all the scenes in the next frame. This method should be
+   * followed by a call up RenderScene.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
+   */
+  void PostRender( bool uploadOnly );
+
 
 private:
-
-  /**
-   * Helper to process a single RenderInstruction.
-   * @param[in] instruction A description of the rendering operation.
-   */
-  void DoRender( RenderInstruction& instruction );
 
 private:
 

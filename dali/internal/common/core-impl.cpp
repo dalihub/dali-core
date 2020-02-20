@@ -27,7 +27,6 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/render-surface.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
@@ -193,18 +192,6 @@ void Core::ContextDestroyed()
   mRenderManager->ContextDestroyed();
 }
 
-void Core::SurfaceDeleted( Integration::RenderSurface* surface )
-{
-  for( auto scene : mScenes )
-  {
-    if( scene->GetSurface() == surface )
-    {
-      scene->SurfaceDeleted();
-      break;
-    }
-  }
-}
-
 void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
 {
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
@@ -229,9 +216,19 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
   // Any message to update will wake it up anyways
 }
 
-void Core::Render( RenderStatus& status, bool forceClear, bool uploadOnly )
+void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
 {
-  mRenderManager->Render( status, forceClear, uploadOnly );
+  mRenderManager->PreRender( status, forceClear, uploadOnly );
+}
+
+void Core::RenderScene( Integration::Scene& scene, bool renderToFbo )
+{
+  mRenderManager->RenderScene( scene, renderToFbo );
+}
+
+void Core::PostRender( bool uploadOnly )
+{
+  mRenderManager->PostRender( uploadOnly );
 }
 
 void Core::SceneCreated()

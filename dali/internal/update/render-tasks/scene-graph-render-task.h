@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/render/common/render-instruction.h>
 
 namespace Dali
 {
@@ -310,10 +311,10 @@ public:
    * then this method will ensure that a GL sync object is created to track
    * when the rendering has finished.
    *
-   * @param[out] instruction to prepare
    * @param[in] updateBufferIndex The current update buffer index.
+   * @return instruction to prepare
    */
-  void PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex );
+  RenderInstruction& PrepareRenderInstruction( BufferIndex updateBufferIndex );
 
   /**
    * @return true if the view matrix has been updated during this or last frame
@@ -325,6 +326,16 @@ public:
    * @param[in] requiresSync whether GL sync is required for native render target
    */
   void SetSyncRequired( bool requiresSync );
+
+  /**
+   * Retrieve the render instruction.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return The render instruction
+   */
+  RenderInstruction& GetRenderInstruction( BufferIndex updateBufferIndex )
+  {
+    return mRenderInstruction[updateBufferIndex];
+  }
 
 private: // from PropertyOwner::Observer
 
@@ -368,6 +379,8 @@ private:
   Node* mCameraNode;
   SceneGraph::Camera* mCamera;
   Render::FrameBuffer* mFrameBuffer;
+
+  RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
 
   uint32_t mRefreshRate;   ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
   uint32_t mFrameCounter;  ///< counter for rendering every N frames

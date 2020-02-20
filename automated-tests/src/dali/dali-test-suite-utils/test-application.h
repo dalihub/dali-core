@@ -24,7 +24,6 @@
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-render-controller.h"
-#include "test-render-surface.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/trace.h>
@@ -95,7 +94,6 @@ protected:
   TestGlAbstraction         mGlAbstraction;
   TestGlSyncAbstraction     mGlSyncAbstraction;
   TestGlContextHelperAbstraction mGlContextHelperAbstraction;
-  TestRenderSurface*        mRenderSurface;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;

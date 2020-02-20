@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_CONTEXT_HELPER_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/integration-api/render-surface.h>
 
 namespace Dali
 {
@@ -44,12 +43,6 @@ public:
    * @brief Switch to the surfaceless GL context
    */
   virtual void MakeSurfacelessContextCurrent() = 0;
-
-  /**
-   * @brief Switch to the GL context of the specific render surface
-   * @param[in] surface The render surface
-   */
-  virtual void MakeContextCurrent( Integration::RenderSurface* surface ) = 0;
 
   /**
    * @brief Clear the GL context

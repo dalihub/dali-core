@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ Context::Context( Integration::GlAbstraction& glAbstraction )
 {
 }
 
-Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts )
+Context::Context( Integration::GlAbstraction& glAbstraction, std::vector< Context* >* contexts )
 : mGlAbstraction(glAbstraction),
   mGlContextCreated(false),
   mColorMask(true),
@@ -107,7 +107,7 @@ Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Con
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode( FaceCullingMode::NONE ),
   mViewPort( 0, 0, 0, 0 ),
-  mSurfaceContexts( contexts )
+  mSceneContexts( contexts )
 {
 }
 
