@@ -77,13 +77,13 @@ namespace Internal
 namespace
 {
 
-const char* gStdAttribs[ Program::ATTRIB_TYPE_LAST ] =
+const char* const gStdAttribs[ Program::ATTRIB_TYPE_LAST ] =
 {
   "aPosition",    // ATTRIB_POSITION
   "aTexCoord",    // ATTRIB_TEXCOORD
 };
 
-const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
+const char* const gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 {
   "uMvpMatrix",           // UNIFORM_MVP_MATRIX
   "uModelView",           // UNIFORM_MODELVIEW_MATRIX
@@ -237,6 +237,41 @@ bool sortByPosition( LocationPosition a, LocationPosition b )
 {
   return a.position < b.position;
 }
+
+const char* const DELIMITERS = " \t\n";
+
+struct StringSize
+{
+  const char* const mString;
+  const uint32_t mLength;
+
+  template <uint32_t kLength>
+  constexpr StringSize(const char(&string)[kLength])
+  : mString(string),
+    mLength(kLength - 1) // remove terminating null; N.B. there should be no other null.
+  {}
+
+  operator const char*() const
+  {
+    return mString;
+  }
+};
+
+bool operator==(const StringSize& lhs, const char* rhs)
+{
+  return strncmp(lhs.mString, rhs, lhs.mLength) == 0;
+}
+
+constexpr StringSize UNIFORM{ "uniform" };
+constexpr StringSize SAMPLER_PREFIX{ "sampler" };
+constexpr StringSize SAMPLER_TYPES[] = {
+  "2D",
+  "Cube",
+  "ExternalOES"
+};
+
+constexpr auto END_SAMPLER_TYPES = SAMPLER_TYPES + std::extent<decltype(SAMPLER_TYPES)>::value;
+
 }
 
 void Program::GetActiveSamplerUniforms()
@@ -272,36 +307,46 @@ void Program::GetActiveSamplerUniforms()
 
   //Determine declaration order of each sampler
   char* fragShader = strdup( mProgramData->GetFragmentShader() );
-  char* nextPtr = NULL;
-  const char* token = strtok_r( fragShader, " ;\n", &nextPtr );
+  char* uniform = strstr( fragShader, UNIFORM );
   int samplerPosition = 0;
-  while( token )
+  while ( uniform )
   {
-    if( ( strncmp( token, "sampler2D", 9u )    == 0 ) ||
-        ( strncmp( token, "samplerCube", 11u ) == 0 ) ||
-        ( strncmp( token, "samplerExternalOES", 18u ) == 0 ) )
+    char* outerToken = strtok_r( uniform + UNIFORM.mLength, ";", &uniform );
+
+    char* nextPtr = NULL;
+    char* token = strtok_r( outerToken, DELIMITERS, &nextPtr );
+    while ( token )
     {
-      bool found( false );
-      token = strtok_r( NULL, " ;\n", &nextPtr );
-      for( uint32_t i=0; i < static_cast<uint32_t>( samplerUniformLocations.size() ); ++i )
+      if ( SAMPLER_PREFIX == token )
       {
-        if( samplerUniformLocations[i].position == -1 &&
-            strncmp( token, samplerNames[i].c_str(), samplerNames[i].size() ) == 0 )
+        token += SAMPLER_PREFIX.mLength;
+        if ( std::find(SAMPLER_TYPES, END_SAMPLER_TYPES, token) != END_SAMPLER_TYPES )
         {
-          samplerUniformLocations[i].position = samplerPosition++;
-          found = true;
+          bool found( false );
+          token = strtok_r( NULL, DELIMITERS, &nextPtr );
+          for (uint32_t i=0; i < static_cast<uint32_t>( samplerUniformLocations.size() ); ++i)
+          {
+            if ( samplerUniformLocations[i].position == -1 &&
+              strncmp(token, samplerNames[i].c_str(), samplerNames[i].size()) == 0 )
+            {
+              samplerUniformLocations[i].position = samplerPosition++;
+              found = true;
+              break;
+            }
+          }
+
+          if (!found)
+          {
+            DALI_LOG_ERROR("Sampler uniform %s declared but not used in the shader\n", token );
+          }
           break;
         }
       }
-      if( !found )
-      {
-        DALI_LOG_ERROR("Sampler uniform %s declared but not used in the shader\n", token );
-      }
+
+      token = strtok_r( NULL, DELIMITERS, &nextPtr );
     }
-    else
-    {
-      token = strtok_r( NULL, " ;\n", &nextPtr );
-    }
+
+    uniform = strstr( uniform, UNIFORM );
   }
 
   free( fragShader );
