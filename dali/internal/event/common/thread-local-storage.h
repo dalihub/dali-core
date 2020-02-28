@@ -18,7 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/singleton-service.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -52,7 +56,7 @@ class UpdateManager;
  * Class to store a pointer to core in thread local storage.
  *
  */
-class ThreadLocalStorage
+class ThreadLocalStorage : public Dali::BaseObject
 {
 public:
 
@@ -62,11 +66,6 @@ public:
    * @param [in] core reference to core
    */
   ThreadLocalStorage(Core* core);
-
-  /**
-   * Destructor.
-   */
-  ~ThreadLocalStorage();
 
   /**
    * Remove core pointer.
@@ -79,6 +78,11 @@ public:
    * @return reference to the TLS
    */
   static ThreadLocalStorage& Get();
+
+  /**
+   * @copydoc Dali::SingletonService::Get()
+   */
+  static Dali::SingletonService GetSingletonService();
 
   /**
    * Checks if the TLS has been created
@@ -172,13 +176,67 @@ public:
    */
   void RemoveScene( Scene* scene );
 
+  /**
+   * @copydoc Dali::SingletonService::Register()
+   */
+  void Register( const std::type_info& info, BaseHandle singleton );
+
+  /**
+   * @copydoc Dali::SingletonService::UnregisterAll()
+   */
+  void UnregisterAll();
+
+  /**
+   * @copydoc Dali::SingletonService::GetSingleton()
+   */
+  BaseHandle GetSingleton( const std::type_info& info ) const;
+
+private:
+
+  /**
+   * Virtual Destructor
+   */
+  virtual ~ThreadLocalStorage();
+
+  // Undefined
+  ThreadLocalStorage( const ThreadLocalStorage& );
+  ThreadLocalStorage& operator=( ThreadLocalStorage& );
+
 private:
 
   Core* mCore;                                              ///< reference to core
 
+  // using the address of the type name string as compiler will allocate these once per library
+  // and we don't support un/re-loading of dali libraries while singleton service is alive
+  typedef std::pair< const char*, BaseHandle> SingletonPair;
+  typedef std::vector< SingletonPair >  SingletonContainer;
+  typedef SingletonContainer::const_iterator SingletonConstIter;
+
+  SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
+
 };
 
 } // namespace Internal
+
+// Helpers for public-api forwarding methods
+
+inline Internal::ThreadLocalStorage& GetImplementation(Dali::SingletonService& service)
+{
+  DALI_ASSERT_ALWAYS( service && "SingletonService handle is empty" );
+
+  BaseObject& handle = service.GetBaseObject();
+
+  return static_cast<Internal::ThreadLocalStorage&>(handle);
+}
+
+inline const Internal::ThreadLocalStorage& GetImplementation(const Dali::SingletonService& service)
+{
+  DALI_ASSERT_ALWAYS( service && "SingletonService handle is empty" );
+
+  const BaseObject& handle = service.GetBaseObject();
+
+  return static_cast<const Internal::ThreadLocalStorage&>(handle);
+}
 
 } // namespace Dali
 
