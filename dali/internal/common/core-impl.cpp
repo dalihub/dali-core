@@ -153,7 +153,7 @@ Core::~Core()
   if( tls )
   {
     tls->Remove();
-    delete tls;
+    tls->Unreference();
   }
 
   mObjectRegistry.Reset();
@@ -432,7 +432,8 @@ void Core::CreateThreadLocalStorage()
 {
   // a pointer to the ThreadLocalStorage object will be stored in TLS
   // The ThreadLocalStorage object should be deleted by the Core destructor
-  new ThreadLocalStorage(this);
+  ThreadLocalStorage* tls = new ThreadLocalStorage(this);
+  tls->Reference();
 }
 
 void Core::RegisterObject( Dali::BaseObject* object )

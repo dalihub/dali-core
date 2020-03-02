@@ -22,6 +22,23 @@
 #include <dali/internal/common/core-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/integration-api/processor-interface.h>
+
+#if defined(DEBUG_ENABLED)
+#include <dali/integration-api/debug.h>
+Debug::Filter* gSingletonServiceLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_SINGLETON_SERVICE" );
+
+// Need to define own macro as the log function is not installed when this object is created so no logging is shown with DALI_LOG_INFO at construction and destruction
+#define DALI_LOG_SINGLETON_SERVICE_DIRECT(level, message)                        \
+    if(gSingletonServiceLogFilter && gSingletonServiceLogFilter->IsEnabledFor(level)) { std::string string(message); Dali::TizenPlatform::LogMessage( Debug::DebugInfo, string );  }
+
+#define DALI_LOG_SINGLETON_SERVICE(level, format, ...) DALI_LOG_INFO(gSingletonServiceLogFilter, level, format, ## __VA_ARGS__ )
+#else
+
+#define DALI_LOG_SINGLETON_SERVICE_DIRECT(level, message)
+#define DALI_LOG_SINGLETON_SERVICE(level, format, ...)
+
+#endif
 
 namespace Dali
 {
@@ -56,6 +73,16 @@ ThreadLocalStorage& ThreadLocalStorage::Get()
   DALI_ASSERT_ALWAYS(threadLocal);
 
   return *threadLocal;
+}
+
+Dali::SingletonService ThreadLocalStorage::GetSingletonService()
+{
+  Dali::SingletonService singletonService;
+  if ( threadLocal )
+  {
+    singletonService = Dali::SingletonService( threadLocal );
+  }
+  return singletonService;
 }
 
 bool ThreadLocalStorage::Created()
@@ -132,6 +159,43 @@ void ThreadLocalStorage::AddScene( Scene* scene )
 void ThreadLocalStorage::RemoveScene( Scene* scene )
 {
   mCore->RemoveScene( scene );
+}
+
+void ThreadLocalStorage::Register( const std::type_info& info, BaseHandle singleton )
+{
+  if( singleton )
+  {
+    DALI_LOG_SINGLETON_SERVICE( Debug::General, "Singleton Added: %s\n", info.name() );
+    mSingletonContainer.push_back( SingletonPair( info.name(), singleton ) );
+
+    Integration::Processor* processor = dynamic_cast<Integration::Processor*>( &singleton.GetBaseObject() );
+    if( processor )
+    {
+      mCore->RegisterProcessor( *processor );
+    }
+  }
+}
+
+void ThreadLocalStorage::UnregisterAll( )
+{
+  mSingletonContainer.clear();
+}
+
+BaseHandle ThreadLocalStorage::GetSingleton( const std::type_info& info ) const
+{
+  BaseHandle object;
+
+  const SingletonContainer::const_iterator end = mSingletonContainer.end();
+  for( SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter )
+  {
+    // comparing the addresses as these are allocated statically per library
+    if( ( *iter ).first == info.name() )
+    {
+      object = ( *iter ).second;
+    }
+  }
+
+  return object;
 }
 
 } // namespace Internal

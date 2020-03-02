@@ -89,6 +89,7 @@ SET(TC_SOURCES
         utc-Dali-SignalDelegate.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
+        utc-Dali-SingletonService.cpp
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
