@@ -228,7 +228,6 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] depthBufferAvailable Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] partialUpdateAvailble whether the partial update is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -238,8 +237,7 @@ public:
                     GlContextHelperAbstraction& glContextHelperAbstraction,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,
-                    StencilBufferAvailable stencilBufferAvailable,
-                    PartialUpdateAvailable partialUpdateAvailable );
+                    StencilBufferAvailable stencilBufferAvailable );
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.

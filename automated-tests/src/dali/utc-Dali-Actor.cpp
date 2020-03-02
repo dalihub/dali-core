@@ -3284,7 +3284,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
   { "opacity",                  DevelActor::Property::OPACITY,             Property::FLOAT       },
-  { "updateSizeHint",           DevelActor::Property::UPDATE_SIZE_HINT,    Property::VECTOR2     },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace
@@ -7193,36 +7192,6 @@ int utcDaliActorCulled(void)
   DALI_TEST_EQUALS( propertyNotificationSignal, true, TEST_LOCATION );
   DALI_TEST_EQUALS( source.GetTargetProperty(), static_cast< int >( DevelActor::Property::CULLED ), TEST_LOCATION );
   DALI_TEST_EQUALS( source.GetTarget().GetProperty< bool >( source.GetTargetProperty() ), true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliActorUpdateSizeHint(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  Vector3 vector(100.0f, 100.0f, 0.0f);
-
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
-
-  actor.SetSize(vector.x, vector.y);
-
-
-  Vector2 updateSizeHint = Vector2(150.f, 150.f);
-  actor.SetProperty(Dali::DevelActor::Property::UPDATE_SIZE_HINT, updateSizeHint);
-
-  // Flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-
-  Vector2 currentSizeHint = actor.GetProperty( Dali::DevelActor::Property::UPDATE_SIZE_HINT ).Get< Vector2 >();
-  DALI_TEST_EQUALS( currentSizeHint, updateSizeHint, Math::MACHINE_EPSILON_0, TEST_LOCATION );
-
-  // Flush the queue and render once
-  application.SendNotification();
-  application.Render();
 
   END_TEST;
 }
