@@ -40,11 +40,6 @@ void TestRenderSurface::GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVe
   dpiHorizontal = dpiVertical = 96;
 };
 
-int TestRenderSurface::GetOrientation() const
-{
-  return 0;
-};
-
 void TestRenderSurface::InitializeGraphics()
 {
 }
