@@ -105,7 +105,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mNode->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -187,7 +186,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mNode->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -267,7 +265,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mNode->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 
@@ -347,7 +344,6 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    mNode->SetPropertyDirty( true );
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
 

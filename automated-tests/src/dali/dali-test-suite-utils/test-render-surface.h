@@ -137,16 +137,6 @@ public:
    */
   virtual Vector4 GetBackgroundColor();
 
-  /**
-   * @copydoc Dali::Integration::RenderSurface::SetDamagedRect
-   */
-  virtual void SetDamagedRect( const Dali::DamagedRect& damagedRect, Dali::DamagedRect& mergedRect );
-
-  /**
-   * @copydoc Dali::Integration::RenderSurface::GetBufferAge
-   */
-  virtual int32_t GetBufferAge();
-
 private:
 
   /**
