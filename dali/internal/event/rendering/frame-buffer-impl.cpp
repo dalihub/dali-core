@@ -133,6 +133,15 @@ void FrameBuffer::MarkSurfaceAsInvalid()
   }
 }
 
+void FrameBuffer::SetPartialUpdateEnabled( bool value )
+{
+  if( mRenderObject->IsSurfaceBacked() )
+  {
+    SetFrameBufferPartialUpdateMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), value );
+  }
+}
+
+
 FrameBuffer::~FrameBuffer()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject )
