@@ -94,10 +94,10 @@ RenderTaskPtr RenderTask::New( Actor* sourceActor, CameraActor* cameraActor, Ren
 
 void RenderTask::SetSourceActor( Actor* actor )
 {
-  mSourceActor = actor;
-  if ( mSourceActor )
+  mSourceActor.SetActor( actor );
+  if ( actor )
   {
-    SetSourceNodeMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), &mSourceActor->GetNode() );
+    SetSourceNodeMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), &actor->GetNode() );
   }
   else
   {
@@ -110,7 +110,7 @@ void RenderTask::SetSourceActor( Actor* actor )
 
 Actor* RenderTask::GetSourceActor() const
 {
-  return mSourceActor;
+  return mSourceActor.GetActor();
 }
 
 void RenderTask::SetExclusive( bool exclusive )
@@ -143,10 +143,10 @@ bool RenderTask::GetInputEnabled() const
 
 void RenderTask::SetCameraActor( CameraActor* cameraActor )
 {
-  mCameraActor = cameraActor;
-  if( mCameraActor )
+  mCameraActor.SetActor( cameraActor );
+  if( cameraActor )
   {
-    SetCameraMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), &mCameraActor->GetNode(), mCameraActor->GetCamera() );
+    SetCameraMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), &cameraActor->GetNode(), cameraActor->GetCamera() );
   }
   else
   {
@@ -159,7 +159,11 @@ void RenderTask::SetCameraActor( CameraActor* cameraActor )
 
 CameraActor* RenderTask::GetCameraActor() const
 {
-  return mCameraActor;
+  if( mCameraActor.GetActor() )
+  {
+    return static_cast< CameraActor* >( mCameraActor.GetActor() );
+  }
+  return nullptr;
 }
 
 void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
@@ -264,9 +268,10 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
       if ( stage )
       {
         Vector2 size( stage->GetSize() );
-        if ( mSourceActor && mSourceActor->OnStage() )
+        Actor* sourceActor = mSourceActor.GetActor();
+        if ( sourceActor && sourceActor->OnStage() )
         {
-          Scene& scene = mSourceActor->GetScene();
+          Scene& scene = sourceActor->GetScene();
           size = scene.GetSize();
         }
 
@@ -412,9 +417,10 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
     {
       Vector2 size( stage->GetSize() );
       CameraActor* defaultCamera( &stage->GetDefaultCameraActor() );
-      if ( mSourceActor && mSourceActor->OnStage() )
+      Actor* sourceActor = mSourceActor.GetActor();
+      if ( sourceActor && sourceActor->OnStage() )
       {
-        Scene& scene = mSourceActor->GetScene();
+        Scene& scene = sourceActor->GetScene();
         size = scene.GetSize();
         defaultCamera = &scene.GetDefaultCameraActor();
       }
@@ -764,8 +770,8 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 
 RenderTask::RenderTask( const SceneGraph::RenderTask* sceneObject, RenderTaskList& renderTaskList )
 : Object( sceneObject ),
-  mSourceActor( nullptr ),
-  mCameraActor( nullptr ),
+  mSourceActor(),
+  mCameraActor(),
   mInputMappingActor(),
   mRenderTaskList( renderTaskList ),
   mClearColor( Dali::RenderTask::DEFAULT_CLEAR_COLOR ),

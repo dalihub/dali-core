@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {
@@ -350,8 +351,8 @@ private: // not copyable
 
 private:
 
-  Actor* mSourceActor; ///< Source actor, we cannot keep the actor alive so raw pointer.
-  CameraActor* mCameraActor; ///< Camera actor, we cannot keep the actor alive so raw pointer.
+  ActorObserver mSourceActor; ///< Source actor
+  ActorObserver mCameraActor; ///< Camera actor
   WeakHandle<Dali::Actor> mInputMappingActor; /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
   RenderTaskList& mRenderTaskList; ///< The render task list
 
