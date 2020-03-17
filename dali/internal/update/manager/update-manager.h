@@ -591,6 +591,22 @@ public:
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t face );
 
   /**
+   * Attach a texture as depth output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
+   * Attach a texture as depth/stencil output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
    * This is called when the surface of the scene has been replaced.
    * @param[in] scene The scene.
    */
@@ -1431,6 +1447,28 @@ inline void AttachColorTextureToFrameBuffer( UpdateManager& manager, Render::Fra
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer );
+}
+
+inline void AttachDepthTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  typedef MessageValue3< UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AttachDepthTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel );
+}
+
+inline void AttachDepthStencilTextureToFrameBuffer( UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  typedef MessageValue3< UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AttachDepthStencilTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel );
 }
 
 inline void SetDepthIndicesMessage( UpdateManager& manager, OwnerPointer< NodeDepths >& nodeDepths )

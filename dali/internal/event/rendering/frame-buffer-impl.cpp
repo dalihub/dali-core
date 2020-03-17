@@ -43,6 +43,8 @@ FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mColor{ nullptr },
+  mDepth( nullptr ),
+  mStencil( nullptr ),
   mWidth( width ),
   mHeight( height ),
   mAttachments( attachments ),
@@ -78,9 +80,47 @@ void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, 
   }
 }
 
+void FrameBuffer::AttachDepthTexture( TexturePtr texture, uint32_t mipmapLevel )
+{
+  if( ( texture->GetWidth() / ( 1u << mipmapLevel ) != mWidth ) ||
+      ( texture->GetHeight() / ( 1u << mipmapLevel ) != mHeight ) )
+  {
+    DALI_LOG_ERROR( "Failed to attach depth texture to FrameBuffer: Size mismatch \n" );
+  }
+  else
+  {
+    mDepth = texture;
+    AttachDepthTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel );
+  }
+}
+
+void FrameBuffer::AttachDepthStencilTexture( TexturePtr texture, unsigned int mipmapLevel )
+{
+  if( ( texture->GetWidth() / ( 1u << mipmapLevel ) != mWidth ) ||
+      ( texture->GetHeight() / ( 1u << mipmapLevel ) != mHeight ) )
+  {
+    DALI_LOG_ERROR( "Failed to attach depth/stencil texture to FrameBuffer: Size mismatch \n" );
+  }
+  else
+  {
+    mStencil = texture;
+    AttachDepthStencilTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel );
+  }
+}
+
 Texture* FrameBuffer::GetColorTexture(uint8_t index) const
 {
   return ( index >= mColorAttachmentCount ) ? nullptr : mColor[index].Get();
+}
+
+Texture* FrameBuffer::GetDepthTexture() const
+{
+  return ( mDepth ) ? mDepth.Get() : nullptr;
+}
+
+Texture* FrameBuffer::GetDepthStencilTexture() const
+{
+  return ( mStencil ) ? mStencil.Get() : nullptr;
 }
 
 void FrameBuffer::SetSize( uint32_t width, uint32_t height )

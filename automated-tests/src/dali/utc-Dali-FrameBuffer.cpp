@@ -388,6 +388,52 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
   END_TEST;
 }
 
+int UtcDaliFrameBufferAttachDepthTexture01(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+
+  Texture textureDepth = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, width, height );
+  DevelFrameBuffer::AttachDepthTexture( frameBuffer, textureDepth );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachDepthStencilTexture01(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+
+  Texture textureStencil = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height );
+  DevelFrameBuffer::AttachDepthStencilTexture( frameBuffer, textureStencil );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliFrameBufferGetColorTexture01(void)
 {
   TestApplication application;
@@ -461,6 +507,42 @@ int UtcDaliFrameBufferGetColorTexture04(void)
   {
     DALI_TEST_EQUALS(DevelFrameBuffer::GetColorTexture(frameBuffer, i), textures[i], TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferGetDepthTexture01(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+
+  Texture textureDepth = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_FLOAT, width, height );
+  DevelFrameBuffer::AttachDepthTexture( frameBuffer, textureDepth );
+
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthTexture( frameBuffer ), textureDepth, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferGetDepthStencilTexture01(void)
+{
+  TestApplication application;
+
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+
+  Texture textureStencil = Texture::New( TextureType::TEXTURE_2D, Pixel::DEPTH_STENCIL, width, height );
+  DevelFrameBuffer::AttachDepthStencilTexture( frameBuffer, textureStencil );
+
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetDepthStencilTexture( frameBuffer ), textureStencil, TEST_LOCATION);
 
   END_TEST;
 }
