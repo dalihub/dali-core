@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -517,6 +517,28 @@ void PixelFormatToGl( Pixel::Format pixelFormat, GLenum& glFormat, GLint& glInte
       break;
     }
 
+    // GLES 3.0 depth and stencil formats
+    case Pixel::DEPTH_UNSIGNED_INT:
+    {
+      glFormat = GL_DEPTH_COMPONENT;
+      pixelDataType = GL_UNSIGNED_INT;
+      break;
+    }
+
+    case Pixel::DEPTH_FLOAT:
+    {
+      glFormat = GL_DEPTH_COMPONENT;
+      pixelDataType = GL_FLOAT;
+      break;
+    }
+
+    case Pixel::DEPTH_STENCIL:
+    {
+      glFormat = GL_DEPTH_STENCIL;
+      pixelDataType = GL_UNSIGNED_INT_24_8;
+      break;
+    }
+
     case Pixel::INVALID:
     {
       DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
@@ -531,6 +553,16 @@ void PixelFormatToGl( Pixel::Format pixelFormat, GLenum& glFormat, GLint& glInte
     case Pixel::RGB32F: // FALL THROUGH
     {
       glInternalFormat = GL_R11F_G11F_B10F;
+      break;
+    }
+    case Pixel::DEPTH_FLOAT:
+    {
+      glInternalFormat = GL_DEPTH_COMPONENT32F;
+      break;
+    }
+    case Pixel::DEPTH_STENCIL:
+    {
+      glInternalFormat = GL_DEPTH24_STENCIL8;
       break;
     }
     default:
@@ -568,6 +600,9 @@ bool IsCompressedFormat(Pixel::Format pixelFormat)
     case Pixel::BGRA8888:
     case Pixel::RGB16F:
     case Pixel::RGB32F:
+    case Pixel::DEPTH_UNSIGNED_INT:
+    case Pixel::DEPTH_FLOAT:
+    case Pixel::DEPTH_STENCIL:
     case Pixel::INVALID:
     {
       return false;

@@ -88,9 +88,29 @@ public:
   void AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
+   * @copydoc Dali::DevelFrameBuffer::AttachDepthTexture()
+   */
+  void AttachDepthTexture( TexturePtr texture, uint32_t mipmapLevel );
+
+  /**
+   * @copydoc Dali::DevelFrameBuffer::AttachDepthStencilTexture()
+   */
+  void AttachDepthStencilTexture( TexturePtr texture, uint32_t mipmapLevel );
+
+  /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
    */
   Texture* GetColorTexture(uint8_t index) const;
+
+  /**
+   * @copydoc Dali::DevelFrameBuffer::GetDepthTexture()
+   */
+  Texture* GetDepthTexture() const;
+
+  /**
+   * @copydoc Dali::DevelFrameBuffer::GetDepthStencilTexture()
+   */
+  Texture* GetDepthStencilTexture() const;
 
   /**
    * @brief Sets the frame buffer size.
@@ -144,6 +164,8 @@ private: // data
   Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
 
   TexturePtr mColor[ Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS ];
+  TexturePtr mDepth;
+  TexturePtr mStencil;
   uint32_t mWidth;
   uint32_t mHeight;
   Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask

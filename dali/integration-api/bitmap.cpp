@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -421,6 +421,26 @@ void ConvertToGlFormat( Format pixelformat, unsigned& pixelDataType, unsigned& i
       DALI_LOG_INFO( Debug::Filter::gImage, Debug::Verbose, "Using GLES 3.0 GLES 3.0 floating point format.\n" );
       pixelDataType = GL_FLOAT;
       internalFormat= GL_RGB;
+      break;
+    }
+
+    // GLES 3.0 depth and stencil formats
+    case Pixel::DEPTH_UNSIGNED_INT:
+    {
+      pixelDataType = GL_UNSIGNED_INT;
+      internalFormat = GL_DEPTH_COMPONENT;
+      break;
+    }
+    case Pixel::DEPTH_FLOAT:
+    {
+      pixelDataType = GL_FLOAT;
+      internalFormat = GL_DEPTH_COMPONENT;
+      break;
+    }
+    case Pixel::DEPTH_STENCIL:
+    {
+      pixelDataType = GL_UNSIGNED_INT_24_8;
+      internalFormat = GL_DEPTH_STENCIL;
       break;
     }
 

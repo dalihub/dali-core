@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -407,6 +407,24 @@ void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
   {
     auto textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( frameBuffer );
     textureFrameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
+  }
+}
+
+void RenderManager::AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  if ( !frameBuffer->IsSurfaceBacked() )
+  {
+    auto textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( frameBuffer );
+    textureFrameBuffer->AttachDepthTexture( mImpl->context, texture, mipmapLevel );
+  }
+}
+
+void RenderManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  if ( !frameBuffer->IsSurfaceBacked() )
+  {
+    auto textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( frameBuffer );
+    textureFrameBuffer->AttachDepthStencilTexture( mImpl->context, texture, mipmapLevel );
   }
 }
 
