@@ -2921,6 +2921,19 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize ) )
           {
+            if( mRelayoutData )
+            {
+              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.width = mTargetSize.width;
+              }
+
+              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.height = mTargetSize.height;
+              }
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -2931,6 +2944,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.width ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.width = mTargetSize.width;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -2941,6 +2959,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.height ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.height = mTargetSize.height;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3065,6 +3088,19 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< Vector3 >( mTargetSize, value ) )
           {
+            if( mRelayoutData )
+            {
+              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.width = mTargetSize.width;
+              }
+
+              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.height = mTargetSize.height;
+              }
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3075,6 +3111,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.width, value ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.width = mTargetSize.width;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3085,6 +3126,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.height, value ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.height = mTargetSize.height;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }

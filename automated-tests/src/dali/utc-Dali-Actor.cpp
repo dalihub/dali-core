@@ -7249,3 +7249,165 @@ int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
 
   END_TEST;
 }
+
+int utcDaliActorGetSizeAfterAnimation(void)
+{
+  TestApplication application;
+  tet_infoline( "Check the actor size when an animation is finished" );
+
+  Vector3 vector( 100.0f, 100.0f, 0.0f );
+
+  Actor actor = Actor::New();
+  actor.SetSize( vector.x, vector.y );
+  actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  Vector3 currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  Vector3 targetValue( 10.0f, 20.0f, 30.0f );
+
+  Animation animation = Animation::New( 1.0f );
+  animation.AnimateTo( Property( actor, Actor::Property::SIZE ), targetValue );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  targetValue.width = 50.0f;
+
+  animation.Clear();
+  animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), targetValue.width );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  targetValue.height = 70.0f;
+
+  animation.Clear();
+  animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), targetValue.height );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  Vector3 offset( 10.0f, 20.0f, 30.0f );
+
+  animation.Clear();
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE ), offset );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  targetValue += offset;
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  offset.width = 20.0f;
+
+  animation.Clear();
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE_WIDTH ), offset.width );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  targetValue.width += offset.width;
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  offset.height = 10.0f;
+
+  animation.Clear();
+  animation.AnimateBy( Property( actor, Actor::Property::SIZE_HEIGHT ), offset.height );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 1100 ); // After the animation
+
+  targetValue.height += offset.height;
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  END_TEST;
+}
