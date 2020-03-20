@@ -25,6 +25,7 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/render/common/render-instruction.h>
 
 namespace Dali
 {
@@ -526,7 +527,8 @@ void Renderer::Render( Context& context,
                        const Matrix& projectionMatrix,
                        const Vector3& size,
                        bool blend,
-                       Vector<GLuint>& boundTextures )
+                       Vector<GLuint>& boundTextures,
+                       const Dali::Internal::SceneGraph::RenderInstruction& instruction )
 {
   // Get the program to use:
   Program* program = mRenderDataProvider->GetShader().GetProgram();
@@ -537,7 +539,33 @@ void Renderer::Render( Context& context,
   }
 
   //Set cull face  mode
-  context.CullFace( mFaceCullingMode );
+  const Dali::Internal::SceneGraph::Camera* cam = instruction.GetCamera();
+  if (cam->GetReflectionUsed())
+  {
+    auto adjFaceCullingMode = mFaceCullingMode;
+    switch( mFaceCullingMode )
+    {
+      case FaceCullingMode::Type::FRONT:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::BACK;
+        break;
+      }
+      case FaceCullingMode::Type::BACK:
+      {
+        adjFaceCullingMode = FaceCullingMode::Type::FRONT;
+        break;
+      }
+      default:
+      {
+        // nothing to do, leave culling as it is
+      }
+    }
+    context.CullFace( adjFaceCullingMode );
+  }
+  else
+  {
+    context.CullFace( mFaceCullingMode );
+  }
 
   //Set blending mode
   SetBlending( context, blend );

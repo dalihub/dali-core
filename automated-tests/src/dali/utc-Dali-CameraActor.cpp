@@ -21,7 +21,7 @@
 #include <cmath>
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/actors/actor-devel.h>
-
+#include <dali/devel-api/actors/camera-actor-devel.h>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
@@ -1736,5 +1736,63 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
     Matrix::Multiply( freeLookTest,  freeLookViewMatrix,  freeLookWorld );
     DALI_TEST_EQUALS( freeLookTest, Matrix::IDENTITY, 0.01f, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliCameraActorReflectionByPlane(void)
+{
+  TestApplication application;
+
+  Stage stage = Stage::GetCurrent();
+
+  Vector3 targetPosition( Vector3::ZERO );
+  Vector3 cameraOffset( 0.0f, 100.0f, 100.0f );
+
+  CameraActor freeLookCameraActor = stage.GetRenderTaskList().GetTask(0).GetCameraActor();
+  freeLookCameraActor.SetType(Camera::LOOK_AT_TARGET);
+  freeLookCameraActor.SetTargetPosition( targetPosition );
+  freeLookCameraActor.SetPosition(cameraOffset);
+
+  stage.GetRootLayer().SetPosition( 1, 0 );
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  Matrix matrixBefore, matrixAfter;
+  freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( matrixBefore );
+  freeLookCameraActor.SetProperty( Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4( 0.0f, 1.0f, 0.0f, 0.0f));
+  stage.GetRootLayer().SetPosition( 0, 0 );
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( matrixAfter );
+
+  Vector3 position, scale;
+  Quaternion rotation;
+  matrixAfter.GetTransformComponents( position, rotation, scale );
+
+  Quaternion reflected( 0, 0, 1, 0 );
+
+  DALI_TEST_EQUALS( reflected, rotation, 0.01f, TEST_LOCATION );
+
+  // Test Free Look camera
+  freeLookCameraActor.SetType(Camera::FREE_LOOK);
+
+  // Make sure the recalculation will take place
+  freeLookCameraActor.SetProperty( Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4( 0.0f, 1.0f, 0.0f, 0.0f));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Nothing should change despite of different camera type
+  matrixAfter.GetTransformComponents( position, rotation, scale );
+  DALI_TEST_EQUALS( reflected, rotation, 0.01f, TEST_LOCATION );
+
   END_TEST;
 }

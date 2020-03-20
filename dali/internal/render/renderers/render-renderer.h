@@ -46,6 +46,8 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
+
+class RenderInstruction; //for relfection effect
 }
 
 namespace Render
@@ -351,6 +353,8 @@ public:
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] boundTextures The textures bound for rendering
+   * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
+
    */
   void Render( Context& context,
                BufferIndex bufferIndex,
@@ -361,7 +365,9 @@ public:
                const Matrix& projectionMatrix,
                const Vector3& size,
                bool blend,
-               Vector<GLuint>& boundTextures );
+               Vector<GLuint>& boundTextures,
+               const Dali::Internal::SceneGraph::RenderInstruction& instruction //for reflection effect
+               );
 
   /**
    * Write the renderer's sort attributes to the passed in reference

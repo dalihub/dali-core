@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -205,6 +206,14 @@ void CameraActor::OnStageConnectionInternal()
   if( ( mCanvasSize.width < Math::MACHINE_EPSILON_1000 ) || ( mCanvasSize.height < Math::MACHINE_EPSILON_1000 ) )
   {
     SetPerspectiveProjection( GetScene().GetSize() );
+  }
+}
+
+void CameraActor::SetReflectByPlane(const Vector4& plane) {
+  SceneGraph::Camera* cam = const_cast<SceneGraph::Camera*>(GetCamera());
+  if (cam)
+  {
+    cam->SetReflectByPlane(plane);
   }
 }
 
@@ -618,6 +627,12 @@ void CameraActor::SetDefaultProperty( Property::Index index, const Property::Val
         SetInvertYAxis( propertyValue.Get<bool>() ); // set to false in case property is not bool
         break;
       }
+      case Dali::DevelCameraActor::Property::REFLECTION_PLANE:
+      {
+        SetReflectByPlane( propertyValue.Get<Vector4>() );
+        break;
+      }
+
       default:
       {
         DALI_LOG_WARNING( "Unknown property (%d)\n", index );

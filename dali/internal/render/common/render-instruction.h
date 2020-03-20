@@ -123,6 +123,11 @@ public:
     // inlined as this is called once per frame per render instruction
     return &mCamera->GetProjectionMatrix( index );
   }
+  // for reflection effect
+  const Camera* GetCamera() const
+  {
+    return mCamera;
+  }
 
 private:
 
