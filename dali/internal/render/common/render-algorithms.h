@@ -65,7 +65,8 @@ class RenderAlgorithms
                                    BufferIndex bufferIndex,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures );
+                                   Vector<GLuint>& boundTextures,
+                                   int orientation);
 
   private:
 
@@ -88,7 +89,7 @@ class RenderAlgorithms
      * @param[in] item     The current RenderItem (about to be rendered)
      * @param[in] context  The current Context
      */
-    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context );
+    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context, int orientation );
 
     /**
      * @brief Set up the clipping based on the specified clipping settings.
@@ -104,7 +105,8 @@ class RenderAlgorithms
                                bool& usedStencilBuffer,
                                uint32_t& lastClippingDepth,
                                uint32_t& lastClippingId,
-                               Integration::StencilBufferAvailable stencilBufferAvailable );
+                               Integration::StencilBufferAvailable stencilBufferAvailable,
+                               int orientation );
 
     /**
      * @brief Process a render-list.
@@ -126,7 +128,7 @@ class RenderAlgorithms
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
                                    const Dali::Internal::SceneGraph::RenderInstruction& instruction // in the case of reflection, things like CullFace need to be adjusted for reflection world   
-                                   );
+                                   int orientation );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );

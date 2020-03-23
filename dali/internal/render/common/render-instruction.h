@@ -121,7 +121,7 @@ public:
   const Matrix* GetProjectionMatrix( BufferIndex index ) const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCamera->GetProjectionMatrix( index );
+    return &mCamera->GetFinalProjectionMatrix( index );
   }
   // for reflection effect
   const Camera* GetCamera() const
