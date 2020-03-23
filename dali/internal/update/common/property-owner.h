@@ -206,18 +206,6 @@ public:
    */
   void RemoveUniformMapObserver( UniformMap::Observer& observer );
 
-  /**
-   * Set whether property has changed to run following a render.
-   * @param[in] value Set to true if the property has changed
-   */
-  virtual void SetPropertyDirty( bool value );
-
-  /**
-   * Query the property status following rendering of a frame.
-   * @return True if the property has changed
-   */
-  virtual bool IsPropertyDirty() const;
-
 
 protected:
 
@@ -238,7 +226,6 @@ protected:
 
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
   UniformMap mUniformMaps; ///< Container of owned uniform maps
-  bool mPropertyDirty:1; ///< Required for marking it dirty in case of partial update.
 
 private:
 
