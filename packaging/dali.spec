@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    DALi 3D Engine
-Version:    1.5.3
+Version:    1.5.4
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
