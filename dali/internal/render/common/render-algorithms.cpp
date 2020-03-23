@@ -416,7 +416,8 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  Integration::StencilBufferAvailable stencilBufferAvailable,
                                                  Vector<GLuint>& boundTextures,
                                                  const RenderInstruction& instruction,
-                                                 int orientation )
+                                                 int orientation,
+                                                 Dali::ClippingBox& scissorBox )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -475,6 +476,12 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
     mScissorStack.push_back( layerScissorBox );
     mHasLayerScissor = true;
   }
+  else if ( !scissorBox.IsEmpty() )
+  {
+    context.SetScissorTest( true );
+    context.Scissor( scissorBox.x, scissorBox.y, scissorBox.width, scissorBox.height );
+    mScissorStack.push_back( scissorBox );
+  }
   else
   {
     // We are not performing a layer clip. Add the viewport as the root scissor rectangle.
@@ -523,7 +530,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
                                                  Integration::StencilBufferAvailable stencilBufferAvailable,
                                                  Vector<GLuint>& boundTextures,
-                                                 int orientation )
+                                                 int orientation,
+                                                 Dali::ClippingBox& scissorBox )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -553,8 +561,9 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                             depthBufferAvailable,
                             stencilBufferAvailable,
                             boundTextures,
-                            instruction //added for reflection effect
-                            orientation );
+                            instruction, //added for reflection effect
+                            orientation,
+                            scissorBox );
       }
     }
   }
