@@ -31,6 +31,10 @@ namespace // unnamed namespace
 {
 const uint32_t UPDATE_COUNT        = 2u;  // Update projection or view matrix this many frames after a change
 const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
+
+//For reflection and clipping plane
+const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_A = 2.0f;
+const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_D = 1.0f;
 }
 
 namespace Dali
@@ -261,6 +265,69 @@ void Camera::SetTargetPosition( const Vector3& targetPosition )
   mUpdateViewFlag = UPDATE_COUNT;
 }
 
+
+
+void VectorReflectedByPlane(Vector4 &out, Vector4 &in, Vector4 &plane)
+{
+  float d = float(2.0) * plane.Dot(in);
+  out.x = static_cast<float>(in.x - plane.x*d);
+  out.y = static_cast<float>(in.y - plane.y*d);
+  out.z = static_cast<float>(in.z - plane.z*d);
+  out.w = static_cast<float>(in.w - plane.w*d);
+}
+
+void Camera::AdjustNearPlaneForPerspective( Matrix& perspective, const Vector4& clipPlane )
+{
+  Vector4    q;
+  float* v = perspective.AsFloat();
+
+  q.x = (Sign(clipPlane.x) + v[8]) / v[0];
+  q.y = (Sign(clipPlane.y) + v[9]) / v[5];
+  q.z = -1.0f;
+  q.w = (1.0f + v[10]) / v[14];
+
+  // Calculate the scaled plane vector
+  Vector4 c = clipPlane * (REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_A / q.Dot( clipPlane));
+
+  // Replace the third row of the projection v
+  v[2] = c.x;
+  v[6] = c.y;
+  v[10] = c.z + REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_D;
+  v[14] = c.w;
+}
+
+void Camera::SetReflectByPlane( const Vector4& plane )
+{
+  float* v = mReflectionMtx.AsFloat();
+  float _2ab = -2.0f * plane.x * plane.y;
+  float _2ac = -2.0f * plane.x * plane.z;
+  float _2bc = -2.0f * plane.y * plane.z;
+
+  v[0] = 1.0f - 2.0f * plane.x * plane.x;
+  v[1] = _2ab;
+  v[2] = _2ac;
+  v[3] = 0.0f;
+
+  v[4] = _2ab;
+  v[5] = 1.0f - 2.0f * plane.y * plane.y;
+  v[6] = _2bc;
+  v[7] = 0.0f;
+
+  v[8] = _2ac;
+  v[9] = _2bc;
+  v[10] = 1.0f - 2.0f * plane.z * plane.z;
+  v[11] = 0.0f;
+
+  v[12] =    - 2 * plane.x * plane.w;
+  v[13] =    - 2 * plane.y * plane.w;
+  v[14] =    - 2 * plane.z * plane.w;
+  v[15] = 1.0f;
+
+  mUseReflection = true;
+  mReflectionPlane = plane;
+  mUpdateViewFlag = UPDATE_COUNT;
+}
+
 const Matrix& Camera::GetProjectionMatrix( BufferIndex bufferIndex ) const
 {
   return mProjectionMatrix[ bufferIndex ];
@@ -349,11 +416,27 @@ uint32_t Camera::UpdateViewMatrix( BufferIndex updateBufferIndex )
         {
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
           viewMatrix = mNode->GetWorldMatrix( updateBufferIndex );
+
+          if (mUseReflection)
+          {
+            const Matrix& owningNodeMatrix( mNode->GetWorldMatrix( updateBufferIndex ) );
+            Vector3 position{}, scale{};
+            Quaternion orientation{};
+            owningNodeMatrix.GetTransformComponents( position, orientation, scale );
+            mReflectionEye = position;
+            mUseReflectionClip = true;
+
+            Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
+            Matrix oldViewMatrix( viewMatrix );
+            Matrix::Multiply(viewMatrix, oldViewMatrix, mReflectionMtx);
+          }
+
           viewMatrix.Invert();
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }
-          // camera orientation constrained to look at a target
+
+        // camera orientation constrained to look at a target
         case Dali::Camera::LOOK_AT_TARGET:
         {
           const Matrix& owningNodeMatrix( mNode->GetWorldMatrix( updateBufferIndex ) );
@@ -361,7 +444,42 @@ uint32_t Camera::UpdateViewMatrix( BufferIndex updateBufferIndex )
           Quaternion orientation;
           owningNodeMatrix.GetTransformComponents( position, orientation, scale );
           Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
-          LookAt( viewMatrix, position, mTargetPosition, orientation.Rotate( Vector3::YAXIS ) );
+
+          if (mUseReflection)
+          {
+            Vector3 up = orientation.Rotate( Vector3::YAXIS );
+            Vector4 position4 = Vector4(position);
+            Vector4 target4 = Vector4(mTargetPosition);
+            Vector4 up4 = Vector4(up);
+            Vector4 positionNew;
+            Vector4 targetNew;
+            Vector4 upNew;
+            Vector3 positionNew3;
+            Vector3 targetNewVector3;
+            Vector3 upNew3;
+
+            // eye
+            VectorReflectedByPlane(positionNew, position4, mReflectionPlane);
+            VectorReflectedByPlane(targetNew, target4, mReflectionPlane);
+            VectorReflectedByPlane(upNew, up4, mReflectionPlane);
+
+            positionNew3     = Vector3(positionNew);
+            targetNewVector3 = Vector3(targetNew);
+            upNew3           = Vector3(upNew);
+            LookAt(viewMatrix, positionNew3, targetNewVector3, upNew3 );
+
+            Matrix oldViewMatrix( viewMatrix );
+            Matrix tmp;
+            tmp.SetIdentityAndScale(Vector3(-1.0, 1.0,1.0));
+            Matrix::Multiply(viewMatrix, oldViewMatrix, tmp);
+
+            mReflectionEye = positionNew;
+            mUseReflectionClip = true;
+          }
+          else
+          {
+            LookAt( viewMatrix, position, mTargetPosition, orientation.Rotate( Vector3::YAXIS ) );
+          }
           mViewMatrix.SetDirty( updateBufferIndex );
           break;
         }
@@ -493,6 +611,32 @@ uint32_t Camera::UpdateProjection( BufferIndex updateBufferIndex )
                        mNearClippingPlane,
                        mFarClippingPlane,
                        mInvertYAxis );
+
+          //need to apply custom clipping plane
+          if (mUseReflectionClip)
+          {
+            Matrix& viewMatrix = mViewMatrix.Get( updateBufferIndex );
+            Matrix viewInv = viewMatrix;
+            viewInv.Invert();
+            viewInv.Transpose();
+
+            Dali::Vector4 adjReflectPlane = mReflectionPlane;
+            float d = mReflectionPlane.Dot(mReflectionEye);
+            if (d < 0)
+            {
+              adjReflectPlane.w = -adjReflectPlane.w;
+            }
+
+            Vector4 customClipping = viewInv * adjReflectPlane;
+            AdjustNearPlaneForPerspective(projectionMatrix, customClipping);
+
+            // Invert Z
+            Matrix matZ;
+            matZ.SetIdentity();
+            float* vZ = matZ.AsFloat();
+            vZ[10] = -vZ[10];
+            Matrix::Multiply(projectionMatrix, projectionMatrix , matZ);
+          }
           break;
         }
         case Dali::Camera::ORTHOGRAPHIC_PROJECTION:

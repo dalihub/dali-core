@@ -160,6 +160,21 @@ public:
   void SetTargetPosition( const Vector3& targetPosition );
 
   /**
+   * Sets the reflection plane
+   * @param[in] plane reflection plane
+   */
+  void SetReflectByPlane( const Vector4& plane );
+
+  /**
+   * Tests whether reflection is used
+   * @return True if used, False otherwise
+   */
+  bool GetReflectionUsed() const
+  {
+    return mUseReflection;
+  }
+
+  /**
    * Retrieve the view-matrix; this is double buffered for input handling.
    * @param[in] bufferIndex The buffer to read from.
    * @return The view-matrix.
@@ -265,6 +280,13 @@ private:
    */
   void UpdateFrustum( BufferIndex updateBufferIndex, bool normalize = true );
 
+  /**
+   * Adjust near plane for reflection
+   * @param perspective Perspective matrix
+   * @param clipPlane Clipping plane
+   */
+  void AdjustNearPlaneForPerspective( Matrix& perspective, const Vector4& clipPlane );
+
   uint32_t                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   uint32_t                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
   const Node*                   mNode;                 ///< The node this scene graph camera belongs to
@@ -283,6 +305,12 @@ public:  // PROPERTIES
   float                         mNearClippingPlane;
   float                         mFarClippingPlane;
   Vector3                       mTargetPosition;
+
+  Dali::Matrix                  mReflectionMtx;
+  Dali::Vector4                 mReflectionPlane;
+  Dali::Vector4                 mReflectionEye;
+  bool                          mUseReflection{ false };
+  bool                          mUseReflectionClip{ false };
 
   InheritedMatrix mViewMatrix;           ///< The viewMatrix; this is double buffered for input handling.
   InheritedMatrix mProjectionMatrix;     ///< The projectionMatrix; this is double buffered for input handling.
