@@ -44,7 +44,6 @@ class GlSyncAbstraction;
 class GlContextHelperAbstraction;
 class UpdateStatus;
 class RenderStatus;
-class RenderSurface;
 struct Event;
 struct TouchData;
 }
@@ -120,11 +119,6 @@ public:
   void RecoverFromContextLoss();
 
   /**
-   * @copydoc Dali::Integration::Core::SurfaceDeleted(Integration::RenderSurface*)
-   */
-  void SurfaceDeleted( Integration::RenderSurface* surface );
-
-  /**
    * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)
    */
   void SetMinimumFrameTimeInterval(uint32_t interval);
@@ -137,7 +131,17 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Render()
    */
-  void Render( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+  void PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+
+  /**
+   * @copydoc Dali::Integration::Core::RenderScene()
+   */
+  void RenderScene( Integration::Scene& scene, bool renderToFbo );
+
+  /**
+   * @copydoc Dali::Integration::Core::Render()
+   */
+  void PostRender( bool uploadOnly );
 
   /**
    * @copydoc Dali::Integration::Core::SceneCreated()

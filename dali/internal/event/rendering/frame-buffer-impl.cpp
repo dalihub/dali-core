@@ -21,9 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/renderers/render-texture-frame-buffer.h>
-#include <dali/internal/render/renderers/render-surface-frame-buffer.h>
-#include <dali/integration-api/render-surface.h>
 
 namespace Dali
 {
@@ -34,14 +31,6 @@ FrameBufferPtr FrameBuffer::New( uint32_t width, uint32_t height, Mask attachmen
 {
   FrameBufferPtr frameBuffer( new FrameBuffer( width, height, attachments ) );
   frameBuffer->Initialize();
-  return frameBuffer;
-}
-
-FrameBufferPtr FrameBuffer::New( Dali::Integration::RenderSurface& renderSurface, Mask attachments )
-{
-  Dali::PositionSize positionSize = renderSurface.GetPositionSize();
-  FrameBufferPtr frameBuffer( new FrameBuffer( positionSize.width, positionSize.height, attachments ) );
-  frameBuffer->Initialize( &renderSurface );
   return frameBuffer;
 }
 
@@ -57,25 +46,13 @@ FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
   mWidth( width ),
   mHeight( height ),
   mAttachments( attachments ),
-  mColorAttachmentCount( 0 ),
-  mIsSurfaceBacked( false )
+  mColorAttachmentCount( 0 )
 {
 }
 
-void FrameBuffer::Initialize( Integration::RenderSurface* renderSurface )
+void FrameBuffer::Initialize()
 {
-  mIsSurfaceBacked = ( renderSurface != nullptr );
-
-  // If render surface backed, create a different scene object
-  // Make Render::FrameBuffer as a base class, and implement Render::TextureFrameBuffer & Render::WindowFrameBuffer
-  if ( mIsSurfaceBacked )
-  {
-    mRenderObject = new Render::SurfaceFrameBuffer( renderSurface );
-  }
-  else
-  {
-    mRenderObject = new Render::TextureFrameBuffer( mWidth, mHeight, mAttachments );
-  }
+   mRenderObject = new Render::FrameBuffer( mWidth, mHeight, mAttachments );
 
   OwnerPointer< Render::FrameBuffer > transferOwnership( mRenderObject );
   AddFrameBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
@@ -83,54 +60,33 @@ void FrameBuffer::Initialize( Integration::RenderSurface* renderSurface )
 
 void FrameBuffer::AttachColorTexture( TexturePtr texture, uint32_t mipmapLevel, uint32_t layer )
 {
-  if ( mIsSurfaceBacked )
+  if( ( texture->GetWidth() / ( 1u << mipmapLevel ) != mWidth ) ||
+      ( texture->GetHeight() / ( 1u << mipmapLevel ) != mHeight ) )
   {
-    DALI_LOG_ERROR( "Attempted to attach color texture to a render surface backed FrameBuffer \n" );
+    DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
+  }
+  else if ( mColorAttachmentCount >= Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS )
+  {
+    DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Exceeded maximum supported color attachments.\n" );
   }
   else
   {
-    if( ( texture->GetWidth() / ( 1u << mipmapLevel ) != mWidth ) ||
-        ( texture->GetHeight() / ( 1u << mipmapLevel ) != mHeight ) )
-    {
-      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Size mismatch \n" );
-    }
-    else if ( mColorAttachmentCount >= Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS )
-    {
-      DALI_LOG_ERROR( "Failed to attach color texture to FrameBuffer: Exceeded maximum supported color attachments.\n" );
-    }
-    else
-    {
-      mColor[mColorAttachmentCount] = texture;
-      ++mColorAttachmentCount;
+    mColor[mColorAttachmentCount] = texture;
+    ++mColorAttachmentCount;
 
-      AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
-    }
+    AttachColorTextureToFrameBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderObject(), mipmapLevel, layer );
   }
 }
 
 Texture* FrameBuffer::GetColorTexture(uint8_t index) const
 {
-  return ( mIsSurfaceBacked || index >= mColorAttachmentCount ) ? nullptr : mColor[index].Get();
+  return ( index >= mColorAttachmentCount ) ? nullptr : mColor[index].Get();
 }
 
 void FrameBuffer::SetSize( uint32_t width, uint32_t height )
 {
   mWidth = width;
   mHeight = height;
-
-  if( mRenderObject->IsSurfaceBacked() )
-  {
-    SetFrameBufferSizeMessage( mEventThreadServices.GetUpdateManager(), static_cast<Render::SurfaceFrameBuffer*>( mRenderObject ), width, height );
-  }
-}
-
-void FrameBuffer::MarkSurfaceAsInvalid()
-{
-  if ( mIsSurfaceBacked )
-  {
-    Render::SurfaceFrameBuffer* renderObject = static_cast<Render::SurfaceFrameBuffer*>( mRenderObject );
-    renderObject->MarkSurfaceAsInvalid();
-  }
 }
 
 FrameBuffer::~FrameBuffer()

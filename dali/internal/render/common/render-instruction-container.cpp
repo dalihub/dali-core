@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,58 +31,45 @@ namespace SceneGraph
 {
 
 RenderInstructionContainer::RenderInstructionContainer()
+: mInstructions{}
 {
-  // array initialisation in ctor initializer list not supported until C++ 11
-  mIndex[ 0 ] = 0u;
-  mIndex[ 1 ] = 0u;
 }
 
 RenderInstructionContainer::~RenderInstructionContainer()
 {
-  // OwnerContainer deletes the instructions
 }
 
 void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint32_t capacityRequired )
 {
-  mIndex[ bufferIndex ] = 0u;
-  uint32_t oldcapacity = static_cast<uint32_t>( mInstructions[ bufferIndex ].Capacity() ); // uint32_t is large enough in practice
-  if( oldcapacity < capacityRequired )
+  // Only re-allocate if necessary.
+  if( mInstructions.size() < capacityRequired )
   {
-    mInstructions[ bufferIndex ].Reserve( capacityRequired );
-    // add N new elements
-    for( ; oldcapacity < capacityRequired; ++oldcapacity )
-    {
-      mInstructions[ bufferIndex ].PushBack( new RenderInstruction );
-    }
+    mInstructions.reserve( capacityRequired );
   }
-  // Note that we may have spare elements in the list, we don't remove them as that would
-  // decrease the capacity of our container and lead to possibly reallocating, which we hate
-  // RenderInstruction holds a lot of data so we keep them and recycle instead of new & delete
+
+  mInstructions.clear();
 }
 
 uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
 {
-  // mIndex contains the number of instructions that have been really prepared and updated
-  // (from UpdateManager through GetNextInstruction)
-  return mIndex[ bufferIndex ];
-}
-
-RenderInstruction& RenderInstructionContainer::GetNextInstruction( BufferIndex bufferIndex )
-{
-  // At protects against running out of space
-  return At( bufferIndex, mIndex[ bufferIndex ]++ );
+  return static_cast<uint32_t>( mInstructions.size() );
 }
 
 RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index )
 {
-  DALI_ASSERT_DEBUG( index < mInstructions[ bufferIndex ].Count() );
+  DALI_ASSERT_DEBUG( index < mInstructions.size() );
 
-  return *mInstructions[ bufferIndex ][ index ];
+  return *mInstructions[ index ];
 }
 
-void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex bufferIndex )
+void RenderInstructionContainer::PushBack( BufferIndex bufferIndex, RenderInstruction* renderInstruction )
 {
-  mIndex[ bufferIndex ]--;
+  mInstructions.push_back( renderInstruction );
+}
+
+void RenderInstructionContainer::DiscardCurrentInstruction( BufferIndex updateBufferIndex )
+{
+  mInstructions.pop_back();
 }
 
 } // namespace SceneGraph

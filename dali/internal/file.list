@@ -112,8 +112,7 @@ SET( internal_src_files
   ${internal_src_dir}/render/gl-resources/gl-call-debug.cpp
   ${internal_src_dir}/render/gl-resources/gpu-buffer.cpp
   ${internal_src_dir}/render/queue/render-queue.cpp
-  ${internal_src_dir}/render/renderers/render-texture-frame-buffer.cpp
-  ${internal_src_dir}/render/renderers/render-surface-frame-buffer.cpp
+  ${internal_src_dir}/render/renderers/render-frame-buffer.cpp
   ${internal_src_dir}/render/renderers/render-geometry.cpp
   ${internal_src_dir}/render/renderers/render-property-buffer.cpp
   ${internal_src_dir}/render/renderers/render-renderer.cpp
@@ -134,6 +133,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/common/scene-graph-buffers.cpp
   ${internal_src_dir}/update/common/scene-graph-connection-change-propagator.cpp
   ${internal_src_dir}/update/common/scene-graph-property-notification.cpp
+  ${internal_src_dir}/update/common/scene-graph-scene.cpp
   ${internal_src_dir}/update/common/uniform-map.cpp
   ${internal_src_dir}/update/controllers/render-message-dispatcher.cpp
   ${internal_src_dir}/update/controllers/scene-controller-impl.cpp

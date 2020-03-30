@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,7 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
  * @param[in]  taskContainer              The container of render-tasks.
  * @param[in]  rootNode                   The root node of the scene-graph.
  * @param[in]  sortedLayers               The layers containing lists of opaque / transparent renderables.
+ * @param[in]  context                    The context holding the GL state of rendering for the rendering instructions.
  * @param[out] instructions               The instructions for rendering the next frame.
  * @param[in]  renderInstructionProcessor An instance of the RenderInstructionProcessor used to sort and handle the renderers for each layer.
  * @param[in]  renderToFboEnabled         Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
@@ -218,6 +219,7 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
                    RenderTaskList::RenderTaskContainer& taskContainer,
                    Layer& rootNode,
                    SortedLayerPointers& sortedLayers,
+                   Context& context,
                    RenderInstructionContainer& instructions,
                    RenderInstructionProcessor& renderInstructionProcessor,
                    bool renderToFboEnabled,
@@ -237,9 +239,8 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
     const bool isDefaultRenderTask = isFirstRenderTask;
     isFirstRenderTask = false;
 
-    const bool isSurfaceBacked = hasFrameBuffer && renderTask.GetFrameBuffer()->IsSurfaceBacked();
-    if( ( !renderToFboEnabled && ( ( !processOffscreen && hasFrameBuffer && !isSurfaceBacked ) ||
-                                   ( processOffscreen && ( !hasFrameBuffer || isSurfaceBacked ) ) ) ) ||
+    if( ( !renderToFboEnabled && ( ( !processOffscreen && hasFrameBuffer ) ||
+                                   ( processOffscreen && !hasFrameBuffer ) ) ) ||
         ( renderToFboEnabled && ( ( processOffscreen && !hasFrameBuffer ) ||
                                   ( isDefaultRenderTask && processOffscreen ) ||
                                   ( !isDefaultRenderTask && !processOffscreen && hasFrameBuffer ) ) ) ||
@@ -286,6 +287,7 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
 
       renderInstructionProcessor.Prepare( updateBufferIndex,
                                           sortedLayers,
+                                          context,
                                           renderTask,
                                           renderTask.GetCullMode(),
                                           hasClippingNodes,
@@ -321,6 +323,7 @@ bool RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    RenderTaskList& renderTasks,
                                    Layer& rootNode,
                                    SortedLayerPointers& sortedLayers,
+                                   Context& context,
                                    RenderInstructionContainer& instructions,
                                    bool renderToFboEnabled,
                                    bool isRenderingToFbo )
@@ -348,6 +351,7 @@ bool RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                 taskContainer,
                                 rootNode,
                                 sortedLayers,
+                                context,
                                 instructions,
                                 mRenderInstructionProcessor,
                                 renderToFboEnabled,
@@ -363,6 +367,7 @@ bool RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                  taskContainer,
                                  rootNode,
                                  sortedLayers,
+                                 context,
                                  instructions,
                                  mRenderInstructionProcessor,
                                  renderToFboEnabled,

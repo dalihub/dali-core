@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,6 +173,7 @@ struct UpdateManager::Impl
     Layer* root{ nullptr };                                   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer< RenderTaskList > taskList;                  ///< Scene graph render task list
     SortedLayerPointers sortedLayerList;                      ///< List of Layer pointers sorted by depth (one list of sorted layers per root)
+    OwnerPointer< Scene > scene;                              ///< Scene graph object of the scene
   };
 
   Impl( NotificationManager& notificationManager,
@@ -195,7 +196,6 @@ struct UpdateManager::Impl
     sceneController( NULL ),
     renderManager( renderManager ),
     renderQueue( renderQueue ),
-    renderInstructions( renderManager.GetRenderInstructionContainer() ),
     renderTaskProcessor( renderTaskProcessor ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
     renderers(),
@@ -283,7 +283,6 @@ struct UpdateManager::Impl
   SceneControllerImpl*                 sceneController;               ///< scene controller
   RenderManager&                       renderManager;                 ///< This is responsible for rendering the results of each "update"
   RenderQueue&                         renderQueue;                   ///< Used to queue messages for the next render
-  RenderInstructionContainer&          renderInstructions;            ///< Used to prepare the render instructions
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
 
   Vector4                              backgroundColor;               ///< The glClear color used at the beginning of each frame.
@@ -510,6 +509,42 @@ void UpdateManager::RemoveRenderTaskList( RenderTaskList* taskList )
     if ( scene && scene->taskList == taskList )
     {
       scene->taskList.Reset();
+      break;
+    }
+  }
+}
+
+void UpdateManager::AddScene( OwnerPointer< Scene >& scene )
+{
+  mImpl->scenes.back()->scene = scene.Release();
+
+  // Initialize the context from render manager
+  typedef MessageValue1< RenderManager, SceneGraph::Scene* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  SceneGraph::Scene& sceneObject = *mImpl->scenes.back()->scene;
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::InitializeScene, &sceneObject );
+}
+
+void UpdateManager::RemoveScene( Scene* scene )
+{
+  // Initialize the context from render manager
+  typedef MessageValue1< RenderManager, SceneGraph::Scene* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::UninitializeScene, scene );
+
+  for ( auto&& sceneInfo : mImpl->scenes )
+  {
+    if ( sceneInfo && sceneInfo->scene && sceneInfo->scene.Get() == scene )
+    {
+      sceneInfo->scene.Reset();
       break;
     }
   }
@@ -970,26 +1005,31 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-      mImpl->renderInstructions.ResetAndReserve( bufferIndex,
-                                                 static_cast<uint32_t>( numberOfRenderTasks ) );
 
+      std::size_t numberOfRenderInstructions = 0;
       for ( auto&& scene : mImpl->scenes )
       {
-        if ( scene && scene->root && scene->taskList )
+        if ( scene && scene->root && scene->taskList && scene->scene )
         {
+          scene->scene->GetRenderInstructions().ResetAndReserve( bufferIndex,
+                                                     static_cast<uint32_t>( scene->taskList->GetTasks().Count() ) );
+
           keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
                                               *scene->taskList,
                                               *scene->root,
                                               scene->sortedLayerList,
-                                              mImpl->renderInstructions,
+                                              *scene->scene->GetContext(),
+                                              scene->scene->GetRenderInstructions(),
                                               renderToFboEnabled,
                                               isRenderingToFbo );
+
+          numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count( bufferIndex );
         }
       }
 
       DALI_LOG_INFO( gLogFilter, Debug::General,
                      "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n",
-                     numberOfRenderTasks, mImpl->renderInstructions.Count( bufferIndex ) );
+                     numberOfRenderTasks, numberOfRenderInstructions );
     }
   }
 
@@ -1100,6 +1140,17 @@ void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetDefaultSurfaceRect, rect );
+}
+
+void UpdateManager::SurfaceReplaced( Scene* scene )
+{
+  typedef MessageValue1< RenderManager, Scene* > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SurfaceReplaced, scene );
 }
 
 void UpdateManager::KeepRendering( float durationSeconds )

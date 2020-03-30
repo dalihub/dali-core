@@ -26,7 +26,6 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-native-image.cpp
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
-        ../dali/dali-test-suite-utils/test-render-surface.cpp
         ../dali/dali-test-suite-utils/test-trace-call-stack.cpp
 )
 

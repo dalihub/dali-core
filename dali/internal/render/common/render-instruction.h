@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
+#include <dali/internal/render/gl-resources/context.h>
 
 namespace Dali
 {
@@ -147,6 +148,8 @@ public: // Data
   bool     mIgnoreRenderToFbo:1;        ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
+
+  Context* mContext;                    ///< The context holding the GL state of rendering
 
 private: // Data
 

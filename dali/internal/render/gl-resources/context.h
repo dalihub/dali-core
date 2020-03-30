@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONTEXT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,9 +79,9 @@ public:
    * @pre Context has not been created.
    * @exception Context already created.
    * @param glAbstraction the gl abstraction.
-   * @param contexts The list of surface contexts (for surface rendering)
+   * @param contexts The list of scene contexts (for surface rendering)
    */
-  Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts );
+  Context( Integration::GlAbstraction& glAbstraction, std::vector< Context* >* contexts );
 
   /**
    * Destructor
@@ -647,9 +647,9 @@ public:
 
     // Need to reset the buffer cache in the surface contexts
     // This will only be executed by the surfaceless context when there are contexts for surface rendering
-    if ( mSurfaceContexts )
+    if ( mSceneContexts )
     {
-      for ( auto&& context : *mSurfaceContexts )
+      for ( auto&& context : *mSceneContexts )
       {
         if ( context )
         {
@@ -698,11 +698,11 @@ public:
 
     ResetTextureCache();
 
-    // Need to reset the texture cache in the surface contexts
+    // Need to reset the texture cache in the scene contexts
     // This will only be executed by the surfaceless context when there are contexts for surface rendering
-    if ( mSurfaceContexts )
+    if ( mSceneContexts )
     {
-      for ( auto&& context : *mSurfaceContexts )
+      for ( auto&& context : *mSceneContexts )
       {
         if ( context )
         {
@@ -1829,7 +1829,7 @@ private: // Data
 
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 
-  OwnerContainer< Context* >* mSurfaceContexts;   ///< The pointer of the container of contexts for surface rendering
+  std::vector< Context* >* mSceneContexts;      ///< The pointer of the container of contexts for surface rendering
 };
 
 } // namespace Internal
