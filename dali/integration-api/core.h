@@ -46,7 +46,7 @@ class GlContextHelperAbstraction;
 class PlatformAbstraction;
 class Processor;
 class RenderController;
-class RenderSurface;
+class Scene;
 struct Event;
 struct TouchData;
 
@@ -283,13 +283,6 @@ public:
    */
   void RecoverFromContextLoss();
 
-  /**
-   * Notify the Core that the GL surface has been deleted.
-   * Multi-threading note: this method should be called from the main thread
-   * @param[in] surface The deleted surface
-   */
-  void SurfaceDeleted( Integration::RenderSurface* surface );
-
   // Core Lifecycle
 
   /**
@@ -345,14 +338,36 @@ public:
                bool isRenderingToFbo );
 
   /**
-   * Render the next frame. This method should be preceded by a call up Update.
+   * This is called before rendering any scene in the next frame. This method should be preceded
+   * by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    * @param[out] status showing whether update is required to run.
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void Render( RenderStatus& status, bool forceClear, bool uploadOnly );
+  void PreRender( RenderStatus& status, bool forceClear, bool uploadOnly );
+
+  /**
+   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * This method should be called twice. The first pass to render off-screen frame buffers if any,
+   * and the second pass to render the surface.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] scene The scene to be rendered.
+   * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
+   */
+  void RenderScene( Integration::Scene& scene, bool renderToFbo );
+
+
+  /**
+   * This is called after rendering all the scenes in the next frame. This method should be
+   * followed by a call up RenderScene.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
+   */
+  void PostRender( bool uploadOnly );
 
   /**
    * @brief Register a processor

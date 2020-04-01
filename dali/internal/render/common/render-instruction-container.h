@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/buffer-index.h>
 
@@ -33,7 +34,8 @@ namespace SceneGraph
 class RenderInstruction;
 
 /**
- * Class to encapsulate double buffered render instruction data
+ * Class to hold ordered list of current frame's render instructions.
+ * Does not own the instructions.
  */
 class RenderInstructionContainer
 {
@@ -64,12 +66,6 @@ public:
   uint32_t Count( BufferIndex bufferIndex );
 
   /**
-   * Get a reference to the next instruction
-   * @param bufferIndex to use
-   */
-  RenderInstruction& GetNextInstruction( BufferIndex bufferIndex );
-
-  /**
    * Get a reference to the instruction at index
    * @param bufferIndex to use
    * @param index to use
@@ -77,16 +73,20 @@ public:
   RenderInstruction& At( BufferIndex bufferIndex, uint32_t index );
 
   /**
-   * Discard the current container index
-   * @param bufferIndex to reset
+   * Add an instruction to the end of the container
+   * @param bufferIndex to use
    */
-  void DiscardCurrentInstruction( BufferIndex bufferIndex );
+  void PushBack( BufferIndex index, RenderInstruction* renderInstruction );
+
+  /**
+   * Discard an instruction from the end of the container
+   * @param bufferIndex to use
+   */
+  void DiscardCurrentInstruction( BufferIndex updateBufferIndex );
 
 private:
 
-  unsigned int mIndex[ 2 ]; ///< count of the elements that have been added
-  typedef OwnerContainer< RenderInstruction* > InstructionContainer;
-  InstructionContainer mInstructions[ 2 ]; /// Double buffered instruction lists
+  std::vector<RenderInstruction*> mInstructions;
 
 };
 

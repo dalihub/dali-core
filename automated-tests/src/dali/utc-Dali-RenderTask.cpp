@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -552,6 +552,41 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskSetSourceActorDestroyed(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Testing RenderTask::SetSourceActor - Set a source actor and destroy the source actor" );
+
+  Stage stage = Stage::GetCurrent();
+  RenderTaskList taskList = stage.GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+
+  Actor actor = task.GetSourceActor();
+  DALI_TEST_CHECK( actor );
+
+  BufferImage img = BufferImage::New( 1,1 );
+  Actor newActor = CreateRenderableActor( img );
+  newActor.SetSize(1,1);
+  stage.Add( newActor );
+
+  task.SetSourceActor( newActor );
+
+  DALI_TEST_CHECK( task.GetSourceActor() != actor );
+  DALI_TEST_CHECK( task.GetSourceActor() == newActor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Destroy the source actor
+  stage.Remove( newActor );
+  newActor.Reset();
+
+  DALI_TEST_CHECK( !task.GetSourceActor() );  // The source actor should be an empty handle.
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskGetSourceActorP01(void)
 {
   TestApplication application;
@@ -967,6 +1002,29 @@ int UtcDaliRenderTaskSetCameraActorN(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskSetCameraActorDestroyed(void)
+{
+  TestApplication application;
+
+  tet_infoline( "Testing RenderTask::SetCameraActor - Set a camera actor and destroy the camera actor" );
+
+  Stage stage = Stage::GetCurrent();
+  RenderTaskList taskList = stage.GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+
+  CameraActor newCameraActor = CameraActor::New();
+  task.SetCameraActor( newCameraActor );
+
+  DALI_TEST_EQUALS( task.GetCameraActor(), newCameraActor, TEST_LOCATION );
+
+  // Destroy the camera actor
+  newCameraActor.Reset();
+
+  CameraActor camera = task.GetCameraActor();
+  DALI_TEST_CHECK( !camera );  // The camera actor should be an empty handle.
+
+  END_TEST;
+}
 
 int UtcDaliRenderTaskGetCameraActorP(void)
 {
@@ -1125,9 +1183,9 @@ int UtcDaliRenderTaskGetFrameBufferN(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  // A scene creates frame buffer by default
+  // By default render-tasks do not render off-screen
   FrameBuffer frameBuffer = task.GetFrameBuffer();
-  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_CHECK( !frameBuffer );
 
   END_TEST;
 }

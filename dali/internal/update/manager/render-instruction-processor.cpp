@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -397,6 +397,7 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
 
 void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
                                           SortedLayerPointers& sortedLayers,
+                                          Context& context,
                                           RenderTask& renderTask,
                                           bool cull,
                                           bool hasClippingNodes,
@@ -404,8 +405,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
 {
   // Retrieve the RenderInstruction buffer from the RenderInstructionContainer
   // then populate with instructions.
-  RenderInstruction& instruction = instructions.GetNextInstruction( updateBufferIndex );
-  renderTask.PrepareRenderInstruction( instruction, updateBufferIndex );
+  RenderInstruction& instruction = renderTask.PrepareRenderInstruction( updateBufferIndex );
   bool viewMatrixHasNotChanged = !renderTask.ViewMatrixUpdated();
   bool isRenderListAdded = false;
   bool isRootLayerDirty = false;
@@ -475,9 +475,10 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
   // Inform the render instruction that all renderers have been added and this frame is complete.
   instruction.UpdateCompleted();
 
-  if( !isRenderListAdded && !instruction.mIsClearColorSet && !isRootLayerDirty )
+  if( isRenderListAdded || instruction.mIsClearColorSet || isRootLayerDirty )
   {
-    instructions.DiscardCurrentInstruction( updateBufferIndex );
+    instruction.mContext = &context;
+    instructions.PushBack( updateBufferIndex, &instruction );
   }
 }
 

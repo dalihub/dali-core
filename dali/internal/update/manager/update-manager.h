@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/internal/update/common/scene-graph-scene.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/manager/scene-graph-frame-callback.h> // for OwnerPointer< FrameCallback >
@@ -237,6 +238,19 @@ public:
    * @param[in] taskList The render task list to remove.
    */
   void RemoveRenderTaskList( RenderTaskList* taskList );
+
+  /**
+   * Add a newly created scene.
+   * @param[in] scene The scene to add.
+   * @post The scene is owned by UpdateManager.
+   */
+  void AddScene( OwnerPointer<Scene>& scene );
+
+  /**
+   * Remove a scene.
+   * @param[in] scene The scene to remove.
+   */
+  void RemoveScene( Scene* scene );
 
   // Animations
 
@@ -575,6 +589,12 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    */
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t face );
+
+  /**
+   * This is called when the surface of the scene has been replaced.
+   * @param[in] scene The scene.
+   */
+  void SurfaceReplaced( Scene* scene );
 
 public:
 
@@ -922,6 +942,31 @@ inline void RemoveRenderTaskListMessage( UpdateManager& manager, const RenderTas
   new (slot) LocalType( &manager, &UpdateManager::RemoveRenderTaskList, &taskList );
 }
 
+inline void AddSceneMessage( UpdateManager& manager, OwnerPointer< SceneGraph::Scene >& scene )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< SceneGraph::Scene > > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddScene, scene );
+}
+
+inline void RemoveSceneMessage( UpdateManager& manager, const SceneGraph::Scene& constScene )
+{
+  // The scene-graph thread owns this object so it can safely edit it.
+  Scene& scene = const_cast< Scene& >( constScene );
+
+  typedef MessageValue1< UpdateManager, Scene* > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveScene, &scene );
+}
+
 inline void AddPropertyNotificationMessage( UpdateManager& manager, OwnerPointer< PropertyNotification >& propertyNotification )
 {
   // Message has ownership of PropertyNotification while in transit from event -> update
@@ -1011,6 +1056,20 @@ inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceRect, rect );
+}
+
+inline void SurfaceReplacedMessage( UpdateManager& manager, const SceneGraph::Scene& constScene )
+{
+  // The scene-graph thread owns this object so it can safely edit it.
+  Scene& scene = const_cast< Scene& >( constScene );
+
+  typedef MessageValue1< UpdateManager, Scene* > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SurfaceReplaced, &scene );
 }
 
 inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )

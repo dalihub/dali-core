@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_PROCESSOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ public:
    * @param[in]  renderTasks        The list of render-tasks.
    * @param[in]  rootNode           The root node of the scene-graph.
    * @param[in]  sortedLayers       The layers containing lists of opaque / transparent renderables.
+   * @param[in]  context            The context holding the GL state of rendering for the rendering instructions.
    * @param[out] instructions       The instructions for rendering the next frame.
    * @param[in]  renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
    * @param[in]  isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
@@ -67,6 +68,7 @@ public:
                 RenderTaskList& renderTasks,
                 Layer& rootNode,
                 SortedLayerPointers& sortedLayers,
+                Context& context,
                 RenderInstructionContainer& instructions,
                 bool renderToFboEnabled,
                 bool isRenderingToFbo );

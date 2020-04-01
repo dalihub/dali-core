@@ -330,7 +330,6 @@ IF( ENABLE_LINK_TEST )
     ${DALI_TEST_SUITE_DIR}/test-application.cpp
     ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp
     ${DALI_TEST_SUITE_DIR}/test-render-controller.cpp
-    ${DALI_TEST_SUITE_DIR}/test-render-surface.cpp
     ${DALI_TEST_SUITE_DIR}/test-gl-abstraction.cpp
     ${DALI_TEST_SUITE_DIR}/test-gl-sync-abstraction.cpp
     ${DALI_TEST_SUITE_DIR}/test-trace-call-stack.cpp
