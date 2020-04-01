@@ -42,8 +42,7 @@ Core* Core::New( RenderController& renderController,
                  GlContextHelperAbstraction& glContextHelperAbstraction,
                  RenderToFrameBuffer renderToFboEnabled,
                  DepthBufferAvailable depthBufferAvailable,
-                 StencilBufferAvailable stencilBufferAvailable,
-                 PartialUpdateAvailable partialUpdateAvailable )
+                 StencilBufferAvailable stencilBufferAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -53,8 +52,7 @@ Core* Core::New( RenderController& renderController,
                                         glContextHelperAbstraction,
                                         renderToFboEnabled,
                                         depthBufferAvailable,
-                                        stencilBufferAvailable,
-                                        partialUpdateAvailable );
+                                        stencilBufferAvailable );
 
   return instance;
 }

@@ -59,7 +59,6 @@ class RenderAlgorithms
      * @param[in] depthBufferAvailable   Whether the depth buffer is available
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      * @param[in] boundTextures          The textures bound for rendering
-     * @param[in] scissorBox             The damaged rect for partial update
      */
     void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
                                    Context& context,
@@ -67,8 +66,7 @@ class RenderAlgorithms
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
-                                   int orientation,
-                                   Dali::ClippingBox& scissorBox );
+                                   int orientation);
 
   private:
 
@@ -120,7 +118,6 @@ class RenderAlgorithms
      * @param[in] depthBufferAvailable   Whether the depth buffer is available
      * @param[in] stencilBufferAvailable Whether the stencil buffer is available
      * @param[in] boundTextures          The textures bound for rendering
-     * @param[in] scissorBox             The damaged rect for partial update
      */
     inline void ProcessRenderList( const Dali::Internal::SceneGraph::RenderList& renderList,
                                    Context& context,
@@ -130,9 +127,8 @@ class RenderAlgorithms
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
-                                   const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world   
-                                   int orientation,
-                                   Dali::ClippingBox& scissorBox );
+                                   const Dali::Internal::SceneGraph::RenderInstruction& instruction // in the case of reflection, things like CullFace need to be adjusted for reflection world   
+                                   int orientation );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );
