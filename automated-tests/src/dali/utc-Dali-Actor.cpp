@@ -2235,6 +2235,13 @@ int UtcDaliActorSetColor(void)
   // world color is clamped
   DALI_TEST_EQUALS( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ), actor.GetCurrentWorldColor(),  TEST_LOCATION );
 
+  actor.SetProperty( Actor::Property::COLOR, color );
+  DALI_TEST_EQUALS( color, actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
+
+  Vector3 newColor( 1.0f, 0.0f, 0.0f );
+  actor.SetProperty( Actor::Property::COLOR, newColor );
+  DALI_TEST_EQUALS( Vector4( newColor.r, newColor.g, newColor.b, 1.0f ), actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
+
   Stage::GetCurrent().Remove( actor );
   END_TEST;
 }
