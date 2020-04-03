@@ -27,8 +27,7 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
                                   uint32_t  horizontalDpi,
                                   uint32_t  verticalDpi,
                                   bool initialize )
-: mRenderSurface( NULL ),
-  mCore( NULL ),
+: mCore( NULL ),
   mSurfaceWidth( surfaceWidth ),
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
@@ -75,8 +74,7 @@ void TestApplication::CreateCore()
 
 void TestApplication::CreateScene()
 {
-  mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
-  mScene = Dali::Integration::Scene::New( *mRenderSurface );
+  mScene = Dali::Integration::Scene::New( Size( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
   mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
 }
 
@@ -89,7 +87,6 @@ void TestApplication::InitializeCore()
 TestApplication::~TestApplication()
 {
   Dali::Integration::Log::UninstallLogFunction();
-  delete mRenderSurface;
   delete mCore;
 }
 
@@ -190,7 +187,11 @@ void TestApplication::DoUpdate( uint32_t intervalMilliseconds, const char* locat
 bool TestApplication::Render( uint32_t intervalMilliseconds, const char* location )
 {
   DoUpdate( intervalMilliseconds, location );
-  mCore->Render( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+
+  mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+  mCore->RenderScene( mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene( mScene, false /*render the surface*/);
+  mCore->PostRender( false /*do not skip rendering*/ );
 
   mFrame++;
 
@@ -216,7 +217,10 @@ bool TestApplication::GetRenderNeedsUpdate()
 bool TestApplication::RenderOnly( )
 {
   // Update Time values
-  mCore->Render( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+  mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+  mCore->RenderScene( mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene( mScene, false /*render the surface*/);
+  mCore->PostRender( false /*do not skip rendering*/ );
 
   mFrame++;
 

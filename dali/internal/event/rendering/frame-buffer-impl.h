@@ -29,11 +29,7 @@
 
 namespace Dali
 {
-
-namespace Integration
-{
-class RenderSurface;
-}
+using Mask = Dali::FrameBuffer::Attachment::Mask;
 
 namespace Internal
 {
@@ -60,15 +56,6 @@ public:
    * @return A smart-pointer to the newly allocated Texture.
    */
   static FrameBufferPtr New( uint32_t width, uint32_t height, Mask attachments );
-
-  /**
-   * @brief Create a new FrameBuffer
-   *
-   * @param[in] renderSurface   The render surface
-   * @param[in] attachments     The attachments comprising the format of the FrameBuffer (bit-mask)
-   * @return A smart-pointer to the newly allocated Texture.
-   */
-  static FrameBufferPtr New( Dali::Integration::RenderSurface& renderSurface, Mask attachments );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -99,16 +86,6 @@ public:
    */
   void SetSize( uint32_t width, uint32_t height );
 
-  /**
-   * @brief Mark the render surface as invalid
-   *
-   * The render surface is maked as invalid when it is deleted.
-   *
-   * @note Only for FrameBuffer backed by a render surface.
-   * @return True if the FrameBuffer is backed by a render surface
-   */
-  void MarkSurfaceAsInvalid();
-
 private: // implementation
 
   /**
@@ -122,7 +99,7 @@ private: // implementation
   /**
    * Second stage initialization of the Texture
    */
-  void Initialize( Integration::RenderSurface* renderSurface = nullptr );
+  void Initialize();
 
 protected:
 
@@ -142,9 +119,6 @@ private: // data
   uint32_t mHeight;
   Mask mAttachments;                           ///< Bit-mask of type FrameBuffer::Attachment::Mask
   uint8_t mColorAttachmentCount;
-
-  bool mIsSurfaceBacked:1;
-
 };
 
 } // namespace Internal

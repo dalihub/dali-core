@@ -17,7 +17,6 @@
 
 // CLASS HEADER
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/render-surface.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -87,11 +86,6 @@ void Core::RecoverFromContextLoss()
   mImpl->RecoverFromContextLoss();
 }
 
-void Core::SurfaceDeleted( Integration::RenderSurface* surface )
-{
-  mImpl->SurfaceDeleted(surface);
-}
-
 void Core::SceneCreated()
 {
   mImpl->SceneCreated();
@@ -117,9 +111,19 @@ void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uin
   mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
 }
 
-void Core::Render( RenderStatus& status, bool forceClear, bool uploadOnly )
+void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
 {
-  mImpl->Render( status, forceClear, uploadOnly );
+  mImpl->PreRender( status, forceClear, uploadOnly );
+}
+
+void Core::RenderScene( Integration::Scene& scene, bool renderToFbo )
+{
+  mImpl->RenderScene( scene, renderToFbo );
+}
+
+void Core::PostRender( bool uploadOnly )
+{
+  mImpl->PostRender( uploadOnly );
 }
 
 void Core::RegisterProcessor( Processor& processor )

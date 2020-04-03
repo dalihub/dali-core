@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/integration-api/render-surface.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/events/event-processor.h>
@@ -41,6 +40,11 @@ struct Event;
 
 namespace Internal
 {
+
+namespace SceneGraph
+{
+class Scene;
+}
 
 class EventProcessor;
 class Layer;
@@ -62,7 +66,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New( Integration::RenderSurface& surface );
+  static ScenePtr New( Size size );
 
   /**
    * virtual destructor
@@ -115,30 +119,22 @@ public:
   Dali::Layer GetLayer(uint32_t depth) const;
 
   /**
-   * @copydoc Dali::Integration::Scene::SetSurface
-   */
-  void SetSurface( Integration::RenderSurface& surface );
-
-  /**
    * Notify the surface has been resized.
+   *
+   * @param[in] width The new width of the set surface
+   * @param[in] height The new height of the set surface
    */
-  void SurfaceResized();
+  void SurfaceResized( float width, float height );
 
   /**
-   * Notify the surface has been deleted.
+   * @copydoc Dali::Integration::Scene::SurfaceReplaced
    */
-  void SurfaceDeleted();
+  void SurfaceReplaced();
 
   /**
    * @copydoc Dali::Integration::Scene::Discard
    */
   void Discard();
-
-  /**
-   * Retrieve the render surface the scene is binded to.
-   * @return The render surface.
-   */
-  Integration::RenderSurface* GetSurface() const;
 
   /**
    * Retrieve the ordered list of on-scene layers.
@@ -179,6 +175,13 @@ public:
    * @return The background color
    */
   Vector4 GetBackgroundColor() const;
+
+  /**
+   * @brief Get the Scene scene graph object
+   *
+   * @return the Scene scene graph object
+   */
+  SceneGraph::Scene* GetSceneObject() const;
 
   /**
    * Used by the EventProcessor to emit key event signals.
@@ -267,8 +270,10 @@ private:
 
   /**
    * Second-phase constructor.
+   *
+   * @param[in] size The size of the set surface
    */
-  void Initialize( Integration::RenderSurface& surface );
+  void Initialize( Size size );
 
   // Undefined
   Scene(const Scene&) = delete;
@@ -277,7 +282,7 @@ private:
   Scene& operator=(const Scene& rhs) = delete;
 
 private:
-  Integration::RenderSurface* mSurface;
+  Internal::SceneGraph::Scene* mSceneObject;
 
   Size mSize;
 
@@ -294,9 +299,6 @@ private:
 
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
-
-  // The frame buffer
-  FrameBufferPtr mFrameBuffer;
 
   bool mDepthTreeDirty:1;  ///< True if the depth tree needs recalculating
 

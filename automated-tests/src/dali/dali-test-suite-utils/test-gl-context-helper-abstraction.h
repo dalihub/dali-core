@@ -2,7 +2,7 @@
 #define TEST_GL_CONTEXT_HELPER_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,6 @@ public:
    * @brief Switch to the surfaceless GL context
    */
   virtual void MakeSurfacelessContextCurrent() {};
-
-  /**
-   * @brief Switch to the GL context of the specific render surface
-   * @param[in] surface The render surface
-   */
-  virtual void MakeContextCurrent( Integration::RenderSurface* surface ) {};
 
   /**
    * @brief Clear the GL context

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-tracker.h>
@@ -39,12 +40,11 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/renderers/render-texture-frame-buffer.h>
-#include <dali/internal/render/renderers/render-surface-frame-buffer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
+#include <dali/internal/update/common/scene-graph-scene.h>
 
 namespace Dali
 {
@@ -72,13 +72,12 @@ struct RenderManager::Impl
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         Integration::DepthBufferAvailable depthBufferAvailableParam,
         Integration::StencilBufferAvailable stencilBufferAvailableParam )
-  : context( glAbstraction, &surfaceContextContainer ),
+  : context( glAbstraction, &sceneContextContainer ),
     currentContext( &context ),
     glAbstraction( glAbstraction ),
     glSyncAbstraction( glSyncAbstraction ),
     glContextHelperAbstraction( glContextHelperAbstraction ),
     renderQueue(),
-    instructions(),
     renderAlgorithms(),
     frameCount( 0u ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
@@ -113,15 +112,26 @@ struct RenderManager::Impl
     mRenderTrackers.EraseObject( renderTracker );
   }
 
-  Context* CreateSurfaceContext()
+  Context* CreateSceneContext()
   {
-    surfaceContextContainer.PushBack( new Context( glAbstraction ) );
-    return surfaceContextContainer[ surfaceContextContainer.Count() - 1 ];
+    sceneContextContainer.push_back( new Context( glAbstraction ) );
+    return sceneContextContainer[ sceneContextContainer.size() - 1 ];
   }
 
-  void DestroySurfaceContext( Context* surfaceContext )
+  void DestroySceneContext( Context* sceneContext )
   {
-    surfaceContextContainer.EraseObject( surfaceContext );
+    auto iter = std::find( sceneContextContainer.begin(), sceneContextContainer.end(), sceneContext );
+    if( iter != sceneContextContainer.end() )
+    {
+      sceneContextContainer.erase( iter );
+    }
+  }
+
+  Context* ReplaceSceneContext( Context* oldSceneContext )
+  {
+    Context* newContext = new Context( glAbstraction );
+    std::replace( sceneContextContainer.begin(), sceneContextContainer.end(), oldSceneContext, newContext );
+    return newContext;
   }
 
   void UpdateTrackers()
@@ -136,15 +146,14 @@ struct RenderManager::Impl
   // programs are owned by context at the moment.
   Context                                   context;                 ///< Holds the GL state of the share resource context
   Context*                                  currentContext;          ///< Holds the GL state of the current context for rendering
-  OwnerContainer< Context* >                surfaceContextContainer; ///< List of owned contexts holding the GL state per surface
+  std::vector< Context* >                   sceneContextContainer;   ///< List of owned contexts holding the GL state per scene
   Integration::GlAbstraction&               glAbstraction;           ///< GL abstraction
   Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
   Integration::GlContextHelperAbstraction&  glContextHelperAbstraction; ///< GL context helper abstraction
   RenderQueue                               renderQueue;             ///< A message queue for receiving messages from the update-thread.
 
-  // Render instructions describe what should be rendered during RenderManager::Render()
-  // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
-  RenderInstructionContainer                instructions;
+  std::vector< SceneGraph::Scene* >         sceneContainer;          ///< List of pointers to the scene graph objects of the scenes
+
   Render::RenderAlgorithms                  renderAlgorithms;        ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
   uint32_t                                  frameCount;              ///< The current frame count
@@ -234,16 +243,17 @@ void RenderManager::ContextDestroyed()
   {
     renderer->GlContextDestroyed();
   }
+
+  // inform scenes
+  for( auto&& scene : mImpl->sceneContainer )
+  {
+    scene->GlContextDestroyed();
+  }
 }
 
 void RenderManager::SetShaderSaver( ShaderSaver& upstream )
 {
   mImpl->programController.SetShaderSaver( upstream );
-}
-
-RenderInstructionContainer& RenderManager::GetRenderInstructionContainer()
-{
-  return mImpl->instructions;
 }
 
 void RenderManager::SetDefaultSurfaceRect(const Rect<int32_t>& rect)
@@ -323,14 +333,7 @@ void RenderManager::AddFrameBuffer( OwnerPointer< Render::FrameBuffer >& frameBu
 {
   Render::FrameBuffer* frameBufferPtr = frameBuffer.Release();
   mImpl->frameBufferContainer.PushBack( frameBufferPtr );
-  if ( frameBufferPtr->IsSurfaceBacked() )
-  {
-    frameBufferPtr->Initialize( *mImpl->CreateSurfaceContext() );
-  }
-  else
-  {
-    frameBufferPtr->Initialize( mImpl->context );
-  }
+  frameBufferPtr->Initialize( mImpl->context );
 }
 
 void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
@@ -343,27 +346,38 @@ void RenderManager::RemoveFrameBuffer( Render::FrameBuffer* frameBuffer )
     if ( iter == frameBuffer )
     {
       frameBuffer->Destroy( mImpl->context );
-
-      if ( frameBuffer->IsSurfaceBacked() )
-      {
-        auto surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( frameBuffer );
-        mImpl->DestroySurfaceContext( surfaceFrameBuffer->GetContext() );
-      }
-
       mImpl->frameBufferContainer.Erase( &iter ); // frameBuffer found; now destroy it
 
       break;
     }
   }
 }
+void RenderManager::InitializeScene( SceneGraph::Scene* scene )
+{
+  scene->Initialize( *mImpl->CreateSceneContext() );
+  mImpl->sceneContainer.push_back( scene );
+}
+
+void RenderManager::UninitializeScene( SceneGraph::Scene* scene )
+{
+  mImpl->DestroySceneContext( scene->GetContext() );
+
+  auto iter = std::find( mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene );
+  if( iter != mImpl->sceneContainer.end() )
+  {
+    mImpl->sceneContainer.erase( iter );
+  }
+}
+
+void RenderManager::SurfaceReplaced( SceneGraph::Scene* scene )
+{
+  Context* newContext = mImpl->ReplaceSceneContext( scene->GetContext() );
+  scene->Initialize( *newContext );
+}
 
 void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer )
 {
-  if ( !frameBuffer->IsSurfaceBacked() )
-  {
-    auto textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( frameBuffer );
-    textureFrameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
-  }
+  frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
 void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
@@ -451,7 +465,7 @@ ProgramCache* RenderManager::GetProgramCache()
   return &(mImpl->programController);
 }
 
-void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, bool uploadOnly )
+void RenderManager::PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
@@ -464,7 +478,12 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, 
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  const uint32_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+  uint32_t count = 0u;
+  for( uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i )
+  {
+    count += mImpl->sceneContainer[i]->GetRenderInstructions().Count( mImpl->renderBufferIndex );
+  }
+
   const bool haveInstructions = count > 0u;
 
   DALI_LOG_INFO( gLogFilter, Debug::General,
@@ -499,75 +518,346 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, 
     }
 
     // Upload the geometries
-    for( uint32_t i = 0; i < count; ++i )
+    for( uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i )
     {
-      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
-
-      const Matrix* viewMatrix       = instruction.GetViewMatrix( mImpl->renderBufferIndex );
-      const Matrix* projectionMatrix = instruction.GetProjectionMatrix( mImpl->renderBufferIndex );
-
-      DALI_ASSERT_DEBUG( viewMatrix );
-      DALI_ASSERT_DEBUG( projectionMatrix );
-
-      if( viewMatrix && projectionMatrix )
+      RenderInstructionContainer& instructions = mImpl->sceneContainer[i]->GetRenderInstructions();
+      for ( uint32_t j = 0; j < instructions.Count( mImpl->renderBufferIndex ); ++j )
       {
-        const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
+        RenderInstruction& instruction = instructions.At( mImpl->renderBufferIndex, j );
 
-        // Iterate through each render list.
-        for( RenderListContainer::SizeType index = 0; index < renderListCount; ++index )
+        const Matrix* viewMatrix       = instruction.GetViewMatrix( mImpl->renderBufferIndex );
+        const Matrix* projectionMatrix = instruction.GetProjectionMatrix( mImpl->renderBufferIndex );
+
+        DALI_ASSERT_DEBUG( viewMatrix );
+        DALI_ASSERT_DEBUG( projectionMatrix );
+
+        if( viewMatrix && projectionMatrix )
         {
-          const RenderList* renderList = instruction.GetRenderList( index );
+          const RenderListContainer::SizeType renderListCount = instruction.RenderListCount();
 
-          if( renderList && !renderList->IsEmpty() )
+          // Iterate through each render list.
+          for( RenderListContainer::SizeType index = 0; index < renderListCount; ++index )
           {
-            const std::size_t itemCount = renderList->Count();
-            for( uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex )
+            const RenderList* renderList = instruction.GetRenderList( index );
+
+            if( renderList && !renderList->IsEmpty() )
             {
-              const RenderItem& item = renderList->GetItem( itemIndex );
-              if( DALI_LIKELY( item.mRenderer ) )
+              const std::size_t itemCount = renderList->Count();
+              for( uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex )
               {
-                item.mRenderer->Upload( *mImpl->currentContext );
+                const RenderItem& item = renderList->GetItem( itemIndex );
+                if( DALI_LIKELY( item.mRenderer ) )
+                {
+                  item.mRenderer->Upload( *mImpl->currentContext );
+                }
               }
             }
           }
         }
       }
     }
+  }
+}
 
-    if ( !uploadOnly )
+
+void RenderManager::RenderScene( Integration::Scene& scene, bool renderToFbo )
+{
+  Internal::Scene& sceneInternal = GetImplementation( scene );
+  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
+
+  uint32_t count = sceneObject->GetRenderInstructions().Count( mImpl->renderBufferIndex );
+
+  for( uint32_t i = 0; i < count; ++i )
+  {
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At( mImpl->renderBufferIndex, i );
+
+    if ( ( renderToFbo && !instruction.mFrameBuffer ) || ( !renderToFbo && instruction.mFrameBuffer ) )
     {
-      for( uint32_t i = 0; i < count; ++i )
+      continue; // skip
+    }
+
+    Rect<int32_t> viewportRect;
+    Vector4   clearColor;
+
+    if ( instruction.mIsClearColorSet )
+    {
+      clearColor = instruction.mClearColor;
+    }
+    else
+    {
+      clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
+    }
+
+    Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
+    Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
+    Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
+
+    if ( instruction.mFrameBuffer )
+    {
+      // offscreen buffer
+      if ( mImpl->currentContext != &mImpl->context )
       {
-        RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+        // Switch to shared context for off-screen buffer
+        mImpl->currentContext = &mImpl->context;
 
-        DoRender( instruction );
+        if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+        {
+          mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+        }
+
+        // Clear the current cached program when the context is switched
+        mImpl->programController.ClearCurrentProgram();
       }
-
+    }
+    else
+    {
       if ( mImpl->currentContext->IsSurfacelessContextSupported() )
       {
-        mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+        if ( mImpl->currentContext != sceneObject->GetContext() )
+        {
+          // Switch the correct context if rendering to a surface
+          mImpl->currentContext = sceneObject->GetContext();
+
+          // Clear the current cached program when the context is switched
+          mImpl->programController.ClearCurrentProgram();
+        }
       }
 
-      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-      for ( auto&& context : mImpl->surfaceContextContainer )
+      surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( scene.GetSize().width ), static_cast<int32_t>( scene.GetSize().height ) );
+    }
+
+    DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
+
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    mImpl->programController.ResetProgramMatrices();
+
+    if( instruction.mFrameBuffer )
+    {
+      instruction.mFrameBuffer->Bind( *mImpl->currentContext );
+
+      // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
+      for (unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
       {
-        context->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+        mImpl->textureDependencyList.PushBack( instruction.mFrameBuffer->GetTextureId(i0) );
+      }
+    }
+    else
+    {
+      mImpl->currentContext->BindFramebuffer( GL_FRAMEBUFFER, 0u );
+    }
+
+    if ( !instruction.mFrameBuffer )
+    {
+      mImpl->currentContext->Viewport( surfaceRect.x,
+                                       surfaceRect.y,
+                                       surfaceRect.width,
+                                       surfaceRect.height );
+    }
+
+    // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
+    // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
+    // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
+    // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
+    GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
+
+    mImpl->currentContext->ColorMask( true );
+
+    if( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
+    {
+      mImpl->currentContext->DepthMask( true );
+      clearMask |= GL_DEPTH_BUFFER_BIT;
+    }
+
+    if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+    {
+      mImpl->currentContext->ClearStencil( 0 );
+      mImpl->currentContext->StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
+      clearMask |= GL_STENCIL_BUFFER_BIT;
+    }
+
+    if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
+    {
+      // Offscreen buffer rendering
+      if ( instruction.mIsViewportSet )
+      {
+        // For glViewport the lower-left corner is (0,0)
+        const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
+        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
+      }
+      else
+      {
+        viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
+      }
+    }
+    else // No Offscreen frame buffer rendering
+    {
+      // Check whether a viewport is specified, otherwise the full surface size is used
+      if ( instruction.mIsViewportSet )
+      {
+        // For glViewport the lower-left corner is (0,0)
+        const int32_t y = ( surfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
+        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
+      }
+      else
+      {
+        viewportRect = surfaceRect;
       }
     }
 
-    //Notify RenderGeometries that rendering has finished
-    for ( auto&& iter : mImpl->geometryContainer )
+    bool clearFullFrameRect = true;
+    if( instruction.mFrameBuffer != 0 )
     {
-      iter->OnRenderFinished();
+      Viewport frameRect( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
+      clearFullFrameRect = ( frameRect == viewportRect );
+    }
+    else
+    {
+      clearFullFrameRect = ( surfaceRect == viewportRect );
+    }
+
+    mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+
+    if( instruction.mIsClearColorSet )
+    {
+      mImpl->currentContext->ClearColor( clearColor.r,
+                                         clearColor.g,
+                                         clearColor.b,
+                                         clearColor.a );
+
+      if( !clearFullFrameRect )
+      {
+        mImpl->currentContext->SetScissorTest( true );
+        mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
+        mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+        mImpl->currentContext->SetScissorTest( false );
+      }
+      else
+      {
+        mImpl->currentContext->SetScissorTest( false );
+        mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+      }
+    }
+
+    // Clear the list of bound textures
+    mImpl->boundTextures.Clear();
+
+    mImpl->renderAlgorithms.ProcessRenderInstruction(
+        instruction,
+        *mImpl->currentContext,
+        mImpl->renderBufferIndex,
+        depthBufferAvailable,
+        stencilBufferAvailable,
+        mImpl->boundTextures );
+
+    // Synchronise the FBO/Texture access when there are multiple contexts
+    if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+    {
+      // Check whether any binded texture is in the dependency list
+      bool textureFound = false;
+
+      if ( mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u )
+      {
+        for ( auto textureId : mImpl->textureDependencyList )
+        {
+
+          textureFound = std::find_if( mImpl->boundTextures.Begin(), mImpl->boundTextures.End(),
+                                       [textureId]( GLuint id )
+                                       {
+                                         return textureId == id;
+                                       } ) != mImpl->boundTextures.End();
+        }
+      }
+
+      if ( textureFound )
+      {
+        if ( instruction.mFrameBuffer )
+        {
+          // For off-screen buffer
+
+          // Wait until all rendering calls for the currently context are executed
+          mImpl->glContextHelperAbstraction.WaitClient();
+
+          // Clear the dependency list
+          mImpl->textureDependencyList.Clear();
+        }
+        else
+        {
+          // Worker thread lambda function
+          auto& glContextHelperAbstraction = mImpl->glContextHelperAbstraction;
+          auto workerFunction = [&glContextHelperAbstraction]( int workerThread )
+          {
+            // Switch to the shared context in the worker thread
+            glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+
+            // Wait until all rendering calls for the shared context are executed
+            glContextHelperAbstraction.WaitClient();
+
+            // Must clear the context in the worker thread
+            // Otherwise the shared context cannot be switched to from the render thread
+            glContextHelperAbstraction.MakeContextNull();
+          };
+
+          auto future = mImpl->threadPool->SubmitTask( 0u, workerFunction );
+          if ( future )
+          {
+            mImpl->threadPool->Wait();
+
+            // Clear the dependency list
+            mImpl->textureDependencyList.Clear();
+          }
+        }
+      }
+    }
+
+    if( instruction.mRenderTracker && instruction.mFrameBuffer )
+    {
+      // This will create a sync object every frame this render tracker
+      // is alive (though it should be now be created only for
+      // render-once render tasks)
+      instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
+      instruction.mRenderTracker = nullptr; // Only create once.
+    }
+
+    if ( renderToFbo )
+    {
+      mImpl->currentContext->Flush();
     }
   }
-  else
+
+  GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+  mImpl->currentContext->InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+}
+
+void RenderManager::PostRender( bool uploadOnly )
+{
+  if ( !uploadOnly )
   {
-    DALI_LOG_RELEASE_INFO( "RenderManager::Render: Skip rendering [%d, %d, %d]\n", haveInstructions, mImpl->lastFrameWasRendered, forceClear );
+    if ( mImpl->currentContext->IsSurfacelessContextSupported() )
+    {
+      mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
+    }
+
+    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+  }
+
+  //Notify RenderGeometries that rendering has finished
+  for ( auto&& iter : mImpl->geometryContainer )
+  {
+    iter->OnRenderFinished();
   }
 
   mImpl->UpdateTrackers();
+
+
+  uint32_t count = 0u;
+  for( uint32_t i = 0; i < mImpl->sceneContainer.size(); ++i )
+  {
+    count += mImpl->sceneContainer[i]->GetRenderInstructions().Count( mImpl->renderBufferIndex );
+  }
+
+  const bool haveInstructions = count > 0u;
 
   // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
   mImpl->lastFrameWasRendered = haveInstructions;
@@ -580,298 +870,6 @@ void RenderManager::Render( Integration::RenderStatus& status, bool forceClear, 
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
-}
-
-void RenderManager::DoRender( RenderInstruction& instruction )
-{
-  Rect<int32_t> viewportRect;
-  Vector4   clearColor;
-
-  if ( instruction.mIsClearColorSet )
-  {
-    clearColor = instruction.mClearColor;
-  }
-  else
-  {
-    clearColor = Dali::RenderTask::DEFAULT_CLEAR_COLOR;
-  }
-
-  Rect<int32_t> surfaceRect = mImpl->defaultSurfaceRect;
-  Integration::DepthBufferAvailable depthBufferAvailable = mImpl->depthBufferAvailable;
-  Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-
-  Render::SurfaceFrameBuffer* surfaceFrameBuffer = nullptr;
-  if ( instruction.mFrameBuffer != 0 )
-  {
-    if ( instruction.mFrameBuffer->IsSurfaceBacked() )
-    {
-      surfaceFrameBuffer = static_cast<Render::SurfaceFrameBuffer*>( instruction.mFrameBuffer );
-
-      if ( !surfaceFrameBuffer->IsSurfaceValid() )
-      {
-        // Skip rendering the frame buffer if the render surface becomes invalid
-        return;
-      }
-
-      if ( mImpl->currentContext->IsSurfacelessContextSupported() )
-      {
-        Context* surfaceContext = surfaceFrameBuffer->GetContext();
-        if ( mImpl->currentContext != surfaceContext )
-        {
-          // Switch the correct context if rendering to a surface
-          mImpl->currentContext = surfaceContext;
-          surfaceFrameBuffer->MakeContextCurrent();
-
-          // Clear the current cached program when the context is switched
-          mImpl->programController.ClearCurrentProgram();
-        }
-      }
-
-      surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( surfaceFrameBuffer->GetWidth() ), static_cast<int32_t>( surfaceFrameBuffer->GetHeight() ) );
-    }
-    else
-    {
-      // Switch to shared context for off-screen buffer
-      mImpl->currentContext = &mImpl->context;
-
-      if ( mImpl->currentContext->IsSurfacelessContextSupported() )
-      {
-        mImpl->glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-      }
-    }
-  }
-
-  DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
-
-  // reset the program matrices for all programs once per frame
-  // this ensures we will set view and projection matrix once per program per camera
-  mImpl->programController.ResetProgramMatrices();
-
-  if( instruction.mFrameBuffer )
-  {
-    instruction.mFrameBuffer->Bind( *mImpl->currentContext );
-
-    if ( !instruction.mFrameBuffer->IsSurfaceBacked() )
-    {
-      // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
-      Render::TextureFrameBuffer* textureFrameBuffer = static_cast<Render::TextureFrameBuffer*>( instruction.mFrameBuffer );
-      for (unsigned int i0 = 0, i1 = textureFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
-      {
-        mImpl->textureDependencyList.PushBack( textureFrameBuffer->GetTextureId(i0) );
-      }
-    }
-  }
-  else
-  {
-    mImpl->currentContext->BindFramebuffer( GL_FRAMEBUFFER, 0u );
-  }
-
-  if ( surfaceFrameBuffer )
-  {
-    mImpl->currentContext->Viewport( surfaceRect.x,
-                              surfaceRect.y,
-                              surfaceRect.width,
-                              surfaceRect.height );
-  }
-
-  // Clear the entire color, depth and stencil buffers for the default framebuffer, if required.
-  // It is important to clear all 3 buffers when they are being used, for performance on deferred renderers
-  // e.g. previously when the depth & stencil buffers were NOT cleared, it caused the DDK to exceed a "vertex count limit",
-  // and then stall. That problem is only noticeable when rendering a large number of vertices per frame.
-  GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
-
-  mImpl->currentContext->ColorMask( true );
-
-  if( depthBufferAvailable == Integration::DepthBufferAvailable::TRUE )
-  {
-    mImpl->currentContext->DepthMask( true );
-    clearMask |= GL_DEPTH_BUFFER_BIT;
-  }
-
-  if( stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
-  {
-    mImpl->currentContext->ClearStencil( 0 );
-    mImpl->currentContext->StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    clearMask |= GL_STENCIL_BUFFER_BIT;
-  }
-
-  if( !instruction.mIgnoreRenderToFbo && ( instruction.mFrameBuffer != 0 ) )
-  {
-    if ( instruction.mFrameBuffer->IsSurfaceBacked() ) // Surface rendering
-    {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( surfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect = surfaceRect;
-      }
-    }
-    else // Offscreen buffer rendering
-    {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
-      }
-    }
-  }
-  else // No Offscreen frame buffer rendering
-  {
-    // Check whether a viewport is specified, otherwise the full surface size is used
-    if ( instruction.mFrameBuffer != 0 )
-    {
-      if ( instruction.mIsViewportSet )
-      {
-        // For glViewport the lower-left corner is (0,0)
-        const int32_t y = ( instruction.mFrameBuffer->GetHeight() - instruction.mViewport.height ) - instruction.mViewport.y;
-        viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
-      }
-      else
-      {
-        viewportRect.Set( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
-      }
-    }
-    else
-    {
-      viewportRect = surfaceRect;
-    }
-  }
-
-  bool clearFullFrameRect = true;
-  if( instruction.mFrameBuffer != 0 )
-  {
-    Viewport frameRect( 0, 0, instruction.mFrameBuffer->GetWidth(), instruction.mFrameBuffer->GetHeight() );
-    clearFullFrameRect = ( frameRect == viewportRect );
-  }
-  else
-  {
-    clearFullFrameRect = ( surfaceRect == viewportRect );
-  }
-
-  mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
-
-  if( instruction.mIsClearColorSet )
-  {
-    mImpl->currentContext->ClearColor( clearColor.r,
-                                       clearColor.g,
-                                       clearColor.b,
-                                       clearColor.a );
-
-    if( !clearFullFrameRect )
-    {
-      mImpl->currentContext->SetScissorTest( true );
-      mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
-      mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-      mImpl->currentContext->SetScissorTest( false );
-    }
-    else
-    {
-      mImpl->currentContext->SetScissorTest( false );
-      mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-    }
-  }
-
-  // Clear the list of bound textures
-  mImpl->boundTextures.Clear();
-
-  mImpl->renderAlgorithms.ProcessRenderInstruction(
-      instruction,
-      *mImpl->currentContext,
-      mImpl->renderBufferIndex,
-      depthBufferAvailable,
-      stencilBufferAvailable,
-      mImpl->boundTextures );
-
-  // Synchronise the FBO/Texture access when there are multiple contexts
-  if ( mImpl->currentContext->IsSurfacelessContextSupported() )
-  {
-    // Check whether any binded texture is in the dependency list
-    bool textureFound = false;
-
-    if ( mImpl->boundTextures.Count() > 0u && mImpl->textureDependencyList.Count() > 0u )
-    {
-      for ( auto textureId : mImpl->textureDependencyList )
-      {
-
-        textureFound = std::find_if( mImpl->boundTextures.Begin(), mImpl->boundTextures.End(),
-                                     [textureId]( GLuint id )
-                                     {
-                                       return textureId == id;
-                                     } ) != mImpl->boundTextures.End();
-      }
-    }
-
-    if ( textureFound )
-    {
-
-      if ( !instruction.mFrameBuffer || !instruction.mFrameBuffer->IsSurfaceBacked() )
-      {
-        // For off-screen buffer
-
-        // Wait until all rendering calls for the currently context are executed
-        mImpl->glContextHelperAbstraction.WaitClient();
-
-        // Clear the dependency list
-        mImpl->textureDependencyList.Clear();
-      }
-      else
-      {
-        // For surface-backed frame buffer
-
-        // Worker thread lambda function
-        auto& glContextHelperAbstraction = mImpl->glContextHelperAbstraction;
-        auto workerFunction = [&glContextHelperAbstraction]( int workerThread )
-        {
-          // Switch to the shared context in the worker thread
-          glContextHelperAbstraction.MakeSurfacelessContextCurrent();
-
-          // Wait until all rendering calls for the shared context are executed
-          glContextHelperAbstraction.WaitClient();
-
-          // Must clear the context in the worker thread
-          // Otherwise the shared context cannot be switched to from the render thread
-          glContextHelperAbstraction.MakeContextNull();
-        };
-
-        auto future = mImpl->threadPool->SubmitTask( 0u, workerFunction );
-        if ( future )
-        {
-          mImpl->threadPool->Wait();
-
-          // Clear the dependency list
-          mImpl->textureDependencyList.Clear();
-        }
-      }
-    }
-  }
-
-  if( instruction.mRenderTracker && ( instruction.mFrameBuffer != 0 ) )
-  {
-    // This will create a sync object every frame this render tracker
-    // is alive (though it should be now be created only for
-    // render-once render tasks)
-    instruction.mRenderTracker->CreateSyncObject( mImpl->glSyncAbstraction );
-    instruction.mRenderTracker = NULL; // Only create once.
-  }
-
-  if ( surfaceFrameBuffer )
-  {
-    surfaceFrameBuffer->PostRender();
-  }
-  else
-  {
-    mImpl->currentContext->Flush();
-  }
 }
 
 } // namespace SceneGraph

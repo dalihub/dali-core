@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ namespace Dali
 namespace Integration
 {
 
-Scene Scene::New( Integration::RenderSurface& surface )
+Scene Scene::New( Size size )
 {
-  Internal::ScenePtr internal = Internal::Scene::New( surface );
+  Internal::ScenePtr internal = Internal::Scene::New( size );
   return Scene( internal.Get() );
 }
 
@@ -119,19 +119,14 @@ Layer Scene::GetLayer( uint32_t depth ) const
   return GetImplementation(*this).GetLayer( depth );
 }
 
-void Scene::SetSurface( Integration::RenderSurface& surface )
+void Scene::SurfaceResized( float width, float height )
 {
-  GetImplementation(*this).SetSurface( surface );
+  GetImplementation( *this ).SurfaceResized( width, height );
 }
 
-void Scene::SurfaceResized()
+void Scene::SurfaceReplaced()
 {
-  GetImplementation( *this ).SurfaceResized();
-}
-
-Integration::RenderSurface* Scene::GetSurface() const
-{
-  return GetImplementation(*this).GetSurface();
+  GetImplementation( *this ).SurfaceReplaced();
 }
 
 void Scene::Discard()
