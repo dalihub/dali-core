@@ -257,60 +257,435 @@ public:
      */
     enum
     {
-      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parentOrigin",          type Vector3     (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_X,                                    ///< name "parentOriginX",         type float       (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_Y,                                    ///< name "parentOriginY",         type float       (constraint-input) @SINCE_1_0.0
-      PARENT_ORIGIN_Z,                                    ///< name "parentOriginZ",         type float       (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT,                                       ///< name "anchorPoint",           type Vector3     (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_X,                                     ///< name "anchorPointX",          type float       (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_Y,                                     ///< name "anchorPointY",          type float       (constraint-input) @SINCE_1_0.0
-      ANCHOR_POINT_Z,                                     ///< name "anchorPointZ",          type float       (constraint-input) @SINCE_1_0.0
-      SIZE,                                               ///< name "size",                  type Vector3     (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_WIDTH,                                         ///< name "sizeWidth",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_HEIGHT,                                        ///< name "sizeHeight",            type float       (animatable / constraint-input) @SINCE_1_0.0
-      SIZE_DEPTH,                                         ///< name "sizeDepth",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      POSITION,                                           ///< name "position",              type Vector3     (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_X,                                         ///< name "positionX",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_Y,                                         ///< name "positionY",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      POSITION_Z,                                         ///< name "positionZ",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION,                                     ///< name "worldPosition",         type Vector3     (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_X,                                   ///< name "worldPositionX",        type float       (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_Y,                                   ///< name "worldPositionY",        type float       (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_POSITION_Z,                                   ///< name "worldPositionZ",        type float       (read-only / constraint-input) @SINCE_1_0.0
-      ORIENTATION,                                        ///< name "orientation",           type Quaternion  (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_ORIENTATION,                                  ///< name "worldOrientation",      type Quaternion  (read-only / constraint-input) @SINCE_1_0.0
-      SCALE,                                              ///< name "scale",                 type Vector3     (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_X,                                            ///< name "scaleX",                type float       (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_Y,                                            ///< name "scaleY",                type float       (animatable / constraint-input) @SINCE_1_0.0
-      SCALE_Z,                                            ///< name "scaleZ",                type float       (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_SCALE,                                        ///< name "worldScale",            type Vector3     (read-only / constraint-input) @SINCE_1_0.0
-      VISIBLE,                                            ///< name "visible",               type bool        (animatable / constraint-input) @SINCE_1_0.0
-      COLOR,                                              ///< name "color",                 type Vector4     (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_RED,                                          ///< name "colorRed",              type float       (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_GREEN,                                        ///< name "colorGreen",            type float       (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_BLUE,                                         ///< name "colorBlue",             type float       (animatable / constraint-input) @SINCE_1_0.0
-      COLOR_ALPHA,                                        ///< name "colorAlpha",            type float       (animatable / constraint-input) @SINCE_1_0.0
-      WORLD_COLOR,                                        ///< name "worldColor",            type Vector4     (read-only / constraint-input) @SINCE_1_0.0
-      WORLD_MATRIX,                                       ///< name "worldMatrix",           type Matrix      (read-only / constraint-input) @SINCE_1_0.0
-      NAME,                                               ///< name "name",                  type std::string @SINCE_1_0.0
-      SENSITIVE,                                          ///< name "sensitive",             type bool        @SINCE_1_0.0
-      LEAVE_REQUIRED,                                     ///< name "leaveRequired",         type bool        @SINCE_1_0.0
-      INHERIT_ORIENTATION,                                ///< name "inheritOrientation",    type bool        @SINCE_1_0.0
-      INHERIT_SCALE,                                      ///< name "inheritScale",          type bool        @SINCE_1_0.0
-      COLOR_MODE,                                         ///< name "colorMode",             type std::string @SINCE_1_0.0
-      RESERVED_PROPERTY_01,                               ///< name "reservedProperty01", This property is removed because it's deprecated.
-      DRAW_MODE,                                          ///< name "drawMode",              type std::string @SINCE_1_0.0
-      SIZE_MODE_FACTOR,                                   ///< name "sizeModeFactor",        type Vector3     @SINCE_1_0.0
-      WIDTH_RESIZE_POLICY,                                ///< name "widthResizePolicy",     type String      @SINCE_1_0.0
-      HEIGHT_RESIZE_POLICY,                               ///< name "heightResizePolicy",    type String      @SINCE_1_0.0
-      SIZE_SCALE_POLICY,                                  ///< name "sizeScalePolicy",       type String      @SINCE_1_0.0
-      WIDTH_FOR_HEIGHT,                                   ///< name "widthForHeight",        type bool        @SINCE_1_0.0
-      HEIGHT_FOR_WIDTH,                                   ///< name "heightForWidth",        type bool        @SINCE_1_0.0
-      PADDING,                                            ///< name "padding",               type Vector4     @SINCE_1_0.0
-      MINIMUM_SIZE,                                       ///< name "minimumSize",           type Vector2     @SINCE_1_0.0
-      MAXIMUM_SIZE,                                       ///< name "maximumSize",           type Vector2     @SINCE_1_0.0
-      INHERIT_POSITION,                                   ///< name "inheritPosition",       type bool        @SINCE_1_1.24
-      CLIPPING_MODE,                                      ///< name "clippingMode",          type String      @SINCE_1_2_5
+      /**
+       * @brief The origin of an actor, within its parent's area.
+       * @details Name "parentOrigin", type Property::VECTOR3, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetParentOrigin()
+       */
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX,
+
+      /**
+       * @brief The x origin of an actor, within its parent's area.
+       * @details Name "parentOriginX", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetParentOrigin()
+       */
+      PARENT_ORIGIN_X,
+
+      /**
+       * @brief The y origin of an actor, within its parent's area.
+       * @details Name "parentOriginY", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetParentOrigin()
+       */
+      PARENT_ORIGIN_Y,
+
+      /**
+       * @brief The z origin of an actor, within its parent's area.
+       * @details Name "parentOriginZ", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetParentOrigin()
+       */
+      PARENT_ORIGIN_Z,
+
+      /**
+       * @brief The anchor-point of an actor.
+       * @details Name "anchorPoint", type Property::VECTOR3, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetAnchorPoint()
+       */
+      ANCHOR_POINT,
+
+      /**
+       * @brief The x anchor-point of an actor.
+       * @details Name "anchorPointX", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetAnchorPoint()
+       */
+      ANCHOR_POINT_X,
+
+      /**
+       * @brief The y anchor-point of an actor.
+       * @details Name "anchorPointY", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetAnchorPoint()
+       */
+      ANCHOR_POINT_Y,
+
+      /**
+       * @brief The z anchor-point of an actor.
+       * @details Name "anchorPointZ", type Property::FLOAT, constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetAnchorPoint()
+       */
+      ANCHOR_POINT_Z,
+
+      /**
+       * @brief The size of an actor.
+       * @details Name "size", type Property::VECTOR3, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetSize()
+       */
+      SIZE,
+
+      /**
+       * @brief The width of an actor.
+       * @details Name "sizeWidth", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetSize()
+       */
+      SIZE_WIDTH,
+
+      /**
+       * @brief The height of an actor.
+       * @details Name "sizeHeight", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetSize()
+       */
+      SIZE_HEIGHT,
+
+      /**
+       * @brief The depth of an actor.
+       * @details Name "sizeDepth", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetSize()
+       */
+      SIZE_DEPTH,
+
+      /**
+       * @brief The position of an actor.
+       * @details Name "position", type Property::VECTOR3, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetPosition()
+       */
+      POSITION,
+
+      /**
+       * @brief The x position of an actor.
+       * @details Name "positionX", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetX()
+       */
+      POSITION_X,
+
+      /**
+       * @brief The y position of an actor.
+       * @details Name "positionY", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetY()
+       */
+      POSITION_Y,
+
+      /**
+       * @brief The z position of an actor.
+       * @details Name "positionZ", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetZ()
+       */
+      POSITION_Z,
+
+      /**
+       * @brief The world position of an actor.
+       * @details Name "worldPosition", type Property::VECTOR3, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldPosition()
+       */
+      WORLD_POSITION,
+
+      /**
+       * @brief The x world position of an actor.
+       * @details Name "worldPositionX", type Property::FLOAT, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldPosition()
+       */
+      WORLD_POSITION_X,
+
+      /**
+       * @brief The y world position of an actor.
+       * @details Name "worldPositionY", type Property::FLOAT, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldPosition()
+       */
+      WORLD_POSITION_Y,
+
+      /**
+       * @brief The z world position of an actor.
+       * @details Name "worldPositionZ", type Property::FLOAT, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldPosition()
+       */
+      WORLD_POSITION_Z,
+
+      /**
+       * @brief The orientation of an actor.
+       * @details Name "orientation", type Property::ROTATION, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetOrientation()
+       */
+      ORIENTATION,
+
+      /**
+       * @brief The world orientation of an actor.
+       * @details Name "worldOrientation", type Property::ROTATION, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldOrientation()
+       */
+      WORLD_ORIENTATION,
+
+      /**
+       * @brief The scale factor applied to an actor.
+       * @details Name "scale", type Property::VECTOR3, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetScale()
+       */
+      SCALE,
+
+      /**
+       * @brief The x scale factor applied to an actor.
+       * @details Name "scaleX", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetScale()
+       */
+      SCALE_X,
+
+      /**
+       * @brief The y scale factor applied to an actor.
+       * @details Name "scaleY", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetScale()
+       */
+      SCALE_Y,
+
+      /**
+       * @brief The x scale factor applied to an actor.
+       * @details Name "scaleZ", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetScale()
+       */
+      SCALE_Z,
+
+      /**
+       * @brief The world scale factor applied to an actor.
+       * @details Name "worldScale", type Property::VECTOR3, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldScale()
+       */
+      WORLD_SCALE,
+
+      /**
+       * @brief The visibility flag of an actor.
+       * @details Name "visible", type Property::BOOL, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetVisible()
+       */
+      VISIBLE,
+
+      /**
+       * @brief The color of an actor.
+       * @details Name "color", type Property::VECTOR4 or Property::VECTOR3, animatable / constraint-input
+       * @note The alpha value will be 1.0f if a Vector3 type value is set.
+       * @SINCE_1_0.0
+       * @see Actor::SetColor()
+       */
+      COLOR,
+
+      /**
+       * @brief The red component of an actor's color.
+       * @details Name "colorRed", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetColor()
+       */
+      COLOR_RED,
+
+      /**
+       * @brief The green component of an actor's color.
+       * @details Name "colorGreen", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetColor()
+       */
+      COLOR_GREEN,
+
+      /**
+       * @brief The blue component of an actor's color.
+       * @details Name "colorBlue", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetColor()
+       */
+      COLOR_BLUE,
+
+      /**
+       * @brief The alpha component of an actor's color.
+       * @details Name "colorAlpha", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::SetColor()
+       */
+      COLOR_ALPHA,
+
+      /**
+       * @brief The world color of an actor.
+       * @details Name "worldColor", type Property::VECTOR4, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldColor()
+       */
+      WORLD_COLOR,
+
+      /**
+       * @brief The world matrix of an actor.
+       * @details Name "worldMatrix", type Property::MATRIX, read-only / constraint-input
+       * @SINCE_1_0.0
+       * @see Actor::GetCurrentWorldMatrix()
+       */
+      WORLD_MATRIX,
+
+      /**
+       * @brief The name of an actor.
+       * @details Name "name", type Property::STRING
+       * @SINCE_1_0.0
+       * @see Actor::GetName()
+       */
+      NAME,
+
+      /**
+       * @brief The flag whether an actor should emit touch or hover signals.
+       * @details Name "sensitive", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       * @see Actor::SetSensitive()
+       */
+      SENSITIVE,
+
+      /**
+       * @brief The flag whether an actor should receive a notification when touch or hover motion events leave.
+       * @details Name "leaveRequired", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       * @see Actor::SetLeaveRequired()
+       */
+      LEAVE_REQUIRED,
+
+      /**
+       * @brief The flag whether a child actor inherits it's parent's orientation.
+       * @details Name "inheritOrientation", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       * @see Actor::SetInheritOrientation()
+       */
+      INHERIT_ORIENTATION,
+
+      /**
+       * @brief The flag whether a child actor inherits it's parent's scale.
+       * @details Name "inheritScale", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       * @see Actor::SetInheritScale()
+       */
+      INHERIT_SCALE,
+
+      /**
+       * @brief The color mode of an actor.
+       * @details Name "colorMode", type ColorMode (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @see Actor::SetColorMode()
+       */
+      COLOR_MODE,
+
+      /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_01,
+
+      /**
+       * @brief The draw mode of an actor.
+       * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @see Actor::SetDrawMode()
+       */
+      DRAW_MODE,
+
+      /**
+       * @brief The size mode factor of an actor.
+       * @details Name "sizeModeFactor", type Property::VECTOR3.
+       * @SINCE_1_0.0
+       * @see Actor::SetSizeModeFactor()
+       */
+      SIZE_MODE_FACTOR,
+
+      /**
+       * @brief The resize policy for the width of an actor.
+       * @details Name "widthResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @see Actor::SetResizePolicy()
+       */
+      WIDTH_RESIZE_POLICY,
+
+      /**
+       * @brief The resize policy for the height of an actor.
+       * @details Name "heightResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @see Actor::SetResizePolicy()
+       */
+      HEIGHT_RESIZE_POLICY,
+
+      /**
+       * @brief The size scale policy of an actor.
+       * @details Name "sizeScalePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @see Actor::SetSizeScalePolicy()
+       */
+      SIZE_SCALE_POLICY,
+
+      /**
+       * @brief The flag to determine the width dependent on the height.
+       * @details Name "widthForHeight", type Property::BOOLEAN.
+       * @SINCE_1_0.0
+       * @see Actor::SetResizePolicy()
+       */
+      WIDTH_FOR_HEIGHT,
+
+      /**
+       * @brief The flag to determine the height dependent on the width.
+       * @details Name "heightForWidth", type Property::BOOLEAN.
+       * @SINCE_1_0.0
+       * @see Actor::SetResizePolicy()
+       */
+      HEIGHT_FOR_WIDTH,
+
+      /**
+       * @brief The padding of an actor for use in layout.
+       * @details Name "padding", type Property::VECTOR4.
+       * @SINCE_1_0.0
+       * @see Actor::SetPadding()
+       */
+      PADDING,
+
+      /**
+       * @brief The minimum size an actor can be assigned in size negotiation.
+       * @details Name "minimumSize", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       * @see Actor::SetMinimumSize()
+       */
+      MINIMUM_SIZE,
+
+      /**
+       * @brief The maximum size an actor can be assigned in size negotiation.
+       * @details Name "maximumSize", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       * @see Actor::SetMaximumSize()
+       */
+      MAXIMUM_SIZE,
+
+      /**
+       * @brief The flag whether a child actor inherits it's parent's position.
+       * @details Name "inheritPosition", type Property::BOOLEAN.
+       * @SINCE_1_1.24
+       * @see Actor::SetInheritPosition()
+       */
+      INHERIT_POSITION,
+
+      /**
+       * @brief The clipping mode of an actor.
+       * @details Name "clippingMode", type ClippingMode::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2_5
+       * @see ClippingMode::Type for supported values.
+       */
+      CLIPPING_MODE,
 
       /**
        * @brief The direction of the layout.

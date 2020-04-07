@@ -2496,7 +2496,16 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::COLOR:
     {
-      SetColor( property.Get< Vector4 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::VECTOR3 )
+      {
+        Vector3 color = property.Get< Vector3 >();
+        SetColor( Vector4( color.r, color.g, color.b, 1.0f ) );
+      }
+      else if( type == Property::VECTOR4 )
+      {
+        SetColor( property.Get< Vector4 >() );
+      }
       break;
     }
 
@@ -2921,6 +2930,19 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize ) )
           {
+            if( mRelayoutData )
+            {
+              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.width = mTargetSize.width;
+              }
+
+              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.height = mTargetSize.height;
+              }
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -2931,6 +2953,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.width ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.width = mTargetSize.width;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -2941,6 +2968,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.height ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.height = mTargetSize.height;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3065,6 +3097,19 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< Vector3 >( mTargetSize, value ) )
           {
+            if( mRelayoutData )
+            {
+              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.width = mTargetSize.width;
+              }
+
+              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+              {
+                mRelayoutData->preferredSize.height = mTargetSize.height;
+              }
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3075,6 +3120,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.width, value ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.width = mTargetSize.width;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3085,6 +3135,11 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.height, value ) )
           {
+            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+            {
+              mRelayoutData->preferredSize.height = mTargetSize.height;
+            }
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
