@@ -41,7 +41,8 @@ Core* Core::New( RenderController& renderController,
                  GlContextHelperAbstraction& glContextHelperAbstraction,
                  RenderToFrameBuffer renderToFboEnabled,
                  DepthBufferAvailable depthBufferAvailable,
-                 StencilBufferAvailable stencilBufferAvailable )
+                 StencilBufferAvailable stencilBufferAvailable,
+                 PartialUpdateAvailable partialUpdateAvailable )
 {
   Core* instance = new Core;
   instance->mImpl = new Internal::Core( renderController,
@@ -51,7 +52,8 @@ Core* Core::New( RenderController& renderController,
                                         glContextHelperAbstraction,
                                         renderToFboEnabled,
                                         depthBufferAvailable,
-                                        stencilBufferAvailable );
+                                        stencilBufferAvailable,
+                                        partialUpdateAvailable );
 
   return instance;
 }
@@ -116,9 +118,19 @@ void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
   mImpl->PreRender( status, forceClear, uploadOnly );
 }
 
+void Core::PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects )
+{
+  mImpl->PreRender( scene, damagedRects );
+}
+
 void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
 {
   mImpl->RenderScene( status, scene, renderToFbo );
+}
+
+void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect )
+{
+  mImpl->RenderScene( status, scene, renderToFbo, clippingRect );
 }
 
 void Core::PostRender( bool uploadOnly )

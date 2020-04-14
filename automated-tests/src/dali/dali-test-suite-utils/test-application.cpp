@@ -26,13 +26,15 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
                                   uint32_t surfaceHeight,
                                   uint32_t  horizontalDpi,
                                   uint32_t  verticalDpi,
-                                  bool initialize )
+                                  bool initialize,
+                                  bool enablePartialUpdate )
 : mCore( NULL ),
   mSurfaceWidth( surfaceWidth ),
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
   mDpi{ horizontalDpi, verticalDpi },
-  mLastVSyncTime(0u)
+  mLastVSyncTime(0u),
+  mPartialUpdateEnabled(enablePartialUpdate)
 {
   if( initialize )
   {
@@ -59,7 +61,8 @@ void TestApplication::CreateCore()
                                         mGlContextHelperAbstraction,
                                         Integration::RenderToFrameBuffer::FALSE,
                                         Integration::DepthBufferAvailable::TRUE,
-                                        Integration::StencilBufferAvailable::TRUE );
+                                        Integration::StencilBufferAvailable::TRUE,
+                                        mPartialUpdateEnabled ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE );
 
   mCore->ContextCreated();
 
@@ -193,9 +196,30 @@ bool TestApplication::Render( uint32_t intervalMilliseconds, const char* locatio
   mRenderStatus.SetNeedsPostRender( false );
 
   mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/);
-  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/);
+  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/ );
+  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/ );
   mCore->PostRender( false /*do not skip rendering*/ );
+
+  mFrame++;
+
+  return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
+}
+
+bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects)
+{
+  DoUpdate(intervalMilliseconds, location);
+
+  mCore->PreRender(mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
+  mCore->PreRender(mScene, damagedRects);
+
+  return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
+}
+
+bool TestApplication::RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect)
+{
+  mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/, clippingRect);
+  mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/, clippingRect);
+  mCore->PostRender(false /*do not skip rendering*/);
 
   mFrame++;
 
@@ -227,8 +251,8 @@ bool TestApplication::RenderOnly( )
 {
   // Update Time values
   mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/);
-  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/);
+  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/ );
+  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/ );
   mCore->PostRender( false /*do not skip rendering*/ );
 
   mFrame++;

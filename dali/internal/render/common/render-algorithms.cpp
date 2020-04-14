@@ -271,7 +271,7 @@ inline void RenderAlgorithms::SetupScissorClipping( const RenderItem& item, Cont
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
 
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox( item.CalculateViewportSpaceAABB( mViewportRectangle.width, mViewportRectangle.height ) );
+      const ClippingBox scissorBox( item.CalculateViewportSpaceAABB( item.mSize, mViewportRectangle.width, mViewportRectangle.height ) );
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox( mScissorStack.back() );
@@ -391,7 +391,8 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
                                                  Integration::StencilBufferAvailable stencilBufferAvailable,
                                                  Vector<GLuint>& boundTextures,
-                                                 const RenderInstruction& instruction
+                                                 const RenderInstruction& instruction,
+                                                 const Rect<int>& rootClippingRect
                                                  )
 {
   DALI_PRINT_RENDER_LIST( renderList );
@@ -411,6 +412,21 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
 
   // Setup Scissor testing (for both viewport and per-node scissor)
   mScissorStack.clear();
+
+  // Add root clipping rect (set manually for Render function ny partial update for example)
+  // on the bottom of the stack
+  if (!rootClippingRect.IsEmpty())
+  {
+    context.SetScissorTest( true );
+    mScissorStack.push_back( rootClippingRect );
+  }
+  // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
+  else if (!renderList.IsClipping())
+  {
+    context.SetScissorTest( false );
+    mScissorStack.push_back( mViewportRectangle );
+  }
+
   if( renderList.IsClipping() )
   {
     context.SetScissorTest( true );
@@ -418,12 +434,6 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
     context.Scissor( layerScissorBox.x, layerScissorBox.y, layerScissorBox.width, layerScissorBox.height );
     mScissorStack.push_back( layerScissorBox );
     mHasLayerScissor = true;
-  }
-  else
-  {
-    // We are not performing a layer clip. Add the viewport as the root scissor rectangle.
-    context.SetScissorTest( false );
-    mScissorStack.push_back( mViewportRectangle );
   }
 
   // Loop through all RenderList in the RenderList, set up any prerequisites to render them, then perform the render.
@@ -466,7 +476,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                                                  BufferIndex bufferIndex,
                                                  Integration::DepthBufferAvailable depthBufferAvailable,
                                                  Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                 Vector<GLuint>& boundTextures )
+                                                 Vector<GLuint>& boundTextures,
+                                                 const Rect<int>& rootClippingRect )
 {
   DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
@@ -496,8 +507,8 @@ void RenderAlgorithms::ProcessRenderInstruction( const RenderInstruction& instru
                             depthBufferAvailable,
                             stencilBufferAvailable,
                             boundTextures,
-                            instruction //added for reflection effect
-                            );
+                            instruction, //added for reflection effect
+                            rootClippingRect );
       }
     }
   }

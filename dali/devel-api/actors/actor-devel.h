@@ -107,6 +107,13 @@ enum Type
    * sibling order. The values set by this Property will likely change.
    */
   SIBLING_ORDER = KEYBOARD_FOCUSABLE + 1,
+
+  /**
+   * @brief Sets the update size hint of the actor.
+   * @details Name "updateSizeHint", type Property::VECTOR2.
+   * @note Overrides the size used for the actor damaged area calculation. Affected by the actor model view matrix.
+   */
+  UPDATE_SIZE_HINT = SIBLING_ORDER + 1,
 };
 
 } // namespace Property

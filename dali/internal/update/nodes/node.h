@@ -117,6 +117,21 @@ public:
   }
 
   /**
+   * Mark an node and its sub tree according to the updated flag.
+   * @param[in] updated The updated flag
+   * (used for partial rendering to mark an animating sub tree for example).
+   */
+  virtual void SetUpdated(bool updated)
+  {
+    mUpdated = updated;
+
+    for (Node* child : mChildren)
+    {
+       child->SetUpdated(updated);
+    }
+  }
+
+  /**
    * This method sets clipping information on the node based on its hierarchy in the scene-graph.
    * A value is calculated that can be used during sorting to increase sort speed.
    * @param[in] clippingId The Clipping ID of the node to set
@@ -614,6 +629,20 @@ public:
   }
 
   /**
+   * Retrieve the update size hint of the node.
+   * @return The update size hint.
+   */
+  const Vector3& GetUpdateSizeHint() const
+  {
+    if( mTransformId != INVALID_TRANSFORM_ID )
+    {
+      return mUpdateSizeHint.Get(0);
+    }
+
+    return Vector3::ZERO;
+  }
+
+  /**
    * Retrieve the bounding sphere of the node
    * @return A vector4 describing the bounding sphere. XYZ is the center and W is the radius
    */
@@ -881,6 +910,8 @@ public: // Default properties
   AnimatableProperty<bool>           mVisible;                ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>           mCulled;                 ///< True if the node is culled. This is not animatable. It is just double-buffered.
   AnimatableProperty<Vector4>        mColor;                  ///< Color can be inherited from the Node hierarchy
+  AnimatableProperty<Vector3>        mUpdateSizeHint;         ///< Update size hint is provided for damaged area calculation. This is not animatable. It is just double-buffered. (Because all these bloody properties are).
+
 
   // Inherited properties; read-only from public API
 

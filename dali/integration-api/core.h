@@ -23,6 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
 
@@ -228,6 +230,7 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] depthBufferAvailable Whether the depth buffer is available
    * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+   * @param[in] partialUpdateAvailable Whether the partial update is available
    * @return A newly allocated Core.
    */
   static Core* New( RenderController& renderController,
@@ -237,7 +240,8 @@ public:
                     GlContextHelperAbstraction& glContextHelperAbstraction,
                     RenderToFrameBuffer renderToFboEnabled,
                     DepthBufferAvailable depthBufferAvailable,
-                    StencilBufferAvailable stencilBufferAvailable );
+                    StencilBufferAvailable stencilBufferAvailable,
+                    PartialUpdateAvailable partialUpdateAvailable);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -349,6 +353,16 @@ public:
   void PreRender( RenderStatus& status, bool forceClear, bool uploadOnly );
 
   /**
+   * This is called before rendering any scene in the next frame. This method should be preceded
+   * by a call up Update.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] scene The scene to be rendered.
+   * @param[out] damagedRects containing damaged render items rects for this pass.
+   */
+  void PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects );
+
+  /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
@@ -360,6 +374,18 @@ public:
    */
   void RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
 
+  /**
+   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * This method should be called twice. The first pass to render off-screen frame buffers if any,
+   * and the second pass to render the surface.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[out] status Contains the rendering flags.
+   * @param[in] scene The scene to be rendered.
+   * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
+   * @param[in] clippingRect The rect to clip rendered scene.
+   */
+  void RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect );
 
   /**
    * This is called after rendering all the scenes in the next frame. This method should be

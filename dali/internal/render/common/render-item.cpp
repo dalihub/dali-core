@@ -50,7 +50,8 @@ RenderItem::RenderItem()
   mNode( NULL ),
   mTextureSet( NULL ),
   mDepthIndex( 0 ),
-  mIsOpaque( true )
+  mIsOpaque( true ),
+  mIsUpdated( false )
 {
 }
 
@@ -59,11 +60,11 @@ RenderItem::~RenderItem()
 }
 
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const
+ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const int viewportWidth, const int viewportHeight ) const
 {
   // Calculate extent vector of the AABB:
-  const float halfActorX = mSize.x * 0.5f;
-  const float halfActorY = mSize.y * 0.5f;
+  const float halfActorX = size.x * 0.5f;
+  const float halfActorY = size.y * 0.5f;
 
   // To transform the actor bounds to screen-space, We do a fast, 2D version of a matrix multiply optimized for 2D quads.
   // This reduces float multiplications from 64 (16 * 4) to 12 (4 * 3).
@@ -120,7 +121,6 @@ void RenderItem::operator delete( void* ptr )
 {
   gRenderItemPool.Free( static_cast<RenderItem*>( ptr ) );
 }
-
 
 } // namespace SceneGraph
 
