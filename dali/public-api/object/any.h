@@ -183,8 +183,9 @@ public:
     else if( mContainer->GetType() != typeid( Type ) ) // Check if the value has the same value than the Any type.
     {
       AssertAlways( "Any::Get(). Trying to retrieve a value of a different type than the template one." );
+      return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetValue();
     }
-    return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetValue();
+    return NULL;
   }
 
   /**
