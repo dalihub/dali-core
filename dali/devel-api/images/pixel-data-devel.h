@@ -60,7 +60,7 @@ struct PixelDataBuffer
  * @param[in,out] pixelData The pixel data object to take the buffer from
  * @return the buffer and the data release mechanism
  */
-PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData );
+DALI_CORE_API PixelDataBuffer ReleasePixelDataBuffer( PixelData& pixelData );
 
 } // namespace DevelPixelData
 
