@@ -245,7 +245,7 @@ IF( INSTALL_CMAKE_MODULES )
 
   # Install the pdb file.
   IF( ENABLE_DEBUG )
-    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.pdb DESTINATION ${BIN_DIR} )
   ENDIF()
 ELSE()
   # Install the library so file and symlinks.

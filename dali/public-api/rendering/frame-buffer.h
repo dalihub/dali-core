@@ -154,7 +154,7 @@ public:
    *
    * @SINCE_1_1.43
    * @param[in] texture The texture that will be used as output when rendering
-   * @note The texture has to have the same size than the FrameBuffer
+   * @note The texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
   void AttachColorTexture( Texture& texture );
@@ -169,7 +169,7 @@ public:
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
-   * @note The specified texture mipmap has to have the same size than the FrameBuffer
+   * @note The mipmapped texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
   void AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer );

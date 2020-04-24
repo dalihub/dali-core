@@ -424,6 +424,26 @@ void ConvertToGlFormat( Format pixelformat, unsigned& pixelDataType, unsigned& i
       break;
     }
 
+    // GLES 3.0 depth and stencil formats
+    case Pixel::DEPTH_UNSIGNED_INT:
+    {
+      pixelDataType = GL_UNSIGNED_INT;
+      internalFormat = GL_DEPTH_COMPONENT;
+      break;
+    }
+    case Pixel::DEPTH_FLOAT:
+    {
+      pixelDataType = GL_FLOAT;
+      internalFormat = GL_DEPTH_COMPONENT;
+      break;
+    }
+    case Pixel::DEPTH_STENCIL:
+    {
+      pixelDataType = GL_UNSIGNED_INT_24_8;
+      internalFormat = GL_DEPTH_STENCIL;
+      break;
+    }
+
     case INVALID:
     {
       DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
