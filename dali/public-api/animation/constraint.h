@@ -502,7 +502,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] tag An integer to identify the constraint
    */
-  void SetTag( uint32_t tag );
+  void SetTag( const uint32_t tag );
 
   /**
    * @brief Gets the tag.
