@@ -104,7 +104,7 @@ Constraint::RemoveAction Constraint::GetRemoveAction() const
   return GetImplementation(*this).GetRemoveAction();
 }
 
-void Constraint::SetTag( uint32_t tag )
+void Constraint::SetTag( const uint32_t tag )
 {
   GetImplementation(*this).SetTag( tag );
 }
