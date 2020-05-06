@@ -94,6 +94,22 @@ public:
   void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
+   * @brief Attach a texture for depth rendering. Valid only for Framebuffers with DEPTH attachments.
+   * @param[in] context The GL context
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
+   * @brief Attach a texture for depth/stencil rendering. Valid only for Framebuffers with DEPTH_STENCIL attachments.
+   * @param[in] context The GL context
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthStencilTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
    * @return The number of color attachments.
    */

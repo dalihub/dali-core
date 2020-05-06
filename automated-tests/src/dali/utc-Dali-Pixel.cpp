@@ -50,7 +50,7 @@ int UtcDaliPixelHasAlpha(void)
 
   tet_infoline("UtcDaliPixelHasAlpha");
 
-  TestPixelEnumSize( 56 );
+  TestPixelEnumSize( 59 );
 
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::INVALID ) == false ); // For completeness
 
@@ -114,6 +114,10 @@ int UtcDaliPixelHasAlpha(void)
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB16F ) == false );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::RGB32F ) == false );
 
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::DEPTH_UNSIGNED_INT ) == false );
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::DEPTH_FLOAT ) == false );
+  DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::DEPTH_STENCIL ) == false );
+
   END_TEST;
 }
 
@@ -130,7 +134,7 @@ int UtcDaliPixelGetBytesPerPixel(void)
   tet_infoline("UtcDaliPixelGetBytesPerPixel");
 
   // Be sure that the number of cases tested below is correct:
-  TestPixelEnumSize( 56 );
+  TestPixelEnumSize( 59 );
 
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::INVALID ) == 0 ); // For completeness
 
@@ -199,6 +203,10 @@ int UtcDaliPixelGetBytesPerPixel(void)
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::RGB16F ) == 12 );
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::RGB32F ) == 24 );
 
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::DEPTH_UNSIGNED_INT ) == 4 );
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::DEPTH_FLOAT ) == 4 );
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel( Pixel::DEPTH_STENCIL ) == 4 );
+
   END_TEST;
 }
 
@@ -218,7 +226,7 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   int bitMask = 0;
 
   // Be sure that the number of cases tested below is correct:
-  TestPixelEnumSize( 56 );
+  TestPixelEnumSize( 59 );
 
   Pixel::GetAlphaOffsetAndMask( Pixel::INVALID, byteOffset, bitMask ); // For completeness
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
@@ -339,6 +347,32 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   Pixel::GetAlphaOffsetAndMask( Pixel::RGB32F, byteOffset, bitMask );
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
 
+  Pixel::GetAlphaOffsetAndMask( Pixel::DEPTH_UNSIGNED_INT, byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+  Pixel::GetAlphaOffsetAndMask( Pixel::DEPTH_FLOAT, byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+  Pixel::GetAlphaOffsetAndMask( Pixel::DEPTH_STENCIL, byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+
+  END_TEST;
+}
+
+int UtcDaliPixelConvertGlFormat(void)
+{
+  tet_infoline("UtcDaliPixelConvertGlFormat");
+
+  unsigned int pixelDataType, internalFormat;
+  Dali::Integration::ConvertToGlFormat( Pixel::Format::DEPTH_UNSIGNED_INT, pixelDataType, internalFormat );
+  DALI_TEST_CHECK( pixelDataType == GL_UNSIGNED_INT );
+  DALI_TEST_CHECK( internalFormat == GL_DEPTH_COMPONENT );
+
+  Dali::Integration::ConvertToGlFormat( Pixel::Format::DEPTH_FLOAT, pixelDataType, internalFormat );
+  DALI_TEST_CHECK( pixelDataType == GL_FLOAT );
+  DALI_TEST_CHECK( internalFormat == GL_DEPTH_COMPONENT );
+
+  Dali::Integration::ConvertToGlFormat( Pixel::Format::DEPTH_STENCIL, pixelDataType, internalFormat );
+  DALI_TEST_CHECK( pixelDataType == GL_UNSIGNED_INT_24_8 );
+  DALI_TEST_CHECK( internalFormat == GL_DEPTH_STENCIL );
   END_TEST;
 }
 

@@ -10,7 +10,7 @@ CMakeFiles/
 cmake_install.cmake
 dali.info
 install_manifest.txt
-libdali-core.so*
+libdali2-core.so*
 *~
 *.pc
 *.o

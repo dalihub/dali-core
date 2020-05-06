@@ -120,6 +120,32 @@ void FrameBuffer::AttachColorTexture( Context& context, Render::Texture* texture
   context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
+void FrameBuffer::AttachDepthTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  context.BindFramebuffer( GL_FRAMEBUFFER, mId );
+
+  // Create a depth attachment.
+  if( texture->GetType() == TextureType::TEXTURE_2D )
+  {
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->GetId(), mipmapLevel );
+  }
+
+  context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+void FrameBuffer::AttachDepthStencilTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  context.BindFramebuffer( GL_FRAMEBUFFER, mId );
+
+  // Create a depth/stencil attachment.
+  if( texture->GetType() == TextureType::TEXTURE_2D )
+  {
+    context.FramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture->GetId(), mipmapLevel );
+  }
+
+  context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
 void FrameBuffer::Bind( Context& context )
 {
   context.BindFramebuffer( GL_FRAMEBUFFER, mId );

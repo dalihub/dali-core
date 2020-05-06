@@ -380,6 +380,16 @@ void RenderManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
   frameBuffer->AttachColorTexture( mImpl->context, texture, mipmapLevel, layer );
 }
 
+void RenderManager::AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  frameBuffer->AttachDepthTexture( mImpl->context, texture, mipmapLevel );
+}
+
+void RenderManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  frameBuffer->AttachDepthStencilTexture( mImpl->context, texture, mipmapLevel );
+}
+
 void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
   mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );

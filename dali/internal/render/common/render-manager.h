@@ -293,6 +293,22 @@ public:
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
+   * Attach a texture as depth output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
+   * Attach a texture as depth/stencil output to an existing FrameBuffer
+   * @param[in] frameBuffer The FrameBuffer
+   * @param[in] texture The texture that will be used as output when rendering
+   * @param[in] mipmapLevel The mipmap of the texture to be attached
+   */
+  void AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
+
+  /**
    * Initializes a Scene to the render manager
    * @param[in] scene The Scene to initialize
    */

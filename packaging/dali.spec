@@ -1,6 +1,6 @@
-Name:       dali
+Name:       dali2
 Summary:    DALi 3D Engine
-Version:    1.5.8
+Version:    1.9.10
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -12,9 +12,6 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
-Provides: libdali-core-cxx11.so
-Provides: libdali-core-cxx11.so.0
-Provides: libdali-core-cxx11.so.0.0.0
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -101,13 +98,6 @@ cd build/tizen
 pushd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install
 
-# Create links to ensure linking with cxx11 library is preserved
-pushd  %{buildroot}%{_libdir}
-ln -sf libdali-core.so libdali-core-cxx11.so
-ln -sf libdali-core.so libdali-core-cxx11.so.0
-ln -sf libdali-core.so libdali-core-cxx11.so.0.0.0
-popd
-
 ##############################
 # Post Install
 ##############################
@@ -133,13 +123,12 @@ exit 0
 %manifest dali.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-core-cxx11.so*
-%{_libdir}/libdali-core.so*
+%{_libdir}/libdali2-core.so*
 %license LICENSE
 
 %files devel
 %defattr(-,root,root,-)
-%{_libdir}/pkgconfig/dali-core.pc
+%{_libdir}/pkgconfig/dali2-core.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/devel-api/*
 %{dev_include_path}/dali/doc/*

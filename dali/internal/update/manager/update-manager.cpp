@@ -1451,6 +1451,28 @@ void UpdateManager::AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameB
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachColorTextureToFrameBuffer, frameBuffer, texture, mipmapLevel, layer );
 }
 
+void UpdateManager::AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  typedef MessageValue3< RenderManager, Render::FrameBuffer*, Render::Texture*, uint32_t > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachDepthTextureToFrameBuffer, frameBuffer, texture, mipmapLevel );
+}
+
+void UpdateManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel )
+{
+  typedef MessageValue3< RenderManager, Render::FrameBuffer*, Render::Texture*, uint32_t > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachDepthStencilTextureToFrameBuffer, frameBuffer, texture, mipmapLevel );
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal
