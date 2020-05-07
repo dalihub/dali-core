@@ -1153,6 +1153,17 @@ void UpdateManager::SurfaceReplaced( Scene* scene )
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SurfaceReplaced, scene );
 }
 
+void UpdateManager::SetDefaultSurfaceOrientation( int orientation )
+{
+  typedef MessageValue1< RenderManager, int > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetDefaultSurfaceOrientation, orientation );
+}
+
 void UpdateManager::KeepRendering( float durationSeconds )
 {
   mImpl->keepRenderingSeconds = std::max( mImpl->keepRenderingSeconds, durationSeconds );
