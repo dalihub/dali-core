@@ -38,6 +38,7 @@ namespace SceneGraph
 class RenderQueue;
 class Shader;
 class Camera;
+class Scene;
 
 
 /**
@@ -54,6 +55,7 @@ public:
   typedef OwnerContainer< Shader* > ShaderQueue;
   typedef OwnerContainer< Renderer* > RendererQueue;
   typedef OwnerContainer< Camera* > CameraQueue;
+  typedef OwnerContainer< Scene* > SceneQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -101,6 +103,14 @@ public:
   void Add( BufferIndex updateBufferIndex, Camera* camera );
 
   /**
+   * Adds an unwanted Scene to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] scene The discarded scene; DiscardQueue takes ownership.
+   */
+  void Add( BufferIndex updateBufferIndex, Scene* scene );
+
+  /**
    * Release the nodes which were queued in the frame N-2.
    * @pre This method should be called (once) at the beginning of every Update.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -124,6 +134,7 @@ private:
   ShaderQueue                  mShaderQueue[2];
   RendererQueue                mRendererQueue[2];
   CameraQueue                  mCameraQueue[2];
+  SceneQueue                   mSceneQueue[2];
 };
 
 } // namespace SceneGraph
