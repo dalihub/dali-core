@@ -220,6 +220,18 @@ public:
   bool IsPreMultipliedAlphaEnabled() const;
 
   /**
+   * @brief Sets the mask used for Renderer filtering.
+   * @param[in] mask The mask used for Renderer filtering.
+   */
+  void SetFilteringMask( uint32_t mask );
+
+  /**
+   * @brief Gets the mask used for Renderer filtering.
+   * @return The mask used for Renderer filtering.
+   */
+  uint32_t GetFilteringMask() const;
+
+  /**
    * Sets the depth buffer write mode
    * @param[in] depthWriteMode The depth buffer write mode
    */
@@ -473,6 +485,8 @@ private:
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
+  uint32_t                     mFilteringMask;                    ///< The mask used for Renderer filtering.
+
 public:
 
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
@@ -594,6 +608,17 @@ inline void SetEnablePreMultipliedAlphaMessage( EventThreadServices& eventThread
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &renderer, &Renderer::EnablePreMultipliedAlpha, preMultiplied );
+}
+
+inline void SetFilteringMaskMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t mask )
+{
+  typedef MessageValue1< Renderer, uint32_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &renderer, &Renderer::SetFilteringMask, mask );
 }
 
 inline void SetDepthWriteModeMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, DepthWriteMode::Type depthWriteMode )

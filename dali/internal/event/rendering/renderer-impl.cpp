@@ -343,6 +343,17 @@ bool Renderer::IsPreMultipliedAlphaEnabled() const
   return mPremultipledAlphaEnabled;
 }
 
+void Renderer::SetFilteringMask(uint32_t mask)
+{
+  mFilteringMask = mask;
+  SetFilteringMaskMessage( GetEventThreadServices(), GetRendererSceneObject(), mask );
+}
+
+uint32_t Renderer::GetFilteringMask() const
+{
+  return mFilteringMask;
+}
+
 const SceneGraph::Renderer& Renderer::GetRendererSceneObject() const
 {
   return static_cast<const SceneGraph::Renderer&>( GetSceneObject() );
@@ -722,7 +733,8 @@ Renderer::Renderer( const SceneGraph::Renderer* sceneObject )
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
-  mPremultipledAlphaEnabled( false )
+  mPremultipledAlphaEnabled( false ),
+  mFilteringMask( DevelRenderer::DEFAULT_FILTERING_MASK )
 {
 }
 

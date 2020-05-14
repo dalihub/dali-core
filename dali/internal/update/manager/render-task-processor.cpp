@@ -167,23 +167,27 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   // Set the information in the node.
   node.SetClippingInformation( currentClippingId, clippingDepth, scissorDepth );
 
+  uint32_t filterMask = renderTask.GetRendererFilterMask();
   for( uint32_t i = 0; i < count; ++i )
   {
     SceneGraph::Renderer* renderer = node.GetRendererAt( i );
 
-    // Normal is the more-likely draw mode to occur.
-    if( DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) )
+    if ( 0 != ( filterMask & renderer->GetMask() ) )
     {
-      layer->colorRenderables.PushBack( Renderable( &node, renderer ) );
-    }
-    else
-    {
-      layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
-    }
+      // Normal is the more-likely draw mode to occur.
+      if( DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) )
+      {
+        layer->colorRenderables.PushBack( Renderable( &node, renderer ) );
+      }
+      else
+      {
+        layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
+      }
 
-    if( renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY )
-    {
-      keepRendering = true;
+      if( renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY )
+      {
+        keepRendering = true;
+      }
     }
   }
 

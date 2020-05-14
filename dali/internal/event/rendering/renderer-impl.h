@@ -162,6 +162,18 @@ public:
   bool IsPreMultipliedAlphaEnabled() const;
 
   /**
+   * @brief Sets the mask used for Renderer filtering.
+   * @param[in] mask The mask used for Renderer filtering.
+   */
+  void SetFilteringMask( uint32_t mask );
+
+  /**
+   * @brief Gets the mask used for Renderer filtering.
+   * @return The mask used for Renderer filtering.
+   */
+  uint32_t GetFilteringMask() const;
+
+  /**
    * @brief Get the scene graph object
    *
    * @return the scene object
@@ -269,6 +281,8 @@ private: // data
   DepthTestMode::Type                 mDepthTestMode:3;            ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type      mRenderingBehavior:2;        ///< The rendering behavior
   bool                                mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+
+  uint32_t                            mFilteringMask;              ///< Renderers are only processed by RenderTasks with Renderer filtering masks matching at least one bit of mFilteringMask.
 };
 
 } // namespace Internal

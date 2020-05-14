@@ -219,6 +219,16 @@ uint32_t RenderTask::GetRefreshRate() const
   return mRefreshRate;
 }
 
+void RenderTask::SetRendererFilteringMask( uint32_t mask )
+{
+  mRendererFilteringMask = mask;
+}
+
+void RenderTask::GetRendererFilteringMask()
+{
+  return mRendererFilteringMask;
+}
+
 bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
 {
   return mActive;
@@ -498,7 +508,8 @@ RenderTask::RenderTask()
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
-  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE )
+  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
+  mRendererFilteringMask( DevelRenderTask::DEFAULT_RENDERER_FILTERING_MASK )
 {
 }
 

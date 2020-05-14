@@ -144,6 +144,7 @@ Renderer::Renderer()
   mDepthTestMode( DepthTestMode::AUTO ),
   mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
   mPremultipledAlphaEnabled( false ),
+  mFilteringMask( DevelRenderer::DEFAULT_FILTERING_MASK )
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
@@ -501,6 +502,16 @@ void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
   return mPremultipledAlphaEnabled;
+}
+
+void Renderer::SetFilteringMask( uint32_t mask )
+{
+  mFilteringMask = mask;
+}
+
+uint32_t Renderer::GetFilteringMask() const
+{
+  return mFilteringMask;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )

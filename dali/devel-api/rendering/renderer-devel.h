@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,23 @@ namespace Property
     RENDERING_BEHAVIOR = STENCIL_OPERATION_ON_Z_PASS + 2,
   };
 } // namespace Property
+
+/**
+ * @brief Default value of Renderers' filtering mask.
+ */
+enum { DEFAULT_FILTERING_MASK = 0xffffffff };
+
+/**
+ * @brief Sets the mask used for Renderer filtering.
+ * @return The mask used for Renderer filtering.
+ */
+void SetFilteringMask( Renderer renderer, uint32_t mask );
+
+/**
+ * @brief Gets the mask used for Renderer filtering.
+ * @return The mask used for Renderer filtering.
+ */
+uint32_t GetFilteringMask( const Renderer renderer );
 
 namespace Rendering
 {

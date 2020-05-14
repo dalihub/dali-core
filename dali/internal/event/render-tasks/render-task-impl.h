@@ -227,6 +227,18 @@ public:
   uint32_t GetRefreshRate() const;
 
   /**
+   * @brief Sets the mask used for Renderer filtering.
+   * @param[in] mask The mask used for Renderer filtering.
+   */
+  void SetRendererFilteringMask(uint32_t mask);
+
+  /**
+   * @brief Gets the mask used for Renderer filtering.
+   * @return The mask used for Renderer filtering.
+   */
+  uint32_t GetRendererFilteringMask() const;
+
+  /**
    * Check if the render-task is hittable. If render task is offscreen, the screen coordinates may be translated.
    * @param[in,out] screenCoords The screen coordinate, which may be converted (for hit-testing actors which are rendered off-screen).
    * @return True the render-task can be used for input-handling; otherwise the output parameters are not valid.
@@ -376,6 +388,8 @@ private:
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode      : 1; ///< True if the render-task's actors should be culled
   bool mRequiresSync  : 1; ///< True if the GL sync is required to track the render of.
+
+  uint32_t	mRendererFilteringMask; ///< The mask used for Renderer filtering. Only those with a mask matching at least one bit of mRendererFilteringMask will be processed.
 
   //Signals
   Dali::RenderTask::RenderTaskSignalType  mSignalFinished; ///< Signal emmited when the render task has been processed.

@@ -374,6 +374,17 @@ uint32_t RenderTask::GetRefreshRate() const
   return mRefreshRate;
 }
 
+void RenderTask::SetRendererFilteringMask( uint32_t mask )
+{
+  mRendererFilteringMask = mask;
+  SetRendererFilteringMaskMessage( GetEventThreadServices(), GetRenderTaskSceneObject(), mask );
+}
+
+uint32_t RenderTask::GetRendererFilterMask() const
+{
+  return mRendererFilteringMask;
+}
+
 bool RenderTask::IsHittable( Vector2& screenCoords ) const
 {
   // True when input is enabled, source & camera actor are valid
@@ -784,7 +795,8 @@ RenderTask::RenderTask( const SceneGraph::RenderTask* sceneObject, RenderTaskLis
   mInputEnabled( Dali::RenderTask::DEFAULT_INPUT_ENABLED ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
   mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
-  mRequiresSync( false )
+  mRequiresSync( false ),
+  mRendererFilteringMask( 0xffffffff )
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);
   // scene object handles observation of source and camera

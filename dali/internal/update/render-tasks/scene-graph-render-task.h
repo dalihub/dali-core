@@ -242,6 +242,17 @@ public:
   uint32_t GetRefreshRate() const;
 
   /**
+   * @brief Sets the mask used for Renderer filtering.
+   * @param[in] mask The mask used for Renderer filtering.
+   */
+  void SetRendererFilteringMask( uint32_t mask );
+
+  /**
+   * @return The Renderer Filter Mask;
+   */
+  uint32_t GetRendererFilteringMask() const;
+
+  /**
    * Check if the render task is ready for rendering.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return True if the render-task is ready for rendering.
@@ -396,6 +407,8 @@ private:
   bool mClearEnabled:1;   ///< Whether previous results are cleared.
   bool mCullMode:1;       ///< Whether renderers should be frustum culled
 
+  uint32_t mRendererFilteringMask; ///< Only process Renderers with a filtering mask matching this by at least one bit.
+
 };
 
 // Messages for RenderTask
@@ -463,6 +476,17 @@ inline void SetRefreshRateMessage( EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &task, &RenderTask::SetRefreshRate, refreshRate );
+}
+
+inline void SetRendererFilteringMaskMessage( EventThreadServices& eventThreadServices, const RenderTask& task, uint32_t mask )
+{
+  typedef MessageValue1< RenderTask, uint32_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &task, &RenderTask::SetRendererFilteringMask, mask );
 }
 
 inline void SetSourceNodeMessage( EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode )
