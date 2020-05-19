@@ -215,7 +215,7 @@ int UtcDaliWheelEventSignalling(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify

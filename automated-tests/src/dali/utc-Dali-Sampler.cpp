@@ -133,7 +133,7 @@ int UtcSamplerSetFilterMode(void)
   renderer.SetTextures( textureSet );
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add( actor );
 
@@ -264,7 +264,7 @@ int UtcSamplerSetWrapMode1(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetSize(400, 400);
   Stage::GetCurrent().Add( actor );
 
@@ -353,7 +353,7 @@ int UtcSamplerSetWrapMode2(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetSize( 400, 400 );
   Stage::GetCurrent().Add( actor );
 

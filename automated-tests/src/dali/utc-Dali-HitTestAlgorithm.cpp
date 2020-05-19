@@ -40,11 +40,11 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
     case Dali::HitTestAlgorithm::CHECK_ACTOR:
     {
       // Check whether the actor is visible and not fully transparent.
-      if( actor.IsVisible()
-       && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE )
+       && actor.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ).a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor has the specific name "HittableActor"
-        if(actor.GetName() == "HittableActor")
+        if(actor.GetProperty< std::string >( Actor::Property::NAME ) == "HittableActor")
         {
           hittable = true;
         }
@@ -53,7 +53,7 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if( actor.IsVisible() ) // Actor is visible, if not visible then none of its children are visible.
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) ) // Actor is visible, if not visible then none of its children are visible.
       {
         hittable = true;
       }
@@ -77,9 +77,9 @@ bool DefaultIsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::
   {
     case Dali::HitTestAlgorithm::CHECK_ACTOR:
     {
-      if( actor.IsVisible() &&
-          actor.IsSensitive() &&
-          actor.GetCurrentWorldColor().a > 0.01f)
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) &&
+          actor.GetProperty< bool >( Actor::Property::SENSITIVE ) &&
+          actor.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ).a > 0.01f)
       {
         hittable = true;
       }
@@ -87,8 +87,8 @@ bool DefaultIsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if( actor.IsVisible() && // Actor is visible, if not visible then none of its children are visible.
-          actor.IsSensitive()) // Actor is sensitive, if insensitive none of its children should be hittable either.
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) && // Actor is visible, if not visible then none of its children are visible.
+          actor.GetProperty< bool >( Actor::Property::SENSITIVE )) // Actor is sensitive, if insensitive none of its children should be hittable either.
       {
         hittable = true;
       }
@@ -116,8 +116,8 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  actor.SetName("NonHittableActor");
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::NAME,"NonHittableActor");
   stage.Add(actor);
 
   // Render and notify
@@ -133,7 +133,7 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
   Dali::HitTestAlgorithm::HitTest( stage, screenCoordinates, results, IsActorHittableFunction );
   DALI_TEST_CHECK( results.actor != actor );
 
-  actor.SetName("HittableActor");
+  actor.SetProperty( Actor::Property::NAME,"HittableActor");
 
   results.actor = Actor();
   results.actorCoordinates = Vector2::ZERO;
@@ -162,16 +162,16 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
-  blue.SetName( "Blue" );
-  blue.SetAnchorPoint( AnchorPoint::CENTER );
-  blue.SetParentOrigin( Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
+  blue.SetProperty( Actor::Property::NAME, "Blue" );
+  blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
   blue.SetSize( actorSize );
   blue.SetZ(30.0f);
 
   Actor green = Actor::New( );
-  green.SetName( "Green" );
-  green.SetAnchorPoint( AnchorPoint::CENTER );
-  green.SetParentOrigin( Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
+  green.SetProperty( Actor::Property::NAME, "Green" );
+  green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
   green.SetSize( actorSize );
 
   // Add the actors to the view
@@ -218,16 +218,16 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
-  blue.SetName( "Blue" );
-  blue.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  blue.SetParentOrigin( Vector3(0.2f, 0.2f, 0.5f) );
+  blue.SetProperty( Actor::Property::NAME, "Blue" );
+  blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.2f, 0.2f, 0.5f) );
   blue.SetSize( actorSize );
   blue.SetZ(30.0f);
 
   Actor green = Actor::New( );
-  green.SetName( "Green" );
-  green.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  green.SetParentOrigin( Vector3(0.4f, 0.4f, 0.5f) );
+  green.SetProperty( Actor::Property::NAME, "Green" );
+  green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.4f, 0.4f, 0.5f) );
   green.SetSize( actorSize );
 
   // Add the actors to the view
@@ -278,30 +278,30 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
 
   Stage stage = Stage::GetCurrent();
   Actor rootLayer = stage.GetRootLayer();
-  rootLayer.SetName( "RootLayer" );
+  rootLayer.SetProperty( Actor::Property::NAME, "RootLayer" );
 
   // Create a layer
   Layer layer = Layer::New();
-  layer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  layer.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  layer.SetName( "layer" );
+  layer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  layer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  layer.SetProperty( Actor::Property::NAME, "layer" );
   stage.Add( layer );
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
-  clippingActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  clippingActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  clippingActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  clippingActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   clippingActor.SetSize( 50.0f, 50.0f );
   clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  clippingActor.SetName( "clippingActor" );
+  clippingActor.SetProperty( Actor::Property::NAME, "clippingActor" );
   layer.Add( clippingActor );
 
   // Create a renderable actor and add it to the clipping actor.
   Actor childActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
   childActor.SetSize( 100.0f, 100.0f );
-  childActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  childActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  childActor.SetName( "childActor" );
+  childActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  childActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  childActor.SetProperty( Actor::Property::NAME, "childActor" );
   clippingActor.Add( childActor );
 
   // Render and notify
@@ -312,12 +312,12 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   HitTestAlgorithm::Results results;
   HitTest( stage, Vector2( 10.0f, 10.0f ), results, &DefaultIsActorTouchableFunction );
   DALI_TEST_CHECK( results.actor == childActor );
-  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
+  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetProperty< std::string >( Actor::Property::NAME ).c_str() : "NULL" ) );
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
   HitTest( stage, Vector2( 60.0f, 60.0f ), results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK( results.actor == rootLayer );
-  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetName().c_str() : "NULL" ) );
+  tet_printf( "Hit: %s\n", ( results.actor ? results.actor.GetProperty< std::string >( Actor::Property::NAME ).c_str() : "NULL" ) );
 
   END_TEST;
 }
@@ -340,16 +340,16 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
   blue.SetDrawMode( DrawMode::OVERLAY_2D );
-  blue.SetName( "Blue" );
-  blue.SetAnchorPoint( AnchorPoint::CENTER );
-  blue.SetParentOrigin( Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
+  blue.SetProperty( Actor::Property::NAME, "Blue" );
+  blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
   blue.SetSize( actorSize );
   blue.SetZ(30.0f);
 
   Actor green = Actor::New( );
-  green.SetName( "Green" );
-  green.SetAnchorPoint( AnchorPoint::CENTER );
-  green.SetParentOrigin( Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
+  green.SetProperty( Actor::Property::NAME, "Green" );
+  green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
   green.SetSize( actorSize );
 
   // Add the actors to the view

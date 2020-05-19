@@ -255,7 +255,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     DALI_LOG_INFO( gLogFilter, Debug::General, "  State(%s), Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    TOUCH_POINT_STATE[iter->GetState()], iter->GetScreenPosition().x, iter->GetScreenPosition().y,
                    ( hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL ),
-                   ( hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" ),
+                   ( hitTestResults.actor ? hitTestResults.actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" ),
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );
 
     // Only set the currentRenderTask for the primary hit actor.
@@ -278,8 +278,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   Dali::Actor primaryHitActor = primaryPoint.GetHitActor();
   PointState::Type primaryPointState = primaryPoint.GetState();
 
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryHitActor ? reinterpret_cast< void* >( &primaryHitActor.GetBaseObject() ) : NULL, primaryHitActor ? primaryHitActor.GetName().c_str() : "" );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryHitActor ? reinterpret_cast< void* >( &primaryHitActor.GetBaseObject() ) : NULL, primaryHitActor ? primaryHitActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
 
   if ( ( primaryPointState == PointState::DOWN ) &&
        ( touchEvent.GetPointCount() == 1 ) &&

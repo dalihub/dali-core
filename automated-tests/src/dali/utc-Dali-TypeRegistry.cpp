@@ -510,7 +510,7 @@ public:
 BaseHandle CreateNamedActorType()
 {
   Actor actor = Actor::New();
-  actor.SetName( "NamedActor" );
+  actor.SetProperty( Actor::Property::NAME, "NamedActor" );
   return actor;
 }
 
@@ -770,7 +770,7 @@ int UtcDaliTypeRegistryTypeRegistrationForNamedTypeP(void)
   Actor namedActor( Actor::DownCast( namedHandle ) );
   DALI_TEST_CHECK( namedActor );
 
-  DALI_TEST_CHECK( namedActor.GetName() == "NamedActor" );
+  DALI_TEST_CHECK( namedActor.GetProperty< std::string >( Actor::Property::NAME ) == "NamedActor" );
   DALI_TEST_CHECK( type.GetName() == "MyNamedActor" );
   DALI_TEST_CHECK( type.GetBaseName() == "Actor" );
 
@@ -1875,11 +1875,11 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
   Actor a = Actor::DownCast(hdl);
   DALI_TEST_CHECK( a );
 
-  a.SetVisible(false);
+  a.SetProperty( Actor::Property::VISIBLE,false);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_CHECK(!a.IsVisible());
+  DALI_TEST_CHECK(!a.GetCurrentProperty< bool >( Actor::Property::VISIBLE ));
 
   Property::Map attributes;
 
@@ -1887,7 +1887,7 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_CHECK(a.IsVisible());
+  DALI_TEST_CHECK(a.GetCurrentProperty< bool >( Actor::Property::VISIBLE ));
 
   DALI_TEST_CHECK(!hdl.DoAction("unknownAction",  attributes));
   END_TEST;
@@ -2066,7 +2066,7 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Register Type
@@ -2104,7 +2104,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Register Type
@@ -2140,7 +2140,7 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Register Type
@@ -2177,7 +2177,7 @@ int UtcDaliRotationGestureDetectorTypeRegistry(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Register Type
@@ -2214,7 +2214,7 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Register Type

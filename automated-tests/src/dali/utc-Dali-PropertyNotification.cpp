@@ -581,7 +581,7 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move right to satisfy XAxis condition
@@ -606,7 +606,7 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -630,7 +630,7 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move left to satisfy XAxis condition
@@ -655,7 +655,7 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -680,7 +680,7 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
 
   // set outside all conditions
   actor.SetPosition(Vector3(200.0f, 200.0f, 200.0f));
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to inside condition
@@ -705,7 +705,7 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   // change alpha to inside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.5f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -730,7 +730,7 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
 
   // set inside all conditions
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.5f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to outside condition
@@ -755,7 +755,7 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   // change alpha to outside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;

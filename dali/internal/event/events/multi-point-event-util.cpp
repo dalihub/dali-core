@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ namespace Internal
 
 #if defined(DEBUG_ENABLED)
 
-static bool HIERARCHY_GEOMETRY(false);
-static bool HIERARCHY_SENSITIVITY(false);
-static bool HIERARCHY_TOUCH_REQUIRED(false);
-static bool HIERARCHY_HOVER_REQUIRED(false);
-static bool HIERARCHY_HITTABLE(false);
+static bool HIERARCHY_GEOMETRY(true);
+static bool HIERARCHY_SENSITIVITY(true);
+static bool HIERARCHY_TOUCH_REQUIRED(true);
+static bool HIERARCHY_HOVER_REQUIRED(true);
+static bool HIERARCHY_HITTABLE(true);
 
 static const Debug::LogLevel HIERARCHY_DEBUG_LOG_LEVEL( Debug::Verbose );
 
@@ -48,11 +48,11 @@ void PrintChildren( Debug::Filter* logFilter, Dali::Actor actor, int level )
     output << " | ";
   }
 
-  output << actor.GetName() << "(" << actor.GetTypeName() << ", " << actor.GetObjectPtr() << ")";
+  output << actor.GetProperty< std::string >( Dali::Actor::Property::NAME ) << "(" << actor.GetTypeName() << ", " << actor.GetObjectPtr() << ")";
 
   if ( HIERARCHY_GEOMETRY )
   {
-    output << " Pos: " << actor.GetCurrentWorldPosition() << " Size: " << actor.GetCurrentSize() << " Scale: " << actor.GetCurrentWorldScale();
+    output << " Pos: " << actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::WORLD_POSITION ) << " Size: " << actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::SIZE ) << " Scale: " << actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::WORLD_SCALE );
   }
 
   if ( HIERARCHY_SENSITIVITY )

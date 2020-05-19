@@ -167,7 +167,7 @@ int UtcDaliNativeImageTestCreationFailure(void)
   nativeImageInterface->SetGlExtensionCreateResult( false );
 
   Actor actor = CreateRenderableActor( nativeImage );
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();

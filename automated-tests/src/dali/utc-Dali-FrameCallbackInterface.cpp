@@ -311,10 +311,10 @@ int UtcDaliFrameCallbackGetters(void)
   Vector3 scale( 2.0f, 4.0f, 6.0f );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetSize( actorSize );
-  actor.SetColor( color );
+  actor.SetProperty( Actor::Property::COLOR, color );
   actor.SetPosition( position );
   actor.SetScale( scale );
 
@@ -346,8 +346,8 @@ int UtcDaliFrameCallbackSetters(void)
   Vector2 actorSize( 200, 300 );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetSize( actorSize );
 
   Stage stage = Stage::GetCurrent();
@@ -410,8 +410,8 @@ int UtcDaliFrameCallbackBake(void)
   Vector2 actorSize( 200, 300 );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetSize( actorSize );
 
   Stage stage = Stage::GetCurrent();
@@ -506,57 +506,57 @@ int UtcDaliFrameCallbackMultipleActors(void)
   positions['H'] = Vector3( 20.0f, 21.0f, 22.0f );
 
   Actor actorA = Actor::New();
-  actorA.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetSize( sizes['A'] );
   actorA.SetPosition( positions['A'] );
   stage.Add( actorA );
 
   Actor actorB = Actor::New();
-  actorB.SetParentOrigin( ParentOrigin::BOTTOM_RIGHT );
-  actorB.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorB.SetSize( sizes['B'] );
   actorB.SetPosition( positions['B'] );
   actorA.Add( actorB );
 
   Actor actorC = Actor::New();
-  actorC.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-  actorC.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
   actorC.SetSize( sizes['C'] );
   actorC.SetPosition( positions['C'] );
   actorB.Add( actorC );
 
   Actor actorD = Actor::New();
-  actorD.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
-  actorD.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  actorD.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT );
+  actorD.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   actorD.SetSize( sizes['D'] );
   actorD.SetPosition( positions['D'] );
   actorA.Add( actorD );
 
   Actor actorE = Actor::New();
-  actorE.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
-  actorE.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  actorE.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
+  actorE.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
   actorE.SetSize( sizes['E'] );
   actorE.SetPosition( positions['E'] );
   stage.Add( actorE );
 
   Actor actorF = Actor::New();
-  actorF.SetParentOrigin( ParentOrigin::TOP_CENTER );
-  actorF.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  actorF.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+  actorF.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
   actorF.SetSize( sizes['F'] );
   actorF.SetPosition( positions['F'] );
   actorE.Add( actorF );
 
   Actor actorG = Actor::New();
-  actorG.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
-  actorG.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  actorG.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT );
+  actorG.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   actorG.SetSize( sizes['G'] );
   actorG.SetPosition( positions['G'] );
   actorE.Add( actorG );
 
   Actor actorH = Actor::New();
-  actorH.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-  actorH.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  actorH.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
+  actorH.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
   actorH.SetSize( sizes['H'] );
   actorH.SetPosition( positions['H'] );
   actorG.Add( actorH );
@@ -612,8 +612,8 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetSize( 200, 300 );
 
   Stage stage = Stage::GetCurrent();

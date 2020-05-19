@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,13 @@ void Filter::DisableGlobalTrace()
   }
 }
 
+void Filter::SetGlobalLogLevel( LogLevel level )
+{
+  for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
+  {
+    (*iter)->SetLogLevel( level );
+  }
+}
 
 void Filter::Log(LogLevel level, const char* format, ...)
 {

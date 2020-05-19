@@ -768,7 +768,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
 
   // Should not equal position by default
   Vector3 position( 10.0f, 20.0f, 30.0f );
-  DALI_TEST_CHECK( actor.GetCurrentPosition() != position );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
 
   // Create a constraint that constrains to position
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
@@ -778,7 +778,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
 
   // Remove the constraint, it should still be at position
   constraint.Remove();
@@ -786,7 +786,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
 
   END_TEST;
 }
@@ -804,11 +804,11 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   application.Render();
 
   // Get and store current position
-  Vector3 originalPosition = actor.GetCurrentPosition();
+  Vector3 originalPosition = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   // Should not equal position by default
   Vector3 position( 10.0f, 20.0f, 30.0f );
-  DALI_TEST_CHECK( actor.GetCurrentPosition() != position );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
 
   // Create a constraint that constrains to position
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
@@ -818,7 +818,7 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), position, TEST_LOCATION );
 
   // Remove the constraint, it should still be at position
   constraint.Remove();
@@ -826,8 +826,8 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), originalPosition, TEST_LOCATION );
-  DALI_TEST_CHECK( actor.GetCurrentPosition() != position );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), originalPosition, TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) != position );
 
   END_TEST;
 }
@@ -1258,7 +1258,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Create a constraint whose value is discarded when it is removed
   Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
@@ -1268,12 +1268,12 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   // Remove the actor from the stage and delete the constraint
   actor.Unparent();
@@ -1283,7 +1283,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   // Check value while off-stage, it should be fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Add the actor back to the stage and check the value, it should be fully opaque again
   Stage::GetCurrent().Add( actor );
@@ -1291,12 +1291,12 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   // Check value when back on-stage, it should be fully opaque as the constraint is no longer applied to it.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1313,7 +1313,7 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Create a constraint whose value is discarded when it is removed
   Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
@@ -1323,12 +1323,12 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   // Remove the actor from the stage
   actor.Unparent();
@@ -1336,23 +1336,23 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check value while off-stage, the constraint is no longer being applied as it's off-stage
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Check the other buffer, the constraint should not be applied to this either.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Add the actor back to the stage and check the value, the constraint should have been re-applied
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );
 
   END_TEST;
 }

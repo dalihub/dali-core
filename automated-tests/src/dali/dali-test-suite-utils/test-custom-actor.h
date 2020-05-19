@@ -346,10 +346,10 @@ struct TestCustomActorVariant7 : public TestCustomActor
   virtual void OnInitialize( const char* name )
   {
     // We need to do this early, before the OnChildAdd is recorded
-    Self().SetName( name );
+    Self().SetProperty( Dali::Actor::Property::NAME, name );
 
     mContainer = Dali::Actor::New();
-    mContainer.SetName( "Container" );
+    mContainer.SetProperty( Dali::Actor::Property::NAME, "Container" );
     Self().Add( mContainer );
   }
 
