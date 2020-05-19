@@ -1166,3 +1166,52 @@ int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneEmptySceneRendering(void)
+{
+  tet_infoline( "Ensure not rendering before a Renderer is added" );
+
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+
+  // Render without any renderer
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), false, TEST_LOCATION );
+
+  // Add a Renderer
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  actor.SetSize( 400, 400 );
+  Stage::GetCurrent().Add( actor );
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+
+  // Remove the Renderer
+  Stage::GetCurrent().Remove( actor );
+  actor.Reset();
+  renderer.Reset();
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION );  // Should be cleared
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+
+  END_TEST;
+}

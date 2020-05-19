@@ -367,10 +367,11 @@ public:
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
+   * @param[out] status contains the rendering flags.
    * @param[in] scene The scene to be rendered.
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    */
-  void RenderScene( Integration::Scene& scene, bool renderToFbo );
+  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
 
   // This method should be called from Core::PostRender()
 

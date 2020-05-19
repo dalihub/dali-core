@@ -136,7 +136,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
    */
-  void RenderScene( Integration::Scene& scene, bool renderToFbo );
+  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
 
   /**
    * @copydoc Dali::Integration::Core::Render()
