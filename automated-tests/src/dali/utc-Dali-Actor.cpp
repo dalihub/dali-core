@@ -15,6 +15,9 @@
  *
  */
 
+// Enable debug log for test coverage
+#define DEBUG_ENABLED 1
+
 #include "assert.h"
 #include <dali/public-api/dali-core.h>
 #include <string>
@@ -22,6 +25,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
+#include <dali/integration-api/debug.h>
 #include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
 
@@ -132,14 +136,14 @@ static int gOnStageCallBackCalled;
 void OnStageCallback( Actor actor )
 {
   ++gOnStageCallBackCalled;
-  gActorNamesOnOffStage.push_back( actor.GetName() );
+  gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
   DALI_TEST_CHECK( actor.OnStage() == true );
 }
 static int gOffStageCallBackCalled;
 void OffStageCallback( Actor actor )
 {
   ++gOffStageCallBackCalled;
-  gActorNamesOnOffStage.push_back( actor.GetName() );
+  gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
   DALI_TEST_CHECK( actor.OnStage() == false );
 }
 
@@ -176,7 +180,7 @@ static std::vector< std::string > gActorNamesRelayout;
 void OnRelayoutCallback( Actor actor )
 {
   gOnRelayoutCallBackCalled = true;
-  gActorNamesRelayout.push_back( actor.GetName() );
+  gActorNamesRelayout.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
 }
 
 struct VisibilityChangedFunctorData
@@ -326,7 +330,7 @@ int UtcDaliActorGetName(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetName().empty());
+  DALI_TEST_CHECK(actor.GetProperty< std::string >( Actor::Property::NAME ).empty());
   END_TEST;
 }
 
@@ -338,8 +342,8 @@ int UtcDaliActorSetName(void)
   string str("ActorName");
   Actor actor = Actor::New();
 
-  actor.SetName(str);
-  DALI_TEST_CHECK(actor.GetName() == str);
+  actor.SetProperty( Actor::Property::NAME,str);
+  DALI_TEST_CHECK(actor.GetProperty< std::string >( Actor::Property::NAME ) == str);
   END_TEST;
 }
 
@@ -748,25 +752,25 @@ int UtcDaliActorSetParentOrigin(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentParentOrigin());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
 
-  actor.SetParentOrigin(vector);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, vector );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentParentOrigin());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
 
   Stage::GetCurrent().Add( actor );
 
-  actor.SetParentOrigin( Vector3( 0.1f, 0.2f, 0.3f ) );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.1f, 0.2f, 0.3f ) );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentParentOrigin(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), TEST_LOCATION );
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -779,7 +783,7 @@ int UtcDaliActorSetParentOriginIndividual(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentParentOrigin());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN_X, vector.x );
 
@@ -787,7 +791,7 @@ int UtcDaliActorSetParentOriginIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.x, actor.GetCurrentParentOrigin().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ).x, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN_Y, vector.y );
 
@@ -795,7 +799,7 @@ int UtcDaliActorSetParentOriginIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.y, actor.GetCurrentParentOrigin().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ).y, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN_Z, vector.z );
 
@@ -803,7 +807,7 @@ int UtcDaliActorSetParentOriginIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.z, actor.GetCurrentParentOrigin().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ).z, TEST_LOCATION );
 
   END_TEST;
 }
@@ -815,15 +819,15 @@ int UtcDaliActorGetCurrentParentOrigin(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentParentOrigin());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
 
-  actor.SetParentOrigin(vector);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, vector );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentParentOrigin());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
   END_TEST;
 }
 
@@ -834,24 +838,24 @@ int UtcDaliActorSetAnchorPoint(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentAnchorPoint());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
 
-  actor.SetAnchorPoint(vector);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, vector );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentAnchorPoint());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
 
   Stage::GetCurrent().Add( actor );
 
-  actor.SetAnchorPoint( Vector3( 0.1f, 0.2f, 0.3f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, Vector3( 0.1f, 0.2f, 0.3f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentAnchorPoint(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), TEST_LOCATION );
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -864,7 +868,7 @@ int UtcDaliActorSetAnchorPointIndividual(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentAnchorPoint());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT_X, vector.x );
 
@@ -872,7 +876,7 @@ int UtcDaliActorSetAnchorPointIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.x, actor.GetCurrentAnchorPoint().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ).x, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT_Y, vector.y );
 
@@ -880,7 +884,7 @@ int UtcDaliActorSetAnchorPointIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.y, actor.GetCurrentAnchorPoint().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ).y, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT_Z, vector.z );
 
@@ -888,7 +892,7 @@ int UtcDaliActorSetAnchorPointIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.z, actor.GetCurrentAnchorPoint().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ).z, TEST_LOCATION );
 
   END_TEST;
 }
@@ -900,15 +904,15 @@ int UtcDaliActorGetCurrentAnchorPoint(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentAnchorPoint());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
 
-  actor.SetAnchorPoint(vector);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, vector);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentAnchorPoint());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
   END_TEST;
 }
 
@@ -920,7 +924,7 @@ int UtcDaliActorSetSize01(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(vector.x, vector.y);
 
@@ -936,7 +940,7 @@ int UtcDaliActorSetSize01(void)
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -986,7 +990,7 @@ int UtcDaliActorSetSize02(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(vector.x, vector.y, vector.z);
 
@@ -999,7 +1003,7 @@ int UtcDaliActorSetSize02(void)
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1015,7 +1019,7 @@ int UtcDaliActorSetSize03(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(Vector2(vector.x, vector.y));
 
@@ -1028,7 +1032,7 @@ int UtcDaliActorSetSize03(void)
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1044,7 +1048,7 @@ int UtcDaliActorSetSize04(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(vector);
 
@@ -1057,7 +1061,7 @@ int UtcDaliActorSetSize04(void)
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   Stage::GetCurrent().Add( actor );
   actor.SetSize( Vector3( 0.1f, 0.2f, 0.3f ) );
@@ -1071,7 +1075,7 @@ int UtcDaliActorSetSize04(void)
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentSize(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), TEST_LOCATION );
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.3f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1087,7 +1091,7 @@ int UtcDaliActorSetSizeIndividual(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
 
@@ -1100,7 +1104,7 @@ int UtcDaliActorSetSizeIndividual(void)
   application.Render();
 
   // Check the width in the new frame
-  DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, TEST_LOCATION );
 
   sizeWidth = actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >();
   DALI_TEST_EQUALS( sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1116,7 +1120,7 @@ int UtcDaliActorSetSizeIndividual(void)
   application.Render();
 
   // Check the height in the new frame
-  DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, TEST_LOCATION );
 
   sizeHeight = actor.GetProperty( Actor::Property::SIZE_HEIGHT ).Get< float >();
   DALI_TEST_EQUALS( sizeHeight, vector.height, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1132,7 +1136,7 @@ int UtcDaliActorSetSizeIndividual(void)
   application.Render();
 
   // Check the depth in the new frame
-  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentSize().depth, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).depth, TEST_LOCATION );
 
   sizeDepth = actor.GetProperty( Actor::Property::SIZE_DEPTH ).Get< float >();
   DALI_TEST_EQUALS( sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1173,7 +1177,7 @@ int UtcDaliActorSetSizeIndividual02(void)
   Stage::GetCurrent().Add( actor );
 
   Vector3 vector( 100.0f, 200.0f, 400.0f );
-  DALI_TEST_CHECK( vector != actor.GetCurrentSize() );
+  DALI_TEST_CHECK( vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) );
 
   actor.SetProperty( Actor::Property::SIZE_WIDTH, vector.width );
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_WIDTH ).Get< float >(), vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1189,8 +1193,8 @@ int UtcDaliActorSetSizeIndividual02(void)
   application.Render();
 
   // Check the width in the new frame
-  DALI_TEST_EQUALS( vector.width, actor.GetCurrentSize().width, TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.height, actor.GetCurrentSize().height, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.width, actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.height, actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1203,7 +1207,7 @@ int UtcDaliActorGetCurrentSize(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 20.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(vector);
 
@@ -1211,7 +1215,7 @@ int UtcDaliActorGetCurrentSize(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
   END_TEST;
 }
 
@@ -1235,19 +1239,19 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   Vector3 vector(100.0f, 100.0f, 20.0f);
 
   DALI_TEST_CHECK(vector != actor.GetTargetSize());
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   actor.SetSize(vector);
 
   DALI_TEST_CHECK(vector == actor.GetTargetSize());
-  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_CHECK(vector == actor.GetTargetSize());
-  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   // Animation
   // Build the animation
@@ -1304,20 +1308,20 @@ int UtcDaliActorSetPosition01(void)
 
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetPosition(vector.x, vector.y);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   Stage::GetCurrent().Add( actor );
   actor.SetPosition( Vector3( 0.1f, 0.2f, 0.3f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
   actor.SetX( 1.0f );
   actor.SetY( 1.1f );
@@ -1325,13 +1329,13 @@ int UtcDaliActorSetPosition01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Vector3( 1.0f, 1.1f, 1.2f ), actor.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 1.0f, 1.1f, 1.2f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
   actor.TranslateBy( Vector3( 0.1f, 0.1f, 0.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Vector3( 1.1f, 1.2f, 1.3f ), actor.GetCurrentPosition(), Math::MACHINE_EPSILON_10000, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 1.1f, 1.2f, 1.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Math::MACHINE_EPSILON_10000, TEST_LOCATION );
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1349,7 +1353,7 @@ int UtcDaliActorSetPosition02(void)
 
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetPosition(vector.x, vector.y, vector.z);
 
@@ -1357,7 +1361,7 @@ int UtcDaliActorSetPosition02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1373,7 +1377,7 @@ int UtcDaliActorSetPosition03(void)
 
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetPosition(vector);
 
@@ -1381,7 +1385,7 @@ int UtcDaliActorSetPosition03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1393,7 +1397,7 @@ int UtcDaliActorSetX(void)
 
   Vector3 vector(100.0f, 0.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetX(100.0f);
 
@@ -1401,7 +1405,7 @@ int UtcDaliActorSetX(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1413,7 +1417,7 @@ int UtcDaliActorSetY(void)
 
   Vector3 vector(0.0f, 100.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetY(100.0f);
 
@@ -1421,7 +1425,7 @@ int UtcDaliActorSetY(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1433,7 +1437,7 @@ int UtcDaliActorSetZ(void)
 
   Vector3 vector(0.0f, 0.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetZ(100.0f);
 
@@ -1441,7 +1445,7 @@ int UtcDaliActorSetZ(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1452,7 +1456,7 @@ int UtcDaliActorSetPositionProperties(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetProperty( Actor::Property::POSITION_X, vector.x );
   DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
@@ -1462,7 +1466,7 @@ int UtcDaliActorSetPositionProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.x, actor.GetCurrentPosition().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.x, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::POSITION_X ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).x, TEST_LOCATION );
@@ -1476,7 +1480,7 @@ int UtcDaliActorSetPositionProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.y, actor.GetCurrentPosition().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::POSITION_Y ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).y, TEST_LOCATION );
@@ -1490,7 +1494,7 @@ int UtcDaliActorSetPositionProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.z, actor.GetCurrentPosition().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.z, actor.GetProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::POSITION_Z ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).z, TEST_LOCATION );
@@ -1506,7 +1510,7 @@ int UtcDaliActorTranslateBy(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.SetPosition(vector);
 
@@ -1514,7 +1518,7 @@ int UtcDaliActorTranslateBy(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   actor.TranslateBy(vector);
 
@@ -1522,7 +1526,7 @@ int UtcDaliActorTranslateBy(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector*2.0f == actor.GetCurrentPosition());
+  DALI_TEST_CHECK(vector*2.0f == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
   END_TEST;
 }
 
@@ -1538,7 +1542,7 @@ int UtcDaliActorGetCurrentPosition(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(actor.GetCurrentPosition() == setVector);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) == setVector);
   END_TEST;
 }
 
@@ -1549,30 +1553,30 @@ int UtcDaliActorGetCurrentWorldPosition(void)
   Actor parent = Actor::New();
   Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetParentOrigin( ParentOrigin::CENTER );
-  parent.SetAnchorPoint( AnchorPoint::CENTER );
+  parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetParentOrigin( ParentOrigin::CENTER );
-  child.SetAnchorPoint( AnchorPoint::CENTER );
+  child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Vector3 childPosition( 6.0f, 6.0f, 6.0f );
   child.SetPosition( childPosition );
   parent.Add( child );
 
   // The actors should not have a world position yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3::ZERO, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), childPosition, TEST_LOCATION );
 
   // The actors should have a world position now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition + childPosition, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1584,53 +1588,53 @@ int UtcDaliActorSetInheritPosition(void)
   Actor parent = Actor::New();
   Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetParentOrigin( ParentOrigin::CENTER );
-  parent.SetAnchorPoint( AnchorPoint::CENTER );
+  parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetParentOrigin( ParentOrigin::CENTER );
-  child.SetAnchorPoint( AnchorPoint::CENTER );
+  child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Vector3 childPosition( 10.0f, 11.0f, 12.0f );
   child.SetPosition( childPosition );
   parent.Add( child );
 
   // The actors should not have a world position yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3::ZERO, TEST_LOCATION );
 
   // first test default, which is to inherit position
-  DALI_TEST_EQUALS( child.IsPositionInherited(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_POSITION ), true, TEST_LOCATION );
   application.SendNotification();
   application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), childPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition + childPosition, TEST_LOCATION );
 
   //Change child position
   Vector3 childOffset( -1.0f, 1.0f, 0.0f );
   child.SetPosition( childOffset );
 
   // Use local position as world postion
-  child.SetInheritPosition( false );
-  DALI_TEST_EQUALS( child.IsPositionInherited(), false, TEST_LOCATION );
+  child.SetProperty( Actor::Property::INHERIT_POSITION, false );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_POSITION ), false, TEST_LOCATION );
   application.SendNotification();
   application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childOffset, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), childOffset, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), childOffset, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), childOffset, TEST_LOCATION );
 
   //Change back to inherit position from parent
-  child.SetInheritPosition( true );
-  DALI_TEST_EQUALS( child.IsPositionInherited(), true, TEST_LOCATION );
+  child.SetProperty( Actor::Property::INHERIT_POSITION, true );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_POSITION ), true, TEST_LOCATION );
   application.SendNotification();
   application.Render(0); // should only really call Update as Render is not required to update scene
-  DALI_TEST_EQUALS( parent.GetCurrentPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), childOffset, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldPosition(), parentPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldPosition(), parentPosition + childOffset, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), childOffset, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), parentPosition + childOffset, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1651,7 +1655,7 @@ int UtcDaliActorInheritOpacity(void)
   application.SendNotification();
   application.Render();
 
-  parent.SetOpacity( 0.1f );
+  parent.SetProperty( DevelActor::Property::OPACITY, 0.1f );
 
   DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
@@ -1683,7 +1687,7 @@ int UtcDaliActorSetOrientation01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1701,24 +1705,24 @@ int UtcDaliActorSetOrientation02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
   actor.RotateBy( Degree( 360 ), axis);
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   actor.SetOrientation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   Quaternion result( Radian( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( result, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS( result, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   actor.SetOrientation( angle, axis);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1739,7 +1743,7 @@ int UtcDaliActorSetOrientationProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(rotation, actor.GetProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
@@ -1757,7 +1761,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion( angle, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion( angle, Vector3::ZAXIS), actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
 
@@ -1765,7 +1769,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1784,13 +1788,13 @@ int UtcDaliActorRotateBy02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
   actor.RotateBy(rotation);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1804,7 +1808,7 @@ int UtcDaliActorGetCurrentOrientation(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1824,28 +1828,28 @@ int UtcDaliActorGetCurrentWorldOrientation(void)
   parent.Add( child );
 
   // The actors should not have a world rotation yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), rotation, 0.001, TEST_LOCATION );
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
 
   // turn off child rotation inheritance
-  child.SetInheritOrientation( false );
-  DALI_TEST_EQUALS( child.IsOrientationInherited(), false, TEST_LOCATION );
+  child.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_ORIENTATION ), false, TEST_LOCATION );
   application.SendNotification();
   application.Render(0);
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), rotation, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1856,11 +1860,11 @@ int UtcDaliActorSetScale01(void)
 
   Actor actor = Actor::New();
 
-  // Set to random value first - GetCurrentScale() asserts if called before SetScale()
+  // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
   actor.SetScale(0.25f);
 
   Vector3 scale(10.0f, 10.0f, 10.0f);
-  DALI_TEST_CHECK(actor.GetCurrentScale() != scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
   actor.SetScale(scale.x);
 
@@ -1868,7 +1872,7 @@ int UtcDaliActorSetScale01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(actor.GetCurrentScale() == scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) == scale);
   END_TEST;
 }
 
@@ -1880,16 +1884,16 @@ int UtcDaliActorSetScale02(void)
 
   Actor actor = Actor::New();
 
-  // Set to random value first - GetCurrentScale() asserts if called before SetScale()
+  // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
   actor.SetScale(Vector3(12.0f, 1.0f, 2.0f));
 
-  DALI_TEST_CHECK(actor.GetCurrentScale() != scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
   actor.SetScale(scale.x, scale.y, scale.z);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.GetCurrentScale() == scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) == scale);
 
   // add to stage and test
   Stage::GetCurrent().Add( actor );
@@ -1897,7 +1901,7 @@ int UtcDaliActorSetScale02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Vector3( 2.0f, 2.0f, 2.0f ), actor.GetCurrentScale(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector3( 2.0f, 2.0f, 2.0f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
 
@@ -1912,10 +1916,10 @@ int UtcDaliActorSetScale03(void)
 
   Actor actor = Actor::New();
 
-  // Set to random value first - GetCurrentScale() asserts if called before SetScale()
+  // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
   actor.SetScale(Vector3(12.0f, 1.0f, 2.0f));
 
-  DALI_TEST_CHECK(actor.GetCurrentScale() != scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
   actor.SetScale(scale);
 
@@ -1923,7 +1927,7 @@ int UtcDaliActorSetScale03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(actor.GetCurrentScale() == scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) == scale);
   END_TEST;
 }
 
@@ -1934,7 +1938,7 @@ int UtcDaliActorSetScaleIndividual(void)
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentScale());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ));
 
   actor.SetProperty( Actor::Property::SCALE_X, vector.x );
   DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
@@ -1943,7 +1947,7 @@ int UtcDaliActorSetScaleIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.x, actor.GetCurrentScale().x, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ).x, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.x, actor.GetProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.x, actor.GetCurrentProperty< float >( Actor::Property::SCALE_X ), TEST_LOCATION );
 
@@ -1954,7 +1958,7 @@ int UtcDaliActorSetScaleIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.y, actor.GetCurrentScale().y, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ).y, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, actor.GetProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, actor.GetCurrentProperty< float >( Actor::Property::SCALE_Y ), TEST_LOCATION );
 
@@ -1965,7 +1969,7 @@ int UtcDaliActorSetScaleIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.z, actor.GetCurrentScale().z, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ).z, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.z, actor.GetProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.z, actor.GetCurrentProperty< float >( Actor::Property::SCALE_Z ), TEST_LOCATION );
 
@@ -1981,7 +1985,7 @@ int UtcDaliActorScaleBy(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetCurrentScale());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ));
 
   actor.SetScale(vector);
 
@@ -1989,7 +1993,7 @@ int UtcDaliActorScaleBy(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentScale());
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ));
 
   actor.ScaleBy(vector);
 
@@ -1997,7 +2001,7 @@ int UtcDaliActorScaleBy(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector*100.0f == actor.GetCurrentScale());
+  DALI_TEST_CHECK(vector*100.0f == actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ));
   END_TEST;
 }
 
@@ -2014,7 +2018,7 @@ int UtcDaliActorGetCurrentScale(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(actor.GetCurrentScale() == scale);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) == scale);
   END_TEST;
 }
 
@@ -2033,22 +2037,22 @@ int UtcDaliActorGetCurrentWorldScale(void)
   parent.Add( child );
 
   // The actors should not have a scale yet
-  DALI_TEST_EQUALS( parent.GetCurrentScale(), Vector3::ONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentScale(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
 
   // The actors should not have a world scale yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldScale(), Vector3::ONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldScale(), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), Vector3::ONE, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), Vector3::ONE, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentScale(), parentScale, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentScale(), childScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), parentScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), childScale, TEST_LOCATION );
 
   // The actors should have a world scale now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldScale(), parentScale, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldScale(), parentScale * childScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), parentScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), parentScale * childScale, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2070,16 +2074,16 @@ int UtcDaliActorInheritScale(void)
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( child.IsScaleInherited(), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldScale(), parentScale * childScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_SCALE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), parentScale * childScale, TEST_LOCATION );
 
-  child.SetInheritScale( false );
-  DALI_TEST_EQUALS( child.IsScaleInherited(), false, TEST_LOCATION );
+  child.SetProperty( Actor::Property::INHERIT_SCALE, false );
+  DALI_TEST_EQUALS( child.GetProperty< bool >( Actor::Property::INHERIT_SCALE ), false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( child.GetCurrentWorldScale(), childScale, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE ), childScale, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2088,25 +2092,25 @@ int UtcDaliActorSetVisible(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetVisible(false);
+  actor.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.IsVisible() == false);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == false);
 
-  actor.SetVisible(true);
+  actor.SetProperty( Actor::Property::VISIBLE,true);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.IsVisible() == true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
   // put actor on stage
   Stage::GetCurrent().Add( actor );
-  actor.SetVisible(false);
+  actor.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.IsVisible() == false);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == false);
   END_TEST;
 }
 
@@ -2116,7 +2120,7 @@ int UtcDaliActorIsVisible(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.IsVisible() == true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
   END_TEST;
 }
 
@@ -2126,38 +2130,38 @@ int UtcDaliActorSetOpacity(void)
 
   Actor actor = Actor::New();
   // initial opacity is 1
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
-  actor.SetOpacity( 0.4f);
+  actor.SetProperty( DevelActor::Property::OPACITY, 0.4f);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.4f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.4f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetOpacity( actor.GetCurrentOpacity() + 0.1f );
+  actor.SetProperty( DevelActor::Property::OPACITY, actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) + 0.1f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, TEST_LOCATION );
 
   // put actor on stage
   Stage::GetCurrent().Add( actor );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetOpacity( 0.9f );
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.5f, TEST_LOCATION );
+  actor.SetProperty( DevelActor::Property::OPACITY, 0.9f );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, TEST_LOCATION );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.9f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.9f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetOpacity( actor.GetCurrentOpacity() - 0.9f );
+  actor.SetProperty( DevelActor::Property::OPACITY, actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) - 0.9f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2166,13 +2170,13 @@ int UtcDaliActorGetCurrentOpacity(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK(actor.GetCurrentOpacity() != 0.5f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) != 0.5f);
 
-  actor.SetOpacity(0.5f);
+  actor.SetProperty( DevelActor::Property::OPACITY,0.5f);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.GetCurrentOpacity() == 0.5f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) == 0.5f);
   END_TEST;
 }
 
@@ -2181,11 +2185,11 @@ int UtcDaliActorSetSensitive(void)
   TestApplication application;
   Actor actor = Actor::New();
 
-  bool sensitive = !actor.IsSensitive();
+  bool sensitive = !actor.GetProperty< bool >( Actor::Property::SENSITIVE );
 
-  actor.SetSensitive(sensitive);
+  actor.SetProperty( Actor::Property::SENSITIVE,sensitive);
 
-  DALI_TEST_CHECK(sensitive == actor.IsSensitive());
+  DALI_TEST_CHECK(sensitive == actor.GetProperty< bool >( Actor::Property::SENSITIVE ));
   END_TEST;
 }
 
@@ -2193,9 +2197,9 @@ int UtcDaliActorIsSensitive(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  actor.SetSensitive(false);
+  actor.SetProperty( Actor::Property::SENSITIVE,false);
 
-  DALI_TEST_CHECK(false == actor.IsSensitive());
+  DALI_TEST_CHECK(false == actor.GetProperty< bool >( Actor::Property::SENSITIVE ));
   END_TEST;
 }
 
@@ -2205,35 +2209,35 @@ int UtcDaliActorSetColor(void)
   Actor actor = Actor::New();
   Vector4 color(1.0f, 1.0f, 1.0f, 0.5f);
 
-  DALI_TEST_CHECK(color != actor.GetCurrentColor());
+  DALI_TEST_CHECK(color != actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ));
 
-  actor.SetColor(color);
+  actor.SetProperty( Actor::Property::COLOR,color);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(color == actor.GetCurrentColor());
+  DALI_TEST_CHECK(color == actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ));
 
-  actor.SetColor( actor.GetCurrentColor() + Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
+  actor.SetProperty( Actor::Property::COLOR, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ) + Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Vector4( 0.6f, 0.5f, 0.4f, 0.1f ), actor.GetCurrentColor(),  TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4( 0.6f, 0.5f, 0.4f, 0.1f ), actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ),  TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
-  actor.SetColor( color );
+  actor.SetProperty( Actor::Property::COLOR, color );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( color, actor.GetCurrentColor(),  TEST_LOCATION );
+  DALI_TEST_EQUALS( color, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ),  TEST_LOCATION );
 
-  actor.SetColor( actor.GetCurrentColor() + Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
+  actor.SetProperty( Actor::Property::COLOR, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ) + Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   // Actor color is not clamped
-  DALI_TEST_EQUALS( Vector4( 2.1f, 2.1f, 2.1f, 1.6f ), actor.GetCurrentColor(),  TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4( 2.1f, 2.1f, 2.1f, 1.6f ), actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ),  TEST_LOCATION );
   // world color is clamped
-  DALI_TEST_EQUALS( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ), actor.GetCurrentWorldColor(),  TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ), actor.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ),  TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR, color );
   DALI_TEST_EQUALS( color, actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
@@ -2253,7 +2257,7 @@ int UtcDaliActorSetColorIndividual(void)
   Actor actor = Actor::New();
 
   Vector4 vector(0.7f, 0.8f, 0.9f, 0.6f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentColor());
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ));
 
   actor.SetProperty( Actor::Property::COLOR_RED, vector.r );
   DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
@@ -2262,7 +2266,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.r, actor.GetCurrentColor().r, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.r, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).r, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.r, actor.GetProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.r, actor.GetCurrentProperty< float >( Actor::Property::COLOR_RED ), TEST_LOCATION );
 
@@ -2273,7 +2277,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.g, actor.GetCurrentColor().g, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.g, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).g, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.g, actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.g, actor.GetCurrentProperty< float >( Actor::Property::COLOR_GREEN ), TEST_LOCATION );
 
@@ -2284,7 +2288,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.b, actor.GetCurrentColor().b, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.b, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).b, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.b, actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.b, actor.GetCurrentProperty< float >( Actor::Property::COLOR_BLUE ), TEST_LOCATION );
 
@@ -2296,7 +2300,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( vector.a, actor.GetCurrentColor().a, TEST_LOCATION );
+  DALI_TEST_EQUALS( vector.a, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.a, actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector.a, actor.GetCurrentProperty< float >( Actor::Property::COLOR_ALPHA ), TEST_LOCATION );
 
@@ -2310,7 +2314,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( 0.2f, actor.GetCurrentColor().a, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.2f, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2322,11 +2326,11 @@ int UtcDaliActorGetCurrentColor(void)
   Actor actor = Actor::New();
   Vector4 color(1.0f, 1.0f, 1.0f, 0.5f);
 
-  actor.SetColor(color);
+  actor.SetProperty( Actor::Property::COLOR,color);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(color == actor.GetCurrentColor());
+  DALI_TEST_CHECK(color == actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ));
   END_TEST;
 }
 
@@ -2337,46 +2341,46 @@ int UtcDaliActorGetCurrentWorldColor(void)
 
   Actor parent = Actor::New();
   Vector4 parentColor( 1.0f, 0.5f, 0.0f, 0.8f );
-  parent.SetColor( parentColor );
+  parent.SetProperty( Actor::Property::COLOR, parentColor );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
   Vector4 childColor( 0.5f, 0.6f, 0.5f, 1.0f );
-  child.SetColor( childColor );
+  child.SetProperty( Actor::Property::COLOR, childColor );
   parent.Add( child );
 
-  DALI_TEST_EQUALS( parent.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
 
   // verify the default color mode
   DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, child.GetColorMode(), TEST_LOCATION );
 
   // The actors should not have a world color yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldColor(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), Color::WHITE, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentColor(), parentColor, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentColor(), childColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), parentColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), childColor, TEST_LOCATION );
 
   // The actors should have a world color now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldColor(), parentColor, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldColor(), Vector4( childColor.r, childColor.g, childColor.b, childColor.a * parentColor.a), TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), parentColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), Vector4( childColor.r, childColor.g, childColor.b, childColor.a * parentColor.a), TEST_LOCATION );
 
   // use own color
   child.SetColorMode( USE_OWN_COLOR );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( child.GetCurrentWorldColor(), childColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), childColor, TEST_LOCATION );
 
   // use parent color
   child.SetColorMode( USE_PARENT_COLOR );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( child.GetCurrentColor(), childColor, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldColor(), parentColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), childColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), parentColor, TEST_LOCATION );
 
   // use parent alpha
   child.SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );
@@ -2384,8 +2388,8 @@ int UtcDaliActorGetCurrentWorldColor(void)
   application.Render(0);
   Vector4 expectedColor( childColor );
   expectedColor.a *= parentColor.a;
-  DALI_TEST_EQUALS( child.GetCurrentColor(), childColor, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldColor(), expectedColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), childColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), expectedColor, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2415,7 +2419,7 @@ int UtcDaliActorScreenToLocal(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.SetSize(100.0f, 100.0f);
   actor.SetPosition(10.0f, 10.0f);
   Stage::GetCurrent().Add(actor);
@@ -2443,11 +2447,11 @@ int UtcDaliActorSetLeaveRequired(void)
 
   Actor actor = Actor::New();
 
-  actor.SetLeaveRequired(false);
-  DALI_TEST_CHECK(actor.GetLeaveRequired() == false);
+  actor.SetProperty( Actor::Property::LEAVE_REQUIRED,false);
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::LEAVE_REQUIRED ) == false);
 
-  actor.SetLeaveRequired(true);
-  DALI_TEST_CHECK(actor.GetLeaveRequired() == true);
+  actor.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::LEAVE_REQUIRED ) == true);
   END_TEST;
 }
 
@@ -2457,7 +2461,7 @@ int UtcDaliActorGetLeaveRequired(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetLeaveRequired() == false);
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::LEAVE_REQUIRED ) == false);
   END_TEST;
 }
 
@@ -2547,7 +2551,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
+  actor.SetProperty( Actor::Property::COLOR, Color::WHITE );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2560,7 +2564,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   constraint1.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
+  actor.SetProperty( Actor::Property::COLOR, Color::WHITE );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2573,7 +2577,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint2Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
+  actor.SetProperty( Actor::Property::COLOR, Color::WHITE );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2586,7 +2590,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
+  actor.SetProperty( Actor::Property::COLOR, Color::WHITE );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2667,7 +2671,7 @@ int UtcDaliActorOnOffStageSignal(void)
   gActorNamesOnOffStage.clear();
 
   Actor parent = Actor::New();
-  parent.SetName( "parent" );
+  parent.SetProperty( Actor::Property::NAME, "parent" );
   parent.OnStageSignal().Connect( OnStageCallback );
   parent.OffStageSignal().Connect( OffStageCallback );
   // sanity check
@@ -2687,7 +2691,7 @@ int UtcDaliActorOnOffStageSignal(void)
   gActorNamesOnOffStage.clear();
 
   Actor child = Actor::New();
-  child.SetName( "child" );
+  child.SetProperty( Actor::Property::NAME, "child" );
   child.OnStageSignal().Connect( OnStageCallback );
   child.OffStageSignal().Connect( OffStageCallback );
   parent.Add( child ); // add child
@@ -2750,11 +2754,11 @@ int UtcDaliActorFindChildByName(void)
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetName( "parent" );
+  parent.SetProperty( Actor::Property::NAME, "parent" );
   Actor first  = Actor::New();
-  first .SetName( "first" );
+  first .SetProperty( Actor::Property::NAME, "first" );
   Actor second = Actor::New();
-  second.SetName( "second" );
+  second.SetProperty( Actor::Property::NAME, "second" );
 
   parent.Add(first);
   first.Add(second);
@@ -2831,8 +2835,8 @@ int UtcDaliActorHitTest(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Stage::GetCurrent().Add( actor );
 
@@ -2984,8 +2988,8 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   tet_infoline(" UtcDaliActorGetCurrentWorldMatrix");
 
   Actor parent = Actor::New();
-  parent.SetParentOrigin(ParentOrigin::CENTER);
-  parent.SetAnchorPoint(AnchorPoint::CENTER);
+  parent.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   Vector3 parentPosition( 10.0f, 20.0f, 30.0f);
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -2996,7 +3000,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetParentOrigin(ParentOrigin::CENTER);
+  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Vector3 childPosition( 0.0f, 0.0f, 100.0f );
   Radian childRotationAngle(Degree(23.0f));
   Quaternion childRotation( childRotationAngle, Vector3::YAXIS );
@@ -3021,8 +3025,8 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Matrix childWorldMatrix(false);
   Matrix::Multiply( childWorldMatrix, childMatrix, parentMatrix);
 
-  DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), parentMatrix, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldMatrix(), childWorldMatrix, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Matrix >( Actor::Property::WORLD_MATRIX ), parentMatrix, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Matrix >( Actor::Property::WORLD_MATRIX ), childWorldMatrix, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -3034,8 +3038,8 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   tet_infoline(" UtcDaliActorConstrainedToWorldMatrix");
 
   Actor parent = Actor::New();
-  parent.SetParentOrigin(ParentOrigin::CENTER);
-  parent.SetAnchorPoint(AnchorPoint::CENTER);
+  parent.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   Vector3 parentPosition( 10.0f, 20.0f, 30.0f);
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -3046,7 +3050,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetParentOrigin(ParentOrigin::CENTER);
+  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Constraint posConstraint = Constraint::New<Vector3>( child, Actor::Property::POSITION, PositionComponentConstraint() );
   posConstraint.AddSource( Source( parent, Actor::Property::WORLD_MATRIX ) );
   posConstraint.Apply();
@@ -3061,8 +3065,8 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Matrix parentMatrix(false);
   parentMatrix.SetTransformComponents(parentScale, parentRotation, parentPosition);
 
-  DALI_TEST_EQUALS( parent.GetCurrentWorldMatrix(), parentMatrix, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentPosition(), parent.GetCurrentPosition(), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentProperty< Matrix >( Actor::Property::WORLD_MATRIX ), parentMatrix, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -3072,8 +3076,8 @@ int UtcDaliActorConstrainedToOrientation(void)
   tet_infoline(" UtcDaliActorConstrainedToOrientation");
 
   Actor parent = Actor::New();
-  parent.SetParentOrigin(ParentOrigin::CENTER);
-  parent.SetAnchorPoint(AnchorPoint::CENTER);
+  parent.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   Vector3 parentPosition( 10.0f, 20.0f, 30.0f);
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -3084,7 +3088,7 @@ int UtcDaliActorConstrainedToOrientation(void)
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetParentOrigin(ParentOrigin::CENTER);
+  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Constraint posConstraint = Constraint::New<Quaternion>( child, Actor::Property::ORIENTATION, OrientationComponentConstraint() );
   posConstraint.AddSource( Source( parent, Actor::Property::ORIENTATION ) );
   posConstraint.Apply();
@@ -3096,7 +3100,7 @@ int UtcDaliActorConstrainedToOrientation(void)
   app.Render();
   app.SendNotification();
 
-  DALI_TEST_EQUALS( child.GetCurrentOrientation(), parent.GetCurrentOrientation(), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), parent.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -3106,7 +3110,7 @@ int UtcDaliActorConstrainedToOpacity(void)
   tet_infoline(" UtcDaliActorConstrainedToOpacity");
 
   Actor parent = Actor::New();
-  parent.SetOpacity( 0.7f );
+  parent.SetProperty( DevelActor::Property::OPACITY, 0.7f );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
@@ -3121,16 +3125,16 @@ int UtcDaliActorConstrainedToOpacity(void)
   app.Render();
   app.SendNotification();
 
-  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), parent.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
-  parent.SetOpacity( 0.3f );
+  parent.SetProperty( DevelActor::Property::OPACITY, 0.3f );
 
   app.SendNotification();
   app.Render(0);
   app.Render();
   app.SendNotification();
 
-  DALI_TEST_EQUALS( child.GetCurrentOpacity(), parent.GetCurrentOpacity(), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), parent.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3545,15 +3549,15 @@ int UtcDaliActorSetMinimumSize(void)
 
   Actor actor = Actor::New();
 
-  Vector2 size = actor.GetMinimumSize();
+  Vector2 size = actor.GetProperty< Vector2 >( Actor::Property::MINIMUM_SIZE );
 
   DALI_TEST_EQUALS( size.width, 0.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 0.0f, TEST_LOCATION );
 
   Vector2 size2( 1.0f, 2.0f );
-  actor.SetMinimumSize( size2 );
+  actor.SetProperty( Actor::Property::MINIMUM_SIZE, size2 );
 
-  size = actor.GetMinimumSize();
+  size = actor.GetProperty< Vector2 >( Actor::Property::MINIMUM_SIZE );
 
   DALI_TEST_EQUALS( size.width, size2.width, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, size2.height, TEST_LOCATION );
@@ -3567,15 +3571,15 @@ int UtcDaliActorSetMaximumSize(void)
 
   Actor actor = Actor::New();
 
-  Vector2 size = actor.GetMaximumSize();
+  Vector2 size = actor.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE );
 
   DALI_TEST_EQUALS( size.width, FLT_MAX, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, FLT_MAX, TEST_LOCATION );
 
   Vector2 size2( 1.0f, 2.0f );
-  actor.SetMaximumSize( size2 );
+  actor.SetProperty( Actor::Property::MAXIMUM_SIZE, size2 );
 
-  size = actor.GetMaximumSize();
+  size = actor.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE );
 
   DALI_TEST_EQUALS( size.width, size2.width, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, size2.height, TEST_LOCATION );
@@ -3594,7 +3598,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   gActorNamesRelayout.clear();
 
   Actor actor = Actor::New();
-  actor.SetName( "actor" );
+  actor.SetProperty( Actor::Property::NAME, "actor" );
   actor.OnRelayoutSignal().Connect( OnRelayoutCallback );
 
   // Sanity check
@@ -3698,35 +3702,35 @@ int UtcDaliActorAnchorPointPropertyAsString(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::TOP_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::TOP_CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "TOP_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "CENTER_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "BOTTOM_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
 
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::ANCHOR_POINT, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3738,35 +3742,35 @@ int UtcDaliActorParentOriginPropertyAsString(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "TOP_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::CENTER_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "CENTER_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::CENTER_RIGHT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_LEFT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_CENTER" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "BOTTOM_RIGHT" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
 
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetCurrentParentOrigin(), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -4036,8 +4040,8 @@ Actor CreateActorWithContent( uint32_t width, uint32_t height)
   // Setup dimensions and position so actor is not skipped by culling.
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   actor.SetSize( width, height );
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   return actor;
 }
@@ -4347,12 +4351,12 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
 
     if( i == 0 )
     {
-      actor.SetParentOrigin( ParentOrigin::CENTER );
+      actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     }
     else
     {
       float b = i > 2 ? 1.0f : -1.0f;
-      actor.SetParentOrigin( Vector3( 0.5 + ( 0.2f * b ), 0.8f, 0.8f ) );
+      actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5 + ( 0.2f * b ), 0.8f, 0.8f ) );
     }
 
     actors[i] = actor;
@@ -4426,8 +4430,8 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   Actor clippingActorA = CreateActorWithContent16x16();
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
-  clippingActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
-  clippingActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+  clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
+  clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
   Stage::GetCurrent().Add( clippingActorA );
 
@@ -4445,8 +4449,8 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   compareParametersString << "0, 0, " << imageSize.x << ", " << imageSize.y;
   DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", compareParametersString.str() ) );                  // Compare with 0, 0, 16, 16
 
-  clippingActorA.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-  clippingActorA.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+  clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
+  clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, scissorTrace );
@@ -4479,12 +4483,12 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   Actor clippingActorA = CreateActorWithContent( sizeA.width, sizeA.height );
   Actor clippingActorB = CreateActorWithContent( sizeB.width, sizeB.height );
 
-  clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorB.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
   clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
@@ -4548,15 +4552,15 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   Actor clippingActorA = CreateActorWithContent16x16();
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
-  clippingActorA.SetParentOrigin( ParentOrigin::CENTER );
-  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
   Stage::GetCurrent().Add( clippingActorA );
 
   // Create a child clipping actor.
   Actor clippingActorB = CreateActorWithContent16x16();
-  clippingActorB.SetParentOrigin( ParentOrigin::CENTER );
-  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER );
+  clippingActorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  clippingActorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
   clippingActorA.Add( clippingActorB );
 
@@ -4625,24 +4629,24 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   Actor clippingActorD = CreateActorWithContent( sizeD.width, sizeD.height );
   Actor clippingActorE = CreateActorWithContent( sizeE.width, sizeE.height );
 
-  clippingActorA.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorA.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorB.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorB.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorC.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorC.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorC.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorD.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorD.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorD.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorD.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorD.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorE.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  clippingActorE.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  clippingActorE.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  clippingActorE.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
   clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
   clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
@@ -4746,20 +4750,22 @@ int UtcDaliActorRaiseLower(void)
 
   TestApplication application;
 
+  Debug::Filter::SetGlobalLogLevel( Debug::Verbose );
+
   Stage stage( Stage::GetCurrent() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -4866,6 +4872,8 @@ int UtcDaliActorRaiseLower(void)
 
   ResetTouchCallbacks();
 
+  Debug::Filter::SetGlobalLogLevel( Debug::NoLogging );
+
   END_TEST;
 }
 
@@ -4904,14 +4912,14 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5116,14 +5124,14 @@ int UtcDaliActorRaiseAbove(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5248,14 +5256,14 @@ int UtcDaliActorLowerBelow(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5267,7 +5275,7 @@ int UtcDaliActorLowerBelow(void)
   actorC.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
 
   Actor container = Actor::New();
-  container.SetParentOrigin( ParentOrigin::CENTER );
+  container.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   container.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   stage.Add( container );
 
@@ -5454,11 +5462,11 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
   parentB.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   parentB.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
 
-  parentA.SetAnchorPoint( AnchorPoint::CENTER );
-  parentA.SetParentOrigin( ParentOrigin::CENTER );
+  parentA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  parentA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  parentB.SetAnchorPoint( AnchorPoint::CENTER );
-  parentB.SetParentOrigin( ParentOrigin::CENTER );
+  parentB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  parentB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   stage.Add( parentA );
   stage.Add( parentB );
@@ -5473,14 +5481,14 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
   tet_printf( "Actor C added to different parent from A and B \n" );
   parentB.Add( actorC );
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5559,14 +5567,14 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5727,14 +5735,14 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5888,14 +5896,14 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorB.SetAnchorPoint( AnchorPoint::CENTER );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   actorA.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT" );
   actorA.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT" );
@@ -5991,7 +5999,7 @@ int UtcDaliActorGetScreenPosition(void)
   Stage stage( Stage::GetCurrent() );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   Vector2 size2( 10.0f, 20.0f );
   actorA.SetSize( size2 );
@@ -6016,7 +6024,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   tet_infoline( "UtcDaliActorGetScreenPosition Top Left Anchor Point and 0,0 position \n" );
 
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   application.SendNotification();
   application.Render();
@@ -6032,7 +6040,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 0,0 position \n" );
 
-  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
 
   application.SendNotification();
   application.Render();
@@ -6080,11 +6088,11 @@ int UtcDaliActorGetScreenPosition(void)
 
   tet_infoline( "UtcDaliActorGetScreenPosition Scale parent and check child's screen position \n" );
 
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetPosition( 30.0, 30.0 );
 
   Actor actorB = Actor::New();
-  actorB.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorB.SetSize( size2 );
   actorB.SetPosition( 10.f, 10.f );
   actorA.Add( actorB );
@@ -6111,7 +6119,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   Stage stage( Stage::GetCurrent() );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   Vector2 size2( 10.0f, 20.0f );
   actorA.SetSize( size2 );
@@ -6136,7 +6144,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
 
   tet_infoline( "UtcDaliActorGetScreenPositionAfterScaling BOTTOM_RIGHT Anchor Point, scale 1.5f and 0,0 position \n" );
 
-  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
 
   application.SendNotification();
   application.Render();
@@ -6162,8 +6170,8 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   Stage stage( Stage::GetCurrent() );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 10.0f, 20.0f );
   actorA.SetSize( size2 );
   actorA.SetPosition( 0.f, 0.f );
@@ -6186,8 +6194,8 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
 
   tet_infoline( " BOTTOM_RIGHT Anchor Point, ParentOrigin::TOP_RIGHT and 0,0 position \n" );
 
-  actorA.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-  actorA.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
 
   application.SendNotification();
   application.Render();
@@ -6216,8 +6224,8 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size1( 10.0f, 20.0f );
   actorA.SetSize( size1 );
   actorA.SetPosition( 0.f, 0.f );
@@ -6225,8 +6233,8 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
   Actor parentActorA = Actor::New();
-  parentActorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  parentActorA.SetParentOrigin( ParentOrigin::CENTER );
+  parentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  parentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 30.0f, 60.0f );
   parentActorA.SetSize( size2 );
   parentActorA.SetPosition( 0.f, 0.f );
@@ -6252,8 +6260,8 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
 
   tet_infoline( "change parent anchor point and parent origin then check screen position \n" );
 
-  parentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
-  parentActorA.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  parentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
+  parentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
 
   application.SendNotification();
   application.Render();
@@ -6281,8 +6289,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size1( 10.0f, 20.0f );
   actorA.SetSize( size1 );
   actorA.SetPosition( 0.f, 0.f );
@@ -6290,8 +6298,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
   Actor parentActorA = Actor::New();
-  parentActorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  parentActorA.SetParentOrigin( ParentOrigin::CENTER );
+  parentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  parentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 30.0f, 60.0f );
   parentActorA.SetSize( size2 );
   parentActorA.SetPosition( 0.f, 0.f );
@@ -6299,8 +6307,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   tet_infoline( "Create Grand Parent Actor 1 BOTTOM_LEFT Anchor Point, ParentOrigin::BOTTOM_LEFT and 0,0 position \n" );
 
   Actor grandParentActorA = Actor::New();
-  grandParentActorA.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
-  grandParentActorA.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  grandParentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
+  grandParentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
   Vector2 size3( 60.0f, 120.0f );
   grandParentActorA.SetSize( size3 );
   grandParentActorA.SetPosition( 0.f, 0.f );
@@ -6340,8 +6348,8 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   tet_infoline( "Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
 
   Actor actorA = Actor::New();
-  actorA.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  actorA.SetParentOrigin( ParentOrigin::CENTER );
+  actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorA.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   actorA.SetSize( 10.0f, 20.0f );
   stage.Add( actorA );
@@ -6349,8 +6357,8 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   tet_infoline( "Create an Actor with AnchorPoint::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
 
   Actor actorB = Actor::New();
-  actorB.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
-  actorB.SetParentOrigin( ParentOrigin::CENTER );
+  actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
+  actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorB.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorBSize( 30.0f, 60.0f );
   actorB.SetSize( actorBSize );
@@ -6359,8 +6367,8 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   tet_infoline( "Create an actor with AnchorPoint::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
 
   Actor actorC = Actor::New();
-  actorC.SetAnchorPoint( AnchorPoint::CENTER );
-  actorC.SetParentOrigin( ParentOrigin::CENTER );
+  actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorC.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorCSize( 60.0f, 120.0f );
   actorC.SetSize( actorCSize );
@@ -6399,8 +6407,8 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   tet_infoline( "Check default behaviour\n" );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
   Stage::GetCurrent().Add( actor );
 
@@ -6408,7 +6416,7 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   application.Render();
 
   tet_infoline( "Check that the world position is in the center\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Set the position uses anchor point property to false\n" );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
@@ -6417,7 +6425,7 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   application.Render();
 
   tet_infoline( "Check that the world position has changed appropriately\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -6428,8 +6436,8 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   tet_infoline( "Check that the scale is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetScale( 2.0f );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
@@ -6439,19 +6447,19 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   application.Render();
 
   tet_infoline( "Check the world position is the same as it would be without a scale\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 100.0f, 100.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 100.0f, 100.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -6462,8 +6470,8 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   tet_infoline( "Check that the rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
@@ -6473,19 +6481,19 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   application.Render();
 
   tet_infoline( "Check the world position is the same as it would be without a rotation\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( -50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( -50.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 150.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 150.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -6496,8 +6504,8 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   tet_infoline( "Check that the scale and rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n" );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
   actor.SetScale( 2.0f );
@@ -6508,19 +6516,19 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   application.Render();
 
   tet_infoline( "Check the world position is the same as it would be without a scale and rotation\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 50.0f, 50.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( -100.0f, 100.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( -100.0f, 100.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly" );
-  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), Vector3( 200.0f, 0.0f, 0.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -6536,11 +6544,11 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   Vector2 stageSize( Stage::GetCurrent().GetSize() );
 
   Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetInheritScale( false );
-  actor.SetInheritOrientation( false );
+  actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
+  actor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   parent.Add( actor );
 
@@ -6550,19 +6558,19 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   const Vector3 expectedWorldPosition( -stageSize.width * 0.5f + 50.0f, -stageSize.height * 0.5f + 50.0f, 0.0f );
 
   tet_infoline( "Check the world position is in the right place\n" );
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), expectedWorldPosition, TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to TOP_LEFT and ensure world position hasn't changed" );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), expectedWorldPosition, TEST_LOCATION );
 
   tet_infoline( "Change the Anchor Point to BOTTOM_RIGHT and ensure world position hasn't changed" );
-  actor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldPosition(), expectedWorldPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), expectedWorldPosition, TEST_LOCATION );
 
   END_TEST;
 }
@@ -6577,14 +6585,14 @@ int utcDaliActorVisibilityChangeSignalSelf(void)
   VisibilityChangedFunctorData data;
   DevelActor::VisibilityChangedSignal( actor ).Connect( &application, VisibilityChangedFunctor( data ) );
 
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
 
   data.Check( true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
 
   tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
   data.Reset();
 
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
   data.Check( false /* not called */, TEST_LOCATION );
 
   tet_infoline( "Change the visibility using properties, ensure called" );
@@ -6622,7 +6630,7 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
   DevelActor::VisibilityChangedSignal( child ).Connect( &application, VisibilityChangedFunctor( childData ) );
   DevelActor::VisibilityChangedSignal( grandChild ).Connect( &application, VisibilityChangedFunctor( grandChildData ) );
 
-  parent.SetVisible( false );
+  parent.SetProperty( Actor::Property::VISIBLE, false );
   parentData.Check( false /* not called */, TEST_LOCATION );
   childData.Check( true /* called */, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
   grandChildData.Check( true /* called */, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
@@ -6634,7 +6642,7 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
 
   DevelActor::VisibilityChangedSignal( parent ).Connect( &application, VisibilityChangedFunctor( parentData ) );
 
-  parent.SetVisible( true );
+  parent.SetProperty( Actor::Property::VISIBLE, true );
   parentData.Check( true /* called */, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION );
   childData.Check( true /* called */, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
   grandChildData.Check( true /* called */, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION );
@@ -6644,7 +6652,7 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
   childData.Reset();
   grandChildData.Reset();
 
-  parent.SetVisible( true );
+  parent.SetProperty( Actor::Property::VISIBLE, true );
   parentData.Check( false /* not called */, TEST_LOCATION );
   childData.Check( false /* not called */, TEST_LOCATION );
   grandChildData.Check( false /* not called */, TEST_LOCATION );
@@ -6701,12 +6709,12 @@ int utcDaliActorVisibilityChangeSignalByName(void)
   bool signalCalled=false;
   actor.ConnectSignal( &application, "visibilityChanged", VisibilityChangedVoidFunctor(signalCalled) );
   DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
   DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
 
   tet_infoline( "Ensure functor is not called if we attempt to change the visibility to what it already is at" );
   signalCalled = false;
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
   DALI_TEST_EQUALS( signalCalled, false, TEST_LOCATION );
 
   tet_infoline( "Change the visibility using properties, ensure called" );
@@ -7247,7 +7255,7 @@ int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
   auto& glAbstraction = application.GetGlAbstraction();
   const auto clearCountBefore = glAbstraction.GetClearCountCalled();
 
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
 
   application.SendNotification();
   application.Render();

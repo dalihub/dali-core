@@ -265,9 +265,9 @@ int UtcDaliLayerSetSortFunction(void)
   Actor actor = CreateRenderableActor( img );
   Actor actor2 = CreateRenderableActor( img );
   actor.SetSize(1,1);
-  actor.SetColor( Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
+  actor.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
   actor2.SetSize(1,1);
-  actor2.SetColor( Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
+  actor2.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
 
   // add to stage
   Stage::GetCurrent().Add( actor );
@@ -609,8 +609,8 @@ Actor CreateActor( bool withAlpha )
   }
 
   Actor actor = CreateRenderableActor( bufferImage );
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   return actor;
 }

@@ -159,70 +159,83 @@ int UtcDaliCustomActorOnStageConnectionOrder(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   Test::TestCustomActor actorC = Test::TestCustomActor::New();
-  actorC.SetName( "ActorC" );
+  actorC.SetProperty( Actor::Property::NAME, "ActorC" );
   actorA.Add( actorC );
 
   Test::TestCustomActor actorD = Test::TestCustomActor::New();
-  actorD.SetName( "ActorD" );
+  actorD.SetProperty( Actor::Property::NAME, "ActorD" );
   actorB.Add( actorD );
 
   Test::TestCustomActor actorE = Test::TestCustomActor::New();
-  actorE.SetName( "ActorE" );
+  actorE.SetProperty( Actor::Property::NAME, "ActorE" );
   actorB.Add( actorE );
 
   Test::TestCustomActor actorF = Test::TestCustomActor::New();
-  actorF.SetName( "ActorF" );
+  actorF.SetProperty( Actor::Property::NAME, "ActorF" );
   actorC.Add( actorF );
 
   // add the custom actor to stage
   Stage::GetCurrent().Add( actorA );
 
-  DALI_TEST_EQUALS( 3, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 3, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",        actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 4, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "OnChildAdd",        actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",        actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorB.GetMethodsCalled()[ 3 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 2, (int)(actorC.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",        actorC.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorC.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, (int)(actorC.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorC.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",        actorC.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorC.GetMethodsCalled()[ 2 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 1, (int)(actorD.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorD.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(actorD.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorD.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorD.GetMethodsCalled()[ 1 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 1, (int)(actorE.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorE.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(actorE.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorE.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorE.GetMethodsCalled()[ 1 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 1, (int)(actorF.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorF.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(actorF.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorF.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorF.GetMethodsCalled()[ 1 ], TEST_LOCATION );
 
   // Check sequence is correct in MasterCallStack
 
-  DALI_TEST_EQUALS( 3+3+2+1+1+1, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 4+4+3+2+2+2, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd", MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd", MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnChildAdd", MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnChildAdd", MasterCallStack[ 3 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorC: OnChildAdd", MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet", MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet", MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",    MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorC: OnPropertySet", MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",    MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorD: OnPropertySet", MasterCallStack[ 5 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 5 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection", MasterCallStack[ 6 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorD: OnStageConnection", MasterCallStack[ 7 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorE: OnStageConnection", MasterCallStack[ 8 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorC: OnStageConnection", MasterCallStack[ 9 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorF: OnStageConnection", MasterCallStack[ 10 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnChildAdd",    MasterCallStack[ 6 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorE: OnPropertySet", MasterCallStack[ 7 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnChildAdd",    MasterCallStack[ 8 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorF: OnPropertySet", MasterCallStack[ 9 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorC: OnChildAdd",    MasterCallStack[ 10 ], TEST_LOCATION );
+
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 11 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection", MasterCallStack[ 12 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorD: OnStageConnection", MasterCallStack[ 13 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorE: OnStageConnection", MasterCallStack[ 14 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorC: OnStageConnection", MasterCallStack[ 15 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorF: OnStageConnection", MasterCallStack[ 16 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -251,27 +264,27 @@ int UtcDaliCustomActorOnStageDisconnectionOrder(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   Test::TestCustomActor actorC = Test::TestCustomActor::New();
-  actorC.SetName( "ActorC" );
+  actorC.SetProperty( Actor::Property::NAME, "ActorC" );
   actorA.Add( actorC );
 
   Test::TestCustomActor actorD = Test::TestCustomActor::New();
-  actorD.SetName( "ActorD" );
+  actorD.SetProperty( Actor::Property::NAME, "ActorD" );
   actorB.Add( actorD );
 
   Test::TestCustomActor actorE = Test::TestCustomActor::New();
-  actorE.SetName( "ActorE" );
+  actorE.SetProperty( Actor::Property::NAME, "ActorE" );
   actorB.Add( actorE );
 
   Test::TestCustomActor actorF = Test::TestCustomActor::New();
-  actorF.SetName( "ActorF" );
+  actorF.SetProperty( Actor::Property::NAME, "ActorF" );
   actorC.Add( actorF );
 
   // Excercise the message passing to Update thread
@@ -342,26 +355,30 @@ int UtcDaliCustomActorAddDuringOnStageConnection(void)
    */
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant1( actorB );
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 2, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION ); // Called from within OnStageConnection()
+  DALI_TEST_EQUALS( 3, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION ); // Called from within OnStageConnection()
 
-  DALI_TEST_EQUALS( 2, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 3, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 5, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection", MasterCallStack[ 1 ], TEST_LOCATION ); // Occurs during Actor::Add from within from within OnStageConnection()
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 2 ], TEST_LOCATION ); // Occurs after Actor::Add from within from within OnStageConnection()
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",     MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",     MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection", MasterCallStack[ 3 ], TEST_LOCATION ); // Occurs during Actor::Add from within from within OnStageConnection()
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 4 ], TEST_LOCATION ); // Occurs after Actor::Add from within from within OnStageConnection()
 
   // Excercise the message passing to Update thread
 
@@ -392,40 +409,44 @@ int UtcDaliCustomActorRemoveDuringOnStageConnection(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant2();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   Test::TestCustomActor actorC = Test::TestCustomActor::New();
-  actorC.SetName( "ActorC" );
+  actorC.SetProperty( Actor::Property::NAME, "ActorC" );
   actorA.Add( actorC );
 
   stage.Add( actorA );
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 5, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 6, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildRemove",     actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION ); // Called from within OnStageConnection()
+  DALI_TEST_EQUALS( "OnChildAdd",        actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION );
   DALI_TEST_EQUALS( "OnChildRemove",     actorA.GetMethodsCalled()[ 4 ], TEST_LOCATION ); // Called from within OnStageConnection()
+  DALI_TEST_EQUALS( "OnChildRemove",     actorA.GetMethodsCalled()[ 5 ], TEST_LOCATION ); // Called from within OnStageConnection()
 
-  DALI_TEST_EQUALS( 5, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 8, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildRemove",     MasterCallStack[ 3 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildRemove",     MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",     MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",     MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorC: OnPropertySet",     MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",        MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection", MasterCallStack[ 5 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildRemove",     MasterCallStack[ 6 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildRemove",     MasterCallStack[ 7 ], TEST_LOCATION );
 
   /* Actors B & C should be removed before the point where they could receive an OnStageConnection callback
    * Therefore they shouldn't receive either OnStageConnection or OnStageDisconnection
    */
-  DALI_TEST_EQUALS( 0, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( 0, (int)(actorC.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, (int)(actorC.GetMethodsCalled().size()), TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -454,10 +475,10 @@ int UtcDaliCustomActorAddDuringOnStageDisconnection(void)
    */
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant3( actorB );
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   // Excercise the message passing to Update thread
@@ -507,11 +528,11 @@ int UtcDaliCustomActorRemoveDuringOnStageDisconnection(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant4();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   // Excercise the message passing to Update thread
@@ -565,30 +586,34 @@ int UtcDaliCustomActorRemoveParentDuringOnStageConnection(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant5();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   stage.Add( actorA );
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 3, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageDisconnection", actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageDisconnection", actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 1, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection", actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",     actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection", actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 4, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 6, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnStageDisconnection", MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",        MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",        MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageDisconnection", MasterCallStack[ 5 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -613,32 +638,36 @@ int UtcDaliCustomActorAddParentDuringOnStageDisconnection(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant6();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   stage.Remove( actorA );
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 2, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 2, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageDisconnection", actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageDisconnection", actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
   // Disconnect was interrupted, so we should only get one OnStageConnection() for actorB
 
-  DALI_TEST_EQUALS( 4, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 6, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageDisconnection", MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",        MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",        MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageDisconnection", MasterCallStack[ 5 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -686,7 +715,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   stage.Add( actorA );
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
   // Check hierarchy is as follows:
@@ -704,7 +733,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   DALI_TEST_CHECK( container );
   if ( container )
   {
-    DALI_TEST_EQUALS( "Container", container.GetName(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "Container", container.GetProperty< std::string >( Actor::Property::NAME ), TEST_LOCATION );
     DALI_TEST_EQUALS( 1, (int)(container.GetChildCount()), TEST_LOCATION );
     containerChild = container.GetChildAt(0);
   }
@@ -712,33 +741,37 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   DALI_TEST_CHECK( containerChild );
   if ( containerChild )
   {
-    DALI_TEST_EQUALS( "ActorB", containerChild.GetName(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "ActorB", containerChild.GetProperty< std::string >( Actor::Property::NAME ), TEST_LOCATION );
     DALI_TEST_EQUALS( 0, (int)(containerChild.GetChildCount()), TEST_LOCATION );
   }
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION ); // The mContainer added to actorA
-  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION ); // The actorB added to actorA
-  DALI_TEST_EQUALS( "OnChildRemove",        actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 5, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION ); // The mContainer added to actorA
+  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION ); // The actorB added to actorA
+  DALI_TEST_EQUALS( "OnChildRemove",        actorA.GetMethodsCalled()[ 4 ], TEST_LOCATION );
   // mContainer will then receive OnChildAdd
 
-  DALI_TEST_EQUALS( 3, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageDisconnection", actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 4, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageDisconnection", actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 3 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 7, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 9, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 3 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageDisconnection", MasterCallStack[ 4 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildRemove",        MasterCallStack[ 5 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 6 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",        MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",        MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 5 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageDisconnection", MasterCallStack[ 6 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildRemove",        MasterCallStack[ 7 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 8 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -767,15 +800,15 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
    */
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
-  actorB.SetName( "ActorB" );
+  actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   stage.Add( actorB );
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant8( actorB );
-  actorA.SetName( "ActorA" );
+  actorA.SetProperty( Actor::Property::NAME, "ActorA" );
   stage.Add( actorA );
 
   Actor childActor = Actor::New();
-  childActor.SetName( "Child" );
+  childActor.SetProperty( Actor::Property::NAME, "Child" );
   // Reparent from actorA to actorB
   actorA.Add( childActor );
   actorB.Add( childActor );
@@ -794,32 +827,36 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
   DALI_TEST_CHECK( child );
   if ( child )
   {
-    DALI_TEST_EQUALS( "Child", child.GetName(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "Child", child.GetProperty< std::string >( Actor::Property::NAME ), TEST_LOCATION );
   }
 
   // Check callback sequence
 
-  DALI_TEST_EQUALS( 3, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION ); // The mContainer added to actorA
-  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildRemove",        actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION ); // The actorB added to actorA
+  DALI_TEST_EQUALS( 4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorA.GetMethodsCalled()[ 1 ], TEST_LOCATION ); // The mContainer added to actorA
+  DALI_TEST_EQUALS( "OnChildAdd",           actorA.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildRemove",        actorA.GetMethodsCalled()[ 3 ], TEST_LOCATION ); // The actorB added to actorA
   // mContainer will then receive OnChildAdd
 
-  DALI_TEST_EQUALS( 3, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( 4, (int)(actorB.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet",        actorB.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnStageConnection",    actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
   // The derived class are always notified, no matter the child is successfully removed or not
-  DALI_TEST_EQUALS( "OnChildRemove",        actorB.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnChildAdd",           actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildRemove",        actorB.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnChildAdd",           actorB.GetMethodsCalled()[ 3 ], TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 6, (int)(MasterCallStack.size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 8, (int)(MasterCallStack.size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 2 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorA: OnChildRemove",        MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnPropertySet",        MasterCallStack[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnStageConnection",    MasterCallStack[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnPropertySet",        MasterCallStack[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnStageConnection",    MasterCallStack[ 3 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildAdd",           MasterCallStack[ 4 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorA: OnChildRemove",        MasterCallStack[ 5 ], TEST_LOCATION );
   // The derived class are always notified, no matter the child is successfully removed or not
-  DALI_TEST_EQUALS( "ActorB: OnChildRemove",        MasterCallStack[ 4 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "ActorB: OnChildAdd",           MasterCallStack[ 5 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnChildRemove",        MasterCallStack[ 6 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "ActorB: OnChildAdd",           MasterCallStack[ 7 ], TEST_LOCATION );
 
   // Excercise the message passing to Update thread
 
@@ -1064,8 +1101,8 @@ int UtcDaliCustomActorDoAction(void)
   DALI_TEST_CHECK(customActorObject.DoAction("invalidCommand", attributes) == false);
 
   // Check that the custom actor is visible
-  custom.SetVisible(true);
-  DALI_TEST_CHECK(custom.IsVisible() == true);
+  custom.SetProperty( Actor::Property::VISIBLE,true);
+  DALI_TEST_CHECK(custom.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
   // Check the custom actor performed an action to hide itself
   DALI_TEST_CHECK(customActorObject.DoAction("hide", attributes) == true);
@@ -1075,7 +1112,7 @@ int UtcDaliCustomActorDoAction(void)
   application.Render();
 
   // Check that the custom actor is now invisible
-  DALI_TEST_CHECK(custom.IsVisible() == false);
+  DALI_TEST_CHECK(custom.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == false);
 
   // Check the custom actor performed an action to show itself
   DALI_TEST_CHECK(customActorObject.DoAction("show", attributes) == true);
@@ -1085,7 +1122,7 @@ int UtcDaliCustomActorDoAction(void)
   application.Render();
 
   // Check that the custom actor is now visible
-  DALI_TEST_CHECK(custom.IsVisible() == true);
+  DALI_TEST_CHECK(custom.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
   END_TEST;
 }
 
@@ -1447,11 +1484,11 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   auto actorHandle = Actor::New();
   DALI_TEST_EQUALS( custom.GetPropertyCount(), actorHandle.GetPropertyCount(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( custom.IsVisible(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( custom.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
   custom.SetProperty( Actor::Property::VISIBLE, false );
   application.SendNotification();
   application.Render(); // IsVisible returns scene value
-  DALI_TEST_EQUALS( custom.IsVisible(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( custom.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
 
   // should have custom actor typename (as it has not registered itself)
   DALI_TEST_EQUALS( "CustomActor", custom.GetTypeName(), TEST_LOCATION );
@@ -1469,7 +1506,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   application.Render(1000.f);
 
   DALI_TEST_EQUALS( Vector3( 100.0f, 150.0f, 200.0f ), custom.GetProperty( Actor::Property::POSITION ).Get<Vector3>(), TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector3( 100.0f, 150.0f, 200.0f ), custom.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 100.0f, 150.0f, 200.0f ), custom.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
   Dali::WeakHandle<UnregisteredCustomActor> weakRef( custom );
   // should have actor signals

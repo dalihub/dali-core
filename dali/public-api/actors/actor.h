@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,8 +73,8 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *
  * - An actor is only hittable if the actor's touch or hover signal has a connection.
  * - An actor is only hittable when it is between the camera's near and far planes.
- * - If an actor is made insensitive, then the actor and its children are not hittable; see IsSensitive().
- * - If an actor's visibility flag is unset, then none of its children are hittable either; see IsVisible().
+ * - If an actor is made insensitive, then the actor and its children are not hittable; see Actor::Property::SENSITIVE.
+ * - If an actor's visibility flag is unset, then none of its children are hittable either; see Actor::Property::VISIBLE.
  * - To be hittable, an actor must have a non-zero size.
  * - If an actor's world color is fully transparent, then it is not hittable; see GetCurrentWorldColor().
  *
@@ -261,7 +261,6 @@ public:
        * @brief The origin of an actor, within its parent's area.
        * @details Name "parentOrigin", type Property::VECTOR3, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetParentOrigin()
        */
       PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX,
 
@@ -269,7 +268,6 @@ public:
        * @brief The x origin of an actor, within its parent's area.
        * @details Name "parentOriginX", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetParentOrigin()
        */
       PARENT_ORIGIN_X,
 
@@ -277,7 +275,6 @@ public:
        * @brief The y origin of an actor, within its parent's area.
        * @details Name "parentOriginY", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetParentOrigin()
        */
       PARENT_ORIGIN_Y,
 
@@ -285,7 +282,6 @@ public:
        * @brief The z origin of an actor, within its parent's area.
        * @details Name "parentOriginZ", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetParentOrigin()
        */
       PARENT_ORIGIN_Z,
 
@@ -293,7 +289,6 @@ public:
        * @brief The anchor-point of an actor.
        * @details Name "anchorPoint", type Property::VECTOR3, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetAnchorPoint()
        */
       ANCHOR_POINT,
 
@@ -301,7 +296,6 @@ public:
        * @brief The x anchor-point of an actor.
        * @details Name "anchorPointX", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetAnchorPoint()
        */
       ANCHOR_POINT_X,
 
@@ -309,7 +303,6 @@ public:
        * @brief The y anchor-point of an actor.
        * @details Name "anchorPointY", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetAnchorPoint()
        */
       ANCHOR_POINT_Y,
 
@@ -317,7 +310,6 @@ public:
        * @brief The z anchor-point of an actor.
        * @details Name "anchorPointZ", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetAnchorPoint()
        */
       ANCHOR_POINT_Z,
 
@@ -389,7 +381,6 @@ public:
        * @brief The world position of an actor.
        * @details Name "worldPosition", type Property::VECTOR3, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldPosition()
        */
       WORLD_POSITION,
 
@@ -397,7 +388,6 @@ public:
        * @brief The x world position of an actor.
        * @details Name "worldPositionX", type Property::FLOAT, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldPosition()
        */
       WORLD_POSITION_X,
 
@@ -405,7 +395,6 @@ public:
        * @brief The y world position of an actor.
        * @details Name "worldPositionY", type Property::FLOAT, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldPosition()
        */
       WORLD_POSITION_Y,
 
@@ -413,7 +402,6 @@ public:
        * @brief The z world position of an actor.
        * @details Name "worldPositionZ", type Property::FLOAT, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldPosition()
        */
       WORLD_POSITION_Z,
 
@@ -429,7 +417,6 @@ public:
        * @brief The world orientation of an actor.
        * @details Name "worldOrientation", type Property::ROTATION, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldOrientation()
        */
       WORLD_ORIENTATION,
 
@@ -469,7 +456,6 @@ public:
        * @brief The world scale factor applied to an actor.
        * @details Name "worldScale", type Property::VECTOR3, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldScale()
        */
       WORLD_SCALE,
 
@@ -477,7 +463,6 @@ public:
        * @brief The visibility flag of an actor.
        * @details Name "visible", type Property::BOOL, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetVisible()
        */
       VISIBLE,
 
@@ -486,7 +471,6 @@ public:
        * @details Name "color", type Property::VECTOR4 or Property::VECTOR3, animatable / constraint-input
        * @note The alpha value will be 1.0f if a Vector3 type value is set.
        * @SINCE_1_0.0
-       * @see Actor::SetColor()
        */
       COLOR,
 
@@ -494,7 +478,6 @@ public:
        * @brief The red component of an actor's color.
        * @details Name "colorRed", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetColor()
        */
       COLOR_RED,
 
@@ -502,7 +485,6 @@ public:
        * @brief The green component of an actor's color.
        * @details Name "colorGreen", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetColor()
        */
       COLOR_GREEN,
 
@@ -510,7 +492,6 @@ public:
        * @brief The blue component of an actor's color.
        * @details Name "colorBlue", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetColor()
        */
       COLOR_BLUE,
 
@@ -518,7 +499,6 @@ public:
        * @brief The alpha component of an actor's color.
        * @details Name "colorAlpha", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetColor()
        */
       COLOR_ALPHA,
 
@@ -526,7 +506,6 @@ public:
        * @brief The world color of an actor.
        * @details Name "worldColor", type Property::VECTOR4, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldColor()
        */
       WORLD_COLOR,
 
@@ -534,7 +513,6 @@ public:
        * @brief The world matrix of an actor.
        * @details Name "worldMatrix", type Property::MATRIX, read-only / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::GetCurrentWorldMatrix()
        */
       WORLD_MATRIX,
 
@@ -542,7 +520,6 @@ public:
        * @brief The name of an actor.
        * @details Name "name", type Property::STRING
        * @SINCE_1_0.0
-       * @see Actor::GetName()
        */
       NAME,
 
@@ -550,7 +527,6 @@ public:
        * @brief The flag whether an actor should emit touch or hover signals.
        * @details Name "sensitive", type Property::BOOLEAN
        * @SINCE_1_0.0
-       * @see Actor::SetSensitive()
        */
       SENSITIVE,
 
@@ -558,7 +534,6 @@ public:
        * @brief The flag whether an actor should receive a notification when touch or hover motion events leave.
        * @details Name "leaveRequired", type Property::BOOLEAN
        * @SINCE_1_0.0
-       * @see Actor::SetLeaveRequired()
        */
       LEAVE_REQUIRED,
 
@@ -566,7 +541,6 @@ public:
        * @brief The flag whether a child actor inherits it's parent's orientation.
        * @details Name "inheritOrientation", type Property::BOOLEAN
        * @SINCE_1_0.0
-       * @see Actor::SetInheritOrientation()
        */
       INHERIT_ORIENTATION,
 
@@ -574,7 +548,6 @@ public:
        * @brief The flag whether a child actor inherits it's parent's scale.
        * @details Name "inheritScale", type Property::BOOLEAN
        * @SINCE_1_0.0
-       * @see Actor::SetInheritScale()
        */
       INHERIT_SCALE,
 
@@ -659,7 +632,6 @@ public:
        * @brief The minimum size an actor can be assigned in size negotiation.
        * @details Name "minimumSize", type Property::VECTOR2.
        * @SINCE_1_0.0
-       * @see Actor::SetMinimumSize()
        */
       MINIMUM_SIZE,
 
@@ -667,7 +639,6 @@ public:
        * @brief The maximum size an actor can be assigned in size negotiation.
        * @details Name "maximumSize", type Property::VECTOR2.
        * @SINCE_1_0.0
-       * @see Actor::SetMaximumSize()
        */
       MAXIMUM_SIZE,
 
@@ -675,7 +646,6 @@ public:
        * @brief The flag whether a child actor inherits it's parent's position.
        * @details Name "inheritPosition", type Property::BOOLEAN.
        * @SINCE_1_1.24
-       * @see Actor::SetInheritPosition()
        */
       INHERIT_POSITION,
 
@@ -769,24 +739,6 @@ public:
    * @return A reference to this
    */
   Actor& operator=(const Actor& rhs);
-
-  /**
-   * @brief Retrieves the Actor's name.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's name
-   * @pre The Actor has been initialized.
-   */
-  const std::string& GetName() const;
-
-  /**
-   * @brief Sets the Actor's name.
-   *
-   * @SINCE_1_0.0
-   * @param[in] name The new name
-   * @pre The Actor has been initialized.
-   */
-  void SetName(const std::string& name);
 
   /**
    * @brief Retrieves the unique ID of the actor.
@@ -927,56 +879,6 @@ public:
   // Positioning
 
   /**
-   * @brief Sets the origin of an actor, within its parent's area.
-   *
-   * This is expressed in unit coordinates, such that (0.0, 0.0, 0.5) is the top-left corner of the parent,
-   * and (1.0, 1.0, 0.5) is the bottom-right corner.
-   * The default parent-origin is Dali::ParentOrigin::TOP_LEFT (0.0, 0.0, 0.5).
-   * An actor's position is the distance between this origin, and the actor's anchor-point.
-   * @image html parent-origin.png
-   * @SINCE_1_0.0
-   * @param[in] origin The new parent-origin
-   * @pre The Actor has been initialized.
-   * @see Dali::ParentOrigin for predefined parent origin values
-   */
-  void SetParentOrigin(const Vector3& origin);
-
-  /**
-   * @brief Retrieves the parent-origin of an actor.
-   *
-   * @SINCE_1_0.0
-   * @return The current parent-origin
-   * @pre The Actor has been initialized.
-   */
-  Vector3 GetCurrentParentOrigin() const;
-
-  /**
-   * @brief Sets the anchor-point of an actor.
-   *
-   * This is expressed in unit coordinates, such that (0.0, 0.0, 0.5)
-   * is the top-left corner of the actor, and (1.0, 1.0, 0.5) is the
-   * bottom-right corner. The default anchor point is
-   * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
-   * An actor position is the distance between its parent-origin and this anchor-point.
-   * An actor's orientation is the rotation from its default orientation, the rotation is centered around its anchor-point.
-   * @image html anchor-point.png
-   * @SINCE_1_0.0
-   * @param[in] anchorPoint The new anchor-point
-   * @pre The Actor has been initialized.
-   * @see Dali::AnchorPoint for predefined anchor point values
-   */
-  void SetAnchorPoint(const Vector3& anchorPoint);
-
-  /**
-   * @brief Retrieves the anchor-point of an actor.
-   *
-   * @SINCE_1_0.0
-   * @return The current anchor-point
-   * @pre The Actor has been initialized.
-   */
-  Vector3 GetCurrentAnchorPoint() const;
-
-  /**
    * @brief Sets the size of an actor.
    *
    * Geometry can be scaled to fit within this area.
@@ -1037,16 +939,6 @@ public:
   Vector3 GetTargetSize() const;
 
   /**
-   * @brief Retrieves the actor's size.
-   *
-   * @SINCE_1_0.0
-   * @return The actor's current size
-   * @pre The actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetSize().
-   */
-  Vector3 GetCurrentSize() const;
-
-  /**
    * @brief Returns the natural size of the actor.
    *
    * Deriving classes stipulate the natural size and by default an actor has a ZERO natural size.
@@ -1061,7 +953,7 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
    *
    * @image html actor-position.png
    * The Actor's z position will be set to 0.0f.
@@ -1077,7 +969,7 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
    *
    * @image html actor-position.png
    * @SINCE_1_0.0
@@ -1093,7 +985,7 @@ public:
    *
    * By default, sets the position vector between the parent origin and anchor point (default).
    *
-   * If Position inheritance if disabled, sets the world position. @see SetInheritPosition
+   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
    *
    * @image html actor-position.png
    * @SINCE_1_0.0
@@ -1137,53 +1029,6 @@ public:
    * @pre The actor has been initialized.
    */
   void TranslateBy(const Vector3& distance);
-
-  /**
-   * @brief Retrieves the position of the Actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current position
-   * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetPosition().
-   */
-  Vector3 GetCurrentPosition() const;
-
-  /**
-   * @brief Retrieves the world-position of the Actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current position in world coordinates
-   * @pre The Actor has been initialized.
-   * @note The actor may not have a world-position unless it has been added to the stage.
-   */
-  Vector3 GetCurrentWorldPosition() const;
-
-  /**
-   * @brief Sets whether a child actor inherits it's parent's position.
-   *
-   * Default is to inherit.
-   * Switching this off means that using SetPosition() sets the actor's world position, i.e. translates from
-   * the world origin (0,0,0) to the anchor point of the actor.
-   * @SINCE_1_1.24
-   * @param[in] inherit - @c true if the actor should inherit position, @c false otherwise
-   * @pre The Actor has been initialized.
-   */
-  inline void SetInheritPosition( bool inherit )
-  {
-    SetProperty(Property::INHERIT_POSITION, inherit );
-  }
-
-  /**
-   * @brief Returns whether the actor inherits its parent's position.
-   *
-   * @SINCE_1_1.24
-   * @return @c true if the actor inherits its parent position, @c false if it uses world position
-   * @pre The Actor has been initialized.
-   */
-  inline bool IsPositionInherited() const
-  {
-    return GetProperty(Property::INHERIT_POSITION ).Get<bool>();
-  }
 
   /**
    * @brief Sets the orientation of the Actor.
@@ -1256,46 +1101,6 @@ public:
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
-   * @brief Retrieves the Actor's orientation.
-   *
-   * @SINCE_1_0.0
-   * @return The current orientation
-   * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetOrientation().
-   */
-  Quaternion GetCurrentOrientation() const;
-
-  /**
-   * @brief Sets whether a child actor inherits it's parent's orientation.
-   *
-   * Default is to inherit.
-   * Switching this off means that using SetOrientation() sets the actor's world orientation.
-   * @SINCE_1_0.0
-   * @param[in] inherit - @c true if the actor should inherit orientation, @c false otherwise
-   * @pre The Actor has been initialized.
-   */
-  void SetInheritOrientation(bool inherit);
-
-  /**
-   * @brief Returns whether the actor inherits its parent's orientation.
-   *
-   * @SINCE_1_0.0
-   * @return @c true if the actor inherits its parent orientation, @c false if it uses world orientation
-   * @pre The Actor has been initialized.
-   */
-  bool IsOrientationInherited() const;
-
-  /**
-   * @brief Retrieves the world-orientation of the Actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current orientation in the world
-   * @pre The Actor has been initialized.
-   * @note The actor will not have a world-orientation, unless it has previously been added to the stage.
-   */
-  Quaternion GetCurrentWorldOrientation() const;
-
-  /**
    * @brief Sets the scale factor applied to an actor.
    *
    * @SINCE_1_0.0
@@ -1336,125 +1141,7 @@ public:
    */
   void ScaleBy(const Vector3& relativeScale);
 
-  /**
-   * @brief Retrieves the scale factor applied to an actor.
-   *
-   * @SINCE_1_0.0
-   * @return A vector representing the scale factor for each axis
-   * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetScale().
-   */
-  Vector3 GetCurrentScale() const;
-
-  /**
-   * @brief Retrieves the world-scale of the Actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current scale in the world
-   * @pre The Actor has been initialized.
-   * @note The actor will not have a world-scale, unless it has previously been added to the stage.
-   */
-  Vector3 GetCurrentWorldScale() const;
-
-  /**
-   * @brief Sets whether a child actor inherits it's parent's scale.
-   *
-   * Default is to inherit.
-   * Switching this off means that using SetScale() sets the actor's world scale.
-   * @SINCE_1_0.0
-   * @param[in] inherit - @c true if the actor should inherit scale, @c false otherwise
-   * @pre The Actor has been initialized.
-   */
-  void SetInheritScale( bool inherit );
-
-  /**
-   * @brief Returns whether the actor inherits its parent's scale.
-   *
-   * @SINCE_1_0.0
-   * @return @c true if the actor inherits its parent scale, @c false if it uses world scale
-   * @pre The Actor has been initialized.
-   */
-  bool IsScaleInherited() const;
-
-  /**
-   * @brief Retrieves the world-matrix of the actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current world matrix
-   * @pre The Actor has been initialized.
-   * @note The actor will not have a world-matrix, unless it has previously been added to the stage.
-   */
-  Matrix GetCurrentWorldMatrix() const;
-
   // Visibility & Color
-
-  /**
-   * @brief Sets the visibility flag of an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] visible The new visibility flag
-   * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with IsVisible().
-   * @note If an actor's visibility flag is set to false, then the actor and its children will not be rendered.
-   *       This is regardless of the individual visibility values of the children i.e. an actor will only be
-   *       rendered if all of its parents have visibility set to true.
-   */
-  void SetVisible(bool visible);
-
-  /**
-   * @brief Retrieves the visibility flag of an actor.
-   *
-   * @SINCE_1_0.0
-   * @return The visibility flag
-   * @pre The actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetVisible().
-   * @note If an actor is not visible, then the actor and its children will not be rendered.
-   *       This is regardless of the individual visibility values of the children i.e. an actor will only be
-   *       rendered if all of its parents have visibility set to true.
-   */
-  bool IsVisible() const;
-
-  /**
-   * @brief Sets the opacity of an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] opacity The new opacity
-   * @pre The actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOpacity().
-   */
-  void SetOpacity(float opacity);
-
-  /**
-   * @brief Retrieves the actor's opacity.
-   *
-   * @SINCE_1_0.0
-   * @return The actor's opacity
-   * @pre The actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetOpacity().
-   */
-  float GetCurrentOpacity() const;
-
-  /**
-   * @brief Sets the actor's color; this is an RGBA value.
-   *
-   * The final color of the actor depends on its color mode.
-   * @SINCE_1_0.0
-   * @param[in] color The new color
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentColor().
-   */
-  void SetColor(const Vector4& color);
-
-  /**
-   * @brief Retrieves the actor's color.
-   *
-   * Actor's own color is not clamped.
-   * @SINCE_1_0.0
-   * @return The color
-   * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetColor().
-   */
-  Vector4 GetCurrentColor() const;
 
   /**
    * @brief Sets the actor's color mode.
@@ -1475,16 +1162,6 @@ public:
    * @pre The Actor has been initialized.
    */
   ColorMode GetColorMode() const;
-
-  /**
-   * @brief Retrieves the world-color of the Actor, where each component is clamped within the 0->1 range.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current color in the world
-   * @pre The Actor has been initialized.
-   * @note The actor will not have a world-color, unless it has previously been added to the stage.
-   */
-  Vector4 GetCurrentWorldColor() const;
 
   /**
    * @brief Sets how the actor and its children should be drawn.
@@ -1515,45 +1192,6 @@ public:
   // Input Handling
 
   /**
-   * @brief Sets whether an actor should emit touch or hover signals.
-   *
-   * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouch(),
-   * the touch event signal will be emitted, and as soon as an application connects to the SignalHover(), the
-   * hover event signal will be emitted.
-   *
-   * If the application wishes to temporarily disable the touch or hover event signal emission, then they can do so by calling:
-   * @code
-   * actor.SetSensitive(false);
-   * @endcode
-   *
-   * Then, to re-enable the touch or hover event signal emission, the application should call:
-   * @code
-   * actor.SetSensitive(true);
-   * @endcode
-   *
-   * @SINCE_1_0.0
-   * @param[in] sensitive true to enable emission of the touch or hover event signals, false otherwise
-   * @pre The Actor has been initialized.
-   * @note If an actor's sensitivity is set to false, then it's children will not be hittable either.
-   *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
-   *       hittable if all of its parents have sensitivity set to true.
-   * @see @see TouchedSignal() and HoveredSignal().
-   */
-  void SetSensitive(bool sensitive);
-
-  /**
-   * @brief Queries whether an actor emits touch or hover event signals.
-   *
-   * @SINCE_1_0.0
-   * @return @c true, if emission of touch or hover event signals is enabled, @c false otherwise
-   * @pre The Actor has been initialized.
-   * @note If an actor is not sensitive, then it's children will not be hittable either.
-   *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
-   *       hittable if all of its parents have sensitivity set to true.
-   */
-  bool IsSensitive() const;
-
-  /**
    * @brief Converts screen coordinates into the actor's coordinate system using the default camera.
    *
    * @SINCE_1_0.0
@@ -1566,29 +1204,6 @@ public:
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
-
-  /**
-   * @brief Sets whether the actor should receive a notification when touch or hover motion events leave
-   * the boundary of the actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] required Should be set to true if a Leave event is required
-   * @pre The Actor has been initialized.
-   * @note By default, this is set to false as most actors do not require this.
-   * @note Need to connect to the TouchedSignal() or HoveredSignal() to actually receive this event.
-   *
-   */
-  void SetLeaveRequired(bool required);
-
-  /**
-   * @brief This returns whether the actor requires touch or hover events whenever touch or hover motion events leave
-   * the boundary of the actor.
-   *
-   * @SINCE_1_0.0
-   * @return @c true if a Leave event is required, @c false otherwise
-   * @pre The Actor has been initialized.
-   */
-  bool GetLeaveRequired() const;
 
   /**
    * @brief Sets whether the actor should be focusable by keyboard navigation.
@@ -1775,38 +1390,6 @@ public:
    * @param[in] paddingOut The returned padding data
    */
   void GetPadding( Padding& paddingOut ) const;
-
-  /**
-   * @brief Sets the minimum size an actor can be assigned in size negotiation.
-   *
-   * @SINCE_1_0.0
-   * @param[in] size The minimum size
-   */
-  void SetMinimumSize( const Vector2& size );
-
-  /**
-   * @brief Returns the minimum relayout size.
-   *
-   * @SINCE_1_0.0
-   * @return Return the minimum size
-   */
-  Vector2 GetMinimumSize();
-
-  /**
-   * @brief Sets the maximum size an actor can be assigned in size negotiation.
-   *
-   * @SINCE_1_0.0
-   * @param[in] size The maximum size
-   */
-  void SetMaximumSize( const Vector2& size );
-
-  /**
-   * @brief Returns the maximum relayout size.
-   *
-   * @SINCE_1_0.0
-   * @return Return the maximum size
-   */
-  Vector2 GetMaximumSize();
 
   /**
    * @brief Gets depth in the hierarchy for the actor.

@@ -71,8 +71,8 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
   Actor meshActor = Actor::New();
   meshActor.AddRenderer( renderer );
   meshActor.SetSize( Vector3( 400.0f, 400.0f, 0.1f ) );
-  meshActor.SetParentOrigin( parentOrigin );
-  meshActor.SetAnchorPoint( anchorPoint );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, parentOrigin );
+  meshActor.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
   Stage::GetCurrent().Add( meshActor );
 
   application.SendNotification();
@@ -101,7 +101,7 @@ bool GetCameraDepths( TestApplication& application, float& nearPlane, float& far
 
     nearPlane = cameraActor.GetNearClippingPlane();
     farPlane = cameraActor.GetFarClippingPlane();
-    cameraDepth = cameraActor.GetCurrentPosition().z;
+    cameraDepth = cameraActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ).z;
   }
 
   return !!cameraActor;
@@ -137,8 +137,8 @@ int UtcFrustumLeftCullP(void)
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
-  meshActor.SetParentOrigin( Vector3( -radius / stageSize.width + offset, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( -radius / stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -182,8 +182,8 @@ int UtcFrustumRightCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  meshActor.SetParentOrigin( Vector3( radius / stageSize.width + offset, 0.5f, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( radius / stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -227,8 +227,8 @@ int UtcFrustumTopCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, -radius / stageSize.width + offset, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, -radius / stageSize.width + offset, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -273,8 +273,8 @@ int UtcFrustumBottomCullP(void)
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
-  meshActor.SetParentOrigin( Vector3( 0.5f, radius / stageSize.width + offset, 0.5f ) );
-  meshActor.SetAnchorPoint( AnchorPoint::CENTER );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, radius / stageSize.width + offset, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -316,7 +316,7 @@ int UtcFrustumNearCullP(void)
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
   Actor meshActor = CreateMeshActorToStage( application );
-  Vector3 meshPosition = meshActor.GetCurrentPosition();
+  Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   float offset = radius + 0.1f;
@@ -344,7 +344,7 @@ int UtcFrustumNearCullN(void)
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
   Actor meshActor = CreateMeshActorToStage( application );
-  Vector3 meshPosition = meshActor.GetCurrentPosition();
+  Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float offset = meshActor.GetTargetSize().z - 0.1f;
   meshPosition.z = cameraDepth - nearPlane + offset;
@@ -370,7 +370,7 @@ int UtcFrustumFarCullP(void)
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
   Actor meshActor = CreateMeshActorToStage( application );
-  Vector3 meshPosition = meshActor.GetCurrentPosition();
+  Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
   float offset = radius + 0.1f;
@@ -398,7 +398,7 @@ int UtcFrustumFarCullN(void)
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
   Actor meshActor = CreateMeshActorToStage( application );
-  Vector3 meshPosition = meshActor.GetCurrentPosition();
+  Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float offset = meshActor.GetTargetSize().z - 0.1f;
   meshPosition.z = cameraDepth - farPlane - offset;

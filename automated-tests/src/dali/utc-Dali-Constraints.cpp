@@ -333,7 +333,7 @@ int UtcDaliConstraintsLookAt(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldOrientation(), Quaternion::IDENTITY, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::WORLD_ORIENTATION ), Quaternion::IDENTITY, TEST_LOCATION );
 
   Vector3 targetPosition;
   Vector3 cameraPosition;

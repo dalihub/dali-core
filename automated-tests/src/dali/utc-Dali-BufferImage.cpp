@@ -248,7 +248,7 @@ int UtcDaliBufferImageUpdate01(void)
   BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
-  actor.SetVisible(true);
+  actor.SetProperty( Actor::Property::VISIBLE,true);
 
   std::vector<GLuint> ids;
   ids.push_back(200);
@@ -293,7 +293,7 @@ int UtcDaliBufferImageUpdate02(void)
   BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   Actor actor = CreateRenderableActor( image );
   Stage::GetCurrent().Add(actor);
-  actor.SetVisible(true);
+  actor.SetProperty( Actor::Property::VISIBLE,true);
 
   application.SendNotification();
   application.Render(0);

@@ -910,7 +910,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get( defaultFieldOfView );
   actor.GetProperty( CameraActor::Property::NEAR_PLANE_DISTANCE ).Get( defaultNearPlaneDistance );
   actor.GetProperty( CameraActor::Property::FAR_PLANE_DISTANCE ).Get( defaultFarPlaneDistance );
-  Vector3 defaultPos = actor.GetCurrentPosition();
+  Vector3 defaultPos = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   actor.SetOrthographicProjection( Size( 1080.0f, 1920.0f ) );
 
@@ -938,7 +938,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   actor.GetProperty( CameraActor::Property::BOTTOM_PLANE_DISTANCE ).Get( value );
   DALI_TEST_EQUALS( -960.0f, value, FLOAT_EPSILON, TEST_LOCATION );
 
-  Vector3 pos = actor.GetCurrentPosition();
+  Vector3 pos = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   DALI_TEST_EQUALS( defaultPos.z, pos.z, 0.001f, TEST_LOCATION );
 
   DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::ORTHOGRAPHIC_PROJECTION, TEST_LOCATION );
@@ -1467,7 +1467,7 @@ int UtcDaliCameraActorModelView(void)
   Actor actor = CreateRenderableActor(image);
   actor.SetSize( 100.0f, 100.0f );
   actor.SetPosition( 20.0f, 30.0f, 40.0f );
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -1476,7 +1476,7 @@ int UtcDaliCameraActorModelView(void)
   application.SendNotification();
 
   Matrix resultMatrix( true );
-  resultMatrix.SetTransformComponents( Vector3::ONE, Quaternion::IDENTITY, actor.GetCurrentPosition() );
+  resultMatrix.SetTransformComponents( Vector3::ONE, Quaternion::IDENTITY, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) );
 
   RenderTask task = Stage::GetCurrent().GetRenderTaskList().GetTask( 0 );
   CameraActor cameraActor = task.GetCameraActor();
@@ -1552,7 +1552,7 @@ int UtcDaliCameraActorAnimatedProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3( 100.0f, 200.0f, 300.0f ), TEST_LOCATION);
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3( 100.0f, 200.0f, 300.0f ), TEST_LOCATION);
   END_TEST;
 }
 
@@ -1576,12 +1576,12 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
   Vector2 stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New( stageSize );
-  freeLookCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  freeLookCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   freeLookCameraActor.SetType( Camera::FREE_LOOK );
 
   Vector3 targetPosition( 30.0f, 240.0f, -256.0f );
   Actor target = Actor::New();
-  target.SetParentOrigin( ParentOrigin::CENTER );
+  target.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   target.SetPosition( targetPosition );
 
   Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
@@ -1593,7 +1593,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
   CameraActor lookAtCameraActor = CameraActor::New( stageSize );
   lookAtCameraActor.SetType( Camera::LOOK_AT_TARGET );
   lookAtCameraActor.SetTargetPosition( targetPosition );
-  lookAtCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  lookAtCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   stage.Add( target );
   stage.Add( freeLookCameraActor );
@@ -1636,12 +1636,12 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   Vector2 stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New( stageSize );
-  freeLookCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  freeLookCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   freeLookCameraActor.SetType( Camera::FREE_LOOK );
 
   Vector3 targetPosition( 30.0f, 240.0f, -256.0f );
   Actor target = Actor::New();
-  target.SetParentOrigin( ParentOrigin::CENTER );
+  target.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   target.SetPosition( targetPosition );
 
   Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
@@ -1653,7 +1653,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   CameraActor lookAtCameraActor = CameraActor::New( stageSize );
   lookAtCameraActor.SetType( Camera::LOOK_AT_TARGET );
   lookAtCameraActor.SetTargetPosition( targetPosition );
-  lookAtCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  lookAtCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   stage.Add( target );
   stage.Add( freeLookCameraActor );
@@ -1681,7 +1681,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
         Matrix freeLookViewMatrix;
         freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( freeLookViewMatrix );
 
-        Matrix freeLookWorld = freeLookCameraActor.GetCurrentWorldMatrix();
+        Matrix freeLookWorld = freeLookCameraActor.GetCurrentProperty< Matrix >( Actor::Property::WORLD_MATRIX );
 
         Matrix freeLookTest( false );
         Matrix::Multiply( freeLookTest, freeLookViewMatrix, freeLookWorld );
@@ -1704,7 +1704,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 
   CameraActor freeLookCameraActor = CameraActor::New( stageSize );
   freeLookCameraActor.SetType( Camera::FREE_LOOK );
-  freeLookCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  freeLookCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Quaternion cameraOrientation( Radian( Degree( 180.0f ) ), Vector3::YAXIS );
   freeLookCameraActor.SetPosition( cameraOffset );
@@ -1730,7 +1730,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
     Matrix freeLookViewMatrix;
     freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( freeLookViewMatrix );
 
-    Matrix freeLookWorld = freeLookCameraActor.GetCurrentWorldMatrix();
+    Matrix freeLookWorld = freeLookCameraActor.GetCurrentProperty< Matrix >( Actor::Property::WORLD_MATRIX );
 
     Matrix freeLookTest( false );
     Matrix::Multiply( freeLookTest,  freeLookViewMatrix,  freeLookWorld );

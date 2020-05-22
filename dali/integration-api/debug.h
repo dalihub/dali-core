@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_DEBUG_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -250,12 +250,19 @@ public:
   /**
    * Enable trace on all filters.
    */
-  void EnableGlobalTrace();
+  static void EnableGlobalTrace();
 
   /**
    * Disable trace on all filters.
    */
-  void DisableGlobalTrace();
+  static void DisableGlobalTrace();
+
+  /**
+   * Set log level for all filters.
+   *
+   * @param[in] level The log level
+   */
+  static void SetGlobalLogLevel( LogLevel level );
 
 private:
 

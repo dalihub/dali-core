@@ -288,18 +288,18 @@ int UtcDaliBaseHandleStlVector(void)
 
     std::stringstream stream;
     stream << "Actor " << i+1;
-    actor.SetName(stream.str());
+    actor.SetProperty( Actor::Property::NAME,stream.str());
 
     myVector.push_back(actor);
   }
 
   DALI_TEST_EQUALS(TargetVectorSize, static_cast<int>(myVector.size()), TEST_LOCATION);
 
-  DALI_TEST_CHECK(myVector[0].GetName() == "Actor 1");
-  DALI_TEST_CHECK(myVector[1].GetName() == "Actor 2");
-  DALI_TEST_CHECK(myVector[2].GetName() == "Actor 3");
-  DALI_TEST_CHECK(myVector[3].GetName() == "Actor 4");
-  DALI_TEST_CHECK(myVector[4].GetName() == "Actor 5");
+  DALI_TEST_CHECK(myVector[0].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 1");
+  DALI_TEST_CHECK(myVector[1].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 2");
+  DALI_TEST_CHECK(myVector[2].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 3");
+  DALI_TEST_CHECK(myVector[3].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 4");
+  DALI_TEST_CHECK(myVector[4].GetProperty< std::string >( Actor::Property::NAME ) == "Actor 5");
   END_TEST;
 }
 
@@ -318,8 +318,8 @@ int UtcDaliBaseHandleDoAction(void)
   DALI_TEST_CHECK(actorObject.DoAction("invalidCommand", attributes) == false);
 
   // Check that the actor is visible
-  actor.SetVisible(true);
-  DALI_TEST_CHECK(actor.IsVisible() == true);
+  actor.SetProperty( Actor::Property::VISIBLE,true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
   // Check the actor performed an action to hide itself
   DALI_TEST_CHECK(actorObject.DoAction("hide", attributes) == true);
@@ -329,7 +329,7 @@ int UtcDaliBaseHandleDoAction(void)
   application.Render();
 
   // Check that the actor is now invisible
-  DALI_TEST_CHECK(actor.IsVisible() == false);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == false);
 
   // Check the actor performed an action to show itself
   DALI_TEST_CHECK(actorObject.DoAction("show", attributes) == true);
@@ -339,7 +339,7 @@ int UtcDaliBaseHandleDoAction(void)
   application.Render();
 
   // Check that the actor is now visible
-  DALI_TEST_CHECK(actor.IsVisible() == true);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
   Stage::GetCurrent().Add(actor);
 
@@ -390,7 +390,7 @@ int UtcDaliBaseHandleDoAction(void)
   // We expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), targetPosition, TEST_LOCATION );
 
   // play again
   signalReceived = false;
@@ -418,8 +418,8 @@ int UtcDaliBaseHandleConnectSignal(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.SetPosition( 240, 400 );
   actor.SetSize( 100, 100 );
 

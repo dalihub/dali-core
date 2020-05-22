@@ -27,7 +27,7 @@ TestCustomActor TestCustomActor::NewNegoSize()
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActor( true );
   TestCustomActor custom( *impl ); // takes ownership
-  custom.SetName( "SizeNegotiationActor" );
+  custom.SetProperty( Dali::Actor::Property::NAME, "SizeNegotiationActor" );
 
   impl->Initialize();
 
@@ -290,7 +290,7 @@ void TestCustomActor::AddToCallStacks( const char* method )
   mMethodsCalled.push_back( method );
 
   // Combine Actor name with method string
-  std::string nameAndMethod( Self().GetName() );
+  std::string nameAndMethod( Self().GetProperty< std::string >( Dali::Actor::Property::NAME ) );
   if ( 0 == nameAndMethod.size() )
   {
     nameAndMethod = "Unknown: ";

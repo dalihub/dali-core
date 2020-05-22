@@ -2001,7 +2001,7 @@ int UtcDaliRenderTaskContinuous02(void)
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
-  secondRootActor.SetVisible(false);
+  secondRootActor.SetProperty( Actor::Property::VISIBLE,false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -2014,7 +2014,7 @@ int UtcDaliRenderTaskContinuous02(void)
   application.GetPlatform().ClearReadyResources();
 
   // MAKE SOURCE ACTOR VISIBLE - expect continuous renders to start, no finished signal
-  secondRootActor.SetVisible(true);
+  secondRootActor.SetProperty( Actor::Property::VISIBLE,true);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
@@ -2558,7 +2558,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   BufferImage image = BufferImage::New( 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetSize( 10, 10 );
-  rootActor.SetVisible(false);
+  rootActor.SetProperty( Actor::Property::VISIBLE,false);
   Stage::GetCurrent().Add( rootActor );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -2678,8 +2678,8 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor.SetSize(100.0f, 100.0f);
   actor.SetPosition( Vector3(0.0, 0.0, 0.0) );
 
-  actor.SetParentOrigin( Vector3(0.5, 0.5, 0.5) );
-  actor.SetAnchorPoint( Vector3(0.5, 0.5, 0.5) );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.5) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.5) );
 
   Stage::GetCurrent().Add(actor);
 
@@ -2696,7 +2696,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
   float screenX = 0.0;
   float screenY = 0.0;
 
-  bool ok = task.WorldToViewport(actor.GetCurrentWorldPosition(), screenX, screenY);
+  bool ok = task.WorldToViewport(actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), screenX, screenY);
   DALI_TEST_CHECK(ok == true);
 
   DALI_TEST_EQUALS(screenX, screenSize.x/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2706,17 +2706,17 @@ int UtcDaliRenderTaskWorldToViewport(void)
   float actor2Size = 100.f;
   actor2.SetSize( actor2Size, actor2Size );
   actor2.SetPosition( Vector3(0.0, 0.0, 0.0) );
-  actor2.SetParentOrigin( Vector3(0.5, 0.5, 0.0) );
-  actor2.SetAnchorPoint( Vector3(0.5, 0.5, 0.0) );
+  actor2.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.0) );
+  actor2.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.0) );
   Stage::GetCurrent().Add( actor2 );
   actor2.Add(actor);
-  actor.SetParentOrigin( Vector3(0,0,0) );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0,0,0) );
 
   application.SendNotification();
   application.Render();
   application.SendNotification();
 
-  ok = task.WorldToViewport(actor.GetCurrentWorldPosition(), screenX, screenY);
+  ok = task.WorldToViewport(actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), screenX, screenY);
   DALI_TEST_CHECK(ok == true);
 
   DALI_TEST_EQUALS(screenX, screenSize.x/2 - actor2Size/2, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -2730,7 +2730,7 @@ int UtcDaliRenderTaskViewportToLocal(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.SetSize(100.0f, 100.0f);
   actor.SetPosition(10.0f, 10.0f);
   Stage::GetCurrent().Add(actor);
@@ -2768,7 +2768,7 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetPosition( 10.0f, 10.0f );
   Stage::GetCurrent().Add( actor );
