@@ -284,7 +284,7 @@ public:
   void RemoveFrameBuffer( Render::FrameBuffer* frameBuffer );
 
   /**
-   * Attach a texture as color output to an existing FrameBuffer
+   * Attaches a texture as color output to the existing frame buffer
    * @param[in] frameBuffer The FrameBuffer
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
@@ -293,7 +293,7 @@ public:
   void AttachColorTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
-   * Attach a texture as depth output to an existing FrameBuffer
+   * Attaches a texture as depth output to the existing frame buffer
    * @param[in] frameBuffer The FrameBuffer
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
@@ -301,7 +301,7 @@ public:
   void AttachDepthTextureToFrameBuffer( Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel );
 
   /**
-   * Attach a texture as depth/stencil output to an existing FrameBuffer
+   * Attaches a texture as depth/stencil output to the existing frame buffer
    * @param[in] frameBuffer The FrameBuffer
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
