@@ -33,55 +33,55 @@ namespace DevelFrameBuffer
 constexpr uint8_t MAX_COLOR_ATTACHMENTS = 8;
 
 /**
- * @brief Attach the base LOD of a depth texture to the framebuffer.
+ * @brief Attaches the base LOD of a depth texture to the frame buffer.
  * @note This causes a depth attachment to be added.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer A handle to the FrameBuffer
  * @param[in] texture The texture that will be used as output when rendering
- * @note The texture has to have same size as that of FrameBuffer
- * otherwise it won't be attached.
+ * @note The size of the texture has to be same as that of the frame buffer.
+ * Otherwise, it won't be attached.
  */
 void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture );
 
 /**
- * @brief Attach a depth texture to the framebuffer.
+ * @brief Attaches a depth texture to the frame buffer.
  * @note This causes a depth attachment to be added.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer A handle to the FrameBuffer
  * @param[in] texture The texture that will be used as output when rendering
  * @param[in] mipmapLevel The mipmap of the texture to be attached
- * @note The mipmapped texture has to have same size as that of FrameBuffer
- * otherwise it won't be attached.
+ * @note The size of the mipmapped texture has to be same as that of the frame buffer.
+ * Otherwise, it won't be attached.
  */
 void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel );
 
 /**
- * @brief Attach the base LOD of a stencil texture to the framebuffer.
+ * @brief Attaches the base LOD of a stencil texture to the frame buffer.
  * @note This causes a stencil attachment to be added.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer A handle to the FrameBuffer
  * @param[in] texture The texture that will be used as output when rendering
- * @note The texture has to have same size as that of FrameBuffer
- * otherwise it won't be attached.
+ * @note The size of the texture has to be same as that of the frame buffer.
+ * Otherwise, it won't be attached.
  */
 void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture );
 
 /**
- * @brief Attach a depth/stencil texture to the framebuffer.
+ * @brief Attaches a depth/stencil texture to the frame buffer.
  * @note This causes a depth/stencil attachment to be added.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer A handle to the FrameBuffer
  * @param[in] texture The texture that will be used as output when rendering
  * @param[in] mipmapLevel The mipmap of the texture to be attached
- * @note The mipmapped texture has to have same size as that of FrameBuffer
- * otherwise it won't be attached.
+ * @note The size of the mipmapped texture has to be same as that of the frame buffer.
+ * Otherwise, it won't be attached.
  */
 void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel );
 
 /**
- * @brief Gets the color texture at the given @a index used as output in the FrameBuffer.
+ * @brief Gets the color texture at the given @a index used as output in the frame buffer.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer A handle to the FrameBuffer
  * @param[in] index The index required
  *
  * @return A handle to the texture used as color output, or an uninitialized handle
@@ -92,20 +92,20 @@ void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture, uint3
 Texture GetColorTexture( const FrameBuffer frameBuffer, uint8_t index );
 
 /**
- * @brief Gets the depth texture used as output in the FrameBuffer.
+ * @brief Gets the depth texture used as output in the frame buffer.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer The FrameBuffer handle
  *
- * @return A handle to the texture used as depth output, or an uninitialized handle
+ * @return A handle of the texture used as depth output, or an uninitialized handle
  */
 Texture GetDepthTexture( FrameBuffer frameBuffer );
 
 /**
- * @brief Gets the depth/stencil texture used as output in the FrameBuffer.
+ * @brief Gets the depth/stencil texture used as output in the frame buffer.
  *
- * @param[in] frameBuffer A handle to the framebuffer
+ * @param[in] frameBuffer The FrameBuffer handle
  *
- * @return A handle to the texture used as stencil output, or an uninitialized handle
+ * @return A handle of the texture used as depth/stencil output, or an uninitialized handle
  */
 Texture GetDepthStencilTexture( FrameBuffer frameBuffer );
 

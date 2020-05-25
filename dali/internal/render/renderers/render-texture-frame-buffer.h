@@ -84,7 +84,7 @@ public:
   bool IsSurfaceBacked() override { return false; };
 
   /**
-   * @brief Attach a texture for color rendering. Valid only for Framebuffers with COLOR attachments.
+   * @brief Attaches a texture for the color rendering. This API is valid only for frame buffer with COLOR attachments.
    * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
@@ -94,7 +94,7 @@ public:
   void AttachColorTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer );
 
   /**
-   * @brief Attach a texture for depth rendering. Valid only for Framebuffers with DEPTH attachments.
+   * @brief Attaches a texture for the depth rendering. This API is valid only for frame buffer with DEPTH attachments.
    * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
@@ -102,7 +102,7 @@ public:
   void AttachDepthTexture( Context& context, Render::Texture* texture, uint32_t mipmapLevel );
 
   /**
-   * @brief Attach a texture for depth/stencil rendering. Valid only for Framebuffers with DEPTH_STENCIL attachments.
+   * @brief Attaches a texture for the depth/stencil rendering. This API is valid only for frame buffer with DEPTH_STENCIL attachments.
    * @param[in] context The GL context
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
