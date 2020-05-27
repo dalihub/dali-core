@@ -133,8 +133,9 @@ void Scene::Initialize( Size size )
   // Create the list of render-tasks
   mRenderTaskList = RenderTaskList::New();
 
-  // Create the default render-task
-  mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
+  // Create the default render-task and ensure clear is enabled on it to show the background color
+  RenderTaskPtr renderTask = mRenderTaskList->CreateTask( mRootLayer.Get(), mDefaultCamera.Get() );
+  renderTask->SetClearEnabled(true);
 
   SurfaceResized( size.width, size.height );
 
