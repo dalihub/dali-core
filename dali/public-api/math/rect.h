@@ -2,7 +2,7 @@
 #define DALI_RECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,20 @@ struct Rect
     width(width),
     height(height)
   {
+  }
+
+  /**
+   * @brief Conversion constructor from Vector4.
+   *
+   * @SINCE_1_9.14
+   * @param[in] vec4 Vector4 to convert from
+   */
+  Rect( const Vector4& vec4 )
+  {
+    x = vec4.x;
+    y = vec4.y;
+    width = vec4.z;
+    height = vec4.w;
   }
 
   /**

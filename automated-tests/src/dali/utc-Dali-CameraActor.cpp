@@ -1406,12 +1406,12 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
     { "leaveRequired",          Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED },
     { "inheritOrientation",     Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION },
     { "inheritScale",           Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE },
-    { "colorMode",              Property::STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE },
-    { "drawMode",               Property::STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE },
+    { "colorMode",              Property::INTEGER,  true,  false, false, Dali::Actor::Property::COLOR_MODE },
+    { "drawMode",               Property::INTEGER,  true,  false, false, Dali::Actor::Property::DRAW_MODE },
     { "sizeModeFactor",         Property::VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR },
     { "widthResizePolicy",      Property::STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY },
     { "heightResizePolicy",     Property::STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY },
-    { "sizeScalePolicy",        Property::STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY },
+    { "sizeScalePolicy",        Property::INTEGER,  true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY },
     { "widthForHeight",         Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT },
     { "heightForWidth",         Property::BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH },
     { "padding",                Property::VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING },
@@ -1708,7 +1708,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 
   Quaternion cameraOrientation( Radian( Degree( 180.0f ) ), Vector3::YAXIS );
   freeLookCameraActor.SetPosition( cameraOffset );
-  freeLookCameraActor.SetOrientation( cameraOrientation );
+  freeLookCameraActor.SetProperty( Actor::Property::ORIENTATION, cameraOrientation );
 
   Actor cameraAnchor = Actor::New();
   cameraAnchor.Add( freeLookCameraActor );
@@ -1720,7 +1720,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
     Quaternion rotation( Radian( Degree( angle ) ), Vector3::YAXIS );
 
     freeLookCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
-    cameraAnchor.SetOrientation( rotation );
+    cameraAnchor.SetProperty( Actor::Property::ORIENTATION, rotation );
 
     application.SendNotification();
     application.Render();

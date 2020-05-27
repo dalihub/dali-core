@@ -1871,18 +1871,18 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
    */
 
   Actor actor0 = CreateActor( root, 0, TEST_LOCATION );
-  actor0.SetDrawMode( DrawMode::OVERLAY_2D );
+  actor0.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   Renderer renderer0 = CreateRenderer( actor0, geometry, shader, 0 );
 
   Actor actor1 = CreateActor( root, 0, TEST_LOCATION );
-  actor1.SetDrawMode( DrawMode::OVERLAY_2D );
+  actor1.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   Renderer renderer1 = CreateRenderer( actor1, geometry, shader, 0 );
 
   Actor actor2 = CreateActor( root, 0, TEST_LOCATION );
   Renderer renderer2 = CreateRenderer( actor2, geometry, shader, 0 );
 
   Actor actor3 = CreateActor( root, 0, TEST_LOCATION );
-  actor3.SetDrawMode( DrawMode::OVERLAY_2D );
+  actor3.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   Renderer renderer3 = CreateRenderer( actor3, geometry, shader, 0 );
 
   Actor actor4 = CreateActor( root, 0, TEST_LOCATION );

@@ -4824,7 +4824,7 @@ int UtcDaliAnimationAnimateByActorOrientationP1(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -4886,7 +4886,7 @@ int UtcDaliAnimationAnimateByActorOrientationP2(void)
   tet_printf("Testing that rotation angle > 360 performs full rotations\n");
 
   Actor actor = Actor::New();
-  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -4947,7 +4947,7 @@ int UtcDaliAnimationAnimateByActorOrientationP3(void)
   tet_printf("Testing that rotation angle > 360 performs partial rotations when cast to Quaternion\n");
 
   Actor actor = Actor::New();
-  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::ZAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -5009,7 +5009,7 @@ int UtcDaliAnimationAnimateByActorOrientationAlphaFunctionP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -5066,7 +5066,7 @@ int UtcDaliAnimationAnimateByActorOrientationAlphaFunctionTimePeriodP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation( Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -7826,7 +7826,7 @@ int UtcDaliAnimationAnimateToActorOrientationAngleAxisP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation(Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -7886,7 +7886,7 @@ int UtcDaliAnimationAnimateToActorOrientationQuaternionP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation(Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -7944,7 +7944,7 @@ int UtcDaliAnimationAnimateToActorOrientationAlphaFunctionP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation(Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion(Radian(0.0f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -8001,7 +8001,7 @@ int UtcDaliAnimationAnimateToActorOrientationTimePeriodP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation(Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -8062,7 +8062,7 @@ int UtcDaliAnimationAnimateToActorOrientationAlphaFunctionTimePeriodP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetOrientation(Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::ANGLE_0, Vector3::YAXIS ) );
   Stage::GetCurrent().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0, Vector3::YAXIS ), ROTATION_EPSILON, TEST_LOCATION );
 
@@ -9316,7 +9316,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleP(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -9364,7 +9364,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleCubicP(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -9410,7 +9410,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation01P(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -9456,7 +9456,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation02P(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   application.SendNotification();
   application.Render(0);
   Stage::GetCurrent().Add(actor);
@@ -9521,7 +9521,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation01CubicP(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -9565,7 +9565,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation02CubicP(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetOrientation(aa.angle, aa.axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(aa.angle, aa.axis) );
   application.SendNotification();
   application.Render(0);
   Stage::GetCurrent().Add(actor);
