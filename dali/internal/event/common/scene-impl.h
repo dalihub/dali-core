@@ -123,10 +123,8 @@ public:
    *
    * @param[in] width The new width of the set surface
    * @param[in] height The new height of the set surface
-   * @param[in] orientation The orientation of the surface
-   * @param[in] forceUpdate The flag to update force
    */
-  void SurfaceResized( float width, float height, int orientation, bool forceUpdate );
+  void SurfaceResized( float width, float height );
 
   /**
    * @copydoc Dali::Integration::Scene::SurfaceReplaced
@@ -291,9 +289,6 @@ private:
   Vector2 mDpi;
 
   Vector4 mBackgroundColor;
-
-  // The SurfaceOrientation
-  int mSurfaceOrientation;
 
   LayerPtr mRootLayer;
 
