@@ -78,11 +78,11 @@ struct Rect
    * @param[in] vec4 Vector4 to convert from
    */
   Rect( const Vector4& vec4 )
+  : x(vec4.x),
+    y(vec4.y),
+    width(vec4.z),
+    height(vec4.w)
   {
-    x = vec4.x;
-    y = vec4.y;
-    width = vec4.z;
-    height = vec4.w;
   }
 
   /**
@@ -115,6 +115,23 @@ struct Rect
       width = rhs.width;
       height = rhs.height;
     }
+
+    return *this;
+  }
+
+  /**
+   * @brief Assignment operator.
+   *
+   * @SINCE_1_9.14
+   * @param[in] vec4 The Vector4 to assign
+   * @return Reference to this
+   */
+  Rect<T>& operator= (const Vector4& vec4)
+  {
+    x = vec4.x;
+    y = vec4.y;
+    width = vec4.z;
+    height = vec4.w;
 
     return *this;
   }
