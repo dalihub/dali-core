@@ -119,7 +119,7 @@ int UtcDaliPinchGestureRecognizerBasicNoAction(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -151,7 +151,7 @@ int UtcDaliPinchGestureRecognizerBasic(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -185,7 +185,7 @@ int UtcDaliPinchGestureRecognizerEndEarly01(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -220,7 +220,7 @@ int UtcDaliPinchGestureRecognizerEndEarly02(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -256,7 +256,7 @@ int UtcDaliPinchGestureRecognizerRealistic01(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -297,7 +297,7 @@ int UtcDaliPinchGestureRecognizerRealistic02(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -337,7 +337,7 @@ int UtcDaliPinchGestureRecognizerRealistic03(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -380,12 +380,12 @@ int UtcDaliPinchGestureRecognizerMultipleDetectors(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetSize(100.0f, 100.0f);
-  actor2.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor2.SetX(100.0f);
   Stage::GetCurrent().Add(actor2);
 
@@ -447,7 +447,7 @@ int UtcDaliPinchGestureRecognizerShortDistance01(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -481,7 +481,7 @@ int UtcDaliPinchGestureRecognizerShortDistance02(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -519,7 +519,7 @@ int UtcDaliPinchGestureRecognizerLongDistance01(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -554,7 +554,7 @@ int UtcDaliPinchGestureRecognizerLongDistance02(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -588,7 +588,7 @@ int UtcDaliPinchGestureRecognizerLongDistance03(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -623,7 +623,7 @@ int UtcDaliPinchGestureRecognizerLongDistance04(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -659,7 +659,7 @@ int UtcDaliPinchGestureRecognizerMinimumTouchEvents(void)
 
   Actor actor = Actor::New();
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( actor );
 
   // Render and notify
@@ -702,7 +702,7 @@ int UtcDaliPinchGestureRecognizerMinimumTouchEventsAfterStart(void)
 
   Actor actor = Actor::New();
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( actor );
 
   // Render and notify

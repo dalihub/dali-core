@@ -61,9 +61,9 @@ void PrintChildren( Dali::Actor actor, int level )
 
   output << actor.GetTypeName();
 
-  output << ", " << actor.GetName();
+  output << ", " << actor.GetProperty< std::string >( Dali::Actor::Property::NAME );
 
-  output << " - Pos: " << actor.GetCurrentPosition() << " Size: " << actor.GetTargetSize();
+  output << " - Pos: " << actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ) << " Size: " << actor.GetTargetSize();
 
   output << ", Dirty: (" << ( GetImplementation( actor ).IsLayoutDirty( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutDirty( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
   output << ", Negotiated: (" << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
@@ -460,7 +460,7 @@ void RelayoutController::Relayout()
 
         if( actorImpl.RelayoutRequired() )
         {
-          DALI_LOG_INFO( gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actor.GetTypeName().c_str(), actor.GetName().c_str(), size.width, size.height );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actor.GetTypeName().c_str(), actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str(), size.width, size.height );
 
           // 3. Negotiate the size with the current actor. Pass it an empty container which the actor
           //    has to fill with all the actors it has not done any size negotiation for.

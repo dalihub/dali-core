@@ -240,7 +240,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     DALI_LOG_INFO( gLogFilter, Debug::General, "  State(%s), Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    TOUCH_POINT_STATE[iter->GetState()], iter->GetScreenPosition().x, iter->GetScreenPosition().y,
                    ( hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL ),
-                   ( hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" ),
+                   ( hitTestResults.actor ? hitTestResults.actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" ),
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );
 
     // Only set the currentRenderTask for the primary hit actor.
@@ -263,8 +263,8 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   Dali::Actor primaryHitActor = primaryPoint.hitActor;
   TouchPoint::State primaryPointState = primaryPoint.state;
 
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryPoint.hitActor ? reinterpret_cast< void* >( &primaryPoint.hitActor.GetBaseObject() ) : NULL, primaryPoint.hitActor ? primaryPoint.hitActor.GetName().c_str() : "" );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryPoint.hitActor ? reinterpret_cast< void* >( &primaryPoint.hitActor.GetBaseObject() ) : NULL, primaryPoint.hitActor ? primaryPoint.hitActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
 
   if ( ( primaryPointState == TouchPoint::Started ) &&
        ( hoverEvent.GetPointCount() == 1 ) &&

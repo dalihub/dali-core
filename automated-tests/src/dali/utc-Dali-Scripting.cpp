@@ -501,18 +501,18 @@ int UtcDaliScriptingNewActorProperties(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( handle.GetCurrentSize(), Vector3::ONE, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentPosition(), Vector3::XAXIS, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentScale(), Vector3::ONE, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.IsVisible(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetName(), "MyActor", TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ONE, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3::XAXIS, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::MAGENTA, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< std::string >( Actor::Property::NAME ), "MyActor", TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.IsSensitive(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::SENSITIVE ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::LEAVE_REQUIRED ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.IsOrientationInherited(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.IsScaleInherited(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_ORIENTATION ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_SCALE ), false, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( handle );
   }
@@ -528,8 +528,8 @@ int UtcDaliScriptingNewActorProperties(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( handle.GetCurrentParentOrigin(), ParentOrigin::TOP_CENTER, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentAnchorPoint(), AnchorPoint::TOP_LEFT, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_CENTER, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), AnchorPoint::TOP_LEFT, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( handle );
   }
@@ -545,8 +545,8 @@ int UtcDaliScriptingNewActorProperties(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( handle.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentAnchorPoint(), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( handle );
   }
@@ -572,8 +572,8 @@ int UtcDaliScriptingNewAnimation(void)
   Scripting::NewAnimation( map, data );
 
   Actor actor = Actor::New();
-  actor.SetName("Actor1");
-  actor.SetColor(Color::CYAN);
+  actor.SetProperty( Actor::Property::NAME,"Actor1");
+  actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
   Stage::GetCurrent().Add(actor);
 
   Animation anim = data.CreateAnimation( actor, 0.5f );
@@ -584,11 +584,11 @@ int UtcDaliScriptingNewAnimation(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), (Color::MAGENTA+Color::CYAN)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), (Color::MAGENTA+Color::CYAN)*0.5f, TEST_LOCATION);
 
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::MAGENTA, TEST_LOCATION );
 
   END_TEST;
 }
@@ -617,13 +617,13 @@ int UtcDaliScriptingNewActorChildren(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( handle.GetCurrentPosition(), Vector3::XAXIS, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3::XAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( handle.GetChildCount(), 1u, TEST_LOCATION );
 
   Actor child1 = handle.GetChildAt(0);
   DALI_TEST_CHECK( child1 );
   DALI_TEST_CHECK( Layer::DownCast( child1 ) );
-  DALI_TEST_EQUALS( child1.GetCurrentPosition(), Vector3::YAXIS, TEST_LOCATION );
+  DALI_TEST_EQUALS( child1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3::YAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Remove( handle );
@@ -667,15 +667,15 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetSize( Vector3::ONE );
     actor.SetPosition( Vector3::XAXIS );
     actor.SetScale( Vector3::ZAXIS );
-    actor.SetVisible( false );
-    actor.SetColor( Color::MAGENTA );
-    actor.SetName( "MyActor" );
-    actor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-    actor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-    actor.SetSensitive( false );
-    actor.SetLeaveRequired( true );
-    actor.SetInheritOrientation( false );
-    actor.SetInheritScale( false );
+    actor.SetProperty( Actor::Property::VISIBLE, false );
+    actor.SetProperty( Actor::Property::COLOR, Color::MAGENTA );
+    actor.SetProperty( Actor::Property::NAME, "MyActor" );
+    actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
+    actor.SetProperty( Actor::Property::SENSITIVE, false );
+    actor.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
+    actor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
+    actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
     actor.SetSizeModeFactor( Vector3::ONE );
 
     Stage::GetCurrent().Add( actor );

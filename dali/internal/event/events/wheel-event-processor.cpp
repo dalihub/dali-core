@@ -104,7 +104,7 @@ bool IsActorWheelableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::Travers
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if( actor.IsVisible() ) // Actor is visible, if not visible then none of its children are visible.
+      if( actor.GetProperty< bool >( Dali::Actor::Property::VISIBLE ) ) // Actor is visible, if not visible then none of its children are visible.
       {
         hittable = true;
       }
@@ -143,14 +143,14 @@ void WheelEventProcessor::ProcessWheelEvent( const Integration::WheelEvent& even
     DALI_LOG_INFO( gLogFilter, Debug::General, "  Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    event.point.x, event.point.y,
                    ( hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL ),
-                   ( hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" ),
+                   ( hitTestResults.actor ? hitTestResults.actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" ),
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );
 
     // Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
     Dali::Actor consumedActor = EmitWheelSignals( hitTestResults.actor, wheelEvent );
 
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL, hitTestResults.actor ? hitTestResults.actor.GetName().c_str() : "" );
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL, hitTestResults.actor ? hitTestResults.actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
   }
   else
   {

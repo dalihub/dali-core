@@ -124,31 +124,31 @@ int UtcPathConstrainerApply(void)
 
   Vector3 position, tangent;
   path.Sample(0.2f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 40% progress */);
   path.Sample(0.4f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 60% progress */);
   path.Sample(0.6f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
   path.Sample(0.8f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 100% progress */);
   path.Sample(1.0f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* beyond the animation duration*/);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   END_TEST;
 }
@@ -191,7 +191,7 @@ int UtcPathConstrainerApplyRange(void)
   actor.GetCurrentProperty( index ).Get(tValue);
   float currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -199,34 +199,34 @@ int UtcPathConstrainerApplyRange(void)
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
   path.Sample(0.5, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   actor.GetCurrentProperty( index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
   actor.GetCurrentProperty( index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
   actor.GetCurrentProperty( index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   // Ensure GetProperty also returns the final result
   actor.GetProperty( index ).Get( tValue );
   currentCursor =  ( tValue - range.x ) / (range.y-range.x);
   path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   END_TEST;
 }
@@ -261,7 +261,7 @@ int UtcPathConstrainerDestroy(void)
 
     Vector3 position, tangent;
     path.Sample(0.5f, position, tangent );
-    DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   }
 
@@ -270,7 +270,7 @@ int UtcPathConstrainerDestroy(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1.0f));
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
 
   END_TEST;
 }
@@ -304,7 +304,7 @@ int UtcPathConstrainerRemove(void)
 
   Vector3 position, tangent;
   path.Sample(0.5f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), position, TEST_LOCATION );
 
   //Remove constraint
   pathConstrainer.Remove( actor );
@@ -312,7 +312,7 @@ int UtcPathConstrainerRemove(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1.0f));
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
 
   END_TEST;
 }
@@ -453,23 +453,23 @@ int UtcLinearConstrainerApply(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.5f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.5f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   //Setup a LinearConstrainer specifying the progress for each value
   linearConstrainer.Remove(actor);
@@ -481,23 +481,23 @@ int UtcLinearConstrainerApply(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 2.0f/3.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 2.0f/3.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f/3.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f/3.0f, Math::MACHINE_EPSILON_1, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -530,23 +530,23 @@ int UtcLinearConstrainerApplyRange(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.5f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.5f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -575,7 +575,7 @@ int UtcLinearConstrainerDestroy(void)
     application.SendNotification();
     application.Render(static_cast<unsigned int>(1.0f));
 
-    DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f, TEST_LOCATION );
 
   }
 
@@ -584,7 +584,7 @@ int UtcLinearConstrainerDestroy(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1.0f));
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -612,7 +612,7 @@ int UtcLinearConstrainerRemove(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1.0f));
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 1.0f, TEST_LOCATION );
 
   //Remove constraint
   linearConstrainer.Remove( actor );
@@ -620,7 +620,7 @@ int UtcLinearConstrainerRemove(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1.0f));
 
-  DALI_TEST_EQUALS( actor.GetCurrentPosition().x, 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Dali::Actor::Property::POSITION ).x, 0.0f, TEST_LOCATION );
 
   END_TEST;
 }

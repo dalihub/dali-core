@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,16 +63,6 @@ Actor& Actor::operator=(const Actor& rhs)
 {
   BaseHandle::operator=(rhs);
   return *this;
-}
-
-const std::string& Actor::GetName() const
-{
-  return GetImplementation(*this).GetName();
-}
-
-void Actor::SetName(const std::string& name)
-{
-  GetImplementation(*this).SetName(name);
 }
 
 uint32_t Actor::GetId() const
@@ -145,26 +135,6 @@ Actor Actor::GetParent() const
   return Actor(parent);
 }
 
-void Actor::SetParentOrigin(const Vector3& origin)
-{
-  GetImplementation(*this).SetParentOrigin(origin);
-}
-
-Vector3 Actor::GetCurrentParentOrigin() const
-{
-  return GetImplementation(*this).GetCurrentParentOrigin();
-}
-
-void Actor::SetAnchorPoint(const Vector3& anchorPoint)
-{
-  GetImplementation(*this).SetAnchorPoint(anchorPoint);
-}
-
-Vector3 Actor::GetCurrentAnchorPoint() const
-{
-  return GetImplementation(*this).GetCurrentAnchorPoint();
-}
-
 void Actor::SetSize(float width, float height)
 {
   GetImplementation(*this).SetSize(width, height);
@@ -188,11 +158,6 @@ void Actor::SetSize(const Vector3& size)
 Vector3 Actor::GetTargetSize() const
 {
   return GetImplementation(*this).GetTargetSize();
-}
-
-Vector3 Actor::GetCurrentSize() const
-{
-  return GetImplementation(*this).GetCurrentSize();
 }
 
 Vector3 Actor::GetNaturalSize() const
@@ -235,16 +200,6 @@ void Actor::TranslateBy(const Vector3& distance)
   GetImplementation(*this).TranslateBy(distance);
 }
 
-Vector3 Actor::GetCurrentPosition() const
-{
-  return GetImplementation(*this).GetCurrentPosition();
-}
-
-Vector3 Actor::GetCurrentWorldPosition() const
-{
-  return GetImplementation(*this).GetCurrentWorldPosition();
-}
-
 void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
   GetImplementation(*this).SetOrientation(angle, axis);
@@ -263,26 +218,6 @@ void Actor::RotateBy(const Radian& angle, const Vector3& axis)
 void Actor::RotateBy(const Quaternion& relativeRotation)
 {
   GetImplementation(*this).RotateBy(relativeRotation);
-}
-
-Quaternion Actor::GetCurrentOrientation() const
-{
-  return GetImplementation(*this).GetCurrentOrientation();
-}
-
-void Actor::SetInheritOrientation(bool inherit)
-{
-  GetImplementation(*this).SetInheritOrientation(inherit);
-}
-
-bool Actor::IsOrientationInherited() const
-{
-  return GetImplementation(*this).IsOrientationInherited();
-}
-
-Quaternion Actor::GetCurrentWorldOrientation() const
-{
-  return GetImplementation(*this).GetCurrentWorldOrientation();
 }
 
 void Actor::SetScale(float scale)
@@ -305,26 +240,6 @@ void Actor::ScaleBy(const Vector3& relativeScale)
   GetImplementation(*this).ScaleBy(relativeScale);
 }
 
-Vector3 Actor::GetCurrentScale() const
-{
-  return GetImplementation(*this).GetCurrentScale();
-}
-
-Vector3 Actor::GetCurrentWorldScale() const
-{
-  return GetImplementation(*this).GetCurrentWorldScale();
-}
-
-void Actor::SetInheritScale( bool inherit )
-{
-  GetImplementation(*this).SetInheritScale( inherit );
-}
-
-bool Actor::IsScaleInherited() const
-{
-  return GetImplementation(*this).IsScaleInherited();
-}
-
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   GetImplementation(*this).SetSizeModeFactor(factor);
@@ -333,41 +248,6 @@ void Actor::SetSizeModeFactor(const Vector3& factor)
 Vector3 Actor::GetSizeModeFactor() const
 {
   return GetImplementation(*this).GetSizeModeFactor();
-}
-
-Matrix Actor::GetCurrentWorldMatrix() const
-{
-  return GetImplementation(*this).GetCurrentWorldMatrix();
-}
-
-void Actor::SetVisible(bool visible)
-{
-  GetImplementation(*this).SetVisible(visible);
-}
-
-bool Actor::IsVisible() const
-{
-  return GetImplementation(*this).IsVisible();
-}
-
-void Actor::SetOpacity(float opacity)
-{
-  GetImplementation(*this).SetOpacity(opacity);
-}
-
-float Actor::GetCurrentOpacity() const
-{
-  return GetImplementation(*this).GetCurrentOpacity();
-}
-
-void Actor::SetColor(const Vector4& color)
-{
-  GetImplementation(*this).SetColor(color);
-}
-
-Vector4 Actor::GetCurrentColor() const
-{
-  return GetImplementation(*this).GetCurrentColor();
 }
 
 void Actor::SetColorMode( ColorMode colorMode )
@@ -380,11 +260,6 @@ ColorMode Actor::GetColorMode() const
   return GetImplementation(*this).GetColorMode();
 }
 
-Vector4 Actor::GetCurrentWorldColor() const
-{
-  return GetImplementation(*this).GetCurrentWorldColor();
-}
-
 void Actor::SetDrawMode( DrawMode::Type drawMode )
 {
   GetImplementation(*this).SetDrawMode( drawMode );
@@ -395,29 +270,9 @@ DrawMode::Type Actor::GetDrawMode() const
   return GetImplementation(*this).GetDrawMode();
 }
 
-void Actor::SetSensitive(bool sensitive)
-{
-  GetImplementation(*this).SetSensitive(sensitive);
-}
-
-bool Actor::IsSensitive() const
-{
-  return GetImplementation(*this).IsSensitive();
-}
-
 bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const
 {
   return GetImplementation(*this).ScreenToLocal(localX, localY, screenX, screenY);
-}
-
-void Actor::SetLeaveRequired(bool required)
-{
-  GetImplementation(*this).SetLeaveRequired(required);
-}
-
-bool Actor::GetLeaveRequired() const
-{
-  return GetImplementation(*this).GetLeaveRequired();
 }
 
 void Actor::SetKeyboardFocusable( bool focusable )
@@ -517,36 +372,6 @@ void Actor::GetPadding( Padding& paddingOut ) const
   paddingOut.right = widthPadding.y;
   paddingOut.bottom = heightPadding.x;
   paddingOut.top = heightPadding.y;
-}
-
-void Actor::SetMinimumSize( const Vector2& size )
-{
-  Internal::Actor& impl = GetImplementation(*this);
-
-  impl.SetMinimumSize( size.x, Dimension::WIDTH );
-  impl.SetMinimumSize( size.y, Dimension::HEIGHT );
-}
-
-Vector2 Actor::GetMinimumSize()
-{
-  Internal::Actor& impl = GetImplementation(*this);
-
-  return Vector2( impl.GetMinimumSize( Dimension::WIDTH ), impl.GetMinimumSize( Dimension::HEIGHT ) );
-}
-
-void Actor::SetMaximumSize( const Vector2& size )
-{
-  Internal::Actor& impl = GetImplementation(*this);
-
-  impl.SetMaximumSize( size.x, Dimension::WIDTH );
-  impl.SetMaximumSize( size.y, Dimension::HEIGHT );
-}
-
-Vector2 Actor::GetMaximumSize()
-{
-  Internal::Actor& impl = GetImplementation(*this);
-
-  return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
 int32_t Actor::GetHierarchyDepth()

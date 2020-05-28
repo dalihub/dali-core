@@ -169,7 +169,7 @@ int UtcDaliPinchGestureDetectorNew(void)
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -230,7 +230,7 @@ int UtcDaliPinchGestureSignalReceptionNegative(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -272,7 +272,7 @@ int UtcDaliPinchGestureSignalReceptionDownMotionLeave(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -333,7 +333,7 @@ int UtcDaliPinchGestureSignalReceptionDownMotionUp(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -384,7 +384,7 @@ int UtcDaliPinchGestureSignalReceptionDetach(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -435,7 +435,7 @@ int UtcDaliPinchGestureSignalReceptionDetachWhilePinching(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -487,7 +487,7 @@ int UtcDaliPinchGestureSignalReceptionActorDestroyedWhilePinching(void)
   // is destroyed.
   Actor tempActor = Actor::New();
   tempActor.SetSize(100.0f, 100.0f);
-  tempActor.SetAnchorPoint(AnchorPoint::BOTTOM_RIGHT);
+  tempActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
   Stage::GetCurrent().Add(tempActor);
   detector.Attach(tempActor);
 
@@ -495,7 +495,7 @@ int UtcDaliPinchGestureSignalReceptionActorDestroyedWhilePinching(void)
   {
     Actor actor = Actor::New();
     actor.SetSize(100.0f, 100.0f);
-    actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(actor);
 
     // Render and notify
@@ -606,7 +606,7 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
-  parent.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(parent);
 
   // Set child to completely cover parent.
@@ -614,8 +614,8 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
   child.SetSize(100.0f, 100.0f);
-  child.SetAnchorPoint(AnchorPoint::CENTER);
-  child.SetParentOrigin(ParentOrigin::CENTER);
+  child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
+  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetOrientation(Dali::Degree(90.0f), Vector3::ZAXIS);
   parent.Add(child);
 
@@ -670,13 +670,13 @@ int UtcDaliPinchGestureSignalReceptionAttachDetachMany(void)
 
   Actor first = Actor::New();
   first.SetSize(100.0f, 100.0f);
-  first.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(first);
 
   Actor second = Actor::New();
   second.SetSize(100.0f, 100.0f);
   second.SetX(100.0f);
-  second.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(second);
 
   // Render and notify
@@ -721,7 +721,7 @@ int UtcDaliPinchGestureSignalReceptionActorBecomesUntouchable(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -747,7 +747,7 @@ int UtcDaliPinchGestureSignalReceptionActorBecomesUntouchable(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor become invisible - actor should not receive the next pinch
-  actor.SetVisible(false);
+  actor.SetProperty( Actor::Property::VISIBLE,false);
 
   // Render and notify
   application.SendNotification();
@@ -767,12 +767,12 @@ int UtcDaliPinchGestureSignalReceptionMultipleDetectorsOnActor(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetSize(100.0f, 100.0f);
-  actor2.SetAnchorPoint(AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
   Stage::GetCurrent().Add(actor2);
 
   // Render and notify
@@ -846,7 +846,7 @@ int UtcDaliPinchGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor1 = Actor::New();
   actor1.SetSize(100.0f, 100.0f);
-  actor1.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor1);
   SignalData data1;
   GestureReceivedFunctor functor1(data1);
@@ -856,8 +856,8 @@ int UtcDaliPinchGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor2 = Actor::New();
   actor2.SetSize(100.0f, 100.0f);
-  actor2.SetAnchorPoint(AnchorPoint::BOTTOM_RIGHT);
-  actor2.SetParentOrigin(ParentOrigin::BOTTOM_RIGHT);
+  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::BOTTOM_RIGHT);
   Stage::GetCurrent().Add(actor2);
   SignalData data2;
   GestureReceivedFunctor functor2(data2);
@@ -883,7 +883,7 @@ int UtcDaliPinchGestureActorUnstaged(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -974,14 +974,14 @@ int UtcDaliPinchGestureActorStagedAndDestroyed(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor( Actor::New() );
   dummyActor.SetSize( 100.0f, 100.0f );
   dummyActor.SetPosition( 100.0f, 100.0f );
-  dummyActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  dummyActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(dummyActor);
 
   // Render and notify
@@ -1066,7 +1066,7 @@ int UtcDaliPinchGestureLayerConsumesTouch(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Add a detector
@@ -1079,7 +1079,7 @@ int UtcDaliPinchGestureLayerConsumesTouch(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetSize(100.0f, 100.0f);
-  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add( layer );
   layer.RaiseToTop();
 

@@ -55,7 +55,7 @@ Actor CreateActor( SetSampler setSamplerOption )
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetSize(400, 400);
 
   return actor;
@@ -253,7 +253,7 @@ int UtcDaliTextureSetSetSampler(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetSize(400, 400);
 
   Stage::GetCurrent().Add( actor );

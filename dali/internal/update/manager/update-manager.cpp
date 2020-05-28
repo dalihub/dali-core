@@ -544,7 +544,7 @@ void UpdateManager::RemoveScene( Scene* scene )
   {
     if ( sceneInfo && sceneInfo->scene && sceneInfo->scene.Get() == scene )
     {
-      sceneInfo->scene.Reset();
+      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), sceneInfo->scene.Release() ); // take the address of the reference to a pointer
       break;
     }
   }

@@ -220,6 +220,7 @@ protected: // Data
 
 };
 
+/// @cond internal
 /**
  * @brief Vector algorithm variant for trivial types.
  *
@@ -378,7 +379,9 @@ protected: // API for deriving classes
     CopyMemory( reinterpret_cast< char* >( at ), reinterpret_cast< const char* >( from ), size );
   }
 };
+/// @endcond
 
+/// @cond internal
 /**
  * @brief Vector algorithm variant for complex types.
  *
@@ -396,6 +399,7 @@ private:
   ~VectorAlgorithms()
   { }
 };
+/// @endcond
 
 /**
  * @brief Vector class with minimum space allocation when it's empty.
