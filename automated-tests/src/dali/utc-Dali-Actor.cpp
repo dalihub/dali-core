@@ -7267,35 +7267,51 @@ int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
 int utcDaliActorGetSizeAfterAnimation(void)
 {
   TestApplication application;
-  tet_infoline( "Check the actor size when an animation is finished" );
+  tet_infoline( "Check the actor size before / after an animation is finished" );
 
-  Vector3 vector( 100.0f, 100.0f, 0.0f );
+  Vector3 actorSize( 100.0f, 100.0f, 0.0f );
 
   Actor actor = Actor::New();
-  actor.SetSize( vector.x, vector.y );
+  actor.SetSize( actorSize );
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   Stage::GetCurrent().Add( actor );
+
+  // Size should be updated without rendering.
+  Vector3 size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
-  Vector3 size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
-  DALI_TEST_EQUALS( size, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+  // Size and current size should be updated.
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.width, actor.GetProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.height, actor.GetProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.depth, actor.GetProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
   Vector3 currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
-  DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
-  DALI_TEST_EQUALS( vector.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actorSize.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
-  Vector3 targetValue( 10.0f, 20.0f, 30.0f );
+  // Set size again
+  actorSize = Vector3( 200.0f, 200.0f, 0.0f );
+  actor.SetSize( actorSize );
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  Vector3 targetValue( 10.0f, 20.0f, 0.0f );
 
   Animation animation = Animation::New( 1.0f );
   animation.AnimateTo( Property( actor, Actor::Property::SIZE ), targetValue );
   animation.Play();
+
+  // Size should be updated without rendering.
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   application.SendNotification();
   application.Render( 1100 ); // After the animation
@@ -7354,7 +7370,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
   DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
   DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
 
-  Vector3 offset( 10.0f, 20.0f, 30.0f );
+  Vector3 offset( 10.0f, 20.0f, 0.0f );
 
   animation.Clear();
   animation.AnimateBy( Property( actor, Actor::Property::SIZE ), offset );
@@ -7422,6 +7438,26 @@ int utcDaliActorGetSizeAfterAnimation(void)
   DALI_TEST_EQUALS( targetValue.width, actor.GetCurrentProperty< float >( Actor::Property::SIZE_WIDTH ), TEST_LOCATION );
   DALI_TEST_EQUALS( targetValue.height, actor.GetCurrentProperty< float >( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
   DALI_TEST_EQUALS( targetValue.depth, actor.GetCurrentProperty< float >( Actor::Property::SIZE_DEPTH ), TEST_LOCATION );
+
+  // Set size again
+  actorSize = Vector3( 300.0f, 300.0f, 0.0f );
+
+  actor.SetSize( actorSize );
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, targetValue, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  currentSize = actor.GetCurrentProperty( Actor::Property::SIZE ).Get< Vector3 >();
+  DALI_TEST_EQUALS( currentSize, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }

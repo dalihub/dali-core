@@ -1154,6 +1154,8 @@ void Actor::SetWidth( float width )
     SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeX, width );
   }
 
+  mUseAnimatedSize &= ~AnimatedSizeFlag::WIDTH;
+
   RelayoutRequest();
 }
 
@@ -1172,12 +1174,16 @@ void Actor::SetHeight( float height )
     SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeY, height );
   }
 
+  mUseAnimatedSize &= ~AnimatedSizeFlag::HEIGHT;
+
   RelayoutRequest();
 }
 
 void Actor::SetDepth( float depth )
 {
   mTargetSize.depth = depth;
+
+  mUseAnimatedSize &= ~AnimatedSizeFlag::DEPTH;
 
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodeTransformComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, depth );
@@ -1187,14 +1193,35 @@ Vector3 Actor::GetTargetSize() const
 {
   Vector3 size = mTargetSize;
 
-  // Should return preferred size if size is fixed as set by SetSize
-  if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+  if( mUseAnimatedSize & AnimatedSizeFlag::WIDTH )
   {
-    size.width = GetPreferredSize().width;
+    // Should return animated size if size is animated
+    size.width = mAnimatedSize.width;
   }
-  if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+  else
   {
-    size.height = GetPreferredSize().height;
+    // Should return preferred size if size is fixed as set by SetSize
+    if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
+    {
+      size.width = GetPreferredSize().width;
+    }
+  }
+
+  if( mUseAnimatedSize & AnimatedSizeFlag::HEIGHT )
+  {
+    size.height = mAnimatedSize.height;
+  }
+  else
+  {
+    if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
+    {
+      size.height = GetPreferredSize().height;
+    }
+  }
+
+  if( mUseAnimatedSize & AnimatedSizeFlag::DEPTH )
+  {
+    size.depth = mAnimatedSize.depth;
   }
 
   return size;
@@ -2031,9 +2058,11 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mTargetSize( Vector3::ZERO ),
   mTargetPosition( Vector3::ZERO ),
   mTargetScale( Vector3::ONE ),
+  mAnimatedSize( Vector3::ZERO ),
   mName(),
   mSortedDepth( 0u ),
   mDepth( 0u ),
+  mUseAnimatedSize( AnimatedSizeFlag::CLEAR ),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
   mIsOnStage( false ),
@@ -2930,18 +2959,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize ) )
           {
-            if( mRelayoutData )
-            {
-              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-              {
-                mRelayoutData->preferredSize.width = mTargetSize.width;
-              }
-
-              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-              {
-                mRelayoutData->preferredSize.height = mTargetSize.height;
-              }
-            }
+            mAnimatedSize = mTargetSize;
+            mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -2953,10 +2972,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.width ) )
           {
-            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-            {
-              mRelayoutData->preferredSize.width = mTargetSize.width;
-            }
+            mAnimatedSize.width = mTargetSize.width;
+            mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -2968,10 +2985,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.height ) )
           {
-            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-            {
-              mRelayoutData->preferredSize.height = mTargetSize.height;
-            }
+            mAnimatedSize.height = mTargetSize.height;
+            mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -2983,6 +2998,9 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( value.Get( mTargetSize.depth ) )
           {
+            mAnimatedSize.depth = mTargetSize.depth;
+            mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -3097,18 +3115,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< Vector3 >( mTargetSize, value ) )
           {
-            if( mRelayoutData )
-            {
-              if( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-              {
-                mRelayoutData->preferredSize.width = mTargetSize.width;
-              }
-
-              if( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-              {
-                mRelayoutData->preferredSize.height = mTargetSize.height;
-              }
-            }
+            mAnimatedSize = mTargetSize;
+            mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -3120,10 +3128,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.width, value ) )
           {
-            if( mRelayoutData && GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FIXED )
-            {
-              mRelayoutData->preferredSize.width = mTargetSize.width;
-            }
+            mAnimatedSize.width = mTargetSize.width;
+            mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -3135,10 +3141,8 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.height, value ) )
           {
-            if( mRelayoutData && GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::FIXED )
-            {
-              mRelayoutData->preferredSize.height = mTargetSize.height;
-            }
+            mAnimatedSize.height = mTargetSize.height;
+            mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
 
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
@@ -3150,6 +3154,9 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         {
           if( AdjustValue< float >( mTargetSize.depth, value ) )
           {
+            mAnimatedSize.depth = mTargetSize.depth;
+            mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
+
             // Notify deriving classes
             OnSizeAnimation( animation, mTargetSize );
           }
@@ -4708,6 +4715,8 @@ void Actor::SetPreferredSize( const Vector2& size )
   }
 
   mRelayoutData->preferredSize = size;
+
+  mUseAnimatedSize = AnimatedSizeFlag::CLEAR;
 
   RelayoutRequest();
 }

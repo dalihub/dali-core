@@ -1740,6 +1740,17 @@ private:
     };
   };
 
+  struct AnimatedSizeFlag
+  {
+    enum Type
+    {
+      CLEAR  = 0,
+      WIDTH  = 1,
+      HEIGHT = 2,
+      DEPTH  = 4
+    };
+  };
+
   // Remove default constructor and copy constructor
   Actor() = delete;
   Actor( const Actor& ) = delete;
@@ -1970,10 +1981,12 @@ protected:
   Vector3         mTargetSize;        ///< Event-side storage for size (not a pointer as most actors will have a size)
   Vector3         mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3         mTargetScale;       ///< Event-side storage for scale
+  Vector3         mAnimatedSize;      ///< Event-side storage for size animation
 
   std::string     mName;              ///< Name of the actor
   uint32_t        mSortedDepth;       ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t         mDepth;             ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  uint16_t        mUseAnimatedSize;   ///< Whether the size is animated.
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
