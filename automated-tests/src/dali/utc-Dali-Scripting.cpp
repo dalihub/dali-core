@@ -507,10 +507,10 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::MAGENTA, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< std::string >( Actor::Property::NAME ), "MyActor", TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_PARENT_COLOR, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::SENSITIVE ), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::LEAVE_REQUIRED ), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::OVERLAY_2D, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_ORIENTATION ), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_SCALE ), false, TEST_LOCATION );
 
@@ -676,7 +676,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
     actor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
     actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
-    actor.SetSizeModeFactor( Vector3::ONE );
+    actor.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3::ONE );
 
     Stage::GetCurrent().Add( actor );
     application.SendNotification();
@@ -715,12 +715,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     Stage::GetCurrent().Remove( actor );
   }
-
-  // ColorMode
-  TestEnumStrings< ColorMode >( "colorMode",  application, COLOR_MODE_VALUES, COLOR_MODE_VALUES_COUNT, &Actor::SetColorMode );
-
-  // DrawMode
-  TestEnumStrings< DrawMode::Type >( "drawMode",  application, DRAW_MODE_VALUES, DRAW_MODE_VALUES_COUNT, &Actor::SetDrawMode );
 
   // Children
   {

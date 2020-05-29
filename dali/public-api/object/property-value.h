@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_VALUE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,14 @@ public:
    * @param[in] vectorValue A vector of 4 integer values
    */
   Value( const Rect<int32_t>& vectorValue );
+
+  /**
+   * @brief Creates a Vector4 property value.
+   *
+   * @SINCE_1_9.14
+   * @param[in] vectorValue A vector of 4 float values
+   */
+  Value( const Rect<float>& vectorValue );
 
   /**
    * @brief Creates an orientation property value.

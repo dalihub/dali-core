@@ -193,13 +193,13 @@ DALI_PROPERTY( "sensitive",                 BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED )
 DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
 DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
-DALI_PROPERTY( "colorMode",                 STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
+DALI_PROPERTY( "colorMode",                 INTEGER,  true,  false, false, Dali::Actor::Property::COLOR_MODE )
 DALI_PROPERTY( "reservedProperty01",        STRING,   true,  false, false, Dali::Actor::Property::RESERVED_PROPERTY_01 ) // This property was removed, but to keep binary compatibility and TypeRegister test app, remain it here.
-DALI_PROPERTY( "drawMode",                  STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
+DALI_PROPERTY( "drawMode",                  INTEGER,  true,  false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
 DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
 DALI_PROPERTY( "heightResizePolicy",        STRING,   true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
-DALI_PROPERTY( "sizeScalePolicy",           STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
+DALI_PROPERTY( "sizeScalePolicy",           INTEGER,  true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
 DALI_PROPERTY( "widthForHeight",            BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
 DALI_PROPERTY( "heightForWidth",            BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
 DALI_PROPERTY( "padding",                   VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING )
@@ -2623,7 +2623,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
       SizeScalePolicy::Type type = GetSizeScalePolicy();
-      if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
+      if( Scripting::GetEnumerationProperty< SizeScalePolicy::Type >( property, SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
       {
         SetSizeScalePolicy( type );
       }
@@ -3743,13 +3743,13 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
 
     case Dali::Actor::Property::COLOR_MODE:
     {
-      value = Scripting::GetLinearEnumerationName< ColorMode >( GetColorMode(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+      value = GetColorMode();
       break;
     }
 
     case Dali::Actor::Property::DRAW_MODE:
     {
-      value = Scripting::GetEnumerationName< DrawMode::Type >( GetDrawMode(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+      value = GetDrawMode();
       break;
     }
 
@@ -3773,7 +3773,7 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT );
+      value = GetSizeScalePolicy();
       break;
     }
 
@@ -4245,12 +4245,12 @@ float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type d
 
     case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
     {
-      return GetLatestSize( dimension ) * GetDimensionValue( child.GetSizeModeFactor(), dimension );
+      return GetLatestSize( dimension ) * GetDimensionValue( child.GetProperty< Vector3 >( Dali::Actor::Property::SIZE_MODE_FACTOR ), dimension );
     }
 
     case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
-      return GetLatestSize( dimension ) + GetDimensionValue( child.GetSizeModeFactor(), dimension );
+      return GetLatestSize( dimension ) + GetDimensionValue( child.GetProperty< Vector3 >( Dali::Actor::Property::SIZE_MODE_FACTOR ), dimension );
     }
 
     default:

@@ -1681,7 +1681,7 @@ int UtcDaliActorSetOrientation01(void)
   Quaternion rotation( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
   Actor actor = Actor::New();
 
-  actor.SetOrientation(rotation);
+  actor.SetProperty( Actor::Property::ORIENTATION, rotation);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1700,7 +1700,7 @@ int UtcDaliActorSetOrientation02(void)
   Radian angle( 0.785f );
   Vector3 axis(1.0f, 1.0f, 0.0f);
 
-  actor.SetOrientation( angle, axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( angle, axis ) );
   Quaternion rotation( angle, axis );
   // flush the queue and render once
   application.SendNotification();
@@ -1711,14 +1711,14 @@ int UtcDaliActorSetOrientation02(void)
   actor.RotateBy( Degree( 360 ), axis);
   DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  actor.SetOrientation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) ) );
   Quaternion result( Radian( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( result, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  actor.SetOrientation( angle, axis);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( angle, axis ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1804,7 +1804,7 @@ int UtcDaliActorGetCurrentOrientation(void)
   Actor actor = Actor::New();
 
   Quaternion rotation(Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
-  actor.SetOrientation(rotation);
+  actor.SetProperty( Actor::Property::ORIENTATION, rotation );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1820,11 +1820,11 @@ int UtcDaliActorGetCurrentWorldOrientation(void)
   Actor parent = Actor::New();
   Radian rotationAngle( Degree(90.0f) );
   Quaternion rotation( rotationAngle, Vector3::YAXIS );
-  parent.SetOrientation( rotation );
+  parent.SetProperty( Actor::Property::ORIENTATION, rotation );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetOrientation( rotation );
+  child.SetProperty( Actor::Property::ORIENTATION, rotation );
   parent.Add( child );
 
   // The actors should not have a world rotation yet
@@ -2353,7 +2353,7 @@ int UtcDaliActorGetCurrentWorldColor(void)
   DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
 
   // verify the default color mode
-  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, child.GetColorMode(), TEST_LOCATION );
+  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, child.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), TEST_LOCATION );
 
   // The actors should not have a world color yet
   DALI_TEST_EQUALS( parent.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), Color::WHITE, TEST_LOCATION );
@@ -2370,20 +2370,20 @@ int UtcDaliActorGetCurrentWorldColor(void)
   DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), Vector4( childColor.r, childColor.g, childColor.b, childColor.a * parentColor.a), TEST_LOCATION );
 
   // use own color
-  child.SetColorMode( USE_OWN_COLOR );
+  child.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), childColor, TEST_LOCATION );
 
   // use parent color
-  child.SetColorMode( USE_PARENT_COLOR );
+  child.SetProperty( Actor::Property::COLOR_MODE, USE_PARENT_COLOR );
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), childColor, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ), parentColor, TEST_LOCATION );
 
   // use parent alpha
-  child.SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );
+  child.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA );
   application.SendNotification();
   application.Render(0);
   Vector4 expectedColor( childColor );
@@ -2401,17 +2401,17 @@ int UtcDaliActorSetColorMode(void)
   Actor child = Actor::New();
   actor.Add( child );
 
-  actor.SetColorMode( USE_OWN_COLOR );
-  DALI_TEST_EQUALS( USE_OWN_COLOR, actor.GetColorMode(), TEST_LOCATION );
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
+  DALI_TEST_EQUALS( USE_OWN_COLOR, actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), TEST_LOCATION );
 
-  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_COLOR, actor.GetColorMode(), TEST_LOCATION );
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
+  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_COLOR, actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), TEST_LOCATION );
 
-  actor.SetColorMode( USE_PARENT_COLOR );
-  DALI_TEST_EQUALS( USE_PARENT_COLOR, actor.GetColorMode(), TEST_LOCATION );
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_PARENT_COLOR );
+  DALI_TEST_EQUALS( USE_PARENT_COLOR, actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), TEST_LOCATION );
 
-  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );
-  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, actor.GetColorMode(), TEST_LOCATION );
+  actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA );
+  DALI_TEST_EQUALS( USE_OWN_MULTIPLY_PARENT_ALPHA, actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), TEST_LOCATION );
   END_TEST;
 }
 
@@ -2895,19 +2895,19 @@ int UtcDaliActorSetDrawMode(void)
   app.SendNotification();
   app.Render(1);
 
-  DALI_TEST_CHECK( DrawMode::NORMAL == a.GetDrawMode() ); // Ensure overlay is off by default
+  DALI_TEST_CHECK( DrawMode::NORMAL == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Ensure overlay is off by default
 
-  a.SetDrawMode( DrawMode::OVERLAY_2D );
+  a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   app.SendNotification();
   app.Render(1);
 
-  DALI_TEST_CHECK( DrawMode::OVERLAY_2D == a.GetDrawMode() ); // Check Actor is overlay
+  DALI_TEST_CHECK( DrawMode::OVERLAY_2D == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Check Actor is overlay
 
-  a.SetDrawMode( DrawMode::NORMAL );
+  a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::NORMAL );
   app.SendNotification();
   app.Render(1);
 
-  DALI_TEST_CHECK( DrawMode::NORMAL == a.GetDrawMode() ); // Check Actor is normal
+  DALI_TEST_CHECK( DrawMode::NORMAL == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Check Actor is normal
   END_TEST;
 }
 
@@ -2965,7 +2965,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   // b (9)
   // c (10)
   // a (8)
-  a.SetDrawMode( DrawMode::OVERLAY_2D );
+  a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   app.GetGlAbstraction().ClearBoundTextures();
 
   app.SendNotification();
@@ -2995,7 +2995,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetOrientation( parentRotation );
+  parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -3006,7 +3006,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion childRotation( childRotationAngle, Vector3::YAXIS );
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
   child.SetPosition( childPosition );
-  child.SetOrientation( childRotation );
+  child.SetProperty( Actor::Property::ORIENTATION, childRotation );
   child.SetScale( childScale );
   parent.Add( child );
 
@@ -3045,7 +3045,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetOrientation( parentRotation );
+  parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -3083,7 +3083,7 @@ int UtcDaliActorConstrainedToOrientation(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetOrientation( parentRotation );
+  parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -3216,8 +3216,8 @@ int UtcDaliActorSetGetOverlay(void)
   tet_infoline(" UtcDaliActorSetGetOverlay");
 
   Actor parent = Actor::New();
-  parent.SetDrawMode(DrawMode::OVERLAY_2D );
-  DALI_TEST_CHECK( parent.GetDrawMode() == DrawMode::OVERLAY_2D );
+  parent.SetProperty( Actor::Property::DRAW_MODE,DrawMode::OVERLAY_2D );
+  DALI_TEST_CHECK( parent.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) == DrawMode::OVERLAY_2D );
   END_TEST;
 }
 
@@ -3281,12 +3281,12 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "leaveRequired",            Actor::Property::LEAVE_REQUIRED,           Property::BOOLEAN     },
   { "inheritOrientation",       Actor::Property::INHERIT_ORIENTATION,      Property::BOOLEAN     },
   { "inheritScale",             Actor::Property::INHERIT_SCALE,            Property::BOOLEAN     },
-  { "colorMode",                Actor::Property::COLOR_MODE,               Property::STRING      },
-  { "drawMode",                 Actor::Property::DRAW_MODE,                Property::STRING      },
+  { "colorMode",                Actor::Property::COLOR_MODE,               Property::INTEGER     },
+  { "drawMode",                 Actor::Property::DRAW_MODE,                Property::INTEGER     },
   { "sizeModeFactor",           Actor::Property::SIZE_MODE_FACTOR,         Property::VECTOR3     },
   { "widthResizePolicy",        Actor::Property::WIDTH_RESIZE_POLICY,      Property::STRING      },
   { "heightResizePolicy",       Actor::Property::HEIGHT_RESIZE_POLICY,     Property::STRING      },
-  { "sizeScalePolicy",          Actor::Property::SIZE_SCALE_POLICY,        Property::STRING      },
+  { "sizeScalePolicy",          Actor::Property::SIZE_SCALE_POLICY,        Property::INTEGER     },
   { "widthForHeight",           Actor::Property::WIDTH_FOR_HEIGHT,         Property::BOOLEAN     },
   { "heightForWidth",           Actor::Property::HEIGHT_FOR_WIDTH,         Property::BOOLEAN     },
   { "padding",                  Actor::Property::PADDING,                  Property::VECTOR4     },
@@ -3362,22 +3362,21 @@ int UtcDaliRelayoutProperties_SizeScalePolicy(void)
   Actor actor = Actor::New();
 
   // Defaults
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), "USE_SIZE_SET", TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetSizeScalePolicy(), SizeScalePolicy::USE_SIZE_SET, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< SizeScalePolicy::Type >( Actor::Property::SIZE_SCALE_POLICY ), SizeScalePolicy::USE_SIZE_SET, TEST_LOCATION );
 
   SizeScalePolicy::Type policy = SizeScalePolicy::FILL_WITH_ASPECT_RATIO;
-  actor.SetSizeScalePolicy( policy );
-  DALI_TEST_EQUALS( actor.GetSizeScalePolicy(), policy, TEST_LOCATION );
+  actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy );
+  DALI_TEST_EQUALS( actor.GetProperty< SizeScalePolicy::Type >( Actor::Property::SIZE_SCALE_POLICY ), policy, TEST_LOCATION );
 
   // Set
-  const char* const policy1 = "FIT_WITH_ASPECT_RATIO";
-  const char* const policy2 = "FILL_WITH_ASPECT_RATIO";
+  const SizeScalePolicy::Type policy1 = SizeScalePolicy::FIT_WITH_ASPECT_RATIO;
+  const SizeScalePolicy::Type policy2 = SizeScalePolicy::FILL_WITH_ASPECT_RATIO;
 
   actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy1 );
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), policy1, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< SizeScalePolicy::Type >( Actor::Property::SIZE_SCALE_POLICY ), policy1, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy2 );
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), policy2, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< SizeScalePolicy::Type >( Actor::Property::SIZE_SCALE_POLICY ), policy2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3390,11 +3389,11 @@ int UtcDaliRelayoutProperties_SizeModeFactor(void)
 
   // Defaults
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_MODE_FACTOR ).Get< Vector3 >(), Vector3( 1.0f, 1.0f, 1.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetSizeModeFactor(), Vector3( 1.0f, 1.0f, 1.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE_MODE_FACTOR ), Vector3( 1.0f, 1.0f, 1.0f ), TEST_LOCATION );
 
   Vector3 sizeMode( 1.0f, 2.0f, 3.0f );
-  actor.SetSizeModeFactor( sizeMode );
-  DALI_TEST_EQUALS( actor.GetSizeModeFactor(), sizeMode, TEST_LOCATION );
+  actor.SetProperty( Actor::Property::SIZE_MODE_FACTOR, sizeMode );
+  DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::SIZE_MODE_FACTOR ), sizeMode, TEST_LOCATION );
 
   // Set
   Vector3 sizeMode1( 2.0f, 3.0f, 4.0f );
@@ -3523,7 +3522,7 @@ int UtcDaliActorSetPadding(void)
   Actor actor = Actor::New();
 
   Padding padding;
-  actor.GetPadding( padding );
+  padding = actor.GetProperty<Vector4>( Actor::Property::PADDING );
 
   DALI_TEST_EQUALS( padding.left, 0.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( padding.right, 0.0f, TEST_LOCATION );
@@ -3531,9 +3530,9 @@ int UtcDaliActorSetPadding(void)
   DALI_TEST_EQUALS( padding.top, 0.0f, TEST_LOCATION );
 
   Padding padding2( 1.0f, 2.0f, 3.0f, 4.0f );
-  actor.SetPadding( padding2 );
+  actor.SetProperty( Actor::Property::PADDING, padding2 );
 
-  actor.GetPadding( padding );
+  padding = actor.GetProperty<Vector4>( Actor::Property::PADDING );
 
   DALI_TEST_EQUALS( padding.left, padding2.left, TEST_LOCATION );
   DALI_TEST_EQUALS( padding.right, padding2.right, TEST_LOCATION );
@@ -3782,20 +3781,20 @@ int UtcDaliActorColorModePropertyAsString(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_COLOR" );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, "USE_PARENT_COLOR" );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_PARENT_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_MULTIPLY_PARENT_COLOR" );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, "USE_OWN_MULTIPLY_PARENT_ALPHA" );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
 
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::COLOR_MODE, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3807,14 +3806,14 @@ int UtcDaliActorDrawModePropertyAsString(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::DRAW_MODE, "NORMAL" );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::NORMAL, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::DRAW_MODE, "OVERLAY_2D" );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::OVERLAY_2D, TEST_LOCATION );
 
   // Invalid should not change anything
   actor.SetProperty( Actor::Property::DRAW_MODE, "INVALID_ARG" );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::OVERLAY_2D, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3826,16 +3825,16 @@ int UtcDaliActorColorModePropertyAsEnum(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, USE_PARENT_COLOR );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_PARENT_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA );
-  DALI_TEST_EQUALS( actor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< ColorMode >( Actor::Property::COLOR_MODE ), USE_OWN_MULTIPLY_PARENT_ALPHA, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3847,10 +3846,10 @@ int UtcDaliActorDrawModePropertyAsEnum(void)
   Actor actor = Actor::New();
 
   actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::NORMAL );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::NORMAL, TEST_LOCATION );
 
   actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
-  DALI_TEST_EQUALS( actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ), DrawMode::OVERLAY_2D, TEST_LOCATION );
 
   END_TEST;
 }
@@ -6473,7 +6472,7 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
@@ -6507,7 +6506,7 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetSize( 100.0f, 100.0f );
-  actor.SetOrientation( Degree( 90.0f), Vector3::ZAXIS );
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetScale( 2.0f );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,6 +117,12 @@ struct Property::Value::Impl
   Impl( const Rect<int32_t>& rectValue )
   : type( Property::RECTANGLE ),
     rectValue( new Rect<int>( rectValue ) )
+  {
+  }
+
+  Impl( const Rect<float>& rectValue )
+  : type( Property::VECTOR4 ),
+    vector4Value( new Vector4( rectValue.x, rectValue.y, rectValue.width, rectValue.height ) )
   {
   }
 
@@ -303,6 +309,11 @@ Property::Value::Value( const Matrix& matrixValue )
 }
 
 Property::Value::Value( const Rect<int32_t>& rectValue )
+: mImpl( new Impl( rectValue ) )
+{
+}
+
+Property::Value::Value( const Rect<float>& rectValue )
 : mImpl( new Impl( rectValue ) )
 {
 }
