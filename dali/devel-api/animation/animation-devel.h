@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,23 @@ DALI_CORE_API float GetProgressNotification( Animation animation );
  * @brief Connects to this signal to be notified when an Animation's animations have reached set progress.
  *
  * @return A signal object to connect with
- *
  */
 DALI_CORE_API Animation::AnimationSignalType& ProgressReachedSignal( Animation animation );
+
+/**
+ * @brief Retrive the number of Animations.
+ *
+ * @return The number of Animations.
+ */
+DALI_CORE_API uint32_t GetAnimationCount();
+
+/**
+ * @brief Retrieve an Animation by index.
+ *
+ * @param[in] index The index of the Animation to retrieve
+ * @return The animation for the given index or empty handle
+ */
+DALI_CORE_API Animation GetAnimationAt( uint32_t index );
 
 } // namespace DevelAnimation
 

@@ -13528,3 +13528,42 @@ int UtcDaliAnimationCombineToAndByWithStop(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationCountAndGetAnimationAt(void)
+{
+  tet_infoline( "UtcDaliAnimationCountAndGetAnimationAt");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetPosition( 100.0f, 100.0f );
+  Stage::GetCurrent().Add( actor );
+
+  auto animation = Animation::New( 1.0f );
+  const float origY = actor.GetProperty( Actor::Property::POSITION_Y ).Get< float >();
+  animation.AnimateTo( Property( actor, Actor::Property::POSITION ), Vector3( 150.0f, origY, 0.0f ), TimePeriod( 1.0f ) );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 500 );
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS( animationCount, 1, TEST_LOCATION );
+
+  DALI_TEST_CHECK( !Dali::DevelAnimation::GetAnimationAt( 5 ) );
+
+  Dali::Animation animationReturned = Dali::DevelAnimation::GetAnimationAt( 0 );
+  DALI_TEST_EQUALS( animationReturned.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( animation.GetDuration(), animationReturned.GetDuration(), TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.GetLoopCount(), animationReturned.GetLoopCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.IsLooping(), animationReturned.IsLooping(), TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.GetEndAction(), animationReturned.GetEndAction(), TEST_LOCATION );
+  DALI_TEST_EQUALS( animation.GetState(), animationReturned.GetState(), TEST_LOCATION );
+
+  // Stop and clear the animation using the current values
+  animation.Stop();
+  animation.Clear();
+
+  END_TEST;
+}
