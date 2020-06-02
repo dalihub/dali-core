@@ -151,7 +151,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *
  *     Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
  *     @endcode
- *     For more information, see SetDrawMode().
+ *     For more information, see Property::DRAW_MODE.
  *
  * <i>Touch or hover Event Delivery:</i>
  *
@@ -409,7 +409,6 @@ public:
        * @brief The orientation of an actor.
        * @details Name "orientation", type Property::ROTATION, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetOrientation()
        */
       ORIENTATION,
 
@@ -555,7 +554,6 @@ public:
        * @brief The color mode of an actor.
        * @details Name "colorMode", type ColorMode (Property::INTEGER) or Property::STRING.
        * @SINCE_1_0.0
-       * @see Actor::SetColorMode()
        */
       COLOR_MODE,
 
@@ -568,7 +566,6 @@ public:
        * @brief The draw mode of an actor.
        * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_0.0
-       * @see Actor::SetDrawMode()
        */
       DRAW_MODE,
 
@@ -598,9 +595,8 @@ public:
 
       /**
        * @brief The size scale policy of an actor.
-       * @details Name "sizeScalePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+       * @details Name "sizeScalePolicy", type SizeScalePolicy::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_0.0
-       * @see Actor::SetSizeScalePolicy()
        */
       SIZE_SCALE_POLICY,
 
@@ -624,7 +620,6 @@ public:
        * @brief The padding of an actor for use in layout.
        * @details Name "padding", type Property::VECTOR4.
        * @SINCE_1_0.0
-       * @see Actor::SetPadding()
        */
       PADDING,
 
@@ -1031,44 +1026,6 @@ public:
   void TranslateBy(const Vector3& distance);
 
   /**
-   * @brief Sets the orientation of the Actor.
-   *
-   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
-   * @SINCE_1_0.0
-   * @param[in] angle The new orientation angle in degrees
-   * @param[in] axis The new axis of orientation
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
-   */
-  void SetOrientation( const Degree& angle, const Vector3& axis )
-  {
-    SetOrientation( Radian( angle ), axis );
-  }
-
-  /**
-   * @brief Sets the orientation of the Actor.
-   *
-   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
-   * @SINCE_1_0.0
-   * @param[in] angle The new orientation angle in radians
-   * @param[in] axis The new axis of orientation
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
-   */
-  void SetOrientation(const Radian& angle, const Vector3& axis);
-
-  /**
-   * @brief Sets the orientation of the Actor.
-   *
-   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
-   * @SINCE_1_0.0
-   * @param[in] orientation The new orientation
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
-   */
-  void SetOrientation(const Quaternion& orientation);
-
-  /**
    * @brief Applies a relative rotation to an actor.
    *
    * @SINCE_1_0.0
@@ -1140,54 +1097,6 @@ public:
    * @pre The actor has been initialized.
    */
   void ScaleBy(const Vector3& relativeScale);
-
-  // Visibility & Color
-
-  /**
-   * @brief Sets the actor's color mode.
-   *
-   * This specifies whether the Actor uses its own color, or inherits
-   * its parent color. The default is USE_OWN_MULTIPLY_PARENT_ALPHA.
-   * @SINCE_1_0.0
-   * @param[in] colorMode ColorMode to use
-   * @pre The Actor has been initialized.
-   */
-  void SetColorMode( ColorMode colorMode );
-
-  /**
-   * @brief Returns the actor's color mode.
-   *
-   * @SINCE_1_0.0
-   * @return Currently used colorMode
-   * @pre The Actor has been initialized.
-   */
-  ColorMode GetColorMode() const;
-
-  /**
-   * @brief Sets how the actor and its children should be drawn.
-   *
-   * Not all actors are renderable, but DrawMode can be inherited from any actor.
-   * If an object is in a 3D layer, it will be depth-tested against
-   * other objects in the world i.e. it may be obscured if other objects are in front.
-   *
-   * If DrawMode::OVERLAY_2D is used, the actor and its children will be drawn as a 2D overlay.
-   * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
-   * For overlay actors, the drawing order is with respect to tree levels of Actors,
-   * and depth-testing will not be used.
-
-   * @SINCE_1_0.0
-   * @param[in] drawMode The new draw-mode to use
-   * @note Layers do not inherit the DrawMode from their parents.
-   */
-  void SetDrawMode( DrawMode::Type drawMode );
-
-  /**
-   * @brief Queries how the actor and its children will be drawn.
-   *
-   * @SINCE_1_0.0
-   * @return Return the draw mode type
-   */
-  DrawMode::Type GetDrawMode() const;
 
   // Input Handling
 
@@ -1304,45 +1213,6 @@ public:
   ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
 
   /**
-   * @brief Sets the policy to use when setting size with size negotiation. Defaults to SizeScalePolicy::USE_SIZE_SET.
-   *
-   * @SINCE_1_0.0
-   * @param[in] policy The policy to use for when the size is set
-   */
-  void SetSizeScalePolicy( SizeScalePolicy::Type policy );
-
-  /**
-   * @brief Returns the size scale policy in use.
-   *
-   * @SINCE_1_0.0
-   * @return Return the size scale policy
-   */
-  SizeScalePolicy::Type GetSizeScalePolicy() const;
-
-  /**
-   * @brief Sets the relative to parent size factor of the actor.
-   *
-   * This factor is only used when ResizePolicy is set to either:
-   * ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
-   * This actor's size is set to the actor's size multiplied by or added to this factor,
-   * depending on ResizePolicy ( See SetResizePolicy() ).
-   *
-   * @SINCE_1_0.0
-   * @param[in] factor A Vector3 representing the relative factor to be applied to each axis
-   * @pre The Actor has been initialized.
-   */
-  void SetSizeModeFactor( const Vector3& factor );
-
-  /**
-   * @brief Retrieves the relative to parent size factor of the actor.
-   *
-   * @SINCE_1_0.0
-   * @return The Actor's current relative size factor
-   * @pre The Actor has been initialized.
-   */
-  Vector3 GetSizeModeFactor() const;
-
-  /**
    * @brief Calculates the height of the actor given a width.
    *
    * The natural size is used for default calculation.
@@ -1374,22 +1244,6 @@ public:
    * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
-
-  /**
-   * @brief Sets the padding for use in layout.
-   *
-   * @SINCE_1_0.0
-   * @param[in] padding Padding for the actor
-   */
-  void SetPadding( const Padding& padding );
-
-  /**
-   * @brief Returns the value of the padding.
-   *
-   * @SINCE_1_0.0
-   * @param[in] paddingOut The returned padding data
-   */
-  void GetPadding( Padding& paddingOut ) const;
 
   /**
    * @brief Gets depth in the hierarchy for the actor.

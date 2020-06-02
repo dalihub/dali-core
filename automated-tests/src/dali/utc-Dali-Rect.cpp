@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ int UtcDaliRectCons03(void)
 
   Rect<float> rect(10.0f, 20.0f, 400.0f, 200.0f);
 
-  Rect<float> r2 = rect;
+  Rect<float> r2(rect);
 
   DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
@@ -78,14 +78,46 @@ int UtcDaliRectCons04(void)
 {
   TestApplication application;
 
+  Vector4 vec4(10.0f, 20.0f, 400.0f, 200.0f);
+
+  Rect<float> rect(vec4);
+
+  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRectAssignmentOperatorRect(void)
+{
+  TestApplication application;
+
   Rect<float> rect(10.0f, 20.0f, 400.0f, 200.0f);
 
-  Rect<float> r2(rect);
+  Rect<float> r2;
+  r2 = rect;
 
   DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r2.width, 400.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r2.height, 200.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRectAssignmentOperatorVector4(void)
+{
+  TestApplication application;
+
+  Vector4 vec4(10.0f, 20.0f, 400.0f, 200.0f);
+
+  Rect<float> rect;
+  rect = vec4;
+
+  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001, TEST_LOCATION);
   END_TEST;
 }
 

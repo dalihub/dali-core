@@ -747,7 +747,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetOrientation(Dali::Degree(90.0f), Vector3::ZAXIS);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -773,7 +773,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
-  actor.SetOrientation(Dali::Degree(180.0f), Vector3::ZAXIS);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
   application.SendNotification();
   application.Render();
 
@@ -788,7 +788,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS(Vector2(2.0f, -16.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
-  actor.SetOrientation(Dali::Degree(270.0f), Vector3::ZAXIS);
+  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(270.0f), Vector3::ZAXIS) );
   application.SendNotification();
   application.Render();
 
@@ -820,7 +820,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
   child.SetSize(100.0f, 100.0f);
   child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  child.SetOrientation(Dali::Degree(90.0f), Vector3::ZAXIS);
+  child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   parent.Add(child);
 
   TouchEventFunctor touchFunctor;

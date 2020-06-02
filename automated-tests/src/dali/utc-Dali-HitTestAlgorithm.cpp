@@ -339,7 +339,7 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
-  blue.SetDrawMode( DrawMode::OVERLAY_2D );
+  blue.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   blue.SetProperty( Actor::Property::NAME, "Blue" );
   blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );

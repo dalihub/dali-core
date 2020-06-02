@@ -200,16 +200,6 @@ void Actor::TranslateBy(const Vector3& distance)
   GetImplementation(*this).TranslateBy(distance);
 }
 
-void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
-{
-  GetImplementation(*this).SetOrientation(angle, axis);
-}
-
-void Actor::SetOrientation(const Quaternion& orientation)
-{
-  GetImplementation(*this).SetOrientation(orientation);
-}
-
 void Actor::RotateBy(const Radian& angle, const Vector3& axis)
 {
   GetImplementation(*this).RotateBy(angle, axis);
@@ -238,36 +228,6 @@ void Actor::SetScale(const Vector3& scale)
 void Actor::ScaleBy(const Vector3& relativeScale)
 {
   GetImplementation(*this).ScaleBy(relativeScale);
-}
-
-void Actor::SetSizeModeFactor(const Vector3& factor)
-{
-  GetImplementation(*this).SetSizeModeFactor(factor);
-}
-
-Vector3 Actor::GetSizeModeFactor() const
-{
-  return GetImplementation(*this).GetSizeModeFactor();
-}
-
-void Actor::SetColorMode( ColorMode colorMode )
-{
-  GetImplementation(*this).SetColorMode(colorMode);
-}
-
-ColorMode Actor::GetColorMode() const
-{
-  return GetImplementation(*this).GetColorMode();
-}
-
-void Actor::SetDrawMode( DrawMode::Type drawMode )
-{
-  GetImplementation(*this).SetDrawMode( drawMode );
-}
-
-DrawMode::Type Actor::GetDrawMode() const
-{
-  return GetImplementation(*this).GetDrawMode();
 }
 
 bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const
@@ -325,16 +285,6 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
   return GetImplementation(*this).GetResizePolicy( dimension );
 }
 
-void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
-{
-  GetImplementation(*this).SetSizeScalePolicy( policy );
-}
-
-SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
-{
-  return GetImplementation(*this).GetSizeScalePolicy();
-}
-
 float Actor::GetHeightForWidth( float width )
 {
   return GetImplementation(*this).GetHeightForWidth( width );
@@ -348,30 +298,6 @@ float Actor::GetWidthForHeight( float height )
 float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetRelayoutSize( dimension );
-}
-
-void Actor::SetPadding( const Padding& padding )
-{
-  Internal::Actor& impl = GetImplementation(*this);
-
-  Vector2 widthPadding( padding.left, padding.right );
-  impl.SetPadding( widthPadding, Dimension::WIDTH );
-
-  Vector2 heightPadding( padding.bottom, padding.top );
-  impl.SetPadding( heightPadding, Dimension::HEIGHT );
-}
-
-void Actor::GetPadding( Padding& paddingOut ) const
-{
-  const Internal::Actor& impl = GetImplementation(*this);
-
-  Vector2 widthPadding = impl.GetPadding( Dimension::WIDTH );
-  Vector2 heightPadding = impl.GetPadding( Dimension::HEIGHT );
-
-  paddingOut.left = widthPadding.x;
-  paddingOut.right = widthPadding.y;
-  paddingOut.bottom = heightPadding.x;
-  paddingOut.top = heightPadding.y;
 }
 
 int32_t Actor::GetHierarchyDepth()
