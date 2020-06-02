@@ -315,9 +315,9 @@ public:
 
       /**
        * @brief The size of an actor.
-       * @details Name "size", type Property::VECTOR3, animatable / constraint-input
+       * @details Name "size", type Property::VECTOR3 or Property::VECTOR2, animatable / constraint-input
+       * @note Only Property::VECTOR3 can be animated or used as constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetSize()
        */
       SIZE,
 
@@ -325,7 +325,6 @@ public:
        * @brief The width of an actor.
        * @details Name "sizeWidth", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetSize()
        */
       SIZE_WIDTH,
 
@@ -333,7 +332,6 @@ public:
        * @brief The height of an actor.
        * @details Name "sizeHeight", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetSize()
        */
       SIZE_HEIGHT,
 
@@ -341,15 +339,14 @@ public:
        * @brief The depth of an actor.
        * @details Name "sizeDepth", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetSize()
        */
       SIZE_DEPTH,
 
       /**
        * @brief The position of an actor.
-       * @details Name "position", type Property::VECTOR3, animatable / constraint-input
+       * @details Name "position", type Property::VECTOR3 or Property::VECTOR2, animatable / constraint-input
+       * @note Only Property::VECTOR3 can be animated or used as constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetPosition()
        */
       POSITION,
 
@@ -357,7 +354,6 @@ public:
        * @brief The x position of an actor.
        * @details Name "positionX", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetX()
        */
       POSITION_X,
 
@@ -365,7 +361,6 @@ public:
        * @brief The y position of an actor.
        * @details Name "positionY", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetY()
        */
       POSITION_Y,
 
@@ -373,7 +368,6 @@ public:
        * @brief The z position of an actor.
        * @details Name "positionZ", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetZ()
        */
       POSITION_Z,
 
@@ -421,9 +415,9 @@ public:
 
       /**
        * @brief The scale factor applied to an actor.
-       * @details Name "scale", type Property::VECTOR3, animatable / constraint-input
+       * @details Name "scale", type Property::VECTOR3 or Property::FLOAT, animatable / constraint-input
+       * @note Only Property::VECTOR3 can be animated or used as constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetScale()
        */
       SCALE,
 
@@ -431,7 +425,6 @@ public:
        * @brief The x scale factor applied to an actor.
        * @details Name "scaleX", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetScale()
        */
       SCALE_X,
 
@@ -439,7 +432,6 @@ public:
        * @brief The y scale factor applied to an actor.
        * @details Name "scaleY", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetScale()
        */
       SCALE_Y,
 
@@ -447,7 +439,6 @@ public:
        * @brief The x scale factor applied to an actor.
        * @details Name "scaleZ", type Property::FLOAT, animatable / constraint-input
        * @SINCE_1_0.0
-       * @see Actor::SetScale()
        */
       SCALE_Z,
 
@@ -874,55 +865,6 @@ public:
   // Positioning
 
   /**
-   * @brief Sets the size of an actor.
-   *
-   * Geometry can be scaled to fit within this area.
-   * This does not interfere with the actors scale factor.
-   * The actors default depth is the minimum of width & height.
-   * @SINCE_1_0.0
-   * @param [in] width The new width
-   * @param [in] height The new height
-   * @pre The actor has been initialized.
-   */
-  void SetSize(float width, float height);
-
-  /**
-   * @brief Sets the size of an actor.
-   *
-   * Geometry can be scaled to fit within this area.
-   * This does not interfere with the actors scale factor.
-   * @SINCE_1_0.0
-   * @param[in] width The size of the actor along the x-axis
-   * @param[in] height The size of the actor along the y-axis
-   * @param[in] depth The size of the actor along the z-axis
-   * @pre The actor has been initialized.
-   */
-  void SetSize(float width, float height, float depth);
-
-  /**
-   * @brief Sets the size of an actor.
-   *
-   * Geometry can be scaled to fit within this area.
-   * This does not interfere with the actors scale factor.
-   * The actors default depth is the minimum of width & height.
-   * @SINCE_1_0.0
-   * @param[in] size The new size
-   * @pre The actor has been initialized.
-   */
-  void SetSize(const Vector2& size);
-
-  /**
-   * @brief Sets the size of an actor.
-   *
-   * Geometry can be scaled to fit within this area.
-   * This does not interfere with the actors scale factor.
-   * @SINCE_1_0.0
-   * @param [in] size The new size
-   * @pre The actor has been initialized.
-   */
-  void SetSize(const Vector3& size);
-
-  /**
    * @brief Retrieves the actor's size.
    *
    * @SINCE_1_0.0
@@ -942,79 +884,6 @@ public:
    * @return The actor's natural size
    */
   Vector3 GetNaturalSize() const;
-
-  /**
-   * @brief Sets the position of the Actor.
-   *
-   * By default, sets the position vector between the parent origin and anchor point (default).
-   *
-   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
-   *
-   * @image html actor-position.png
-   * The Actor's z position will be set to 0.0f.
-   * @SINCE_1_0.0
-   * @param[in] x The new x position
-   * @param[in] y The new y position
-   * @pre The Actor has been initialized.
-   */
-  void SetPosition(float x, float y);
-
-  /**
-   * @brief Sets the position of the Actor.
-   *
-   * By default, sets the position vector between the parent origin and anchor point (default).
-   *
-   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
-   *
-   * @image html actor-position.png
-   * @SINCE_1_0.0
-   * @param[in] x The new x position
-   * @param[in] y The new y position
-   * @param[in] z The new z position
-   * @pre The Actor has been initialized.
-   */
-  void SetPosition(float x, float y, float z);
-
-  /**
-   * @brief Sets the position of the Actor.
-   *
-   * By default, sets the position vector between the parent origin and anchor point (default).
-   *
-   * If Position inheritance if disabled, sets the world position. @see Actor::Property::INHERIT_POSITION
-   *
-   * @image html actor-position.png
-   * @SINCE_1_0.0
-   * @param[in] position The new position
-   * @pre The Actor has been initialized.
-   */
-  void SetPosition(const Vector3& position);
-
-  /**
-   * @brief Sets the position of an actor along the X-axis.
-   *
-   * @SINCE_1_0.0
-   * @param[in] x The new x position
-   * @pre The Actor has been initialized.
-   */
-  void SetX(float x);
-
-  /**
-   * @brief Sets the position of an actor along the Y-axis.
-   *
-   * @SINCE_1_0.0
-   * @param[in] y The new y position
-   * @pre The Actor has been initialized.
-   */
-  void SetY(float y);
-
-  /**
-   * @brief Sets the position of an actor along the Z-axis.
-   *
-   * @SINCE_1_0.0
-   * @param[in] z The new z position
-   * @pre The Actor has been initialized.
-   */
-  void SetZ(float z);
 
   /**
    * @brief Translates an actor relative to its existing position.
@@ -1056,38 +925,6 @@ public:
    * @pre The actor has been initialized.
    */
   void RotateBy(const Quaternion& relativeRotation);
-
-  /**
-   * @brief Sets the scale factor applied to an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] scale The scale factor applied on all axes
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
-   */
-  void SetScale(float scale);
-
-  /**
-   * @brief Sets the scale factor applied to an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] scaleX The scale factor applied along the x-axis
-   * @param[in] scaleY The scale factor applied along the y-axis
-   * @param[in] scaleZ The scale factor applied along the z-axis
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
-   */
-  void SetScale(float scaleX, float scaleY, float scaleZ);
-
-  /**
-   * @brief Sets the scale factor applied to an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] scale A vector representing the scale factor for each axis
-   * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
-   */
-  void SetScale(const Vector3& scale);
 
   /**
    * @brief Applies a relative scale to an actor.

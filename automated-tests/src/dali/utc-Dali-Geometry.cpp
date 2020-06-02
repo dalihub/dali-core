@@ -140,7 +140,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 
@@ -218,7 +218,7 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 
@@ -251,7 +251,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 
@@ -309,7 +309,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 
@@ -441,7 +441,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 

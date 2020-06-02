@@ -670,7 +670,7 @@ int UtcDaliSceneTouchSignalP(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -793,7 +793,7 @@ int UtcDaliSceneTouchSignalN(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -915,7 +915,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   // Render before resizing surface
@@ -969,7 +969,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   actor.AddRenderer(renderer);
   int testWidth = 400;
   int testHeight = 400;
-  actor.SetSize(testWidth, testHeight);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( testWidth, testHeight) );
   stage.Add(actor);
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( testWidth, testHeight ) );
@@ -1189,7 +1189,8 @@ int UtcDaliSceneEmptySceneRendering(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400, 400 ) );
   Stage::GetCurrent().Add( actor );
 
   // Render

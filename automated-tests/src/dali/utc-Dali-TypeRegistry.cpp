@@ -2065,7 +2065,7 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -2103,7 +2103,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -2139,7 +2139,7 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -2176,7 +2176,7 @@ int UtcDaliRotationGestureDetectorTypeRegistry(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -2213,7 +2213,7 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 

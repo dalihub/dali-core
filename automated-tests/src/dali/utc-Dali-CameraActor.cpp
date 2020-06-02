@@ -1465,8 +1465,8 @@ int UtcDaliCameraActorModelView(void)
   BufferImage image = CreateBufferImage();
 
   Actor actor = CreateRenderableActor(image);
-  actor.SetSize( 100.0f, 100.0f );
-  actor.SetPosition( 20.0f, 30.0f, 40.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 20.0f, 30.0f, 40.0f ));
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( actor );
 
@@ -1501,7 +1501,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.SendNotification();
   Image image = CreateBufferImage();
   Actor actor = CreateRenderableActor( image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE );
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add( actor );
 
   Matrix projectionMatrix;
@@ -1541,14 +1541,14 @@ int UtcDaliCameraActorAnimatedProperties(void)
 
   CameraActor camera = Stage::GetCurrent().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add( actor );
 
   Constraint constraint = Constraint::New<Dali::Vector3>( actor, Actor::Property::POSITION, EqualToConstraint() );
   constraint.AddSource( Source( camera, Actor::Property::POSITION ) );
   constraint.Apply();
 
-  camera.SetPosition( 100.0f, 200.0f, 300.0f );
+  camera.SetProperty( Actor::Property::POSITION, Vector3( 100.0f, 200.0f, 300.0f ));
   application.SendNotification();
   application.Render();
 
@@ -1582,7 +1582,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
   Vector3 targetPosition( 30.0f, 240.0f, -256.0f );
   Actor target = Actor::New();
   target.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  target.SetPosition( targetPosition );
+  target.SetProperty( Actor::Property::POSITION, targetPosition );
 
   Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
   cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_POSITION ) );
@@ -1610,8 +1610,8 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
         position.Normalize();
         position *= 200.0f;
 
-        freeLookCameraActor.SetPosition( position );
-        lookAtCameraActor.SetPosition( position );
+        freeLookCameraActor.SetProperty( Actor::Property::POSITION, position );
+        lookAtCameraActor.SetProperty( Actor::Property::POSITION, position );
 
         application.SendNotification();
         application.Render();
@@ -1642,7 +1642,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   Vector3 targetPosition( 30.0f, 240.0f, -256.0f );
   Actor target = Actor::New();
   target.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  target.SetPosition( targetPosition );
+  target.SetProperty( Actor::Property::POSITION, targetPosition );
 
   Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
   cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_POSITION ) );
@@ -1671,8 +1671,8 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
         position.Normalize();
         position *= 200.0f;
 
-        freeLookCameraActor.SetPosition( position );
-        lookAtCameraActor.SetPosition( position );
+        freeLookCameraActor.SetProperty( Actor::Property::POSITION, position );
+        lookAtCameraActor.SetProperty( Actor::Property::POSITION, position );
 
         application.SendNotification();
         application.Render();
@@ -1707,7 +1707,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
   freeLookCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Quaternion cameraOrientation( Radian( Degree( 180.0f ) ), Vector3::YAXIS );
-  freeLookCameraActor.SetPosition( cameraOffset );
+  freeLookCameraActor.SetProperty( Actor::Property::POSITION, cameraOffset );
   freeLookCameraActor.SetProperty( Actor::Property::ORIENTATION, cameraOrientation );
 
   Actor cameraAnchor = Actor::New();
@@ -1719,7 +1719,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
   {
     Quaternion rotation( Radian( Degree( angle ) ), Vector3::YAXIS );
 
-    freeLookCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
+    freeLookCameraActor.SetProperty( Actor::Property::POSITION, rotation.Rotate( cameraOffset ) );
     cameraAnchor.SetProperty( Actor::Property::ORIENTATION, rotation );
 
     application.SendNotification();
@@ -1751,9 +1751,9 @@ int UtcDaliCameraActorReflectionByPlane(void)
   CameraActor freeLookCameraActor = stage.GetRenderTaskList().GetTask(0).GetCameraActor();
   freeLookCameraActor.SetType(Camera::LOOK_AT_TARGET);
   freeLookCameraActor.SetTargetPosition( targetPosition );
-  freeLookCameraActor.SetPosition(cameraOffset);
+  freeLookCameraActor.SetProperty( Actor::Property::POSITION, cameraOffset );
 
-  stage.GetRootLayer().SetPosition( 1, 0 );
+  stage.GetRootLayer().SetProperty( Actor::Property::POSITION, Vector2( 1, 0 ));
 
   application.SendNotification();
   application.Render();
@@ -1763,7 +1763,7 @@ int UtcDaliCameraActorReflectionByPlane(void)
   Matrix matrixBefore, matrixAfter;
   freeLookCameraActor.GetProperty( CameraActor::CameraActor::Property::VIEW_MATRIX ).Get( matrixBefore );
   freeLookCameraActor.SetProperty( Dali::DevelCameraActor::Property::REFLECTION_PLANE, Vector4( 0.0f, 1.0f, 0.0f, 0.0f));
-  stage.GetRootLayer().SetPosition( 0, 0 );
+  stage.GetRootLayer().SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
   application.SendNotification();
   application.Render();
   application.SendNotification();

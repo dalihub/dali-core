@@ -272,7 +272,7 @@ int UtcDaliAnimationSetDurationP(void)
 
   // Restart the animation, with a different duration
   finishCheck.Reset();
-  actor.SetPosition(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   durationSeconds = 3.5f;
   animation.SetDuration(durationSeconds);
   DALI_TEST_EQUALS(animation.GetDuration(), durationSeconds, TEST_LOCATION);
@@ -847,7 +847,7 @@ int UtcDaliAnimationSetEndActionN(void)
   DALI_TEST_EQUALS( targetPosition, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
   // Go back to the start
-  actor.SetPosition(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( Vector3::ZERO, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
@@ -874,7 +874,7 @@ int UtcDaliAnimationSetEndActionN(void)
   DALI_TEST_EQUALS( targetPosition, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
   // Go back to the start
-  actor.SetPosition(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( Vector3::ZERO, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
@@ -1664,7 +1664,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
   for( unsigned int actorIndex = 0; actorIndex < NUM_ENTRIES; ++actorIndex )
   {
     Actor actor = Actor::New();
-    actor.SetPosition( Vector3( testData[actorIndex].startX, 0, 0 ) );
+    actor.SetProperty( Actor::Property::POSITION, Vector3( testData[actorIndex].startX, 0, 0 ) );
     actors.push_back(actor);
     Stage::GetCurrent().Add(actor);
 
@@ -1761,7 +1761,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
   std::vector<Dali::Actor> actors;
 
   Actor actor = Actor::New();
-  actor.SetPosition( Vector3( testData.startX, 0, 0 ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector3( testData.startX, 0, 0 ) );
   actors.push_back(actor);
   Stage::GetCurrent().Add(actor);
 
@@ -1843,7 +1843,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount02(void)
   std::vector<Dali::Actor> actors;
 
   Actor actor = Actor::New();
-  actor.SetPosition( Vector3( testData.startX, 0, 0 ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector3( testData.startX, 0, 0 ) );
   actors.push_back(actor);
   Stage::GetCurrent().Add(actor);
 
@@ -2929,7 +2929,7 @@ int UtcDaliAnimationStopSetPositionP(void)
   // Stop the animation
   animation.Stop();
   Vector3 positionSet(2.0f, 3.0f, 4.0f);
-  actor.SetPosition(positionSet);
+  actor.SetProperty( Actor::Property::POSITION, positionSet );
   application.SendNotification();
 
   // Loop 5 times
@@ -2988,7 +2988,7 @@ int UtcDaliAnimationClearP(void)
 
   // Restart as a scale animation; this should not move the actor's position
   finishCheck.Reset();
-  actor.SetPosition(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   Vector3 targetScale(3.0f, 3.0f, 3.0f);
   animation.AnimateTo( Property( actor, Actor::Property::SCALE ), targetScale, AlphaFunction::LINEAR );
   animation.Play();
@@ -4563,7 +4563,7 @@ int UtcDaliAnimationAnimateByActorPositionP(void)
 
   Actor actor = Actor::New();
   Vector3 startPosition(10.0f, 10.0f, 10.0f);
-  actor.SetPosition(startPosition);
+  actor.SetProperty( Actor::Property::POSITION, startPosition );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -4657,7 +4657,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionP(void)
 
   Actor actor = Actor::New();
   Vector3 startPosition(10.0f, 10.0f, 10.0f);
-  actor.SetPosition(startPosition);
+  actor.SetProperty( Actor::Property::POSITION, startPosition );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -4714,7 +4714,7 @@ int UtcDaliAnimationAnimateByActorPositionTimePeriodP(void)
 
   Actor actor = Actor::New();
   Vector3 startPosition(10.0f, 10.0f, 10.0f);
-  actor.SetPosition(startPosition);
+  actor.SetProperty( Actor::Property::POSITION, startPosition );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -4769,7 +4769,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionTimePeriodP(void)
 
   Actor actor = Actor::New();
   Vector3 startPosition(10.0f, 10.0f, 10.0f);
-  actor.SetPosition(startPosition);
+  actor.SetProperty( Actor::Property::POSITION, startPosition );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -5168,7 +5168,7 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetScale(Vector3::ONE);
+  actor.SetProperty( Actor::Property::SCALE,Vector3::ONE);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
@@ -5205,7 +5205,7 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetScale(Vector3::ONE);
+  actor.SetProperty( Actor::Property::SCALE,Vector3::ONE);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
@@ -7113,7 +7113,7 @@ int UtcDaliAnimationAnimateToActorSizeP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetSize(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ZERO);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
@@ -7150,7 +7150,7 @@ int UtcDaliAnimationAnimateToActorSizeP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetSize(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ZERO);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
@@ -7377,7 +7377,7 @@ int UtcDaliAnimationAnimateToActorSizeWidthHeightP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetSize(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ZERO);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
@@ -7414,7 +7414,7 @@ int UtcDaliAnimationAnimateToActorSizeWidthHeightP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetSize(Vector3::ZERO);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ZERO);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3::ZERO, TEST_LOCATION );
@@ -8165,7 +8165,7 @@ int UtcDaliAnimationAnimateToActorScaleP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetScale(Vector3::ONE);
+  actor.SetProperty( Actor::Property::SCALE,Vector3::ONE);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
@@ -8202,7 +8202,7 @@ int UtcDaliAnimationAnimateToActorScaleP(void)
 
   // Reset everything
   finishCheck.Reset();
-  actor.SetScale(Vector3::ONE);
+  actor.SetProperty( Actor::Property::SCALE,Vector3::ONE);
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), Vector3::ONE, TEST_LOCATION );
@@ -11200,7 +11200,7 @@ int UtcDaliAnimationTimePeriodOrder(void)
 
   tet_infoline( "Same animation again but in a different order - should yield the same result" );
 
-  actor.SetX( 0.0f );
+  actor.SetProperty( Actor::Property::POSITION_X,  0.0f );
   DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
 
@@ -11276,7 +11276,7 @@ int UtcDaliAnimationTimePeriodOrderSeveralAnimateToCalls(void)
 
   tet_infoline( "Same animation again but in a different order - should end up at the same point" );
 
-  actor.SetX( 0.0f );
+  actor.SetProperty( Actor::Property::POSITION_X,  0.0f );
 
   DALI_TEST_EQUALS( actor.GetProperty< Vector3 >( Actor::Property::POSITION ), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::POSITION_X ), 0.0f, TEST_LOCATION );
@@ -13501,7 +13501,7 @@ int UtcDaliAnimationCombineToAndByWithStop(void)
   TestApplication application;
 
   auto actor = Actor::New();
-  actor.SetPosition( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
   Stage::GetCurrent().Add( actor );
 
   auto animation = Animation::New( 1.0f );
@@ -13536,7 +13536,7 @@ int UtcDaliAnimationCountAndGetAnimationAt(void)
   TestApplication application;
 
   auto actor = Actor::New();
-  actor.SetPosition( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
   Stage::GetCurrent().Add( actor );
 
   auto animation = Animation::New( 1.0f );

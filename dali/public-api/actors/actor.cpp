@@ -135,26 +135,6 @@ Actor Actor::GetParent() const
   return Actor(parent);
 }
 
-void Actor::SetSize(float width, float height)
-{
-  GetImplementation(*this).SetSize(width, height);
-}
-
-void Actor::SetSize(float width, float height, float depth)
-{
-  GetImplementation(*this).SetSize(width, height, depth);
-}
-
-void Actor::SetSize(const Vector2& size)
-{
-  GetImplementation(*this).SetSize( size );
-}
-
-void Actor::SetSize(const Vector3& size)
-{
-  GetImplementation(*this).SetSize( size );
-}
-
 Vector3 Actor::GetTargetSize() const
 {
   return GetImplementation(*this).GetTargetSize();
@@ -163,36 +143,6 @@ Vector3 Actor::GetTargetSize() const
 Vector3 Actor::GetNaturalSize() const
 {
   return GetImplementation(*this).GetNaturalSize();
-}
-
-void Actor::SetPosition(float x, float y)
-{
-  GetImplementation(*this).SetPosition(x, y);
-}
-
-void Actor::SetPosition(float x, float y, float z)
-{
-  GetImplementation(*this).SetPosition(x, y, z);
-}
-
-void Actor::SetPosition(const Vector3& position)
-{
-  GetImplementation(*this).SetPosition(position);
-}
-
-void Actor::SetX(float x)
-{
-  GetImplementation(*this).SetX(x);
-}
-
-void Actor::SetY(float y)
-{
-  GetImplementation(*this).SetY(y);
-}
-
-void Actor::SetZ(float z)
-{
-  GetImplementation(*this).SetZ(z);
 }
 
 void Actor::TranslateBy(const Vector3& distance)
@@ -208,21 +158,6 @@ void Actor::RotateBy(const Radian& angle, const Vector3& axis)
 void Actor::RotateBy(const Quaternion& relativeRotation)
 {
   GetImplementation(*this).RotateBy(relativeRotation);
-}
-
-void Actor::SetScale(float scale)
-{
-  GetImplementation(*this).SetScale(scale);
-}
-
-void Actor::SetScale(float scaleX, float scaleY, float scaleZ)
-{
-  GetImplementation(*this).SetScale(scaleX, scaleY, scaleZ);
-}
-
-void Actor::SetScale(const Vector3& scale)
-{
-  GetImplementation(*this).SetScale(scale);
 }
 
 void Actor::ScaleBy(const Vector3& relativeScale)

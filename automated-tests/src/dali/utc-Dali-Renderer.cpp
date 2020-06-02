@@ -255,7 +255,7 @@ int UtcDaliRendererSetGetGeometry(void)
   Renderer renderer = Renderer::New(geometry1, shader);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -290,7 +290,7 @@ int UtcDaliRendererSetGetShader(void)
   Renderer renderer = Renderer::New(geometry, shader1);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -330,7 +330,7 @@ int UtcDaliRendererSetGetDepthIndex(void)
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -369,7 +369,7 @@ int UtcDaliRendererSetGetFaceCullingMode(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   // By default, none of the faces should be culled
@@ -456,7 +456,7 @@ int UtcDaliRendererBlendOptions01(void)
   // set a transparent actor color so that blending is enabled
   actor.SetProperty( DevelActor::Property::OPACITY, 0.5f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB,    BlendFactor::ONE_MINUS_SRC_COLOR );
@@ -501,7 +501,7 @@ int UtcDaliRendererBlendOptions02(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.5f ); // enable blending
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB,    BlendFactor::CONSTANT_COLOR );
@@ -546,7 +546,7 @@ int UtcDaliRendererBlendOptions03(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   // Test the defaults as documented in blending.h
@@ -572,7 +572,7 @@ int UtcDaliRendererBlendOptions04(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.1f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   // Test the single blending equation setting
@@ -617,7 +617,7 @@ int UtcDaliRendererSetBlendMode01(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.98f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
@@ -649,7 +649,7 @@ int UtcDaliRendererSetBlendMode01b(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.0f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
@@ -684,7 +684,7 @@ int UtcDaliRendererSetBlendMode02(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.15f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF);
@@ -716,7 +716,7 @@ int UtcDaliRendererSetBlendMode03(void)
   Actor actor = Actor::New();
   actor.SetProperty( DevelActor::Property::OPACITY, 0.75f );
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -747,7 +747,7 @@ int UtcDaliRendererSetBlendMode04(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -778,7 +778,7 @@ int UtcDaliRendererSetBlendMode04b(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 0.5f) );
   Stage::GetCurrent().Add(actor);
 
@@ -810,7 +810,7 @@ int UtcDaliRendererSetBlendMode04c(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Color::MAGENTA );
   Stage::GetCurrent().Add(actor);
 
@@ -846,7 +846,7 @@ int UtcDaliRendererSetBlendMode05(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -877,7 +877,7 @@ int UtcDaliRendererSetBlendMode06(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -911,7 +911,7 @@ int UtcDaliRendererSetBlendMode07(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -971,7 +971,7 @@ int UtcDaliRendererSetBlendColor(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -1043,7 +1043,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 0.5f) );
   Stage::GetCurrent().Add(actor);
 
@@ -1139,7 +1139,7 @@ int UtcDaliRendererConstraint01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
@@ -1181,7 +1181,7 @@ int UtcDaliRendererConstraint02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1235,7 +1235,7 @@ int UtcDaliRendererAnimatedProperty01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
@@ -1276,7 +1276,7 @@ int UtcDaliRendererAnimatedProperty02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1330,7 +1330,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1387,7 +1387,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1445,7 +1445,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1483,7 +1483,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1530,7 +1530,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -1583,8 +1583,8 @@ Actor CreateActor( Actor parent, int siblingOrder, const char* location )
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,AnchorPoint::CENTER);
-  actor.SetPosition(0.0f,0.0f);
-  actor.SetSize(100, 100);
+  actor.SetProperty( Actor::Property::POSITION, Vector2(0.0f,0.0f));
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.Add(actor);
   actor.SetProperty( Dali::DevelActor::Property::SIBLING_ORDER, siblingOrder );
   DALI_TEST_EQUALS( actor.GetProperty<int>( Dali::DevelActor::Property::SIBLING_ORDER), siblingOrder, TEST_INNER_LOCATION(location) );
@@ -1948,7 +1948,7 @@ int UtcDaliRendererSetIndexRange(void)
   gl.EnableDrawCallTrace( true );
 
   Actor actor = Actor::New();
-  actor.SetSize( 100, 100 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
 
   // create geometry
   Geometry geometry = Geometry::New();
@@ -2081,7 +2081,7 @@ int UtcDaliRendererSetDepthFunction(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage stage = Stage::GetCurrent();
   stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
   stage.Add(actor);
@@ -2254,7 +2254,7 @@ int UtcDaliRendererEnumProperties(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   /*
@@ -2290,7 +2290,7 @@ Renderer RendererTestFixture( TestApplication& application )
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400.0f, 400.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage stage = Stage::GetCurrent();
   stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
   stage.Add( actor );
@@ -2784,8 +2784,8 @@ int UtcDaliRendererWrongNumberOfTextures(void)
 
   Actor actor= Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetPosition(0.0f,0.0f);
-  actor.SetSize(100, 100);
+  actor.SetProperty( Actor::Property::POSITION, Vector2(0.0f,0.0f));
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add(actor);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -2826,7 +2826,7 @@ int UtcDaliRendererOpacity(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor );
 
@@ -2874,7 +2874,7 @@ int UtcDaliRendererOpacityAnimation(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor );
 
@@ -2927,7 +2927,7 @@ int UtcDaliRendererInvalidProperty(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -2954,7 +2954,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor );
 
@@ -3022,7 +3022,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4( 1.0f, 0.0f, 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor );
 

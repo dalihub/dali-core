@@ -418,8 +418,8 @@ int UtcDaliConstraintCloneP(void)
   calledCount = 0;
 
   // Change the position of both actors
-  actor.SetPosition( 100.0f, 100.0f );
-  clone.SetPosition( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
+  clone.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
 
   application.SendNotification();
   application.Render();
@@ -1037,7 +1037,7 @@ int UtcDaliConstraintApplySeveralTimes(void)
   count = 0;
 
   // Change the position property, apply again
-  actor.SetPosition( 10.0f, 10.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 10.0f, 10.0f ));
   constraint.Apply();
 
   application.SendNotification();

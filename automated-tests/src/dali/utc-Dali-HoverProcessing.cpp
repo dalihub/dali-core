@@ -136,7 +136,7 @@ int UtcDaliHoverNormalProcessing(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -205,7 +205,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
   Vector2 stageSize = stage.GetSize();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   stage.Add(actor);
@@ -238,7 +238,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
   data.Reset();
 
   // Emit a started signal where actor is just at the camera's near plane
-  actor.SetZ(distance - nearPlane);
+  actor.SetProperty( Actor::Property::POSITION_Z, distance - nearPlane);
 
   // Render and notify
   application.SendNotification();
@@ -249,7 +249,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
   data.Reset();
 
   // Emit a started signal where actor is closer than the camera's near plane
-  actor.SetZ((distance - nearPlane) + 1.0f);
+  actor.SetProperty( Actor::Property::POSITION_Z, (distance - nearPlane) + 1.0f);
 
   // Render and notify
   application.SendNotification();
@@ -260,7 +260,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
   data.Reset();
 
   // Emit a started signal where actor is just at the camera's far plane
-  actor.SetZ(distance - farPlane);
+  actor.SetProperty( Actor::Property::POSITION_Z, distance - farPlane);
 
   // Render and notify
   application.SendNotification();
@@ -271,7 +271,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
   data.Reset();
 
   // Emit a started signal where actor is further than the camera's far plane
-  actor.SetZ((distance - farPlane) - 1.0f);
+  actor.SetProperty( Actor::Property::POSITION_Z, (distance - farPlane) - 1.0f);
 
   // Render and notify
   application.SendNotification();
@@ -306,7 +306,7 @@ int UtcDaliHoverInterrupted(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -343,7 +343,7 @@ int UtcDaliHoverParentConsumer(void)
   Actor rootActor( Stage::GetCurrent().GetRootLayer() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -443,7 +443,7 @@ int UtcDaliHoverInterruptedParentConsumer(void)
   Actor rootActor( Stage::GetCurrent().GetRootLayer() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -520,7 +520,7 @@ int UtcDaliHoverLeave(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -575,7 +575,7 @@ int UtcDaliHoverLeaveParentConsumer(void)
   Actor rootActor( Stage::GetCurrent().GetRootLayer() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -656,7 +656,7 @@ int UtcDaliHoverActorBecomesInsensitive(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -692,7 +692,7 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
   Actor rootActor( Stage::GetCurrent().GetRootLayer() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -749,14 +749,14 @@ int UtcDaliHoverMultipleLayers(void)
   HoverEventFunctor functor( data );
 
   Layer layer1 ( Layer::New() );
-  layer1.SetSize(100.0f, 100.0f);
+  layer1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add( layer1 );
 
   Actor actor1 ( Actor::New() );
-  actor1.SetSize( 100.0f, 100.0f );
+  actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  actor1.SetZ( 1.0f ); // Should hit actor1 in this layer
+  actor1.SetProperty( Actor::Property::POSITION_Z,  1.0f ); // Should hit actor1 in this layer
   layer1.Add( actor1 );
 
   // Render and notify
@@ -797,13 +797,13 @@ int UtcDaliHoverMultipleLayers(void)
 
   // Add another layer
   Layer layer2 ( Layer::New() );
-  layer2.SetSize(100.0f, 100.0f );
+  layer2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  layer2.SetZ( 10.0f ); // Should hit layer2 in this layer rather than actor2
+  layer2.SetProperty( Actor::Property::POSITION_Z,  10.0f ); // Should hit layer2 in this layer rather than actor2
   Stage::GetCurrent().Add( layer2 );
 
   Actor actor2 ( Actor::New() );
-  actor2.SetSize(100.0f, 100.0f);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   layer2.Add( actor2 );
 
@@ -865,7 +865,7 @@ int UtcDaliHoverMultipleRenderTasks(void)
   Vector2 stageSize ( stage.GetSize() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   stage.Add(actor);
 
@@ -909,12 +909,12 @@ int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
   Vector2 stageSize ( stage.GetSize() );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   stage.Add(actor);
 
   Layer layer = Layer::New();
-  layer.SetSize(100.0f, 100.0f);
+  layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.Add(layer);
 
@@ -965,12 +965,12 @@ int UtcDaliHoverOffscreenRenderTasks(void)
   // Create a renderable actor to display the FrameBufferImage
   Actor renderableActor = CreateRenderableActor( frameBufferImage );
   renderableActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  renderableActor.SetSize( stageSize.x, stageSize.y );
+  renderableActor.SetProperty( Actor::Property::SIZE, Vector2( stageSize.x, stageSize.y ) );
   renderableActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
   stage.Add( renderableActor );
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   stage.Add( actor );
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE ); // Ensure framebuffer connects
@@ -1010,12 +1010,12 @@ int UtcDaliHoverMultipleRenderableActors(void)
   Vector2 stageSize ( stage.GetSize() );
 
   Actor parent = CreateRenderableActor();
-  parent.SetSize( 100.0f, 100.0f );
+  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   stage.Add(parent);
 
   Actor actor = CreateRenderableActor();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   parent.Add(actor);
 
@@ -1041,7 +1041,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -1110,7 +1110,7 @@ int UtcDaliHoverActorSignalNotConsumed(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -1134,7 +1134,7 @@ int UtcDaliHoverActorUnStaged(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -1172,7 +1172,7 @@ int UtcDaliHoverLeaveActorReadded(void)
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   stage.Add(actor);
 
@@ -1218,20 +1218,20 @@ int UtcDaliHoverClippingActor(void)
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   stage.Add( actor );
 
   Actor clippingActor = Actor::New();
-  clippingActor.SetSize( 50.0f, 50.0f );
+  clippingActor.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
   clippingActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   stage.Add( clippingActor );
 
   // Add a child to the clipped region.
   Actor clippingChild = Actor::New();
-  clippingChild.SetSize( 50.0f, 50.0f );
-  clippingChild.SetPosition( 25.0f, 25.0f );
+  clippingChild.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
+  clippingChild.SetProperty( Actor::Property::POSITION, Vector2( 25.0f, 25.0f ));
   clippingChild.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   clippingActor.Add( clippingChild );
 
