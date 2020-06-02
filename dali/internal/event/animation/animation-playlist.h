@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_PLAYLIST_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,21 @@ public:
    * @param[in] sceneGraphAnimation scene graph animation that has reached progress
    */
   void NotifyProgressReached( const SceneGraph::Animation* sceneGraphAnimation );
+
+  /**
+   * @brief Retrive the number of Animations.
+   *
+   * @return The number of Animations.
+   */
+  uint32_t GetAnimationCount();
+
+  /**
+   * @brief Retrieve an Animation by index.
+   *
+   * @param[in] index The index of the Animation to retrieve
+   * @return The animation for the given index or empty handle
+   */
+  Animation* GetAnimationAt( uint32_t index );
 
 private:
 

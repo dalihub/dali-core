@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/animation/animation-playlist.h>
 
 namespace Dali
 {
@@ -38,6 +40,18 @@ float GetProgressNotification( Animation animation )
 Animation::AnimationSignalType& ProgressReachedSignal( Animation animation )
 {
   return GetImplementation( animation ).ProgressReachedSignal();
+}
+
+uint32_t GetAnimationCount()
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.GetAnimationPlaylist().GetAnimationCount();
+}
+
+Animation GetAnimationAt( uint32_t index )
+{
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return Animation( tls.GetAnimationPlaylist().GetAnimationAt( index ) );
 }
 
 } // namespace DevelAnimation

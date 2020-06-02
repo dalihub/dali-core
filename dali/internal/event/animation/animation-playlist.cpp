@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,21 @@ void AnimationPlaylist::NotifyProgressReached( const SceneGraph::Animation* scen
 
     GetImplementation(handle).EmitSignalProgressReached();
   }
+}
+
+uint32_t AnimationPlaylist::GetAnimationCount()
+{
+  return mAnimations.Size();
+}
+
+Animation* AnimationPlaylist::GetAnimationAt( uint32_t index )
+{
+  if( index >= mAnimations.Size() )
+  {
+    DALI_LOG_ERROR( "Animation index is out of bounds.\n" );
+    return NULL;
+  }
+  return mAnimations[index];
 }
 
 } // namespace Internal
