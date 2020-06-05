@@ -193,7 +193,7 @@ int UtcDaliNativeImageTestCreationFailure(void)
   drawTrace.Reset();
 
   nativeImageInterface->SetGlExtensionCreateResult( true );
-  actor.SetPosition( 0, 0, 1 );
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 0, 0, 1 ));
   application.SendNotification();
   application.Render();
 

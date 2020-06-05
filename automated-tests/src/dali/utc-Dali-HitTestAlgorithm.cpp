@@ -115,7 +115,7 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.SetProperty( Actor::Property::NAME,"NonHittableActor");
   stage.Add(actor);
@@ -157,7 +157,7 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
 
   Vector2 stageSize ( stage.GetSize() );
   cameraActor.SetOrthographicProjection( stageSize );
-  cameraActor.SetPosition(0.0f, 0.0f, 1600.0f);
+  cameraActor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
@@ -165,14 +165,14 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   blue.SetProperty( Actor::Property::NAME, "Blue" );
   blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
-  blue.SetSize( actorSize );
-  blue.SetZ(30.0f);
+  blue.SetProperty( Actor::Property::SIZE, actorSize );
+  blue.SetProperty( Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New( );
   green.SetProperty( Actor::Property::NAME, "Green" );
   green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
-  green.SetSize( actorSize );
+  green.SetProperty( Actor::Property::SIZE, actorSize );
 
   // Add the actors to the view
   stage.Add( blue );
@@ -213,7 +213,7 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   cameraActor.SetOrthographicProjection(-stageSize.x * 0.3f,  stageSize.x * 0.7f,
                                          stageSize.y * 0.3f, -stageSize.y * 0.7f,
                                          800.0f, 4895.0f);
-  cameraActor.SetPosition(0.0f, 0.0f, 1600.0f);
+  cameraActor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
@@ -221,14 +221,14 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   blue.SetProperty( Actor::Property::NAME, "Blue" );
   blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.2f, 0.2f, 0.5f) );
-  blue.SetSize( actorSize );
-  blue.SetZ(30.0f);
+  blue.SetProperty( Actor::Property::SIZE, actorSize );
+  blue.SetProperty( Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New( );
   green.SetProperty( Actor::Property::NAME, "Green" );
   green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.4f, 0.4f, 0.5f) );
-  green.SetSize( actorSize );
+  green.SetProperty( Actor::Property::SIZE, actorSize );
 
   // Add the actors to the view
   stage.Add( blue );
@@ -291,14 +291,14 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   Actor clippingActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
   clippingActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   clippingActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  clippingActor.SetSize( 50.0f, 50.0f );
+  clippingActor.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
   clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   clippingActor.SetProperty( Actor::Property::NAME, "clippingActor" );
   layer.Add( clippingActor );
 
   // Create a renderable actor and add it to the clipping actor.
   Actor childActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
-  childActor.SetSize( 100.0f, 100.0f );
+  childActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   childActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   childActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   childActor.SetProperty( Actor::Property::NAME, "childActor" );
@@ -334,7 +334,7 @@ int UtcDaliHitTestAlgorithmOverlay(void)
 
   Vector2 stageSize ( stage.GetSize() );
   cameraActor.SetOrthographicProjection( stageSize );
-  cameraActor.SetPosition(0.0f, 0.0f, 1600.0f);
+  cameraActor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
   Vector2 actorSize( stageSize * 0.5f );
   // Create two actors with half the size of the stage and set them to be partially overlapping
@@ -343,14 +343,14 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   blue.SetProperty( Actor::Property::NAME, "Blue" );
   blue.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   blue.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(1.0f/3.0f, 1.0f/3.0f, 0.5f) );
-  blue.SetSize( actorSize );
-  blue.SetZ(30.0f);
+  blue.SetProperty( Actor::Property::SIZE, actorSize );
+  blue.SetProperty( Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New( );
   green.SetProperty( Actor::Property::NAME, "Green" );
   green.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   green.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(2.0f/3.0f, 2.0f/3.0f, 0.5f) );
-  green.SetSize( actorSize );
+  green.SetProperty( Actor::Property::SIZE, actorSize );
 
   // Add the actors to the view
   stage.Add( blue );

@@ -188,9 +188,13 @@ bool TestApplication::Render( uint32_t intervalMilliseconds, const char* locatio
 {
   DoUpdate( intervalMilliseconds, location );
 
+  // Reset the status
+  mRenderStatus.SetNeedsUpdate( false );
+  mRenderStatus.SetNeedsPostRender( false );
+
   mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mScene, true /*render the off-screen buffers*/);
-  mCore->RenderScene( mScene, false /*render the surface*/);
+  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/);
   mCore->PostRender( false /*do not skip rendering*/ );
 
   mFrame++;
@@ -214,12 +218,17 @@ bool TestApplication::GetRenderNeedsUpdate()
   return mRenderStatus.NeedsUpdate();
 }
 
+bool TestApplication::GetRenderNeedsPostRender()
+{
+  return mRenderStatus.NeedsPostRender();
+}
+
 bool TestApplication::RenderOnly( )
 {
   // Update Time values
   mCore->PreRender( mRenderStatus, false /*do not force clear*/, false /*do not skip rendering*/ );
-  mCore->RenderScene( mScene, true /*render the off-screen buffers*/);
-  mCore->RenderScene( mScene, false /*render the surface*/);
+  mCore->RenderScene( mRenderStatus, mScene, true /*render the off-screen buffers*/);
+  mCore->RenderScene( mRenderStatus, mScene, false /*render the surface*/);
   mCore->PostRender( false /*do not skip rendering*/ );
 
   mFrame++;

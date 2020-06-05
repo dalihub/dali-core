@@ -134,7 +134,7 @@ int UtcSamplerSetFilterMode(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add( actor );
 
 
@@ -265,7 +265,7 @@ int UtcSamplerSetWrapMode1(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -354,7 +354,7 @@ int UtcSamplerSetWrapMode2(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetSize( 400, 400 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();

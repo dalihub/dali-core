@@ -116,9 +116,9 @@ void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
   mImpl->PreRender( status, forceClear, uploadOnly );
 }
 
-void Core::RenderScene( Integration::Scene& scene, bool renderToFbo )
+void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
 {
-  mImpl->RenderScene( scene, renderToFbo );
+  mImpl->RenderScene( status, scene, renderToFbo );
 }
 
 void Core::PostRender( bool uploadOnly )

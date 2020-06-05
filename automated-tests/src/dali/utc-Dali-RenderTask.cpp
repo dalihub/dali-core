@@ -174,7 +174,7 @@ Actor CreateRenderableActorSuccess(TestApplication& application, std::string fil
   PrepareResourceImage( application, 80u, 80u, Pixel::RGBA8888 );
   Image image = ResourceImage::New(filename);
   Actor actor = CreateRenderableActor(image);
-  actor.SetSize( 80, 80 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
   return actor;
 }
 
@@ -183,7 +183,7 @@ Actor CreateRenderableActorFailed(TestApplication& application, std::string file
   Image image = ResourceImage::New(filename);
   DALI_TEST_CHECK( image );
   Actor actor = CreateRenderableActor(image);
-  actor.SetSize( 80, 80 );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
   return actor;
 }
 
@@ -363,7 +363,7 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
-  newActor.SetSize(1,1);
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
 
   Actor nonRenderableActor = Actor::New();
@@ -409,7 +409,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
-  newActor.SetSize(1,1);
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
 
   Actor nonRenderableActor = Actor::New();
@@ -468,7 +468,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
-  newActor.SetSize(1,1);
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   task.SetSourceActor( newActor );
   // Don't add newActor to stage yet   //'
 
@@ -517,7 +517,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
-  newActor.SetSize(1,1);
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
 
   Actor nonRenderableActor = Actor::New();
@@ -567,7 +567,7 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   Actor newActor = CreateRenderableActor( img );
-  newActor.SetSize(1,1);
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
 
   task.SetSourceActor( newActor );
@@ -661,7 +661,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   BufferImage img1 = BufferImage::New( 1,1 );
   Actor actor1 = CreateRenderableActor( img1 );
-  actor1.SetSize(1,1);
+  actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor1 );
 
   // Update & Render actor1
@@ -684,7 +684,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   BufferImage img2 = BufferImage::New( 1,1 );
   Actor actor2 = CreateRenderableActor( img2 );
-  actor2.SetSize(1,1);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
 
   // Force actor2 to be rendered before actor1
   Layer layer = Layer::New();
@@ -713,7 +713,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   BufferImage img3 = BufferImage::New( 1,1 );
   Actor actor3 = CreateRenderableActor( img3 );
-  actor3.SetSize(1,1);
+  actor3.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
 
   // Force actor3 to be rendered before actor2
   layer = Layer::New();
@@ -813,7 +813,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
 
   BufferImage img1 = BufferImage::New( 1,1 );
   Actor actor1 = CreateRenderableActor( img1 );
-  actor1.SetSize(1,1);
+  actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor1 );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -1884,7 +1884,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   BufferImage image = BufferImage::New( 10, 10 );
   image.Update();
   Actor rootActor = CreateRenderableActor( image );
-  rootActor.SetSize( 10, 10 );
+  rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   Stage::GetCurrent().Add( rootActor );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -2155,7 +2155,7 @@ int UtcDaliRenderTaskOnce02(void)
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetSize(100, 100);
+  secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
@@ -2248,7 +2248,7 @@ int UtcDaliRenderTaskOnce04(void)
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetSize(100, 100);
+  secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
@@ -2330,7 +2330,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetSize(100, 100);
+  secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
@@ -2411,7 +2411,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   renderer.SetTextures( textureSet );
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetSize(100, 100);
+  secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add(secondRootActor);
 
 
@@ -2557,7 +2557,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   BufferImage image = BufferImage::New( 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
-  rootActor.SetSize( 10, 10 );
+  rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   rootActor.SetProperty( Actor::Property::VISIBLE,false);
   Stage::GetCurrent().Add( rootActor );
 
@@ -2638,11 +2638,11 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
   BufferImage image = BufferImage::New( 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
-  rootActor.SetSize( 10, 10 );
+  rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( rootActor );
 
   Actor actorWithMissingImage = CreateRenderableActor( Image() );
-  actorWithMissingImage.SetSize( 10, 10 );
+  actorWithMissingImage.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( actorWithMissingImage );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -2675,8 +2675,8 @@ int UtcDaliRenderTaskWorldToViewport(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetPosition( Vector3(0.0, 0.0, 0.0) );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0, 0.0, 0.0) );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.5) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.5) );
@@ -2704,8 +2704,8 @@ int UtcDaliRenderTaskWorldToViewport(void)
 
   Actor actor2 = Actor::New();
   float actor2Size = 100.f;
-  actor2.SetSize( actor2Size, actor2Size );
-  actor2.SetPosition( Vector3(0.0, 0.0, 0.0) );
+  actor2.SetProperty( Actor::Property::SIZE, Vector2( actor2Size, actor2Size ) );
+  actor2.SetProperty( Actor::Property::POSITION, Vector3(0.0, 0.0, 0.0) );
   actor2.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.0) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.0) );
   Stage::GetCurrent().Add( actor2 );
@@ -2731,8 +2731,8 @@ int UtcDaliRenderTaskViewportToLocal(void)
   TestApplication application;
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetPosition(10.0f, 10.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   Stage::GetCurrent().Add(actor);
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -2769,8 +2769,8 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
   TestApplication application;
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetSize( 100.0f, 100.0f );
-  actor.SetPosition( 10.0f, 10.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 10.0f, 10.0f ));
   Stage::GetCurrent().Add( actor );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();

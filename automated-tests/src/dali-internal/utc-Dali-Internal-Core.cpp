@@ -76,8 +76,8 @@ int UtcDaliCoreProcessEvents(void)
 
   Actor actor = Actor::New();
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  actor.SetSize( size );
-  actor.SetPosition( position );
+  actor.SetProperty( Actor::Property::SIZE, size );
+  actor.SetProperty( Actor::Property::POSITION, position );
   Stage::GetCurrent().Add( actor );
 
   RelayoutSignalHandler relayoutSignal( application );
