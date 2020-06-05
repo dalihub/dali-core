@@ -66,7 +66,7 @@ inline float GetDefaultMinimumPinchDistance( const Vector2& dpi )
 } // unnamed namespace
 
 PinchGestureRecognizer::PinchGestureRecognizer( Observer& observer, Vector2 screenSize, Vector2 screenDpi, float minimumPinchDistance, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
-: GestureRecognizer( screenSize, Gesture::Pinch ),
+: GestureRecognizer( screenSize, Dali::Gesture::Pinch ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),
@@ -149,7 +149,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
                 mStartingDistance = GetDistance(mTouchEvents.begin()->points[0], mTouchEvents.begin()->points[1]);
 
                 // Send pinch started
-                SendPinch(Gesture::Started, event);
+                SendPinch(Dali::Gesture::Started, event);
 
                 mState = Started;
               }
@@ -175,14 +175,14 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
       {
         // System interruption occurred, pinch should be cancelled
         mTouchEvents.clear();
-        SendPinch(Gesture::Cancelled, event);
+        SendPinch(Dali::Gesture::Cancelled, event);
         mState = Clear;
         mTouchEvents.clear();
       }
       else if (pointCount != 2)
       {
         // Send pinch finished event
-        SendPinch(Gesture::Finished, event);
+        SendPinch(Dali::Gesture::Finished, event);
 
         mState = Clear;
         mTouchEvents.clear();
@@ -196,7 +196,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           mTouchEvents.push_back(event);
           // Send pinch finished event
-          SendPinch(Gesture::Finished, event);
+          SendPinch(Dali::Gesture::Finished, event);
 
           mState = Clear;
           mTouchEvents.clear();
@@ -208,7 +208,7 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
           {
             // Send pinch continuing
-            SendPinch(Gesture::Continuing, event);
+            SendPinch(Dali::Gesture::Continuing, event);
 
             mTouchEvents.clear();
           }
@@ -261,7 +261,7 @@ void PinchGestureRecognizer::SendPinch(Gesture::State state, const Integration::
   else
   {
     // Something has gone wrong, just cancel the gesture.
-    gesture.state = Gesture::Cancelled;
+    gesture.state = Dali::Gesture::Cancelled;
   }
 
   gesture.time = currentEvent.time;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
@@ -56,25 +57,25 @@ void EmitTapSignal(
   const TapGestureEvent& tapEvent,
   Vector2 localPoint)
 {
-  TapGesture tap;
-  tap.time = tapEvent.time;
-  tap.numberOfTaps = tapEvent.numberOfTaps;
-  tap.numberOfTouches = tapEvent.numberOfTouches;
-  tap.screenPoint = tapEvent.point;
-  tap.localPoint = localPoint;
+  Internal::TapGesturePtr tap( new Internal::TapGesture(tapEvent.state) );
+  tap->SetTime( tapEvent.time );
+  tap->SetNumberOfTaps(tapEvent.numberOfTaps);
+  tap->SetNumberOfTouches(tapEvent.numberOfTouches);
+  tap->SetScreenPoint(tapEvent.point);
+  tap->SetLocalPoint(localPoint);
 
   Dali::Actor actorHandle( actor );
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    static_cast< TapGestureDetector* >( *iter )->EmitTapGestureSignal( actorHandle, tap );
+    static_cast< TapGestureDetector* >( *iter )->EmitTapGestureSignal( actorHandle, Dali::TapGesture( tap.Get() ) );
   }
 }
 
 } // unnamed namespace
 
 TapGestureProcessor::TapGestureProcessor()
-: GestureProcessor( Gesture::Tap ),
+: GestureProcessor( Dali::Gesture::Tap ),
   mTapGestureDetectors(),
   mMinTapsRequired( 1 ),
   mMaxTapsRequired( 1 ),
@@ -93,7 +94,7 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
 {
   switch ( tapEvent.state )
   {
-    case Gesture::Possible:
+    case Dali::Gesture::Possible:
     {
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
@@ -112,7 +113,7 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
       break;
     }
 
-    case Gesture::Started:
+    case Dali::Gesture::Started:
     {
       // Ensure that we're processing a hit on the current actor and that we've already processed a touch down
       HitTestAlgorithm::Results hitTestResults;
@@ -130,24 +131,24 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
       break;
     }
 
-    case Gesture::Cancelled:
+    case Dali::Gesture::Cancelled:
     {
       mPossibleProcessed = false;
       ResetActor();
       break;
     }
 
-    case Gesture::Continuing:
+    case Dali::Gesture::Continuing:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
       break;
     }
-    case Gesture::Finished:
+    case Dali::Gesture::Finished:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Finished\n" );
       break;
     }
-    case Gesture::Clear:
+    case Dali::Gesture::Clear:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
       break;

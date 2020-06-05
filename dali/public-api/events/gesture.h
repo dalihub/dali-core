@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -30,6 +31,11 @@ namespace Dali
  * @addtogroup dali_core_events
  * @{
  */
+
+namespace Internal DALI_INTERNAL
+{
+class Gesture;
+}
 
 /**
  * @brief Base structure for different gestures that an application can receive.
@@ -41,35 +47,58 @@ namespace Dali
  * To receive a particular gesture, the application has to create and connect to the appropriate
  * GestureDetector.
  *
- * @SINCE_1_0.0
+ * @SINCE_1_9.28
  * @note An instance of this class cannot be created.
  * @see GestureDetector
  *
  */
-struct DALI_CORE_API Gesture
+class DALI_CORE_API Gesture : public BaseHandle
 {
+public:
+
+  /**
+   * @brief Creates an uninitialized Gesture handle.
+   *
+   * Calling member functions with an uninitialized Actor handle is not allowed.
+   * @SINCE_1_9.28
+   */
+  Gesture();
+
   /**
    * @brief Copy constructor.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
   Gesture( const Gesture& rhs );
 
   /**
+   * @brief Move constructor.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the handle to move
+   */
+  Gesture( Gesture&& rhs );
+
+  /**
    * @brief Assignment operator.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   Gesture& operator=( const Gesture& rhs );
 
-  // Destruction
+  /**
+   * @brief Move assignment operator.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the handle to move
+   * @return A reference to this
+   */
+  Gesture& operator=( Gesture&& rhs );
 
   /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
+   * @brief Non virtual destructor.
+   * @SINCE_1_9.28
    */
-  virtual ~Gesture();
+  ~Gesture();
 
   /**
    * @brief Enumeration for type of gesture.
@@ -98,37 +127,40 @@ struct DALI_CORE_API Gesture
     Possible    ///< A gesture is possible. @SINCE_1_0.0
   };
 
-  // Data
-
   /**
    * @brief The gesture type.
+   * @SINCE_1_9.28
+   * @return The gesture type
    */
-  Type type;
+  Type GetType() const;
 
   /**
    * @brief The gesture state.
    *
    * Please see the description in the sub-classes to see the states
    * used by the actual gesture.
+   * @SINCE_1_9.28
+   * @return The state of the gesture
    */
-  State state;
+  State GetState() const;
 
   /**
    * @brief The time the gesture took place.
+   * @SINCE_1_9.28
+   * @return The time the gesture took place
    */
-  uint32_t time;
+  uint32_t GetTime() const;
 
-protected: // Creation
+public: // Not intended for application developers
 
+  /// @cond internal
   /**
-   * @brief This constructor is only used by derived classes.
-   *
-   * @SINCE_1_0.0
-   * @param[in] gestureType   The type of gesture event.
-   * @param[in] gestureState  The state of the gesture event.
+   * @brief Internal constructor.
+   * @SINCE_1_9.28
+   * @param[in] gesture Pointer to internal gesture
    */
-  Gesture(Type gestureType, State gestureState);
-
+  explicit DALI_INTERNAL Gesture(Internal::Gesture* gesture);
+  /// @endcond
 };
 
 /**

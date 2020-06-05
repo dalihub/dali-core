@@ -10,9 +10,14 @@ SET(TC_SOURCES
         utc-Dali-Internal-Core.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-FrustumCulling.cpp
+        utc-Dali-Internal-Gesture.cpp
         utc-Dali-Internal-Handles.cpp
+        utc-Dali-Internal-LongPressGesture.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-OwnerPointer.cpp
+        utc-Dali-Internal-PinchGesture.cpp
+        utc-Dali-Internal-RotationGesture.cpp
+        utc-Dali-Internal-TapGesture.cpp
 )
 
 LIST(APPEND TC_SOURCES

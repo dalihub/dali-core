@@ -36,7 +36,7 @@ struct SignalData
   SignalData()
   : functorCalled( false ),
     voidFunctorCalled( false ),
-    receivedGesture( Gesture::Clear ),
+    receivedGesture( ),
     pressedActor()
   {}
 
@@ -45,9 +45,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.numberOfTouches = 0u;
-    receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
-    receivedGesture.localPoint = Vector2(0.0f, 0.0f);
+    receivedGesture.Reset();
 
     pressedActor.Reset();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,42 +20,46 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
 
 namespace Dali
 {
 
-PinchGesture::PinchGesture(Gesture::State state)
-: Gesture(Gesture::Pinch, state),
-  scale(0.0f),
-  speed(0.0f)
+PinchGesture::PinchGesture( Internal::PinchGesture* internal )
+: Gesture( internal )
 {
 }
 
-PinchGesture::PinchGesture( const PinchGesture& rhs )
-: Gesture( rhs ),
-  scale( rhs.scale ),
-  speed( rhs.speed ),
-  screenCenterPoint( rhs.screenCenterPoint ),
-  localCenterPoint( rhs.localCenterPoint )
+PinchGesture::PinchGesture() = default;
+
+PinchGesture::PinchGesture( const PinchGesture& rhs ) = default;
+
+PinchGesture::PinchGesture( PinchGesture&& rhs ) = default;
+
+PinchGesture& PinchGesture::operator=( const PinchGesture& rhs ) = default;
+
+PinchGesture& PinchGesture::operator=( PinchGesture&& rhs ) = default;
+
+PinchGesture::~PinchGesture() = default;
+
+float PinchGesture::GetScale() const
 {
+  return GetImplementation( *this ).GetScale();
 }
 
-PinchGesture& PinchGesture::operator=( const PinchGesture& rhs )
+float PinchGesture::GetSpeed() const
 {
-  if( this != &rhs )
-  {
-    Gesture::operator=(rhs);
-    scale = rhs.scale;
-    speed = rhs.speed;
-    screenCenterPoint = rhs.screenCenterPoint;
-    localCenterPoint = rhs.localCenterPoint;
-  }
-
-  return *this;
+  return GetImplementation( *this ).GetSpeed();
 }
 
-PinchGesture::~PinchGesture()
+const Vector2& PinchGesture::GetScreenCenterPoint() const
 {
+  return GetImplementation( *this ).GetScreenCenterPoint();
+}
+
+const Vector2& PinchGesture::GetLocalCenterPoint() const
+{
+  return GetImplementation( *this ).GetLocalCenterPoint();
 }
 
 } // namespace Dali

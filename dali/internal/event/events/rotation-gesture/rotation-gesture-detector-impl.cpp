@@ -58,11 +58,11 @@ RotationGestureDetectorPtr RotationGestureDetector::New()
 }
 
 RotationGestureDetector::RotationGestureDetector()
-: GestureDetector( Gesture::Rotation )
+: GestureDetector( Dali::Gesture::Rotation )
 {
 }
 
-void RotationGestureDetector::EmitRotationGestureSignal( Dali::Actor actor, const RotationGesture& rotation )
+void RotationGestureDetector::EmitRotationGestureSignal( Dali::Actor actor, const Dali::RotationGesture& rotation )
 {
   // Guard against destruction during signal emission
   Dali::RotationGestureDetector handle( this );

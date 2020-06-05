@@ -43,7 +43,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.state = Gesture::Started;
+    receivedGesture.Reset();
 
     tappedActor.Reset();
   }

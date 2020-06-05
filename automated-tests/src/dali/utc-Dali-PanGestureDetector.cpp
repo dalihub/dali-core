@@ -26,6 +26,7 @@
 #include <dali/integration-api/input-options.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-event-utils.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 
 using namespace Dali;
 
@@ -51,7 +52,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
-    receivedGesture(Gesture::Clear)
+    receivedGesture()
   {}
 
   void Reset()
@@ -59,12 +60,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.state = Gesture::Clear;
-    receivedGesture.velocity = Vector2(0.0f, 0.0f);
-    receivedGesture.displacement = Vector2(0.0f, 0.0f);
-    receivedGesture.position = Vector2(0.0f, 0.0f);
-    receivedGesture.screenPosition = Vector2(0.0f, 0.0f);
-    receivedGesture.numberOfTouches = 0;
+    receivedGesture.Reset();
 
     pannedActor.Reset();
   }
@@ -109,7 +105,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
     GestureReceivedFunctor::operator()( actor, pan );
 
-    if ( pan.state == stateToUnstage )
+    if ( pan.GetState() == stateToUnstage )
     {
       scene.Remove( actor );
     }
@@ -177,20 +173,20 @@ PanGesture GeneratePan( unsigned int time,
                         Vector2 localVelocity = Vector2::ONE,
                         unsigned int numberOfTouches = 1 )
 {
-  PanGesture pan( state );
+  Dali::PanGesture pan = DevelPanGesture::New( state );
 
-  pan.time = time;
+  DevelPanGesture::SetTime( pan, time );
 
-  pan.screenPosition = screenPosition;
-  pan.position = localPosition;
+  DevelPanGesture::SetScreenPosition( pan, screenPosition );
+  DevelPanGesture::SetPosition( pan, localPosition );
 
-  pan.screenDisplacement = screenDisplacement;
-  pan.displacement = localDisplacement;
+  DevelPanGesture::SetScreenDisplacement( pan, screenDisplacement );
+  DevelPanGesture::SetDisplacement( pan, localDisplacement );
 
-  pan.screenVelocity = screenVelocity;
-  pan.velocity = localVelocity;
+  DevelPanGesture::SetScreenVelocity( pan, screenVelocity );
+  DevelPanGesture::SetVelocity( pan, localVelocity );
 
-  pan.numberOfTouches = numberOfTouches;
+  DevelPanGesture::SetNumberOfTouches( pan, numberOfTouches );
 
   return pan;
 }
@@ -455,10 +451,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(16.0f, 0.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.5f, 0.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(16.0f, 0.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.5f, 0.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(16.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(0.5f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
 
@@ -469,10 +465,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.0f, -16.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.0f, -1.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.0f, -16.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.0f, -1.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(16.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(1.0f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
 
@@ -483,10 +479,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(320.0f, 0.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(20.0f, 0.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(320.0f, 0.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 0.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(320.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(20.0f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
 
@@ -496,10 +492,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   TestEndPan( application, Vector2(314.0f, 4.0f), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-32.0f, 0.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-2.0f, 0.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(-32.0f, 0.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(-2.0f, 0.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(32.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(2.0f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
   END_TEST;
@@ -530,10 +526,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(16.0f, 0.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.5f, 0.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(16.0f, 0.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.5f, 0.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(16.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(0.5f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
 
@@ -544,10 +540,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.0f, -16.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(0.0f, -1.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.0f, -16.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(0.0f, -1.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(16.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(1.0f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
 
@@ -557,10 +553,10 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   TestEndPan( application, Vector2(10.0f, 4.0f), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-16.0f, 0.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-1.0f, 0.0f), data.receivedGesture.velocity, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(-16.0f, 0.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(-1.0f, 0.0f), data.receivedGesture.GetVelocity(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(16.0f, data.receivedGesture.GetDistance(), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(1.0f, data.receivedGesture.GetSpeed(), 0.01f, TEST_LOCATION);
   END_TEST;
@@ -763,7 +759,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   TestEndPan( application, Vector2(25.0f, 28.0f), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
+  DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
@@ -778,7 +774,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   TestEndPan( application, Vector2(25.0f, 28.0f), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(2.0f, -16.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
+  DALI_TEST_EQUALS(Vector2(2.0f, -16.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(270.0f), Vector3::ZAXIS) );
@@ -793,7 +789,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   TestEndPan( application, Vector2(25.0f, 28.0f), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-16.0f, -2.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
+  DALI_TEST_EQUALS(Vector2(-16.0f, -2.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
   END_TEST;
 }
 
@@ -838,7 +834,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pannedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(-2.0f, 16.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
+  DALI_TEST_EQUALS(Vector2(-2.0f, 16.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
 
   // Attach child and generate same touch points to yield a different displacement
   // (Also proves that you can detach and then re-attach another actor)
@@ -854,7 +850,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pannedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
+  DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
   END_TEST;
 }
 
@@ -2824,10 +2820,10 @@ int UtcDaliPanGestureNoTimeDiff(void)
   TestEndPan( application, Vector2(26.0f, 20.0f), 100 );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.x ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.y ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.x ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.y ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetVelocity().x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetVelocity().y ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetScreenVelocity().x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetScreenVelocity().y ) );
   data.Reset();
 
   data.Reset();
@@ -2864,7 +2860,7 @@ int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
   TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
   data.Reset();
 
   // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
@@ -2874,7 +2870,7 @@ int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.GetState(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2898,7 +2894,7 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
       &application,
       [&detector, &functorCalled](Actor actor, const PanGesture& pan)
       {
-        if( pan.state == Gesture::Finished )
+        if( pan.GetState() == Gesture::Finished )
         {
           detector.Detach(actor);
           functorCalled = true;

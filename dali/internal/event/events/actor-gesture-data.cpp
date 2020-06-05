@@ -86,27 +86,27 @@ GestureDetectorContainer*& ActorGestureData::GetContainerPtr( Gesture::Type type
 {
   switch ( type )
   {
-    case Gesture::Pan:
+    case Dali::Gesture::Pan:
     {
       return panDetectors;
     }
 
-    case Gesture::Pinch:
+    case Dali::Gesture::Pinch:
     {
       return pinchDetectors;
     }
 
-    case Gesture::LongPress:
+    case Dali::Gesture::LongPress:
     {
       return longPressDetectors;
     }
 
-    case Gesture::Tap:
+    case Dali::Gesture::Tap:
     {
       return tapDetectors;
     }
 
-    case Gesture::Rotation:
+    case Dali::Gesture::Rotation:
     {
       return rotationDetectors;
     }

@@ -27,7 +27,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-detector-impl.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
-#include <dali/public-api/events/pan-gesture.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/integration-api/debug.h>
 
 
@@ -65,35 +65,35 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
 {
   switch (gestureDetector->GetType())
   {
-    case Gesture::LongPress:
+    case Dali::Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.AddGestureDetector(longPress, scene);
       break;
     }
 
-    case Gesture::Pan:
+    case Dali::Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.AddGestureDetector(pan, scene, envOptionMinimumPanDistance, envOptionMinimumPanEvents);
       break;
     }
 
-    case Gesture::Pinch:
+    case Dali::Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.AddGestureDetector(pinch, scene);
       break;
     }
 
-    case Gesture::Tap:
+    case Dali::Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.AddGestureDetector(tap, scene);
       break;
     }
 
-    case Gesture::Rotation:
+    case Dali::Gesture::Rotation:
     {
       RotationGestureDetector* rotation = static_cast<RotationGestureDetector*>(gestureDetector);
       mRotationGestureProcessor.AddGestureDetector(rotation, scene);
@@ -106,35 +106,35 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
 {
   switch (gestureDetector->GetType())
   {
-    case Gesture::LongPress:
+    case Dali::Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.RemoveGestureDetector(longPress);
       break;
     }
 
-    case Gesture::Pan:
+    case Dali::Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.RemoveGestureDetector(pan);
       break;
     }
 
-    case Gesture::Pinch:
+    case Dali::Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.RemoveGestureDetector(pinch);
       break;
     }
 
-    case Gesture::Tap:
+    case Dali::Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.RemoveGestureDetector(tap);
       break;
     }
 
-    case Gesture::Rotation:
+    case Dali::Gesture::Rotation:
     {
       RotationGestureDetector* rotation = static_cast<RotationGestureDetector*>(gestureDetector);
       mRotationGestureProcessor.RemoveGestureDetector(rotation);
@@ -147,35 +147,35 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
 {
   switch (gestureDetector->GetType())
   {
-    case Gesture::LongPress:
+    case Dali::Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.GestureDetectorUpdated(longPress);
       break;
     }
 
-    case Gesture::Pan:
+    case Dali::Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.GestureDetectorUpdated(pan);
       break;
     }
 
-    case Gesture::Pinch:
+    case Dali::Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.GestureDetectorUpdated(pinch);
       break;
     }
 
-    case Gesture::Tap:
+    case Dali::Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.GestureDetectorUpdated(tap);
       break;
     }
 
-    case Gesture::Rotation:
+    case Dali::Gesture::Rotation:
     {
       // Nothing to do
       break;
@@ -183,11 +183,11 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
   }
 }
 
-void GestureEventProcessor::SetGestureProperties( const Gesture& gesture )
+void GestureEventProcessor::SetGestureProperties( const Dali::Gesture& gesture )
 {
-  DALI_ASSERT_DEBUG( gesture.type == Gesture::Pan && "Only PanGesture has a scene object\n" );
+  DALI_ASSERT_DEBUG( gesture.GetType() == Dali::Gesture::Pan && "Only PanGesture has a scene object\n" );
 
-  const PanGesture& pan = static_cast< const PanGesture& >( gesture );
+  const Dali::PanGesture& pan = static_cast< const Dali::PanGesture& >( gesture );
   if( mPanGestureProcessor.SetPanGestureProperties( pan ) )
   {
     // We may not be updating so we need to ask the render controller for an update.

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PINCH_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/pinch-gesture-detector.h>
+#include <dali/public-api/events/pinch-gesture.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
-struct PinchGesture;
 
 namespace Internal
 {
@@ -61,7 +60,7 @@ public:
    * @param[in]  actor  The pinched actor.
    * @param[in]  pinch  The pinch gesture.
    */
-  void EmitPinchGestureSignal(Dali::Actor actor, const PinchGesture& pinch);
+  void EmitPinchGestureSignal(Dali::Actor actor, const Dali::PinchGesture& pinch);
 
 public: // Signals
 

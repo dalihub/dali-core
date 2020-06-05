@@ -20,38 +20,41 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 
 namespace Dali
 {
 
-RotationGesture::RotationGesture( Gesture::State state )
-: Gesture( Gesture::Rotation, state )
+RotationGesture::RotationGesture( Internal::RotationGesture* internal )
+: Gesture( internal )
 {
 }
 
-RotationGesture::RotationGesture( const RotationGesture& rhs )
-: Gesture( rhs ),
-  rotation( rhs.rotation ),
-  screenCenterPoint( rhs.screenCenterPoint ),
-  localCenterPoint( rhs.localCenterPoint )
+RotationGesture::RotationGesture() = default;
+
+RotationGesture::RotationGesture( const RotationGesture& rhs ) = default;
+
+RotationGesture::RotationGesture( RotationGesture&& rhs ) = default;
+
+RotationGesture& RotationGesture::operator=( const RotationGesture& rhs ) = default;
+
+RotationGesture& RotationGesture::operator=( RotationGesture&& rhs ) = default;
+
+RotationGesture::~RotationGesture() = default;
+
+const Radian& RotationGesture::GetRotation() const
 {
+  return GetImplementation( *this ).GetRotation();
 }
 
-RotationGesture& RotationGesture::operator=( const RotationGesture& rhs )
+const Vector2& RotationGesture::GetScreenCenterPoint() const
 {
-  if( this != &rhs )
-  {
-    Gesture::operator=( rhs );
-    rotation = rhs.rotation;
-    screenCenterPoint = rhs.screenCenterPoint;
-    localCenterPoint = rhs.localCenterPoint;
-  }
-
-  return *this;
+  return GetImplementation( *this ).GetScreenCenterPoint();
 }
 
-RotationGesture::~RotationGesture()
+const Vector2& RotationGesture::GetLocalCenterPoint() const
 {
+  return GetImplementation( *this ).GetLocalCenterPoint();
 }
 
 } // namespace Dali

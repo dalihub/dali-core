@@ -64,7 +64,7 @@ struct PanGestureRequest : public GestureRequest
    * Default Constructor
    */
   PanGestureRequest()
-  : GestureRequest(Gesture::Pan),
+  : GestureRequest(Dali::Gesture::Pan),
     minTouches(1),
     maxTouches(1)
   {
@@ -94,7 +94,7 @@ struct TapGestureRequest : public GestureRequest
    * Default Constructor
    */
   TapGestureRequest()
-  : GestureRequest(Gesture::Tap),
+  : GestureRequest(Dali::Gesture::Tap),
     minTaps(1),
     maxTaps(1),
     minTouches(1),
@@ -128,7 +128,7 @@ struct LongPressGestureRequest : public GestureRequest
    * Default Constructor
    */
   LongPressGestureRequest()
-  : GestureRequest(Gesture::LongPress),
+  : GestureRequest(Dali::Gesture::LongPress),
     minTouches(1),
     maxTouches(1)
   {

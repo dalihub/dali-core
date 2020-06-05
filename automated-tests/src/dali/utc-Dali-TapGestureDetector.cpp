@@ -53,10 +53,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.numberOfTaps = 0u;
-    receivedGesture.numberOfTouches = 0u;
-    receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
-    receivedGesture.localPoint = Vector2(0.0f, 0.0f);
+    receivedGesture.Reset();
 
     tappedActor.Reset();
   }
@@ -330,9 +327,9 @@ int UtcDaliTapGestureSignalReceptionPositive(void)
   // Do a tap inside actor's area
   TestGenerateTap( application, 50.0f, 50.0f, 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
   END_TEST;
 }
 
@@ -359,17 +356,17 @@ int UtcDaliTapGestureSignalReceptionDetach(void)
   // Start tap within the actor's area
   TestGenerateTap( application, 20.0f, 20.0f, 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(20.0f, 20.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
 
   // repeat the tap within the actor's area - we should still receive the signal
   data.Reset();
   TestGenerateTap( application, 50.0f, 50.0f, 700 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
 
   // Detach actor
   detector.DetachAll();
@@ -449,9 +446,9 @@ int UtcDaliTapGestureSignalReceptionRotatedActor(void)
   // Do tap, only check finished value
   TestGenerateTap( application, 5.0f, 5.0f, 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
@@ -462,9 +459,9 @@ int UtcDaliTapGestureSignalReceptionRotatedActor(void)
   data.Reset();
   TestGenerateTap( application, 5.0f, 5.0f, 700 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::YAXIS) );
@@ -515,7 +512,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   TestGenerateTap( application, 50.0f, 50.0f, 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.tappedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetScreenPoint(), 0.01f, TEST_LOCATION);
 
   // Attach child and generate same touch points
   // (Also proves that you can detach and then re-attach another actor)
@@ -527,7 +524,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   TestGenerateTap( application, 51.0f, 51.0f, 700 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.tappedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.GetScreenPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 

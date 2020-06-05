@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/events/pan-gesture.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/gestures/gesture-properties.h>
 
 namespace Dali
 {
 
-struct PanGesture;
+class PanGesture;
 
 namespace Internal
 {
@@ -118,7 +118,7 @@ public:
      */
     PanInfo()
     : time( 0u ),
-      state( Gesture::Clear ),
+      state( Dali::Gesture::Clear ),
       read( true )
     {
     }
@@ -156,18 +156,18 @@ public:
      * Assignment operator
      * @param[in] gesture A Dali::Gesture
      */
-    PanInfo& operator=( const Dali::PanGesture& rhs )
+    PanInfo& operator=( const Internal::PanGesture& rhs )
     {
-      time = rhs.time;
-      state = rhs.state;
+      time = rhs.GetTime();
+      state = rhs.GetState();
 
-      local.velocity = rhs.velocity;
-      local.displacement = rhs.displacement;
-      local.position = rhs.position;
+      local.velocity = rhs.GetVelocity();
+      local.displacement = rhs.GetDisplacement();
+      local.position = rhs.GetPosition();
 
-      screen.velocity = rhs.screenVelocity;
-      screen.displacement = rhs.screenDisplacement;
-      screen.position = rhs.screenPosition;
+      screen.velocity = rhs.GetScreenVelocity();
+      screen.displacement = rhs.GetScreenDisplacement();
+      screen.position = rhs.GetScreenPosition();
 
       return *this;
     }
@@ -203,7 +203,7 @@ public:
    * Adds a PanGesture to the internal circular-buffer waiting to be handled by UpdateProperties.
    * @param[in]  gesture  The latest pan gesture.
    */
-  void AddGesture( const Dali::PanGesture& gesture );
+  void AddGesture( const Internal::PanGesture& gesture );
 
   /**
    * @brief Removes pan events from the history that are older than maxAge, leaving at least minEvents

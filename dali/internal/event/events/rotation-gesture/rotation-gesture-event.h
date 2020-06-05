@@ -47,7 +47,7 @@ struct RotationGestureEvent : public GestureEvent
    * @param[in]  state  The state of the gesture
    */
   RotationGestureEvent( Gesture::State state )
-  : GestureEvent( Gesture::Rotation, state )
+  : GestureEvent( Dali::Gesture::Rotation, state )
   {
   }
 

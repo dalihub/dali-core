@@ -26,6 +26,11 @@
 namespace Dali
 {
 
+namespace Internal DALI_INTERNAL
+{
+class RotationGesture;
+}
+
 /**
  * @brief A RotationGesture is emitted when the user moves two fingers that are opposite each other
  * in a rotational/circular gesture.
@@ -37,59 +42,88 @@ namespace Dali
  *
  * A rotation gesture will continue to be sent to the actor under the center point of the rotation
  * until the rotation ends.
- * @SINCE_1_9.27
+ * @SINCE_1_9.28
  */
-struct DALI_CORE_API RotationGesture: public Gesture
+class DALI_CORE_API RotationGesture: public Gesture
 {
-  // Construction & Destruction
+public:
 
   /**
-   * @brief Default Constructor.
-   * @SINCE_1_9.27
-   * @param[in] state The state of the gesture
+   * @brief Creates an uninitialized RotationGesture handle.
+   *
+   * Calling member functions with an uninitialized Actor handle is not allowed.
+   * @SINCE_1_9.28
    */
-  RotationGesture( Gesture::State state );
+  RotationGesture();
 
   /**
    * @brief Copy constructor.
-   * @SINCE_1_9.27
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
   RotationGesture( const RotationGesture& rhs );
 
   /**
+   * @brief Move constructor.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   */
+  RotationGesture( RotationGesture&& rhs );
+
+  /**
    * @brief Assignment operator.
-   * @SINCE_1_9.27
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   RotationGesture& operator=( const RotationGesture& rhs );
 
   /**
-   * @brief Virtual destructor.
-   * @SINCE_1_9.27
+   * @brief Move assignment operator.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
    */
-  virtual ~RotationGesture();
+  RotationGesture& operator=( RotationGesture&& rhs );
 
-  // Data
+  /**
+   * @brief Non virtual destructor.
+   * @SINCE_1_9.28
+   */
+  ~RotationGesture();
 
   /**
    * @brief The overall rotation from the start of the rotation gesture till the latest rotation gesture.
-   * @SINCE_1_9.27
+   * @SINCE_1_9.28
+   * @return The rotation from the start of the rotation gesture till the latest rotation gesture.
    */
-  Radian rotation;
+  const Radian& GetRotation() const;
 
   /**
    * @brief The center point of the two points that caused the rotation gesture in screen coordinates.
-   * @SINCE_1_9.27
+   * @SINCE_1_9.28
+   * @return The center point in screen coordinates
    */
-  Vector2 screenCenterPoint;
+  const Vector2& GetScreenCenterPoint() const;
 
   /**
    * @brief The center point of the two points that caused the rotation gesture in local actor coordinates.
-   * @SINCE_1_9.27
+   * @SINCE_1_9.28
+   * @return The center point in local actor coordinates
    */
-  Vector2 localCenterPoint;
+  const Vector2& GetLocalCenterPoint() const;
+
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized RotationGesture handle.
+   *
+   * @param[in] rotationGesture A pointer to a newly allocated Dali resource
+   * @SINCE_1_9.28
+   */
+  explicit DALI_INTERNAL RotationGesture( Internal::RotationGesture* rotationGesture );
+  /// @endcond
 };
 
 } // namespace Dali

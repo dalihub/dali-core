@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,41 +18,48 @@
 // CLASS HEADER
 #include <dali/public-api/events/tap-gesture.h>
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
+
 namespace Dali
 {
 
-TapGesture::TapGesture()
-: Gesture(Gesture::Tap, Gesture::Clear),
-  numberOfTaps(1),
-  numberOfTouches(1)
+TapGesture::TapGesture( Internal::TapGesture* internal )
+: Gesture( internal )
 {
 }
 
-TapGesture::TapGesture( const TapGesture& rhs )
-: Gesture( rhs ),
-  numberOfTaps( rhs.numberOfTaps ),
-  numberOfTouches( rhs.numberOfTouches ),
-  screenPoint( rhs.screenPoint ),
-  localPoint( rhs.localPoint )
+TapGesture::TapGesture() = default;
+
+TapGesture::TapGesture( const TapGesture& rhs ) = default;
+
+TapGesture::TapGesture( TapGesture&& rhs ) = default;
+
+TapGesture& TapGesture::operator=( const TapGesture& rhs ) = default;
+
+TapGesture& TapGesture::operator=( TapGesture&& rhs ) = default;
+
+TapGesture::~TapGesture() = default;
+
+uint32_t TapGesture::GetNumberOfTaps() const
 {
+  return GetImplementation( *this ).GetNumberOfTaps();
 }
 
-TapGesture& TapGesture::operator=( const TapGesture& rhs )
+uint32_t TapGesture::GetNumberOfTouches() const
 {
-  if( this != &rhs )
-  {
-    Gesture::operator=(rhs);
-    numberOfTaps = rhs.numberOfTaps;
-    numberOfTouches = rhs.numberOfTouches;
-    screenPoint = rhs.screenPoint;
-    localPoint = rhs.localPoint;
-  }
-
-  return *this;
+  return GetImplementation( *this ).GetNumberOfTouches();
 }
 
-TapGesture::~TapGesture()
+const Vector2& TapGesture::GetScreenPoint() const
 {
+  return GetImplementation( *this ).GetScreenPoint();
+}
+
+const Vector2& TapGesture::GetLocalPoint() const
+{
+  return GetImplementation( *this ).GetLocalPoint();
 }
 
 } // namespace Dali

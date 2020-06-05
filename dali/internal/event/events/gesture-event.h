@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/gesture.h>
 #include <dali/integration-api/events/event.h>
+#include <dali/internal/event/events/gesture-impl.h>
 
 namespace Dali
 {

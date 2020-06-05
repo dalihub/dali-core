@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,37 +18,46 @@
 // CLASS HEADER
 #include <dali/public-api/events/gesture.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/gesture-impl.h>
+
 namespace Dali
 {
 
-Gesture::Gesture( const Gesture& rhs )
-: type(rhs.type),
-  state(rhs.state),
-  time(rhs.time)
+Gesture::Gesture()
 {
 }
 
-Gesture& Gesture::operator=( const Gesture& rhs )
+Gesture::Gesture(Internal::Gesture* internal)
+: BaseHandle(internal)
 {
-  if( this != &rhs )
-  {
-    type = rhs.type;
-    state = rhs.state;
-    time = rhs.time;
-  }
-
-  return *this;
 }
+
+Gesture::Gesture( const Gesture& rhs ) = default;
+
+Gesture::Gesture( Gesture&& rhs ) = default;
+
+Gesture& Gesture::operator=( const Gesture& rhs ) = default;
+
+Gesture& Gesture::operator=( Gesture&& rhs ) = default;
 
 Gesture::~Gesture()
 {
 }
 
-Gesture::Gesture(Type gestureType, State gestureState)
-: type(gestureType),
-  state(gestureState),
-  time(0)
+Gesture::Type Gesture::GetType() const
 {
+  return GetImplementation(*this).GetType();
+}
+
+Gesture::State Gesture::GetState() const
+{
+  return GetImplementation(*this).GetState();
+}
+
+uint32_t Gesture::GetTime() const
+{
+  return GetImplementation(*this).GetTime();
 }
 
 } // namespace Dali

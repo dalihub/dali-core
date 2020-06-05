@@ -25,7 +25,6 @@
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
 
-
 using namespace Dali;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,7 +36,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
-    receivedGesture(Gesture::Started)
+    receivedGesture()
   {}
 
   void Reset()
@@ -45,7 +44,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.state = Gesture::Started;
+    receivedGesture.Reset();
 
     pressedActor.Reset();
   }

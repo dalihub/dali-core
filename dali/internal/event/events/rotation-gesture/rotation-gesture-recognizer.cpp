@@ -55,7 +55,7 @@ inline Vector2 GetCenterPoint( const Integration::Point& point1, const Integrati
 } // unnamed namespace
 
 RotationGestureRecognizer::RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
-: GestureRecognizer( Gesture::Rotation ),
+: GestureRecognizer( Dali::Gesture::Rotation ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),
@@ -117,7 +117,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
               mStartingAngle = GetAngle( mTouchEvents.begin()->points[0], mTouchEvents.begin()->points[1] );
 
               // Send rotation started
-              SendRotation( Gesture::Started, event );
+              SendRotation( Dali::Gesture::Started, event );
 
               mState = Started;
             }
@@ -142,14 +142,14 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
       {
         // System interruption occurred, rotation should be cancelled
         mTouchEvents.clear();
-        SendRotation(Gesture::Cancelled, event);
+        SendRotation(Dali::Gesture::Cancelled, event);
         mState = Clear;
         mTouchEvents.clear();
       }
       else if( pointCount != 2 )
       {
         // Send rotation finished event
-        SendRotation( Gesture::Finished, event );
+        SendRotation( Dali::Gesture::Finished, event );
 
         mState = Clear;
         mTouchEvents.clear();
@@ -164,7 +164,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
         {
           mTouchEvents.push_back( event );
           // Send rotation finished event
-          SendRotation( Gesture::Finished, event );
+          SendRotation( Dali::Gesture::Finished, event );
 
           mState = Clear;
           mTouchEvents.clear();
@@ -176,7 +176,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
           if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
           {
             // Send rotation continuing
-            SendRotation( Gesture::Continuing, event );
+            SendRotation( Dali::Gesture::Continuing, event );
 
             mTouchEvents.clear();
           }
@@ -200,7 +200,6 @@ void RotationGestureRecognizer::SetMinimumTouchEventsAfterStart( uint32_t value 
 void RotationGestureRecognizer::SendRotation( Gesture::State state, const Integration::TouchEvent& currentEvent )
 {
   RotationGestureEvent gesture( state );
-
   if( !mTouchEvents.empty() )
   {
     // Assert if we have been holding TouchEvents that do not have 2 points
@@ -223,7 +222,7 @@ void RotationGestureRecognizer::SendRotation( Gesture::State state, const Integr
   else
   {
     // Something has gone wrong, just cancel the gesture.
-    gesture.state = Gesture::Cancelled;
+    gesture.state = Dali::Gesture::Cancelled;
   }
 
   gesture.time = currentEvent.time;

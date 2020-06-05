@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ private:
    * Emits the long press gesture if all conditions are applicable.
    * @param[in] state The state of this gesture event.
    */
-  void EmitGesture(Gesture::State state);
+  void EmitGesture( Gesture::State state );
 
 private:
 

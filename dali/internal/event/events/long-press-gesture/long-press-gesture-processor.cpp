@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/long-press-gesture.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
@@ -57,17 +57,17 @@ void EmitLongPressSignal(
     const LongPressGestureEvent& longPressEvent,
     Vector2 localPoint)
 {
-  LongPressGesture longPress(longPressEvent.state);
-  longPress.time = longPressEvent.time;
-  longPress.numberOfTouches = longPressEvent.numberOfTouches;
-  longPress.screenPoint = longPressEvent.point;
-  longPress.localPoint = localPoint;
+  Internal::LongPressGesturePtr longPress( new Internal::LongPressGesture(longPressEvent.state ) );
+  longPress->SetTime( longPressEvent.time );
+  longPress->SetNumberOfTouches( longPressEvent.numberOfTouches );
+  longPress->SetScreenPoint( longPressEvent.point );
+  longPress->SetLocalPoint( localPoint );
 
   Dali::Actor actorHandle( actor );
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    static_cast< LongPressGestureDetector* >( *iter )->EmitLongPressGestureSignal( actorHandle, longPress );
+    static_cast< LongPressGestureDetector* >( *iter )->EmitLongPressGestureSignal( actorHandle, Dali::LongPressGesture( longPress.Get() ) );
   }
 }
 
@@ -102,7 +102,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 LongPressGestureProcessor::LongPressGestureProcessor()
-: GestureProcessor( Gesture::LongPress ),
+: GestureProcessor( Dali::Gesture::LongPress ),
   mLongPressGestureDetectors(),
   mCurrentEmitters(),
   mCurrentRenderTask(),
@@ -121,7 +121,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
 {
   switch ( longPressEvent.state )
   {
-    case Gesture::Possible:
+    case Dali::Gesture::Possible:
     {
       mCurrentEmitters.clear();
       ResetActor();
@@ -134,7 +134,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Gesture::Started:
+    case Dali::Gesture::Started:
     {
       Actor* currentGesturedActor = GetCurrentGesturedActor();
       if ( currentGesturedActor )
@@ -161,7 +161,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Gesture::Finished:
+    case Dali::Gesture::Finished:
     {
       // The gesture should only be sent to the gesture detector which first received it so that it
       // can be told when the gesture ends as well.
@@ -195,20 +195,20 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Gesture::Cancelled:
+    case Dali::Gesture::Cancelled:
     {
       mCurrentEmitters.clear();
       ResetActor();
       break;
     }
 
-    case Gesture::Continuing:
+    case Dali::Gesture::Continuing:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
       break;
     }
 
-    case Gesture::Clear:
+    case Dali::Gesture::Clear:
     {
       DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
       break;

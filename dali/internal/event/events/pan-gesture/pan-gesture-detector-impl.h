@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/public-api/events/pan-gesture.h>
 
 namespace Dali
 {
@@ -137,7 +138,7 @@ public:
    * @param[in]  actor  The panned actor.
    * @param[in]  pan    The pan gesture.
    */
-  void EmitPanGestureSignal(Dali::Actor actor, const PanGesture& pan);
+  void EmitPanGestureSignal(Dali::Actor actor, const Dali::PanGesture& pan);
 
 public: // Signals
 
@@ -165,7 +166,7 @@ public: // Override Pan Gesture
   /**
    * @copydoc Dali::PanGestureDetector::SetPanGestureProperties()
    */
-  static void SetPanGestureProperties( const PanGesture& pan );
+  static void SetPanGestureProperties( const Dali::PanGesture& pan );
 
 protected:
 

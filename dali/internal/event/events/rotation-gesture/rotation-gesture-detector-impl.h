@@ -20,12 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/rotation-gesture-detector.h>
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
-struct RotationGesture;
 
 namespace Internal
 {
@@ -66,7 +65,7 @@ public:
    * @param[in]  actor     The rotated actor
    * @param[in]  rotation  The rotation gesture
    */
-  void EmitRotationGestureSignal( Dali::Actor actor, const RotationGesture& rotation );
+  void EmitRotationGestureSignal( Dali::Actor actor, const Dali::RotationGesture& rotation );
 
 public: // Signals
 

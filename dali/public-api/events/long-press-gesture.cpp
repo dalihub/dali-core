@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,38 +18,42 @@
 // CLASS HEADER
 #include <dali/public-api/events/long-press-gesture.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
+
 namespace Dali
 {
 
-LongPressGesture::LongPressGesture(Gesture::State state)
-: Gesture( Gesture::LongPress, state ),
-  numberOfTouches( 1 )
+LongPressGesture::LongPressGesture( Internal::LongPressGesture* internal )
+: Gesture( internal )
 {
 }
 
-LongPressGesture::LongPressGesture( const LongPressGesture& rhs )
-: Gesture( rhs ),
-  numberOfTouches( rhs.numberOfTouches ),
-  screenPoint( rhs.screenPoint ),
-  localPoint( rhs.localPoint )
+LongPressGesture::LongPressGesture() = default;
+
+LongPressGesture::LongPressGesture( const LongPressGesture& rhs ) = default;
+
+LongPressGesture::LongPressGesture( LongPressGesture&& rhs ) = default;
+
+LongPressGesture& LongPressGesture::operator=( const LongPressGesture& rhs ) = default;
+
+LongPressGesture& LongPressGesture::operator=( LongPressGesture&& rhs ) = default;
+
+LongPressGesture::~LongPressGesture() = default;
+
+uint32_t LongPressGesture::GetNumberOfTouches() const
 {
+  return GetImplementation( *this ).GetNumberOfTouches();
 }
 
-LongPressGesture& LongPressGesture::operator=( const LongPressGesture& rhs )
+const Vector2& LongPressGesture::GetScreenPoint() const
 {
-  if( this != &rhs )
-  {
-    Gesture::operator=(rhs);
-    numberOfTouches = rhs.numberOfTouches;
-    screenPoint = rhs.screenPoint;
-    localPoint = rhs.localPoint;
-  }
-
-  return *this;
+  return GetImplementation( *this ).GetScreenPoint();
 }
 
-LongPressGesture::~LongPressGesture()
+const Vector2& LongPressGesture::GetLocalPoint() const
 {
+  return GetImplementation( *this ).GetLocalPoint();
 }
 
 } // namespace Dali

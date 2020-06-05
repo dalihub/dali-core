@@ -31,7 +31,6 @@ SET(TC_SOURCES
         utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameCallbackInterface.cpp
         utc-Dali-Geometry.cpp
-        utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
@@ -41,7 +40,6 @@ SET(TC_SOURCES
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
         utc-Dali-LocklessBuffer.cpp
-        utc-Dali-LongPressGesture.cpp
         utc-Dali-LongPressGestureDetector.cpp
         utc-Dali-LongPressGestureRecognizer.cpp
         utc-Dali-MathUtils.cpp
@@ -54,7 +52,6 @@ SET(TC_SOURCES
         utc-Dali-PanGestureDetector.cpp
         utc-Dali-PanGestureRecognizer.cpp
         utc-Dali-Path.cpp
-        utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-PinchGestureRecognizer.cpp
         utc-Dali-Pixel.cpp
@@ -72,7 +69,6 @@ SET(TC_SOURCES
         utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
-        utc-Dali-RotationGesture.cpp
         utc-Dali-RotationGestureDetector.cpp
         utc-Dali-RotationGestureRecognizer.cpp
         utc-Dali-Sampler.cpp
@@ -84,7 +80,6 @@ SET(TC_SOURCES
         utc-Dali-SignalTemplates.cpp
         utc-Dali-SingletonService.cpp
         utc-Dali-Stage.cpp
-        utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
         utc-Dali-TapGestureRecognizer.cpp
         utc-Dali-Texture.cpp

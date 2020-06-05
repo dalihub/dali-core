@@ -31,6 +31,7 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 
 namespace Dali
 {
@@ -56,17 +57,17 @@ void EmitRotationSignal(
     const RotationGestureEvent& rotationEvent,
     Vector2 localCenter)
 {
-  RotationGesture rotation(rotationEvent.state);
-  rotation.time = rotationEvent.time;
-  rotation.rotation = rotationEvent.rotation;
-  rotation.screenCenterPoint = rotationEvent.centerPoint;
-  rotation.localCenterPoint = localCenter;
+  Internal::RotationGesturePtr rotation( new Internal::RotationGesture(rotationEvent.state ) );
+  rotation->SetTime( rotationEvent.time );
+  rotation->SetRotation( rotationEvent.rotation );
+  rotation->SetScreenCenterPoint( rotationEvent.centerPoint );
+  rotation->SetLocalCenterPoint( localCenter );
 
   Dali::Actor actorHandle( actor );
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    static_cast< RotationGestureDetector* >( *iter )->EmitRotationGestureSignal( actorHandle, rotation );
+    static_cast< RotationGestureDetector* >( *iter )->EmitRotationGestureSignal( actorHandle, Dali::RotationGesture( rotation.Get() ) );
   }
 }
 
@@ -101,7 +102,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 RotationGestureProcessor::RotationGestureProcessor()
-: GestureProcessor( Gesture::Rotation ),
+: GestureProcessor( Dali::Gesture::Rotation ),
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
   mCurrentRotationEvent( nullptr ),
@@ -114,7 +115,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
 {
   switch ( rotationEvent.state )
   {
-    case Gesture::Started:
+    case Dali::Gesture::Started:
     {
       // The rotation gesture should only be sent to the gesture detector which first received it so that
       // it can be told when the gesture ends as well.
@@ -136,9 +137,9 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       break;
     }
 
-    case Gesture::Continuing:
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case Dali::Gesture::Continuing:
+    case Dali::Gesture::Finished:
+    case Dali::Gesture::Cancelled:
     {
       // Only send subsequent rotation gesture signals if we processed the rotation gesture when it started.
       // Check if actor is still touchable.
@@ -167,7 +168,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
           }
 
           // Clear current emitters if rotation gesture has ended or been cancelled.
-          if ( rotationEvent.state == Gesture::Finished || rotationEvent.state == Gesture::Cancelled )
+          if ( rotationEvent.state == Dali::Gesture::Finished || rotationEvent.state == Dali::Gesture::Cancelled )
           {
             mCurrentRotationEmitters.clear();
             ResetActor();
@@ -182,8 +183,8 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       break;
     }
 
-    case Gesture::Clear:
-    case Gesture::Possible:
+    case Dali::Gesture::Clear:
+    case Dali::Gesture::Possible:
     {
       // Nothing to do
       break;

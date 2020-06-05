@@ -2,7 +2,7 @@
 #define DALI_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@
 
 namespace Dali
 {
+
+namespace Internal DALI_INTERNAL
+{
+class PanGesture;
+}
+
 /**
  * @addtogroup dali_core_events
  * @{
@@ -43,48 +49,55 @@ namespace Dali
  * - Cancelled by the system.
  *
  * A pan gesture will continue to be sent to the actor under than initial pan until it ends.
- * @SINCE_1_0.0
+ * @SINCE_1_9.28
  */
-struct DALI_CORE_API PanGesture: public Gesture
+class DALI_CORE_API PanGesture: public Gesture
 {
-  // Construction & Destruction
+public:
 
   /**
-   * @brief Default Constructor.
-   * @SINCE_1_0.0
+   * @brief Creates an uninitialized PanGesture handle.
+   *
+   * Calling member functions with an uninitialized Actor handle is not allowed.
+   * @SINCE_1_9.28
    */
   PanGesture();
 
   /**
-   * @brief Constructor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] state The state of the gesture
-   */
-  PanGesture(Gesture::State state);
-
-  /**
    * @brief Copy constructor.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
   PanGesture( const PanGesture& rhs );
 
   /**
+   * @brief Move constructor.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   */
+  PanGesture( PanGesture&& rhs );
+
+  /**
    * @brief Assignment operator.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PanGesture& operator=( const PanGesture& rhs );
 
   /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
+   * @brief Move assignment operator.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
    */
-  virtual ~PanGesture();
+  PanGesture& operator=( PanGesture&& rhs );
 
-  // Data
+  /**
+   * @brief Non virtual destructor.
+   * @SINCE_1_9.28
+   */
+  ~PanGesture();
 
   /**
    * @brief The velocity at which the user is moving their fingers.
@@ -93,8 +106,10 @@ struct DALI_CORE_API PanGesture: public Gesture
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y values means upwards.
    * This value represents the local coordinates of the actor attached to the PanGestureDetector.
+   * @SINCE_1_9.28
+   * @return The velocity of the pan
    */
-  Vector2 velocity;
+  const Vector2& GetVelocity() const;
 
   /**
    * @brief This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
@@ -104,13 +119,17 @@ struct DALI_CORE_API PanGesture: public Gesture
    * A positive y value shows that the user is panning downwards, a negative y value means upwards.
    * This value is in local actor coordinates, the actor being the one attached to the
    * PanGestureDetector.
+   * @SINCE_1_9.28
+   * @return The displacement of the pan
    */
-  Vector2 displacement;
+  const Vector2& GetDisplacement() const;
 
   /**
    * @brief This current touch position of the primary touch point in local actor coordinates.
+   * @SINCE_1_9.28
+   * @return The current position of the pan (in local actor coordinates)
    */
-  Vector2 position;
+  const Vector2& GetPosition() const;
 
   /**
    * @brief The velocity at which the user is moving their fingers.
@@ -119,8 +138,10 @@ struct DALI_CORE_API PanGesture: public Gesture
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y values means upwards.
    * This value represents the screen coordinates.
+   * @SINCE_1_9.28
+   * @return The velocity of the pan (in screen coordinates)
    */
-  Vector2 screenVelocity;
+  const Vector2& GetScreenVelocity() const;
 
   /**
    * @brief This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
@@ -129,18 +150,24 @@ struct DALI_CORE_API PanGesture: public Gesture
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y value means upwards.
    * This value is in screen coordinates.
+   * @SINCE_1_9.28
+   * @return The displacement of the pan (in screen coordinates)
    */
-  Vector2 screenDisplacement;
+  const Vector2& GetScreenDisplacement() const;
 
   /**
    * @brief This current touch position of the primary touch point in screen coordinates.
+   * @SINCE_1_9.28
+   * @return The current position of the pan (in screen coordinates)
    */
-  Vector2 screenPosition;
+  const Vector2& GetScreenPosition() const;
 
   /**
    * @brief The total number of fingers touching the screen in a pan gesture.
+   * @SINCE_1_9.28
+   * @return The number of touches in the pan
    */
-  uint32_t numberOfTouches;
+  uint32_t GetNumberOfTouches() const;
 
   // Convenience Methods
 
@@ -148,7 +175,7 @@ struct DALI_CORE_API PanGesture: public Gesture
    * @brief Returns the speed at which the user is moving their fingers.
    *
    * This is the pixel movement per millisecond.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @return The speed of the pan (in pixels per millisecond)
    */
   float GetSpeed() const;
@@ -158,7 +185,7 @@ struct DALI_CORE_API PanGesture: public Gesture
    * if the gesture has just started, then the distance moved since the user touched the screen.
    *
    * This is always a positive value.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @return The distance, as a float, a user's finger has panned
    */
   float GetDistance() const;
@@ -167,7 +194,7 @@ struct DALI_CORE_API PanGesture: public Gesture
    * @brief Returns the speed at which the user is moving their fingers relative to screen coordinates.
    *
    * This is the pixel movement per millisecond.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @return The speed of the pan (in pixels per millisecond)
    */
   float GetScreenSpeed() const;
@@ -178,10 +205,23 @@ struct DALI_CORE_API PanGesture: public Gesture
    * since the user touched the screen.
    *
    * This is always a positive value.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @return The distance, as a float, a user's finger has panned
    */
   float GetScreenDistance() const;
+
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized PanGesture handle.
+   *
+   * @param[in] panGesture A pointer to a newly allocated Dali resource
+   * @SINCE_1_9.28
+   */
+  explicit DALI_INTERNAL PanGesture( Internal::PanGesture* panGesture );
+  /// @endcond
+
 };
 
 /**

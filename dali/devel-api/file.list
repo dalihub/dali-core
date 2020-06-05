@@ -14,8 +14,9 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/common/stage-devel.cpp
   ${devel_api_src_dir}/common/stage.cpp
   ${devel_api_src_dir}/events/hit-test-algorithm.cpp
-  ${devel_api_src_dir}/events/long-press-gesture-detector-devel.cpp
   ${devel_api_src_dir}/events/key-event-devel.cpp
+  ${devel_api_src_dir}/events/long-press-gesture-detector-devel.cpp
+  ${devel_api_src_dir}/events/pan-gesture-devel.cpp
   ${devel_api_src_dir}/events/touch-point.cpp
   ${devel_api_src_dir}/events/wheel-event-devel.cpp
   ${devel_api_src_dir}/images/distance-field.cpp
@@ -71,8 +72,9 @@ SET( devel_api_core_common_header_files
 
 SET( devel_api_core_events_header_files
   ${devel_api_src_dir}/events/hit-test-algorithm.h
-  ${devel_api_src_dir}/events/long-press-gesture-detector-devel.h
   ${devel_api_src_dir}/events/key-event-devel.h
+  ${devel_api_src_dir}/events/long-press-gesture-detector-devel.h
+  ${devel_api_src_dir}/events/pan-gesture-devel.h
   ${devel_api_src_dir}/events/touch-point.h
   ${devel_api_src_dir}/events/wheel-event-devel.h
 )

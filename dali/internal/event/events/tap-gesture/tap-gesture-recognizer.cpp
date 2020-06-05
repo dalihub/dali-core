@@ -43,7 +43,7 @@ const unsigned long MAXIMUM_TIME_ALLOWED = 500u;
 } // unnamed namespace
 
 TapGestureRecognizer::TapGestureRecognizer( Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
-: GestureRecognizer( screenSize, Gesture::Tap ),
+: GestureRecognizer( screenSize, Dali::Gesture::Tap ),
   mObserver(observer),
   mState(Clear),
   mMinimumTapsRequired(request.minTaps),
@@ -122,7 +122,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             else
             {
               ++mTapsRegistered;
-              EmitGesture( Gesture::Started, event.time );
+              EmitGesture( Dali::Gesture::Started, event.time );
               mState = Clear;
             }
           }
@@ -166,7 +166,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
     mState = Failed;
 
     // We have entered a multi-touch event so emit registered gestures if required.
-    EmitGesture(Gesture::Started, event.time);
+    EmitGesture(Dali::Gesture::Started, event.time);
   }
 }
 
@@ -182,7 +182,7 @@ void TapGestureRecognizer::SetupForTouchDown( const Integration::TouchEvent& eve
 
 void TapGestureRecognizer::EmitPossibleState( const Integration::TouchEvent& event )
 {
-  TapGestureEvent tapEvent( Gesture::Possible );
+  TapGestureEvent tapEvent( Dali::Gesture::Possible );
   tapEvent.point = mTouchPosition;
   tapEvent.time = event.time;
 
@@ -200,7 +200,7 @@ void TapGestureRecognizer::Update(const GestureRequest& request)
 
 void TapGestureRecognizer::EmitGesture( Gesture::State state, uint32_t time )
 {
-  if ( (state == Gesture::Cancelled) ||
+  if ( (state == Dali::Gesture::Cancelled) ||
        (mTapsRegistered >= mMinimumTapsRequired && mTapsRegistered <= mMaximumTapsRequired) )
 
   {
@@ -211,7 +211,7 @@ void TapGestureRecognizer::EmitGesture( Gesture::State state, uint32_t time )
 
 void TapGestureRecognizer::EmitSingleTap( uint32_t time, const Integration::Point& point )
 {
-  TapGestureEvent event( Gesture::Started );
+  TapGestureEvent event( Dali::Gesture::Started );
   const Vector2& screen( point.GetScreenPosition() );
   Vector2 distanceDelta(std::abs(mTouchPosition.x - screen.x),
                         std::abs(mTouchPosition.y - screen.y));
@@ -219,7 +219,7 @@ void TapGestureRecognizer::EmitSingleTap( uint32_t time, const Integration::Poin
   if (distanceDelta.x > MAXIMUM_MOTION_ALLOWED ||
       distanceDelta.y > MAXIMUM_MOTION_ALLOWED )
   {
-    event.state = Gesture::Cancelled;
+    event.state = Dali::Gesture::Cancelled;
   }
   mTapsRegistered = 1u;
   EmitTap( time, event );

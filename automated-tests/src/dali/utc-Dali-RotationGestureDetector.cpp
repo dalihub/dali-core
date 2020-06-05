@@ -46,7 +46,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
-    receivedGesture(Gesture::Started)
+    receivedGesture()
   {}
 
   void Reset()
@@ -54,10 +54,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.state = Gesture::Started;
-    receivedGesture.rotation = 0.0f;
-    receivedGesture.screenCenterPoint = Vector2(0.0f, 0.0f);
-    receivedGesture.localCenterPoint = Vector2(0.0f, 0.0f);
+    receivedGesture.Reset();
 
     rotatedActor.Reset();
   }
@@ -102,7 +99,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
     GestureReceivedFunctor::operator()( actor, rotation );
 
-    if ( rotation.state == stateToUnstage )
+    if ( rotation.GetState() == stateToUnstage )
     {
       scene.Remove( actor );
     }
@@ -282,36 +279,40 @@ int UtcDaliRotationGestureSignalReceptionDownMotionLeave(void)
   TestStartRotation( application,  Vector2( 5.0f, 5.0f ), Vector2( 20.0f, 20.0f ),
                                    Vector2( 5.0f, 5.0f ), Vector2( 20.0f, 30.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.244f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(12.5f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.244f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(12.5f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(12.48f, 17.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
   TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                      Vector2( 17.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 400 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(21.0f, 20.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(21.0f, 20.0f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(21.0f, 20.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Pan Gesture leaves actor's area - we should still receive the signal
   data.Reset();
   TestContinueRotation( application, Vector2( 17.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                      Vector2( 300.0f, 10.0f ), Vector2( 340.0f, 10.0f ), 1000 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(320.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(320.0f, 10.0f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(320.0f, 10.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Gesture ends - we would receive a finished state
   data.Reset();
   TestEndRotation( application,  Vector2( 300.0f, 10.0f ), Vector2( 340.0f, 10.0f ),
                                  Vector2( 305.0f, 10.0f ), Vector2( 315.0f, 10.0f ), 1500);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(310.0f, 10.0f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.785398f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(310.0f, 10.0f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(310.0f, 10.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -339,27 +340,30 @@ int UtcDaliRotationGestureSignalReceptionDownMotionUp(void)
   TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                    Vector2( 10.0f, 20.0f ), Vector2( 31.0f, 29.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.404892f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(20.5f, 24.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0.404892f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.5f, 24.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.5f, 24.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Continue the rotation within the actor's area - we should still receive the signal
   data.Reset();
   TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                      Vector2( 15.0f, 20.0f ), Vector2( 29.0f, 15.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.343024f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(22.0f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.343024f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(22.0f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(22.0f, 17.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Gesture ends within actor's area - we would receive a finished state
   data.Reset();
   TestEndRotation( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                  Vector2( 19.0f, 20.0f ), Vector2( 29.0f, 15.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.463648f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(24.0f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.463648f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(24.0f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(24.0f, 17.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -387,7 +391,7 @@ int UtcDaliRotationGestureSignalReceptionDetach(void)
   TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                    Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
 
 
   // Continue the rotation within the actor's area - we should still receive the signal
@@ -395,14 +399,14 @@ int UtcDaliRotationGestureSignalReceptionDetach(void)
   TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                      Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
 
   // Gesture ends within actor's area
   data.Reset();
   TestEndRotation( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                  Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.GetState(), TEST_LOCATION);
 
   // Detach actor
   detector.DetachAll();
@@ -438,14 +442,14 @@ int UtcDaliRotationGestureSignalReceptionDetachWhileRotationing(void)
   TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                    Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
 
   // Continue the rotation within the actor's area - we should still receive the signal
   data.Reset();
   TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                      Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
 
   // Detach actor during the rotation, we should not receive the next event
   detector.DetachAll();
@@ -493,14 +497,14 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
     TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                      Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-    DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+    DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
 
     // Continue the rotation within the actor's area - we should still receive the signal
     data.Reset();
     TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                        Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-    DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
+    DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
     application.GetScene().Remove(actor);
@@ -547,8 +551,9 @@ int UtcDaliRotationGestureSignalReceptionRotatedActor(void)
   TestEndRotation( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                  Vector2( 19.0f, 20.0f ), Vector2( 27.0f, 15.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(67.5f, 27.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Rotate actor again and render and notify
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
@@ -562,8 +567,9 @@ int UtcDaliRotationGestureSignalReceptionRotatedActor(void)
   TestEndRotation( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                  Vector2( 19.0f, 20.0f ), Vector2( 27.0f, 15.0f ), 3000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(27.0f, 32.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Rotate actor again and render and notify
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(270.0f), Vector3::ZAXIS) );
@@ -577,8 +583,9 @@ int UtcDaliRotationGestureSignalReceptionRotatedActor(void)
   TestEndRotation( application,  Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ),
                                  Vector2( 19.0f, 20.0f ), Vector2( 27.0f, 15.0f ), 5000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(-0.558599f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(23.0f, 17.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(32.5f, 73.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -620,8 +627,9 @@ int UtcDaliRotationGestureSignalReceptionChildHit(void)
                                  Vector2( 19.0f, 20.0f ), Vector2( 29.0f, 25.0f ), 1000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.rotatedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.463648f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(24.0f, 22.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.463648f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(24.0f, 22.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(24.0f, 22.5f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
 
   // Attach child and generate same touch points to yield same results
   // (Also proves that you can detach and then re-attach another actor)
@@ -636,8 +644,9 @@ int UtcDaliRotationGestureSignalReceptionChildHit(void)
                                  Vector2( 19.0f, 20.0f ), Vector2( 29.0f, 35.0f ), 3000);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.rotatedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.982794f, data.receivedGesture.rotation.radian, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(24.0f, 27.5f), data.receivedGesture.screenCenterPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.982794f, data.receivedGesture.GetRotation().radian, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(24.0f, 27.5f), data.receivedGesture.GetScreenCenterPoint(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(27.5f, 76.0f), data.receivedGesture.GetLocalCenterPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1119,7 +1128,7 @@ int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
                                    Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
   data.Reset();
 
   // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
@@ -1128,7 +1137,7 @@ int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
   TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
                                      Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.GetState(), TEST_LOCATION);
   data.Reset();
 
   // Start another rotation, we should not even get the callback this time
@@ -1158,7 +1167,7 @@ int UtcDaliRotationGestureDisableDetectionDuringRotationN(void)
       &application,
       [&detector, &functorCalled](Actor actor, const RotationGesture& gesture)
       {
-        if( gesture.state == Gesture::Finished )
+        if( gesture.GetState() == Gesture::Finished )
         {
           detector.Detach(actor);
           functorCalled = true;

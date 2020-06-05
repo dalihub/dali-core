@@ -43,7 +43,7 @@ const float MAXIMUM_MOTION_ALLOWED = 60.0f;
 } // unnamed namespace
 
 LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vector2 screenSize, const LongPressGestureRequest& request, uint32_t minimumHoldingTime )
-: GestureRecognizer( screenSize, Gesture::LongPress ),
+: GestureRecognizer( screenSize, Dali::Gesture::LongPress ),
   mObserver( observer ),
   mState( Clear ),
   mMinimumTouchesRequired( request.minTouches ),
@@ -91,7 +91,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
         // A long press gesture may be possible, tell Core about this and change state to Touched.
         mState = Touched;
-        EmitGesture( Gesture::Possible );
+        EmitGesture( Dali::Gesture::Possible );
       }
 
       break;
@@ -103,7 +103,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
       if (pointCount > mMaximumTouchesRequired)
       {
         // A long press did not occur, tell Core that it was cancelled and change state to Failed.
-        EmitGesture( Gesture::Cancelled );
+        EmitGesture( Dali::Gesture::Cancelled );
         mTouchPositions.clear();
         platformAbstraction.CancelTimer(mTimerId);
         mTimerId = 0;
@@ -130,7 +130,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           case PointState::INTERRUPTED:
           {
             // System has interrupted us, long press is not possible, inform Core
-            EmitGesture( Gesture::Cancelled );
+            EmitGesture( Dali::Gesture::Cancelled );
             mTouchPositions.clear();
             platformAbstraction.CancelTimer(mTimerId);
             mTimerId = 0;
@@ -147,7 +147,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             if (distanceSquared > ( MAXIMUM_MOTION_ALLOWED * MAXIMUM_MOTION_ALLOWED ) )
             {
               // We have moved more than the allowable motion for a long press gesture. Inform Core and change state to Failed.
-              EmitGesture( Gesture::Cancelled );
+              EmitGesture( Dali::Gesture::Cancelled );
               platformAbstraction.CancelTimer(mTimerId);
               mTimerId = 0;
               mState = Failed;
@@ -180,7 +180,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           if(mState == Finished)
           {
             // When the last touch point is lifted, we should inform the Core that the Long press has finished.
-            EmitGesture(Gesture::Finished);
+            EmitGesture(Dali::Gesture::Finished);
           }
           mTouchPositions.clear();
           mState = Clear; // Reset state to clear when last touch point is lifted.
@@ -207,7 +207,7 @@ void LongPressGestureRecognizer::SetMinimumHoldingTime( uint32_t time )
 
 bool LongPressGestureRecognizer::TimerCallback()
 {
-  EmitGesture(Gesture::Started);
+  EmitGesture(Dali::Gesture::Started);
 
   mState = Finished;
 
@@ -221,8 +221,8 @@ void LongPressGestureRecognizer::EmitGesture(Gesture::State state)
   unsigned int touchPoints ( static_cast<unsigned int>( mTouchPositions.size() ) );
 
   // We should tell Core about the Possible and Cancelled states regardless of whether we have satisfied long press requirements.
-  if ( (state == Gesture::Possible) ||
-       (state == Gesture::Cancelled) ||
+  if ( (state == Dali::Gesture::Possible) ||
+       (state == Dali::Gesture::Cancelled) ||
        (touchPoints >= mMinimumTouchesRequired) )
   {
     LongPressGestureEvent longPress( state );
@@ -236,7 +236,7 @@ void LongPressGestureRecognizer::EmitGesture(Gesture::State state)
     longPress.point /= static_cast<float>( touchPoints );
 
     longPress.time = mTouchTime;
-    if ( state != Gesture::Possible )
+    if ( state != Dali::Gesture::Possible )
     {
       longPress.time += mMinimumHoldingTime;
     }
