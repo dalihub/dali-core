@@ -4704,12 +4704,12 @@ void Actor::SetPreferredSize( const Vector2& size )
   // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
   // then change to FIXED as well
 
-  if( size.width > 0.0f )
+  if( size.width > 0.0f || GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DEFAULT )
   {
     SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
   }
 
-  if( size.height > 0.0f )
+  if( size.height > 0.0f || GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DEFAULT )
   {
     SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
   }
