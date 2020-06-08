@@ -19,7 +19,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/events/key-event-devel.cpp
   ${devel_api_src_dir}/images/distance-field.cpp
   ${devel_api_src_dir}/images/texture-set-image.cpp
-  ${devel_api_src_dir}/images/nine-patch-image.cpp
   ${devel_api_src_dir}/images/pixel-data-devel.cpp
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
@@ -77,7 +76,6 @@ SET( devel_api_core_events_header_files
 SET( devel_api_core_images_header_files
   ${devel_api_src_dir}/images/distance-field.h
   ${devel_api_src_dir}/images/native-image-interface-extension.h
-  ${devel_api_src_dir}/images/nine-patch-image.h
   ${devel_api_src_dir}/images/texture-set-image.h
   ${devel_api_src_dir}/images/pixel-data-devel.h
 )

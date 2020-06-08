@@ -52,7 +52,6 @@ SET(TC_SOURCES
         utc-Dali-MeshMaterial.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp
-        utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
