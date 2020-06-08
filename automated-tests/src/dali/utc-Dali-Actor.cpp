@@ -3872,7 +3872,7 @@ int UtcDaliActorAddRendererP(void)
   END_TEST;
 }
 
-int UtcDaliActorAddRendererN(void)
+int UtcDaliActorAddRendererN01(void)
 {
   tet_infoline("Testing Actor::AddRenderer");
   TestApplication application;
@@ -3897,6 +3897,44 @@ int UtcDaliActorAddRendererN(void)
   {
     tet_printf("Assertion test failed - wrong Exception\n" );
     tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliActorAddRendererN02(void)
+{
+  tet_infoline( "UtcDaliActorAddRendererN02" );
+
+  Actor actor;
+  Renderer renderer;
+
+  {
+    TestApplication application;
+
+    Geometry geometry = CreateQuadGeometry();
+    Shader shader = CreateShader();
+    renderer = Renderer::New( geometry, shader );
+
+    actor = Actor::New();
+  }
+
+  // try illegal AddRenderer
+  try
+  {
+    actor.AddRenderer( renderer );
+    tet_printf( "Assertion test failed - no Exception\n" );
+    tet_result( TET_FAIL );
+  }
+  catch( Dali::DaliException& e )
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT( e, "EventThreadServices::IsCoreRunning()", TEST_LOCATION );
+  }
+  catch(...)
+  {
+    tet_printf( "Assertion test failed - wrong Exception\n" );
+    tet_result( TET_FAIL );
   }
 
   END_TEST;
