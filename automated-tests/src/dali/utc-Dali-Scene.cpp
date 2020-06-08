@@ -670,7 +670,7 @@ int UtcDaliSceneTouchSignalP(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -793,7 +793,7 @@ int UtcDaliSceneTouchSignalN(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -915,7 +915,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   // Render before resizing surface
@@ -969,7 +969,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   actor.AddRenderer(renderer);
   int testWidth = 400;
   int testHeight = 400;
-  actor.SetSize(testWidth, testHeight);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( testWidth, testHeight) );
   stage.Add(actor);
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( testWidth, testHeight ) );
@@ -1163,6 +1163,56 @@ int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
 
   enabledDisableTrace.Enable( false );
   enabledDisableTrace.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneEmptySceneRendering(void)
+{
+  tet_infoline( "Ensure not rendering before a Renderer is added" );
+
+  TestApplication application;
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+
+  // Render without any renderer
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), false, TEST_LOCATION );
+
+  // Add a Renderer
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400, 400 ) );
+  Stage::GetCurrent().Add( actor );
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+
+  // Remove the Renderer
+  Stage::GetCurrent().Remove( actor );
+  actor.Reset();
+  renderer.Reset();
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  // Check the clear count and the render status
+  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION );  // Should be cleared
+  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
 
   END_TEST;
 }

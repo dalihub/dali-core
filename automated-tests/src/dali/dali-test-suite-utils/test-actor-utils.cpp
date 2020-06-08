@@ -88,7 +88,7 @@ Actor CreateRenderableActor( Image texture, const std::string& vertexShader, con
     renderer.SetTextures( textureSet );
 
     // Set actor to the size of the texture if set
-    actor.SetSize( texture.GetWidth(), texture.GetHeight() );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( texture.GetWidth(), texture.GetHeight() ) );
   }
 
   return actor;

@@ -507,12 +507,6 @@ void RenderManager::PreRender( Integration::RenderStatus& status, bool forceClea
   {
     DALI_LOG_INFO( gLogFilter, Debug::General, "Render: Processing\n" );
 
-    if ( !uploadOnly )
-    {
-      // Mark that we will require a post-render step to be performed (includes swap-buffers).
-      status.SetNeedsPostRender( true );
-    }
-
     // Switch to the shared context
     if ( mImpl->currentContext != &mImpl->context )
     {
@@ -570,7 +564,7 @@ void RenderManager::PreRender( Integration::RenderStatus& status, bool forceClea
 }
 
 
-void RenderManager::RenderScene( Integration::Scene& scene, bool renderToFbo )
+void RenderManager::RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
 {
   Internal::Scene& sceneInternal = GetImplementation( scene );
   SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
@@ -585,6 +579,9 @@ void RenderManager::RenderScene( Integration::Scene& scene, bool renderToFbo )
     {
       continue; // skip
     }
+
+    // Mark that we will require a post-render step to be performed (includes swap-buffers).
+    status.SetNeedsPostRender( true );
 
     Rect<int32_t> viewportRect;
     Vector4   clearColor;

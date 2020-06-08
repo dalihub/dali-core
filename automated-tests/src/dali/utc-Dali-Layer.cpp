@@ -264,9 +264,9 @@ int UtcDaliLayerSetSortFunction(void)
   // create two transparent actors so there is something to sort
   Actor actor = CreateRenderableActor( img );
   Actor actor2 = CreateRenderableActor( img );
-  actor.SetSize(1,1);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 1, 1 ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
-  actor2.SetSize(1,1);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2( 1, 1 ) );
   actor2.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
 
   // add to stage

@@ -196,7 +196,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
 
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -277,7 +277,7 @@ int UtcDaliLongPressGestureSignalReceptionNegative(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -305,7 +305,7 @@ int UtcDaliLongPressGestureSignalReceptionPositive(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -334,7 +334,7 @@ int UtcDaliLongPressGestureSignalReceptionDetach(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -389,7 +389,7 @@ int UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress(void)
   // Actor lifetime is scoped
   {
     Actor actor = Actor::New();
-    actor.SetSize(100.0f, 100.0f);
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(actor);
 
@@ -424,7 +424,7 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Dali::Degree(90.0f), Vector3::ZAXIS ) );
   Stage::GetCurrent().Add(actor);
 
@@ -477,7 +477,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetSize(100.0f, 100.0f);
+  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(parent);
 
@@ -485,7 +485,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   // Change rotation of child to be different from parent so that we can check if our local coordinate
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
-  child.SetSize(100.0f, 100.0f);
+  child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
@@ -532,13 +532,13 @@ int UtcDaliLongPressGestureSignalReceptionAttachDetachMany(void)
   TestApplication application;
 
   Actor first = Actor::New();
-  first.SetSize(100.0f, 100.0f);
+  first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(first);
 
   Actor second = Actor::New();
-  second.SetSize(100.0f, 100.0f);
-  second.SetX(100.0f);
+  second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  second.SetProperty( Actor::Property::POSITION_X, 100.0f);
   second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(second);
 
@@ -589,7 +589,7 @@ int UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -629,7 +629,7 @@ int UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -663,7 +663,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -683,7 +683,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor somewhere else
-  actor.SetPosition( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
 
   // Render and notify
   application.SendNotification();
@@ -699,7 +699,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor in to the long press position.
-  actor.SetPosition( 0.0f, 0.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   // Render and notify
   application.SendNotification();
@@ -722,7 +722,7 @@ int UtcDaliLongPressGesturePossibleCancelled(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -750,7 +750,7 @@ int UtcDaliLongPressGestureDetachAfterStarted(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -784,7 +784,7 @@ int UtcDaliLongPressGestureActorUnstaged(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -838,14 +838,14 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor( Actor::New() );
-  dummyActor.SetSize( 100.0f, 100.0f );
-  dummyActor.SetPosition( 100.0f, 100.0f );
+  dummyActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  dummyActor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
   dummyActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(dummyActor);
 
@@ -918,7 +918,7 @@ int UtcDaliLongPressGestureLayerConsumesTouch(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -931,7 +931,7 @@ int UtcDaliLongPressGestureLayerConsumesTouch(void)
 
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
-  layer.SetSize(100.0f, 100.0f);
+  layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add( layer );
   layer.RaiseToTop();
@@ -972,7 +972,7 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
   Integration::SetLongPressMinimumHoldingTime( kMinumumHolding1 );
 
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( actor );
 

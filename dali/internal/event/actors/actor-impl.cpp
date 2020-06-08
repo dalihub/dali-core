@@ -2441,7 +2441,15 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::SIZE:
     {
-      SetSize( property.Get< Vector3 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::VECTOR2 )
+      {
+        SetSize( property.Get< Vector2 >() );
+      }
+      else if ( type == Property::VECTOR3 )
+      {
+        SetSize( property.Get< Vector3 >() );
+      }
       break;
     }
 
@@ -2465,7 +2473,16 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::POSITION:
     {
-      SetPosition( property.Get< Vector3 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::VECTOR2 )
+      {
+        Vector2 position = property.Get< Vector2 >();
+        SetPosition( Vector3( position.x, position.y, 0.0f ) );
+      }
+      else if ( type == Property::VECTOR3 )
+      {
+        SetPosition( property.Get< Vector3 >() );
+      }
       break;
     }
 
@@ -2495,7 +2512,16 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::SCALE:
     {
-      SetScale( property.Get< Vector3 >() );
+      Property::Type type = property.GetType();
+      if( type == Property::FLOAT )
+      {
+        float scale = property.Get< float >();
+        SetScale( scale, scale, scale );
+      }
+      else if ( type == Property::VECTOR3 )
+      {
+        SetScale( property.Get< Vector3 >() );
+      }
       break;
     }
 

@@ -1028,7 +1028,7 @@ int UtcDaliStageTouchedSignalP(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -1153,7 +1153,7 @@ int UtcDaliStageTouchedSignalN(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -1243,7 +1243,7 @@ int UtcDaliStageTouchSignalP(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );
@@ -1374,7 +1374,7 @@ int UtcDaliStageTouchSignalN(void)
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   actor.TouchedSignal().Connect( &DummyTouchCallback );

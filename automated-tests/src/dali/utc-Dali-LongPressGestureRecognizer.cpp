@@ -122,7 +122,7 @@ int UtcDaliLongPressGestureRecognizerBasicNoAction(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -154,7 +154,7 @@ int UtcDaliLongPressGestureRecognizerBasic(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -186,7 +186,7 @@ int UtcDaliLongPressGestureRecognizerTooShortWait(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -218,7 +218,7 @@ int UtcDaliLongPressGestureRecognizerTooFewPoints(void)
   detector.SetTouchesRequired(2,2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -251,7 +251,7 @@ int UtcDaliLongPressGestureRecognizerTooManyPoints(void)
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -287,7 +287,7 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsMoving(void)
   detector.SetTouchesRequired(2,2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -327,7 +327,7 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
   detector.SetTouchesRequired(2,2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -361,14 +361,14 @@ int UtcDaliLongPressGestureRecognizerMultipleDetectors(void)
   TestApplication application;
 
     Actor actor = Actor::New();
-    actor.SetSize(100.0f, 100.0f);
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(actor);
 
     Actor actor2 = Actor::New();
-    actor2.SetSize(100.0f, 100.0f);
+    actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    actor2.SetX(100.0f);
+    actor2.SetProperty( Actor::Property::POSITION_X, 100.0f);
     Stage::GetCurrent().Add(actor2);
 
     // Render and notify

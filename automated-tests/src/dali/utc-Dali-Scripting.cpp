@@ -664,9 +664,9 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
   // Default properties
   {
     Actor actor = Actor::New();
-    actor.SetSize( Vector3::ONE );
-    actor.SetPosition( Vector3::XAXIS );
-    actor.SetScale( Vector3::ZAXIS );
+    actor.SetProperty( Actor::Property::SIZE, Vector3::ONE );
+    actor.SetProperty( Actor::Property::POSITION, Vector3::XAXIS );
+    actor.SetProperty( Actor::Property::SCALE, Vector3::ZAXIS );
     actor.SetProperty( Actor::Property::VISIBLE, false );
     actor.SetProperty( Actor::Property::COLOR, Color::MAGENTA );
     actor.SetProperty( Actor::Property::NAME, "MyActor" );

@@ -187,7 +187,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
   gCallBackCalled = false;
 
   tet_infoline(" UtcDaliAddPropertyNotificationCallback - Forcing notification condition true, should receive a notification");
-  object->mActor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  object->mActor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -196,7 +196,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
   gCallBackCalled = false;
 
   tet_infoline(" UtcDaliAddPropertyNotificationCallback - Forcing notification condition false, should not receive a notification");
-  object->mActor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  object->mActor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -205,7 +205,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
   gCallBackCalled = false;
 
   tet_infoline(" UtcDaliAddPropertyNotificationCallback - Deleting notification and it's owning object, should not receive a notification");
-  object->mActor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  object->mActor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
   object->Terminate();
@@ -221,7 +221,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
 
   object->RemovePropertyNotification();
 
-  object->mActor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  object->mActor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -236,7 +236,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
 
   object->RemovePropertyNotifications();
 
-  object->mActor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  object->mActor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -409,7 +409,7 @@ int UtcDaliPropertyNotificationGetNotifyResultP(void)
   gCallBackCalled = false;
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
@@ -434,25 +434,25 @@ int UtcDaliPropertyNotificationGreaterThan(void)
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move right to satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move left to un-satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( !gCallBackCalled );
 
   // Move right to satisfy condition again.
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -469,25 +469,25 @@ int UtcDaliPropertyNotificationLessThan(void)
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, LessThanCondition(100.0f ) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move left to satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move right to un-satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( !gCallBackCalled );
 
   // Move left to satisfy condition again.
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -504,25 +504,25 @@ int UtcDaliPropertyNotificationInside(void)
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, InsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move inside to satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(150.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(150.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move outside (right) to un-satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(300.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(300.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( !gCallBackCalled );
 
   // Move inside to satisfy condition again.
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(150.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(150.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -539,25 +539,25 @@ int UtcDaliPropertyNotificationOutside(void)
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, OutsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(150.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(150.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move outside (left) to satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move inside to un-satisfy condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(150.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(150.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( !gCallBackCalled );
 
   // Move outside (right) to satisfy condition again.
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(300.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(300.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
   END_TEST;
@@ -580,26 +580,26 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   notification = actor.AddPropertyNotification( Actor::Property::COLOR, 3, GreaterThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move right to satisfy XAxis condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move down to satisfy YAxis condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 200.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 200.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move forward to satisfy ZAxis
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(200.0f, 200.0f, 200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 200.0f, 200.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
@@ -629,26 +629,26 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   notification = actor.AddPropertyNotification( Actor::Property::COLOR, 3, LessThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move left to satisfy XAxis condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(-200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(-200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move up to satisfy YAxis condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(-200.0f, -200.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(-200.0f, -200.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move back to satisfy ZAxis
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(-200.0f, -200.0f, -200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(-200.0f, -200.0f, -200.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
@@ -679,26 +679,26 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   // set outside all conditions
-  actor.SetPosition(Vector3(200.0f, 200.0f, 200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 200.0f, 200.0f));
   actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to inside condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(0.0f, 200.0f, 200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 200.0f, 200.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move y to inside condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(0.0f, 0.0f, 200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 200.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move z to inside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
@@ -729,26 +729,26 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   // set inside all conditions
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   actor.SetProperty( Actor::Property::COLOR,Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to outside condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move y to outside condition
   gCallBackCalled = false;
-  actor.SetPosition(Vector3(200.0f, 200.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 200.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
   // Move z to outside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetPosition(Vector3(200.0f, 200.0f, 200.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(200.0f, 200.0f, 200.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 
@@ -774,7 +774,7 @@ int UtcDaliPropertyNotificationSetSizeResultP(void)
   gCallBackCalled = false;
   notification.NotifySignal().Connect( &TestCallback );
 
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f) );
 
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
@@ -787,7 +787,7 @@ int UtcDaliPropertyNotificationSetSizeResultP(void)
 
   gCallBackCalled = false;
 
-  actor.SetSize(200.0f, 200.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
 
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
@@ -836,7 +836,7 @@ int UtcDaliPropertyNotificationStep(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   // set initial position
-  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // test both directions
@@ -844,7 +844,7 @@ int UtcDaliPropertyNotificationStep(void)
   {
     // Move x to negative position
     gCallBackCalled = false;
-    actor.SetPosition(Vector3((i * step), 0.0f, 0.0f));
+    actor.SetProperty( Actor::Property::POSITION, Vector3((i * step), 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }
@@ -853,7 +853,7 @@ int UtcDaliPropertyNotificationStep(void)
   {
     // Move x to negative position
     gCallBackCalled = false;
-    actor.SetPosition(Vector3(-(i * step), 0.0f, 0.0f));
+    actor.SetProperty( Actor::Property::POSITION, Vector3(-(i * step), 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }
@@ -881,7 +881,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
   notification.NotifySignal().Connect( &TestCallback );
 
   // set initial position lower than first position in list
-  actor.SetPosition(Vector3(values[0] - averageStep, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(values[0] - averageStep, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   for( unsigned int i = 0 ; i < values.Count() - 1 ; ++i )
@@ -889,7 +889,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
     gCallBackCalled = false;
     // set position half way between the current values
     float position = values[i] + (0.5f * (values[i + 1] - values[i]));
-    actor.SetPosition(Vector3(position, 0.0f, 0.0f));
+    actor.SetProperty( Actor::Property::POSITION, Vector3(position, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }

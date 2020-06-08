@@ -916,7 +916,6 @@ int UtcDaliActorGetCurrentAnchorPoint(void)
   END_TEST;
 }
 
-// SetSize(float width, float height)
 int UtcDaliActorSetSize01(void)
 {
   TestApplication application;
@@ -926,7 +925,7 @@ int UtcDaliActorSetSize01(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(vector.x, vector.y);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( vector.x, vector.y ) );
 
   // Immediately retrieve the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -962,7 +961,7 @@ int UtcDaliActorSetSize01(void)
   DALI_TEST_EQUALS( currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Set a new size after resize policy is changed and check the new size
-  actor.SetSize( Vector3( 0.1f, 0.2f, 0.0f ) );
+  actor.SetProperty( Actor::Property::SIZE, Vector3( 0.1f, 0.2f, 0.0f ) );
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -974,7 +973,7 @@ int UtcDaliActorSetSize01(void)
   DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Set another new size after resize policy is changed and check the new size
-  actor.SetSize( Vector3( 50.0f, 60.0f, 0.0f ) );
+  actor.SetProperty( Actor::Property::SIZE, Vector3( 50.0f, 60.0f, 0.0f ) );
 
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, Vector3( 50.0f, 60.0f, 0.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -982,7 +981,6 @@ int UtcDaliActorSetSize01(void)
   END_TEST;
 }
 
-// SetSize(float width, float height, float depth)
 int UtcDaliActorSetSize02(void)
 {
   TestApplication application;
@@ -992,7 +990,7 @@ int UtcDaliActorSetSize02(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(vector.x, vector.y, vector.z);
+  actor.SetProperty( Actor::Property::SIZE, Vector3( vector.x, vector.y, vector.z ) );
 
   // Immediately check the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -1021,7 +1019,7 @@ int UtcDaliActorSetSize03(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(Vector2(vector.x, vector.y));
+  actor.SetProperty( Actor::Property::SIZE,Vector2(vector.x, vector.y));
 
   // Immediately check the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -1050,7 +1048,7 @@ int UtcDaliActorSetSize04(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(vector);
+  actor.SetProperty( Actor::Property::SIZE,vector);
 
   // Immediately check the size after setting
   Vector3 currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -1064,7 +1062,7 @@ int UtcDaliActorSetSize04(void)
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   Stage::GetCurrent().Add( actor );
-  actor.SetSize( Vector3( 0.1f, 0.2f, 0.3f ) );
+  actor.SetProperty( Actor::Property::SIZE, Vector3( 0.1f, 0.2f, 0.3f ) );
 
   // Immediately check the size after setting
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -1209,7 +1207,7 @@ int UtcDaliActorGetCurrentSize(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(vector);
+  actor.SetProperty( Actor::Property::SIZE,vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1241,7 +1239,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   DALI_TEST_CHECK(vector != actor.GetTargetSize());
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  actor.SetSize(vector);
+  actor.SetProperty( Actor::Property::SIZE,vector);
 
   DALI_TEST_CHECK(vector == actor.GetTargetSize());
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
@@ -1279,8 +1277,8 @@ int UtcDaliActorCalculateScreenExtents(void)
 
   Actor actor = Actor::New();
 
-  actor.SetPosition(Vector3(2.0f, 2.0f, 16.0f));
-  actor.SetSize(Vector3{ 1.0f, 1.0f, 1.0f });
+  actor.SetProperty( Actor::Property::POSITION, Vector3(2.0f, 2.0f, 16.0f));
+  actor.SetProperty( Actor::Property::SIZE,Vector3{ 1.0f, 1.0f, 1.0f });
 
   application.SendNotification();
   application.Render();
@@ -1304,28 +1302,28 @@ int UtcDaliActorSetPosition01(void)
   Actor actor = Actor::New();
 
   // Set to random to start off with
-  actor.SetPosition(Vector3(120.0f, 120.0f, 0.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(120.0f, 120.0f, 0.0f));
 
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetPosition(vector.x, vector.y);
+  actor.SetProperty( Actor::Property::POSITION, Vector2(vector.x, vector.y));
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
   Stage::GetCurrent().Add( actor );
-  actor.SetPosition( Vector3( 0.1f, 0.2f, 0.3f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector3( 0.1f, 0.2f, 0.3f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
 
-  actor.SetX( 1.0f );
-  actor.SetY( 1.1f );
-  actor.SetZ( 1.2f );
+  actor.SetProperty( Actor::Property::POSITION_X,  1.0f );
+  actor.SetProperty( Actor::Property::POSITION_Y,  1.1f );
+  actor.SetProperty( Actor::Property::POSITION_Z,  1.2f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1349,13 +1347,13 @@ int UtcDaliActorSetPosition02(void)
   Actor actor = Actor::New();
 
   // Set to random to start off with
-  actor.SetPosition(Vector3(120.0f, 120.0f, 120.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(120.0f, 120.0f, 120.0f));
 
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetPosition(vector.x, vector.y, vector.z);
+  actor.SetProperty( Actor::Property::POSITION, Vector3(vector.x, vector.y, vector.z));
 
   // flush the queue and render once
   application.SendNotification();
@@ -1373,13 +1371,13 @@ int UtcDaliActorSetPosition03(void)
   Actor actor = Actor::New();
 
   // Set to random to start off with
-  actor.SetPosition(Vector3(120.0f, 120.0f, 120.0f));
+  actor.SetProperty( Actor::Property::POSITION, Vector3(120.0f, 120.0f, 120.0f));
 
   Vector3 vector(100.0f, 100.0f, 100.0f);
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetPosition(vector);
+  actor.SetProperty( Actor::Property::POSITION, vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1399,7 +1397,7 @@ int UtcDaliActorSetX(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetX(100.0f);
+  actor.SetProperty( Actor::Property::POSITION_X, 100.0f);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1419,7 +1417,7 @@ int UtcDaliActorSetY(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetY(100.0f);
+  actor.SetProperty( Actor::Property::POSITION_Y, 100.0f);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1439,7 +1437,7 @@ int UtcDaliActorSetZ(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetZ(100.0f);
+  actor.SetProperty( Actor::Property::POSITION_Z, 100.0f);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1512,7 +1510,7 @@ int UtcDaliActorTranslateBy(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  actor.SetPosition(vector);
+  actor.SetProperty( Actor::Property::POSITION, vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1536,7 +1534,7 @@ int UtcDaliActorGetCurrentPosition(void)
 
   Actor actor = Actor::New();
   Vector3 setVector(100.0f, 100.0f, 0.0f);
-  actor.SetPosition(setVector);
+  actor.SetProperty( Actor::Property::POSITION, setVector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1552,7 +1550,7 @@ int UtcDaliActorGetCurrentWorldPosition(void)
 
   Actor parent = Actor::New();
   Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
+  parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Stage::GetCurrent().Add( parent );
@@ -1561,7 +1559,7 @@ int UtcDaliActorGetCurrentWorldPosition(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Vector3 childPosition( 6.0f, 6.0f, 6.0f );
-  child.SetPosition( childPosition );
+  child.SetProperty( Actor::Property::POSITION, childPosition );
   parent.Add( child );
 
   // The actors should not have a world position yet
@@ -1587,7 +1585,7 @@ int UtcDaliActorSetInheritPosition(void)
 
   Actor parent = Actor::New();
   Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
+  parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Stage::GetCurrent().Add( parent );
@@ -1596,7 +1594,7 @@ int UtcDaliActorSetInheritPosition(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Vector3 childPosition( 10.0f, 11.0f, 12.0f );
-  child.SetPosition( childPosition );
+  child.SetProperty( Actor::Property::POSITION, childPosition );
   parent.Add( child );
 
   // The actors should not have a world position yet
@@ -1614,7 +1612,7 @@ int UtcDaliActorSetInheritPosition(void)
 
   //Change child position
   Vector3 childOffset( -1.0f, 1.0f, 0.0f );
-  child.SetPosition( childOffset );
+  child.SetProperty( Actor::Property::POSITION, childOffset );
 
   // Use local position as world postion
   child.SetProperty( Actor::Property::INHERIT_POSITION, false );
@@ -1861,12 +1859,12 @@ int UtcDaliActorSetScale01(void)
   Actor actor = Actor::New();
 
   // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
-  actor.SetScale(0.25f);
+  actor.SetProperty( Actor::Property::SCALE,0.25f);
 
   Vector3 scale(10.0f, 10.0f, 10.0f);
   DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
-  actor.SetScale(scale.x);
+  actor.SetProperty( Actor::Property::SCALE,scale.x);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1885,11 +1883,11 @@ int UtcDaliActorSetScale02(void)
   Actor actor = Actor::New();
 
   // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
-  actor.SetScale(Vector3(12.0f, 1.0f, 2.0f));
+  actor.SetProperty( Actor::Property::SCALE, Vector3( 12.0f, 1.0f, 2.0f ) );
 
   DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
-  actor.SetScale(scale.x, scale.y, scale.z);
+  actor.SetProperty( Actor::Property::SCALE, Vector3( scale.x, scale.y, scale.z ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1897,7 +1895,7 @@ int UtcDaliActorSetScale02(void)
 
   // add to stage and test
   Stage::GetCurrent().Add( actor );
-  actor.SetScale( 2.0f, 2.0f, 2.0f );
+  actor.SetProperty( Actor::Property::SCALE, Vector3( 2.0f, 2.0f, 2.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1917,11 +1915,11 @@ int UtcDaliActorSetScale03(void)
   Actor actor = Actor::New();
 
   // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
-  actor.SetScale(Vector3(12.0f, 1.0f, 2.0f));
+  actor.SetProperty( Actor::Property::SCALE, Vector3(12.0f, 1.0f, 2.0f));
 
   DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) != scale);
 
-  actor.SetScale(scale);
+  actor.SetProperty( Actor::Property::SCALE,scale);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1987,7 +1985,7 @@ int UtcDaliActorScaleBy(void)
 
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ));
 
-  actor.SetScale(vector);
+  actor.SetProperty( Actor::Property::SCALE,vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2012,7 +2010,7 @@ int UtcDaliActorGetCurrentScale(void)
 
   Actor actor = Actor::New();
 
-  actor.SetScale(scale);
+  actor.SetProperty( Actor::Property::SCALE,scale);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2028,12 +2026,12 @@ int UtcDaliActorGetCurrentWorldScale(void)
 
   Actor parent = Actor::New();
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
-  parent.SetScale( parentScale );
+  parent.SetProperty( Actor::Property::SCALE, parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
-  child.SetScale( childScale );
+  child.SetProperty( Actor::Property::SCALE, childScale );
   parent.Add( child );
 
   // The actors should not have a scale yet
@@ -2063,12 +2061,12 @@ int UtcDaliActorInheritScale(void)
 
   Actor parent = Actor::New();
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
-  parent.SetScale( parentScale );
+  parent.SetProperty( Actor::Property::SCALE, parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
-  child.SetScale( childScale );
+  child.SetProperty( Actor::Property::SCALE, childScale );
   parent.Add( child );
 
   application.SendNotification();
@@ -2420,8 +2418,8 @@ int UtcDaliActorScreenToLocal(void)
   TestApplication application;
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  actor.SetSize(100.0f, 100.0f);
-  actor.SetPosition(10.0f, 10.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   Stage::GetCurrent().Add(actor);
 
   // flush the queue and render once
@@ -2845,8 +2843,8 @@ int UtcDaliActorHitTest(void)
   unsigned int index = 0;
   while( NULL != hitTestData[index] )
   {
-    actor.SetSize( 1.f, 1.f );
-    actor.SetScale( hitTestData[index]->mScale.x, hitTestData[index]->mScale.y, hitTestData[index]->mScale.z );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 1.f, 1.f ) );
+    actor.SetProperty( Actor::Property::SCALE, Vector3( hitTestData[index]->mScale.x, hitTestData[index]->mScale.y, hitTestData[index]->mScale.z ) );
 
     // flush the queue and render once
     application.SendNotification();
@@ -2994,9 +2992,9 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
+  parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
-  parent.SetScale( parentScale );
+  parent.SetProperty( Actor::Property::SCALE, parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
@@ -3005,9 +3003,9 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Radian childRotationAngle(Degree(23.0f));
   Quaternion childRotation( childRotationAngle, Vector3::YAXIS );
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
-  child.SetPosition( childPosition );
+  child.SetProperty( Actor::Property::POSITION, childPosition );
   child.SetProperty( Actor::Property::ORIENTATION, childRotation );
-  child.SetScale( childScale );
+  child.SetProperty( Actor::Property::SCALE, childScale );
   parent.Add( child );
 
   app.SendNotification();
@@ -3044,9 +3042,9 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
+  parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
-  parent.SetScale( parentScale );
+  parent.SetProperty( Actor::Property::SCALE, parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
@@ -3082,9 +3080,9 @@ int UtcDaliActorConstrainedToOrientation(void)
   Radian rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
-  parent.SetPosition( parentPosition );
+  parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
-  parent.SetScale( parentScale );
+  parent.SetProperty( Actor::Property::SCALE, parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
@@ -3504,7 +3502,7 @@ int UtcDaliActorGetRelayoutSize(void)
   DALI_TEST_EQUALS( actor.GetRelayoutSize( Dimension::WIDTH ), 0.0f, TEST_LOCATION );
 
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
-  actor.SetSize( Vector2( 1.0f, 0.0f ) );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 0.0f ) );
 
   // Flush the queue and render once
   app.SendNotification();
@@ -3607,7 +3605,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   Stage::GetCurrent().Add( actor );
 
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  actor.SetSize( Vector2( 1.0f, 2.0 ) );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 2.0 ) );
 
   // Flush the queue and render once
   application.SendNotification();
@@ -4038,7 +4036,7 @@ Actor CreateActorWithContent( uint32_t width, uint32_t height)
 
   // Setup dimensions and position so actor is not skipped by culling.
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  actor.SetSize( width, height );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( width, height ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
@@ -4346,7 +4344,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
 
     // Setup dimensions and position so actor is not skipped by culling.
     actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-    actor.SetSize( 16.0f, 16.0f );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 16.0f, 16.0f ) );
 
     if( i == 0 )
     {
@@ -4490,8 +4488,8 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   clippingActorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   clippingActorB.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
 
-  clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
-  clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
+  clippingActorA.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, -200.0f, 0.0f ));
+  clippingActorB.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
 
   Stage::GetCurrent().Add( clippingActorA );
   Stage::GetCurrent().Add( clippingActorB );
@@ -4573,7 +4571,7 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   {
     // Position the child clipping actor so it intersects with the 1st clipping actor. This changes each loop.
     const Vector2 position = ( imageSize / 2.0f ) * positionModifiers[test];
-    clippingActorB.SetPosition( position.x, position.y );
+    clippingActorB.SetProperty( Actor::Property::POSITION, Vector2( position.x, position.y ));
 
     // Gather the call trace.
     GenerateTrace( application, enabledDisableTrace, scissorTrace );
@@ -4647,11 +4645,11 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   clippingActorE.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
   clippingActorE.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
-  clippingActorA.SetPosition( 0.0f, -200.0f, 0.0f );
-  clippingActorB.SetPosition( 0.0f, 0.0f, 0.0f );
-  clippingActorC.SetPosition( 0.0f, 100.0f, 0.0f );
-  clippingActorD.SetPosition( 0.0f, 0.0f, 0.0f );
-  clippingActorE.SetPosition( 0.0f, 0.0f, 0.0f );
+  clippingActorA.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, -200.0f, 0.0f ));
+  clippingActorB.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
+  clippingActorC.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 100.0f, 0.0f ));
+  clippingActorD.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
+  clippingActorE.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
 
   Stage::GetCurrent().Add( clippingActorA );
   clippingActorA.Add( clippingActorB );
@@ -6001,9 +5999,9 @@ int UtcDaliActorGetScreenPosition(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   Vector2 size2( 10.0f, 20.0f );
-  actorA.SetSize( size2 );
+  actorA.SetProperty( Actor::Property::SIZE, size2 );
 
-  actorA.SetPosition( 0.f, 0.f );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "UtcDaliActorGetScreenPosition Center Anchor Point and 0,0 position \n" );
 
@@ -6055,7 +6053,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,0 position \n" );
 
-  actorA.SetPosition( 30.0, 0.0 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 30.0, 0.0 ));
 
   application.SendNotification();
   application.Render();
@@ -6071,7 +6069,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   tet_infoline( "UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,420 position \n" );
 
-  actorA.SetPosition( 30.0, 420.0 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 30.0, 420.0 ));
 
   application.SendNotification();
   application.Render();
@@ -6088,15 +6086,15 @@ int UtcDaliActorGetScreenPosition(void)
   tet_infoline( "UtcDaliActorGetScreenPosition Scale parent and check child's screen position \n" );
 
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actorA.SetPosition( 30.0, 30.0 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 30.0, 30.0 ));
 
   Actor actorB = Actor::New();
   actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actorB.SetSize( size2 );
-  actorB.SetPosition( 10.f, 10.f );
+  actorB.SetProperty( Actor::Property::SIZE, size2 );
+  actorB.SetProperty( Actor::Property::POSITION, Vector2( 10.f, 10.f ));
   actorA.Add( actorB );
 
-  actorA.SetScale( 2.0f );
+  actorA.SetProperty( Actor::Property::SCALE, 2.0f );
 
   application.SendNotification();
   application.Render();
@@ -6121,9 +6119,9 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   Vector2 size2( 10.0f, 20.0f );
-  actorA.SetSize( size2 );
-  actorA.SetScale( 1.5f );
-  actorA.SetPosition( 0.f, 0.f );
+  actorA.SetProperty( Actor::Property::SIZE, size2 );
+  actorA.SetProperty( Actor::Property::SCALE, 1.5f );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "UtcDaliActorGetScreenPositionAfterScaling TopRight Anchor Point, scale 1.5f and 0,0 position \n" );
 
@@ -6172,8 +6170,8 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 10.0f, 20.0f );
-  actorA.SetSize( size2 );
-  actorA.SetPosition( 0.f, 0.f );
+  actorA.SetProperty( Actor::Property::SIZE, size2 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( " TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
@@ -6226,8 +6224,8 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size1( 10.0f, 20.0f );
-  actorA.SetSize( size1 );
-  actorA.SetPosition( 0.f, 0.f );
+  actorA.SetProperty( Actor::Property::SIZE, size1 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
@@ -6235,8 +6233,8 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   parentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   parentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 30.0f, 60.0f );
-  parentActorA.SetSize( size2 );
-  parentActorA.SetPosition( 0.f, 0.f );
+  parentActorA.SetProperty( Actor::Property::SIZE, size2 );
+  parentActorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "Add child 1 to Parent 1 and check screen position \n" );
 
@@ -6291,8 +6289,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size1( 10.0f, 20.0f );
-  actorA.SetSize( size1 );
-  actorA.SetPosition( 0.f, 0.f );
+  actorA.SetProperty( Actor::Property::SIZE, size1 );
+  actorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
@@ -6300,8 +6298,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   parentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   parentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Vector2 size2( 30.0f, 60.0f );
-  parentActorA.SetSize( size2 );
-  parentActorA.SetPosition( 0.f, 0.f );
+  parentActorA.SetProperty( Actor::Property::SIZE, size2 );
+  parentActorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "Create Grand Parent Actor 1 BOTTOM_LEFT Anchor Point, ParentOrigin::BOTTOM_LEFT and 0,0 position \n" );
 
@@ -6309,8 +6307,8 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   grandParentActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
   grandParentActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
   Vector2 size3( 60.0f, 120.0f );
-  grandParentActorA.SetSize( size3 );
-  grandParentActorA.SetPosition( 0.f, 0.f );
+  grandParentActorA.SetProperty( Actor::Property::SIZE, size3 );
+  grandParentActorA.SetProperty( Actor::Property::POSITION, Vector2( 0.f, 0.f ));
 
   tet_infoline( "Add Parent 1 to Grand Parent 1 \n" );
 
@@ -6350,7 +6348,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorA.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
-  actorA.SetSize( 10.0f, 20.0f );
+  actorA.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 20.0f ) );
   stage.Add( actorA );
 
   tet_infoline( "Create an Actor with AnchorPoint::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
@@ -6360,7 +6358,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorB.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorBSize( 30.0f, 60.0f );
-  actorB.SetSize( actorBSize );
+  actorB.SetProperty( Actor::Property::SIZE, actorBSize );
   stage.Add( actorB );
 
   tet_infoline( "Create an actor with AnchorPoint::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
@@ -6370,7 +6368,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actorC.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorCSize( 60.0f, 120.0f );
-  actorC.SetSize( actorCSize );
+  actorC.SetProperty( Actor::Property::SIZE, actorCSize );
   stage.Add( actorC );
 
   application.SendNotification();
@@ -6386,9 +6384,9 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
 
   tet_infoline( "Add scale to all actors" );
 
-  actorA.SetScale( 2.0f );
-  actorB.SetScale( 2.0f );
-  actorC.SetScale( 2.0f );
+  actorA.SetProperty( Actor::Property::SCALE, 2.0f );
+  actorB.SetProperty( Actor::Property::SCALE, 2.0f );
+  actorC.SetProperty( Actor::Property::SCALE, 2.0f );
 
   application.SendNotification();
   application.Render();
@@ -6408,7 +6406,7 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -6437,8 +6435,8 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  actor.SetSize( 100.0f, 100.0f );
-  actor.SetScale( 2.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::SCALE, 2.0f );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
@@ -6471,7 +6469,7 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
@@ -6505,9 +6503,9 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
-  actor.SetScale( 2.0f );
+  actor.SetProperty( Actor::Property::SCALE, 2.0f );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
@@ -6545,7 +6543,7 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
   actor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
   actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
@@ -7171,7 +7169,7 @@ int utcDaliActorCulled(void)
   tet_infoline( "Check that the actor is culled if the actor is out of the screen" );
 
   Actor actor = Actor::New();
-  actor.SetSize( 10.0f, 10.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -7194,7 +7192,7 @@ int utcDaliActorCulled(void)
   CulledPropertyNotificationFunctor f( propertyNotificationSignal, source );
   notification.NotifySignal().Connect( &application, f ) ;
 
-  actor.SetPosition( 1000.0f, 1000.0f );
+  actor.SetProperty( Actor::Property::POSITION, Vector2( 1000.0f, 1000.0f ));
 
   application.SendNotification();
   application.Render();
@@ -7218,7 +7216,7 @@ int utcDaliEnsureRenderWhenRemovingLastRenderableActor(void)
   tet_infoline( "Ensure we clear the screen when the last actor is removed" );
 
   Actor actor = CreateRenderableActor();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   stage.Add( actor );
 
   application.SendNotification();
@@ -7245,7 +7243,7 @@ int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
   tet_infoline( "Ensure we clear the screen when the last actor is made invisible" );
 
   Actor actor = CreateRenderableActor();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   stage.Add( actor );
 
   application.SendNotification();
@@ -7272,7 +7270,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
   Vector3 actorSize( 100.0f, 100.0f, 0.0f );
 
   Actor actor = Actor::New();
-  actor.SetSize( actorSize );
+  actor.SetProperty( Actor::Property::SIZE, actorSize );
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   Stage::GetCurrent().Add( actor );
 
@@ -7298,7 +7296,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
 
   // Set size again
   actorSize = Vector3( 200.0f, 200.0f, 0.0f );
-  actor.SetSize( actorSize );
+  actor.SetProperty( Actor::Property::SIZE, actorSize );
 
   size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -7442,7 +7440,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
   // Set size again
   actorSize = Vector3( 300.0f, 300.0f, 0.0f );
 
-  actor.SetSize( actorSize );
+  actor.SetProperty( Actor::Property::SIZE, actorSize );
 
   size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( size, actorSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );

@@ -138,7 +138,7 @@ int UtcDaliPropertyBufferSetData01(void)
     Shader shader = CreateShader();
     Renderer renderer = Renderer::New(geometry, shader);
     Actor actor = Actor::New();
-    actor.SetSize(Vector3::ONE * 100.f);
+    actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
     actor.AddRenderer(renderer);
     Stage::GetCurrent().Add(actor);
 
@@ -189,7 +189,7 @@ int UtcDaliPropertyBufferSetData02(void)
   Shader shader = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   Actor actor = Actor::New();
-  actor.SetSize(Vector3::ONE * 100.f);
+  actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
   Stage::GetCurrent().Add(actor);
 

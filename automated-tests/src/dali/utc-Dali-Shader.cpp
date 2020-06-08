@@ -147,7 +147,7 @@ int UtcDaliShaderConstraint01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
@@ -189,7 +189,7 @@ int UtcDaliShaderConstraint02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);
@@ -243,7 +243,7 @@ int UtcDaliShaderAnimatedProperty01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
@@ -284,7 +284,7 @@ int UtcDaliShaderAnimatedProperty02(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetSize(400, 400);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
   application.SendNotification();
   application.Render(0);

@@ -74,6 +74,7 @@ public:
   bool RenderOnly( );
   void ResetContext();
   bool GetRenderNeedsUpdate();
+  bool GetRenderNeedsPostRender();
   uint32_t Wait( uint32_t durationToWait );
   static void EnableLogging( bool enabled )
   {

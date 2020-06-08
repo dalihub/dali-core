@@ -889,15 +889,17 @@ int UtcDaliCustomActorOnSizeSet(void)
   Test::TestCustomActor custom = Test::TestCustomActor::New();
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
-  custom.SetSize( Vector2( 9.0f, 10.0f ) );
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  custom.SetProperty( Actor::Property::SIZE, Vector2( 9.0f, 10.0f ) );
+  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnSizeSet", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
   DALI_TEST_EQUALS( 9.0f, custom.GetSize().width, TEST_LOCATION );
   DALI_TEST_EQUALS( 10.0f, custom.GetSize().height, TEST_LOCATION );
 
-  custom.SetSize( Vector3( 4.0f, 5.0f, 6.0f ) );
-  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnSizeSet", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  custom.SetProperty( Actor::Property::SIZE, Vector3( 4.0f, 5.0f, 6.0f ) );
+  DALI_TEST_EQUALS( 4, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnSizeSet", custom.GetMethodsCalled()[ 2 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnPropertySet", custom.GetMethodsCalled()[ 3 ], TEST_LOCATION );
   DALI_TEST_EQUALS( 4.0f, custom.GetSize().width, TEST_LOCATION );
   DALI_TEST_EQUALS( 5.0f, custom.GetSize().height, TEST_LOCATION );
   DALI_TEST_EQUALS( 6.0f, custom.GetSize().depth, TEST_LOCATION );
@@ -936,24 +938,24 @@ int UtcDaliCustomActorSizeComponentAnimation(void)
   float intialWidth( 10.0f );
 
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  custom.SetSize( intialWidth, 10.0f); // First method
+  custom.SetProperty( Actor::Property::SIZE, Vector2( intialWidth, 10.0f) ); // First method
 
   Animation anim = Animation::New( 1.0f );
 
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   anim.AnimateTo( Property( custom, Actor::Property::SIZE_WIDTH ), 20.0f );
 
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   anim.Play();   // Triggers second method ( OnSizeAnimation )
 
   application.SendNotification();
   application.Render( static_cast<unsigned int>( 1000.0f ) );
 
-  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 2 ], TEST_LOCATION );
 
   END_TEST;
 
@@ -968,7 +970,7 @@ int UtcDaliCustomActorOnTouchEvent(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   // set size for custom actor
-  custom.SetSize( 100, 100 );
+  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
   Stage::GetCurrent().Add( custom );
   custom.ResetCallStack();
@@ -1001,7 +1003,7 @@ int UtcDaliCustomActorOnHoverEvent(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   // set size for custom actor
-  custom.SetSize( 100, 100 );
+  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
   Stage::GetCurrent().Add( custom );
   custom.ResetCallStack();
@@ -1034,7 +1036,7 @@ int UtcDaliCustomActorOnWheelEvent(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   // set size for custom actor
-  custom.SetSize( 100, 100 );
+  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
   Stage::GetCurrent().Add( custom );
   custom.ResetCallStack();
@@ -1201,7 +1203,7 @@ int UtcDaliCustomActorImplCalculateChildSizeBase(void)
 
   Actor child = Actor::New();
   child.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
-  child.SetSize(150, 150);
+  child.SetProperty( Actor::Property::SIZE, Vector2( 150, 150 ) );
 
   application.SendNotification();
   application.Render();

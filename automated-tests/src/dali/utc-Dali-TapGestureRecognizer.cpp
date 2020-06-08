@@ -116,7 +116,7 @@ int UtcDaliTapGestureRecognizerBasic(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -149,7 +149,7 @@ int UtcDaliTapGestureRecognizerGapTooLong(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -182,7 +182,7 @@ int UtcDaliTapGestureRecognizerInterrupted(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -217,7 +217,7 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -250,7 +250,7 @@ int UtcDaliTapGestureRecognizerStartDouble(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -283,7 +283,7 @@ int UtcDaliTapGestureRecognizerEndDouble(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -318,7 +318,7 @@ int UtcDaliTapGestureRecognizerDoubleTap(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -359,7 +359,7 @@ int UtcDaliTapGestureRecognizerDoubleTapMoveTooFar(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -412,7 +412,7 @@ int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
@@ -463,14 +463,14 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize(100.0f, 100.0f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(actor);
 
   Actor actor2 = Actor::New();
-  actor2.SetSize(100.0f, 100.0f);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  actor2.SetX(100.0f);
+  actor2.SetProperty( Actor::Property::POSITION_X, 100.0f);
   Stage::GetCurrent().Add(actor2);
 
   // Render and notify

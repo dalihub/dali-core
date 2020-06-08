@@ -115,7 +115,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEvents(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( actor );
 
@@ -156,7 +156,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEventsAfterStart(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetSize( 100.0f, 100.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( actor );
 
