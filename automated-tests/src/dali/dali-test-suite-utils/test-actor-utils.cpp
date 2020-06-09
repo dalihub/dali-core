@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,41 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 Actor CreateRenderableActor()
 {
-  return CreateRenderableActor( Image(), VERTEX_SHADER, FRAGMENT_SHADER );
+  return CreateRenderableActor( Texture(), VERTEX_SHADER, FRAGMENT_SHADER );
+}
+
+Actor CreateRenderableActor( Texture texture )
+{
+  return CreateRenderableActor( texture, VERTEX_SHADER, FRAGMENT_SHADER );
+}
+
+Actor CreateRenderableActor( Texture texture, const std::string& vertexShader, const std::string& fragmentShader )
+{
+  // Create the geometry
+  Geometry geometry = CreateQuadGeometry();
+
+  // Create Shader
+  Shader shader = Shader::New( vertexShader, fragmentShader );
+
+  // Create renderer from geometry and material
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  // Create actor and set renderer
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+
+  // If we a texture, then create a texture-set and add to renderer
+  if( texture )
+  {
+    TextureSet textureSet = TextureSet::New();
+    textureSet.SetTexture( 0u, texture );
+    renderer.SetTextures( textureSet );
+
+    // Set actor to the size of the texture if set
+    actor.SetProperty( Actor::Property::SIZE, Vector2( texture.GetWidth(), texture.GetHeight() ) );
+  }
+
+  return actor;
 }
 
 Actor CreateRenderableActor( Image texture )

@@ -361,7 +361,7 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
 
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor newActor = CreateRenderableActor( img );
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
@@ -407,7 +407,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   DALI_TEST_CHECK( actor );
 
 
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor newActor = CreateRenderableActor( img );
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
@@ -466,7 +466,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   TraceCallStack& drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
 
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor newActor = CreateRenderableActor( img );
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   task.SetSourceActor( newActor );
@@ -515,7 +515,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
 
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor newActor = CreateRenderableActor( img );
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
@@ -565,7 +565,8 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK( actor );
 
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
+
   Actor newActor = CreateRenderableActor( img );
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   stage.Add( newActor );
@@ -659,7 +660,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   ids.push_back( 10 ); // 10 = actor3
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BufferImage img1 = BufferImage::New( 1,1 );
+  Texture img1 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor1 = CreateRenderableActor( img1 );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor1 );
@@ -682,7 +683,8 @@ int UtcDaliRenderTaskSetExclusive(void)
     }
   }
 
-  BufferImage img2 = BufferImage::New( 1,1 );
+  Texture img2 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
+
   Actor actor2 = CreateRenderableActor( img2 );
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
 
@@ -711,7 +713,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     DALI_TEST_EQUALS( boundTextures[c++], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
-  BufferImage img3 = BufferImage::New( 1,1 );
+  Texture img3 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor3 = CreateRenderableActor( img3 );
   actor3.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
 
@@ -811,7 +813,7 @@ int UtcDaliRenderTaskSetExclusive02(void)
   ids.push_back( 8 ); // 8 = actor1
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BufferImage img1 = BufferImage::New( 1,1 );
+  Texture img1 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor1 = CreateRenderableActor( img1 );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   Stage::GetCurrent().Add( actor1 );
@@ -1881,8 +1883,7 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  BufferImage image = BufferImage::New( 10, 10 );
-  image.Update();
+  Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   Stage::GetCurrent().Add( rootActor );
@@ -2555,7 +2556,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  BufferImage image = BufferImage::New( 10, 10 );
+  Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   rootActor.SetProperty( Actor::Property::VISIBLE,false);
@@ -2636,7 +2637,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
 
   Stage stage = Stage::GetCurrent();
 
-  BufferImage image = BufferImage::New( 10, 10 );
+  Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( rootActor );

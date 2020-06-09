@@ -45,8 +45,7 @@ enum TestAttribType
 // Create bitmap actor
 static Actor CreateBitmapActor()
 {
-  BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
-  Actor actor = CreateRenderableActor( image );
+  Actor actor = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::NAME,"Test Image Rendering Actor");
   return actor;

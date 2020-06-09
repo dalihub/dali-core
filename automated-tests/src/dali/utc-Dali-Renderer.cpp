@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -837,7 +837,7 @@ int UtcDaliRendererSetBlendMode05(void)
   tet_infoline("Test setting the blend mode to auto with an opaque color and an image with an alpha channel renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
-  BufferImage image = BufferImage::New( 40, 40, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40);
 
   Shader shader = CreateShader();
   TextureSet textureSet = CreateTextureSet( image );
@@ -904,7 +904,7 @@ int UtcDaliRendererSetBlendMode07(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
 
-  BufferImage image = BufferImage::New( 50, 50, Pixel::RGB888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, 50, 50);
   TextureSet textureSet = CreateTextureSet( image );
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
@@ -964,8 +964,8 @@ int UtcDaliRendererSetBlendColor(void)
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
   TextureSet textureSet = TextureSet::New();
-  BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
-  TextureSetImage( textureSet, 0u, image );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 50, 50);
+  textureSet.SetTexture(0u, image);
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 
@@ -1319,7 +1319,7 @@ int UtcDaliRendererUniformMapPrecendence01(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
@@ -1376,7 +1376,7 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
@@ -1434,7 +1434,7 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   tet_infoline("Test the uniform map precedence is applied properly");
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
@@ -1472,7 +1472,7 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
 
   tet_infoline("Test the uniform maps are collected from all objects (same type)");
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
@@ -1519,7 +1519,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   tet_infoline("Test the uniform maps are collected from all objects (different types)");
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   TextureSet textureSet = CreateTextureSet( image );
@@ -1568,7 +1568,7 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
 Renderer CreateRenderer( Actor actor, Geometry geometry, Shader shader, int depthIndex )
 {
-  Image image0 = BufferImage::New( 64, 64, Pixel::RGB888 );
+  Texture image0 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, 64, 64);
   TextureSet textureSet0 = CreateTextureSet( image0 );
   Renderer renderer0 = Renderer::New( geometry, shader );
   renderer0.SetTextures( textureSet0 );

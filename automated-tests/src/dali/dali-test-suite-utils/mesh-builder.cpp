@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,13 @@ TextureSet CreateTextureSet( Image image )
 {
   TextureSet textureSet = TextureSet::New();
   TextureSetImage( textureSet, 0u, image );
+  return textureSet;
+}
+
+TextureSet CreateTextureSet( Texture texture )
+{
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetTexture(0u, texture);
   return textureSet;
 }
 

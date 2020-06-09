@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,7 +288,7 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   stage.Add( layer );
 
   // Create a clipping actor and add it to the layer.
-  Actor clippingActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
+  Actor clippingActor = CreateRenderableActor();
   clippingActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   clippingActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   clippingActor.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
@@ -297,7 +297,7 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   layer.Add( clippingActor );
 
   // Create a renderable actor and add it to the clipping actor.
-  Actor childActor = CreateRenderableActor( Dali::BufferImage::WHITE() );
+  Actor childActor = CreateRenderableActor();
   childActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   childActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   childActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );

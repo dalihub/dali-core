@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,9 +96,9 @@ int UtcDaliTextureSetCopyConstructor(void)
 {
   TestApplication application;
 
-  Image image = BufferImage::New(32, 32, Pixel::RGBA8888);
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 32, 32);
   TextureSet textureSet = TextureSet::New();
-  TextureSetImage( textureSet, 0u, image );
+  textureSet.SetTexture( 0u, image );
 
   TextureSet textureSetCopy(textureSet);
 
@@ -242,7 +242,7 @@ int UtcDaliTextureSetSetSampler(void)
 {
   TestApplication application;
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
 
   Shader shader = CreateShader();
   TextureSet textureSet = CreateTextureSet( image );
@@ -378,11 +378,11 @@ int UtcDaliTextureSetGetTextureCount0(void)
   TextureSet textureSet = CreateTextureSet();
   DALI_TEST_EQUALS( textureSet.GetTextureCount(), 0u, TEST_LOCATION );
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  TextureSetImage( textureSet, 0u, image );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  textureSet.SetTexture( 0u, image );
   DALI_TEST_EQUALS( textureSet.GetTextureCount(), 1u, TEST_LOCATION );
 
-  TextureSetImage( textureSet, 1u, image );
+  textureSet.SetTexture( 1u, image );
   DALI_TEST_EQUALS( textureSet.GetTextureCount(), 2u, TEST_LOCATION );
 
   Sampler sampler = Sampler::New();
@@ -390,7 +390,7 @@ int UtcDaliTextureSetGetTextureCount0(void)
   textureSet.SetSampler( 2u, sampler );
   DALI_TEST_EQUALS( textureSet.GetTextureCount(), 2u, TEST_LOCATION );
 
-  TextureSetImage( textureSet, 2u, image );
+  textureSet.SetTexture( 2u, image );
   DALI_TEST_EQUALS( textureSet.GetTextureCount(), 3u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureSet.GetSampler(2u), sampler, TEST_LOCATION );
 

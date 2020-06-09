@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1462,9 +1462,7 @@ int UtcDaliCameraActorModelView(void)
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor Test view application" );
 
-  BufferImage image = CreateBufferImage();
-
-  Actor actor = CreateRenderableActor(image);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::POSITION, Vector3( 20.0f, 30.0f, 40.0f ));
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
@@ -1499,7 +1497,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.Render( 0 );
   application.Render();
   application.SendNotification();
-  Image image = CreateBufferImage();
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
   Actor actor = CreateRenderableActor( image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   Stage::GetCurrent().Add( actor );

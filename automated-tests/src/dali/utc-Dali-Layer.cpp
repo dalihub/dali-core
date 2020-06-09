@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,10 +260,10 @@ int UtcDaliLayerSetSortFunction(void)
 {
   tet_infoline("Testing Dali::Layer::SetSortFunction()");
   TestApplication application;
-  BufferImage img = BufferImage::New( 1,1 );
+
   // create two transparent actors so there is something to sort
-  Actor actor = CreateRenderableActor( img );
-  Actor actor2 = CreateRenderableActor( img );
+  Actor actor = CreateRenderableActor();
+  Actor actor2 = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 1, 1 ) );
   actor.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 1, 1 ) );
@@ -564,7 +564,7 @@ int UtcDaliLayerClippingGLCalls(void)
   layer.SetClippingBox( testBox );
 
   // Add at least one renderable actor so the GL calls are actually made
-  BufferImage img = BufferImage::New( 1,1 );
+  Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor = CreateRenderableActor( img );
   stage.Add( actor );
 
@@ -592,23 +592,9 @@ int UtcDaliLayerBehaviour(void)
 
 Actor CreateActor( bool withAlpha )
 {
-  Dali::BufferImage bufferImage;
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, withAlpha ? Pixel::Format::RGBA8888 : Pixel::Format::RGB888, 1u, 1u );
 
-  if( withAlpha )
-  {
-    bufferImage = Dali::BufferImage::WHITE();
-  }
-  else
-  {
-    bufferImage = BufferImage::New( 1u, 1u, Pixel::RGB888 );
-    PixelBuffer* pBuffer = bufferImage.GetBuffer();
-    if( pBuffer )
-    {
-      pBuffer[0] = pBuffer[1] = pBuffer[2] = 0xFF;
-    }
-  }
-
-  Actor actor = CreateRenderableActor( bufferImage );
+  Actor actor = CreateRenderableActor( texture );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
