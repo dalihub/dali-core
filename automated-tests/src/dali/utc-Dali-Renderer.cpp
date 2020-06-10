@@ -2083,7 +2083,7 @@ int UtcDaliRendererSetDepthFunction(void)
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage stage = Stage::GetCurrent();
-  stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
+  stage.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
   stage.Add(actor);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -2292,7 +2292,7 @@ Renderer RendererTestFixture( TestApplication& application )
   actor.AddRenderer( renderer );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage stage = Stage::GetCurrent();
-  stage.GetRootLayer().SetBehavior( Layer::LAYER_3D );
+  stage.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
   stage.Add( actor );
 
   return renderer;
@@ -2341,7 +2341,7 @@ int UtcDaliRendererSetDepthTestMode(void)
 
   // Change the layer behavior to LAYER_UI.
   // Note this will also disable depth testing for the layer by default, we test this first.
-  Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_UI );
+  Stage::GetCurrent().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_UI );
 
   glEnableDisableStack.Reset();
   application.SendNotification();
@@ -2351,7 +2351,7 @@ int UtcDaliRendererSetDepthTestMode(void)
   DALI_TEST_CHECK( glEnableDisableStack.FindMethodAndParams( "Disable", GetDepthTestString() ) );
 
   // Turn the layer depth-test flag back on, and confirm that depth testing is now on.
-  Stage::GetCurrent().GetRootLayer().SetDepthTestDisabled( false );
+  Stage::GetCurrent().GetRootLayer().SetProperty(Layer::Property::DEPTH_TEST, true );
 
   glEnableDisableStack.Reset();
   application.SendNotification();

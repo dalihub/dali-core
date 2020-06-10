@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,42 @@ public:
     {
       CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clippingEnable",   type bool @SINCE_1_0.0
       CLIPPING_BOX,                                                 ///< name "clippingBox",      type Rect<int32_t> @SINCE_1_0.0
-      BEHAVIOR,                                                     ///< name "behavior",         type String @SINCE_1_0.0
+      BEHAVIOR,                                                     ///< name "behavior",         type integer or string @SINCE_1_0.0
+
+      /**
+       * @brief The current depth of the layer.
+       * @details Name "depth", type Property::INTEGER. Read-only
+       * @note 0 is the bottom most layer, higher number is on top.
+       * @note Layer should be on the stage. If layer is not added to the stage, the depth is 0.
+       * @SINCE_1_9.16
+       */
+      DEPTH,
+
+      /**
+       * @brief Whether to enable the depth test.
+       * @details Name "depthTest", type Property::BOOLEAN.
+       * @note By default a layer enables depth test if there is more than one opaque actor
+       * or if there is one opaque actor and one, or more, transparent actors in LAYER_3D mode.
+       * However, it's possible to disable the depth test by setting this property to False.
+       * @SINCE_1_9.16
+       */
+      DEPTH_TEST,
+
+      /**
+       * @brief Whether this layer should consume touch (including gestures).
+       * @details Name "consumesTouch", type Property::BOOLEAN.
+       * @note When this is True, any layers behind this layer will not be hit-test.
+       * @SINCE_1_9.16
+       */
+      CONSUMES_TOUCH,
+
+      /**
+       * @brief Whether this layer should consume hover (including gestures).
+       * @details Name "consumesHover", type Property::BOOLEAN.
+       * @note When this is True, any layers behind this layer will not be hit-test.
+       * @SINCE_1_9.16
+       */
+      CONSUMES_HOVER,
     };
   };
 
@@ -250,17 +285,6 @@ public:
   Layer& operator=(const Layer& rhs);
 
   /**
-   * @brief Queries the depth of the layer.
-   *
-   * 0 is the bottom most layer, higher number is on top.
-   * @SINCE_1_0.0
-   * @return The current depth of the layer
-   * @pre Layer is on the stage.
-   * If layer is not added to the stage, returns 0.
-   */
-  uint32_t GetDepth() const;
-
-  /**
    * @brief Increments the depth of the layer.
    *
    * @SINCE_1_0.0
@@ -340,93 +364,6 @@ public:
    */
   void MoveBelow( Layer target );
 
-  /**
-   * @brief Sets the behavior of the layer.
-   *
-   * @SINCE_1_0.0
-   * @param[in] behavior The desired behavior
-   */
-  void SetBehavior( Behavior behavior );
-
-  /**
-   * @brief Gets the behavior of the layer.
-   *
-   * @SINCE_1_0.0
-   * @return The behavior of the layer
-   */
-  Behavior GetBehavior() const;
-
-  /**
-   * @brief Sets whether clipping is enabled for a layer.
-   *
-   * Clipping is initially disabled; see also SetClippingBox().
-   * @SINCE_1_0.0
-   * @param[in] enabled True if clipping is enabled
-   *
-   * @note When clipping is enabled, the default clipping box is empty (0,0,0,0), which means everything is clipped.
-   */
-  void SetClipping(bool enabled);
-
-  /**
-   * @brief Queries whether clipping is enabled for a layer.
-   * @SINCE_1_0.0
-   * @return True if clipping is enabled
-   */
-  bool IsClipping() const;
-
-  /**
-   * @brief Sets the clipping box of a layer, in window coordinates.
-   *
-   * The contents of the layer will not be visible outside this box, when clipping is
-   * enabled. The default clipping box is empty (0,0,0,0) which means everything is clipped.
-   * You can only do rectangular clipping using this API in window coordinates.
-   * @SINCE_1_0.0
-   * @param[in] x The X-coordinate of the top-left corner of the box
-   * @param[in] y The Y-coordinate of the top-left corner of the box
-   * @param[in] width The width of the box
-   * @param[in] height The height of the box
-   */
-  void SetClippingBox(int32_t x, int32_t y, int32_t width, int32_t height);
-
-  /**
-   * @brief Sets the clipping box of a layer in window coordinates.
-   *
-   * The contents of the layer will not be visible outside this box when clipping is
-   * enabled. The default clipping box is empty (0,0,0,0).
-   * @SINCE_1_0.0
-   * @param[in] box The clipping box
-   */
-  void SetClippingBox(ClippingBox box);
-
-  /**
-   * @brief Retrieves the clipping box of a layer in window coordinates.
-   *
-   * @SINCE_1_0.0
-   * @return The clipping box
-   */
-  ClippingBox GetClippingBox() const;
-
-  // Depth test
-
-  /**
-   * @brief Whether to disable the depth test.
-   *
-   * By default a layer enables depth test if there is more than one opaque actor or if there is one opaque actor and one, or more, transparent actors in LAYER_3D mode.
-   * However, it's possible to disable the depth test by calling this method.
-   *
-   * @SINCE_1_0.0
-   * @param[in] disable \e True disables depth test. \e false sets the default behavior
-   */
-  void SetDepthTestDisabled( bool disable );
-
-  /**
-   * @brief Retrieves whether depth test is disabled.
-   *
-   * @SINCE_1_0.0
-   * @return \e True if depth test is disabled
-   */
-  bool IsDepthTestDisabled() const;
-
   // Sorting
 
   /**
@@ -450,34 +387,6 @@ public:
    *
   */
   void SetSortFunction( SortFunctionType function );
-
-  /**
-   * @brief This allows the user to specify whether this layer should consume touch (including gestures).
-   *
-   * If set, any layers behind this layer will not be hit-test.
-   *
-   * @SINCE_1_0.0
-   * @param[in] consume Whether the layer should consume touch (including gestures)
-   */
-  void SetTouchConsumed( bool consume );
-
-  /**
-   * @brief Retrieves whether the layer consumes touch (including gestures).
-   *
-   * @SINCE_1_0.0
-   * @return @c True if consuming touch, @c false otherwise
-   */
-  bool IsTouchConsumed() const;
-
-  /**
-   * @brief This allows the user to specify whether this layer should consume hover.
-   *
-   * If set, any layers behind this layer will not be hit-test.
-   *
-   * @SINCE_1_0.0
-   * @param[in] consume Whether the layer should consume hover
-   */
-  void SetHoverConsumed( bool consume );
 
   /**
    * @brief Retrieves whether the layer consumes hover.

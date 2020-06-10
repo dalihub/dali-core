@@ -4310,7 +4310,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
     // If we are on the first loop, set the layer to 3D and loop to perform the test again.
     if( i == 0u )
     {
-      Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_3D );
+      Stage::GetCurrent().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
       GenerateTrace( application, enabledDisableTrace, stencilTrace );
     }
   }

@@ -432,7 +432,7 @@ bool HitTestRenderTask( const RenderTaskList::ExclusivesContainer& exclusives,
       Dali::Layer layer( sourceActor->GetLayer() );
       if( layer )
       {
-        const uint32_t sourceActorDepth( layer.GetDepth() );
+        const uint32_t sourceActorDepth( layer.GetProperty< bool >( Dali::Layer::Property::DEPTH ) );
 
         CameraActor* cameraActor = renderTask.GetCameraActor();
         bool pickingPossible = cameraActor->BuildPickingRay(
