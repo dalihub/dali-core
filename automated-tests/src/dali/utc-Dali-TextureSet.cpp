@@ -298,20 +298,6 @@ int UtcDaliTextureSetSetSampler(void)
   END_TEST;
 }
 
-int UtcDaliTextureSetGetImage(void)
-{
-  TestApplication application;
-
-  TextureSet textureSet = CreateTextureSet();
-  Image imageSource = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  TextureSetImage( textureSet, 0u, imageSource );
-
-  Image imageReturn = TextureGetImage( textureSet, 0u );
-  DALI_TEST_EQUALS( imageSource, imageReturn, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliTextureSetGetTexture(void)
 {
   TestApplication application;
