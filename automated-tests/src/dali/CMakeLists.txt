@@ -27,7 +27,6 @@ SET(TC_SOURCES
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
-        utc-Dali-EncodedBufferImage.cpp
         utc-Dali-Extents.cpp
         utc-Dali-FrameBuffer.cpp
         utc-Dali-FrameBufferImage.cpp
@@ -53,7 +52,6 @@ SET(TC_SOURCES
         utc-Dali-MeshMaterial.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp
-        utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp

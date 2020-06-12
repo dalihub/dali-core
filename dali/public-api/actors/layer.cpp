@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,11 +58,6 @@ Layer& Layer::operator=(const Layer& rhs)
   return *this;
 }
 
-uint32_t Layer::GetDepth() const
-{
-  return GetImplementation(*this).GetDepth();
-}
-
 void Layer::Raise()
 {
   GetImplementation(*this).Raise();
@@ -103,74 +98,9 @@ void Layer::MoveBelow( Layer target )
   GetImplementation(*this).MoveBelow( GetImplementation( target ) );
 }
 
-void Layer::SetBehavior( Behavior behavior )
-{
-  GetImplementation(*this).SetBehavior( behavior );
-}
-
-Layer::Behavior Layer::GetBehavior() const
-{
-  return GetImplementation(*this).GetBehavior();
-}
-
-void Layer::SetClipping(bool enabled)
-{
-  GetImplementation(*this).SetClipping(enabled);
-}
-
-bool Layer::IsClipping() const
-{
-  return GetImplementation(*this).IsClipping();
-}
-
-void Layer::SetClippingBox(int32_t x, int32_t y, int32_t width, int32_t height)
-{
-  GetImplementation(*this).SetClippingBox(x, y, width, height);
-}
-
-void Layer::SetClippingBox(ClippingBox box)
-{
-  GetImplementation(*this).SetClippingBox(box.x, box.y, box.width, box.height);
-}
-
-ClippingBox Layer::GetClippingBox() const
-{
-  return GetImplementation(*this).GetClippingBox();
-}
-
-void Layer::SetDepthTestDisabled( bool disable )
-{
-  GetImplementation(*this).SetDepthTestDisabled( disable );
-}
-
-bool Layer::IsDepthTestDisabled() const
-{
-  return GetImplementation(*this).IsDepthTestDisabled();
-}
-
 void Layer::SetSortFunction(SortFunctionType function)
 {
   GetImplementation(*this).SetSortFunction(function);
-}
-
-void Layer::SetTouchConsumed( bool consume )
-{
-  GetImplementation( *this ).SetTouchConsumed( consume );
-}
-
-bool Layer::IsTouchConsumed() const
-{
-  return GetImplementation( *this ).IsTouchConsumed();
-}
-
-void Layer::SetHoverConsumed( bool consume )
-{
-  GetImplementation( *this ).SetHoverConsumed( consume );
-}
-
-bool Layer::IsHoverConsumed() const
-{
-  return GetImplementation( *this ).IsHoverConsumed();
 }
 
 Layer::Layer(Internal::Layer* internal)

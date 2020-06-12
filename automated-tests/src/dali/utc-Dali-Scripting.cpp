@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -791,17 +791,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( map.Find( "width" )->Get< int >(), 300, TEST_LOCATION );
     DALI_TEST_CHECK( NULL != map.Find( "height" ) );
     DALI_TEST_EQUALS( map.Find( "height" )->Get< int >(), 400, TEST_LOCATION );
-  }
-
-  // BufferImage
-  {
-    Image image = BufferImage::New( 200, 300, Pixel::A8 );
-    Property::Map map;
-    CreatePropertyMap( image, map );
-    DALI_TEST_CHECK( NULL != map.Find( "type" ) );
-    DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "BufferImage", TEST_LOCATION );
-    DALI_TEST_CHECK( NULL != map.Find( "pixelFormat") );
-    DALI_TEST_EQUALS( map.Find( "pixelFormat" )->Get< std::string >(), "A8", TEST_LOCATION );
   }
 
   // FrameBufferImage

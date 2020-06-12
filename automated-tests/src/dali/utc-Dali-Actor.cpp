@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2923,9 +2923,9 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   ids.push_back( 10 );  // third rendered actor
   app.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BufferImage imageA = BufferImage::New(16, 16);
-  BufferImage imageB = BufferImage::New(16, 16);
-  BufferImage imageC = BufferImage::New(16, 16);
+  Texture imageA = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  Texture imageB = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  Texture imageC = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
   Actor a = CreateRenderableActor( imageA );
   Actor b = CreateRenderableActor( imageB );
   Actor c = CreateRenderableActor( imageC );
@@ -4031,7 +4031,7 @@ int UtcDaliActorRemoveRendererN(void)
 // Clipping test helper functions:
 Actor CreateActorWithContent( uint32_t width, uint32_t height)
 {
-  BufferImage image = BufferImage::New( width, height );
+  Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   Actor actor = CreateRenderableActor( image );
 
   // Setup dimensions and position so actor is not skipped by culling.
@@ -4310,7 +4310,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
     // If we are on the first loop, set the layer to 3D and loop to perform the test again.
     if( i == 0u )
     {
-      Stage::GetCurrent().GetRootLayer().SetBehavior( Layer::LAYER_3D );
+      Stage::GetCurrent().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
       GenerateTrace( application, enabledDisableTrace, stencilTrace );
     }
   }
@@ -4339,7 +4339,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   Actor actors[5];
   for( int i = 0; i < 5; ++i )
   {
-    BufferImage image = BufferImage::New( 16u, 16u );
+    Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u );
     Actor actor = CreateRenderableActor( image );
 
     // Setup dimensions and position so actor is not skipped by culling.
