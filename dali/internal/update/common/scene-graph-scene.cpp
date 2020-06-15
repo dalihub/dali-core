@@ -27,7 +27,9 @@ namespace SceneGraph
 {
 
 Scene::Scene()
-: mContext( nullptr )
+: mContext( nullptr ),
+  mFrameRenderedCallbacks(),
+  mFramePresentedCallbacks()
 {
 }
 
@@ -40,6 +42,9 @@ Scene::~Scene()
     delete mContext;
     mContext = nullptr;
   }
+
+  mFrameRenderedCallbacks.clear();
+  mFramePresentedCallbacks.clear();
 }
 
 void Scene::GlContextDestroyed()
@@ -73,6 +78,38 @@ Context* Scene::GetContext()
 RenderInstructionContainer& Scene::GetRenderInstructions()
 {
   return mInstructions;
+}
+
+void Scene::AddFrameRenderedCallback( CallbackBase* callback, int32_t frameId )
+{
+  mFrameRenderedCallbacks.push_back( std::make_pair( std::unique_ptr< CallbackBase >( callback ), frameId ) );
+}
+
+void Scene::AddFramePresentedCallback( CallbackBase* callback, int32_t frameId )
+{
+  mFramePresentedCallbacks.push_back( std::make_pair( std::unique_ptr< CallbackBase >( callback ), frameId ) );
+}
+
+void Scene::GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+{
+  // Transfer owership of the callbacks
+  for( auto&& iter : mFrameRenderedCallbacks )
+  {
+    callbacks.push_back( std::make_pair( std::move( iter.first ), iter.second ) );
+  }
+
+  mFrameRenderedCallbacks.clear();
+}
+
+void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+{
+  // Transfer owership of the callbacks
+  for( auto&& iter : mFramePresentedCallbacks )
+  {
+    callbacks.push_back( std::make_pair( std::move( iter.first ), iter.second ) );
+  }
+
+  mFramePresentedCallbacks.clear();
 }
 
 } //SceneGraph

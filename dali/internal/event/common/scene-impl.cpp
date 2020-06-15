@@ -337,6 +337,28 @@ void Scene::EmitWheelEventSignal(const WheelEvent& event)
   }
 }
 
+void Scene::AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  AddFrameRenderedCallbackMessage( tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId );
+}
+
+void Scene::AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  AddFramePresentedCallbackMessage( tls->GetEventThreadServices(), *mSceneObject, callback.release(), frameId );
+}
+
+void Scene::GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+{
+  mSceneObject->GetFrameRenderedCallback( callbacks );
+}
+
+void Scene::GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks )
+{
+  mSceneObject->GetFramePresentedCallback( callbacks );
+}
+
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
 {
   return mKeyEventSignal;

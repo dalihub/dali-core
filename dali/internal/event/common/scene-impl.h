@@ -217,6 +217,26 @@ public:
   void EmitWheelEventSignal( const WheelEvent& event );
 
   /**
+   * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback
+   */
+  void AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+
+  /**
+   * @copydoc Dali::Integration::Scene::AddFramePresentedCallback
+   */
+  void AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetFrameRenderedCallback
+   */
+  void GetFrameRenderedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetFramePresentedCallback
+   */
+  void GetFramePresentedCallback( Dali::Integration::Scene::FrameCallbackContainer& callbacks );
+
+  /**
    * @copydoc Integration::Scene::KeyEventSignal()
    */
   Integration::Scene::KeyEventSignalType& KeyEventSignal();

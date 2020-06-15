@@ -248,6 +248,10 @@ bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
   return true;
 }
 
+void FrameCallback( int frameId )
+{
+}
+
 } // unnamed namespace
 
 int UtcDaliSceneAdd(void)
@@ -1213,6 +1217,47 @@ int UtcDaliSceneEmptySceneRendering(void)
   // Check the clear count and the render status
   DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION );  // Should be cleared
   DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSceneFrameRenderedPresentedCallback(void)
+{
+  tet_infoline( "UtcDaliSceneFrameRenderedCallback" );
+
+  TestApplication application;
+
+  // Add a Renderer
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  Stage::GetCurrent().Add( actor );
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  int frameId = 1;
+  scene.AddFrameRenderedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
+  scene.AddFramePresentedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Scene::FrameCallbackContainer callbackContainer;
+  scene.GetFrameRenderedCallback( callbackContainer );
+
+  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
+
+  callbackContainer.clear();
+
+  scene.GetFramePresentedCallback( callbackContainer );
+
+  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
 
   END_TEST;
 }
