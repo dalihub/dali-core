@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,11 +120,11 @@ int UtcSamplerSetFilterMode(void)
 {
   TestApplication application;
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   Sampler sampler = Sampler::New();
 
   TextureSet textureSet = CreateTextureSet();
-  TextureSetImage( textureSet, 0u, image );
+  textureSet.SetTexture(0u, image);
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();
@@ -251,10 +251,10 @@ int UtcSamplerSetWrapMode1(void)
 {
   TestApplication application;
 
-  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   TextureSet textureSet = CreateTextureSet();
   Sampler sampler = Sampler::New();
-  TextureSetImage( textureSet, 0u, image );
+  textureSet.SetTexture(0u, image);
   textureSet.SetSampler( 0u, sampler );
 
   Shader shader = CreateShader();

@@ -894,7 +894,7 @@ int UtcDaliTapGestureLayerConsumesTouch(void)
   data.Reset();
 
   // Set layer to consume all touch
-  layer.SetTouchConsumed( true );
+  layer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
 
   // Render and notify
   application.SendNotification();

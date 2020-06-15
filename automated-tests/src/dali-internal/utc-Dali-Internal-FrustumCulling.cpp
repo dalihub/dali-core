@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/bitmap.h>
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
@@ -58,13 +58,15 @@ void main()
 
 Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
 {
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
-  BufferImage image = BufferImage::New( pixelBuffer, 1, 1 );
+  Integration::PixelBuffer* pixelBuffer = new Integration::PixelBuffer[ 4 ];
+  PixelData pixelData = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  image.Upload(pixelData);
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, shaderHints );
   TextureSet textureSet = TextureSet::New();
-  TextureSetImage( textureSet, 0u, image );
+  textureSet.SetTexture(0u, image);
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
 

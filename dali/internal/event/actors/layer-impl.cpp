@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,11 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "clippingEnable",    BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
 DALI_PROPERTY( "clippingBox",       RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
-DALI_PROPERTY( "behavior",          STRING,     true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
+DALI_PROPERTY( "behavior",          INTEGER,    true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
+DALI_PROPERTY( "depth",             INTEGER,    false,   false,   false,  Dali::Layer::Property::DEPTH           )
+DALI_PROPERTY( "depthTest",         BOOLEAN,    true,    false,   false,  Dali::Layer::Property::DEPTH_TEST      )
+DALI_PROPERTY( "consumesTouch",     BOOLEAN,    true,    false,   false,  Dali::Layer::Property::CONSUMES_TOUCH  )
+DALI_PROPERTY( "consumesHover",     BOOLEAN,    true,    false,   false,  Dali::Layer::Property::CONSUMES_HOVER  )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaultProperties )
 
 // Actions
@@ -383,11 +387,35 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        Behavior behavior(Dali::Layer::LAYER_UI);
-        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
+        Behavior behavior = mBehavior;
+
+        Property::Type type = propertyValue.GetType();
+        if( type == Property::STRING )
         {
-          SetBehavior( behavior );
+          if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior ) )
+          {
+            SetBehavior( behavior );
+          }
         }
+        else if ( type == Property::INTEGER )
+        {
+          SetBehavior( propertyValue.Get< Dali::Layer::Behavior >() );
+        }
+        break;
+      }
+      case Dali::Layer::Property::DEPTH_TEST:
+      {
+        SetDepthTestDisabled( !propertyValue.Get<bool>() );
+        break;
+      }
+      case Dali::Layer::Property::CONSUMES_TOUCH:
+      {
+        SetTouchConsumed( propertyValue.Get<bool>() );
+        break;
+      }
+      case Dali::Layer::Property::CONSUMES_HOVER:
+      {
+        SetHoverConsumed( propertyValue.Get<bool>() );
         break;
       }
       default:
@@ -423,7 +451,27 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT );
+        ret = mBehavior;
+        break;
+      }
+      case Dali::Layer::Property::DEPTH:
+      {
+        ret = static_cast<int>( GetDepth() );
+        break;
+      }
+      case Dali::Layer::Property::DEPTH_TEST:
+      {
+        ret = !mDepthTestDisabled;
+        break;
+      }
+      case Dali::Layer::Property::CONSUMES_TOUCH:
+      {
+        ret = mTouchConsumed;
+        break;
+      }
+      case Dali::Layer::Property::CONSUMES_HOVER:
+      {
+        ret = mHoverConsumed;
         break;
       }
       default:

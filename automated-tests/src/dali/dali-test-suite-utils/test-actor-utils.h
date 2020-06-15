@@ -2,7 +2,7 @@
 #define DALI_TEST_ACTOR_UTILS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace Dali
 
 class Actor;
 class Image;
+class Texture;
 
 /**
  * @brief Creates a simple renderable-actor with solid colored quad.
@@ -48,6 +49,22 @@ Actor CreateRenderableActor( Image texture );
  * @return An actor with a renderer.
  */
 Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader );
+
+/**
+ * @brief Creates a renderable-actor with a texture.
+ * @param[in] texture Texture to set.
+ * @return An actor with a renderer.
+ */
+Actor CreateRenderableActor( Texture texture );
+
+/**
+ * @brief Creates a renderable-actor with a texture and custom shaders.
+ * @param[in] texture Texture to set.
+ * @param[in] vertexShader The vertex-shader.
+ * @param[in] fragmentShader The fragment-shader.
+ * @return An actor with a renderer.
+ */
+Actor CreateRenderableActor( Texture texture, const std::string& vertexShader, const std::string& fragmentShader );
 
 } // namespace Dali
 

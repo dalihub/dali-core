@@ -532,7 +532,7 @@ protected:
    */
   inline EventThreadServices& GetEventThreadServices()
   {
-    DALI_ASSERT_DEBUG( EventThreadServices::IsCoreRunning() );
+    DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() );
     return mEventThreadServices;
   }
 
@@ -545,7 +545,7 @@ protected:
    */
   inline const EventThreadServices& GetEventThreadServices() const
   {
-    DALI_ASSERT_DEBUG( EventThreadServices::IsCoreRunning() );
+    DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() );
     return mEventThreadServices;
   }
 

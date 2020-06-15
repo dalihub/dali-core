@@ -415,6 +415,9 @@ const SceneGraph::Node* Actor::CreateNode()
   SceneGraph::Node* node = SceneGraph::Node::New();
   OwnerPointer< SceneGraph::Node > transferOwnership( node );
   Internal::ThreadLocalStorage* tls = Internal::ThreadLocalStorage::GetInternal();
+
+  DALI_ASSERT_ALWAYS( tls && "ThreadLocalStorage is null" );
+
   AddNodeMessage( tls->GetUpdateManager(), transferOwnership );
 
   return node;

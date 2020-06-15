@@ -960,10 +960,10 @@ int UtcDaliHoverOffscreenRenderTasks(void)
   Vector2 stageSize ( stage.GetSize() );
 
   // FrameBufferImage for offscreen RenderTask
-  FrameBufferImage frameBufferImage( FrameBufferImage::New( stageSize.width, stageSize.height, Pixel::RGBA8888 ) );
+  FrameBuffer frameBuffer = FrameBuffer::New( stageSize.width, stageSize.height );
 
   // Create a renderable actor to display the FrameBufferImage
-  Actor renderableActor = CreateRenderableActor( frameBufferImage );
+  Actor renderableActor = CreateRenderableActor(frameBuffer.GetColorTexture());
   renderableActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   renderableActor.SetProperty( Actor::Property::SIZE, Vector2( stageSize.x, stageSize.y ) );
   renderableActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
@@ -980,7 +980,7 @@ int UtcDaliHoverOffscreenRenderTasks(void)
   // Create a RenderTask
   RenderTask renderTask = stage.GetRenderTaskList().CreateTask();
   renderTask.SetSourceActor( actor );
-  renderTask.SetTargetFrameBuffer( frameBufferImage );
+  renderTask.SetFrameBuffer(frameBuffer);
   renderTask.SetInputEnabled( true );
 
   // Create another RenderTask

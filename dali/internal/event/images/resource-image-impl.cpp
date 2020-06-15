@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 
 using namespace Dali::Integration;
@@ -66,17 +65,9 @@ ResourceImagePtr ResourceImage::New()
 ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes )
 {
   ResourceImagePtr image;
-
-  if( NinePatchImage::IsNinePatchUrl( url ) )
-  {
-    image = NinePatchImage::New( url );
-  }
-  else
-  {
-    image = new ResourceImage(url, attributes);
-    image->Initialize();
-    image->Reload();
-  }
+  image = new ResourceImage(url, attributes);
+  image->Initialize();
+  image->Reload();
 
   DALI_LOG_SET_OBJECT_STRING( image, url );
 
