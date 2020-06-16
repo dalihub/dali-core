@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,13 +89,6 @@ int UtcDaliImageGetWidthHeight(void)
   Image image3 = FrameBufferImage::New(testSize.x, testSize.y);
   DALI_TEST_EQUALS(image3.GetWidth(), testSize.x, TEST_LOCATION);
   DALI_TEST_EQUALS(image3.GetHeight(), testSize.y, TEST_LOCATION);
-
-  testSize = Vector2(32.0f, 64.0f);
-  PrepareResourceImage( application, testSize.x, testSize.y, Pixel::RGBA8888 );
-  TestNativeImagePointer nativeImage = TestNativeImage::New(testSize.x, testSize.y);
-  Image image4 = NativeImage::New(*(nativeImage.Get()));
-  DALI_TEST_EQUALS(image4.GetWidth(), testSize.x, TEST_LOCATION);
-  DALI_TEST_EQUALS(image4.GetHeight(), testSize.y, TEST_LOCATION);
 
   END_TEST;
 }
