@@ -413,10 +413,10 @@ int UtcDaliStageAddP(void)
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   stage.Add( actor );
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
 
@@ -451,13 +451,13 @@ int UtcDaliStageRemoveP(void)
   Stage stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   stage.Add( actor );
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   stage.Remove(actor);
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
 
@@ -491,7 +491,7 @@ int UtcDaliStageRemoveN2(void)
 
   Stage stage = Stage::GetCurrent();
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   bool asserted = false;
   try

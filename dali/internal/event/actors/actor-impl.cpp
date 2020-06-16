@@ -194,7 +194,6 @@ DALI_PROPERTY( "leaveRequired",             BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "inheritOrientation",        BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
 DALI_PROPERTY( "inheritScale",              BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
 DALI_PROPERTY( "colorMode",                 INTEGER,  true,  false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "reservedProperty01",        STRING,   true,  false, false, Dali::Actor::Property::RESERVED_PROPERTY_01 ) // This property was removed, but to keep binary compatibility and TypeRegister test app, remain it here.
 DALI_PROPERTY( "drawMode",                  INTEGER,  true,  false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "sizeModeFactor",            VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
 DALI_PROPERTY( "widthResizePolicy",         STRING,   true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
@@ -209,11 +208,17 @@ DALI_PROPERTY( "inheritPosition",           BOOLEAN,  true,  false, false, Dali:
 DALI_PROPERTY( "clippingMode",              STRING,   true,  false, false, Dali::Actor::Property::CLIPPING_MODE )
 DALI_PROPERTY( "layoutDirection",           STRING,   true,  false, false, Dali::Actor::Property::LAYOUT_DIRECTION )
 DALI_PROPERTY( "inheritLayoutDirection",    BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION )
+DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::Actor::Property::OPACITY )
+DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::Actor::Property::SCREEN_POSITION )
+DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::Actor::Property::POSITION_USES_ANCHOR_POINT )
+DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true,  Dali::Actor::Property::CULLED )
+DALI_PROPERTY( "id",                        INTEGER,  false, false, false, Dali::Actor::Property::ID )
+DALI_PROPERTY( "hierarchyDepth",            INTEGER,  false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH )
+DALI_PROPERTY( "isRoot",                    BOOLEAN,  false, false, false, Dali::Actor::Property::IS_ROOT )
+DALI_PROPERTY( "isLayer",                   BOOLEAN,  false, false, false, Dali::Actor::Property::IS_LAYER )
+DALI_PROPERTY( "connectedToScene",          BOOLEAN,  false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE )
+DALI_PROPERTY( "keyboardFocusable",         BOOLEAN,  true,  false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE )
 DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
-DALI_PROPERTY( "opacity",                   FLOAT,    true,  true,  true,  Dali::DevelActor::Property::OPACITY )
-DALI_PROPERTY( "screenPosition",            VECTOR2,  false, false, false, Dali::DevelActor::Property::SCREEN_POSITION )
-DALI_PROPERTY( "positionUsesAnchorPoint",   BOOLEAN,  true,  false, false, Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
-DALI_PROPERTY( "culled",                    BOOLEAN,  false, false, true, Dali::DevelActor::Property::CULLED )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -2586,7 +2591,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::DevelActor::Property::OPACITY:
+    case Dali::Actor::Property::OPACITY:
     {
       float value;
       if( property.Get( value ) )
@@ -2752,7 +2757,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
+    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
     {
       bool value = false;
       if( property.Get( value ) && value != mPositionUsesAnchorPoint )
@@ -2781,6 +2786,16 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       if( property.Get( value ) )
       {
         SetInheritLayoutDirection( value );
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
+    {
+      bool value = false;
+      if( property.Get( value ) )
+      {
+        SetKeyboardFocusable( value );
       }
       break;
     }
@@ -3121,7 +3136,7 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         }
 
         case Dali::Actor::Property::COLOR_ALPHA:
-        case Dali::DevelActor::Property::OPACITY:
+        case Dali::Actor::Property::OPACITY:
         {
           value.Get( mTargetColor.a );
           break;
@@ -3286,7 +3301,7 @@ void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::In
         }
 
         case Dali::Actor::Property::COLOR_ALPHA:
-        case Dali::DevelActor::Property::OPACITY:
+        case Dali::Actor::Property::OPACITY:
         {
           AdjustValue< float >( mTargetColor.a, value );
           break;
@@ -3348,7 +3363,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
     case Dali::Actor::Property::COLOR_GREEN: // FALLTHROUGH
     case Dali::Actor::Property::COLOR_BLUE:  // FALLTHROUGH
     case Dali::Actor::Property::COLOR_ALPHA: // FALLTHROUGH
-    case Dali::DevelActor::Property::OPACITY:
+    case Dali::Actor::Property::OPACITY:
     {
       property = &GetNode().mColor;
       break;
@@ -3417,7 +3432,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
       property = &GetNode().mWorldMatrix;
       break;
     }
-    case Dali::DevelActor::Property::CULLED:
+    case Dali::Actor::Property::CULLED:
     {
       property = &GetNode().mCulled;
       break;
@@ -3480,7 +3495,7 @@ int32_t Actor::GetPropertyComponentIndex( Property::Index index ) const
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::DevelActor::Property::OPACITY:
+    case Dali::Actor::Property::OPACITY:
     {
       componentIndex = 3;
       break;
@@ -3735,7 +3750,7 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::DevelActor::Property::OPACITY:
+    case Dali::Actor::Property::OPACITY:
     {
       value = mTargetColor.a;
       break;
@@ -3857,13 +3872,13 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
       break;
     }
 
-    case Dali::DevelActor::Property::SCREEN_POSITION:
+    case Dali::Actor::Property::SCREEN_POSITION:
     {
       value = GetCurrentScreenPosition();
       break;
     }
 
-    case Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT:
+    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
     {
       value = mPositionUsesAnchorPoint;
       break;
@@ -3878,6 +3893,42 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
     case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
     {
       value = IsLayoutDirectionInherited();
+      break;
+    }
+
+    case Dali::Actor::Property::ID:
+    {
+      value = static_cast<int>( GetId() );
+      break;
+    }
+
+    case Dali::Actor::Property::HIERARCHY_DEPTH:
+    {
+      value = GetHierarchyDepth();
+      break;
+    }
+
+    case Dali::Actor::Property::IS_ROOT:
+    {
+      value = IsRoot();
+      break;
+    }
+
+    case Dali::Actor::Property::IS_LAYER:
+    {
+      value = IsLayer();
+      break;
+    }
+
+    case Dali::Actor::Property::CONNECTED_TO_SCENE:
+    {
+      value = OnStage();
+      break;
+    }
+
+    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
+    {
+      value = IsKeyboardFocusable();
       break;
     }
 
@@ -4037,7 +4088,7 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
     }
 
     case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::DevelActor::Property::OPACITY:
+    case Dali::Actor::Property::OPACITY:
     {
       value = GetCurrentColor().a;
       break;
@@ -4061,7 +4112,7 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
       break;
     }
 
-    case DevelActor::Property::CULLED:
+    case Dali::Actor::Property::CULLED:
     {
       value = GetNode().IsCulled( GetEventThreadServices().GetEventBufferIndex() );
       break;

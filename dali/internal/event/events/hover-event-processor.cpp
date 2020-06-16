@@ -268,7 +268,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
 
   if ( ( primaryPointState == TouchPoint::Started ) &&
        ( hoverEvent.GetPointCount() == 1 ) &&
-       ( consumedActor && consumedActor.OnStage() ) )
+       ( consumedActor && GetImplementation( consumedActor ).OnStage() ) )
   {
     mHoverStartConsumedActor.SetActor( &GetImplementation( consumedActor ) );
   }
@@ -346,12 +346,12 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   else
   {
     // The primaryHitActor may have been removed from the stage so ensure it is still on the stage before setting members.
-    if ( primaryHitActor && primaryHitActor.OnStage() )
+    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnStage() )
     {
       mLastPrimaryHitActor.SetActor( &GetImplementation( primaryHitActor ) );
 
       // Only observe the consumed actor if we have a primaryHitActor (check if it is still on stage).
-      if ( consumedActor && consumedActor.OnStage() )
+      if ( consumedActor && GetImplementation( consumedActor ).OnStage() )
       {
         mLastConsumedActor.SetActor( &GetImplementation( consumedActor ) );
       }

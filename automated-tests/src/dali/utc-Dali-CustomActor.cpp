@@ -1515,7 +1515,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   custom.ConnectSignal( &application, "offStage",
     [weakRef]()
       {
-        DALI_TEST_EQUALS( weakRef.GetHandle().OnStage(), false, TEST_LOCATION );
+        DALI_TEST_EQUALS( weakRef.GetHandle().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ), false, TEST_LOCATION );
       } );
 
   Stage::GetCurrent().Remove( custom );

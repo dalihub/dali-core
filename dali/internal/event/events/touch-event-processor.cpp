@@ -283,7 +283,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 
   if ( ( primaryPointState == PointState::DOWN ) &&
        ( touchEvent.GetPointCount() == 1 ) &&
-       ( consumedActor && consumedActor.OnStage() ) )
+       ( consumedActor && consumedActor.GetProperty< bool >( Dali::Actor::Property::CONNECTED_TO_SCENE ) ) )
   {
     mTouchDownConsumedActor.SetActor( &GetImplementation( consumedActor ) );
   }
@@ -361,12 +361,12 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   else
   {
     // The primaryHitActor may have been removed from the stage so ensure it is still on the stage before setting members.
-    if ( primaryHitActor && primaryHitActor.OnStage() )
+    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnStage() )
     {
       mLastPrimaryHitActor.SetActor( &GetImplementation( primaryHitActor ) );
 
       // Only observe the consumed actor if we have a primaryHitActor (check if it is still on stage).
-      if ( consumedActor && consumedActor.OnStage() )
+      if ( consumedActor && GetImplementation( consumedActor ).OnStage() )
       {
         mLastConsumedActor.SetActor( &GetImplementation( consumedActor ) );
       }
