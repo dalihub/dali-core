@@ -85,11 +85,6 @@ int UtcDaliImageGetWidthHeight(void)
   DALI_TEST_EQUALS( image2.GetWidth(), testSize.x, TEST_LOCATION );
   DALI_TEST_EQUALS( image2.GetHeight(), testSize.y, TEST_LOCATION );
 
-  testSize = Vector2(16.0f, 32.0f);
-  Image image3 = FrameBufferImage::New(testSize.x, testSize.y);
-  DALI_TEST_EQUALS(image3.GetWidth(), testSize.x, TEST_LOCATION);
-  DALI_TEST_EQUALS(image3.GetHeight(), testSize.y, TEST_LOCATION);
-
   END_TEST;
 }
 

@@ -28,7 +28,6 @@ SET(TC_SOURCES
         utc-Dali-DistanceField.cpp
         utc-Dali-Extents.cpp
         utc-Dali-FrameBuffer.cpp
-        utc-Dali-FrameBufferImage.cpp
         utc-Dali-FrameCallbackInterface.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-Gesture.cpp

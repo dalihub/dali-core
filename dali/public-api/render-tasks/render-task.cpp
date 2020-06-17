@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
@@ -116,23 +115,6 @@ void RenderTask::SetCameraActor( CameraActor cameraActor )
 CameraActor RenderTask::GetCameraActor() const
 {
   return Dali::CameraActor(GetImplementation(*this).GetCameraActor());
-}
-
-void RenderTask::SetTargetFrameBuffer( Dali::FrameBufferImage frameBuffer )
-{
-  Internal::FrameBufferImage* frameBufferPtr( NULL );
-  if( frameBuffer )
-  {
-    frameBufferPtr = &GetImplementation( frameBuffer );
-  }
-
-  GetImplementation(*this).SetTargetFrameBuffer( frameBufferPtr );
-}
-
-FrameBufferImage RenderTask::GetTargetFrameBuffer() const
-{
-  Internal::FrameBufferImage* frameBufferPtr = GetImplementation(*this).GetTargetFrameBuffer();
-  return Dali::FrameBufferImage( frameBufferPtr );
 }
 
 void RenderTask::SetFrameBuffer( FrameBuffer frameBuffer )

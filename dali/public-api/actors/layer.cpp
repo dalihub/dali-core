@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/layer-impl.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 
 namespace Dali
 {
