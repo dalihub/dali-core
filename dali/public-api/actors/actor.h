@@ -549,11 +549,6 @@ public:
       COLOR_MODE,
 
       /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_01,
-
-      /**
        * @brief The draw mode of an actor.
        * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_0.0
@@ -657,6 +652,85 @@ public:
        * @SINCE_1_2.60
        */
       INHERIT_LAYOUT_DIRECTION,
+
+      /**
+       * @brief The opacity of the actor.
+       * @details Name "opacity", type Property::FLOAT.
+       * @SINCE_1_9.17
+       */
+      OPACITY,
+
+      /**
+       * @brief Returns the screen position of the Actor
+       * @details Name "screenPosition", type Property::VECTOR2. Read-only
+       * @note This assumes default camera and default render-task and the Z position is ZERO.
+       * @note The last known frame is used for the calculation. May not match a position value just set.
+       * @SINCE_1_9.17
+       */
+      SCREEN_POSITION,
+
+      /**
+       * @brief Determines whether the anchor point should be used to determine the position of the actor.
+       * @details Name "positionUsesAnchorPoint", type Property::BOOLEAN.
+       * @note This is true by default.
+       * @note If false, then the top-left of the actor is used for the position.
+       * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
+       * @SINCE_1_9.17
+       */
+      POSITION_USES_ANCHOR_POINT,
+
+      /**
+       * @brief Returns whether the actor is culled or not.
+       * @details Name "culled", type Property::BOOLEAN. Read-only
+       * @note True means that the actor is out of the view frustum.
+       * @SINCE_1_9.17
+       */
+      CULLED,
+
+      /**
+       * @brief The unique ID of the actor.
+       * @details Name "id", type Property::INTEGER. Read-only
+       * @SINCE_1_9.17
+       */
+      ID,
+
+      /**
+       * @brief The current depth in the hierarchy of the actor.
+       * @details Name "hierarchyDepth", type Property::INTEGER. Read-only
+       * @note The value is -1 if actor is not in the hierarchy.
+       * @SINCE_1_9.17
+       */
+      HIERARCHY_DEPTH,
+
+      /**
+       * @brief The flag whether an actor is the root actor, which is owned by the Scene.
+       * @details Name "isRoot", type Property::BOOLEAN. Read-only
+       * @SINCE_1_9.17
+       */
+      IS_ROOT,
+
+      /**
+       * @brief The flag whether the actor is of class Dali::Layer.
+       * @details Name "isLayer", type Property::BOOLEAN. Read-only
+       * @SINCE_1_9.17
+       */
+      IS_LAYER,
+
+      /**
+       * @brief The flag whether the actor is connected to the Scene.
+       * When an actor is connected, it will be directly or indirectly parented to the root Actor.
+       * @details Name "connectedToScene", type Property::BOOLEAN. Read-only
+       * @note The root Actor is provided automatically by Dali::Scene, and is always considered to be connected.
+       * @SINCE_1_9.17
+       */
+      CONNECTED_TO_SCENE,
+
+      /**
+       * @brief The flag whether the actor should be focusable by keyboard navigation.
+       * @details Name "keyboardFocusable", type Property::BOOLEAN.
+       * @SINCE_1_9.17
+       */
+      KEYBOARD_FOCUSABLE,
     };
   };
 
@@ -726,25 +800,7 @@ public:
    */
   Actor& operator=(const Actor& rhs);
 
-  /**
-   * @brief Retrieves the unique ID of the actor.
-   *
-   * @SINCE_1_0.0
-   * @return The ID
-   * @pre The Actor has been initialized.
-   */
-  uint32_t GetId() const;
-
   // Containment
-
-  /**
-   * @brief Queries whether an actor is the root actor, which is owned by the Stage.
-   *
-   * @SINCE_1_0.0
-   * @return True if the actor is the root actor
-   * @pre The Actor has been initialized.
-   */
-  bool IsRoot() const;
 
   /**
    * @brief Queries whether the actor is connected to the Stage.
@@ -756,15 +812,6 @@ public:
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    */
   bool OnStage() const;
-
-  /**
-   * @brief Queries whether the actor is of class Dali::Layer.
-   *
-   * @SINCE_1_0.0
-   * @return True if the actor is a layer
-   * @pre The Actor has been initialized.
-   */
-  bool IsLayer() const;
 
   /**
    * @brief Gets the layer in which the actor is present.
@@ -952,26 +999,6 @@ public:
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
 
   /**
-   * @brief Sets whether the actor should be focusable by keyboard navigation.
-   *
-   * The default is false.
-   * @SINCE_1_0.0
-   * @param[in] focusable - true if the actor should be focusable by keyboard navigation,
-   * false otherwise
-   * @pre The Actor has been initialized.
-   */
-  void SetKeyboardFocusable( bool focusable );
-
-  /**
-   * @brief Returns whether the actor is focusable by keyboard navigation.
-   *
-   * @SINCE_1_0.0
-   * @return @c true if the actor is focusable by keyboard navigation, @c false if not
-   * @pre The Actor has been initialized.
-   */
-  bool IsKeyboardFocusable() const;
-
-  /**
    * @brief Raise actor above the next sibling actor.
    *
    * @SINCE_1_2.60
@@ -1081,14 +1108,6 @@ public:
    * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
-
-  /**
-   * @brief Gets depth in the hierarchy for the actor.
-   *
-   * @SINCE_1_0.0
-   * @return The current depth in the hierarchy of the actor, or @c -1 if actor is not in the hierarchy
-   */
-  int32_t GetHierarchyDepth();
 
 public: // Renderer
 
