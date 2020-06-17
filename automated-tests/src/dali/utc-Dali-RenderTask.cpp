@@ -171,28 +171,14 @@ bool TestScreenToFrameBufferFunction( Vector2& coordinates )
 
 Actor CreateRenderableActorSuccess(TestApplication& application, std::string filename)
 {
-  PrepareResourceImage( application, 80u, 80u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(filename);
-  Actor actor = CreateRenderableActor(image);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
   return actor;
 }
 
-Actor CreateRenderableActorFailed(TestApplication& application, std::string filename)
+Texture CreateTexture()
 {
-  Image image = ResourceImage::New(filename);
-  DALI_TEST_CHECK( image );
-  Actor actor = CreateRenderableActor(image);
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
-  return actor;
-}
-
-Image CreateResourceImage(TestApplication& application, std::string filename)
-{
-  PrepareResourceImage( application, 80u, 80u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(filename);
-  DALI_TEST_CHECK( image );
-  return image;
+  return Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 80u, 80u);
 }
 
 RenderTask CreateRenderTask(TestApplication& application,
@@ -2013,7 +1999,7 @@ int UtcDaliRenderTaskContinuous04(void)
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
@@ -2084,7 +2070,7 @@ int UtcDaliRenderTaskOnce02(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2177,7 +2163,7 @@ int UtcDaliRenderTaskOnce04(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2259,7 +2245,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2340,7 +2326,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2393,7 +2379,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
@@ -2580,7 +2566,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( rootActor );
 
-  Actor actorWithMissingImage = CreateRenderableActor( Image() );
+  Actor actorWithMissingImage = CreateRenderableActor( Texture() );
   actorWithMissingImage.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( actorWithMissingImage );
 

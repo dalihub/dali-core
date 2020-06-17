@@ -20,7 +20,6 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <cstdio>
 #include <string>

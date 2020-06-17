@@ -393,9 +393,6 @@ struct DefaultFunctionCoverage
   }
 };
 
-// Prepare a resource image to be loaded. Should be called before creating the ResourceImage
-void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat );
-
 // Test namespace to prevent pollution of Dali namespace, add Test helper functions here
 namespace Test
 {

@@ -36,7 +36,6 @@ SET(TC_SOURCES
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
-        utc-Dali-Image.cpp
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
@@ -73,7 +72,6 @@ SET(TC_SOURCES
         utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
-        utc-Dali-ResourceImage.cpp
         utc-Dali-RotationGesture.cpp
         utc-Dali-RotationGestureDetector.cpp
         utc-Dali-RotationGestureRecognizer.cpp

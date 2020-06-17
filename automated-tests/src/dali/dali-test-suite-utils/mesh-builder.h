@@ -26,7 +26,6 @@ namespace Dali
 
 Shader CreateShader();
 TextureSet CreateTextureSet();
-TextureSet CreateTextureSet( Image image );
 TextureSet CreateTextureSet( Texture texture );
 Geometry CreateQuadGeometry();
 PropertyBuffer CreatePropertyBuffer();

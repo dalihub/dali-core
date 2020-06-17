@@ -65,9 +65,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
 

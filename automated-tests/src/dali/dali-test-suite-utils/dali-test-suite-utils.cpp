@@ -328,21 +328,6 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat )
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetClosestImageSize(Vector2( imageWidth, imageHeight));
-
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
-  uint32_t bytesPerPixel = GetBytesPerPixel(  pixelFormat );
-  uint32_t initialColor = 0xFF;
-  memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
-
-  Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetSynchronouslyLoadedResource( resourcePtr );
-}
-
 namespace Test
 {
 
