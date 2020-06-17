@@ -65,11 +65,6 @@ Actor& Actor::operator=(const Actor& rhs)
   return *this;
 }
 
-bool Actor::OnStage() const
-{
-  return GetImplementation(*this).OnStage();
-}
-
 Layer Actor::GetLayer()
 {
   return GetImplementation(*this).GetLayer();

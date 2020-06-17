@@ -803,17 +803,6 @@ public:
   // Containment
 
   /**
-   * @brief Queries whether the actor is connected to the Stage.
-   *
-   * When an actor is connected, it will be directly or indirectly parented to the root Actor.
-   * @SINCE_1_0.0
-   * @return True if the actor is connected to the Stage
-   * @pre The Actor has been initialized.
-   * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
-   */
-  bool OnStage() const;
-
-  /**
    * @brief Gets the layer in which the actor is present.
    *
    * @SINCE_1_0.0
