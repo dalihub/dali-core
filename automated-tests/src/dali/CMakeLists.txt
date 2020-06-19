@@ -12,7 +12,6 @@ SET(TC_SOURCES
         utc-Dali-Animation.cpp
         utc-Dali-Any.cpp
         utc-Dali-BaseHandle.cpp
-        utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-CircularQueue.cpp
         utc-Dali-ConditionalWait.cpp
@@ -29,7 +28,6 @@ SET(TC_SOURCES
         utc-Dali-DistanceField.cpp
         utc-Dali-Extents.cpp
         utc-Dali-FrameBuffer.cpp
-        utc-Dali-FrameBufferImage.cpp
         utc-Dali-FrameCallbackInterface.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-Gesture.cpp
@@ -38,7 +36,6 @@ SET(TC_SOURCES
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
-        utc-Dali-Image.cpp
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
@@ -51,7 +48,6 @@ SET(TC_SOURCES
         utc-Dali-Matrix3.cpp
         utc-Dali-MeshMaterial.cpp
         utc-Dali-Mutex.cpp
-        utc-Dali-NativeImage.cpp
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
@@ -76,7 +72,6 @@ SET(TC_SOURCES
         utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
-        utc-Dali-ResourceImage.cpp
         utc-Dali-RotationGesture.cpp
         utc-Dali-RotationGestureDetector.cpp
         utc-Dali-RotationGestureRecognizer.cpp

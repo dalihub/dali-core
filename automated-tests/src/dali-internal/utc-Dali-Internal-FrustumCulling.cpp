@@ -17,6 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/bitmap.h>
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
@@ -57,7 +58,7 @@ void main()
 
 Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
 {
-  PixelBuffer* pixelBuffer = new PixelBuffer[ 4 ];
+  Integration::PixelBuffer* pixelBuffer = new Integration::PixelBuffer[ 4 ];
   PixelData pixelData = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
   Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   image.Upload(pixelData);

@@ -2,7 +2,7 @@
 #define DALI_TEST_SUITE_UTILS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -392,15 +392,6 @@ struct DefaultFunctionCoverage
     delete b;
   }
 };
-
-
-// Helper to Create buffer image
-BufferImage CreateBufferImage();
-BufferImage CreateBufferImage(int32_t width, int32_t height, const Vector4& color);
-
-
-// Prepare a resource image to be loaded. Should be called before creating the ResourceImage
-void PrepareResourceImage( TestApplication& application, uint32_t imageWidth, uint32_t imageHeight, Pixel::Format pixelFormat );
 
 // Test namespace to prevent pollution of Dali namespace, add Test helper functions here
 namespace Test

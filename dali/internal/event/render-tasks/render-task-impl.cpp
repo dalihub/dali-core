@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/projection.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
@@ -166,18 +165,6 @@ CameraActor* RenderTask::GetCameraActor() const
   return nullptr;
 }
 
-void RenderTask::SetTargetFrameBuffer( FrameBufferImagePtr image )
-{
-  mFrameBufferImage = image;
-  FrameBuffer* frameBufferPtr( NULL );
-  if( image )
-  {
-    frameBufferPtr = image->GetFrameBuffer();
-  }
-
-  SetFrameBuffer( frameBufferPtr );
-}
-
 void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 {
   mFrameBuffer = frameBuffer;
@@ -193,11 +180,6 @@ void RenderTask::SetFrameBuffer( FrameBufferPtr frameBuffer )
 FrameBuffer* RenderTask::GetFrameBuffer() const
 {
   return mFrameBuffer.Get();
-}
-
-FrameBufferImage* RenderTask::GetTargetFrameBuffer() const
-{
-  return mFrameBufferImage.Get();
 }
 
 void RenderTask::SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction )
@@ -256,29 +238,20 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
 
   if( !GetRenderTaskSceneObject().GetViewportEnabled( bufferIndex ) )
   {
-    if ( mFrameBufferImage )
+    Internal::Stage* stage = Internal::Stage::GetCurrent();
+    if ( stage )
     {
-      viewPort.x = viewPort.y = 0;
-      viewPort.width = mFrameBufferImage->GetWidth();
-      viewPort.height = mFrameBufferImage->GetHeight();
-    }
-    else
-    {
-      Internal::Stage* stage = Internal::Stage::GetCurrent();
-      if ( stage )
+      Vector2 size( stage->GetSize() );
+      Actor* sourceActor = mSourceActor.GetActor();
+      if ( sourceActor && sourceActor->OnStage() )
       {
-        Vector2 size( stage->GetSize() );
-        Actor* sourceActor = mSourceActor.GetActor();
-        if ( sourceActor && sourceActor->OnStage() )
-        {
-          Scene& scene = sourceActor->GetScene();
-          size = scene.GetSize();
-        }
-
-        viewPort.x = viewPort.y = 0;
-        viewPort.width = static_cast<int32_t>( size.width ); // truncated
-        viewPort.height = static_cast<int32_t>( size.height ); // truncated
+        Scene& scene = sourceActor->GetScene();
+        size = scene.GetSize();
       }
+
+      viewPort.x = viewPort.y = 0;
+      viewPort.width = static_cast<int32_t>( size.width ); // truncated
+      viewPort.height = static_cast<int32_t>( size.height ); // truncated
     }
   }
   else
@@ -408,7 +381,7 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
   // the function should only be called for offscreen tasks
   Dali::Actor mappingActor = GetScreenToFrameBufferMappingActor();
 
-  if( mFrameBufferImage && mappingActor )
+  if( mFrameBuffer && mappingActor )
   {
     Internal::Actor* inputMappingActor = &GetImplementation( mappingActor );
     CameraActor* localCamera = GetCameraActor();
@@ -451,7 +424,7 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
       }
     }
   }
-  else if ( mFrameBufferImage && mScreenToFrameBufferFunction )
+  else if ( mFrameBuffer && mScreenToFrameBufferFunction )
   {
     inside = mScreenToFrameBufferFunction( screenCoords );
   }

@@ -20,7 +20,6 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <cstdio>
 #include <string>
@@ -454,7 +453,7 @@ int UtcDaliRendererBlendOptions01(void)
 
   Actor actor = Actor::New();
   // set a transparent actor color so that blending is enabled
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.5f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.5f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -499,7 +498,7 @@ int UtcDaliRendererBlendOptions02(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.5f ); // enable blending
+  actor.SetProperty( Actor::Property::OPACITY, 0.5f ); // enable blending
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -570,7 +569,7 @@ int UtcDaliRendererBlendOptions04(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.1f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.1f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -615,7 +614,7 @@ int UtcDaliRendererSetBlendMode01(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.98f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.98f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -647,7 +646,7 @@ int UtcDaliRendererSetBlendMode01b(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.0f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.0f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -682,7 +681,7 @@ int UtcDaliRendererSetBlendMode02(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.15f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.15f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);
@@ -714,7 +713,7 @@ int UtcDaliRendererSetBlendMode03(void)
   Renderer renderer = Renderer::New( geometry, shader );
 
   Actor actor = Actor::New();
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.75f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.75f );
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
   Stage::GetCurrent().Add(actor);

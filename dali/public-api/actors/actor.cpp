@@ -65,26 +65,6 @@ Actor& Actor::operator=(const Actor& rhs)
   return *this;
 }
 
-uint32_t Actor::GetId() const
-{
-  return GetImplementation(*this).GetId();
-}
-
-bool Actor::IsRoot() const
-{
-  return GetImplementation(*this).IsRoot();
-}
-
-bool Actor::OnStage() const
-{
-  return GetImplementation(*this).OnStage();
-}
-
-bool Actor::IsLayer() const
-{
-  return GetImplementation(*this).IsLayer();
-}
-
 Layer Actor::GetLayer()
 {
   return GetImplementation(*this).GetLayer();
@@ -170,16 +150,6 @@ bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float scr
   return GetImplementation(*this).ScreenToLocal(localX, localY, screenX, screenY);
 }
 
-void Actor::SetKeyboardFocusable( bool focusable )
-{
-  GetImplementation(*this).SetKeyboardFocusable(focusable);
-}
-
-bool Actor::IsKeyboardFocusable() const
-{
-  return GetImplementation(*this).IsKeyboardFocusable();
-}
-
 void Actor::Raise()
 {
   GetImplementation( *this ).Raise();
@@ -233,11 +203,6 @@ float Actor::GetWidthForHeight( float height )
 float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetRelayoutSize( dimension );
-}
-
-int32_t Actor::GetHierarchyDepth()
-{
-  return GetImplementation(*this).GetHierarchyDepth();
 }
 
 Actor::TouchSignalType& Actor::TouchedSignal()

@@ -8432,7 +8432,7 @@ int UtcDaliAnimationAnimateToActorColorP(void)
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_GREEN ), targetColor.g, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_BLUE ), targetColor.b, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetColor.a, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( DevelActor::Property::OPACITY ), targetColor.a, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::OPACITY ), targetColor.a, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -8748,7 +8748,7 @@ int UtcDaliAnimationAnimateToActorColorAlphaP(void)
   // Target value should be retrievable straight away
   DALI_TEST_EQUALS( actor.GetProperty< Vector4 >( Actor::Property::COLOR ), Vector4( startValue, startValue, startValue, targetAlpha ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), targetAlpha, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty< float >( DevelActor::Property::OPACITY ), targetAlpha, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::OPACITY ), targetAlpha, TEST_LOCATION );
 
   bool signalReceived(false);
   AnimationFinishCheck finishCheck(signalReceived);
@@ -10638,7 +10638,7 @@ int UtcDaliAnimationUpdateManagerP(void)
 
   // Apply animation to actor
   animation.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( 100.f, 90.f, 80.f ), AlphaFunction::LINEAR );
-  animation.AnimateTo( Property(actor, DevelActor::Property::OPACITY), 0.3f, AlphaFunction::LINEAR );
+  animation.AnimateTo( Property(actor, Actor::Property::OPACITY), 0.3f, AlphaFunction::LINEAR );
 
   animation.Play();
 

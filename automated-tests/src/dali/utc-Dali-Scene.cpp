@@ -258,10 +258,10 @@ int UtcDaliSceneAdd(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   scene.Add( actor );
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   END_TEST;
 }
@@ -274,13 +274,13 @@ int UtcDaliSceneRemove(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   scene.Add( actor );
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   scene.Remove(actor);
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   END_TEST;
 }

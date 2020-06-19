@@ -17,7 +17,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -294,20 +293,6 @@ int UtcDaliTextureSetSetSampler(void)
   //There should have been two calls to TexParameteri to set the new filtering mode
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
 
-
-  END_TEST;
-}
-
-int UtcDaliTextureSetGetImage(void)
-{
-  TestApplication application;
-
-  TextureSet textureSet = CreateTextureSet();
-  Image imageSource = BufferImage::New( 64, 64, Pixel::RGBA8888 );
-  TextureSetImage( textureSet, 0u, imageSource );
-
-  Image imageReturn = TextureGetImage( textureSet, 0u );
-  DALI_TEST_EQUALS( imageSource, imageReturn, TEST_LOCATION );
 
   END_TEST;
 }

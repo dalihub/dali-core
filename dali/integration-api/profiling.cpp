@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,6 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 
-
-#include <dali/internal/event/images/image-impl.h>
 
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
@@ -97,9 +95,6 @@ const std::size_t CAMERA_ACTOR_MEMORY_SIZE(
 const std::size_t LAYER_MEMORY_SIZE(
   sizeof( Internal::Layer ) +
   sizeof( Internal::SceneGraph::Layer ) );
-const std::size_t IMAGE_MEMORY_SIZE(
-  sizeof( Internal::Image ) +
-  sizeof( Integration::Bitmap ) );
 const std::size_t RENDERER_MEMORY_SIZE(
   sizeof( Internal::Renderer ) +
   sizeof( Internal::SceneGraph::Renderer ) +

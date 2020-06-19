@@ -2,7 +2,7 @@
 #define DALI_RENDER_TASK_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,20 +286,6 @@ public:
    * @return The scene is viewed from the perspective of this actor
    */
   CameraActor GetCameraActor() const;
-
-  /**
-   * @brief Sets the frame-buffer used as a render target.
-   * @SINCE_1_0.0
-   * @param[in] frameBuffer A valid frame-buffer handle to enable off-screen rendering, or an uninitialized handle to disable
-   */
-  void SetTargetFrameBuffer( FrameBufferImage frameBuffer );
-
-  /**
-   * @brief Retrieves the frame-buffer used as a render target.
-   * @SINCE_1_0.0
-   * @return A valid frame-buffer handle, or an uninitialised handle if off-screen rendering is disabled
-   */
-  FrameBufferImage GetTargetFrameBuffer() const;
 
   /**
    * @brief Sets the frame-buffer used as a render target.

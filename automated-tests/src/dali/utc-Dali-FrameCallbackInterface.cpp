@@ -321,7 +321,7 @@ int UtcDaliFrameCallbackGetters(void)
   Stage stage = Stage::GetCurrent();
   stage.Add( actor );
 
-  FrameCallbackOneActor frameCallback( actor.GetId() );
+  FrameCallbackOneActor frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
   DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
 
   application.SendNotification();
@@ -358,7 +358,7 @@ int UtcDaliFrameCallbackSetters(void)
   Vector4 colorToSet( Color::MAGENTA );
   Vector3 scaleToSet( 1.0f, 3.0f, 5.0f );
 
-  FrameCallbackSetter frameCallback( actor.GetId(), sizeToSet, positionToSet, colorToSet, scaleToSet );
+  FrameCallbackSetter frameCallback( actor.GetProperty< int >( Actor::Property::ID ), sizeToSet, positionToSet, colorToSet, scaleToSet );
   DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
 
   application.SendNotification();
@@ -422,7 +422,7 @@ int UtcDaliFrameCallbackBake(void)
   Vector4 colorToSet( Color::MAGENTA );
   Vector3 scaleToSet( 1.0f, 3.0f, 5.0f );
 
-  FrameCallbackBaker frameCallback( actor.GetId(), sizeToSet, positionToSet, colorToSet, scaleToSet );
+  FrameCallbackBaker frameCallback( actor.GetProperty< int >( Actor::Property::ID ), sizeToSet, positionToSet, colorToSet, scaleToSet );
   DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
 
   application.SendNotification();
@@ -562,14 +562,14 @@ int UtcDaliFrameCallbackMultipleActors(void)
   actorG.Add( actorH );
 
   std::map< char, unsigned int > actorIds;
-  actorIds['A'] = actorA.GetId();
-  actorIds['B'] = actorB.GetId();
-  actorIds['C'] = actorC.GetId();
-  actorIds['D'] = actorD.GetId();
-  actorIds['E'] = actorE.GetId();
-  actorIds['F'] = actorF.GetId();
-  actorIds['G'] = actorG.GetId();
-  actorIds['H'] = actorH.GetId();
+  actorIds['A'] = actorA.GetProperty< int >( Actor::Property::ID );
+  actorIds['B'] = actorB.GetProperty< int >( Actor::Property::ID );
+  actorIds['C'] = actorC.GetProperty< int >( Actor::Property::ID );
+  actorIds['D'] = actorD.GetProperty< int >( Actor::Property::ID );
+  actorIds['E'] = actorE.GetProperty< int >( Actor::Property::ID );
+  actorIds['F'] = actorF.GetProperty< int >( Actor::Property::ID );
+  actorIds['G'] = actorG.GetProperty< int >( Actor::Property::ID );
+  actorIds['H'] = actorH.GetProperty< int >( Actor::Property::ID );
 
   FrameCallbackMultipleActors frameCallback;
   for( auto&& i : actorIds )
@@ -617,7 +617,7 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200, 300 ) );
 
   Stage stage = Stage::GetCurrent();
-  FrameCallbackOneActor frameCallback( actor.GetId() );
+  FrameCallbackOneActor frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
   DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
 
   application.SendNotification();
@@ -677,7 +677,7 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
   Actor actor = Actor::New();
   stage.Add( actor );
 
-  FrameCallbackActorIdCheck frameCallback( actor.GetId() );
+  FrameCallbackActorIdCheck frameCallback( actor.GetProperty< int >( Actor::Property::ID ) );
   DevelStage::AddFrameCallback( stage, frameCallback, stage.GetRootLayer() );
 
   application.SendNotification();
