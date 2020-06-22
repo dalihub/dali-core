@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include "mesh-builder.h"
@@ -85,40 +84,6 @@ Actor CreateRenderableActor( Texture texture, const std::string& vertexShader, c
   {
     TextureSet textureSet = TextureSet::New();
     textureSet.SetTexture( 0u, texture );
-    renderer.SetTextures( textureSet );
-
-    // Set actor to the size of the texture if set
-    actor.SetProperty( Actor::Property::SIZE, Vector2( texture.GetWidth(), texture.GetHeight() ) );
-  }
-
-  return actor;
-}
-
-Actor CreateRenderableActor( Image texture )
-{
-  return CreateRenderableActor( texture, VERTEX_SHADER, FRAGMENT_SHADER );
-}
-
-Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader )
-{
-  // Create the geometry
-  Geometry geometry = CreateQuadGeometry();
-
-  // Create Shader
-  Shader shader = Shader::New( vertexShader, fragmentShader );
-
-  // Create renderer from geometry and material
-  Renderer renderer = Renderer::New( geometry, shader );
-
-  // Create actor and set renderer
-  Actor actor = Actor::New();
-  actor.AddRenderer( renderer );
-
-  // If we a texture, then create a texture-set and add to renderer
-  if( texture )
-  {
-    TextureSet textureSet = TextureSet::New();
-    TextureSetImage( textureSet, 0u, texture );
     renderer.SetTextures( textureSet );
 
     // Set actor to the size of the texture if set

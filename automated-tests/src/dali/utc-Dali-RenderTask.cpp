@@ -171,28 +171,14 @@ bool TestScreenToFrameBufferFunction( Vector2& coordinates )
 
 Actor CreateRenderableActorSuccess(TestApplication& application, std::string filename)
 {
-  PrepareResourceImage( application, 80u, 80u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(filename);
-  Actor actor = CreateRenderableActor(image);
+  Actor actor = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
   return actor;
 }
 
-Actor CreateRenderableActorFailed(TestApplication& application, std::string filename)
+Texture CreateTexture()
 {
-  Image image = ResourceImage::New(filename);
-  DALI_TEST_CHECK( image );
-  Actor actor = CreateRenderableActor(image);
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 80.0f, 80.0f ) );
-  return actor;
-}
-
-Image CreateResourceImage(TestApplication& application, std::string filename)
-{
-  PrepareResourceImage( application, 80u, 80u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(filename);
-  DALI_TEST_CHECK( image );
-  return image;
+  return Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 80u, 80u);
 }
 
 RenderTask CreateRenderTask(TestApplication& application,
@@ -206,15 +192,12 @@ RenderTask CreateRenderTask(TestApplication& application,
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   taskList.GetTask(0u).SetSourceActor( rootActor );
 
-  FrameBufferImage frameBufferImage;
+  FrameBuffer frameBuffer = FrameBuffer::New(10,10);
   if( glSync )
   {
     NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
-    frameBufferImage= FrameBufferImage::New( *(testNativeImagePtr.Get()) );
-  }
-  else
-  {
-    frameBufferImage = FrameBufferImage::New( 10, 10 );
+    Texture texture = Texture::New(*testNativeImagePtr);
+    frameBuffer.AttachColorTexture(texture);
   }
 
   // Don't draw output framebuffer // '
@@ -227,7 +210,7 @@ RenderTask CreateRenderTask(TestApplication& application,
   newTask.SetClearEnabled( true );
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( refreshRate );
-  newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetFrameBuffer( frameBuffer );
   newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, glSync );
   return newTask;
 }
@@ -1065,69 +1048,6 @@ int UtcDaliRenderTaskGetCameraActorN(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetTargetFrameBufferP(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask::SetTargetFrameBuffer()");
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-
-  RenderTask task = taskList.GetTask( 0u );
-
-  FrameBufferImage newImage = FrameBufferImage::New();
-  task.SetTargetFrameBuffer( newImage );
-  DALI_TEST_CHECK( task.GetTargetFrameBuffer() == newImage );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskSetTargetFrameBufferN(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask::SetTargetFrameBuffer()");
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-
-  RenderTask task = taskList.GetTask( 0u );
-  FrameBufferImage newImage; // Empty handle
-  task.SetTargetFrameBuffer( newImage );
-  DALI_TEST_EQUALS( (bool)task.GetTargetFrameBuffer(), false, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskGetTargetFrameBufferP(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask::GetTargetFrameBuffer()");
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-
-  RenderTask newTask = taskList.CreateTask();
-  FrameBufferImage fb = FrameBufferImage::New(128, 128, Pixel::RGBA8888);
-  newTask.SetTargetFrameBuffer( fb );
-  DALI_TEST_EQUALS( newTask.GetTargetFrameBuffer(), fb, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskGetTargetFrameBufferN(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask::GetTargetFrameBuffer()");
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-
-  RenderTask task = taskList.GetTask( 0u );
-
-  // By default render-tasks do not render off-screen
-  FrameBufferImage image = task.GetTargetFrameBuffer();
-  DALI_TEST_CHECK( !image );
-
-  END_TEST;
-}
-
 int UtcDaliRenderTaskSetFrameBufferP(void)
 {
   TestApplication application;
@@ -1890,7 +1810,9 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
-  FrameBufferImage frameBufferImage = FrameBufferImage::New( *testNativeImagePtr.Get() );
+  Texture frameBufferTexture = Texture::New( *testNativeImagePtr );
+  FrameBuffer frameBuffer = FrameBuffer::New(frameBufferTexture.GetWidth(),frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
 
   RenderTask newTask = taskList.CreateTask();
   newTask.SetCameraActor( offscreenCameraActor );
@@ -1900,7 +1822,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   newTask.SetClearEnabled( true );
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
-  newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetFrameBuffer( frameBuffer );
   newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
 
   bool finished = false;
@@ -2077,7 +1999,7 @@ int UtcDaliRenderTaskContinuous04(void)
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
@@ -2148,7 +2070,7 @@ int UtcDaliRenderTaskOnce02(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2241,7 +2163,7 @@ int UtcDaliRenderTaskOnce04(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2323,7 +2245,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2404,7 +2326,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Stage::GetCurrent().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
-  Image image = CreateResourceImage(application, "aFile.jpg");
+  Texture image = CreateTexture();
   TextureSet textureSet = CreateTextureSet( image );
 
   Geometry geometry = CreateQuadGeometry();
@@ -2457,7 +2379,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Stage::GetCurrent().Add( offscreenCameraActor );
-  Actor secondRootActor = CreateRenderableActorFailed(application, "aFile.jpg");
+  Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
   Stage::GetCurrent().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
@@ -2507,8 +2429,8 @@ int UtcDaliRenderTaskOnceChain01(void)
   firstTask.FinishedSignal().Connect( &application, renderTask1Finished );
 
   // Second render task
-  FrameBufferImage fbo = firstTask.GetTargetFrameBuffer();
-  Actor secondRootActor = CreateRenderableActor( fbo );
+  FrameBuffer fbo = firstTask.GetFrameBuffer();
+  Actor secondRootActor = CreateRenderableActor( fbo.GetColorTexture() );
   Stage::GetCurrent().Add(secondRootActor);
   RenderTask secondTask = CreateRenderTask(application, offscreenCameraActor, defaultRootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool secondFinished = false;
@@ -2564,7 +2486,9 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
-  FrameBufferImage frameBufferImage = FrameBufferImage::New( *testNativeImagePtr.Get() );
+  Texture frameBufferTexture = Texture::New( *testNativeImagePtr );
+  FrameBuffer frameBuffer = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
 
   // Flush all outstanding messages
   application.SendNotification();
@@ -2578,7 +2502,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   newTask.SetClearEnabled( true );
   newTask.SetExclusive( true );
   newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
-  newTask.SetTargetFrameBuffer( frameBufferImage );
+  newTask.SetFrameBuffer( frameBuffer );
   newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, true );
 
   // Framebuffer doesn't actually get created until Connected, i.e. by previous line
@@ -2642,7 +2566,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( rootActor );
 
-  Actor actorWithMissingImage = CreateRenderableActor( Image() );
+  Actor actorWithMissingImage = CreateRenderableActor( Texture() );
   actorWithMissingImage.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( actorWithMissingImage );
 
@@ -2777,8 +2701,8 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
 
-  FrameBufferImage newFrameBuffer = FrameBufferImage::New( 10, 10 );
-  task.SetTargetFrameBuffer( newFrameBuffer );
+  FrameBuffer newFrameBuffer = FrameBuffer::New(10, 10);
+  task.SetFrameBuffer( newFrameBuffer );
   task.SetSourceActor( actor );
   task.SetScreenToFrameBufferMappingActor( actor );
 

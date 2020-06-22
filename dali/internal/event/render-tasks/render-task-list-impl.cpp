@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ void RenderTaskList::RecoverFromContextLoss()
   for ( auto&& item : mTasks )
   {
     // If the render target renders only once to an offscreen, re-render the render task
-    if( item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetTargetFrameBuffer() )
+    if( item->GetRefreshRate() == Dali::RenderTask::REFRESH_ONCE && item->GetFrameBuffer() )
     {
       item->SetRefreshRate( Dali::RenderTask::REFRESH_ONCE );
     }

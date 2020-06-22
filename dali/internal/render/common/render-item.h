@@ -67,7 +67,7 @@ struct RenderItem
    * @param[in]    viewportHeight    The height of the viewport to calculate for
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  ClippingBox CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const;
+  ClippingBox CalculateViewportSpaceAABB( const Vector3& size, const int viewportWidth, const int viewportHeight ) const;
 
   /**
    * Overriden delete operator.
@@ -79,11 +79,13 @@ struct RenderItem
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
   Vector3           mSize;
+  Vector3           mUpdateSize;
   Render::Renderer* mRenderer;
   Node*             mNode;
   const void*       mTextureSet;        //< Used for sorting only
   int               mDepthIndex;
   bool              mIsOpaque:1;
+  bool              mIsUpdated:1;
 
 private:
 

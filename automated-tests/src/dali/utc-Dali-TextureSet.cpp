@@ -17,7 +17,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>

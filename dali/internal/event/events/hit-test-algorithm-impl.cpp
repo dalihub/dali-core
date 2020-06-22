@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/projection.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
@@ -546,7 +545,7 @@ bool HitTestRenderTaskList( const Vector2& sceneSize,
   for( RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter )
   {
     RenderTask& renderTask = *iter->Get();
-    bool isOffscreenRenderTask = ( renderTask.GetTargetFrameBuffer() || renderTask.GetFrameBuffer() );
+    const bool isOffscreenRenderTask = renderTask.GetFrameBuffer();
     if( (onScreen && isOffscreenRenderTask) || (!onScreen && !isOffscreenRenderTask) )
     {
       // Skip to next task

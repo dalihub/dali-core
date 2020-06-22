@@ -39,22 +39,6 @@ Actor CreateRenderableActor();
  * @param[in] texture Texture to set.
  * @return An actor with a renderer.
  */
-Actor CreateRenderableActor( Image texture );
-
-/**
- * @brief Creates a renderable-actor with a texture and custom shaders.
- * @param[in] texture Texture to set.
- * @param[in] vertexShader The vertex-shader.
- * @param[in] fragmentShader The fragment-shader.
- * @return An actor with a renderer.
- */
-Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader );
-
-/**
- * @brief Creates a renderable-actor with a texture.
- * @param[in] texture Texture to set.
- * @return An actor with a renderer.
- */
 Actor CreateRenderableActor( Texture texture );
 
 /**

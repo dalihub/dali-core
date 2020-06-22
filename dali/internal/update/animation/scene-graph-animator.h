@@ -519,6 +519,11 @@ public:
       progress = SetProgress( progress );
     }
 
+    if( mPropertyOwner )
+    {
+      mPropertyOwner->SetUpdated( true );
+    }
+
     float alpha = ApplyAlphaFunction( progress );
 
     // PropertyType specific part

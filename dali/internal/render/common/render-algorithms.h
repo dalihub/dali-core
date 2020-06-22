@@ -65,7 +65,8 @@ class RenderAlgorithms
                                    BufferIndex bufferIndex,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
-                                   Vector<GLuint>& boundTextures );
+                                   Vector<GLuint>& boundTextures,
+                                   const Rect<int>& rootClippingRect );
 
   private:
 
@@ -125,8 +126,8 @@ class RenderAlgorithms
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
-                                   const Dali::Internal::SceneGraph::RenderInstruction& instruction // in the case of reflection, things like CullFace need to be adjusted for reflection world   
-                                   );
+                                   const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
+                                   const Rect<int>& rootClippingRect );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );

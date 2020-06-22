@@ -37,12 +37,8 @@ SET( public_api_src_files
   ${public_api_src_dir}/events/touch-point.cpp
   ${public_api_src_dir}/events/touch-event.cpp
   ${public_api_src_dir}/events/touch-data.cpp
-  ${public_api_src_dir}/images/image.cpp
   ${public_api_src_dir}/images/pixel.cpp
   ${public_api_src_dir}/images/pixel-data.cpp
-  ${public_api_src_dir}/images/frame-buffer-image.cpp
-  ${public_api_src_dir}/images/resource-image.cpp
-  ${public_api_src_dir}/images/native-image.cpp
   ${public_api_src_dir}/math/compile-time-math.cpp
   ${public_api_src_dir}/math/degree.cpp
   ${public_api_src_dir}/math/matrix.cpp
@@ -131,6 +127,7 @@ SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/loading-state.h
   ${public_api_src_dir}/common/stage.h
   ${public_api_src_dir}/common/type-traits.h
+  ${public_api_src_dir}/common/list-wrapper.h
   ${public_api_src_dir}/common/vector-wrapper.h
   ${public_api_src_dir}/common/view-mode.h
 )
@@ -160,13 +157,9 @@ SET( public_api_core_events_header_files
 
 
 SET( public_api_core_images_header_files
-  ${public_api_src_dir}/images/frame-buffer-image.h
-  ${public_api_src_dir}/images/image.h
   ${public_api_src_dir}/images/image-operations.h
   ${public_api_src_dir}/images/pixel.h
   ${public_api_src_dir}/images/pixel-data.h
-  ${public_api_src_dir}/images/resource-image.h
-  ${public_api_src_dir}/images/native-image.h
   ${public_api_src_dir}/images/native-image-interface.h
 )
 

@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,6 @@ enum Type
   INHERIT_ORIENTATION         = Dali::Actor::Property::INHERIT_ORIENTATION,
   INHERIT_SCALE               = Dali::Actor::Property::INHERIT_SCALE,
   COLOR_MODE                  = Dali::Actor::Property::COLOR_MODE,
-  RESERVED_PROPERTY_01        = Dali::Actor::Property::RESERVED_PROPERTY_01,
   DRAW_MODE                   = Dali::Actor::Property::DRAW_MODE,
   SIZE_MODE_FACTOR            = Dali::Actor::Property::SIZE_MODE_FACTOR,
   WIDTH_RESIZE_POLICY         = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
@@ -89,6 +88,16 @@ enum Type
   CLIPPING_MODE               = Dali::Actor::Property::CLIPPING_MODE,
   LAYOUT_DIRECTION            = Dali::Actor::Property::LAYOUT_DIRECTION,
   INHERIT_LAYOUT_DIRECTION    = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
+  OPACITY                     = Dali::Actor::Property::OPACITY,
+  SCREEN_POSITION             = Dali::Actor::Property::SCREEN_POSITION,
+  POSITION_USES_ANCHOR_POINT  = Dali::Actor::Property::POSITION_USES_ANCHOR_POINT,
+  CULLED                      = Dali::Actor::Property::CULLED,
+  ID                          = Dali::Actor::Property::ID,
+  HIERARCHY_DEPTH             = Dali::Actor::Property::HIERARCHY_DEPTH,
+  IS_ROOT                     = Dali::Actor::Property::IS_ROOT,
+  IS_LAYER                    = Dali::Actor::Property::IS_LAYER,
+  CONNECTED_TO_SCENE          = Dali::Actor::Property::CONNECTED_TO_SCENE,
+  KEYBOARD_FOCUSABLE          = Dali::Actor::Property::KEYBOARD_FOCUSABLE,
 
   /**
    * @brief Sets the sibling order of the actor so depth position can be defined within the same parent.
@@ -97,37 +106,14 @@ enum Type
    * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
    * sibling order. The values set by this Property will likely change.
    */
-  SIBLING_ORDER = INHERIT_LAYOUT_DIRECTION + 1,
+  SIBLING_ORDER = KEYBOARD_FOCUSABLE + 1,
 
   /**
-   * @brief The opacity of the actor.
-   * @details Name "opacity", type Property::FLOAT.
+   * @brief Sets the update size hint of the actor.
+   * @details Name "updateSizeHint", type Property::VECTOR2.
+   * @note Overrides the size used for the actor damaged area calculation. Affected by the actor model view matrix.
    */
-  OPACITY = INHERIT_LAYOUT_DIRECTION + 2,
-
-  /**
-   * @brief Returns the screen position of the Actor
-   * @details Name "screenPosition", type Property::VECTOR2. Read-only
-   * @note This assumes default camera and default render-task and the Z position is ZERO.
-   * @note The last known frame is used for the calculation. May not match a position value just set.
-   */
-  SCREEN_POSITION = INHERIT_LAYOUT_DIRECTION + 3,
-
-  /**
-   * @brief Determines whether the anchor point should be used to determine the position of the actor.
-   * @details Name "positionUsesAnchorPoint", type Property::BOOLEAN.
-   * @note This is true by default.
-   * @note If false, then the top-left of the actor is used for the position.
-   * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
-   */
-  POSITION_USES_ANCHOR_POINT = INHERIT_LAYOUT_DIRECTION + 4,
-
-  /**
-   * @brief Returns whether the actor is culled or not.
-   * @details Name "culled", type Property::BOOLEAN. Read-only
-   * @note True means that the actor is out of the view frustum.
-   */
-  CULLED = INHERIT_LAYOUT_DIRECTION + 5,
+  UPDATE_SIZE_HINT = SIBLING_ORDER + 1,
 };
 
 } // namespace Property

@@ -194,6 +194,11 @@ void Camera::SetNode( const Node* node )
   mNode = node;
 }
 
+const Node* Camera::GetNode() const
+{
+  return mNode;
+}
+
 void Camera::SetType( Dali::Camera::Type type )
 {
   mType = type;

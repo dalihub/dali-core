@@ -137,14 +137,14 @@ void OnStageCallback( Actor actor )
 {
   ++gOnStageCallBackCalled;
   gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
-  DALI_TEST_CHECK( actor.OnStage() == true );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
 }
 static int gOffStageCallBackCalled;
 void OffStageCallback( Actor actor )
 {
   ++gOffStageCallBackCalled;
   gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
-  DALI_TEST_CHECK( actor.OnStage() == false );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == false );
 }
 
 struct PositionComponentConstraint
@@ -349,15 +349,15 @@ int UtcDaliActorSetName(void)
 
 int UtcDaliActorGetId(void)
 {
-  tet_infoline("Testing Dali::Actor::UtcDaliActorGetId()");
+  tet_infoline("Testing Dali::Actor::UtcDaliActo.GetProperty< int >( Actor::Property::ID )");
   TestApplication application;
 
   Actor first = Actor::New();
   Actor second = Actor::New();
   Actor third = Actor::New();
 
-  DALI_TEST_CHECK(first.GetId() != second.GetId());
-  DALI_TEST_CHECK(second.GetId() != third.GetId());
+  DALI_TEST_CHECK(first.GetProperty< int >( Actor::Property::ID ) != second.GetProperty< int >( Actor::Property::ID ));
+  DALI_TEST_CHECK(second.GetProperty< int >( Actor::Property::ID ) != third.GetProperty< int >( Actor::Property::ID ));
   END_TEST;
 }
 
@@ -366,11 +366,11 @@ int UtcDaliActorIsRoot(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK(!actor.IsRoot());
+  DALI_TEST_CHECK(!actor.GetProperty< bool >( Actor::Property::IS_ROOT ));
 
   // get the root layer
   actor = Stage::GetCurrent().GetLayer( 0 );
-  DALI_TEST_CHECK( actor.IsRoot() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::IS_ROOT ) );
   END_TEST;
 }
 
@@ -379,11 +379,11 @@ int UtcDaliActorOnStage(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   // get the root layer
   actor = Stage::GetCurrent().GetLayer( 0 );
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
 
@@ -392,11 +392,11 @@ int UtcDaliActorIsLayer(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.IsLayer() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::IS_LAYER ) );
 
   // get the root layer
   actor = Stage::GetCurrent().GetLayer( 0 );
-  DALI_TEST_CHECK( actor.IsLayer() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::IS_LAYER ) );
   END_TEST;
 }
 
@@ -1653,7 +1653,7 @@ int UtcDaliActorInheritOpacity(void)
   application.SendNotification();
   application.Render();
 
-  parent.SetProperty( DevelActor::Property::OPACITY, 0.1f );
+  parent.SetProperty( Actor::Property::OPACITY, 0.1f );
 
   DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
@@ -2128,38 +2128,38 @@ int UtcDaliActorSetOpacity(void)
 
   Actor actor = Actor::New();
   // initial opacity is 1
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.4f);
+  actor.SetProperty( Actor::Property::OPACITY, 0.4f);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.4f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.4f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetProperty( DevelActor::Property::OPACITY, actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) + 0.1f );
+  actor.SetProperty( Actor::Property::OPACITY, actor.GetCurrentProperty< float >( Actor::Property::OPACITY ) + 0.1f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.5f, TEST_LOCATION );
 
   // put actor on stage
   Stage::GetCurrent().Add( actor );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.9f );
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, TEST_LOCATION );
+  actor.SetProperty( Actor::Property::OPACITY, 0.9f );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.5f, TEST_LOCATION );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.9f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.9f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.SetProperty( DevelActor::Property::OPACITY, actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) - 0.9f );
+  actor.SetProperty( Actor::Property::OPACITY, actor.GetCurrentProperty< float >( Actor::Property::OPACITY ) - 0.9f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2168,13 +2168,13 @@ int UtcDaliActorGetCurrentOpacity(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) != 0.5f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ) != 0.5f);
 
-  actor.SetProperty( DevelActor::Property::OPACITY,0.5f);
+  actor.SetProperty( Actor::Property::OPACITY,0.5f);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) == 0.5f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ) == 0.5f);
   END_TEST;
 }
 
@@ -2305,7 +2305,7 @@ int UtcDaliActorSetColorIndividual(void)
   DALI_TEST_EQUALS( vector, actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
   DALI_TEST_EQUALS( vector, actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
 
-  actor.SetProperty( DevelActor::Property::OPACITY, 0.2f );
+  actor.SetProperty( Actor::Property::OPACITY, 0.2f );
 
 
   // flush the queue and render once
@@ -2469,11 +2469,11 @@ int UtcDaliActorSetKeyboardFocusable(void)
 
   Actor actor = Actor::New();
 
-  actor.SetKeyboardFocusable(true);
-  DALI_TEST_CHECK(actor.IsKeyboardFocusable() == true);
+  actor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) == true);
 
-  actor.SetKeyboardFocusable(false);
-  DALI_TEST_CHECK(actor.IsKeyboardFocusable() == false);
+  actor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, false );
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) == false);
   END_TEST;
 }
 
@@ -2483,7 +2483,7 @@ int UtcDaliActorIsKeyboardFocusable(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.IsKeyboardFocusable() == false);
+  DALI_TEST_CHECK(actor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) == false);
   END_TEST;
 }
 
@@ -2790,13 +2790,13 @@ int UtcDaliActorFindChildById(void)
   Actor found = parent.FindChildById( 100000 );
   DALI_TEST_CHECK( !found );
 
-  found = parent.FindChildById( parent.GetId() );
+  found = parent.FindChildById( parent.GetProperty< int >( Actor::Property::ID ) );
   DALI_TEST_CHECK( found == parent );
 
-  found = parent.FindChildById( first.GetId() );
+  found = parent.FindChildById( first.GetProperty< int >( Actor::Property::ID ) );
   DALI_TEST_CHECK( found == first );
 
-  found = parent.FindChildById( second.GetId() );
+  found = parent.FindChildById( second.GetProperty< int >( Actor::Property::ID ) );
   DALI_TEST_CHECK( found == second );
   END_TEST;
 }
@@ -3108,12 +3108,12 @@ int UtcDaliActorConstrainedToOpacity(void)
   tet_infoline(" UtcDaliActorConstrainedToOpacity");
 
   Actor parent = Actor::New();
-  parent.SetProperty( DevelActor::Property::OPACITY, 0.7f );
+  parent.SetProperty( Actor::Property::OPACITY, 0.7f );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  Constraint opacityConstraint = Constraint::New<float>( child, DevelActor::Property::OPACITY, EqualToConstraint() );
-  opacityConstraint.AddSource( Source( parent, DevelActor::Property::OPACITY ) );
+  Constraint opacityConstraint = Constraint::New<float>( child, Actor::Property::OPACITY, EqualToConstraint() );
+  opacityConstraint.AddSource( Source( parent, Actor::Property::OPACITY ) );
   opacityConstraint.Apply();
 
   Stage::GetCurrent().Add( child );
@@ -3123,16 +3123,16 @@ int UtcDaliActorConstrainedToOpacity(void)
   app.Render();
   app.SendNotification();
 
-  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), parent.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( Actor::Property::OPACITY ), parent.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
-  parent.SetProperty( DevelActor::Property::OPACITY, 0.3f );
+  parent.SetProperty( Actor::Property::OPACITY, 0.3f );
 
   app.SendNotification();
   app.Render(0);
   app.Render();
   app.SendNotification();
 
-  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), parent.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentProperty< float >( Actor::Property::OPACITY ), parent.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3292,7 +3292,7 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "maximumSize",              Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
   { "inheritPosition",          Actor::Property::INHERIT_POSITION,         Property::BOOLEAN     },
   { "clippingMode",             Actor::Property::CLIPPING_MODE,            Property::STRING      },
-  { "opacity",                  DevelActor::Property::OPACITY,             Property::FLOAT       },
+  { "opacity",                  Actor::Property::OPACITY,             Property::FLOAT       },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace
@@ -3646,15 +3646,15 @@ int UtcDaliActorGetHierachyDepth(void)
   Actor actorF = Actor::New();
 
   //Test that root actor has depth equal 0
-  DALI_TEST_EQUALS( 0, stage.GetRootLayer().GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0, stage.GetRootLayer().GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
 
   //Test actors return depth -1 when not connected to the tree
-  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorA.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
 
   //Create the hierarchy
   stage.Add( actorA );
@@ -3665,29 +3665,29 @@ int UtcDaliActorGetHierachyDepth(void)
   actorC.Add( actorF );
 
   //Test actors return correct depth
-  DALI_TEST_EQUALS( 1, actorA.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 2, actorB.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 2, actorC.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 3, actorD.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 3, actorE.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 3, actorF.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, actorA.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorB.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorC.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorD.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorE.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorF.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
 
   //Removing actorB from the hierarchy. actorB, actorD and actorE should now have depth equal -1
   actorA.Remove( actorB );
 
-  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
 
   //Removing actorA from the stage. All actors should have depth equal -1
   stage.Remove( actorA );
 
-  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
-  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorA.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetProperty< int >( Actor::Property::HIERARCHY_DEPTH ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -6049,7 +6049,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.Render();
 
   Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::CENTER \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position %f %f \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6065,7 +6065,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position  ( %f %f ) AnchorPoint::TOP_LEFT  \n",  actorWorldPosition.x, actorWorldPosition.y );
   tet_printf( "Actor Screen Position  ( %f %f ) AnchorPoint::TOP_LEFT \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6081,7 +6081,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT   \n",  actorWorldPosition.x, actorWorldPosition.y );
   tet_printf( "Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT  \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6097,7 +6097,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0 \n",  actorWorldPosition.x, actorWorldPosition.y );
   tet_printf( "Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0   \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6113,7 +6113,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   DALI_TEST_EQUALS( actorScreenPosition.x,  30lu , TEST_LOCATION );
   DALI_TEST_EQUALS( actorScreenPosition.y,  420lu , TEST_LOCATION );
@@ -6137,7 +6137,7 @@ int UtcDaliActorGetScreenPosition(void)
   application.SendNotification();
   application.Render();
 
-  actorScreenPosition = actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorB.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   DALI_TEST_EQUALS( actorScreenPosition.x,  50lu , TEST_LOCATION );
   DALI_TEST_EQUALS( actorScreenPosition.y,  50lu , TEST_LOCATION );
@@ -6169,7 +6169,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   application.Render();
 
   Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6185,7 +6185,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6219,7 +6219,7 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   application.Render();
 
   Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6236,7 +6236,7 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT ParentOrigin::TOP_RIGHT \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6283,7 +6283,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   application.Render();
 
   Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6302,7 +6302,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   application.Render();
 
   actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::BOTTOM_LEFT ParentOrigin::TOP_LEFT  \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6361,7 +6361,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   application.Render();
 
   Vector3 actorWorldPosition = actorA.GetProperty( Actor::Property::WORLD_POSITION ).Get< Vector3 >();
-  Vector2 actorScreenPosition = actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >();
+  Vector2 actorScreenPosition = actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >();
 
   tet_printf( "Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n",  actorWorldPosition.x, actorWorldPosition.y  );
   tet_printf( "Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y );
@@ -6385,7 +6385,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   Actor actorA = Actor::New();
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actorA.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actorA.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   actorA.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 20.0f ) );
   stage.Add( actorA );
 
@@ -6394,7 +6394,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   Actor actorB = Actor::New();
   actorB.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
   actorB.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actorB.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actorB.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorBSize( 30.0f, 60.0f );
   actorB.SetProperty( Actor::Property::SIZE, actorBSize );
   stage.Add( actorB );
@@ -6404,7 +6404,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   Actor actorC = Actor::New();
   actorC.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actorC.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actorC.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actorC.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   Vector2 actorCSize( 60.0f, 120.0f );
   actorC.SetProperty( Actor::Property::SIZE, actorCSize );
   stage.Add( actorC );
@@ -6416,9 +6416,9 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
 
   Vector2 center( stage.GetSize() * 0.5f );
 
-  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center, TEST_LOCATION );
 
   tet_infoline( "Add scale to all actors" );
 
@@ -6429,9 +6429,9 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actorA.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center /* TOP_LEFT Anchor */, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorB.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorBSize /* BOTTOM_RIGHT Anchor */, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorC.GetProperty( DevelActor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorCSize * 0.5f /* CENTER Anchor*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorA.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center /* TOP_LEFT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorB.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorBSize /* BOTTOM_RIGHT Anchor */, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorC.GetProperty( Actor::Property::SCREEN_POSITION).Get< Vector2 >(), center - actorCSize * 0.5f /* CENTER Anchor*/, TEST_LOCATION );
 
   END_TEST;
 }
@@ -6454,7 +6454,7 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), TEST_LOCATION );
 
   tet_infoline( "Set the position uses anchor point property to false\n" );
-  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
 
   application.SendNotification();
   application.Render();
@@ -6475,7 +6475,7 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::SCALE, 2.0f );
-  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -6509,7 +6509,7 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
-  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -6544,7 +6544,7 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetProperty( Actor::Property::SCALE, 2.0f );
-  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -6584,7 +6584,7 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
   actor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
-  actor.SetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
   parent.Add( actor );
 
   application.SendNotification();
@@ -7219,9 +7219,9 @@ int utcDaliActorCulled(void)
   application.SendNotification();
   application.Render( 0 );
 
-  DALI_TEST_EQUALS( actor.GetProperty< bool >( DevelActor::Property::CULLED ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::CULLED ), false, TEST_LOCATION );
 
-  PropertyNotification notification = actor.AddPropertyNotification( DevelActor::Property::CULLED, LessThanCondition( 0.5f ) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::CULLED, LessThanCondition( 0.5f ) );
   notification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
 
   // Connect NotifySignal
@@ -7237,10 +7237,10 @@ int utcDaliActorCulled(void)
 
   application.SendNotification();
 
-  DALI_TEST_EQUALS( actor.GetProperty< bool >( DevelActor::Property::CULLED ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::CULLED ), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( propertyNotificationSignal, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( source.GetTargetProperty(), static_cast< int >( DevelActor::Property::CULLED ), TEST_LOCATION );
+  DALI_TEST_EQUALS( source.GetTargetProperty(), static_cast< int >( Actor::Property::CULLED ), TEST_LOCATION );
   DALI_TEST_EQUALS( source.GetTarget().GetProperty< bool >( source.GetTargetProperty() ), true, TEST_LOCATION );
 
   END_TEST;
@@ -7497,3 +7497,364 @@ int utcDaliActorGetSizeAfterAnimation(void)
 
   END_TEST;
 }
+
+int utcDaliActorPartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged area");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int> clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // First render pass, nothing to render, adaptor would just do swap buffer.
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+
+  // 1. Actor added, damaged rect is added size of actor
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // 2. Set new size
+  actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0));
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 752, 48, 48); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // 3. Set new position
+  actor.SetProperty(Actor::Property::POSITION, Vector3(32.0f, 32.0f, 0));
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 736, 64, 64); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  Stage::GetCurrent().Remove(actor);
+  application.SendNotification();
+
+  // Actor removed, last 3 dirty rects are reported. Adaptor would merge them together.
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 3, TEST_LOCATION);
+
+  clippingRect = damagedRects[0];
+  clippingRect.Merge(damagedRects[1]);
+  clippingRect.Merge(damagedRects[2]);
+
+  DALI_TEST_EQUALS(clippingRect.IsEmpty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.IsValid(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(16, 736, 64, 64), TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateSetColor(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check uniform update");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int> clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // First render pass, nothing to render, adaptor would just do swap buffer.
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+
+  // 1. Actor added, damaged rect is added size of actor
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // 2. Set new color
+  actor.SetProperty(Actor::Property::COLOR, Vector3(1.0f, 0.0f, 0.0f));
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+const std::string SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME("uLightCameraProjectionMatrix");
+const std::string SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME("uLightCameraViewMatrix");
+const std::string SHADER_SHADOW_COLOR_PROPERTY_NAME("uShadowColor");
+const char* const RENDER_SHADOW_VERTEX_SOURCE =
+  " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
+  " uniform mediump mat4 uLightCameraViewMatrix;\n"
+  "\n"
+  "void main()\n"
+  "{\n"
+  "  gl_Position = uProjection * uModelView * vec4(aPosition,1.0);\n"
+  "  vec4 textureCoords = uLightCameraProjectionMatrix * uLightCameraViewMatrix * uModelMatrix  * vec4(aPosition,1.0);\n"
+  "  vTexCoord = 0.5 + 0.5 * (textureCoords.xy/textureCoords.w);\n"
+  "}\n";
+
+const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
+  "uniform lowp vec4 uShadowColor;\n"
+  "void main()\n"
+  "{\n"
+  "  lowp float alpha;\n"
+  "  alpha = texture2D(sTexture, vec2(vTexCoord.x, vTexCoord.y)).a;\n"
+  "  gl_FragColor = vec4(uShadowColor.rgb, uShadowColor.a * alpha);\n"
+  "}\n";
+
+int utcDaliActorPartialUpdateSetProperty(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+ 
+  tet_infoline( "Set/Update property with partial update" );
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int> clippingRect;
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // First render pass, nothing to render, adaptor would just do swap buffer.
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
+  Actor actor = CreateRenderableActor(image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  actor.RegisterProperty(SHADER_SHADOW_COLOR_PROPERTY_NAME, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+
+  damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  Property::Index shadowColorPropertyIndex = actor.GetPropertyIndex( SHADER_SHADOW_COLOR_PROPERTY_NAME );
+  actor.SetProperty(shadowColorPropertyIndex, Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+
+  damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateTwoActors(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rects with partial update and two actors");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::POSITION, Vector3(100.0f, 100.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(50.0f, 50.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
+  actor2.SetProperty(Actor::Property::SIZE, Vector3(100.0f, 100.0f, 0.0f));
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor2);
+
+  application.SendNotification();
+  std::vector<Rect<int>> damagedRects;
+  application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(96, 592, 112, 112), damagedRects[1], TEST_LOCATION);
+
+  // in screen coordinates, adaptor would calculate it using previous frames information
+  Rect<int> clippingRect = Rect<int>(64, 592, 144, 192);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorPartialUpdateActorsWithSizeHint(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline( "Check the damaged rect with partial update and actor size hint" );
+
+  const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::POSITION, Vector3(75.0f, 150.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(75.0f, 150.0f, 0.0f));
+  actor.SetProperty(DevelActor::Property::UPDATE_SIZE_HINT, Vector3(150, 300, 0));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  std::vector<Rect<int>> damagedRects;
+  application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
+
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  Rect<int> clippingRect = Rect<int>(0, 496, 160, 320);
+  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  END_TEST;
+}
+

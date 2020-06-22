@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,39 +81,6 @@ Texture* TextureSet::GetTexture( uint32_t index ) const
   else
   {
     DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetTexture\n");
-  }
-
-  return result;
-}
-
-void TextureSet::SetImage( uint32_t index, ImagePtr image )
-{
-  Texture* texture( NULL );
-  if( image )
-  {
-    uint32_t textureCount = static_cast<uint32_t>( mImages.size() );
-    if( index >= textureCount )
-    {
-      mImages.resize(index + 1);
-    }
-    mImages[index] = image;
-
-    texture = image->GetTexture();
-  }
-
-  SetTexture( index, texture );
-}
-
-Image* TextureSet::GetImage( uint32_t index ) const
-{
-  Image* result( NULL );
-  if( index < mImages.size() )
-  {
-    result = mImages[index].Get();
-  }
-  else
-  {
-    DALI_LOG_ERROR( "Error: Invalid index to TextureSet::GetImage\n");
   }
 
   return result;

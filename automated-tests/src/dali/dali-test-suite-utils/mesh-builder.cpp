@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include "mesh-builder.h"
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/images/texture-set-image.h>
-
 namespace Dali
 {
 
@@ -32,13 +29,6 @@ Shader CreateShader()
 TextureSet CreateTextureSet()
 {
   return TextureSet::New();
-}
-
-TextureSet CreateTextureSet( Image image )
-{
-  TextureSet textureSet = TextureSet::New();
-  TextureSetImage( textureSet, 0u, image );
-  return textureSet;
 }
 
 TextureSet CreateTextureSet( Texture texture )

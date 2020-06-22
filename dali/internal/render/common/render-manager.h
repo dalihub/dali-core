@@ -85,7 +85,8 @@ public:
                              Integration::GlSyncAbstraction& glSyncAbstraction,
                              Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
                              Integration::DepthBufferAvailable depthBufferAvailable,
-                             Integration::StencilBufferAvailable stencilBufferAvailable );
+                             Integration::StencilBufferAvailable stencilBufferAvailable,
+                             Integration::PartialUpdateAvailable partialUpdateAvailable );
 
   /**
    * Non-virtual destructor; not intended as a base class
@@ -359,6 +360,18 @@ public:
    */
   void PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
 
+  // This method should be called from Core::PreRender()
+
+  /**
+   * This is called before rendering any scene in the next frame. This method should be preceded
+   * by a call up Update.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[in] scene The scene to be rendered.
+   * @param[out] damagedRects The list of damaged rects for the current render pass.
+   */
+  void PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects );
+
   // This method should be called from Core::RenderScene()
 
   /**
@@ -372,6 +385,19 @@ public:
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    */
   void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
+
+  /**
+   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * This method should be called twice. The first pass to render off-screen frame buffers if any,
+   * and the second pass to render the surface.
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @pre The GL context must have been created, and made current.
+   * @param[out] status contains the rendering flags.
+   * @param[in] scene The scene to be rendered.
+   * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
+   * @param[in] clippingRect The clipping rect for the rendered scene.
+   */
+  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect );
 
   // This method should be called from Core::PostRender()
 

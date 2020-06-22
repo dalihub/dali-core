@@ -151,45 +151,53 @@ bool CompareItems3DWithClipping( const RenderInstructionProcessor::SortAttribute
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param cull Whether frustum culling is enabled or not
  */
-inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
-                                     RenderList& renderList,
-                                     Renderable& renderable,
-                                     const Matrix& viewMatrix,
-                                     SceneGraph::Camera& camera,
-                                     bool isLayer3d,
-                                     bool cull )
+inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
+                                    RenderList& renderList,
+                                    Renderable& renderable,
+                                    const Matrix& viewMatrix,
+                                    SceneGraph::Camera& camera,
+                                    bool isLayer3d,
+                                    bool cull)
 {
-  bool inside( true );
+  bool inside(true);
   Node* node = renderable.mNode;
 
-  if( cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled( Dali::Shader::Hint::MODIFIES_GEOMETRY ) )
+  if (cull && renderable.mRenderer && !renderable.mRenderer->GetShader().HintEnabled(Dali::Shader::Hint::MODIFIES_GEOMETRY))
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
-    inside = ( boundingSphere.w > Math::MACHINE_EPSILON_1000 ) &&
-             ( camera.CheckSphereInFrustum( updateBufferIndex, Vector3( boundingSphere ), boundingSphere.w ) );
+    inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
+             (camera.CheckSphereInFrustum(updateBufferIndex, Vector3(boundingSphere), boundingSphere.w));
   }
 
-  if( inside )
+  if (inside)
   {
     Renderer::OpacityType opacityType = renderable.mRenderer ? renderable.mRenderer->GetOpacityType( updateBufferIndex, *renderable.mNode ) : Renderer::OPAQUE;
-    if( opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN )
+    if (opacityType != Renderer::TRANSPARENT || node->GetClippingMode() == ClippingMode::CLIP_CHILDREN)
     {
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
+      item.mIsUpdated = (item.mNode != renderable.mNode);
       item.mNode = renderable.mNode;
-      item.mIsOpaque = ( opacityType == Renderer::OPAQUE );
-      item.mDepthIndex = 0;
 
-      if(!isLayer3d)
+      bool prevIsOpaque = item.mIsOpaque;
+      item.mIsOpaque = (opacityType == Renderer::OPAQUE);
+      item.mIsUpdated |= (prevIsOpaque != item.mIsOpaque);
+
+      int prevDepthIndex = item.mDepthIndex;
+      item.mDepthIndex = 0;
+      if (!isLayer3d)
       {
         item.mDepthIndex = renderable.mNode->GetDepthIndex();
       }
 
-      if( DALI_LIKELY( renderable.mRenderer ) )
+      Render::Renderer* prevRenderer = item.mRenderer;
+      if (DALI_LIKELY(renderable.mRenderer))
       {
-        item.mRenderer =   &renderable.mRenderer->GetRenderer();
-        item.mTextureSet =  renderable.mRenderer->GetTextures();
+        item.mRenderer = &renderable.mRenderer->GetRenderer();
+        const void* prevTextureSet = item.mTextureSet;
+        item.mTextureSet = renderable.mRenderer->GetTextures();
+        item.mIsUpdated |= (prevTextureSet != item.mTextureSet);
         item.mDepthIndex += renderable.mRenderer->GetDepthIndex();
       }
       else
@@ -197,17 +205,45 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
         item.mRenderer = nullptr;
       }
 
-      // Save ModelView matrix onto the item.
-      node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+      item.mIsUpdated |= (prevDepthIndex != item.mDepthIndex);
+      item.mIsUpdated |= (prevRenderer != item.mRenderer);
+      item.mIsUpdated |= isLayer3d;
 
-      Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
+      if (!item.mIsUpdated)
+      {
+        Matrix prevModelViewMatrix = item.mModelViewMatrix;
+        Vector3 prevSize = item.mSize;
+
+        // Save ModelView matrix onto the item.
+        node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+        Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
+
+        item.mIsUpdated = ((prevSize != item.mSize) || (item.mModelViewMatrix != prevModelViewMatrix));
+      }
+      else
+      {
+        // Save ModelView matrix onto the item.
+        node->GetWorldMatrixAndSize( item.mModelMatrix, item.mSize );
+        Matrix::Multiply( item.mModelViewMatrix, item.mModelMatrix, viewMatrix );
+      }
+
+      item.mUpdateSize = node->GetUpdateSizeHint();
+      if (item.mUpdateSize == Vector3::ZERO)
+      {
+        // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
+        // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be to slow
+        if (!isLayer3d && item.mModelMatrix.GetZAxis() == Vector3(0.0f, 0.0f, 1.0f))
+        {
+          item.mUpdateSize = item.mSize;
+        }
+      }
     }
 
-     node->SetCulled( updateBufferIndex, false );
+    node->SetCulled( updateBufferIndex, false );
   }
   else
   {
-     node->SetCulled( updateBufferIndex, true );
+    node->SetCulled( updateBufferIndex, true );
   }
 }
 
@@ -240,7 +276,7 @@ inline void AddRenderersToRenderList( BufferIndex updateBufferIndex,
                              viewMatrix,
                              camera,
                              isLayer3d,
-                             cull );
+                             cull);
   }
 }
 
@@ -280,6 +316,7 @@ inline bool TryReuseCachedRenderers( Layer& layer,
       retValue = true;
     }
   }
+
   return retValue;
 }
 

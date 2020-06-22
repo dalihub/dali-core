@@ -22,6 +22,21 @@
 #include <dali/public-api/rendering/property-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
+#ifdef ANDROID
+namespace std
+{
+  uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed)
+  {
+    for (uint64_t i = 0; i < size; i++)
+    {
+      seed = seed * 31 + reinterpret_cast<const unsigned char*>(bytes)[i];
+    }
+
+    return seed;
+  }
+}
+#endif
+
 namespace Dali
 {
 namespace Internal

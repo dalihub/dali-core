@@ -166,6 +166,16 @@ struct Rect
   }
 
   /**
+   * @brief Determines whether or not this Rectangle is valid.
+   *
+   * @return True if width and height are not negative
+   */
+  bool IsValid() const
+  {
+    return !(width < 0 || height < 0);
+  }
+
+  /**
    * @brief Gets the left of the rectangle.
    *
    * @SINCE_1_0.0
@@ -228,10 +238,70 @@ struct Rect
    */
   bool Intersects(const Rect<T>& other) const
   {
-    return (other.x + other.width)  > x           &&
-      other.x                 < (x + width) &&
-                                (other.y + other.height) > y           &&
-      other.y                 < (y + height);
+    return (other.x + other.width) > x && other.x < (x + width) &&
+      (other.y + other.height) > y && other.y < (y + height);
+  }
+
+  /**
+   * @brief Intersects this rectangle and the specified rectangle.
+   * The result of the intersection is stored in this rectangle.
+   *
+   * @param[in] rect The other rectangle to intersect with
+   */
+  bool Intersect(const Rect<T>& rect)
+  {
+    const int left = std::max(rect.x, x);
+    const int top = std::max(rect.y, y);
+    const int right = std::min(rect.x + rect.width, x + width);
+    const int bottom = std::min(rect.y + rect.height, y + height);
+
+    const int width = right - left;
+    const int height = bottom - top;
+    if (!(width < 0 || height < 0))
+    {
+      x = left;
+      y = top;
+      this->width = width;
+      this->height = height;
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * @brief Merges this rectangle and the specified rectangle.
+   * The result of the merge is stored in this rectangle.
+   *
+   * @param[in] rect The other rectangle to merge with
+   */
+  void Merge(const Rect<T>& rect)
+  {
+    const int left = std::min(rect.x, x);
+    const int top = std::min(rect.y, y);
+    const int right = std::max(rect.x + rect.width, x + width);
+    const int bottom = std::max(rect.y + rect.height, y + height);
+    x = left;
+    y = top;
+    width = right - left;
+    height = bottom - top;
+  }
+
+  /**
+   * @brief Inset the rectangle by (dx,dy). If dx is positive, then the sides are moved inwards.
+   * If dx is negative, then the sides are moved outwards.
+   * The result of the inset is stored in this rectangle.
+   */
+  void Inset(T dx, T dy)
+  {
+    const int left = x - dx;
+    const int top = y - dy;
+    const int right = x + width + dx;
+    const int bottom = y + height + dy;
+    x = left;
+    y = top;
+    width = right - left;
+    height = bottom - top;
   }
 
   /**
@@ -243,10 +313,8 @@ struct Rect
    */
   bool Contains(const Rect<T>& other) const
   {
-    return other.x                  >= x           &&
-      (other.x + other.width)  <= (x + width) &&
-      other.y                  >= y           &&
-      (other.y + other.height) <= (y + height);
+    return other.x >= x && (other.x + other.width)  <= (x + width) &&
+      other.y >= y && (other.y + other.height) <= (y + height);
   }
 
 public:   // Data
