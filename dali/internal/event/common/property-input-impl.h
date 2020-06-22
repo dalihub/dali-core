@@ -31,7 +31,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/common/buffer-index.h>
 
-#ifdef ANDROID
+#if defined (ANDROID) || defined(WIN32)
 namespace std
 {
 
