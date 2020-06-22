@@ -22,7 +22,7 @@
 #include <dali/public-api/rendering/property-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-#ifdef ANDROID
+#if defined (ANDROID) || defined(WIN32)
 namespace std
 {
   uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed)
