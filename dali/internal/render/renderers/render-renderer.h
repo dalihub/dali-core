@@ -384,6 +384,14 @@ public:
    */
   void SetShaderChanged( bool value );
 
+  /**
+   * Check if the renderer attributes/uniforms are updated and returns the flag
+   *
+   * @param[in] bufferIndex The current update buffer index.
+   * @param[in] node The node using this renderer
+   */
+  bool Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node);
+
 private:
 
   struct UniformIndexMap;
@@ -445,6 +453,8 @@ private:
   UniformIndexMappings         mUniformIndexMap;
   Vector<GLint>                mAttributesLocation;
 
+  uint64_t                     mUniformsHash;
+
   StencilParameters            mStencilParameters;          ///< Struct containing all stencil related options
   BlendingOptions              mBlendingOptions;            ///< Blending options including blend color, blend func and blend equation
 
@@ -458,6 +468,7 @@ private:
   bool                         mUpdateAttributesLocation:1; ///< Indicates attribute locations have changed
   bool                         mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                         mShaderChanged:1;            ///< Flag indicating the shader changed and uniform maps have to be updated
+  bool                         mUpdated:1;
 
 
 };

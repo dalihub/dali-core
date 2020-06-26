@@ -86,7 +86,8 @@ public:
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         Integration::RenderToFrameBuffer renderToFboEnabled,
         Integration::DepthBufferAvailable depthBufferAvailable,
-        Integration::StencilBufferAvailable stencilBufferAvailable );
+        Integration::StencilBufferAvailable stencilBufferAvailable,
+        Integration::PartialUpdateAvailable partialUpdateAvailable );
 
   /**
    * Destructor
@@ -129,14 +130,24 @@ public:
   void Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, Integration::UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo );
 
   /**
-   * @copydoc Dali::Integration::Core::Render()
+   * @copydoc Dali::Integration::Core::PreRender()
    */
   void PreRender( Integration::RenderStatus& status, bool forceClear, bool uploadOnly );
+
+  /**
+   * @copydoc Dali::Integration::Core::PreRender()
+   */
+  void PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects );
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
    */
   void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
+
+  /**
+   * @copydoc Dali::Integration::Core::RenderScene()
+   */
+  void RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect );
 
   /**
    * @copydoc Dali::Integration::Core::Render()

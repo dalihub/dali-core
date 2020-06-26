@@ -51,7 +51,8 @@ public:
                    uint32_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    uint32_t horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                    uint32_t verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   bool initialize = true );
+                   bool initialize = true,
+                   bool enablePartialUpdate = false );
 
   void Initialize();
   void CreateCore();
@@ -69,6 +70,8 @@ public:
   void ProcessEvent(const Integration::Event& event);
   void SendNotification();
   bool Render( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location=NULL );
+  bool PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
+  bool RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
   uint32_t GetUpdateStatus();
   bool UpdateOnly( uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL );
   bool RenderOnly( );
@@ -108,6 +111,7 @@ protected:
 
   struct { uint32_t x; uint32_t y; } mDpi;
   uint32_t mLastVSyncTime;
+  bool mPartialUpdateEnabled;
   static bool mLoggingEnabled;
 };
 

@@ -87,7 +87,8 @@ Core::Core( RenderController& renderController,
             GlContextHelperAbstraction& glContextHelperAbstraction,
             Integration::RenderToFrameBuffer renderToFboEnabled,
             Integration::DepthBufferAvailable depthBufferAvailable,
-            Integration::StencilBufferAvailable stencilBufferAvailable )
+            Integration::StencilBufferAvailable stencilBufferAvailable,
+            Integration::PartialUpdateAvailable partialUpdateAvailable )
 : mRenderController( renderController ),
   mPlatform(platform),
   mProcessingEvent(false),
@@ -107,7 +108,7 @@ Core::Core( RenderController& renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, glContextHelperAbstraction, depthBufferAvailable, stencilBufferAvailable );
+  mRenderManager = RenderManager::New( glAbstraction, glSyncAbstraction, glContextHelperAbstraction, depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable );
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
@@ -221,9 +222,19 @@ void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
   mRenderManager->PreRender( status, forceClear, uploadOnly );
 }
 
+void Core::PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects )
+{
+  mRenderManager->PreRender( scene, damagedRects );
+}
+
 void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
 {
   mRenderManager->RenderScene( status, scene, renderToFbo );
+}
+
+void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect )
+{
+  mRenderManager->RenderScene( status, scene, renderToFbo, clippingRect );
 }
 
 void Core::PostRender( bool uploadOnly )

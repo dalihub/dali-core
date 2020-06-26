@@ -100,6 +100,12 @@ public:
   void SetNode( const Node* node );
 
   /**
+   * Get the node this scene graph camera belongs to.
+   * @return node The owning node.
+   */
+  const Node* GetNode() const;
+
+  /**
    * @copydoc Dali::Internal::CameraActor::SetType
    */
   void SetType( Dali::Camera::Type type );

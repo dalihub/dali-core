@@ -1946,6 +1946,18 @@ private:
    */
   void InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set = false );
 
+  /**
+   * @brief Sets the update size hint of an actor.
+   * @param [in] updateSizeHint The update size hint.
+   */
+  void SetUpdateSizeHint( const Vector2& updateSizeHint );
+
+  /**
+   * @brief Return the update size hint of actor
+   * @return Return the update size hint
+   */
+  Vector2 GetUpdateSizeHint() const;
+
 protected:
 
   Scene* mScene;                  ///< The scene the actor is added to

@@ -219,6 +219,7 @@ DALI_PROPERTY( "isLayer",                   BOOLEAN,  false, false, false, Dali:
 DALI_PROPERTY( "connectedToScene",          BOOLEAN,  false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE )
 DALI_PROPERTY( "keyboardFocusable",         BOOLEAN,  true,  false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE )
 DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
+DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -2800,6 +2801,12 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
+    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
+    {
+      SetUpdateSizeHint( property.Get< Vector2 >() );
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -4118,6 +4125,12 @@ bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& val
       break;
     }
 
+    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
+    {
+      value = GetUpdateSizeHint();
+      break;
+    }
+
     default:
     {
       // Must be an event-side only property
@@ -5185,6 +5198,19 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirec
       }
     }
   }
+}
+
+void Actor::SetUpdateSizeHint( const Vector2& updateSizeHint )
+{
+  // node is being used in a separate thread; queue a message to set the value & base value
+  SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f ) );
+}
+
+Vector2 Actor::GetUpdateSizeHint() const
+{
+  // node is being used in a separate thread, the value from the previous update is the same, set by user
+  Vector3 updateSizeHint = GetNode().GetUpdateSizeHint();
+  return Vector2( updateSizeHint.width, updateSizeHint.height );
 }
 
 } // namespace Internal

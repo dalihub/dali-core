@@ -31,6 +31,15 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/common/buffer-index.h>
 
+#if defined (ANDROID) || defined(WIN32)
+namespace std
+{
+
+uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed);
+
+}
+#endif
+
 namespace Dali
 {
 
@@ -306,6 +315,63 @@ public:
   {
     return false;
   }
+
+  std::uint64_t Hash(BufferIndex bufferIndex, uint64_t seed) const
+  {
+    switch ( GetType() )
+    {
+      case Property::BOOLEAN:
+      {
+        return std::_Hash_bytes(&GetBoolean(bufferIndex), sizeof(bool), seed);
+      }
+
+      case Property::INTEGER:
+      {
+        return std::_Hash_bytes(&GetInteger(bufferIndex), sizeof(int), seed);
+      }
+
+      case Property::FLOAT:
+      {
+        return std::_Hash_bytes(&GetFloat(bufferIndex), sizeof(float), seed);
+      }
+
+      case Property::VECTOR2:
+      {
+        return std::_Hash_bytes(&GetVector2(bufferIndex), sizeof(Vector2), seed);
+      }
+
+      case Property::VECTOR3:
+      {
+        return std::_Hash_bytes(&GetVector3(bufferIndex), sizeof(Vector3), seed);
+      }
+
+      case Property::VECTOR4:
+      {
+        return std::_Hash_bytes(&GetVector4(bufferIndex), sizeof(Vector4), seed);
+      }
+
+      case Property::ROTATION:
+      {
+        return std::_Hash_bytes(&GetQuaternion(bufferIndex), sizeof(Quaternion), seed);
+      }
+
+      case Property::MATRIX:
+      {
+        return std::_Hash_bytes(&GetMatrix(bufferIndex), sizeof(Matrix), seed);
+      }
+
+      case Property::MATRIX3:
+      {
+        return std::_Hash_bytes(&GetMatrix3(bufferIndex), sizeof(Matrix3), seed);
+      }
+
+      default:
+        break; // print nothing
+    }
+
+    return seed;
+  }
+
 
   /**
    * Print the property value using a stream.

@@ -62,6 +62,53 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 } // unnamed namespace
 #endif
 
+struct DirtyRect
+{
+  DirtyRect(Node* node, Render::Renderer* renderer, int frame, Rect<int>& rect)
+  : node(node),
+    renderer(renderer),
+    frame(frame),
+    rect(rect),
+    visited(true)
+  {
+  }
+
+  DirtyRect()
+  : node(nullptr),
+    renderer(nullptr),
+    frame(0),
+    rect(),
+    visited(true)
+  {
+  }
+
+  bool operator<(const DirtyRect& rhs) const
+  {
+    if (node == rhs.node)
+    {
+      if (renderer == rhs.renderer)
+      {
+        return frame > rhs.frame; // Most recent rects come first
+      }
+      else
+      {
+        return renderer < rhs.renderer;
+      }
+    }
+    else
+    {
+      return node < rhs.node;
+    }
+  }
+
+  Node* node;
+  Render::Renderer* renderer;
+  int frame;
+
+  Rect<int> rect;
+  bool visited;
+};
+
 /**
  * Structure to contain internal data
  */
@@ -71,7 +118,8 @@ struct RenderManager::Impl
         Integration::GlSyncAbstraction& glSyncAbstraction,
         Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
         Integration::DepthBufferAvailable depthBufferAvailableParam,
-        Integration::StencilBufferAvailable stencilBufferAvailableParam )
+        Integration::StencilBufferAvailable stencilBufferAvailableParam,
+        Integration::PartialUpdateAvailable partialUpdateAvailableParam )
   : context( glAbstraction, &sceneContextContainer ),
     currentContext( &context ),
     glAbstraction( glAbstraction ),
@@ -89,7 +137,9 @@ struct RenderManager::Impl
     lastFrameWasRendered( false ),
     programController( glAbstraction ),
     depthBufferAvailable( depthBufferAvailableParam ),
-    stencilBufferAvailable( stencilBufferAvailableParam )
+    stencilBufferAvailable( stencilBufferAvailableParam ),
+    partialUpdateAvailable( partialUpdateAvailableParam ),
+    itemsCheckSum(0)
   {
      // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
     threadPool = std::unique_ptr<Dali::ThreadPool>( new Dali::ThreadPool() );
@@ -176,24 +226,29 @@ struct RenderManager::Impl
 
   Integration::DepthBufferAvailable         depthBufferAvailable;     ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable       stencilBufferAvailable;   ///< Whether the stencil buffer is available
+  Integration::PartialUpdateAvailable       partialUpdateAvailable;   ///< Whether the partial update is available
 
   std::unique_ptr<Dali::ThreadPool>         threadPool;               ///< The thread pool
   Vector<GLuint>                            boundTextures;            ///< The textures bound for rendering
   Vector<GLuint>                            textureDependencyList;    ///< The dependency list of binded textures
+  std::size_t                               itemsCheckSum;            ///< The damaged render items checksum from previous prerender phase.
+  std::vector<DirtyRect>                    itemsDirtyRects;
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction,
                                    Integration::GlSyncAbstraction& glSyncAbstraction,
                                    Integration::GlContextHelperAbstraction& glContextHelperAbstraction,
                                    Integration::DepthBufferAvailable depthBufferAvailable,
-                                   Integration::StencilBufferAvailable stencilBufferAvailable )
+                                   Integration::StencilBufferAvailable stencilBufferAvailable,
+                                   Integration::PartialUpdateAvailable partialUpdateAvailable )
 {
   RenderManager* manager = new RenderManager;
   manager->mImpl = new Impl( glAbstraction,
                              glSyncAbstraction,
                              glContextHelperAbstraction,
                              depthBufferAvailable,
-                             stencilBufferAvailable );
+                             stencilBufferAvailable,
+                             partialUpdateAvailable );
   return manager;
 }
 
@@ -563,8 +618,232 @@ void RenderManager::PreRender( Integration::RenderStatus& status, bool forceClea
   }
 }
 
+void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects )
+{
+  if (mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  {
+    return;
+  }
+
+  class DamagedRectsCleaner
+  {
+  public:
+    DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects)
+    : mDamagedRects(damagedRects),
+      mCleanOnReturn(true)
+    {
+    }
+
+    void SetCleanOnReturn(bool cleanOnReturn)
+    {
+      mCleanOnReturn = cleanOnReturn;
+    }
+
+    ~DamagedRectsCleaner()
+    {
+      if (mCleanOnReturn)
+      {
+        mDamagedRects.clear();
+      }
+    }
+
+  private:
+    std::vector<Rect<int>>& mDamagedRects;
+    bool mCleanOnReturn;
+  };
+
+  Rect<int32_t> surfaceRect = Rect<int32_t>(0, 0, static_cast<int32_t>( scene.GetSize().width ), static_cast<int32_t>( scene.GetSize().height ));
+
+  // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
+  DamagedRectsCleaner damagedRectCleaner(damagedRects);
+
+  // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
+  // so you don't need to sort: std::stable_sort(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end());
+  for (DirtyRect& dirtyRect : mImpl->itemsDirtyRects)
+  {
+    dirtyRect.visited = false;
+  }
+
+  Internal::Scene& sceneInternal = GetImplementation(scene);
+  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
+  uint32_t count = sceneObject->GetRenderInstructions().Count( mImpl->renderBufferIndex );
+  for (uint32_t i = 0; i < count; ++i)
+  {
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At( mImpl->renderBufferIndex, i );
+
+    if (instruction.mFrameBuffer)
+    {
+      return; // TODO: reset, we don't deal with render tasks with framebuffers (for now)
+    }
+
+    const Camera* camera = instruction.GetCamera();
+    if (camera->mType == Camera::DEFAULT_TYPE && camera->mTargetPosition == Camera::DEFAULT_TARGET_POSITION)
+    {
+      const Node* node = instruction.GetCamera()->GetNode();
+      if (node)
+      {
+        Vector3 position;
+        Vector3 scale;
+        Quaternion orientation;
+        node->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
+
+        Vector3 orientationAxis;
+        Radian orientationAngle;
+        orientation.ToAxisAngle( orientationAxis, orientationAngle );
+
+        if (position.x > Math::MACHINE_EPSILON_10000 ||
+            position.y > Math::MACHINE_EPSILON_10000 ||
+            orientationAxis != Vector3(0.0f, 1.0f, 0.0f) ||
+            orientationAngle != ANGLE_180 ||
+            scale != Vector3(1.0f, 1.0f, 1.0f))
+        {
+          return;
+        }
+      }
+    }
+    else
+    {
+      return;
+    }
+
+    Rect<int32_t> viewportRect;
+    if (instruction.mIsViewportSet)
+    {
+      const int32_t y = (surfaceRect.height - instruction.mViewport.height) - instruction.mViewport.y;
+      viewportRect.Set(instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height);
+      if (viewportRect.IsEmpty() || !viewportRect.IsValid())
+      {
+        return; // just skip funny use cases for now, empty viewport means it is set somewhere else
+      }
+    }
+    else
+    {
+      viewportRect = surfaceRect;
+    }
+
+    const Matrix* viewMatrix       = instruction.GetViewMatrix(mImpl->renderBufferIndex);
+    const Matrix* projectionMatrix = instruction.GetProjectionMatrix(mImpl->renderBufferIndex);
+    if (viewMatrix && projectionMatrix)
+    {
+      const RenderListContainer::SizeType count = instruction.RenderListCount();
+      for (RenderListContainer::SizeType index = 0u; index < count; ++index)
+      {
+        const RenderList* renderList = instruction.GetRenderList( index );
+        if (renderList && !renderList->IsEmpty())
+        {
+          const std::size_t count = renderList->Count();
+          for (uint32_t index = 0u; index < count; ++index)
+          {
+            RenderItem& item = renderList->GetItem( index );
+            // If the item does 3D transformation, do early exit and clean the damaged rect array
+            if (item.mUpdateSize == Vector3::ZERO)
+            {
+              return;
+            }
+
+            Rect<int> rect;
+            DirtyRect dirtyRect(item.mNode, item.mRenderer, mImpl->frameCount, rect);
+            // If the item refers to updated node or renderer.
+            if (item.mIsUpdated ||
+                (item.mNode &&
+                (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated(mImpl->renderBufferIndex, item.mNode)))))
+            {
+              item.mIsUpdated = false;
+              item.mNode->SetUpdated(false);
+
+              rect = item.CalculateViewportSpaceAABB(item.mUpdateSize, viewportRect.width, viewportRect.height);
+              if (rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
+              {
+                const int left = rect.x;
+                const int top = rect.y;
+                const int right = rect.x + rect.width;
+                const int bottom = rect.y + rect.height;
+                rect.x = (left / 16) * 16;
+                rect.y = (top / 16) * 16;
+                rect.width = ((right + 16) / 16) * 16 - rect.x;
+                rect.height = ((bottom + 16) / 16) * 16 - rect.y;
+
+                // Found valid dirty rect.
+                // 1. Insert it in the sorted array of the dirty rects.
+                // 2. Mark the related dirty rects as visited so they will not be removed below.
+                // 3. Keep only last 3 dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
+                dirtyRect.rect = rect;
+                auto dirtyRectPos = std::lower_bound(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end(), dirtyRect);
+                dirtyRectPos = mImpl->itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+
+                int c = 1;
+                while (++dirtyRectPos != mImpl->itemsDirtyRects.end())
+                {
+                  if (dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
+                  {
+                    break;
+                  }
+
+                  dirtyRectPos->visited = true;
+                  Rect<int>& dirtRect = dirtyRectPos->rect;
+                  rect.Merge(dirtRect);
+
+                  c++;
+                  if (c > 3) // no more then 3 previous rects
+                  {
+                    mImpl->itemsDirtyRects.erase(dirtyRectPos);
+                    break;
+                  }
+                }
+
+                damagedRects.push_back(rect);
+              }
+            }
+            else
+            {
+              // 1. The item is not dirty, the node and renderer referenced by the item are still exist.
+              // 2. Mark the related dirty rects as visited so they will not be removed below.
+              auto dirtyRectPos = std::lower_bound(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end(), dirtyRect);
+              while (dirtyRectPos != mImpl->itemsDirtyRects.end())
+              {
+                if (dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
+                {
+                  break;
+                }
+
+                dirtyRectPos->visited = true;
+                dirtyRectPos++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check removed nodes or removed renderers dirty rects
+  auto i = mImpl->itemsDirtyRects.begin();
+  auto j = mImpl->itemsDirtyRects.begin();
+  while (i != mImpl->itemsDirtyRects.end())
+  {
+    if (i->visited)
+    {
+      *j++ = *i;
+    }
+    else
+    {
+      Rect<int>& dirtRect = i->rect;
+      damagedRects.push_back(dirtRect);
+    }
+    i++;
+  }
+
+  mImpl->itemsDirtyRects.resize(j - mImpl->itemsDirtyRects.begin());
+  damagedRectCleaner.SetCleanOnReturn(false);
+}
 
 void RenderManager::RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
+{
+  Rect<int> clippingRect;
+  RenderScene( status, scene, renderToFbo, clippingRect);
+}
+
+void RenderManager::RenderScene( Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect )
 {
   Internal::Scene& sceneInternal = GetImplementation( scene );
   SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
@@ -723,26 +1002,45 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
       clearFullFrameRect = ( surfaceRect == viewportRect );
     }
 
+    if (!clippingRect.IsEmpty())
+    {
+      if (!clippingRect.Intersect(viewportRect))
+      {
+        DALI_LOG_ERROR("Invalid clipping rect %d %d %d %d\n", clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
+        clippingRect = Rect<int>();
+      }
+      clearFullFrameRect = false;
+    }
+
     mImpl->currentContext->Viewport(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
 
-    if( instruction.mIsClearColorSet )
+    if (instruction.mIsClearColorSet)
     {
-      mImpl->currentContext->ClearColor( clearColor.r,
-                                         clearColor.g,
-                                         clearColor.b,
-                                         clearColor.a );
-
-      if( !clearFullFrameRect )
+      mImpl->currentContext->ClearColor(clearColor.r,
+                                        clearColor.g,
+                                        clearColor.b,
+                                        clearColor.a);
+      if (!clearFullFrameRect)
       {
-        mImpl->currentContext->SetScissorTest( true );
-        mImpl->currentContext->Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
-        mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
-        mImpl->currentContext->SetScissorTest( false );
+        if (!clippingRect.IsEmpty())
+        {
+          mImpl->currentContext->SetScissorTest(true);
+          mImpl->currentContext->Scissor(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
+          mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
+          mImpl->currentContext->SetScissorTest(false);
+        }
+        else
+        {
+          mImpl->currentContext->SetScissorTest(true);
+          mImpl->currentContext->Scissor(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+          mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
+          mImpl->currentContext->SetScissorTest(false);
+        }
       }
       else
       {
-        mImpl->currentContext->SetScissorTest( false );
-        mImpl->currentContext->Clear( clearMask, Context::FORCE_CLEAR );
+        mImpl->currentContext->SetScissorTest(false);
+        mImpl->currentContext->Clear(clearMask, Context::FORCE_CLEAR);
       }
     }
 
@@ -755,7 +1053,8 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
         mImpl->renderBufferIndex,
         depthBufferAvailable,
         stencilBufferAvailable,
-        mImpl->boundTextures );
+        mImpl->boundTextures,
+        clippingRect );
 
     // Synchronise the FBO/Texture access when there are multiple contexts
     if ( mImpl->currentContext->IsSurfacelessContextSupported() )

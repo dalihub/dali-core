@@ -160,6 +160,23 @@ public:
     return mCustomProperties;
   }
 
+  /**
+   * Mark an property owner with the updated flag.
+   * @param[in] updated The updated flag
+   */
+  virtual void SetUpdated(bool updated)
+  {
+    mUpdated = updated;
+  }
+
+  /**
+   * Retrieve if the property owner is updated due to the property is being animating.
+   * @return An updated flag
+   */
+  bool Updated()
+  {
+    return mUpdated;
+  }
 
   // Constraints
 
@@ -226,6 +243,7 @@ protected:
 
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
   UniformMap mUniformMaps; ///< Container of owned uniform maps
+  bool mUpdated;
 
 private:
 

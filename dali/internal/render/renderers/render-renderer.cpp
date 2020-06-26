@@ -25,6 +25,7 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
+#include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/common/render-instruction.h>
 
 namespace Dali
@@ -137,6 +138,7 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mGeometry( geometry ),
   mUniformIndexMap(),
   mAttributesLocation(),
+  mUniformsHash(),
   mStencilParameters( stencilParameters ),
   mBlendingOptions(),
   mIndexedDrawFirstElement( 0 ),
@@ -147,7 +149,8 @@ Renderer::Renderer( SceneGraph::RenderDataProvider* dataProvider,
   mDepthTestMode( depthTestMode ),
   mUpdateAttributesLocation( true ),
   mPremultipledAlphaEnabled( preMultipliedAlphaEnabled ),
-  mShaderChanged( false )
+  mShaderChanged( false ),
+  mUpdated( true )
 {
   if( blendingBitmask != 0u )
   {
@@ -198,6 +201,8 @@ void Renderer::SetBlending( Context& context, bool blend )
     context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
                                    mBlendingOptions.GetBlendEquationAlpha() );
   }
+
+  mUpdated = true;
 }
 
 void Renderer::GlContextDestroyed()
@@ -376,41 +381,49 @@ bool Renderer::BindTextures( Context& context, Program& program, Vector<GLuint>&
 void Renderer::SetFaceCullingMode( FaceCullingMode::Type mode )
 {
   mFaceCullingMode =  mode;
+  mUpdated = true;
 }
 
 void Renderer::SetBlendingBitMask( uint32_t bitmask )
 {
   mBlendingOptions.SetBitmask( bitmask );
+  mUpdated = true;
 }
 
 void Renderer::SetBlendColor( const Vector4& color )
 {
   mBlendingOptions.SetBlendColor( color );
+  mUpdated = true;
 }
 
 void Renderer::SetIndexedDrawFirstElement( uint32_t firstElement )
 {
   mIndexedDrawFirstElement = firstElement;
+  mUpdated = true;
 }
 
 void Renderer::SetIndexedDrawElementsCount( uint32_t elementsCount )
 {
   mIndexedDrawElementsCount = elementsCount;
+  mUpdated = true;
 }
 
 void Renderer::EnablePreMultipliedAlpha( bool enable )
 {
   mPremultipledAlphaEnabled = enable;
+  mUpdated = true;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
 {
   mDepthWriteMode = depthWriteMode;
+  mUpdated = true;
 }
 
 void Renderer::SetDepthTestMode( DepthTestMode::Type depthTestMode )
 {
   mDepthTestMode = depthTestMode;
+  mUpdated = true;
 }
 
 DepthWriteMode::Type Renderer::GetDepthWriteMode() const
@@ -426,6 +439,7 @@ DepthTestMode::Type Renderer::GetDepthTestMode() const
 void Renderer::SetDepthFunction( DepthFunction::Type depthFunction )
 {
   mDepthFunction = depthFunction;
+  mUpdated = true;
 }
 
 DepthFunction::Type Renderer::GetDepthFunction() const
@@ -436,6 +450,7 @@ DepthFunction::Type Renderer::GetDepthFunction() const
 void Renderer::SetRenderMode( RenderMode::Type renderMode )
 {
   mStencilParameters.renderMode = renderMode;
+  mUpdated = true;
 }
 
 RenderMode::Type Renderer::GetRenderMode() const
@@ -446,6 +461,7 @@ RenderMode::Type Renderer::GetRenderMode() const
 void Renderer::SetStencilFunction( StencilFunction::Type stencilFunction )
 {
   mStencilParameters.stencilFunction = stencilFunction;
+  mUpdated = true;
 }
 
 StencilFunction::Type Renderer::GetStencilFunction() const
@@ -456,6 +472,7 @@ StencilFunction::Type Renderer::GetStencilFunction() const
 void Renderer::SetStencilFunctionMask( int stencilFunctionMask )
 {
   mStencilParameters.stencilFunctionMask = stencilFunctionMask;
+  mUpdated = true;
 }
 
 int Renderer::GetStencilFunctionMask() const
@@ -466,6 +483,7 @@ int Renderer::GetStencilFunctionMask() const
 void Renderer::SetStencilFunctionReference( int stencilFunctionReference )
 {
   mStencilParameters.stencilFunctionReference = stencilFunctionReference;
+  mUpdated = true;
 }
 
 int Renderer::GetStencilFunctionReference() const
@@ -476,6 +494,7 @@ int Renderer::GetStencilFunctionReference() const
 void Renderer::SetStencilMask( int stencilMask )
 {
   mStencilParameters.stencilMask = stencilMask;
+  mUpdated = true;
 }
 
 int Renderer::GetStencilMask() const
@@ -486,6 +505,7 @@ int Renderer::GetStencilMask() const
 void Renderer::SetStencilOperationOnFail( StencilOperation::Type stencilOperationOnFail )
 {
   mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
+  mUpdated = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnFail() const
@@ -496,6 +516,7 @@ StencilOperation::Type Renderer::GetStencilOperationOnFail() const
 void Renderer::SetStencilOperationOnZFail( StencilOperation::Type stencilOperationOnZFail )
 {
   mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
+  mUpdated = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnZFail() const
@@ -506,6 +527,7 @@ StencilOperation::Type Renderer::GetStencilOperationOnZFail() const
 void Renderer::SetStencilOperationOnZPass( StencilOperation::Type stencilOperationOnZPass )
 {
   mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
+  mUpdated = true;
 }
 
 StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
@@ -609,6 +631,8 @@ void Renderer::Render( Context& context,
                      mAttributesLocation,
                      mIndexedDrawFirstElement,
                      mIndexedDrawElementsCount );
+
+    mUpdated = false;
   }
 }
 
@@ -622,6 +646,51 @@ void Renderer::SetSortAttributes( BufferIndex bufferIndex,
 void Renderer::SetShaderChanged( bool value )
 {
   mShaderChanged = value;
+}
+
+bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider* node)
+{
+  if (mUpdated)
+  {
+    mUpdated = false;
+    return true;
+  }
+
+  if (mShaderChanged || mUpdateAttributesLocation || mGeometry->AttributesChanged())
+  {
+    return true;
+  }
+
+  std::vector<Render::Texture*> textures = mRenderDataProvider->GetTextures();
+  for (Render::Texture* texture : textures)
+  {
+    if (texture && texture->IsNativeImage())
+    {
+      return true;
+    }
+  }
+
+  uint64_t hash = 0xc70f6907UL;
+  const SceneGraph::CollectedUniformMap& uniformMapNode = node->GetUniformMap( bufferIndex );
+  for (const auto* uniformProperty : uniformMapNode)
+  {
+    hash = uniformProperty->propertyPtr->Hash(bufferIndex, hash);
+  }
+
+  const SceneGraph::UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
+  const SceneGraph::CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
+  for (const auto* uniformProperty : uniformMap)
+  {
+    hash = uniformProperty->propertyPtr->Hash(bufferIndex, hash);
+  }
+
+  if (mUniformsHash != hash)
+  {
+    mUniformsHash = hash;
+    return true;
+  }
+
+  return false;
 }
 
 } // namespace SceneGraph
