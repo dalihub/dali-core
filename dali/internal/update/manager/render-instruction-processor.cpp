@@ -184,6 +184,10 @@ inline void AddRendererToRenderList(BufferIndex updateBufferIndex,
       item.mIsOpaque = (opacityType == Renderer::OPAQUE);
       item.mIsUpdated |= (prevIsOpaque != item.mIsOpaque);
 
+      Vector4 prevColor = item.mColor;
+      item.mColor = renderable.mNode->GetColor(updateBufferIndex);
+      item.mIsUpdated |= (prevColor != item.mColor);
+
       int prevDepthIndex = item.mDepthIndex;
       item.mDepthIndex = 0;
       if (!isLayer3d)

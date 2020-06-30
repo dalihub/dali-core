@@ -7649,6 +7649,12 @@ int utcDaliActorPartialUpdateSetColor(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
   // 2. Set new color
   actor.SetProperty(Actor::Property::COLOR, Vector3(1.0f, 0.0f, 0.0f));
   application.SendNotification();
