@@ -97,19 +97,6 @@ public:
   static FrameBuffer New( uint32_t width, uint32_t height, Attachment::Mask attachments );
 
   /**
-   * @DEPRECATED_1_4.0 use New( uint32_t width, uint32_t height ) or New( uint32_t width, uint32_t height, Attachment::Mask attachments ) instead
-   * @brief Creates a new FrameBuffer object.
-   *
-   * @SINCE_1_1.43
-   *
-   * @param[in] width The width of the FrameBuffer
-   * @param[in] height The height of the FrameBuffer
-   * @param[in] attachments The attachments comprising the format of the FrameBuffer (the type is int to allow multiple bitmasks to be ORd)
-   * @return A handle to a newly allocated FrameBuffer
-   */
-  static FrameBuffer New( uint32_t width, uint32_t height, uint32_t attachments );
-
-  /**
    * @brief Default constructor, creates an empty handle.
    */
   FrameBuffer();
