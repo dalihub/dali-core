@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
 
@@ -2034,3 +2035,56 @@ int UtcDaliTouchDataGetMouseButtonNagative(void)
   END_TEST;
 }
 
+int UtcDaliTouchDataCapturePropertySet(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchDataFunctor functor( data );
+  actor.TouchSignal().Connect( &application, functor );
+
+  // Emit a down signal
+  application.ProcessEvent( GenerateSingleTouch( PointState::STARTED, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Now motion outside of actor, we should not receive the event
+  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 110.0f, 110.0f ) ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Up event, should receive an interrupted
+  application.ProcessEvent( GenerateSingleTouch( PointState::FINISHED, Vector2( 110.0f, 110.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.touchData.GetPoint(0).state, PointState::INTERRUPTED, TEST_LOCATION );
+
+  // Now set the capture property
+  actor.SetProperty( DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
+
+  // Emit a down signal
+  application.ProcessEvent( GenerateSingleTouch( PointState::STARTED, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Now motion outside of actor, we now SHOULD receive the event
+  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 110.0f, 110.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Up event, we should receive it again, but as ended rather than interrupted
+  application.ProcessEvent( GenerateSingleTouch( PointState::FINISHED, Vector2( 110.0f, 110.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.touchData.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION );
+
+  END_TEST;
+}
