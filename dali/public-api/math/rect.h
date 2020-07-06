@@ -168,6 +168,7 @@ struct Rect
   /**
    * @brief Determines whether or not this Rectangle is valid.
    *
+   * @SINCE_1_9.18
    * @return True if width and height are not negative
    */
   bool IsValid() const
@@ -246,7 +247,9 @@ struct Rect
    * @brief Intersects this rectangle and the specified rectangle.
    * The result of the intersection is stored in this rectangle.
    *
+   * @SINCE_1_9.18
    * @param[in] rect The other rectangle to intersect with
+   * @return True if the rectangles intersect
    */
   bool Intersect(const Rect<T>& rect)
   {
@@ -273,6 +276,7 @@ struct Rect
    * @brief Merges this rectangle and the specified rectangle.
    * The result of the merge is stored in this rectangle.
    *
+   * @SINCE_1_9.18
    * @param[in] rect The other rectangle to merge with
    */
   void Merge(const Rect<T>& rect)
@@ -291,6 +295,7 @@ struct Rect
    * @brief Inset the rectangle by (dx,dy). If dx is positive, then the sides are moved inwards.
    * If dx is negative, then the sides are moved outwards.
    * The result of the inset is stored in this rectangle.
+   * @SINCE_1_9.18
    */
   void Inset(T dx, T dy)
   {
