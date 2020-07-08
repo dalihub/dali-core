@@ -83,6 +83,16 @@ int UtcDaliVector2Constructor05P(void)
   END_TEST;
 }
 
+int UtcDaliVector2ConstructorUint16PairP(void)
+{
+  TestApplication application;
+  Uint16Pair pair( 20, 30 );
+  Vector2 vec2(pair);
+  DALI_TEST_EQUALS(vec2.x, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec2.y, 30.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliVector2CopyConstructor01P(void)
 {
   TestApplication application;
