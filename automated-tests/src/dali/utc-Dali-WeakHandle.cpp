@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,18 +206,22 @@ int UtcDaliWeakHandleBaseConstructorVoid(void)
   END_TEST;
 }
 
-int UtcDaliWeakHandleBaseConstructorWithHandle(void)
+int UtcDaliWeakHandleBaseConstructorWithBaseHandle(void)
 {
   TestApplication application;
-  tet_infoline("Testing Dali::WeakHandleBase::WeakHandleBase(Handle)");
+  tet_infoline("Testing Dali::WeakHandleBase::WeakHandleBase(BaseHandle)");
 
-  Handle emptyHandle;
+  BaseHandle emptyHandle;
   WeakHandleBase emptyObject(emptyHandle);
   DALI_TEST_CHECK(!emptyObject.GetBaseHandle());
 
   Actor actor = Actor::New();
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
+
+  Animation animation = Animation::New( 1.0f );
+  WeakHandleBase animationObject( animation );
+  DALI_TEST_CHECK( animationObject.GetBaseHandle() == animation );
 
   END_TEST;
 }
@@ -352,6 +356,17 @@ int UtcDaliWeakHandleBaseGetBaseHandle(void)
   WeakHandleBase aDifferentWeakHandleBase(differentActor);
   DALI_TEST_CHECK(object.GetBaseHandle() != aDifferentWeakHandleBase.GetBaseHandle());
 
+  Animation animation = Animation::New( 1.0f );
+  WeakHandleBase animationObject( animation );
+  DALI_TEST_CHECK( animationObject.GetBaseHandle() == animation );
+
+  WeakHandleBase theSameAnimationObject = WeakHandleBase( animation );
+  DALI_TEST_CHECK( animationObject.GetBaseHandle() == theSameAnimationObject.GetBaseHandle() );
+
+  Animation differentAnimation = Animation::New( 1.0f );
+  WeakHandleBase aDifferentAnimationObject( differentAnimation );
+  DALI_TEST_CHECK( animationObject.GetBaseHandle() != aDifferentAnimationObject.GetBaseHandle() );
+
   END_TEST;
 }
 
@@ -387,8 +402,14 @@ int UtcDaliWeakHandleGetHandle(void)
 
   DALI_TEST_CHECK(object.GetHandle() != customObject.GetHandle());
 
+  Animation animation = Animation::New( 1.0f );
+  WeakHandle<Animation>  animationObject( animation );
+  DALI_TEST_CHECK( animationObject.GetHandle() == animation );
+
+  animation.Reset();
+  DALI_TEST_CHECK( animationObject.GetHandle() == Animation() );
+
   END_TEST;
 }
-
 
 

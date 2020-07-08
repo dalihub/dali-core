@@ -26,6 +26,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/animation/linear-constrainer-impl.cpp
   ${internal_src_dir}/event/animation/path-impl.cpp
   ${internal_src_dir}/event/animation/path-constrainer-impl.cpp
+  ${internal_src_dir}/event/common/base-object-impl.cpp
   ${internal_src_dir}/event/common/event-thread-services.cpp
   ${internal_src_dir}/event/common/notification-manager.cpp
   ${internal_src_dir}/event/common/object-impl.cpp
