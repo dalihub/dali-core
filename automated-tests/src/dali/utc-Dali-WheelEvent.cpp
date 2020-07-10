@@ -216,7 +216,7 @@ int UtcDaliWheelEventSignalling(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -243,7 +243,7 @@ int UtcDaliWheelEventSignalling(void)
   data.Reset();
 
   // Emit a wheel signal where the actor is not present, will hit the root actor though
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   // Connect to root actor's wheel event signal
   SignalData rootData;
@@ -263,8 +263,8 @@ int UtcDaliWheelEventSignalling(void)
   DALI_TEST_EQUALS(1, rootData.receivedWheelEvent.z, TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(1000u, rootData.receivedWheelEvent.timeStamp, TEST_LOCATION); // check modifier
 
-  // Remove actor from stage
-  Stage::GetCurrent().Remove( actor );
+  // Remove actor from the scene
+  application.GetScene().Remove( actor );
 
   // Render and notify
   application.SendNotification();

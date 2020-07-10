@@ -302,7 +302,7 @@ int UtcDaliTouchDataNormalProcessing01(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -366,7 +366,7 @@ int UtcDaliTouchDataNormalProcessing02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -400,7 +400,7 @@ int UtcDaliTouchDataAPINegative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -433,21 +433,21 @@ int UtcDaliTouchDataOutsideCameraNearFarPlanes(void)
 {
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
-  Vector2 stageSize = stage.GetSize();
+  Integration::Scene scene = application.GetScene();
+  Vector2 sceneSize = scene.GetSize();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  stage.Add(actor);
+  scene.Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Get the camera's near and far planes
-  RenderTaskList taskList = stage.GetRenderTaskList();
+  RenderTaskList taskList = scene.GetRenderTaskList();
   Dali::RenderTask task = taskList.GetTask(0);
   CameraActor camera = task.GetCameraActor();
   float nearPlane = camera.GetNearClippingPlane();
@@ -455,14 +455,14 @@ int UtcDaliTouchDataOutsideCameraNearFarPlanes(void)
 
   // Calculate the current distance of the actor from the camera
   float tanHalfFov = tanf(camera.GetFieldOfView() * 0.5f);
-  float distance = (stageSize.y * 0.5f) / tanHalfFov;
+  float distance = (sceneSize.y * 0.5f) / tanHalfFov;
 
   // Connect to actor's touched signal
   SignalData data;
   TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
-  Vector2 screenCoordinates( stageSize.x * 0.5f, stageSize.y * 0.5f );
+  Vector2 screenCoordinates( sceneSize.x * 0.5f, sceneSize.y * 0.5f );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
@@ -540,7 +540,7 @@ int UtcDaliTouchDataInterrupted(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -572,12 +572,12 @@ int UtcDaliTouchDataInterrupted(void)
 int UtcDaliTouchDataParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -672,12 +672,12 @@ int UtcDaliTouchDataParentConsumer(void)
 int UtcDaliTouchDataInterruptedParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -724,8 +724,8 @@ int UtcDaliTouchDataInterruptedParentConsumer(void)
   data.Reset();
   rootData.Reset();
 
-  // Remove actor from Stage
-  Stage::GetCurrent().Remove( actor );
+  // Remove actor from scene
+  application.GetScene().Remove( actor );
   data.Reset();
   rootData.Reset();
 
@@ -756,7 +756,7 @@ int UtcDaliTouchDataLeave(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -806,12 +806,12 @@ int UtcDaliTouchDataLeave(void)
 int UtcDaliTouchDataLeaveParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -877,8 +877,8 @@ int UtcDaliTouchDataLeaveParentConsumer(void)
   actor.SetProperty( Actor::Property::LEAVE_REQUIRED, false );
 
   // Another motion event outside of root actor, only root signalled
-  Vector2 stageSize( Stage::GetCurrent().GetSize() );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( stageSize.width + 10.0f, stageSize.height + 10.0f )) );
+  Vector2 sceneSize( application.GetScene().GetSize() );
+  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( sceneSize.width + 10.0f, sceneSize.height + 10.0f )) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( PointState::LEAVE, rootData.touchData.points[0].state, TEST_LOCATION );
@@ -892,7 +892,7 @@ int UtcDaliTouchDataActorBecomesInsensitive(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -923,12 +923,12 @@ int UtcDaliTouchDataActorBecomesInsensitive(void)
 int UtcDaliTouchDataActorBecomesInsensitiveParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -974,7 +974,7 @@ int UtcDaliTouchDataActorBecomesInsensitiveParentConsumer(void)
 int UtcDaliTouchDataMultipleLayers(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   // Connect to actor's touched signal
   SignalData data;
@@ -983,7 +983,7 @@ int UtcDaliTouchDataMultipleLayers(void)
   Layer layer1 ( Layer::New() );
   layer1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer1 );
+  application.GetScene().Add( layer1 );
 
   Actor actor1 ( Actor::New() );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1032,7 +1032,7 @@ int UtcDaliTouchDataMultipleLayers(void)
   layer2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   layer2.SetProperty( Actor::Property::POSITION_Z,  10.0f ); // Should hit layer2 in this layer rather than actor2
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
 
   Actor actor2 ( Actor::New() );
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1093,17 +1093,17 @@ int UtcDaliTouchDataMultipleLayers(void)
 int UtcDaliTouchDataMultipleRenderTasks(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
-  Vector2 stageSize ( stage.GetSize() );
+  Integration::Scene scene ( application.GetScene() );
+  Vector2 sceneSize ( scene.GetSize() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  stage.Add(actor);
+  scene.Add(actor);
 
   // Create render task
-  Viewport viewport( stageSize.width * 0.5f, stageSize.height * 0.5f, stageSize.width * 0.5f, stageSize.height * 0.5f );
-  RenderTask renderTask ( Stage::GetCurrent().GetRenderTaskList().CreateTask() );
+  Viewport viewport( sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f );
+  RenderTask renderTask ( application.GetScene().GetRenderTaskList().CreateTask() );
   renderTask.SetViewport( viewport );
   renderTask.SetInputEnabled( true );
 
@@ -1137,13 +1137,13 @@ int UtcDaliTouchDataMultipleRenderTasks(void)
 int UtcDaliTouchDataMultipleRenderTasksWithChildLayer(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
-  Vector2 stageSize ( stage.GetSize() );
+  Integration::Scene scene ( application.GetScene() );
+  Vector2 sceneSize ( scene.GetSize() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  stage.Add(actor);
+  scene.Add(actor);
 
   Layer layer = Layer::New();
   layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1151,8 +1151,8 @@ int UtcDaliTouchDataMultipleRenderTasksWithChildLayer(void)
   actor.Add(layer);
 
   // Create render task
-  Viewport viewport( stageSize.width * 0.5f, stageSize.height * 0.5f, stageSize.width * 0.5f, stageSize.height * 0.5f );
-  RenderTask renderTask ( Stage::GetCurrent().GetRenderTaskList().CreateTask() );
+  Viewport viewport( sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f );
+  RenderTask renderTask ( application.GetScene().GetRenderTaskList().CreateTask() );
   renderTask.SetViewport( viewport );
   renderTask.SetInputEnabled( true );
   renderTask.SetSourceActor( actor );
@@ -1188,35 +1188,35 @@ int UtcDaliTouchDataMultipleRenderTasksWithChildLayer(void)
 int UtcDaliTouchDataOffscreenRenderTasks(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
-  Vector2 stageSize ( stage.GetSize() );
+  Integration::Scene scene ( application.GetScene() );
+  Vector2 sceneSize ( scene.GetSize() );
 
   // FrameBufferImage for offscreen RenderTask
-  FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height);
+  FrameBuffer frameBuffer = FrameBuffer::New(sceneSize.width, sceneSize.height);
 
   // Create a renderable actor to display the FrameBufferImage
   Actor renderableActor = CreateRenderableActor(frameBuffer.GetColorTexture());
   renderableActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  renderableActor.SetProperty( Actor::Property::SIZE, Vector2( stageSize.x, stageSize.y ) );
+  renderableActor.SetProperty( Actor::Property::SIZE, Vector2( sceneSize.x, sceneSize.y ) );
   renderableActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
-  stage.Add( renderableActor );
+  scene.Add( renderableActor );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  stage.Add( actor );
+  scene.Add( actor );
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE ); // Ensure framebuffer connects
 
-  stage.GetRenderTaskList().GetTask( 0u ).SetScreenToFrameBufferFunction( RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION );
+  scene.GetRenderTaskList().GetTask( 0u ).SetScreenToFrameBufferFunction( RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION );
 
   // Create a RenderTask
-  RenderTask renderTask = stage.GetRenderTaskList().CreateTask();
+  RenderTask renderTask = scene.GetRenderTaskList().CreateTask();
   renderTask.SetSourceActor( actor );
   renderTask.SetFrameBuffer(frameBuffer);
   renderTask.SetInputEnabled( true );
 
   // Create another RenderTask
-  RenderTask renderTask2( stage.GetRenderTaskList().CreateTask() );
+  RenderTask renderTask2( scene.GetRenderTaskList().CreateTask() );
   renderTask2.SetInputEnabled( true );
 
   // Render and notify
@@ -1238,13 +1238,13 @@ int UtcDaliTouchDataOffscreenRenderTasks(void)
 int UtcDaliTouchDataMultipleRenderableActors(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
-  Vector2 stageSize ( stage.GetSize() );
+  Integration::Scene scene ( application.GetScene() );
+  Vector2 sceneSize ( scene.GetSize() );
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  stage.Add(parent);
+  scene.Add(parent);
 
   Actor actor = CreateRenderableActor();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1275,7 +1275,7 @@ int UtcDaliTouchDataActorRemovedInSignal(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1295,7 +1295,7 @@ int UtcDaliTouchDataActorRemovedInSignal(void)
   data.Reset();
 
   // Re-add, render and notify
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
 
@@ -1318,8 +1318,8 @@ int UtcDaliTouchDataActorRemovedInSignal(void)
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
-  // Re-add actor back to stage, render and notify
-  Stage::GetCurrent().Add(actor);
+  // Re-add actor back to scene, render and notify
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
 
@@ -1344,7 +1344,7 @@ int UtcDaliTouchDataActorSignalNotConsumed(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1361,14 +1361,14 @@ int UtcDaliTouchDataActorSignalNotConsumed(void)
   END_TEST;
 }
 
-int UtcDaliTouchDataActorUnStaged(void)
+int UtcDaliTouchDataActorRemovedFromScene(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1384,8 +1384,8 @@ int UtcDaliTouchDataActorUnStaged(void)
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
-  // Remove actor from stage
-  Stage::GetCurrent().Remove( actor );
+  // Remove actor from scene
+  application.GetScene().Remove( actor );
   data.Reset();
 
   // Render and notify
@@ -1406,7 +1406,7 @@ int UtcDaliTouchDataLayerConsumesTouch(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1421,7 +1421,7 @@ int UtcDaliTouchDataLayerConsumesTouch(void)
   Layer layer = Layer::New();
   layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.RaiseToTop();
 
   // Render and notify
@@ -1453,12 +1453,12 @@ int UtcDaliTouchDataLayerConsumesTouch(void)
 int UtcDaliTouchDataLeaveActorReadded(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  stage.Add(actor);
+  scene.Add(actor);
 
   // Set actor to receive touch-events
   actor.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
@@ -1478,9 +1478,9 @@ int UtcDaliTouchDataLeaveActorReadded(void)
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
-  // Remove actor from stage and add again
-  stage.Remove( actor );
-  stage.Add( actor );
+  // Remove actor from scene and add again
+  scene.Remove( actor );
+  scene.Add( actor );
 
   // Emit a motion within the actor's bounds
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 12.0f, 10.0f ) ) );
@@ -1499,18 +1499,18 @@ int UtcDaliTouchDataLeaveActorReadded(void)
 int UtcDaliTouchDataClippedActor(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  stage.Add( actor );
+  scene.Add( actor );
 
   Actor clippingActor = Actor::New();
   clippingActor.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
   clippingActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   clippingActor.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  stage.Add( clippingActor );
+  scene.Add( clippingActor );
 
   // Add a child to the clipped region.
   Actor clippingChild = Actor::New();
@@ -1548,14 +1548,14 @@ int UtcDaliTouchDataClippedActor(void)
   END_TEST;
 }
 
-int UtcDaliTouchDataActorUnstaged(void)
+int UtcDaliTouchDataActorUnparented(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1586,14 +1586,14 @@ int UtcDaliTouchDataActorUnstaged(void)
   END_TEST;
 }
 
-int UtcDaliTouchDataParentUnstaged(void)
+int UtcDaliTouchDataParentRemovedFromScene(void)
 {
   TestApplication application;
 
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1629,14 +1629,14 @@ int UtcDaliTouchDataParentUnstaged(void)
   END_TEST;
 }
 
-int UtcDaliTouchDataActorUnstagedDifferentConsumer(void)
+int UtcDaliTouchDataActorRemovedFromSceneDifferentConsumer(void)
 {
   TestApplication application;
 
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1724,12 +1724,12 @@ int UtcDaliTouchDataActorUnstagedDifferentConsumer(void)
 int UtcDaliTouchDataInterruptedDifferentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1800,7 +1800,7 @@ int UtcDaliTouchDataGetRadius(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1831,7 +1831,7 @@ int UtcDaliTouchDataGetEllipseRadius(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1862,7 +1862,7 @@ int UtcDaliTouchDataGetAngle(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1891,7 +1891,7 @@ int UtcDaliTouchDataGetPressure(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1920,7 +1920,7 @@ int UtcDaliTouchDataAndEventUsage(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1951,7 +1951,7 @@ int UtcDaliTouchDataGetDeviceAPINegative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1982,7 +1982,7 @@ int UtcDaliTouchDataGetMouseButtonPositive(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -2011,7 +2011,7 @@ int UtcDaliTouchDataGetMouseButtonNagative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();

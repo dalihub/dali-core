@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ int UtcDaliPanGestureRecognizerBasicNoAction(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -152,7 +152,7 @@ int UtcDaliPanGestureRecognizerBasic(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -184,7 +184,7 @@ int UtcDaliPanGestureRecognizerBasicInterrupted(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -216,7 +216,7 @@ int UtcDaliPanGestureRecognizerBasicShortest(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -248,7 +248,7 @@ int UtcDaliPanGestureRecognizerBasicFailToStart(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -280,7 +280,7 @@ int UtcDaliPanGestureRecognizerBasicStationary(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -317,7 +317,7 @@ int UtcDaliPanGestureRecognizerNewParametersFail(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -352,7 +352,7 @@ int UtcDaliPanGestureRecognizerNewParametersSuccess(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -387,7 +387,7 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches01(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -423,7 +423,7 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -459,7 +459,7 @@ int UtcDaliPanGestureRecognizerNewParametersNoStart(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -494,7 +494,7 @@ int UtcDaliPanGestureRecognizerNewParametersSlowRelease(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -529,7 +529,7 @@ int UtcDaliPanGestureRecognizerOtherEvent(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -563,7 +563,7 @@ int UtcDaliPanGestureRecognizerSlowMoving(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -601,7 +601,7 @@ int UtcDaliPanGestureRecognizerNewParamsMinNum(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -638,7 +638,7 @@ int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();

@@ -95,7 +95,7 @@ int UtcDaliContextVertexAttribImageRendering(void)
 
   // create a test bitmap actor
   Actor actor(CreateBitmapActor());
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
 
   application.SendNotification();

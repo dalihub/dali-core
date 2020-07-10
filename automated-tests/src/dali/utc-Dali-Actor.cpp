@@ -369,7 +369,7 @@ int UtcDaliActorIsRoot(void)
   DALI_TEST_CHECK(!actor.GetProperty< bool >( Actor::Property::IS_ROOT ));
 
   // get the root layer
-  actor = Stage::GetCurrent().GetLayer( 0 );
+  actor = application.GetScene().GetLayer( 0 );
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::IS_ROOT ) );
   END_TEST;
 }
@@ -382,7 +382,7 @@ int UtcDaliActorOnStage(void)
   DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   // get the root layer
-  actor = Stage::GetCurrent().GetLayer( 0 );
+  actor = application.GetScene().GetLayer( 0 );
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
@@ -395,7 +395,7 @@ int UtcDaliActorIsLayer(void)
   DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::IS_LAYER ) );
 
   // get the root layer
-  actor = Stage::GetCurrent().GetLayer( 0 );
+  actor = application.GetScene().GetLayer( 0 );
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::IS_LAYER ) );
   END_TEST;
 }
@@ -405,13 +405,13 @@ int UtcDaliActorGetLayer(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   Layer layer = actor.GetLayer();
 
   DALI_TEST_CHECK(layer);
 
   // get the root layers layer
-  actor = Stage::GetCurrent().GetLayer( 0 );
+  actor = application.GetScene().GetLayer( 0 );
   DALI_TEST_CHECK( actor.GetLayer() );
   END_TEST;
 }
@@ -485,7 +485,7 @@ int UtcDaliActorAddN(void)
   // try reparenting root
   try
   {
-    parent2.Add( Stage::GetCurrent().GetLayer( 0 ) );
+    parent2.Add( application.GetScene().GetLayer( 0 ) );
     tet_printf("Assertion test failed - no Exception\n" );
     tet_result(TET_FAIL);
   }
@@ -580,7 +580,7 @@ int UtcDaliActorRemoveP(void)
   Actor child = Actor::New();
   Actor random = Actor::New();
 
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   DALI_TEST_CHECK(parent.GetChildCount() == 0);
 
@@ -592,7 +592,7 @@ int UtcDaliActorRemoveP(void)
 
   DALI_TEST_CHECK(parent.GetChildCount() == 1);
 
-  Stage::GetCurrent().Remove( parent );
+  application.GetScene().Remove( parent );
 
   DALI_TEST_CHECK(parent.GetChildCount() == 1);
   END_TEST;
@@ -681,7 +681,7 @@ int UtcDaliActorCustomProperty(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   float startValue(1.0f);
   Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
@@ -704,7 +704,7 @@ int UtcDaliActorCustomPropertyIntToFloat(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   float startValue(5.0f);
   Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
@@ -727,7 +727,7 @@ int UtcDaliActorCustomPropertyFloatToInt(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   int startValue(5);
   Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
@@ -762,7 +762,7 @@ int UtcDaliActorSetParentOrigin(void)
 
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ));
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.1f, 0.2f, 0.3f ) );
 
@@ -772,7 +772,7 @@ int UtcDaliActorSetParentOrigin(void)
 
   DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -848,7 +848,7 @@ int UtcDaliActorSetAnchorPoint(void)
 
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.SetProperty( Actor::Property::ANCHOR_POINT, Vector3( 0.1f, 0.2f, 0.3f ) );
   // flush the queue and render once
@@ -857,7 +857,7 @@ int UtcDaliActorSetAnchorPoint(void)
 
   DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1061,7 +1061,7 @@ int UtcDaliActorSetSize04(void)
   // Check the size in the new frame
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.SetProperty( Actor::Property::SIZE, Vector3( 0.1f, 0.2f, 0.3f ) );
 
   // Immediately check the size after setting
@@ -1078,7 +1078,7 @@ int UtcDaliActorSetSize04(void)
   currentSize = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
   DALI_TEST_EQUALS( currentSize, Vector3( 0.1f, 0.2f, 0.3f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1172,7 +1172,7 @@ int UtcDaliActorSetSizeIndividual02(void)
 
   Actor actor = Actor::New();
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Vector3 vector( 100.0f, 200.0f, 400.0f );
   DALI_TEST_CHECK( vector != actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) );
@@ -1290,7 +1290,7 @@ int UtcDaliActorCalculateScreenExtents(void)
   DALI_TEST_EQUALS( expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
   DALI_TEST_EQUALS( expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1314,7 +1314,7 @@ int UtcDaliActorSetPosition01(void)
   application.Render();
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ));
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.SetProperty( Actor::Property::POSITION, Vector3( 0.1f, 0.2f, 0.3f ) );
   // flush the queue and render once
   application.SendNotification();
@@ -1335,7 +1335,7 @@ int UtcDaliActorSetPosition01(void)
   application.Render();
   DALI_TEST_EQUALS( Vector3( 1.1f, 1.2f, 1.3f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Math::MACHINE_EPSILON_10000, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1553,7 +1553,7 @@ int UtcDaliActorGetCurrentWorldPosition(void)
   parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
@@ -1588,7 +1588,7 @@ int UtcDaliActorSetInheritPosition(void)
   parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
@@ -1644,7 +1644,7 @@ int UtcDaliActorInheritOpacity(void)
   Actor parent = Actor::New();
   Actor child = Actor::New();
   parent.Add( child );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   DALI_TEST_EQUALS( parent.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty( Actor::Property::COLOR_ALPHA ).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION );
@@ -1705,7 +1705,7 @@ int UtcDaliActorSetOrientation02(void)
   application.Render();
   DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.RotateBy( Degree( 360 ), axis);
   DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
@@ -1722,7 +1722,7 @@ int UtcDaliActorSetOrientation02(void)
   application.Render();
   DALI_TEST_EQUALS(rotation, actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1761,7 +1761,7 @@ int UtcDaliActorRotateBy01(void)
   application.Render();
   DALI_TEST_EQUALS(Quaternion( angle, Vector3::ZAXIS), actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.RotateBy( angle, Vector3::ZAXIS);
   // flush the queue and render once
@@ -1769,7 +1769,7 @@ int UtcDaliActorRotateBy01(void)
   application.Render();
   DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION);
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -1819,7 +1819,7 @@ int UtcDaliActorGetCurrentWorldOrientation(void)
   Radian rotationAngle( Degree(90.0f) );
   Quaternion rotation( rotationAngle, Vector3::YAXIS );
   parent.SetProperty( Actor::Property::ORIENTATION, rotation );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::ORIENTATION, rotation );
@@ -1894,14 +1894,14 @@ int UtcDaliActorSetScale02(void)
   DALI_TEST_CHECK(actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) == scale);
 
   // add to stage and test
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.SetProperty( Actor::Property::SCALE, Vector3( 2.0f, 2.0f, 2.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( Vector3( 2.0f, 2.0f, 2.0f ), actor.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ), 0.001, TEST_LOCATION);
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   END_TEST;
 }
@@ -2027,7 +2027,7 @@ int UtcDaliActorGetCurrentWorldScale(void)
   Actor parent = Actor::New();
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetProperty( Actor::Property::SCALE, parentScale );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
@@ -2062,7 +2062,7 @@ int UtcDaliActorInheritScale(void)
   Actor parent = Actor::New();
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetProperty( Actor::Property::SCALE, parentScale );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
@@ -2103,7 +2103,7 @@ int UtcDaliActorSetVisible(void)
   DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
   // put actor on stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
@@ -2144,7 +2144,7 @@ int UtcDaliActorSetOpacity(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.5f, TEST_LOCATION );
 
   // put actor on stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // change opacity, actor is on stage to change is not immediate
   actor.SetProperty( Actor::Property::OPACITY, 0.9f );
@@ -2221,7 +2221,7 @@ int UtcDaliActorSetColor(void)
   application.Render();
   DALI_TEST_EQUALS( Vector4( 0.6f, 0.5f, 0.4f, 0.1f ), actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ),  TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   actor.SetProperty( Actor::Property::COLOR, color );
   // flush the queue and render once
   application.SendNotification();
@@ -2244,7 +2244,7 @@ int UtcDaliActorSetColor(void)
   actor.SetProperty( Actor::Property::COLOR, newColor );
   DALI_TEST_EQUALS( Vector4( newColor.r, newColor.g, newColor.b, 1.0f ), actor.GetProperty< Vector4 >( Actor::Property::COLOR ), TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   END_TEST;
 }
 
@@ -2340,7 +2340,7 @@ int UtcDaliActorGetCurrentWorldColor(void)
   Actor parent = Actor::New();
   Vector4 parentColor( 1.0f, 0.5f, 0.0f, 0.8f );
   parent.SetProperty( Actor::Property::COLOR, parentColor );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   Vector4 childColor( 0.5f, 0.6f, 0.5f, 1.0f );
@@ -2420,7 +2420,7 @@ int UtcDaliActorScreenToLocal(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2502,7 +2502,7 @@ int UtcDaliActorRemoveConstraints(void)
 
   DALI_TEST_CHECK( gTestConstraintCalled == false );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   constraint.Apply();
 
   // flush the queue and render once
@@ -2536,7 +2536,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   constraint2.SetTag( constraint2Tag );
   constraint2.Apply();
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2605,7 +2605,7 @@ int UtcDaliActorTouchedSignal(void)
   ResetTouchCallbacks();
 
   // get the root layer
-  Actor actor = Stage::GetCurrent().GetRootLayer();
+  Actor actor = application.GetScene().GetRootLayer();
   DALI_TEST_CHECK( gTouchCallBackCalled == false );
 
   application.SendNotification();
@@ -2615,7 +2615,7 @@ int UtcDaliActorTouchedSignal(void)
   actor.TouchedSignal().Connect( TestCallback );
 
   // simulate a touch event in the middle of the screen
-  Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
+  Vector2 touchPoint( application.GetScene().GetSize() * 0.5 );
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
   point.SetState( PointState::DOWN );
@@ -2635,7 +2635,7 @@ int UtcDaliActorHoveredSignal(void)
   gHoverCallBackCalled = false;
 
   // get the root layer
-  Actor actor = Stage::GetCurrent().GetRootLayer();
+  Actor actor = application.GetScene().GetRootLayer();
   DALI_TEST_CHECK( gHoverCallBackCalled == false );
 
   application.SendNotification();
@@ -2645,7 +2645,7 @@ int UtcDaliActorHoveredSignal(void)
   actor.HoveredSignal().Connect( TestCallback3 );
 
   // simulate a hover event in the middle of the screen
-  Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
+  Vector2 touchPoint( application.GetScene().GetSize() * 0.5 );
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
   point.SetState( PointState::MOTION );
@@ -2677,7 +2677,7 @@ int UtcDaliActorOnOffStageSignal(void)
   DALI_TEST_CHECK( gOffStageCallBackCalled == 0 );
 
   // add parent to stage
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
   // onstage emitted, offstage not
   DALI_TEST_EQUALS(  gOnStageCallBackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gOffStageCallBackCalled, 0, TEST_LOCATION );
@@ -2703,7 +2703,7 @@ int UtcDaliActorOnOffStageSignal(void)
   gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
   gActorNamesOnOffStage.clear();
 
-  Stage::GetCurrent().Remove( parent );
+  application.GetScene().Remove( parent );
   // onstage not emitted, offstage is
   DALI_TEST_EQUALS(  gOnStageCallBackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gOffStageCallBackCalled, 2, TEST_LOCATION );
@@ -2715,7 +2715,7 @@ int UtcDaliActorOnOffStageSignal(void)
   gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
   gActorNamesOnOffStage.clear();
 
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
   // onstage emitted, offstage not
   DALI_TEST_EQUALS(  gOnStageCallBackCalled, 2, TEST_LOCATION );
   DALI_TEST_EQUALS( gOffStageCallBackCalled, 0, TEST_LOCATION );
@@ -2738,7 +2738,7 @@ int UtcDaliActorOnOffStageSignal(void)
   gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
   gActorNamesOnOffStage.clear();
 
-  Stage::GetCurrent().Remove( parent );
+  application.GetScene().Remove( parent );
   // onstage not emitted, offstage is
   DALI_TEST_EQUALS(  gOnStageCallBackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gOffStageCallBackCalled, 1, TEST_LOCATION );
@@ -2836,7 +2836,7 @@ int UtcDaliActorHitTest(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   ResetTouchCallbacks();
 
@@ -2882,28 +2882,28 @@ int UtcDaliActorHitTest(void)
 
 int UtcDaliActorSetDrawMode(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorSetDrawModeOverlay");
 
   Actor a = Actor::New();
 
-  Stage::GetCurrent().Add(a);
-  app.SendNotification();
-  app.Render(0);
-  app.SendNotification();
-  app.Render(1);
+  application.GetScene().Add(a);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(1);
 
   DALI_TEST_CHECK( DrawMode::NORMAL == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Ensure overlay is off by default
 
   a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   DALI_TEST_CHECK( DrawMode::OVERLAY_2D == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Check Actor is overlay
 
   a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::NORMAL );
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   DALI_TEST_CHECK( DrawMode::NORMAL == a.GetProperty< DrawMode::Type >( Actor::Property::DRAW_MODE ) ); // Check Actor is normal
   END_TEST;
@@ -2911,17 +2911,17 @@ int UtcDaliActorSetDrawMode(void)
 
 int UtcDaliActorSetDrawModeOverlayRender(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorSetDrawModeOverlayRender");
 
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   std::vector<GLuint> ids;
   ids.push_back( 8 );   // first rendered actor
   ids.push_back( 9 );   // second rendered actor
   ids.push_back( 10 );  // third rendered actor
-  app.GetGlAbstraction().SetNextTextureIds( ids );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
 
   Texture imageA = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
   Texture imageB = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
@@ -2930,25 +2930,25 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   Actor b = CreateRenderableActor( imageB );
   Actor c = CreateRenderableActor( imageC );
 
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   //Textures are bound when first created. Clear bound textures vector
-  app.GetGlAbstraction().ClearBoundTextures();
+  application.GetGlAbstraction().ClearBoundTextures();
 
   // Render a,b,c as regular non-overlays. so order will be:
   // a (8)
   // b (9)
   // c (10)
-  Stage::GetCurrent().Add(a);
-  Stage::GetCurrent().Add(b);
-  Stage::GetCurrent().Add(c);
+  application.GetScene().Add(a);
+  application.GetScene().Add(b);
+  application.GetScene().Add(c);
 
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   // Should be 3 textures changes.
-  const std::vector<GLuint>& boundTextures = app.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
+  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
   typedef std::vector<GLuint>::size_type TextureSize;
   DALI_TEST_EQUALS( boundTextures.size(), static_cast<TextureSize>( 3 ), TEST_LOCATION );
   if( boundTextures.size() == 3 )
@@ -2964,10 +2964,10 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   // c (10)
   // a (8)
   a.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
-  app.GetGlAbstraction().ClearBoundTextures();
+  application.GetGlAbstraction().ClearBoundTextures();
 
-  app.SendNotification();
-  app.Render(1);
+  application.SendNotification();
+  application.Render(1);
 
   // Should be 3 texture changes.
   DALI_TEST_EQUALS( boundTextures.size(), static_cast<TextureSize>(3), TEST_LOCATION );
@@ -2982,7 +2982,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
 
 int UtcDaliActorGetCurrentWorldMatrix(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorGetCurrentWorldMatrix");
 
   Actor parent = Actor::New();
@@ -2995,7 +2995,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetProperty( Actor::Property::SCALE, parentScale );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -3008,10 +3008,10 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   child.SetProperty( Actor::Property::SCALE, childScale );
   parent.Add( child );
 
-  app.SendNotification();
-  app.Render(0);
-  app.Render();
-  app.SendNotification();
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
 
   Matrix parentMatrix(false);
   parentMatrix.SetTransformComponents(parentScale, parentRotation, parentPosition);
@@ -3032,7 +3032,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
 
 int UtcDaliActorConstrainedToWorldMatrix(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorConstrainedToWorldMatrix");
 
   Actor parent = Actor::New();
@@ -3045,7 +3045,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetProperty( Actor::Property::SCALE, parentScale );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -3053,12 +3053,12 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   posConstraint.AddSource( Source( parent, Actor::Property::WORLD_MATRIX ) );
   posConstraint.Apply();
 
-  Stage::GetCurrent().Add( child );
+  application.GetScene().Add( child );
 
-  app.SendNotification();
-  app.Render(0);
-  app.Render();
-  app.SendNotification();
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
 
   Matrix parentMatrix(false);
   parentMatrix.SetTransformComponents(parentScale, parentRotation, parentPosition);
@@ -3070,7 +3070,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
 int UtcDaliActorConstrainedToOrientation(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorConstrainedToOrientation");
 
   Actor parent = Actor::New();
@@ -3083,7 +3083,7 @@ int UtcDaliActorConstrainedToOrientation(void)
   parent.SetProperty( Actor::Property::POSITION, parentPosition );
   parent.SetProperty( Actor::Property::ORIENTATION, parentRotation );
   parent.SetProperty( Actor::Property::SCALE, parentScale );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -3091,12 +3091,12 @@ int UtcDaliActorConstrainedToOrientation(void)
   posConstraint.AddSource( Source( parent, Actor::Property::ORIENTATION ) );
   posConstraint.Apply();
 
-  Stage::GetCurrent().Add( child );
+  application.GetScene().Add( child );
 
-  app.SendNotification();
-  app.Render(0);
-  app.Render();
-  app.SendNotification();
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
 
   DALI_TEST_EQUALS( child.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), parent.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), 0.001, TEST_LOCATION );
   END_TEST;
@@ -3104,33 +3104,33 @@ int UtcDaliActorConstrainedToOrientation(void)
 
 int UtcDaliActorConstrainedToOpacity(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorConstrainedToOpacity");
 
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::OPACITY, 0.7f );
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   Constraint opacityConstraint = Constraint::New<float>( child, Actor::Property::OPACITY, EqualToConstraint() );
   opacityConstraint.AddSource( Source( parent, Actor::Property::OPACITY ) );
   opacityConstraint.Apply();
 
-  Stage::GetCurrent().Add( child );
+  application.GetScene().Add( child );
 
-  app.SendNotification();
-  app.Render(0);
-  app.Render();
-  app.SendNotification();
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
 
   DALI_TEST_EQUALS( child.GetCurrentProperty< float >( Actor::Property::OPACITY ), parent.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
   parent.SetProperty( Actor::Property::OPACITY, 0.3f );
 
-  app.SendNotification();
-  app.Render(0);
-  app.Render();
-  app.SendNotification();
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
 
   DALI_TEST_EQUALS( child.GetCurrentProperty< float >( Actor::Property::OPACITY ), parent.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.001f, TEST_LOCATION );
 
@@ -3139,11 +3139,11 @@ int UtcDaliActorConstrainedToOpacity(void)
 
 int UtcDaliActorUnparent(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorUnparent");
 
   Actor parent = Actor::New();
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
 
@@ -3187,11 +3187,11 @@ int UtcDaliActorUnparent(void)
 
 int UtcDaliActorGetChildAt(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorGetChildAt");
 
   Actor parent = Actor::New();
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child0 = Actor::New();
   parent.Add( child0 );
@@ -3210,7 +3210,7 @@ int UtcDaliActorGetChildAt(void)
 
 int UtcDaliActorSetGetOverlay(void)
 {
-  TestApplication app;
+  TestApplication application;
   tet_infoline(" UtcDaliActorSetGetOverlay");
 
   Actor parent = Actor::New();
@@ -3299,7 +3299,7 @@ const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PRO
 
 int UtcDaliActorProperties(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3315,7 +3315,7 @@ int UtcDaliActorProperties(void)
 
 int UtcDaliRelayoutProperties_ResizePolicies(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3355,7 +3355,7 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
 
 int UtcDaliRelayoutProperties_SizeScalePolicy(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3381,7 +3381,7 @@ int UtcDaliRelayoutProperties_SizeScalePolicy(void)
 
 int UtcDaliRelayoutProperties_SizeModeFactor(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3404,7 +3404,7 @@ int UtcDaliRelayoutProperties_SizeModeFactor(void)
 
 int UtcDaliRelayoutProperties_DimensionDependency(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3428,7 +3428,7 @@ int UtcDaliRelayoutProperties_DimensionDependency(void)
 
 int UtcDaliRelayoutProperties_Padding(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3446,7 +3446,7 @@ int UtcDaliRelayoutProperties_Padding(void)
 
 int UtcDaliRelayoutProperties_MinimumMaximumSize(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3470,7 +3470,7 @@ int UtcDaliRelayoutProperties_MinimumMaximumSize(void)
 
 int UtcDaliActorGetHeightForWidth(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3481,7 +3481,7 @@ int UtcDaliActorGetHeightForWidth(void)
 
 int UtcDaliActorGetWidthForHeight(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3492,12 +3492,12 @@ int UtcDaliActorGetWidthForHeight(void)
 
 int UtcDaliActorGetRelayoutSize(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
   // Add actor to stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   DALI_TEST_EQUALS( actor.GetRelayoutSize( Dimension::WIDTH ), 0.0f, TEST_LOCATION );
 
@@ -3505,8 +3505,8 @@ int UtcDaliActorGetRelayoutSize(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 0.0f ) );
 
   // Flush the queue and render once
-  app.SendNotification();
-  app.Render();
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS( actor.GetRelayoutSize( Dimension::WIDTH ), 1.0f, TEST_LOCATION );
 
@@ -3515,7 +3515,7 @@ int UtcDaliActorGetRelayoutSize(void)
 
 int UtcDaliActorSetPadding(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3542,7 +3542,7 @@ int UtcDaliActorSetPadding(void)
 
 int UtcDaliActorSetMinimumSize(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3564,7 +3564,7 @@ int UtcDaliActorSetMinimumSize(void)
 
 int UtcDaliActorSetMaximumSize(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -3602,7 +3602,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   DALI_TEST_CHECK( ! gOnRelayoutCallBackCalled );
 
   // Add actor to stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 2.0 ) );
@@ -3636,7 +3636,7 @@ int UtcDaliActorGetHierachyDepth(void)
    *
    * GetHierarchyDepth should return 1 for A, 2 for B and C, and 3 for D, E and F.
    */
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -3946,7 +3946,7 @@ int UtcDaliActorAddRendererOnStage(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render(0);
@@ -4207,7 +4207,7 @@ int UtcDaliActorPropertyClippingActor(void)
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  Stage::GetCurrent().Add( actorDepth1Clip );
+  application.GetScene().Add( actorDepth1Clip );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, stencilTrace );
@@ -4243,7 +4243,7 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  Stage::GetCurrent().Add( actorDepth1Clip );
+  application.GetScene().Add( actorDepth1Clip );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, stencilTrace );
@@ -4291,7 +4291,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  Stage::GetCurrent().Add( actorDepth1Clip );
+  application.GetScene().Add( actorDepth1Clip );
 
   // Create a child actor.
   Actor childDepth2 = CreateActorWithContent16x16();
@@ -4348,7 +4348,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
     // If we are on the first loop, set the layer to 3D and loop to perform the test again.
     if( i == 0u )
     {
-      Stage::GetCurrent().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
+      application.GetScene().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
       GenerateTrace( application, enabledDisableTrace, stencilTrace );
     }
   }
@@ -4401,7 +4401,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
   actors[1].SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
   // Build the scene graph.
-  Stage::GetCurrent().Add( actors[0] );
+  application.GetScene().Add( actors[0] );
 
   // Left branch:
   actors[0].Add( actors[1] );
@@ -4468,7 +4468,7 @@ int UtcDaliActorPropertyScissorClippingActor(void)
   clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
   clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
-  Stage::GetCurrent().Add( clippingActorA );
+  application.GetScene().Add( clippingActorA );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, scissorTrace );
@@ -4529,8 +4529,8 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   clippingActorA.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, -200.0f, 0.0f ));
   clippingActorB.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
 
-  Stage::GetCurrent().Add( clippingActorA );
-  Stage::GetCurrent().Add( clippingActorB );
+  application.GetScene().Add( clippingActorA );
+  application.GetScene().Add( clippingActorB );
 
   // Gather the call trace.
   GenerateTrace( application, enabledDisableTrace, scissorTrace );
@@ -4590,7 +4590,7 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   clippingActorA.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   clippingActorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   clippingActorA.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
-  Stage::GetCurrent().Add( clippingActorA );
+  application.GetScene().Add( clippingActorA );
 
   // Create a child clipping actor.
   Actor clippingActorB = CreateActorWithContent16x16();
@@ -4689,10 +4689,10 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   clippingActorD.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
   clippingActorE.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
 
-  Stage::GetCurrent().Add( clippingActorA );
+  application.GetScene().Add( clippingActorA );
   clippingActorA.Add( clippingActorB );
-  Stage::GetCurrent().Add( clippingActorC );
-  Stage::GetCurrent().Add( clippingActorD );
+  application.GetScene().Add( clippingActorC );
+  application.GetScene().Add( clippingActorD );
   clippingActorD.Add( clippingActorE );
 
   // Gather the call trace.
@@ -4732,7 +4732,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
   actorDepth1Clip.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-  Stage::GetCurrent().Add( actorDepth1Clip );
+  application.GetScene().Add( actorDepth1Clip );
 
   // Turn the RenderMode to just "COLOR" at the Renderer level to ignore the clippingMode.
   actorDepth1Clip.GetRendererAt( 0 ).SetProperty( Renderer::Property::RENDER_MODE, RenderMode::COLOR );
@@ -4770,7 +4770,7 @@ int UtcDaliActorPropertyClippingActorWithRendererOverride(void)
 int UtcDaliGetPropertyN(void)
 {
   tet_infoline( "Testing Actor::GetProperty returns a non valid value if property index is out of range" );
-  TestApplication app;
+  TestApplication application;
 
   Actor actor = Actor::New();
 
@@ -4787,7 +4787,7 @@ int UtcDaliActorRaiseLower(void)
 
   Debug::Filter::SetGlobalLogLevel( Debug::Verbose );
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -4918,7 +4918,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -5153,7 +5153,7 @@ int UtcDaliActorRaiseAbove(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -5262,7 +5262,7 @@ int UtcDaliActorLowerBelow(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
   // enables checking of which actor the uniform is assigned too
@@ -5488,7 +5488,7 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor parentA = Actor::New();
   Actor parentB = Actor::New();
@@ -5596,7 +5596,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -5764,7 +5764,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -5925,7 +5925,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6031,7 +6031,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
@@ -6151,7 +6151,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
@@ -6202,7 +6202,7 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   Actor actorA = Actor::New();
   actorA.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
@@ -6254,7 +6254,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
@@ -6319,7 +6319,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   tet_infoline( "Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n" );
 
@@ -6378,7 +6378,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
 
   TestApplication application;
 
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene stage( application.GetScene() );
 
   tet_infoline( "Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false" );
 
@@ -6445,7 +6445,7 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -6476,7 +6476,7 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::SCALE, 2.0f );
   actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -6510,7 +6510,7 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -6545,7 +6545,7 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.0f), Vector3::ZAXIS ) );
   actor.SetProperty( Actor::Property::SCALE, 2.0f );
   actor.SetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT, false );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -6575,8 +6575,8 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
 
   Actor parent = Actor::New();
 
-  Stage::GetCurrent().Add( parent );
-  Vector2 stageSize( Stage::GetCurrent().GetSize() );
+  application.GetScene().Add( parent );
+  Vector2 stageSize( application.GetScene().GetSize() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
@@ -6701,7 +6701,7 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   tet_infoline( "Check that the visibility change signal is emitted when the visibility changes when an animation starts" );
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -6778,7 +6778,7 @@ int UtcDaliActorLayoutDirectionProperty(void)
 
   Actor actor0 = Actor::New();
   DALI_TEST_EQUALS( actor0.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
-  Stage::GetCurrent().Add( actor0 );
+  application.GetScene().Add( actor0 );
 
   application.SendNotification();
   application.Render();
@@ -6819,7 +6819,7 @@ int UtcDaliActorLayoutDirectionProperty(void)
   DALI_TEST_EQUALS( actor1.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor3 );
+  application.GetScene().Add( actor3 );
   actor3.Add( actor4 );
   actor4.Add( actor5 );
   actor5.Add( actor6 );
@@ -6887,7 +6887,7 @@ int UtcDaliActorLayoutDirectionSignal(void)
 
   Actor actor = Actor::New();
   DALI_TEST_EQUALS( actor.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   bool signalCalled = false;
   LayoutDirectionFunctor layoutDirectionFunctor(signalCalled);
 
@@ -6936,7 +6936,7 @@ struct ChildAddedSignalCheck
 int UtcDaliChildAddedSignalP1(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -6963,7 +6963,7 @@ int UtcDaliChildAddedSignalP1(void)
 int UtcDaliChildAddedSignalP2(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -6991,7 +6991,7 @@ int UtcDaliChildAddedSignalP2(void)
 int UtcDaliChildAddedSignalN(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -7039,7 +7039,7 @@ struct ChildRemovedSignalCheck
 int UtcDaliChildRemovedSignalP1(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -7072,7 +7072,7 @@ int UtcDaliChildRemovedSignalP1(void)
 int UtcDaliChildRemovedSignalP2(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -7105,7 +7105,7 @@ int UtcDaliChildRemovedSignalP2(void)
 int UtcDaliChildRemovedSignalN(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool signalReceived=false;
   Actor childActor;
@@ -7132,7 +7132,7 @@ int UtcDaliChildRemovedSignalN(void)
 int UtcDaliChildMovedSignalP(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   bool addedASignalReceived   = false;
   bool removedASignalReceived = false;
@@ -7202,7 +7202,7 @@ int UtcDaliChildMovedSignalP(void)
 int utcDaliActorCulled(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   tet_infoline( "Check that the actor is culled if the actor is out of the screen" );
 
@@ -7249,7 +7249,7 @@ int utcDaliActorCulled(void)
 int utcDaliEnsureRenderWhenRemovingLastRenderableActor(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   tet_infoline( "Ensure we clear the screen when the last actor is removed" );
 
@@ -7276,7 +7276,7 @@ int utcDaliEnsureRenderWhenRemovingLastRenderableActor(void)
 int utcDaliEnsureRenderWhenMakingLastActorInvisible(void)
 {
   TestApplication application;
-  auto stage = Stage::GetCurrent();
+  auto stage = application.GetScene();
 
   tet_infoline( "Ensure we clear the screen when the last actor is made invisible" );
 
@@ -7310,7 +7310,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, actorSize );
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Size should be updated without rendering.
   Vector3 size = actor.GetProperty( Actor::Property::SIZE ).Get< Vector3 >();
@@ -7526,7 +7526,7 @@ int utcDaliActorPartialUpdate(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 
@@ -7578,7 +7578,7 @@ int utcDaliActorPartialUpdate(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  Stage::GetCurrent().Remove(actor);
+  application.GetScene().Remove(actor);
   application.SendNotification();
 
   // Actor removed, last 3 dirty rects are reported. Adaptor would merge them together.
@@ -7631,7 +7631,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 
@@ -7727,7 +7727,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   actor.RegisterProperty(SHADER_SHADOW_COLOR_PROPERTY_NAME, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 
@@ -7796,13 +7796,13 @@ int utcDaliActorPartialUpdateTwoActors(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(100.0f, 100.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(50.0f, 50.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Actor actor2 = CreateRenderableActor();
   actor2.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
   actor2.SetProperty(Actor::Property::SIZE, Vector3(100.0f, 100.0f, 0.0f));
   actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   application.SendNotification();
   std::vector<Rect<int>> damagedRects;
@@ -7843,7 +7843,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint(void)
   actor.SetProperty(Actor::Property::SIZE, Vector3(75.0f, 150.0f, 0.0f));
   actor.SetProperty(DevelActor::Property::UPDATE_SIZE_HINT, Vector3(150, 300, 0));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   std::vector<Rect<int>> damagedRects;

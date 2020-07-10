@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,9 +94,10 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage )
+  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage, Integration::Scene scene )
   : GestureReceivedFunctor( data ),
-    stateToUnstage( stateToUnstage )
+    stateToUnstage( stateToUnstage ),
+    scene( scene )
   {
   }
 
@@ -106,11 +107,12 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 
     if ( rotation.state == stateToUnstage )
     {
-      Stage::GetCurrent().Remove( actor );
+      scene.Remove( actor );
     }
   }
 
   Gesture::State& stateToUnstage;
+  Integration::Scene scene;
 };
 
 // Functor for receiving a touch event
@@ -172,7 +174,7 @@ int UtcDaliRotationGestureDetectorNew(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -233,7 +235,7 @@ int UtcDaliRotationGestureSignalReceptionNegative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -275,7 +277,7 @@ int UtcDaliRotationGestureSignalReceptionDownMotionLeave(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -332,7 +334,7 @@ int UtcDaliRotationGestureSignalReceptionDownMotionUp(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -380,7 +382,7 @@ int UtcDaliRotationGestureSignalReceptionDetach(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -431,7 +433,7 @@ int UtcDaliRotationGestureSignalReceptionDetachWhileRotationing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -483,7 +485,7 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
   Actor tempActor = Actor::New();
   tempActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   tempActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(tempActor);
+  application.GetScene().Add(tempActor);
   detector.Attach(tempActor);
 
   // Actor lifetime is scoped
@@ -491,7 +493,7 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
     Actor actor = Actor::New();
     actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     // Render and notify
     application.SendNotification();
@@ -513,7 +515,7 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
     DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
-    Stage::GetCurrent().Remove(actor);
+    application.GetScene().Remove(actor);
 
     // Render and notify
     application.SendNotification();
@@ -537,7 +539,7 @@ int UtcDaliRotationGestureSignalReceptionRotatedActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify a couple of times
   application.SendNotification();
@@ -599,7 +601,7 @@ int UtcDaliRotationGestureSignalReceptionChildHit(void)
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
   // Change rotation of child to be different from parent so that we can check if our local coordinate
@@ -661,13 +663,13 @@ int UtcDaliRotationGestureSignalReceptionAttachDetachMany(void)
   Actor first = Actor::New();
   first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   second.SetProperty( Actor::Property::POSITION_X, 100.0f);
   second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Render and notify
   application.SendNotification();
@@ -712,7 +714,7 @@ int UtcDaliRotationGestureSignalReceptionActorBecomesUntouchable(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -758,12 +760,12 @@ int UtcDaliRotationGestureSignalReceptionMultipleDetectorsOnActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   // Render and notify
   application.SendNotification();
@@ -837,7 +839,7 @@ int UtcDaliRotationGestureSignalReceptionEnsureCorrectSignalling(void)
   Actor actor1 = Actor::New();
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor1);
+  application.GetScene().Add(actor1);
   SignalData data1;
   GestureReceivedFunctor functor1(data1);
   RotationGestureDetector detector1 = RotationGestureDetector::New();
@@ -848,7 +850,7 @@ int UtcDaliRotationGestureSignalReceptionEnsureCorrectSignalling(void)
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
   actor2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
   SignalData data2;
   GestureReceivedFunctor functor2(data2);
   RotationGestureDetector detector2 = RotationGestureDetector::New();
@@ -874,7 +876,7 @@ int UtcDaliRotationGestureActorUnstaged(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -885,7 +887,7 @@ int UtcDaliRotationGestureActorUnstaged(void)
 
   // Attach actor to detector
   SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage );
+  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
   RotationGestureDetector detector = RotationGestureDetector::New();
   detector.Attach(actor);
   detector.DetectedSignal().Connect( &application, functor );
@@ -905,7 +907,7 @@ int UtcDaliRotationGestureActorUnstaged(void)
   application.Render();
 
   // Re-add actor to stage
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -933,7 +935,7 @@ int UtcDaliRotationGestureActorUnstaged(void)
   application.Render();
 
   // Re-add actor to stage
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -965,14 +967,14 @@ int UtcDaliRotationGestureActorStagedAndDestroyed(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor( Actor::New() );
   dummyActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   dummyActor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
   dummyActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(dummyActor);
+  application.GetScene().Add(dummyActor);
 
   // Render and notify
   application.SendNotification();
@@ -983,7 +985,7 @@ int UtcDaliRotationGestureActorStagedAndDestroyed(void)
 
   // Attach actor to detector
   SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage );
+  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
   RotationGestureDetector detector = RotationGestureDetector::New();
   detector.Attach(actor);
   detector.Attach(dummyActor);
@@ -1004,7 +1006,7 @@ int UtcDaliRotationGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Re add to the stage, we should not be signalled
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1057,7 +1059,7 @@ int UtcDaliRotationGestureLayerConsumesTouch(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a detector
   SignalData data;
@@ -1070,7 +1072,7 @@ int UtcDaliRotationGestureLayerConsumesTouch(void)
   Layer layer = Layer::New();
   layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.RaiseToTop();
 
   // Render and notify

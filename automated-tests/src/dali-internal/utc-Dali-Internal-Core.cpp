@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ int UtcDaliCoreProcessEvents(void)
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   actor.SetProperty( Actor::Property::SIZE, size );
   actor.SetProperty( Actor::Property::POSITION, position );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   RelayoutSignalHandler relayoutSignal( application );
   actor.OnRelayoutSignal().Connect( &relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );

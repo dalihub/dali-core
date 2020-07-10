@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -600,7 +600,7 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
   DALI_TEST_CHECK( type );
   CameraActor ca = CameraActor::DownCast(type.CreateInstance());
   DALI_TEST_CHECK( ca );
-  Stage::GetCurrent().Add( ca );
+  application.GetScene().Add( ca );
   application.Render();
 
   // animations
@@ -1062,7 +1062,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   unsigned int customPropertyCount( customActor.GetPropertyCount() );
 
@@ -1172,7 +1172,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   unsigned int customPropertyCount( customActor.GetPropertyCount() );
 
@@ -2067,7 +2067,7 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Register Type
   TypeInfo type;
@@ -2105,7 +2105,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Register Type
   TypeInfo type;
@@ -2141,7 +2141,7 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Register Type
   TypeInfo type;
@@ -2178,7 +2178,7 @@ int UtcDaliRotationGestureDetectorTypeRegistry(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Register Type
   TypeInfo type;
@@ -2215,7 +2215,7 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Register Type
   TypeInfo type;
@@ -2455,7 +2455,7 @@ int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGet01(void)
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   tet_infoline( "Set the value and ensure it changes straight away" );
   DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyIndex ), 0.0f, TEST_LOCATION );
@@ -2499,7 +2499,7 @@ int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponents
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   tet_infoline( "Get the component values, they should be the default value of the base-property" );
   DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
@@ -2566,7 +2566,7 @@ int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponents
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   tet_infoline( "Get the component values, they should be the default value of the base-property" );
   DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
@@ -2644,7 +2644,7 @@ int UtcDaliPropertyRegistrationPropertyAnimatableSynchronousSetGetWithComponents
   DALI_TEST_CHECK( handle );
   Actor customActor = Actor::DownCast( handle );
   DALI_TEST_CHECK( customActor );
-  Stage::GetCurrent().Add(customActor);
+  application.GetScene().Add(customActor);
 
   tet_infoline( "Get the component values, they should be the default value of the base-property" );
   DALI_TEST_EQUALS( customActor.GetProperty< float >( componentZeroPropertyIndex ), 13.0f, TEST_LOCATION );
@@ -2727,7 +2727,7 @@ int UtcDaliTypeInfoRegisterChildProperties01(void)
   ChildPropertyRegistration( myCustomTypeInfo.GetName(), "marginSpecification", MARGIN_SPECIFICATION, Property::EXTENTS );
 
   auto customActor = MyTestCustomActor::New();
-  Stage::GetCurrent().Add( customActor );
+  application.GetScene().Add( customActor );
   auto child = Actor::New();
   customActor.Add( child );
 

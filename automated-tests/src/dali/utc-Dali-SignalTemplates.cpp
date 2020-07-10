@@ -92,7 +92,7 @@ float StaticFloatCallbackFloatValueFloatValue( float value1, float value2 )
 
 int UtcDaliSignalEmptyP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // Test that Empty() is true, when no slots connected to the signal
 
@@ -115,7 +115,7 @@ int UtcDaliSignalEmptyP(void)
 
 int UtcDaliSignalEmptyN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // Test that Empty() is false after signal connection
   TestSignals::VoidRetNoParamSignal signal;
@@ -128,7 +128,7 @@ int UtcDaliSignalEmptyN(void)
 
 int UtcDaliSignalGetConnectionCountP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestSignals::VoidRetNoParamSignal signal;
   TestSlotHandler handler;
@@ -144,7 +144,7 @@ int UtcDaliSignalGetConnectionCountP(void)
 
 int UtcDaliSignalGetConnectionCountN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
   TestSignals::VoidRetNoParamSignal signal;
   DALI_TEST_CHECK( signal.GetConnectionCount() == 0 );
   END_TEST;
@@ -156,7 +156,7 @@ int UtcDaliSignalGetConnectionCountN(void)
  */
 int UtcDaliSignalConnectP01(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test static function: void Connect( void (*func)() )
   TestSignals::VoidRetNoParamSignal signal;
@@ -172,7 +172,7 @@ int UtcDaliSignalConnectN01(void)
   // difficult to perform a negative test on Connect as no checks are performed
   // when creating a callback for a null function ( during Connect).
   // so we test an assert on Emit
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestSignals::VoidRetNoParamSignal signal;
   signal.Connect( NULL );
@@ -192,7 +192,7 @@ int UtcDaliSignalConnectN01(void)
 
 int UtcDaliSignalConnectP02(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test member function: Connect( X* obj, void (X::*func)() ))
   TestSignals::VoidRetNoParamSignal signal;
@@ -206,7 +206,7 @@ int UtcDaliSignalConnectP02(void)
 
 int UtcDaliSignalConnectN02(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestSignals::VoidRetNoParamSignal signal;
   try
@@ -226,7 +226,7 @@ int UtcDaliSignalConnectN02(void)
 
 int UtcDaliSignalConnectP03(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test slot delegate: Connect( SlotDelegate<X>& delegate, void (X::*func)() )
   TestSignals::VoidRetNoParamSignal signal;
@@ -241,7 +241,7 @@ int UtcDaliSignalConnectP03(void)
 
 int UtcDaliSignalConnectN03(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
   // the delegate is passed by reference, so you can't pass null.
   tet_result( TET_PASS );
   END_TEST;
@@ -249,7 +249,7 @@ int UtcDaliSignalConnectN03(void)
 
 int UtcDaliSignalConnectP04(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   //  test function object: Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
   TestSlotHandler handler;
@@ -286,7 +286,7 @@ int UtcDaliSignalConnectN04(void)
 
 int UtcDaliSignalConnectP05(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test function object using FunctorDelegate.
   // :Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
@@ -312,7 +312,7 @@ int UtcDaliSignalConnectP05(void)
 
 int UtcDaliSignalConnectN05(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // for negative test we try to connect a null connection tracker to the signal
   // :Connect( ConnectionTrackerInterface == NULL, FunctorDelegate* delegate )
@@ -338,7 +338,7 @@ int UtcDaliSignalConnectN05(void)
  */
 int UtcDaliSignalDisconnectP01(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test static function:  Disconnect( void (*func)( Arg0 arg0 ) )
 
@@ -353,7 +353,7 @@ int UtcDaliSignalDisconnectP01(void)
  }
 int UtcDaliSignalDisconnectN01(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // 1. Disconnect using the function
   TestSignals::VoidRetNoParamSignal signal;
@@ -369,7 +369,7 @@ int UtcDaliSignalDisconnectN01(void)
 
 int UtcDaliSignalDisconnectP02(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test member function: Disconnect( X* obj, void (X::*func)( Arg0 arg0 ) )
   TestSignals::VoidRetNoParamSignal signal;
@@ -384,7 +384,7 @@ int UtcDaliSignalDisconnectP02(void)
 }
 int UtcDaliSignalDisconnectN02(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // 1. Disconnect using a null connection tracker
   TestSignals::VoidRetNoParamSignal signal;
@@ -409,7 +409,7 @@ int UtcDaliSignalDisconnectN02(void)
 
 int UtcDaliSignalDisconnectP03(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // test slot delegate: Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
   TestSignals::VoidRetNoParamSignal signal;
@@ -424,7 +424,7 @@ int UtcDaliSignalDisconnectP03(void)
 
 int UtcDaliSignalDisconnectN03(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
    // try to disconnect from the wrong signal
   TestSignals::VoidRetNoParamSignal signal;
@@ -1576,7 +1576,7 @@ int UtcDaliSignalDisconnectDuringCallback2(void)
 
 int UtcDaliSignalEmitDuringCallback(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   // for coverage purposes we test the emit guard for each signal type (0,1,2,3 params) void / return value
   {
@@ -1641,7 +1641,7 @@ int UtcDaliSignalDeleteDuringEmit(void)
   // testing a signal deletion during an emit
   // need to dynamically allocate the signal for this to work
 
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestSignals::VoidRetNoParamSignal* signal = new TestSignals::VoidRetNoParamSignal;
 
