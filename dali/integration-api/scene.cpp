@@ -149,6 +149,26 @@ void Scene::ProcessEvents()
   GetImplementation(*this).ProcessEvents();
 }
 
+void Scene::AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  GetImplementation( *this ).AddFrameRenderedCallback( std::move( callback ), frameId );
+}
+
+void Scene::AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  GetImplementation( *this ).AddFramePresentedCallback( std::move( callback ), frameId );
+}
+
+void Scene::GetFrameRenderedCallback( FrameCallbackContainer& callbacks )
+{
+  GetImplementation( *this ).GetFrameRenderedCallback( callbacks );
+}
+
+void Scene::GetFramePresentedCallback( FrameCallbackContainer& callbacks )
+{
+  GetImplementation( *this ).GetFramePresentedCallback( callbacks );
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();

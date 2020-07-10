@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,13 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/common/base-object-impl.h>
 
 namespace Dali
 {
 
 BaseObject::BaseObject()
+: mImpl( new Impl( *this ) )
 {
 }
 

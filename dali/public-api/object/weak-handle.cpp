@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,29 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/base-object-impl.h>
 
 namespace Dali
 {
 
-struct WeakHandleBase::Impl : public Internal::Object::Observer
+struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
 {
   // Construction
   Impl()
-  : mObject( NULL )
+  : mObject( nullptr )
   {
   }
 
   // Construction
-  Impl( Handle& handle )
-  : mObject( NULL )
+  Impl( BaseHandle& handle )
+  : mObject( nullptr )
   {
-    if(handle)
+    if( handle )
     {
-      mObject = static_cast<Internal::Object*>( handle.GetObjectPtr() );
-      if(mObject)
+      mObject = static_cast<Dali::BaseObject*>( handle.GetObjectPtr() );
+      if( mObject )
       {
-        mObject->AddObserver( *this );
+        BaseObject::Impl::Get( *mObject ).AddObserver( *this );
       }
     }
   }
@@ -56,35 +56,21 @@ struct WeakHandleBase::Impl : public Internal::Object::Observer
   {
     if( mObject )
     {
-      mObject->RemoveObserver( *this );
-      mObject = NULL;
+      BaseObject::Impl::Get( *mObject ).RemoveObserver( *this );
+      mObject = nullptr;
     }
   }
 
   /**
-   * From Object::Observer
+   * From BaseObject::Impl::Observer
    */
-  virtual void SceneObjectAdded( Internal::Object& object )
+  virtual void ObjectDestroyed( BaseObject& object )
   {
-  }
-
-  /**
-   * From Object::Observer
-   */
-  virtual void SceneObjectRemoved( Internal::Object& object )
-  {
-  }
-
-  /**
-   * From Object::Observer
-   */
-  virtual void ObjectDestroyed( Internal::Object& object )
-  {
-    mObject = NULL;
+    mObject = nullptr;
   }
 
   // Data
-  Internal::Object* mObject;
+  Dali::BaseObject* mObject;
 };
 
 WeakHandleBase::WeakHandleBase()
@@ -92,7 +78,7 @@ WeakHandleBase::WeakHandleBase()
 {
 }
 
-WeakHandleBase::WeakHandleBase( Handle& handle )
+WeakHandleBase::WeakHandleBase( BaseHandle& handle )
 : mImpl( new Impl( handle ) )
 {
 }
@@ -100,13 +86,13 @@ WeakHandleBase::WeakHandleBase( Handle& handle )
 WeakHandleBase::~WeakHandleBase()
 {
   delete mImpl;
-  mImpl = NULL;
+  mImpl = nullptr;
 }
 
 WeakHandleBase::WeakHandleBase(const WeakHandleBase& handle)
-: mImpl( NULL )
+: mImpl( nullptr )
 {
-  Handle object = handle.GetBaseHandle();
+  BaseHandle object = handle.GetBaseHandle();
   mImpl = new Impl(object);
 }
 
@@ -116,7 +102,7 @@ WeakHandleBase& WeakHandleBase::operator=( const WeakHandleBase& rhs )
   {
     delete mImpl;
 
-    Handle handle = rhs.GetBaseHandle();
+    BaseHandle handle = rhs.GetBaseHandle();
     mImpl = new Impl(handle);
   }
 
@@ -133,9 +119,9 @@ bool WeakHandleBase::operator!=( const WeakHandleBase& rhs ) const
   return !( *this == rhs );
 }
 
-Handle WeakHandleBase::GetBaseHandle() const
+BaseHandle WeakHandleBase::GetBaseHandle() const
 {
-  return Handle( mImpl->mObject );
+  return BaseHandle( mImpl->mObject );
 }
 
 void WeakHandleBase::Reset()
