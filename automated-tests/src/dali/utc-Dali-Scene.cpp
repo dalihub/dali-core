@@ -248,6 +248,10 @@ bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
   return true;
 }
 
+void FrameCallback( int frameId )
+{
+}
+
 } // unnamed namespace
 
 int UtcDaliSceneAdd(void)
@@ -916,7 +920,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render before resizing surface
   application.SendNotification();
@@ -959,7 +963,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   glAbstraction.EnableViewportCallTrace( true );
 
   // Initial scene setup
-  auto stage = Stage::GetCurrent();
+  auto scene = application.GetScene();
 
   Geometry geometry = CreateQuadGeometry();
   Shader shader = CreateShader();
@@ -970,14 +974,14 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   int testWidth = 400;
   int testHeight = 400;
   actor.SetProperty( Actor::Property::SIZE, Vector2( testWidth, testHeight) );
-  stage.Add(actor);
+  scene.Add(actor);
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( testWidth, testHeight ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   FrameBuffer newFrameBuffer = FrameBuffer::New( testWidth, testHeight, FrameBuffer::Attachment::NONE );
 
-  RenderTask newTask = stage.GetRenderTaskList().CreateTask();
+  RenderTask newTask = scene.GetRenderTaskList().CreateTask();
   newTask.SetCameraActor( offscreenCameraActor );
   newTask.SetSourceActor( actor );
   newTask.SetFrameBuffer( newFrameBuffer );
@@ -999,6 +1003,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   DALI_TEST_CHECK( defaultScene );
 
   // Ensure stage size matches the scene size
+  auto stage = Stage::GetCurrent();
   DALI_TEST_EQUALS( stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION );
 
   // Resize the scene
@@ -1191,7 +1196,7 @@ int UtcDaliSceneEmptySceneRendering(void)
   actor.AddRenderer( renderer );
   
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400, 400 ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Render
   application.SendNotification();
@@ -1202,7 +1207,7 @@ int UtcDaliSceneEmptySceneRendering(void)
   DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
 
   // Remove the Renderer
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   actor.Reset();
   renderer.Reset();
 
@@ -1213,6 +1218,47 @@ int UtcDaliSceneEmptySceneRendering(void)
   // Check the clear count and the render status
   DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION );  // Should be cleared
   DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSceneFrameRenderedPresentedCallback(void)
+{
+  tet_infoline( "UtcDaliSceneFrameRenderedCallback" );
+
+  TestApplication application;
+
+  // Add a Renderer
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = CreateShader();
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer( renderer );
+  application.GetScene().Add( actor );
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  int frameId = 1;
+  scene.AddFrameRenderedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
+  scene.AddFramePresentedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
+
+  // Render
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Scene::FrameCallbackContainer callbackContainer;
+  scene.GetFrameRenderedCallback( callbackContainer );
+
+  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
+
+  callbackContainer.clear();
+
+  scene.GetFramePresentedCallback( callbackContainer );
+
+  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
 
   END_TEST;
 }

@@ -88,16 +88,16 @@ int UtcDaliLayerGetDepth(void)
   Layer layer1 = Layer::New();
   Layer layer2 = Layer::New();
 
-  // layers are not on stage
+  // layers are not on scene
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer2.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
 
   // root depth is 0
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   DALI_TEST_EQUALS(root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
 
-  Stage::GetCurrent().Add(layer1);
-  Stage::GetCurrent().Add(layer2);
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
 
   DALI_TEST_EQUALS(  root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
@@ -112,15 +112,15 @@ int UtcDaliLayerRaise(void)
   Layer layer1 = Layer::New();
   Layer layer2 = Layer::New();
 
-  Stage::GetCurrent().Add(layer1);
-  Stage::GetCurrent().Add(layer2);
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
 
   layer1.Raise();
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 2u, TEST_LOCATION);
 
   // get root
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   DALI_TEST_EQUALS(  root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
   root.Raise();
   DALI_TEST_EQUALS(  root.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
@@ -136,15 +136,15 @@ int UtcDaliLayerLower(void)
   Layer layer1 = Layer::New();
   Layer layer2 = Layer::New();
 
-  Stage::GetCurrent().Add(layer1);
-  Stage::GetCurrent().Add(layer2);
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
   DALI_TEST_EQUALS(layer2.GetProperty< int >( Layer::Property::DEPTH ), 2u, TEST_LOCATION);
 
   layer2.Lower();
   DALI_TEST_EQUALS(layer2.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
 
   // get root
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   root.Lower();
   DALI_TEST_EQUALS(  root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
   layer2.Lower();
@@ -161,10 +161,10 @@ int UtcDaliLayerRaiseToTop(void)
   Layer layer2 = Layer::New();
   Layer layer3 = Layer::New();
 
-  Stage::GetCurrent().Add(layer1);
-  Stage::GetCurrent().Add(layer2);
-  Stage::GetCurrent().Add(layer3);
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  application.GetScene().Add(layer3);
+  Layer root = application.GetScene().GetLayer( 0 );
 
   DALI_TEST_EQUALS(  root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
@@ -187,9 +187,9 @@ int UtcDaliLayerLowerToBottom(void)
   Layer layer2 = Layer::New();
   Layer layer3 = Layer::New();
 
-  Stage::GetCurrent().Add(layer1);
-  Stage::GetCurrent().Add(layer2);
-  Stage::GetCurrent().Add(layer3);
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  application.GetScene().Add(layer3);
 
   DALI_TEST_EQUALS(layer1.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(layer2.GetProperty< int >( Layer::Property::DEPTH ), 2u, TEST_LOCATION);
@@ -268,11 +268,11 @@ int UtcDaliLayerSetSortFunction(void)
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 1, 1 ) );
   actor2.SetProperty( Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f ) ); // 50% transparent
 
-  // add to stage
-  Stage::GetCurrent().Add( actor );
-  Stage::GetCurrent().Add( actor2 );
+  // add to scene
+  application.GetScene().Add( actor );
+  application.GetScene().Add( actor2 );
 
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   gTestSortFunctionCalled = 0;
   root.SetSortFunction(TestSortFunction);
 
@@ -291,12 +291,12 @@ int UtcDaliLayerRaiseAbove(void)
   TestApplication application;
   Layer layer = Layer::New();
   // try to raise above root layer
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   layer.RaiseAbove( root );
-  // layer depth is zero as its not on stage
+  // layer depth is zero as its not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
-  // add to stage
-  Stage::GetCurrent().Add( layer );
+  // add to scene
+  application.GetScene().Add( layer );
   layer.RaiseAbove( root );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
   root.RaiseAbove( layer );
@@ -304,9 +304,9 @@ int UtcDaliLayerRaiseAbove(void)
   layer.RaiseAbove( layer );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
 
-  // make another layer on the stage
+  // make another layer on the scene
   Layer layer2 = Layer::New();
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
   layer.RaiseAbove( layer2 );
   DALI_TEST_GREATER( layer.GetProperty< int >( Layer::Property::DEPTH ), layer2.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
   layer2.RaiseAbove( layer );
@@ -322,12 +322,12 @@ int UtcDaliLayerRaiseBelow(void)
   TestApplication application;
   Layer layer = Layer::New();
   // try to lower below root layer
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   layer.LowerBelow( root );
-  // layer depth is zero as its not on stage
+  // layer depth is zero as its not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
-  // add to stage
-  Stage::GetCurrent().Add( layer );
+  // add to scene
+  application.GetScene().Add( layer );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
   layer.LowerBelow( root );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
@@ -336,9 +336,9 @@ int UtcDaliLayerRaiseBelow(void)
   layer.LowerBelow( layer );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
 
-  // make another layer on the stage
+  // make another layer on the scene
   Layer layer2 = Layer::New();
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
   layer.LowerBelow( layer2 );
   DALI_TEST_GREATER( layer2.GetProperty< int >( Layer::Property::DEPTH ), layer.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
   layer2.LowerBelow( layer );
@@ -354,15 +354,15 @@ int UtcDaliLayerMoveAbove(void)
   TestApplication application;
   Layer layer = Layer::New();
   // try to raise above root layer
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   layer.MoveAbove( root );
-  // layer depth is zero as its not on stage
+  // layer depth is zero as its not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
   root.MoveAbove( layer );
-  // root depth is zero as layer is not on stage
+  // root depth is zero as layer is not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
-  // add to stage
-  Stage::GetCurrent().Add( layer );
+  // add to scene
+  application.GetScene().Add( layer );
   layer.MoveAbove( root );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
@@ -370,9 +370,9 @@ int UtcDaliLayerMoveAbove(void)
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
 
-  // make another layer on the stage
+  // make another layer on the scene
   Layer layer2 = Layer::New();
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
   layer.MoveAbove( layer2 );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), layer2.GetProperty< int >( Layer::Property::DEPTH ) + 1u, TEST_LOCATION );
   layer2.MoveAbove( root );
@@ -381,13 +381,13 @@ int UtcDaliLayerMoveAbove(void)
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), layer.GetProperty< int >( Layer::Property::DEPTH ) + 1u, TEST_LOCATION );
 
   Layer layer3 = Layer::New();
-  Stage::GetCurrent().Add( layer3 );
+  application.GetScene().Add( layer3 );
   DALI_TEST_EQUALS( layer3.GetProperty< int >( Layer::Property::DEPTH ), 3u, TEST_LOCATION );
   root.MoveAbove( layer3 );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 3u, TEST_LOCATION );
   DALI_TEST_EQUALS( layer3.GetProperty< int >( Layer::Property::DEPTH ), 2u, TEST_LOCATION );
-  DALI_TEST_EQUALS( Stage::GetCurrent().GetLayer( 0 ).GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
-  layer3.MoveAbove( Stage::GetCurrent().GetLayer( 0 ) );
+  DALI_TEST_EQUALS( application.GetScene().GetLayer( 0 ).GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
+  layer3.MoveAbove( application.GetScene().GetLayer( 0 ) );
   DALI_TEST_EQUALS( layer3.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
   END_TEST;
 }
@@ -398,15 +398,15 @@ int UtcDaliLayerMoveBelow(void)
   TestApplication application;
   Layer layer = Layer::New();
   // try to raise above root layer
-  Layer root = Stage::GetCurrent().GetLayer( 0 );
+  Layer root = application.GetScene().GetLayer( 0 );
   layer.MoveBelow( root );
-  // layer depth is zero as its not on stage
+  // layer depth is zero as its not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
   root.MoveBelow( layer );
-  // root depth is zero as layer is not on stage
+  // root depth is zero as layer is not on scene
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
-  // add to stage
-  Stage::GetCurrent().Add( layer );
+  // add to scene
+  application.GetScene().Add( layer );
   layer.MoveBelow( root );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
@@ -414,9 +414,9 @@ int UtcDaliLayerMoveBelow(void)
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 0u, TEST_LOCATION );
 
-  // make another layer on the stage
+  // make another layer on the scene
   Layer layer2 = Layer::New();
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
   layer.MoveBelow( layer2 );
   DALI_TEST_EQUALS( layer.GetProperty< int >( Layer::Property::DEPTH ), layer2.GetProperty< int >( Layer::Property::DEPTH ) - 1u, TEST_LOCATION );
   layer2.MoveBelow( root );
@@ -425,7 +425,7 @@ int UtcDaliLayerMoveBelow(void)
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), layer.GetProperty< int >( Layer::Property::DEPTH ) - 1u, TEST_LOCATION );
 
   Layer layer3 = Layer::New();
-  Stage::GetCurrent().Add( layer3 );
+  application.GetScene().Add( layer3 );
   DALI_TEST_EQUALS( layer3.GetProperty< int >( Layer::Property::DEPTH ), 3u, TEST_LOCATION );
   root.MoveBelow( layer3 );
   DALI_TEST_EQUALS( root.GetProperty< int >( Layer::Property::DEPTH ), 2u, TEST_LOCATION );
@@ -559,24 +559,24 @@ int UtcDaliLayerClippingGLCalls(void)
 {
   TestApplication application;
   const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
-  Stage stage( Stage::GetCurrent() );
+  Integration::Scene scene( application.GetScene() );
 
   ClippingBox testBox( 5, 6, 77, 83 );
-  Layer layer = Stage::GetCurrent().GetRootLayer();
+  Layer layer = application.GetScene().GetRootLayer();
   layer.SetProperty( Layer::Property::CLIPPING_ENABLE, true );
   layer.SetProperty( Layer::Property::CLIPPING_BOX, testBox );
 
   // Add at least one renderable actor so the GL calls are actually made
   Texture img = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor = CreateRenderableActor( img );
-  stage.Add( actor );
+  scene.Add( actor );
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS( testBox.x, glScissorParams.x, TEST_LOCATION );
-  DALI_TEST_EQUALS( testBox.y, (int)(stage.GetSize().height - glScissorParams.y - testBox.height), TEST_LOCATION ); // GL Coordinates are from bottom left
+  DALI_TEST_EQUALS( testBox.y, (int)(scene.GetSize().height - glScissorParams.y - testBox.height), TEST_LOCATION ); // GL Coordinates are from bottom left
   DALI_TEST_EQUALS( testBox.width, glScissorParams.width, TEST_LOCATION );
   DALI_TEST_EQUALS( testBox.height, glScissorParams.height, TEST_LOCATION );
   END_TEST;
@@ -611,11 +611,11 @@ int UtcDaliLayer3DSort(void)
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
-  Stage::GetCurrent().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
+  application.GetScene().GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
 
   // Create an actor.
   Actor actor = CreateActor( false );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Create child actors.
   Actor child1 = CreateActor( true );

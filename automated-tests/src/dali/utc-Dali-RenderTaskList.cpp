@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ int UtcDaliRenderTaskListDownCast(void)
 
   tet_infoline("Testing RenderTaskList::DownCast()");
 
-  BaseHandle base = Stage::GetCurrent().GetRenderTaskList();
+  BaseHandle base = application.GetScene().GetRenderTaskList();
 
   RenderTaskList taskList = RenderTaskList::DownCast( base );
 
@@ -99,7 +99,7 @@ int UtcDaliRenderTaskListCreateTask(void)
 
   tet_infoline("Testing RenderTaskList::CreateTask()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   taskList.CreateTask();
@@ -113,7 +113,7 @@ int UtcDaliRenderTaskListRemoveTask(void)
 
   tet_infoline("Testing RenderTaskList::RemoveTask()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   RenderTask newTask = taskList.CreateTask();
@@ -130,7 +130,7 @@ int UtcDaliRenderTaskListRemoveTaskWithExclusiveActor(void)
 
   tet_infoline("Testing RenderTaskList::RemoveTask() which has an exclusive actor set");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   RenderTask newTask = taskList.CreateTask();
@@ -153,7 +153,7 @@ int UtcDaliRenderTaskListGetTaskCount(void)
 
   tet_infoline("Testing RenderTaskList::GetTaskCount()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   taskList.RemoveTask( taskList.GetTask(0u) );
@@ -167,7 +167,7 @@ int UtcDaliRenderTaskListGetTask(void)
 
   tet_infoline("Testing RenderTaskList::GetTask()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask defaultTask = taskList.GetTask( 0u );
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
   DALI_TEST_CHECK( defaultTask );

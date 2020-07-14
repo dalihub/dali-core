@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ int UtcDaliActorObserverTests(void)
 {
   TestApplication application;
 
-  auto stage = Stage::GetCurrent();
+  auto scene = application.GetScene();
   auto actor = Actor::New();
   auto& actorImpl = GetImplementation( actor );
 
@@ -73,15 +73,15 @@ int UtcDaliActorObserverTests(void)
   actorObserver.SetActor( &actorImpl );
   DALI_TEST_EQUALS( actorObserver.GetActor(), &actorImpl, TEST_LOCATION );
 
-  stage.Add( actor );
+  scene.Add( actor );
   DALI_TEST_EQUALS( actorObserver.GetActor(), &actorImpl, TEST_LOCATION );
 
-  // Removing the actor from the stage should make it return null
-  stage.Remove( actor );
+  // Removing the actor from the scene should make it return null
+  scene.Remove( actor );
   DALI_TEST_EQUALS( actorObserver.GetActor(), nullptr, TEST_LOCATION );
 
   // Adding the actor back to the scene should mean it returning the actor again
-  stage.Add( actor );
+  scene.Add( actor );
   DALI_TEST_EQUALS( actorObserver.GetActor(), &actorImpl, TEST_LOCATION );
 
   // Resetting the actor should return nullptr
@@ -92,7 +92,7 @@ int UtcDaliActorObserverTests(void)
   actorObserver.SetActor( &actorImpl );
   DALI_TEST_EQUALS( actorObserver.GetActor(), &actorImpl, TEST_LOCATION );
 
-  // Create another Actor and observe that (don't add it to the stage just yet)
+  // Create another Actor and observe that (don't add it to the scene just yet)
   {
     auto actor2 = Actor::New();
     auto& actor2Impl = GetImplementation( actor2 );
@@ -237,17 +237,17 @@ int UtcDaliActorObserverFunctionCallback(void)
   // Test to ensure the passed in callback is called when the observed actor is disconnected
   TestCallback::Reset();
 
-  auto stage = Stage::GetCurrent();
+  auto scene = application.GetScene();
   auto actor = Actor::New();
   auto& actorImpl = GetImplementation( actor );
-  stage.Add( actor );
+  scene.Add( actor );
 
   ActorObserver actorObserver( MakeCallback( &TestCallback::Function ) );
   actorObserver.SetActor( &actorImpl );
   DALI_TEST_EQUALS( actorObserver.GetActor(), &actorImpl, TEST_LOCATION );
   DALI_TEST_EQUALS( TestCallback::disconnectedActor, nullptr, TEST_LOCATION );
 
-  // Unstage Actor
+  // Remove Actor from scene
   actor.Unparent();
   DALI_TEST_EQUALS( actorObserver.GetActor(), nullptr, TEST_LOCATION );
   DALI_TEST_EQUALS( TestCallback::disconnectedActor, &actorImpl, TEST_LOCATION );
@@ -265,10 +265,10 @@ int UtcDaliActorObserverFunctionCallbackEnsureNoDoubleDelete(void)
 
   try
   {
-    auto stage = Stage::GetCurrent();
+    auto scene = application.GetScene();
     auto actor = Actor::New();
     auto& actorImpl = GetImplementation( actor );
-    stage.Add( actor );
+    scene.Add( actor );
 
     ActorObserver *observer1 = new ActorObserver( MakeCallback( &TestCallback::Function ) );
     observer1->SetActor( &actorImpl );
@@ -276,7 +276,7 @@ int UtcDaliActorObserverFunctionCallbackEnsureNoDoubleDelete(void)
     // Move observer1 into a new observer
     ActorObserver* observer2 = new ActorObserver( std::move( *observer1 ) );
 
-    // Unstage Actor, function should be called only once
+    // Remove actor from scene, function should be called only once
     actor.Unparent();
     DALI_TEST_EQUALS( TestCallback::disconnectedActor, &actorImpl, TEST_LOCATION );
     DALI_TEST_EQUALS( TestCallback::callCount, 1, TEST_LOCATION );

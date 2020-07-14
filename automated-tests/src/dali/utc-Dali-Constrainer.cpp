@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ int UtcPathConstrainerApply(void)
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
 
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   //Create a Path
   Dali::Path path = Dali::Path::New();
@@ -161,7 +161,7 @@ int UtcPathConstrainerApplyRange(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   //Create a Path
   Dali::Path path = Dali::Path::New();
@@ -239,7 +239,7 @@ int UtcPathConstrainerDestroy(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   {
     //Create a Path
@@ -283,7 +283,7 @@ int UtcPathConstrainerRemove(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   //Create a Path
   Dali::Path path = Dali::Path::New();
@@ -433,7 +433,7 @@ int UtcLinearConstrainerApply(void)
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
 
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
 
   //Create a LinearConstrainer without specifying progress for values
@@ -510,7 +510,7 @@ int UtcLinearConstrainerApplyRange(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 100.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   //Create a LinearConstrainer
   Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();
@@ -559,7 +559,7 @@ int UtcLinearConstrainerDestroy(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   {
     //Create a LinearConstrainer
@@ -597,7 +597,7 @@ int UtcLinearConstrainerRemove(void)
 
   // Register a float property
   Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   //Create a LinearConstrainer
   Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();

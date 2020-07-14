@@ -50,7 +50,8 @@ class TestClass : public ConnectionTracker
 {
 public:
 
-  TestClass()
+  TestClass(Integration::Scene scene )
+  : mScene( scene )
   {
   }
 
@@ -61,7 +62,7 @@ public:
   void Initialize()
   {
     mActor = Actor::New();
-    Stage::GetCurrent().Add( mActor );
+    mScene.Add( mActor );
     mNotification = mActor.AddPropertyNotification( Actor::Property::POSITION_X, GreaterThanCondition(100.0f) );
     mNotification.NotifySignal().Connect( this, &TestClass::OnPropertyNotify );
   }
@@ -78,7 +79,7 @@ public:
 
   void Terminate()
   {
-    Stage::GetCurrent().Remove( mActor );
+    mScene.Remove( mActor );
     mActor.Reset();
     mNotification.Reset();
   }
@@ -91,6 +92,7 @@ public:
 
   Actor mActor;
   PropertyNotification mNotification;
+  Integration::Scene mScene;
 };
 
 
@@ -178,7 +180,7 @@ int UtcDaliAddPropertyNotificationCallback(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  TestClass* object = new TestClass;
+  TestClass* object = new TestClass(application.GetScene());
 
   object->Initialize();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -429,7 +431,7 @@ int UtcDaliPropertyNotificationGreaterThan(void)
   tet_infoline(" UtcDaliPropertyNotificationGreaterThan");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -464,7 +466,7 @@ int UtcDaliPropertyNotificationLessThan(void)
   tet_infoline(" UtcDaliPropertyNotificationLessThan");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, LessThanCondition(100.0f ) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -499,7 +501,7 @@ int UtcDaliPropertyNotificationInside(void)
   tet_infoline(" UtcDaliPropertyNotificationInside");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, InsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -534,7 +536,7 @@ int UtcDaliPropertyNotificationOutside(void)
   tet_infoline(" UtcDaliPropertyNotificationOutside");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION_X, OutsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -569,7 +571,7 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   tet_infoline(" UtcDaliPropertyNotificationGreaterThan");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -618,7 +620,7 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   tet_infoline(" UtcDaliPropertyNotificationLessThan");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, LessThanCondition(-100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -667,7 +669,7 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   tet_infoline(" UtcDaliPropertyNotificationInside");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, InsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -717,7 +719,7 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   tet_infoline(" UtcDaliPropertyNotificationOutside");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, OutsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
@@ -828,7 +830,7 @@ int UtcDaliPropertyNotificationStep(void)
   tet_infoline(" UtcDaliPropertyNotificationStep");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   const float step = 100.0f;
   // float
@@ -866,7 +868,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
   tet_infoline(" UtcDaliPropertyNotificationStep");
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Dali::Vector<float> values;
 
@@ -907,7 +909,7 @@ int UtcDaliPropertyNotificationOrder(void)
   TestApplication application; // Reset all test adapter return codes
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   // this should complete in first frame
   PropertyNotification notification1 = actor.AddPropertyNotification( Actor::Property::POSITION_X, GreaterThanCondition(90.0f) );
   notification1.NotifySignal().Connect( &TestCallback );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ int UtcDaliConstraintNewFunctionP(void)
   UtcDaliConstraintNewFunction::gConstraintFunctionCalled = false;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -174,7 +174,7 @@ int UtcDaliConstraintNewFunctionNonConstrainableTypeN(void)
   UtcDaliConstraintNewFunction::gConstraintFunctionCalled = false;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -211,7 +211,7 @@ int UtcDaliConstraintNewFunctorP(void)
   bool functorCalled = false;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -294,7 +294,7 @@ int UtcDaliConstraintNewFunctorMemberP(void)
   bool sizeFunctorCalled = false;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -375,7 +375,7 @@ int UtcDaliConstraintCloneP(void)
   Actor actor = Actor::New();
   Actor clone = Actor::New();
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( actor );
   stage.Add( clone );
 
@@ -472,7 +472,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   Actor actor = Actor::New();
   Actor clone = Actor::New();
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( actor );
   stage.Add( clone );
 
@@ -513,7 +513,7 @@ int UtcDaliConstraintCopyAndAssignment(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
   Constraint copied( constraint );
@@ -761,7 +761,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -798,7 +798,7 @@ int UtcDaliConstraintDiscardRemoveAction(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -846,7 +846,7 @@ int UtcDaliConstraintApplyRemove(void)
   bool functorCalled = false;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -904,7 +904,7 @@ int UtcDaliConstraintApplyBeforeAddedToStage(void)
   DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
 
   // Add actor to stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -938,7 +938,7 @@ int UtcDaliConstraintApplyAndRemoveBeforeAddedToStage(void)
   constraint.Remove();
 
   // Add actor to stage
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -959,7 +959,7 @@ int UtcDaliConstraintApplyActorStagedUnstaged(void)
 
   // Create an actor and add to stage
   Actor actor = Actor::New();
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( actor );
 
   // Create a constraint and apply
@@ -1006,7 +1006,7 @@ int UtcDaliConstraintApplySeveralTimes(void)
 
   // Create an actor and add to stage
   Actor actor = Actor::New();
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( actor );
 
   // Create a constraint and apply
@@ -1073,7 +1073,7 @@ int UtcDaliConstraintAddSourceP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Create a constraint, add sources
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &UtcDaliConstraintAddSource::Function );
@@ -1166,7 +1166,7 @@ int UtcDaliConstraintChaining(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Constraint constraint1 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function1 );
   Constraint constraint2 = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &TestChaining::Function2 );
@@ -1199,7 +1199,7 @@ void Execute( T value )
   Actor actor = Actor::New();
   Property::Index index = actor.RegisterProperty( "TEMP_PROPERTY_NAME", value );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1253,7 +1253,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Check initial value is fully opaque
   application.SendNotification();
@@ -1286,7 +1286,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Add the actor back to the stage and check the value, it should be fully opaque again
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Check value when back on-stage, it should be fully opaque as the constraint is no longer applied to it.
   application.SendNotification();
@@ -1308,7 +1308,7 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Check initial value is fully opaque
   application.SendNotification();
@@ -1344,7 +1344,7 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 1.0f, TEST_LOCATION );
 
   // Add the actor back to the stage and check the value, the constraint should have been re-applied
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a, 0.5f, TEST_LOCATION );

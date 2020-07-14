@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ int UtcDaliPropertyBufferSetData01(void)
     Actor actor = Actor::New();
     actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
     actor.AddRenderer(renderer);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     application.SendNotification();
     application.Render(0);
@@ -191,7 +191,7 @@ int UtcDaliPropertyBufferSetData02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render(0);

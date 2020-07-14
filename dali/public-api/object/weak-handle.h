@@ -2,7 +2,7 @@
 #define DALI_WEAK_HANDLE_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/actors/custom-actor.h>
 
 namespace Dali
@@ -54,7 +54,7 @@ public:
    * @SINCE_1_2.60
    * @param [in] handle A reference to the handle of the DALi object
    */
-  WeakHandleBase( Handle& handle );
+  WeakHandleBase( BaseHandle& handle );
 
   /**
    * @brief Destructor to free resources.
@@ -104,7 +104,7 @@ public:
    * @SINCE_1_2.60
    * @return The handle of the DALi object pointed by this WeakHandleBase or an empty handle if the DALi object doesn't exist
    */
-  Handle GetBaseHandle() const;
+  BaseHandle GetBaseHandle() const;
 
   /**
    * @brief Resets this weak handle to not point to any DALi object
@@ -141,7 +141,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::WeakHandleBase::WeakHandleBase(Handle&)
+   * @copydoc Dali::WeakHandleBase::WeakHandleBase( BaseHandle& )
    */
   WeakHandle( T& handle )
   : WeakHandleBase( handle )
@@ -191,7 +191,7 @@ public:
    */
   T GetHandle() const
   {
-    Handle handle( GetBaseHandle() );
+    BaseHandle handle( WeakHandleBase::GetBaseHandle() );
     if( handle )
     {
       return DownCast< T >( handle );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
 namespace Dali
@@ -47,6 +48,12 @@ Vector2::Vector2(const Vector3& vec3)
 Vector2::Vector2(const Vector4& vec4)
 : x(vec4.x),
   y(vec4.y)
+{
+}
+
+Vector2::Vector2(const Uint16Pair& pair)
+: width(pair.GetWidth()),
+  height(pair.GetHeight())
 {
 }
 

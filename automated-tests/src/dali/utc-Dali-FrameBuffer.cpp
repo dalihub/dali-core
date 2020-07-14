@@ -127,7 +127,7 @@ int UtcDaliFrameBufferNew06(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, static_cast<FrameBuffer::Attachment::Mask>( FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL ) );
 
   DALI_TEST_CHECK( frameBuffer );
 
@@ -349,7 +349,7 @@ int UtcDaliFrameBufferAttachColorTexture04(void)
 
   unsigned int width(64);
   unsigned int height(64);
-  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL );
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, static_cast<FrameBuffer::Attachment::Mask>( FrameBuffer::Attachment::DEPTH | FrameBuffer::Attachment::STENCIL ) );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   frameBuffer.AttachColorTexture( texture );
 

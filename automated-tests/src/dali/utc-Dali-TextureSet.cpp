@@ -149,7 +149,7 @@ int UtcDaliTextureSetTexture01(void)
 
   Actor actor = CreateActor( DONT_SET_SAMPLER );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -179,7 +179,7 @@ int UtcDaliTextureSetTexture02(void)
 
   Actor actor = CreateActor(SET_SAMPLER);
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -211,8 +211,8 @@ int UtcDaliTextureSetMultiple(void)
   Actor actor1 = CreateActor(SET_SAMPLER);
   Actor actor2 = CreateActor(SET_SAMPLER);
 
-  Stage::GetCurrent().Add( actor1 );
-  Stage::GetCurrent().Add( actor2 );
+  application.GetScene().Add( actor1 );
+  application.GetScene().Add( actor2 );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -255,7 +255,7 @@ int UtcDaliTextureSetSetSampler(void)
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 

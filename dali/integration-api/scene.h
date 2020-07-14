@@ -18,10 +18,14 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
@@ -57,6 +61,8 @@ public:
   typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
   typedef Signal< void (const Dali::TouchData&) > TouchSignalType; ///< Touch signal type
   typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< Touched signal type
+
+  using FrameCallbackContainer = std::vector< std::pair< std::unique_ptr< CallbackBase >, int32_t > >;
 
   /**
    * @brief Create an initialized Scene handle.
@@ -228,6 +234,56 @@ public:
    * This function is called by Core when events are processed.
    */
   void ProcessEvents();
+
+  /**
+   * @brief Adds a callback that is called when the frame rendering is done by the graphics driver.
+   *
+   * @param[in] callback The function to call
+   * @param[in] frameId The Id to specify the frame. It will be passed when the callback is called.
+   *
+   * @note A callback of the following type may be used:
+   * @code
+   *   void MyFunction( int frameId );
+   * @endcode
+   * This callback will be deleted once it is called.
+   *
+   * @note Ownership of the callback is passed onto this class.
+   */
+  void AddFrameRenderedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+
+  /**
+   * @brief Adds a callback that is called when the frame is displayed on the display.
+   *
+   * @param[in] callback The function to call
+   * @param[in] frameId The Id to specify the frame. It will be passed when the callback is called.
+   *
+   * @note A callback of the following type may be used:
+   * @code
+   *   void MyFunction( int frameId );
+   * @endcode
+   * This callback will be deleted once it is called.
+   *
+   * @note Ownership of the callback is passed onto this class.
+   */
+  void AddFramePresentedCallback( std::unique_ptr< CallbackBase > callback, int32_t frameId );
+
+  /**
+   * @brief Gets the callback list that is called when the frame rendering is done by the graphics driver.
+   *
+   * @param[out] callbacks The callback list
+   *
+   * @note This is called in the update thread.
+   */
+  void GetFrameRenderedCallback( FrameCallbackContainer& callbacks );
+
+  /**
+   * @brief Gets the callback list that is called when the frame is displayed on the display.
+   *
+   * @param[out] callbacks The callback list
+   *
+   * @note This is called in the update thread.
+   */
+  void GetFramePresentedCallback( FrameCallbackContainer& callbacks );
 
   /**
    * @brief This signal is emitted just after the event processing is finished.

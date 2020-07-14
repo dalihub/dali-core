@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,7 +206,7 @@ int UtcDaliAlphaFunctionBezier(void)
   // Register a float property
   float startValue(0.0f);
   Property::Index index = actor.RegisterProperty( "testProperty",  startValue );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
 
   // Build the animation

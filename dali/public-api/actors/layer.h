@@ -213,17 +213,6 @@ public:
   };
 
   /**
-   * @DEPRECATED_1_2.26. Not intended for application use.
-   *
-   * @brief Enumeration for TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
-   * @SINCE_1_0.0
-   */
-  enum TreeDepthMultiplier
-  {
-    TREE_DEPTH_MULTIPLIER = 10000,
-  };
-
-  /**
    * @brief The sort function type.
    *
    * @SINCE_1_0.0

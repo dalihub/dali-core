@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ int UtcDaliLongPressGestureRecognizerBasicNoAction(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -156,7 +156,7 @@ int UtcDaliLongPressGestureRecognizerBasic(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -188,7 +188,7 @@ int UtcDaliLongPressGestureRecognizerTooShortWait(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -220,7 +220,7 @@ int UtcDaliLongPressGestureRecognizerTooFewPoints(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -253,7 +253,7 @@ int UtcDaliLongPressGestureRecognizerTooManyPoints(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -289,7 +289,7 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsMoving(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -329,7 +329,7 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -363,13 +363,13 @@ int UtcDaliLongPressGestureRecognizerMultipleDetectors(void)
     Actor actor = Actor::New();
     actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     Actor actor2 = Actor::New();
     actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     actor2.SetProperty( Actor::Property::POSITION_X, 100.0f);
-    Stage::GetCurrent().Add(actor2);
+    application.GetScene().Add(actor2);
 
     // Render and notify
     application.SendNotification();

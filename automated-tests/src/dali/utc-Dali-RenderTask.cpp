@@ -189,7 +189,7 @@ RenderTask CreateRenderTask(TestApplication& application,
                             bool glSync)
 {
   // Change main render task to use a different root
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   taskList.GetTask(0u).SetSourceActor( rootActor );
 
   FrameBuffer frameBuffer = FrameBuffer::New(10,10);
@@ -284,7 +284,7 @@ int UtcDaliRenderTaskDownCast01(void)
 
   tet_infoline("Testing RenderTask::DownCast()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   BaseHandle base = taskList.GetTask( 0u );
   DALI_TEST_CHECK( base );
@@ -315,7 +315,7 @@ int UtcDaliRenderTaskSetSourceActorN(void)
 {
   TestApplication application;
   tet_infoline("Testing RenderTask::SetSourceActor() Negative - try with empty actor handle");
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor srcActor;
 
@@ -337,7 +337,7 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   RenderTaskList taskList = stage.GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
@@ -380,7 +380,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that switching source from a non-renderable to a renderable actor causes the texture to be drawn");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   RenderTaskList taskList = stage.GetRenderTaskList();
 
@@ -438,7 +438,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor (on/off stage testing)");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   RenderTaskList taskList = stage.GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
@@ -491,7 +491,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor (empty handle case)");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   RenderTaskList taskList = stage.GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
@@ -541,7 +541,7 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
 
   tet_infoline( "Testing RenderTask::SetSourceActor - Set a source actor and destroy the source actor" );
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   RenderTaskList taskList = stage.GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
@@ -577,7 +577,7 @@ int UtcDaliRenderTaskGetSourceActorP01(void)
 
   tet_infoline("Testing RenderTask::GetSourceActor() Check the default render task has a valid source actor");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -585,7 +585,7 @@ int UtcDaliRenderTaskGetSourceActorP01(void)
   DALI_TEST_CHECK( actor );
 
   // By default the entire scene should be rendered
-  Actor root = Stage::GetCurrent().GetLayer( 0 );
+  Actor root = application.GetScene().GetLayer( 0 );
   DALI_TEST_CHECK( root == actor );
   END_TEST;
 }
@@ -596,10 +596,10 @@ int UtcDaliRenderTaskGetSourceActorP02(void)
 
   tet_infoline("Testing RenderTask::GetSourceActor() Create a new render task, Add a new actor to the stage and set it as the source of the new render task. Get its source actor and check that it is equivalent to what was set.");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   task.SetSourceActor( actor );
 
   DALI_TEST_EQUALS( actor, task.GetSourceActor(), TEST_LOCATION );
@@ -633,7 +633,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   tet_infoline("Testing RenderTask::SetExclusive() Check that exclusion works");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // Manipulate the GenTextures behaviour, to identify different actors
 
@@ -646,7 +646,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   Texture img1 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor1 = CreateRenderableActor( img1 );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
-  Stage::GetCurrent().Add( actor1 );
+  application.GetScene().Add( actor1 );
 
   // Update & Render actor1
   application.SendNotification();
@@ -673,7 +673,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   // Force actor2 to be rendered before actor1
   Layer layer = Layer::New();
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.Add( actor2 );
   layer.LowerToBottom();
 
@@ -702,7 +702,7 @@ int UtcDaliRenderTaskSetExclusive(void)
 
   // Force actor3 to be rendered before actor2
   layer = Layer::New();
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.Add( actor3 );
   layer.LowerToBottom();
 
@@ -799,9 +799,9 @@ int UtcDaliRenderTaskSetExclusive02(void)
   Texture img1 = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1 );
   Actor actor1 = CreateRenderableActor( img1 );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
-  Stage::GetCurrent().Add( actor1 );
+  application.GetScene().Add( actor1 );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
 
   task.SetSourceActor( actor1 );
@@ -853,7 +853,7 @@ int UtcDaliRenderTaskIsExclusive01(void)
 
   tet_infoline("Testing RenderTask::IsExclusive() Check default values are non-exclusive");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // Not exclusive is the default
   RenderTask task = taskList.GetTask( 0u );
@@ -871,7 +871,7 @@ int UtcDaliRenderTaskIsExclusive02(void)
 
   tet_infoline("Testing RenderTask::IsExclusive() Check the getter returns set values");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // Not exclusive is the default
   RenderTask newTask = taskList.CreateTask();
@@ -908,7 +908,7 @@ int UtcDaliRenderTaskSetInputEnabled(void)
 
   tet_infoline("Testing RenderTask::SetInputEnabled()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // Input is enabled by default
   RenderTask task = taskList.GetTask( 0u );
@@ -928,7 +928,7 @@ int UtcDaliRenderTaskGetInputEnabled(void)
 
   tet_infoline("Testing RenderTask::GetInputEnabled()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // Input is enabled by default
   RenderTask task = taskList.GetTask( 0u );
@@ -949,7 +949,7 @@ int UtcDaliRenderTaskSetCameraActorP(void)
 
   tet_infoline("Testing RenderTask::SetCameraActor()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -972,7 +972,7 @@ int UtcDaliRenderTaskSetCameraActorN(void)
 
   tet_infoline("Testing RenderTask::SetCameraActor() with empty actor handle");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -993,7 +993,7 @@ int UtcDaliRenderTaskSetCameraActorDestroyed(void)
 
   tet_infoline( "Testing RenderTask::SetCameraActor - Set a camera actor and destroy the camera actor" );
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   RenderTaskList taskList = stage.GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1017,7 +1017,7 @@ int UtcDaliRenderTaskGetCameraActorP(void)
 
   tet_infoline("Testing RenderTask::GetCameraActor()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1054,7 +1054,7 @@ int UtcDaliRenderTaskSetFrameBufferP(void)
 
   tet_infoline("Testing RenderTask::SetFrameBuffer()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1070,7 +1070,7 @@ int UtcDaliRenderTaskSetFrameBufferN(void)
 
   tet_infoline("Testing RenderTask::SetFrameBuffer()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
   FrameBuffer newFrameBuffer; // Empty handle
@@ -1085,7 +1085,7 @@ int UtcDaliRenderTaskGetFrameBufferP(void)
 
   tet_infoline("Testing RenderTask::GetFrameBuffer()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1101,7 +1101,7 @@ int UtcDaliRenderTaskGetFrameBufferN(void)
 
   tet_infoline("Testing RenderTask::GetFrameBuffer()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1118,7 +1118,7 @@ int UtcDaliRenderTaskSetScreenToFrameBufferFunctionP(void)
 
   tet_infoline("Testing RenderTask::SetScreenToFrameBufferFunction()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1166,7 +1166,7 @@ int UtcDaliRenderTaskGetScreenToFrameBufferFunctionP(void)
 
   tet_infoline("Testing RenderTask::GetScreenToFrameBufferFunction()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1205,7 +1205,7 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorP(void)
   TestApplication application;
   tet_infoline("Testing RenderTask::GetScreenToFrameBufferMappingActor ");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask renderTask = taskList.CreateTask();
   Actor mappingActor = Actor::New();
   renderTask.SetScreenToFrameBufferMappingActor(mappingActor);
@@ -1239,7 +1239,7 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor02N(void)
   TestApplication application;
   tet_infoline("Testing RenderTask::GetScreenToFrameBufferMappingActor with empty task handle");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask renderTask = taskList.CreateTask();
   Actor actor;
   renderTask.SetScreenToFrameBufferMappingActor(actor);
@@ -1254,12 +1254,12 @@ int UtcDaliRenderTaskGetViewportP01(void)
 
   tet_infoline("Testing RenderTask::GetViewport() on default task");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
   Viewport viewport = task.GetViewport();
 
   // By default the viewport should match the stage width/height
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
   DALI_TEST_CHECK( viewport == expectedViewport );
   END_TEST;
@@ -1271,12 +1271,12 @@ int UtcDaliRenderTaskGetViewportP02(void)
 
   tet_infoline("Testing RenderTask::GetViewport() on new task");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
   Viewport viewport = task.GetViewport();
 
   // By default the viewport should match the stage width/height
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
   DALI_TEST_CHECK( viewport == expectedViewport );
   END_TEST;
@@ -1309,10 +1309,10 @@ int UtcDaliRenderTaskSetViewportP(void)
 
   tet_infoline("Testing RenderTask::SetViewport()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Viewport newViewport( 0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f );
   task.SetViewport( newViewport );
 
@@ -1330,12 +1330,12 @@ int UtcDaliRenderTaskSetViewportN(void)
 
   tet_infoline("Testing RenderTask::SetViewport()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task;
   try
   {
-    Vector2 stageSize = Stage::GetCurrent().GetSize();
+    Vector2 stageSize = application.GetScene().GetSize();
     Viewport newViewport( 0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f );
     task.SetViewport( newViewport );
   }
@@ -1355,7 +1355,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   tet_infoline("Testing RenderTask::SetViewportPosition()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1363,7 +1363,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   // By default the viewport should match the stage width/height
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
   DALI_TEST_CHECK( viewport == expectedViewport );
 
@@ -1430,7 +1430,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   tet_infoline("Testing RenderTask::SetViewportSize()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
 
@@ -1438,7 +1438,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   // By default the viewport should match the stage width/height
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
   DALI_TEST_CHECK( viewport == expectedViewport );
 
@@ -1507,7 +1507,7 @@ int UtcDaliRenderTaskSetClearColorP(void)
   Vector4 testColor( 1.0f, 2.0f, 3.0f, 4.0f );
   Vector4 testColor2( 5.0f, 6.0f, 7.0f, 8.0f );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_CHECK( task.GetClearColor() != testColor );
@@ -1586,7 +1586,7 @@ int UtcDaliRenderTaskGetClearColorP(void)
 
   tet_infoline("Testing RenderTask::GetClearColor()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_EQUALS( task.GetClearColor(), RenderTask::DEFAULT_CLEAR_COLOR, TEST_LOCATION );
   END_TEST;
@@ -1618,7 +1618,7 @@ int UtcDaliRenderTaskSetClearEnabledP(void)
 
   tet_infoline("Testing RenderTask::SetClearEnabled()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_CHECK( task.GetClearEnabled() ); // defaults to true
@@ -1656,7 +1656,7 @@ int UtcDaliRenderTaskGetClearEnabledP(void)
 
   tet_infoline("Testing RenderTask::GetClearEnabled()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_CHECK( task.GetClearEnabled() ); // defaults to true
@@ -1690,7 +1690,7 @@ int UtcDaliRenderTaskSetCullModeP(void)
 
   tet_infoline("Testing RenderTask::SetCullMode()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_EQUALS( task.GetCullMode(), true, TEST_LOCATION );
 
@@ -1726,7 +1726,7 @@ int UtcDaliRenderTaskGetCullModeP(void)
 
   tet_infoline("Testing RenderTask::GetCullMode()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
   DALI_TEST_EQUALS( task.GetCullMode(), true, TEST_LOCATION );
   END_TEST;
@@ -1759,7 +1759,7 @@ int UtcDaliRenderTaskSetRefreshRate(void)
 
   tet_infoline("Testing RenderTask::SetRefreshRate()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // By default tasks will be processed every frame
   RenderTask task = taskList.GetTask( 0u );
@@ -1779,7 +1779,7 @@ int UtcDaliRenderTaskGetRefreshRate(void)
 
   tet_infoline("Testing RenderTask::GetRefreshRate()");
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   // By default tasks will be processed every frame
   RenderTask task = taskList.GetTask( 0u );
@@ -1801,14 +1801,14 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   CameraActor offscreenCameraActor = CameraActor::New();
 
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
   Texture frameBufferTexture = Texture::New( *testNativeImagePtr );
   FrameBuffer frameBuffer = FrameBuffer::New(frameBufferTexture.GetWidth(),frameBufferTexture.GetHeight());
@@ -1879,10 +1879,10 @@ int UtcDaliRenderTaskContinuous01(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
 
@@ -1896,7 +1896,7 @@ int UtcDaliRenderTaskContinuous01(void)
   application.GetPlatform().ClearReadyResources();
 
   // ADD SOURCE ACTOR TO STAGE - expect continuous renders to start, no finished signal
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                  Input,    Expected  Input,    Expected
@@ -1917,13 +1917,13 @@ int UtcDaliRenderTaskContinuous02(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
   secondRootActor.SetProperty( Actor::Property::VISIBLE,false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
@@ -1957,11 +1957,11 @@ int UtcDaliRenderTaskContinuous03(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -1974,7 +1974,7 @@ int UtcDaliRenderTaskContinuous03(void)
   application.GetPlatform().ClearReadyResources();
 
   // ADD CAMERA ACTOR TO STAGE - expect continuous renders to start, no finished signal
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
@@ -1995,12 +1995,12 @@ int UtcDaliRenderTaskContinuous04(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -2026,13 +2026,13 @@ int UtcDaliRenderTaskOnce01(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
 
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
   bool finished = false;
@@ -2064,10 +2064,10 @@ int UtcDaliRenderTaskOnce02(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
   Texture image = CreateTexture();
@@ -2079,7 +2079,7 @@ int UtcDaliRenderTaskOnce02(void)
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
   bool finished = false;
@@ -2112,12 +2112,12 @@ int UtcDaliRenderTaskOnce03(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -2157,10 +2157,10 @@ int UtcDaliRenderTaskOnce04(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
   Texture image = CreateTexture();
@@ -2172,7 +2172,7 @@ int UtcDaliRenderTaskOnce04(void)
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -2209,12 +2209,12 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool finished = false;
@@ -2239,10 +2239,10 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
   Texture image = CreateTexture();
@@ -2254,7 +2254,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool finished = false;
@@ -2283,12 +2283,12 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
   bool finished = false;
@@ -2320,10 +2320,10 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Shader shader = CreateShader();
   Texture image = CreateTexture();
@@ -2335,7 +2335,7 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   Actor secondRootActor = Actor::New();
   secondRootActor.AddRenderer(renderer);
   secondRootActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
@@ -2375,12 +2375,12 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   drawTrace.Enable(true);
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor secondRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
   bool finished = false;
@@ -2415,12 +2415,12 @@ int UtcDaliRenderTaskOnceChain01(void)
   drawTrace.Enable(true);
 
   Actor defaultRootActor = Actor::New(); // Root for default RT
-  Stage::GetCurrent().Add( defaultRootActor );
+  application.GetScene().Add( defaultRootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   Actor firstRootActor = CreateRenderableActorSuccess(application, "aFile.jpg");
-  Stage::GetCurrent().Add(firstRootActor);
+  application.GetScene().Add(firstRootActor);
 
   // first render task
   RenderTask firstTask = CreateRenderTask(application, offscreenCameraActor, defaultRootActor, firstRootActor, RenderTask::REFRESH_ONCE, false);
@@ -2431,7 +2431,7 @@ int UtcDaliRenderTaskOnceChain01(void)
   // Second render task
   FrameBuffer fbo = firstTask.GetFrameBuffer();
   Actor secondRootActor = CreateRenderableActor( fbo.GetColorTexture() );
-  Stage::GetCurrent().Add(secondRootActor);
+  application.GetScene().Add(secondRootActor);
   RenderTask secondTask = CreateRenderTask(application, offscreenCameraActor, defaultRootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool secondFinished = false;
   RenderTaskFinished renderTask2Finished( secondFinished );
@@ -2456,7 +2456,7 @@ int UtcDaliRenderTaskProperties(void)
 {
   TestApplication application;
 
-  RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
+  RenderTask task = application.GetScene().GetRenderTaskList().CreateTask();
 
   Property::IndexContainer indices;
   task.GetPropertyIndices( indices );
@@ -2476,15 +2476,15 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   CameraActor offscreenCameraActor = CameraActor::New();
 
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
   rootActor.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   rootActor.SetProperty( Actor::Property::VISIBLE,false);
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
   Texture frameBufferTexture = Texture::New( *testNativeImagePtr );
   FrameBuffer frameBuffer = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
@@ -2559,7 +2559,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   // Previously we had bugs where not having a resource ID would cause render-tasks to wait forever
   tet_infoline("Testing RenderTask::SignalFinished() when an Actor has no Image set");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Texture image = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10 );
   Actor rootActor = CreateRenderableActor( image );
@@ -2570,7 +2570,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   actorWithMissingImage.SetProperty( Actor::Property::SIZE, Vector2( 10.0f, 10.0f ) );
   stage.Add( actorWithMissingImage );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask newTask = taskList.CreateTask();
   newTask.SetInputEnabled( false );
   newTask.SetClearColor( Vector4( 0.f, 0.f, 0.f, 0.f ) );
@@ -2597,7 +2597,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
 {
   TestApplication application( 400u, 400u ); // square surface
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -2606,7 +2606,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.5) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.5) );
 
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
@@ -2633,7 +2633,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor2.SetProperty( Actor::Property::POSITION, Vector3(0.0, 0.0, 0.0) );
   actor2.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.0) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.0) );
-  Stage::GetCurrent().Add( actor2 );
+  application.GetScene().Add( actor2 );
   actor2.Add(actor);
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3(0,0,0) );
 
@@ -2658,9 +2658,9 @@ int UtcDaliRenderTaskViewportToLocal(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.GetTask( 0u );
 
   // flush the queue and render once
@@ -2696,9 +2696,9 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::POSITION, Vector2( 10.0f, 10.0f ));
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
 
   FrameBuffer newFrameBuffer = FrameBuffer::New(10, 10);
@@ -2707,7 +2707,7 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
   task.SetScreenToFrameBufferMappingActor( actor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
   task.SetCameraActor( offscreenCameraActor );
 
   // flush the queue and render once
@@ -2738,7 +2738,7 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
 int UtcDaliRenderTaskRequiresSync(void)
 {
   TestApplication application;
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask newTask = taskList.CreateTask();
   newTask.SetProperty( RenderTask::Property::REQUIRES_SYNC, false );
@@ -2764,16 +2764,16 @@ int UtcDaliRenderTaskSetClearEnabled(void)
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
   Actor renderableActor = CreateRenderableActorSuccess( application, "aFile.jpg" );
-  Stage::GetCurrent().Add( renderableActor );
+  application.GetScene().Add( renderableActor );
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   CameraActor offscreenCameraActor = CameraActor::New( Size( TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT ) );
-  Stage::GetCurrent().Add( offscreenCameraActor );
+  application.GetScene().Add( offscreenCameraActor );
 
   Actor sourceActor = CreateRenderableActorSuccess( application, "aFile.jpg" );
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   RenderTask newTask = CreateRenderTask( application, offscreenCameraActor, rootActor, sourceActor, RenderTask::REFRESH_ALWAYS, false );
 

@@ -57,14 +57,6 @@ FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, Attachment::Mask 
   return FrameBuffer( frameBuffer.Get() );
 }
 
-FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, uint32_t attachments )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: FrameBuffer::New(uint32_t,uint32_t,uint32_t) is deprecated and will be removed from next release. use New(uint32_t, uint32_t,Attachment::Mask) instead.\n" );
-  // have to static cast, which according to standard since C++11 is undefined behaviour, hence this variant is deprecated
-  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, static_cast<Attachment::Mask>( attachments ) );
-  return FrameBuffer( frameBuffer.Get() );
-}
-
 FrameBuffer::FrameBuffer()
 {
 }

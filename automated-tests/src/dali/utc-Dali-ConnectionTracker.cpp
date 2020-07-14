@@ -53,7 +53,7 @@ namespace {
 
 int UtcConnectionTrackerConstructorP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   ConnectionTracker tracker;
 
@@ -64,7 +64,7 @@ int UtcConnectionTrackerConstructorP(void)
 
 int UtcConnectionTrackerDestructorP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
   // make sure the ConnectionTracker disconnects form a signal when it
   // gets deleted.
   TestButton* button = new TestButton(1);
@@ -84,7 +84,7 @@ int UtcConnectionTrackerDestructorP(void)
 
 int UtcConnectionTrackerDisconnectAllP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp testApp;
@@ -103,7 +103,7 @@ int UtcConnectionTrackerDisconnectAllP(void)
 
 int UtcConnectionTrackerDisconnectAllN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
   TestApp testApp;
   TestButton* button = new TestButton(1);
 
@@ -118,7 +118,7 @@ int UtcConnectionTrackerDisconnectAllN(void)
 
 int UtcConnectionTrackerSignalConnectedP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp testApp;
@@ -133,7 +133,7 @@ int UtcConnectionTrackerSignalConnectedP(void)
 }
 int UtcConnectionTrackerSignalConnectedN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp* testApp( NULL );
@@ -158,7 +158,7 @@ int UtcConnectionTrackerSignalConnectedN(void)
 
 int UtcConnectionTrackerSignalDisconnectP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp testApp;
@@ -177,7 +177,7 @@ int UtcConnectionTrackerSignalDisconnectP(void)
 
 int UtcConnectionTrackerSignalDisconnectN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp testApp;
@@ -187,7 +187,7 @@ int UtcConnectionTrackerSignalDisconnectN(void)
 
   try
   {
-    app.SignalDisconnected( NULL, NULL );
+    application.SignalDisconnected( NULL, NULL );
     tet_result( TET_FAIL );
   }
   catch (Dali::DaliException& e)
@@ -203,7 +203,7 @@ int UtcConnectionTrackerSignalDisconnectN(void)
 
 int UtcConnectionTrackerGetConnectionCountP(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   TestApp testApp;
@@ -217,7 +217,7 @@ int UtcConnectionTrackerGetConnectionCountP(void)
 
 int UtcConnectionTrackerGetConnectionCountN(void)
 {
-  TestApplication app; // Create core for debug logging
+  TestApplication application; // Create core for debug logging
 
   TestButton* button = new TestButton(1);
   DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 0 );

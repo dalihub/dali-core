@@ -78,6 +78,7 @@ struct RenderItem
 
   Matrix            mModelMatrix;
   Matrix            mModelViewMatrix;
+  Vector4           mColor;
   Vector3           mSize;
   Vector3           mUpdateSize;
   Render::Renderer* mRenderer;
