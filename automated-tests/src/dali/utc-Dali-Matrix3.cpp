@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,44 @@ int UtcDaliMatrix3FromMatrix(void)
   Matrix3 m2(m0);
 
   DALI_TEST_EQUALS(m1, m2, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrix3CopyConstructor(void)
+{
+  Matrix3 m0( Matrix3::IDENTITY );
+  Matrix3 m1( m0 );
+  DALI_TEST_EQUALS(m1, Matrix3::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrix3MoveConstructor(void)
+{
+  Matrix3 m0( Matrix3::IDENTITY );
+  Matrix3 m1 = std::move( m0 );
+  DALI_TEST_EQUALS(m1, Matrix3::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrix3CopyAssignment(void)
+{
+  Matrix3 m0( Matrix3::IDENTITY );
+  Matrix3 m1;
+  m1 = m0;
+  DALI_TEST_EQUALS(m1, Matrix3::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrix3MoveAssignment(void)
+{
+  Matrix3 m0( Matrix3::IDENTITY );
+  Matrix3 m1;
+  m1 = std::move( m0 );
+  DALI_TEST_EQUALS(m1, Matrix3::IDENTITY, 0.001f, TEST_LOCATION);
+
   END_TEST;
 }
 

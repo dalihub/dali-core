@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,44 @@ int UtcDaliMatrixConstructor04P(void)
   Quaternion q(Quaternion::IDENTITY);
   Matrix m(q);
   DALI_TEST_EQUALS(Matrix(Matrix::IDENTITY), m, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMatrixCopyConstructor(void)
+{
+  Matrix m0( Matrix::IDENTITY );
+  Matrix m1( m0 );
+  DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrixMoveConstructor(void)
+{
+  Matrix m0( Matrix::IDENTITY );
+  Matrix m1 = std::move( m0 );
+  DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrixCopyAssignment(void)
+{
+  Matrix m0( Matrix::IDENTITY );
+  Matrix m1;
+  m1 = m0;
+  DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMatrixMoveAssignment(void)
+{
+  Matrix m0( Matrix::IDENTITY );
+  Matrix m1;
+  m1 = std::move( m0 );
+  DALI_TEST_EQUALS(m1, Matrix::IDENTITY, 0.001f, TEST_LOCATION);
+
   END_TEST;
 }
 
