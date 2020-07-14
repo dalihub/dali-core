@@ -74,9 +74,9 @@ TestCustomActor TestCustomActor::NewVariant4()
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant5()
+TestCustomActor TestCustomActor::NewVariant5(Integration::Scene scene)
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant5();
+  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant5(scene);
   TestCustomActor custom( *impl ); // takes ownership
 
   impl->Initialize();
@@ -84,9 +84,9 @@ TestCustomActor TestCustomActor::NewVariant5()
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant6()
+TestCustomActor TestCustomActor::NewVariant6(Integration::Scene scene)
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant6();
+  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant6(scene);
   TestCustomActor custom( *impl ); // takes ownership
 
   impl->Initialize();

@@ -2,7 +2,7 @@
 #define DALI_STAGE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,14 +103,12 @@ public:
    * @brief Allows the creation of an empty stage handle.
    *
    * To retrieve the current stage, this handle can be set using Stage::GetCurrent().
-   * @SINCE_1_0.0
    */
   Stage();
 
   /**
    * @brief Gets the current Stage.
    *
-   * @SINCE_1_0.0
    * @return The current stage or an empty handle if the internal core has not been created or has been already destroyed
    */
   static Stage GetCurrent();
@@ -118,7 +116,6 @@ public:
   /**
    * @brief Queries whether the Stage exists; this should only return false during or after destruction of Dali core.
    *
-   * @SINCE_1_0.0
    * @return True when it's safe to call Stage::GetCurrent()
    */
   static bool IsInstalled();
@@ -127,14 +124,12 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   * @SINCE_1_0.0
    */
   ~Stage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
-   * @SINCE_1_0.0
    * @param[in] handle A reference to the copied handle
    */
   Stage(const Stage& handle);
@@ -142,7 +137,6 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
-   * @SINCE_1_0.0
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
@@ -154,7 +148,6 @@ public:
    * @brief Adds a child Actor to the Stage.
    *
    * The child will be referenced.
-   * @SINCE_1_0.0
    * @param[in] actor The child
    * @pre The actor has been initialized.
    * @pre The actor does not have a parent.
@@ -165,7 +158,6 @@ public:
    * @brief Removes a child Actor from the Stage.
    *
    * The child will be unreferenced.
-   * @SINCE_1_0.0
    * @param[in] actor The child
    * @pre The actor has been added to the stage.
    */
@@ -187,7 +179,6 @@ public:
   /**
    * @brief Retrieves the list of render-tasks.
    *
-   * @SINCE_1_0.0
    * @return A valid handle to a RenderTaskList
    */
   RenderTaskList GetRenderTaskList() const;
@@ -198,7 +189,6 @@ public:
    * @brief Queries the number of on-stage layers.
    *
    * Note that a default layer is always provided (count >= 1).
-   * @SINCE_1_0.0
    * @return The number of layers
    */
   uint32_t GetLayerCount() const;
@@ -206,7 +196,6 @@ public:
   /**
    * @brief Retrieves the layer at a specified depth.
    *
-   * @SINCE_1_0.0
    * @param[in] depth The depth
    * @return The layer found at the given depth
    * @pre Depth is less than layer count; see GetLayerCount().
@@ -216,7 +205,6 @@ public:
   /**
    * @brief Returns the Stage's Root Layer.
    *
-   * @SINCE_1_0.0
    * @return The root layer
    */
   Layer GetRootLayer() const;
@@ -226,7 +214,6 @@ public:
   /**
    * @brief Sets the background color of the stage.
    *
-   * @SINCE_1_0.0
    * @param[in] color The new background color
    */
   void SetBackgroundColor(Vector4 color);
@@ -234,7 +221,6 @@ public:
   /**
    * @brief Retrieves the background color of the stage.
    *
-   * @SINCE_1_0.0
    * @return The background color
    */
   Vector4 GetBackgroundColor() const;
@@ -242,7 +228,6 @@ public:
   /**
    * @brief Retrieves the DPI of the display device to which the stage is connected.
    *
-   * @SINCE_1_0.0
    * @return The horizontal and vertical DPI
    */
   Vector2 GetDpi() const;
@@ -250,7 +235,6 @@ public:
   /**
    * @brief Gets the Object registry.
    *
-   * @SINCE_1_0.0
    * @return The object registry
    */
   ObjectRegistry GetObjectRegistry() const;
@@ -262,7 +246,6 @@ public:
    *
    * By default, Dali will stop rendering when no Actor positions are being set, and when no animations are running etc.
    * This method is useful to force screen refreshes e.g. when updating a NativeImage.
-   * @SINCE_1_0.0
    * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
    */
   void KeepRendering( float durationSeconds );
@@ -284,7 +267,6 @@ public:
   /**
    * @brief This signal is emitted just after the event processing is finished.
    *
-   * @SINCE_1_0.0
    * @return The signal to connect to
    */
   EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
@@ -302,7 +284,6 @@ public:
    *   void YourCallbackName(const TouchEvent& event);
    * @endcode
    *
-   * @SINCE_1_0.0
    * @return The touch signal to connect to
    * @note Motion events are not emitted.
    */
@@ -320,7 +301,6 @@ public:
    *   void YourCallbackName( TouchData event );
    * @endcode
    *
-   * @SINCE_1_1.37
    * @return The touch signal to connect to
    * @note Motion events are not emitted.
    */
@@ -333,7 +313,6 @@ public:
    * @code
    *   void YourCallbackName(const WheelEvent& event);
    * @endcode
-   * @SINCE_1_0.0
    * @return The signal to connect to
    */
   WheelEventSignalType& WheelEventSignal();
@@ -343,7 +322,6 @@ public:
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and tear down UI components when received.
-   * @SINCE_1_0.0
    * @return The context lost signal to connect to
    */
   ContextStatusSignal& ContextLostSignal();
@@ -354,7 +332,6 @@ public:
    *
    * If the application is responsible for handling context loss, it should listen to
    * this signal and rebuild UI components on receipt.
-   * @SINCE_1_0.0
    * @return The context regained signal to connect to
    */
   ContextStatusSignal& ContextRegainedSignal();
@@ -369,7 +346,6 @@ public:
    * @code
    *   void YourCallbackName();
    * @endcode
-   * @SINCE_1_0.0
    * @return The signal to connect to
    */
   SceneCreatedSignalType& SceneCreatedSignal();
@@ -380,7 +356,6 @@ public: // Not intended for application developers
   /**
    * @brief This constructor is used by Stage::GetCurrent() methods.
    *
-   * @SINCE_1_0.0
    * @param[in] stage A pointer to a Dali resource
    */
   explicit DALI_INTERNAL Stage(Internal::Stage* stage);

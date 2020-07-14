@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,11 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
-#include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
 namespace Dali
 {

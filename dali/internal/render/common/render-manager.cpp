@@ -22,29 +22,15 @@
 #include <memory.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/sampling.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/devel-api/threading/thread-pool.h>
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
-#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-tracker.h>
-#include <dali/internal/render/common/render-instruction-container.h>
-#include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/renderers/render-frame-buffer.h>
-#include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/render/shaders/program-controller.h>
-#include <dali/internal/update/common/scene-graph-scene.h>
 
 namespace Dali
 {
