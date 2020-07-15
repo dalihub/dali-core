@@ -356,17 +356,16 @@ struct ObjectDestructionFunctor
   bool& refObjectDestroyedBoolean;
 };
 
-ObjectDestructionTracker::ObjectDestructionTracker()
-  :mRefObjectDestroyed( false)
+ObjectDestructionTracker::ObjectDestructionTracker( ObjectRegistry objectRegistry )
+: mObjectRegistry( objectRegistry ),
+  mRefObjectDestroyed( false)
 {
 }
 
 void ObjectDestructionTracker::Start( Actor actor )
 {
   ObjectDestructionFunctor destructionFunctor( actor.GetObjectPtr(), mRefObjectDestroyed );
-
-  ObjectRegistry objectRegistry = Stage::GetCurrent().GetObjectRegistry();
-  objectRegistry.ObjectDestroyedSignal().Connect( this, destructionFunctor );
+  mObjectRegistry.ObjectDestroyedSignal().Connect( this, destructionFunctor );
 }
 
 bool ObjectDestructionTracker::IsDestroyed()

@@ -32,6 +32,7 @@ namespace Dali
 {
 
 class Layer;
+class ObjectRegistry;
 class RenderTaskList;
 
 namespace Internal
@@ -409,6 +410,12 @@ public:
    * @param[in] processor The process to unregister
    */
   void UnregisterProcessor( Processor& processor );
+
+  /**
+   * @brief Gets the Object registry.
+   * @return The object registry
+   */
+  ObjectRegistry GetObjectRegistry() const;
 
 private:
 

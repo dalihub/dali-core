@@ -131,7 +131,7 @@ int UtcDaliObjectRegistryGet(void)
   TestApplication application;
 
   ObjectRegistry registry; //  like this for ctor code coverage
-  registry= Stage::GetCurrent().GetObjectRegistry();
+  registry= application.GetCore().GetObjectRegistry();
 
   DALI_TEST_CHECK( registry );
   END_TEST;
@@ -152,7 +152,7 @@ int UtcDaliObjectRegistrySignalActorCreated(void)
 {
   tet_infoline("Testing GetObjectRegistry()");
   TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   bool verified = false;
@@ -179,7 +179,7 @@ int UtcDaliObjectRegistrySignalCameraCreated(void)
 {
   TestApplication application;
 
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
 
   bool verified = false;
   TestCameraActorCallback test(verified);
@@ -204,7 +204,7 @@ int UtcDaliObjectRegistrySignalCameraCreated(void)
 int UtcDaliObjectRegistrySignalLayerCreated(void)
 {
   TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
 
   bool verified = false;
   TestLayerCallback test(verified);
@@ -229,7 +229,7 @@ int UtcDaliObjectRegistrySignalLayerCreated(void)
 int UtcDaliObjectRegistrySignalAnimationCreated(void)
 {
   TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
 
   bool verified = false;
   TestAnimationCallback test(verified);
