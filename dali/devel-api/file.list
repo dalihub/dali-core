@@ -24,6 +24,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
+  ${devel_api_src_dir}/rendering/renderer-devel.cpp
   ${devel_api_src_dir}/scripting/scripting.cpp
   ${devel_api_src_dir}/signals/signal-delegate.cpp
   ${devel_api_src_dir}/threading/conditional-wait.cpp

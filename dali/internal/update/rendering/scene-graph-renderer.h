@@ -432,6 +432,8 @@ public: // From UniformMapDataProvider
    */
   virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
 
+  void SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size );
+
 private:
 
   /**
@@ -472,6 +474,8 @@ private:
   DevelRenderer::Rendering::Type mRenderingBehavior:2;            ///< The rendering behavior
   bool                         mUniformMapChanged[2];             ///< Records if the uniform map has been altered this frame
   bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+
+  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
 
 public:
 
@@ -725,6 +729,17 @@ inline void SetRenderingBehaviorMessage( EventThreadServices& eventThreadService
 
   new (slot) LocalType( &renderer, &Renderer::SetRenderingBehavior, renderingBehavior );
 }
+
+inline void SetDrawCommandsMessage( EventThreadServices& eventThreadServices, const Renderer& renderer, Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size )
+{
+  typedef MessageValue2< Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &renderer, &Renderer::SetDrawCommands, pDrawCommands, size );
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

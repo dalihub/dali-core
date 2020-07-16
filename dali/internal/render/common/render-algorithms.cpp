@@ -440,6 +440,7 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
   for( uint32_t index = 0u; index < count; ++index )
   {
     const RenderItem& item = renderList.GetItem( index );
+
     DALI_PRINT_RENDER_ITEM( item );
 
     // Set up clipping based on both the Renderer and Actor APIs.
@@ -458,9 +459,18 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
         SetupDepthBuffer( item, context, autoDepthTestMode, firstDepthBufferUse );
       }
 
-      // Render the item.
-      item.mRenderer->Render( context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
-                              viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction ); // Added instruction for reflection effect
+      // Depending on whether the renderer has draw commands attached or not the rendering process will
+      // iterate through all the render queues. If there are no draw commands attached, only one
+      // iteration must be done and the default behaviour of the renderer will be executed.
+      // The queues allow to iterate over the same renderer multiple times changing the state of the renderer.
+      // It is similar to the multi-pass rendering.
+      auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
+      for( auto queue = 0u; queue < MAX_QUEUE; ++queue )
+      {
+        // Render the item.
+        item.mRenderer->Render(context, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix,
+                               viewMatrix, projectionMatrix, item.mSize, !item.mIsOpaque, boundTextures, instruction, queue);
+      }
     }
   }
 }
