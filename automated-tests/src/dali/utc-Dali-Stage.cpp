@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1458,14 +1458,14 @@ int UtcDaliStageSignalWheelEventP(void)
 
 int UtcDaliStageContextLostSignalP(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   bool contextLost = false;
   ContextStatusFunctor contextLostFunctor( contextLost );
-  stage.ContextLostSignal().Connect( &app, contextLostFunctor );
+  stage.ContextLostSignal().Connect( &application, contextLostFunctor );
 
-  Integration::ContextNotifierInterface* notifier = app.GetCore().GetContextNotifier();
+  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   DALI_TEST_EQUALS( contextLost, true, TEST_LOCATION );
 
@@ -1474,7 +1474,7 @@ int UtcDaliStageContextLostSignalP(void)
 
 int UtcDaliStageContextLostSignalN(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
 
   // Check that connecting to the signal with a bad stage instance causes an assert.
@@ -1483,7 +1483,7 @@ int UtcDaliStageContextLostSignalN(void)
   ContextStatusFunctor contextLostFunctor( contextLost );
   try
   {
-    stage.ContextLostSignal().Connect( &app, contextLostFunctor );
+    stage.ContextLostSignal().Connect( &application, contextLostFunctor );
   }
   catch( Dali::DaliException& e )
   {
@@ -1498,14 +1498,14 @@ int UtcDaliStageContextLostSignalN(void)
 
 int UtcDaliStageContextRegainedSignalP(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   bool contextRegained = false;
   ContextStatusFunctor contextRegainedFunctor( contextRegained );
-  stage.ContextRegainedSignal().Connect( &app, contextRegainedFunctor );
+  stage.ContextRegainedSignal().Connect( &application, contextRegainedFunctor );
 
-  Integration::ContextNotifierInterface* notifier = app.GetCore().GetContextNotifier();
+  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   notifier->NotifyContextRegained();
   DALI_TEST_EQUALS( contextRegained, true, TEST_LOCATION );
@@ -1515,7 +1515,7 @@ int UtcDaliStageContextRegainedSignalP(void)
 
 int UtcDaliStageContextRegainedSignalN(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
 
   // Check that connecting to the signal with a bad stage instance causes an assert.
@@ -1524,7 +1524,7 @@ int UtcDaliStageContextRegainedSignalN(void)
   ContextStatusFunctor contextRegainedFunctor( contextRegained );
   try
   {
-    stage.ContextRegainedSignal().Connect( &app, contextRegainedFunctor );
+    stage.ContextRegainedSignal().Connect( &application, contextRegainedFunctor );
   }
   catch( Dali::DaliException& e )
   {
@@ -1539,14 +1539,14 @@ int UtcDaliStageContextRegainedSignalN(void)
 
 int UtcDaliStageSceneCreatedSignalP(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   bool signalCalled = false;
   SceneCreatedStatusFunctor sceneCreatedFunctor( signalCalled );
-  stage.SceneCreatedSignal().Connect( &app, sceneCreatedFunctor );
+  stage.SceneCreatedSignal().Connect( &application, sceneCreatedFunctor );
 
-  Integration::Core& core = app.GetCore();
+  Integration::Core& core = application.GetCore();
   core.SceneCreated();
   DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
 
@@ -1555,7 +1555,7 @@ int UtcDaliStageSceneCreatedSignalP(void)
 
 int UtcDaliStageSceneCreatedSignalN(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
 
   // Check that connecting to the signal with a bad stage instance causes an assert.
@@ -1564,7 +1564,7 @@ int UtcDaliStageSceneCreatedSignalN(void)
   SceneCreatedStatusFunctor sceneCreatedFunctor( signalCalled );
   try
   {
-    stage.SceneCreatedSignal().Connect( &app, sceneCreatedFunctor );
+    stage.SceneCreatedSignal().Connect( &application, sceneCreatedFunctor );
   }
   catch( Dali::DaliException& e )
   {
@@ -1579,7 +1579,7 @@ int UtcDaliStageSceneCreatedSignalN(void)
 
 int UtcDaliStageGetRenderTaskListP(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   // Check we get a valid instance.
@@ -1599,7 +1599,7 @@ int UtcDaliStageGetRenderTaskListP(void)
 
 int UtcDaliStageGetRenderTaskListN(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
 
   // Check that getting the render task list with a bad stage instance causes an assert.
@@ -1621,7 +1621,7 @@ int UtcDaliStageGetRenderTaskListN(void)
 
 int UtcDaliStageGetObjectRegistryP(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage = Stage::GetCurrent();
 
   ObjectRegistry objectRegistry = stage.GetObjectRegistry();
@@ -1630,7 +1630,7 @@ int UtcDaliStageGetObjectRegistryP(void)
   // However we want a basic test to confirm the returned registry is valid and works.
   bool verified = false;
   ActorCreatedFunctor test( verified );
-  objectRegistry.ObjectCreatedSignal().Connect( &app, test );
+  objectRegistry.ObjectCreatedSignal().Connect( &application, test );
 
   Actor actor = Actor::New();
   DALI_TEST_CHECK( test.mSignalVerified );
@@ -1640,7 +1640,7 @@ int UtcDaliStageGetObjectRegistryP(void)
 
 int UtcDaliStageGetObjectRegistryN(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
 
   // Check that getting the object registry with a bad stage instance DOES NOT cause an assert.
@@ -1662,7 +1662,7 @@ int UtcDaliStageGetObjectRegistryN(void)
 
 int UtcDaliStageOperatorAssign(void)
 {
-  TestApplication app;
+  TestApplication application;
   Stage stage;
   DALI_TEST_CHECK( !stage );
 

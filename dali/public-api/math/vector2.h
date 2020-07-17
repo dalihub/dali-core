@@ -2,7 +2,7 @@
 #define DALI_VECTOR_2_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@
 
 namespace Dali
 {
+
+class Uint16Pair;
+
 /**
  * @addtogroup dali_core_math
  * @{
@@ -97,6 +100,15 @@ public:
    * @param[in] vec4 Vector4 to create this vector from
    */
   explicit Vector2(const Vector4& vec4);
+
+  /**
+   * @brief Conversion constructor from a Uint16Pair.
+   *
+   * @SINCE_1_9.21
+   *
+   * @param[in] pair The Uint16Pair to create this vector from
+   */
+  Vector2(const Uint16Pair& pair);
 
 // Constants
 
@@ -434,6 +446,13 @@ public:
    * @note inlined for performance reasons (generates less code than a function call)
    */
   float* AsFloat() {return &x;}
+
+public:
+
+  Vector2( const Vector2& ) = default; ///< Default copy constructor
+  Vector2( Vector2&& ) = default; ///< Default move constructor
+  Vector2& operator=( const Vector2& ) = default; ///< Default copy assignment operator
+  Vector2& operator=( Vector2&& ) = default; ///< Default move assignment operator
 
 public: // Data
 

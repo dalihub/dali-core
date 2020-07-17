@@ -138,7 +138,7 @@ int UtcDaliHoverNormalProcessing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -201,7 +201,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
 {
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   Vector2 stageSize = stage.GetSize();
 
   Actor actor = Actor::New();
@@ -308,7 +308,7 @@ int UtcDaliHoverInterrupted(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -340,12 +340,12 @@ int UtcDaliHoverInterrupted(void)
 int UtcDaliHoverParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -440,12 +440,12 @@ int UtcDaliHoverParentConsumer(void)
 int UtcDaliHoverInterruptedParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -493,7 +493,7 @@ int UtcDaliHoverInterruptedParentConsumer(void)
   rootData.Reset();
 
   // Remove actor from Stage
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   // Render and notify
   application.SendNotification();
@@ -522,7 +522,7 @@ int UtcDaliHoverLeave(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -572,12 +572,12 @@ int UtcDaliHoverLeave(void)
 int UtcDaliHoverLeaveParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -643,7 +643,7 @@ int UtcDaliHoverLeaveParentConsumer(void)
   actor.SetProperty( Actor::Property::LEAVE_REQUIRED, false );
 
   // Another motion event outside of root actor, only root signalled
-  Vector2 stageSize( Stage::GetCurrent().GetSize() );
+  Vector2 stageSize( application.GetScene().GetSize() );
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, Vector2 ( stageSize.width + 10.0f, stageSize.height + 10.0f )) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
@@ -658,7 +658,7 @@ int UtcDaliHoverActorBecomesInsensitive(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -689,12 +689,12 @@ int UtcDaliHoverActorBecomesInsensitive(void)
 int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -722,7 +722,7 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
   rootData.Reset();
 
   // Remove actor from Stage
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   // Render and notify
   application.SendNotification();
@@ -742,7 +742,7 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
 int UtcDaliHoverMultipleLayers(void)
 {
   TestApplication application;
-  Actor rootActor( Stage::GetCurrent().GetRootLayer() );
+  Actor rootActor( application.GetScene().GetRootLayer() );
 
   // Connect to actor's hovered signal
   SignalData data;
@@ -751,7 +751,7 @@ int UtcDaliHoverMultipleLayers(void)
   Layer layer1 ( Layer::New() );
   layer1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer1 );
+  application.GetScene().Add( layer1 );
 
   Actor actor1 ( Actor::New() );
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -800,7 +800,7 @@ int UtcDaliHoverMultipleLayers(void)
   layer2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   layer2.SetProperty( Actor::Property::POSITION_Z,  10.0f ); // Should hit layer2 in this layer rather than actor2
-  Stage::GetCurrent().Add( layer2 );
+  application.GetScene().Add( layer2 );
 
   Actor actor2 ( Actor::New() );
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -861,7 +861,7 @@ int UtcDaliHoverMultipleLayers(void)
 int UtcDaliHoverMultipleRenderTasks(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
+  Integration::Scene stage ( application.GetScene() );
   Vector2 stageSize ( stage.GetSize() );
 
   Actor actor = Actor::New();
@@ -871,7 +871,7 @@ int UtcDaliHoverMultipleRenderTasks(void)
 
   // Create render task
   Viewport viewport( stageSize.width * 0.5f, stageSize.height * 0.5f, stageSize.width * 0.5f, stageSize.height * 0.5f );
-  RenderTask renderTask ( Stage::GetCurrent().GetRenderTaskList().CreateTask() );
+  RenderTask renderTask ( application.GetScene().GetRenderTaskList().CreateTask() );
   renderTask.SetViewport( viewport );
   renderTask.SetInputEnabled( true );
 
@@ -905,7 +905,7 @@ int UtcDaliHoverMultipleRenderTasks(void)
 int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
+  Integration::Scene stage ( application.GetScene() );
   Vector2 stageSize ( stage.GetSize() );
 
   Actor actor = Actor::New();
@@ -920,7 +920,7 @@ int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 
   // Create render task
   Viewport viewport( stageSize.width * 0.5f, stageSize.height * 0.5f, stageSize.width * 0.5f, stageSize.height * 0.5f );
-  RenderTask renderTask ( Stage::GetCurrent().GetRenderTaskList().CreateTask() );
+  RenderTask renderTask ( application.GetScene().GetRenderTaskList().CreateTask() );
   renderTask.SetViewport( viewport );
   renderTask.SetInputEnabled( true );
   renderTask.SetSourceActor( actor );
@@ -956,7 +956,7 @@ int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 int UtcDaliHoverOffscreenRenderTasks(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
+  Integration::Scene stage ( application.GetScene() );
   Vector2 stageSize ( stage.GetSize() );
 
   // FrameBufferImage for offscreen RenderTask
@@ -1006,7 +1006,7 @@ int UtcDaliHoverOffscreenRenderTasks(void)
 int UtcDaliHoverMultipleRenderableActors(void)
 {
   TestApplication application;
-  Stage stage ( Stage::GetCurrent() );
+  Integration::Scene stage ( application.GetScene() );
   Vector2 stageSize ( stage.GetSize() );
 
   Actor parent = CreateRenderableActor();
@@ -1043,7 +1043,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1063,7 +1063,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
   data.Reset();
 
   // Re-add, render and notify
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
 
@@ -1087,7 +1087,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
   data.Reset();
 
   // Re-add actor back to stage, render and notify
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
 
@@ -1112,7 +1112,7 @@ int UtcDaliHoverActorSignalNotConsumed(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1136,7 +1136,7 @@ int UtcDaliHoverActorUnStaged(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1153,7 +1153,7 @@ int UtcDaliHoverActorUnStaged(void)
   data.Reset();
 
   // Remove actor from stage
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   // Render and notify
   application.SendNotification();
@@ -1169,7 +1169,7 @@ int UtcDaliHoverActorUnStaged(void)
 int UtcDaliHoverLeaveActorReadded(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1215,7 +1215,7 @@ int UtcDaliHoverLeaveActorReadded(void)
 int UtcDaliHoverClippingActor(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );

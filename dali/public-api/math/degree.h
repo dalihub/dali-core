@@ -2,7 +2,7 @@
 #define DALI_DEGREE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,13 @@ struct Degree
    * @param[in] value The initial value in Radians
    */
   DALI_CORE_API Degree( Radian value );
+
+public:
+
+  Degree( const Degree& ) = default; ///< Default copy constructor
+  Degree( Degree&& ) = default; ///< Default move constructor
+  Degree& operator=( const Degree& ) = default; ///< Default copy assignment operator
+  Degree& operator=( Degree&& ) = default; ///< Default move assignment operator
 
 public:
 

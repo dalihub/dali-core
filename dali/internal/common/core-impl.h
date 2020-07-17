@@ -194,6 +194,12 @@ public:
    */
   void RemoveScene( Scene* scene );
 
+  /**
+   * @brief Gets the Object registry.
+   * @return A reference to the object registry
+   */
+  ObjectRegistry& GetObjectRegistry() const;
+
 public: // Implementation of EventThreadServices
 
   /**
@@ -237,6 +243,7 @@ public: // Implementation of EventThreadServices
   bool IsNextUpdateForced() override;
 
 private:
+
   /**
    * Run each registered processor
    */
@@ -285,12 +292,6 @@ private:
    * @Return Return a reference to the relayout controller
    */
   RelayoutController& GetRelayoutController();
-
-  /**
-   * @brief Gets the Object registry.
-   * @return A reference to the object registry
-   */
-  ObjectRegistry& GetObjectRegistry() const;
 
   /**
    * @brief Gets the event thread services.

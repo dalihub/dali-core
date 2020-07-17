@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,59 @@ int UtcDaliVector4Constructor05P(void)
   DALI_TEST_EQUALS(v.y, 2.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(v.z, 3.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(v.w, 0.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector4CopyConstructor(void)
+{
+  TestApplication application;
+  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
+  Vector4 vec1( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector4MoveConstructor(void)
+{
+  TestApplication application;
+  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
+  Vector4 vec1 = std::move( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVector4CopyAssignment(void)
+{
+  TestApplication application;
+  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
+  Vector4 vec1;
+  vec1 = vec0;
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVector4MoveAssignment(void)
+{
+  TestApplication application;
+  Vector4 vec0( 10.f, 20.f, 30.0f, 40.0f );
+  Vector4 vec1;
+  vec1 = std::move( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.w, 40.0f, TEST_LOCATION);
+
   END_TEST;
 }
 

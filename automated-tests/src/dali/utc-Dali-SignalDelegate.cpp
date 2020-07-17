@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,10 +155,10 @@ int UtcDaliSignalDelegateConnectToMemberP(void)
   // Note: It is at this point that the delegate internally makes the connection.
   testObject.ConnectToInternalMember();
 
-  // Add the actor to the stage to trigger it's "onStage" signal.
+  // Add the actor to the scene to trigger it's "onStage" signal.
   // If the delegate connected correctly, this will call the member
   // function in the test object and set a global flag.
-  Stage::GetCurrent().Add( connectActor );
+  application.GetScene().Add( connectActor );
 
   // Check the global flag to confirm the signal was received.
   DALI_TEST_CHECK( gSignalReceived );
@@ -217,10 +217,10 @@ int UtcDaliSignalDelegateConnectToFunctorP(void)
   // Check the signal delegate has made the connection.
   DALI_TEST_CHECK( signalDelegate.IsConnected() );
 
-  // Add the actor to the stage to trigger it's "onStage" signal.
+  // Add the actor to the scene to trigger it's "onStage" signal.
   // If the delegate connected correctly, this will call the () operator of our
   // passed-in functor, the functor will in turn set a global flag.
-  Stage::GetCurrent().Add( connectActor );
+  application.GetScene().Add( connectActor );
 
   // Check the global flag to confirm the signal was received.
   DALI_TEST_CHECK( gSignalReceived );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ int UtcDaliHandleGetPropertyIndex02(void)
   tet_infoline("Positive Test Dali::Handle::GetPropertyIndex() int key");
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add( actor );
@@ -645,7 +645,7 @@ int UtcDaliHandleRegisterProperty01(void)
   tet_infoline("Positive Test Dali::Handle::RegisterProperty()");
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add( actor );
@@ -682,7 +682,7 @@ int UtcDaliHandleRegisterProperty02(void)
   tet_infoline("Positive Test Dali::Handle::RegisterProperty() int key");
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add( actor );
@@ -1363,7 +1363,7 @@ int UtcDaliHandleCustomPropertySynchronousGetSet(void)
   tet_infoline( "Create a custom property and set the value ensuring it can be retrieved synchronously" );
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   tet_infoline( "Create the custom property with an initial value" );
   float startValue(1.0f);
@@ -1427,7 +1427,7 @@ int UtcDaliHandleGetCurrentProperty(void)
   tet_infoline( "Get a default and non-animatable custom property using the GetCurrentProperty API" );
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   DALI_TEST_EQUALS( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ), true, TEST_LOCATION );
 
   Property::Index index = actor.RegisterProperty( "testProperty3", 1.0f, Property::READ_WRITE );
@@ -1493,7 +1493,7 @@ int UtcDaliHandleDoesCustomPropertyExistN3(void)
   ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
 
   auto container = Test::TestCustomActor::New();
-  Stage::GetCurrent().Add( container );
+  application.GetScene().Add( container );
   auto child = Actor::New();
   container.Add( child ); // Resolve child properties (if any)
 
@@ -1516,7 +1516,7 @@ int UtcDaliHandleDoesCustomPropertyExistP2(void)
   ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
 
   auto container = Test::TestCustomActor::New();
-  Stage::GetCurrent().Add( container );
+  application.GetScene().Add( container );
   auto child = Actor::New();
   container.Add( child ); // Resolve child properties (if any)
   child.SetProperty( CHILD_PROPERTY, 2 );
@@ -1541,7 +1541,7 @@ int UtcDaliHandleDoesCustomPropertyExistP3(void)
   ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
 
   auto container = Test::TestCustomActor::New();
-  Stage::GetCurrent().Add( container );
+  application.GetScene().Add( container );
   auto child = Actor::New();
   child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
   container.Add( child ); // Resolve child properties (if any)
@@ -1594,7 +1594,7 @@ struct PropertySetSignalCheck
 
 int UtcDaliHandlePropertySetSignal01(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   bool signalReceived(false);
   Property::Value value;
@@ -1603,7 +1603,7 @@ int UtcDaliHandlePropertySetSignal01(void)
   tet_infoline( "Test that setting a default property triggers a signal" );
 
   auto actor = Actor::New();
-  DevelHandle::PropertySetSignal(actor).Connect(&app, propertySetCheck);
+  DevelHandle::PropertySetSignal(actor).Connect(&application, propertySetCheck);
 
   actor.SetProperty( Actor::Property::POSITION, Vector3::XAXIS );
   propertySetCheck.CheckSignalReceived();
@@ -1614,7 +1614,7 @@ int UtcDaliHandlePropertySetSignal01(void)
 
 int UtcDaliHandlePropertySetSignal02(void)
 {
-  TestApplication app;
+  TestApplication application;
 
   bool signalReceived(false);
   Property::Value value;
@@ -1623,7 +1623,7 @@ int UtcDaliHandlePropertySetSignal02(void)
   tet_infoline( "Test that setting a custom property triggers a signal" );
 
   auto actor = Actor::New();
-  DevelHandle::PropertySetSignal(actor).Connect(&app, propertySetCheck);
+  DevelHandle::PropertySetSignal(actor).Connect(&application, propertySetCheck);
 
   auto propertyIndex = actor.RegisterProperty("propName", 3.0f);
   actor.SetProperty( propertyIndex, 5.0f );
@@ -1635,7 +1635,7 @@ int UtcDaliHandlePropertySetSignal02(void)
 
 int UtcDaliHandlePropertySetSignal03(void)
 {
-  TestApplication app;
+  TestApplication application;
   TypeRegistry typeRegistry = TypeRegistry::Get();
 
   bool signalReceived(false);
@@ -1652,10 +1652,10 @@ int UtcDaliHandlePropertySetSignal03(void)
   ChildPropertyRegistration( customActorTypeInfo.GetName(), CHILD_PROPERTY_NAME, CHILD_PROPERTY, Property::INTEGER );
 
   auto container = Test::TestCustomActor::New();
-  Stage::GetCurrent().Add( container );
+  application.GetScene().Add( container );
   auto child = Actor::New();
   child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
-  DevelHandle::PropertySetSignal(child).Connect(&app, propertySetCheck);
+  DevelHandle::PropertySetSignal(child).Connect(&application, propertySetCheck);
   container.Add( child ); // Resolve child properties (if any)
 
   DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );

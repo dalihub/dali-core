@@ -96,7 +96,7 @@ void TestEnumStrings(
     Actor actor = Actor::New();
     (actor.*method)( ( T ) values[i].value );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     application.SendNotification();
     application.Render();
 
@@ -107,7 +107,7 @@ void TestEnumStrings(
     DALI_TEST_CHECK( NULL != map.Find( keyName ) );
     DALI_TEST_EQUALS( map.Find( keyName )->Get< std::string >(), values[i].string, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
 }
 
@@ -192,7 +192,7 @@ int UtcDaliScriptingNewActorProperties(void)
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
 
-    Stage::GetCurrent().Add( handle );
+    application.GetScene().Add( handle );
     application.SendNotification();
     application.Render();
 
@@ -209,7 +209,7 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_ORIENTATION ), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetProperty< bool >( Actor::Property::INHERIT_SCALE ), false, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( handle );
+    application.GetScene().Remove( handle );
   }
 
   // Check Anchor point and parent origin vector3s
@@ -219,14 +219,14 @@ int UtcDaliScriptingNewActorProperties(void)
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
 
-    Stage::GetCurrent().Add( handle );
+    application.GetScene().Add( handle );
     application.SendNotification();
     application.Render();
 
     DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_CENTER, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), AnchorPoint::TOP_LEFT, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( handle );
+    application.GetScene().Remove( handle );
   }
 
   // Check Anchor point and parent origin STRINGS
@@ -236,14 +236,14 @@ int UtcDaliScriptingNewActorProperties(void)
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
 
-    Stage::GetCurrent().Add( handle );
+    application.GetScene().Add( handle );
     application.SendNotification();
     application.Render();
 
     DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_LEFT, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( handle );
+    application.GetScene().Remove( handle );
   }
   END_TEST;
 }
@@ -269,7 +269,7 @@ int UtcDaliScriptingNewAnimation(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Animation anim = data.CreateAnimation( actor, 0.5f );
   anim.Play();
@@ -308,7 +308,7 @@ int UtcDaliScriptingNewActorChildren(void)
   Actor handle = NewActor( map );
   DALI_TEST_CHECK( handle );
 
-  Stage::GetCurrent().Add( handle );
+  application.GetScene().Add( handle );
   application.SendNotification();
   application.Render();
 
@@ -321,7 +321,7 @@ int UtcDaliScriptingNewActorChildren(void)
   DALI_TEST_EQUALS( child1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3::YAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( handle );
+  application.GetScene().Remove( handle );
   END_TEST;
 }
 
@@ -340,7 +340,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( NULL != map.Find( "type" ) );
     DALI_TEST_EQUALS( map.Find( "type")->Get< std::string >(), "Actor", TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
 
   // Layer Type
@@ -353,7 +353,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( NULL != map.Find( "type" ) );
     DALI_TEST_EQUALS( map.Find( "type" )->Get< std::string >(), "Layer", TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
 
   // Default properties
@@ -373,7 +373,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetProperty( Actor::Property::INHERIT_SCALE, false );
     actor.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3::ONE );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     application.SendNotification();
     application.Render();
 
@@ -408,7 +408,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( NULL != map.Find( "sizeModeFactor" ) );
     DALI_TEST_EQUALS( map.Find( "sizeModeFactor" )->Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
 
   // Children
@@ -417,7 +417,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Actor child = Layer::New();
     actor.Add( child );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     application.SendNotification();
     application.Render();
 
@@ -436,7 +436,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( childMap.Find( "type" ) );
     DALI_TEST_EQUALS( childMap.Find( "type" )->Get< std::string >(), "Layer", TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
   END_TEST;
 }

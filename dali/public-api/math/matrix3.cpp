@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,20 @@ void Matrix3::SetIdentity()
   mElements[S00]=1.0f;
   mElements[S11]=1.0f;
   mElements[S22]=1.0f;
+}
+
+Matrix3::Matrix3( Matrix3&& matrix )
+{
+  memcpy( mElements, matrix.mElements, NUM_BYTES_IN_MATRIX );
+}
+
+Matrix3& Matrix3::operator=( Matrix3&& matrix )
+{
+  if( this != &matrix )
+  {
+    memcpy( AsFloat(), matrix.AsFloat(), NUM_BYTES_IN_MATRIX );
+  }
+  return *this;
 }
 
 Matrix3& Matrix3::operator=( const Matrix3& matrix )

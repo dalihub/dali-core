@@ -2,7 +2,7 @@
 #define DALI_UINT_16_PAIR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,16 +68,6 @@ public:
      * Unit tests make sure this is equivalent.
      **/
     mData = (height << 16u) + width;
-  }
-
-  /**
-   * @brief Copy constructor.
-   * @SINCE_1_0.0
-   * @param[in] rhs A reference to assign
-   */
-  Uint16Pair( const Uint16Pair& rhs )
-  {
-    mData = rhs.mData;
   }
 
   /**
@@ -161,21 +151,6 @@ public:
   }
 
   /**
-   * @brief Assignment operator.
-   * @SINCE_1_0.0
-   * @param[in] rhs Handle to an object
-   * @return A reference to this
-   */
-  Uint16Pair& operator=( const Uint16Pair& rhs )
-  {
-    if( rhs != *this )
-    {
-      mData = rhs.mData;
-    }
-    return *this;
-  }
-
-  /**
    * @brief Equality operator.
    * @SINCE_1_0.0
    * @param[in] rhs A reference for comparison
@@ -256,6 +231,13 @@ public:
     DALI_ASSERT_DEBUG( from[1] + 0.5f < 65536.0f );
     return Uint16Pair( from[0] + 0.5f, from[1] + 0.5f );
   }
+
+public:
+
+  Uint16Pair( const Uint16Pair& ) = default; ///< Default copy constructor
+  Uint16Pair( Uint16Pair&& ) = default; ///< Default move constructor
+  Uint16Pair& operator=( const Uint16Pair& ) = default; ///< Default copy assignment operator
+  Uint16Pair& operator=( Uint16Pair&& ) = default; ///< Default move assignment operator
 
 private:
   union

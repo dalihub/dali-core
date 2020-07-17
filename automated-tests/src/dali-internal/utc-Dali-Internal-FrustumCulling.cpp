@@ -56,7 +56,7 @@ void main()
 }
 );
 
-Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
+Actor CreateMeshActorToScene( TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE )
 {
   Integration::PixelBuffer* pixelBuffer = new Integration::PixelBuffer[ 4 ];
   PixelData pixelData = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
@@ -75,7 +75,7 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
   meshActor.SetProperty( Actor::Property::SIZE, Vector3( 400.0f, 400.0f, 0.1f ) );
   meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, parentOrigin );
   meshActor.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
-  Stage::GetCurrent().Add( meshActor );
+  application.GetScene().Add( meshActor );
 
   application.SendNotification();
   application.Render( 16 );
@@ -85,7 +85,7 @@ Actor CreateMeshActorToStage( TestApplication& application, Vector3 parentOrigin
 
 bool GetCameraDepths( TestApplication& application, float& nearPlane, float& farPlane, float& cameraDepth )
 {
-  RenderTaskList renderTasks = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList renderTasks = application.GetScene().GetRenderTaskList();
   CameraActor cameraActor;
   for( unsigned int i = 0; i < renderTasks.GetTaskCount(); ++i )
   {
@@ -116,7 +116,7 @@ int UtcFrustumCullN(void)
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
 
-  CreateMeshActorToStage( application );
+  CreateMeshActorToScene( application );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -135,11 +135,11 @@ int UtcFrustumLeftCullP(void)
   drawTrace.Enable( true );
 
   float offset = -0.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
-  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( -radius / stageSize.width + offset, 0.5f, 0.5f ) );
+  Vector2 sceneSize = application.GetScene().GetSize();
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( -radius / sceneSize.width + offset, 0.5f, 0.5f ) );
   meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
@@ -160,7 +160,7 @@ int UtcFrustumLeftCullN(void)
   drawTrace.Enable( true );
 
   float offset = 0.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_RIGHT );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -179,12 +179,12 @@ int UtcFrustumRightCullP(void)
   drawTrace.Enable( true );
 
   float offset = 1.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 sceneSize = application.GetScene().GetSize();
 
-  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( radius / stageSize.width + offset, 0.5f, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( radius / sceneSize.width + offset, 0.5f, 0.5f ) );
   meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
@@ -205,7 +205,7 @@ int UtcFrustumRightCullN(void)
   drawTrace.Enable( true );
 
   float offset = 0.99f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( offset, 0.5f, 0.5f ), AnchorPoint::CENTER_LEFT );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -224,12 +224,12 @@ int UtcFrustumTopCullP(void)
   drawTrace.Enable( true );
 
   float offset = -0.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 sceneSize = application.GetScene().GetSize();
 
-  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, -radius / stageSize.width + offset, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, -radius / sceneSize.width + offset, 0.5f ) );
   meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
@@ -250,7 +250,7 @@ int UtcFrustumTopCullN(void)
   drawTrace.Enable( true );
 
   float offset = 0.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::BOTTOM_CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -270,12 +270,12 @@ int UtcFrustumBottomCullP(void)
   drawTrace.Enable( true );
 
   float offset = 1.01f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 sceneSize = application.GetScene().GetSize();
 
-  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, radius / stageSize.width + offset, 0.5f ) );
+  meshActor.SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, radius / sceneSize.width + offset, 0.5f ) );
   meshActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   drawTrace.Reset();
@@ -296,7 +296,7 @@ int UtcFrustumBottomCullN(void)
   drawTrace.Enable( true );
 
   float offset = 0.99f;
-  Actor meshActor = CreateMeshActorToStage( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
+  Actor meshActor = CreateMeshActorToScene( application, Vector3( 0.5f, offset, 0.5f ), AnchorPoint::TOP_CENTER );
 
   drawTrace.Reset();
   application.SendNotification();
@@ -317,7 +317,7 @@ int UtcFrustumNearCullP(void)
   float nearPlane, farPlane, cameraDepth;
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Actor meshActor = CreateMeshActorToStage( application );
+  Actor meshActor = CreateMeshActorToScene( application );
   Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
@@ -345,7 +345,7 @@ int UtcFrustumNearCullN(void)
   float nearPlane, farPlane, cameraDepth;
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Actor meshActor = CreateMeshActorToStage( application );
+  Actor meshActor = CreateMeshActorToScene( application );
   Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float offset = meshActor.GetTargetSize().z - 0.1f;
@@ -371,7 +371,7 @@ int UtcFrustumFarCullP(void)
   float nearPlane, farPlane, cameraDepth;
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Actor meshActor = CreateMeshActorToStage( application );
+  Actor meshActor = CreateMeshActorToScene( application );
   Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float radius = meshActor.GetTargetSize().Length() * 0.5f;
@@ -399,7 +399,7 @@ int UtcFrustumFarCullN(void)
   float nearPlane, farPlane, cameraDepth;
   DALI_TEST_CHECK( GetCameraDepths( application, nearPlane, farPlane, cameraDepth ) );
 
-  Actor meshActor = CreateMeshActorToStage( application );
+  Actor meshActor = CreateMeshActorToScene( application );
   Vector3 meshPosition = meshActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   float offset = meshActor.GetTargetSize().z - 0.1f;
@@ -422,7 +422,7 @@ int UtcFrustumCullDisabledP(void)
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
   drawTrace.Enable( true );
 
-  CreateMeshActorToStage( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::Hint::MODIFIES_GEOMETRY );
+  CreateMeshActorToScene( application, Vector3( 7.0f, 0.5f, 0.5f ), AnchorPoint::CENTER, Shader::Hint::MODIFIES_GEOMETRY );
 
   drawTrace.Reset();
   application.SendNotification();

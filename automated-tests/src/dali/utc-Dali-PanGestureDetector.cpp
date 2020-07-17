@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,9 +98,10 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage )
+  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage, Integration::Scene scene )
   : GestureReceivedFunctor( data ),
-    stateToUnstage( stateToUnstage )
+    stateToUnstage( stateToUnstage ),
+    scene( scene )
   {
   }
 
@@ -110,11 +111,12 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 
     if ( pan.state == stateToUnstage )
     {
-      Stage::GetCurrent().Remove( actor );
+      scene.Remove( actor );
     }
   }
 
   Gesture::State& stateToUnstage;
+  Integration::Scene scene;
 };
 
 // Functor for receiving a touch event
@@ -259,7 +261,7 @@ int UtcDaliPanGestureDetectorNew(void)
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   detector.Attach(actor);
 
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -318,7 +320,7 @@ int UtcDaliPanGestureSetMinimumTouchesRequired(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -360,7 +362,7 @@ int UtcDaliPanGestureSetMaximumTouchesRequired(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -404,7 +406,7 @@ int UtcDaliPanGestureSignalReceptionNegative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -444,7 +446,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -519,7 +521,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -580,7 +582,7 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -636,7 +638,7 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -691,7 +693,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   Actor tempActor = Actor::New();
   tempActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   tempActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(tempActor);
+  application.GetScene().Add(tempActor);
   detector.Attach(tempActor);
 
   uint32_t time = 100;
@@ -701,7 +703,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
     Actor actor = Actor::New();
     actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     // Render and notify
     application.SendNotification();
@@ -723,7 +725,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
-    Stage::GetCurrent().Remove(actor);
+    application.GetScene().Remove(actor);
 
     // Render and notify
     application.SendNotification();
@@ -748,7 +750,7 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -811,7 +813,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
   // Change rotation of child to be different from parent so that we can check if our local coordinate
@@ -874,13 +876,13 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
   Actor first = Actor::New();
   first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   second.SetProperty( Actor::Property::POSITION_X, 100.0f);
   second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Render and notify
   application.SendNotification();
@@ -894,15 +896,15 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
   detector.Attach(second);
   detector.DetectedSignal().Connect(&application, functor);
 
-  DALI_TEST_EQUALS(Stage::GetCurrent().GetRootLayer(), first.GetParent(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Stage::GetCurrent().GetRootLayer(), second.GetParent(), TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), first.GetParent(), TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), second.GetParent(), TEST_LOCATION);
 
   // Start pan within second actor's area
   uint32_t time = 100;
   TestStartPan( application, Vector2( 110.0f, 20.0f ),  Vector2( 126.0f, 20.0f ), time );
 
-  DALI_TEST_EQUALS(Stage::GetCurrent().GetRootLayer(), first.GetParent(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Stage::GetCurrent().GetRootLayer(), second.GetParent(), TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), first.GetParent(), TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), second.GetParent(), TEST_LOCATION);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pannedActor, TEST_LOCATION);
@@ -937,7 +939,7 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -987,12 +989,12 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   // Render and notify
   application.SendNotification();
@@ -1073,7 +1075,7 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
   Actor actor1 = Actor::New();
   actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor1);
+  application.GetScene().Add(actor1);
   SignalData data1;
   GestureReceivedFunctor functor1(data1);
   PanGestureDetector detector1 = PanGestureDetector::New();
@@ -1084,7 +1086,7 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
   actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
   actor2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::BOTTOM_RIGHT);
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
   SignalData data2;
   GestureReceivedFunctor functor2(data2);
   PanGestureDetector detector2 = PanGestureDetector::New();
@@ -1113,7 +1115,7 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDown(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1161,7 +1163,7 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDownAfterInitialPanToAnother
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( parent );
+  application.GetScene().Add( parent );
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1233,7 +1235,7 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1302,7 +1304,7 @@ int UtcDaliPanGestureActorUnstaged(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1313,7 +1315,7 @@ int UtcDaliPanGestureActorUnstaged(void)
 
   // Attach actor to detector
   SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage );
+  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
   PanGestureDetector detector = PanGestureDetector::New();
   detector.Attach(actor);
   detector.DetectedSignal().Connect( &application, functor );
@@ -1335,7 +1337,7 @@ int UtcDaliPanGestureActorUnstaged(void)
   application.Render();
 
   // Re-add actor to stage
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1367,7 +1369,7 @@ int UtcDaliPanGestureActorUnstaged(void)
   application.Render();
 
   // Re-add actor to stage
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1402,14 +1404,14 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor( Actor::New() );
   dummyActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   dummyActor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
   dummyActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(dummyActor);
+  application.GetScene().Add(dummyActor);
 
   // Render and notify
   application.SendNotification();
@@ -1420,7 +1422,7 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
 
   // Attach actor to detector
   SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage );
+  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
   PanGestureDetector detector = PanGestureDetector::New();
   detector.Attach(actor);
   detector.Attach(dummyActor);
@@ -1442,7 +1444,7 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Re add to the stage, we should not be signalled
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -1643,7 +1645,7 @@ int UtcDaliPanGestureAngleProcessing(void)
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1776,7 +1778,7 @@ int UtcDaliPanGestureDirectionProcessing(void)
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1891,7 +1893,7 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -1954,7 +1956,7 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2018,7 +2020,7 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2081,7 +2083,7 @@ int UtcDaliPanGesturePredictionSmoothing01(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2147,7 +2149,7 @@ int UtcDaliPanGesturePredictionSmoothing02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2254,7 +2256,7 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap01(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2328,7 +2330,7 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2433,7 +2435,7 @@ int UtcDaliPanGesturePrediction2Smoothing(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2528,7 +2530,7 @@ int UtcDaliPanGestureSetProperties(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2592,7 +2594,7 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2723,7 +2725,7 @@ int UtcDaliPanGestureGetPropertyWithSceneObject(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2759,7 +2761,7 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2772,7 +2774,7 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
   Layer layer = Layer::New();
   layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.RaiseToTop();
 
   // Render and notify
@@ -2812,7 +2814,7 @@ int UtcDaliPanGestureNoTimeDiff(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();

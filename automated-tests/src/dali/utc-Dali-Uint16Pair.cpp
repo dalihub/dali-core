@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,42 @@ int UtcDaliUint16PairConstructor02P(void)
   END_TEST;
 }
 
-int UtcDaliUint16PairCopyConstructor01P(void)
+int UtcDaliUint16PairCopyConstructor(void)
 {
   Uint16Pair u( 5u, 5u );
   Uint16Pair v( u );
+  DALI_TEST_EQUALS( v.GetX(), 5u, TEST_LOCATION );
+  DALI_TEST_EQUALS( v.GetY(), 5u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairMoveConstructor(void)
+{
+  Uint16Pair u( 5u, 5u );
+  Uint16Pair v = std::move( u );
+  DALI_TEST_EQUALS( v.GetX(), 5u, TEST_LOCATION );
+  DALI_TEST_EQUALS( v.GetY(), 5u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairCopyAssignment(void)
+{
+  Uint16Pair u( 5u, 5u );
+  Uint16Pair v;
+  v = u;
+  DALI_TEST_EQUALS( v.GetX(), 5u, TEST_LOCATION );
+  DALI_TEST_EQUALS( v.GetY(), 5u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliUint16PairMoveAssignment(void)
+{
+  Uint16Pair u( 5u, 5u );
+  Uint16Pair v;
+  v = std::move( u );
   DALI_TEST_EQUALS( v.GetX(), 5u, TEST_LOCATION );
   DALI_TEST_EQUALS( v.GetY(), 5u, TEST_LOCATION );
 

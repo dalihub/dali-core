@@ -2,7 +2,7 @@
 #define DALI_MATRIX3_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,23 @@ public:
    * @param[in] s22 Ninth element
    */
   Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.21
+   * @param[in] matrix A reference to the moved matrix
+   */
+  Matrix3( Matrix3&& matrix );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.21
+   * @param[in] matrix A reference to the moved matrix
+   * @return A reference to this
+   */
+  Matrix3& operator=( Matrix3&& matrix );
 
   /**
    * @brief Assignment Operator.

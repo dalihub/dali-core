@@ -341,7 +341,7 @@ int UtcDaliBaseHandleDoAction(void)
   // Check that the actor is now visible
   DALI_TEST_CHECK(actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) == true);
 
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Build an animation with initial duration of 1 second
   float durationSeconds(1.0f);
@@ -423,7 +423,7 @@ int UtcDaliBaseHandleConnectSignal(void)
   actor.SetProperty( Actor::Property::POSITION, Vector2( 240, 400 ));
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   DALI_TEST_CHECK( gTouchCallBackCalled == false );
 

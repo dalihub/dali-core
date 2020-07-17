@@ -148,6 +148,11 @@ void Core::UnregisterProcessor( Processor& processor )
   mImpl->UnregisterProcessor( processor );
 }
 
+ObjectRegistry Core::GetObjectRegistry() const
+{
+  return ObjectRegistry( &mImpl->GetObjectRegistry() );
+}
+
 Core::Core()
 : mImpl( NULL )
 {

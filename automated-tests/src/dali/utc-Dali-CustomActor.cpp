@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,12 +122,12 @@ int UtcDaliCustomActorOnStageConnectionDisconnection(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   // add the custom actor to stage
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Add( custom );
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnStageConnection", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( custom );
+  application.GetScene().Remove( custom );
 
   DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnStageDisconnection", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
@@ -182,7 +182,7 @@ int UtcDaliCustomActorOnStageConnectionOrder(void)
   actorC.Add( actorF );
 
   // add the custom actor to stage
-  Stage::GetCurrent().Add( actorA );
+  application.GetScene().Add( actorA );
 
   DALI_TEST_EQUALS( 4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnPropertySet",     actorA.GetMethodsCalled()[ 0 ], TEST_LOCATION );
@@ -250,7 +250,7 @@ int UtcDaliCustomActorOnStageDisconnectionOrder(void)
   TestApplication application;
   tet_infoline("Testing Dali::CustomActor::OnStageDisconnection() order");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   /* Build tree of actors:
    *
@@ -346,7 +346,7 @@ int UtcDaliCustomActorAddDuringOnStageConnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Add behaviour during Dali::CustomActor::OnStageConnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -400,7 +400,7 @@ int UtcDaliCustomActorRemoveDuringOnStageConnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Remove behaviour during Dali::CustomActor::OnStageConnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -468,7 +468,7 @@ int UtcDaliCustomActorAddDuringOnStageDisconnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Add behaviour during Dali::CustomActor::OnStageDisonnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   /* The actorA is a special variant which adds a child to itself during OnStageDisconnection()
    * The actorB is provided as the child
@@ -521,7 +521,7 @@ int UtcDaliCustomActorRemoveDuringOnStageDisconnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Remove behaviour during Dali::CustomActor::OnStageDisconnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   /* The actorA is a special variant which removes its children during OnStageDisconnection()
    * The actorB is provided as the child
@@ -576,7 +576,7 @@ int UtcDaliCustomActorRemoveParentDuringOnStageConnection(void)
   TestApplication application;
   tet_infoline("Weird test where child removes its own parent from Stage during Dali::CustomActor::OnStageConnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -588,11 +588,11 @@ int UtcDaliCustomActorRemoveParentDuringOnStageConnection(void)
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
   actorA.SetProperty( Actor::Property::NAME, "ActorA" );
 
-  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant5();
+  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant5(scene);
   actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
-  stage.Add( actorA );
+  scene.Add( actorA );
 
   // Check callback sequence
 
@@ -628,7 +628,7 @@ int UtcDaliCustomActorAddParentDuringOnStageDisconnection(void)
   TestApplication application;
   tet_infoline("Weird test where child adds its own parent to Stage during Dali::CustomActor::OnStageDisconnection() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -639,13 +639,13 @@ int UtcDaliCustomActorAddParentDuringOnStageDisconnection(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
   actorA.SetProperty( Actor::Property::NAME, "ActorA" );
-  stage.Add( actorA );
+  scene.Add( actorA );
 
-  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant6();
+  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant6(scene);
   actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
-  stage.Remove( actorA );
+  scene.Remove( actorA );
 
   // Check callback sequence
 
@@ -703,7 +703,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   TestApplication application;
   tet_infoline("Testing Actor:Add (reparenting) behaviour during Dali::CustomActor::OnChildAdd() callback");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -790,7 +790,7 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
   TestApplication application;
   tet_infoline("Testing Actor:Remove behaviour during OnChildRemove() callback triggered when reparenting");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -972,7 +972,7 @@ int UtcDaliCustomActorOnTouchEvent(void)
   // set size for custom actor
   custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Add( custom );
   custom.ResetCallStack();
 
   // Render and notify a couple of times
@@ -1005,7 +1005,7 @@ int UtcDaliCustomActorOnHoverEvent(void)
   // set size for custom actor
   custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Add( custom );
   custom.ResetCallStack();
 
   // Render and notify a couple of times
@@ -1038,7 +1038,7 @@ int UtcDaliCustomActorOnWheelEvent(void)
   // set size for custom actor
   custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   // add the custom actor to stage
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Add( custom );
   custom.ResetCallStack();
 
   // Render and notify a couple of times
@@ -1145,7 +1145,7 @@ int UtcDaliCustomActorImplRelayoutRequest(void)
   DALI_TEST_CHECK( gOnRelayout == false );
 
   Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
-  Stage::GetCurrent().Add(custom);
+  application.GetScene().Add(custom);
 
   application.SendNotification();
   application.Render();
@@ -1269,7 +1269,7 @@ int UtcDaliCustomActorGetExtensionP(void)
 {
   TestApplication application;
 
-  Test::TestCustomActor custom = Test::TestCustomActor::NewVariant5();
+  Test::TestCustomActor custom = Test::TestCustomActor::NewVariant5(application.GetScene());
 
   DALI_TEST_CHECK( NULL == custom.GetImplementation().GetExtension() );
 
@@ -1281,7 +1281,7 @@ int UtcDaliCustomActorOnConnectionDepth(void)
   TestApplication application;
   tet_infoline("Testing Dali::CustomActor::OnStageConnection() hierarchy depth");
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   /* Build tree of actors:
    *
@@ -1335,7 +1335,7 @@ int UtcDaliCustomActorSetGetProperty(void)
   TestApplication application; // Need the type registry
 
   Test::TestCustomActor actor = Test::TestCustomActor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.SetProperty( Test::TestCustomActor::Property::TEST_PROPERTY1, 0.5f );
   actor.SetProperty( Test::TestCustomActor::Property::TEST_PROPERTY2, Color::WHITE );
@@ -1479,7 +1479,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   TestApplication application; // Need the type registry
 
   auto custom = UnregisteredCustomActor::New();
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Add( custom );
 
   // should have all actor properties
   DALI_TEST_EQUALS( custom.GetPropertyType( Actor::Property::COLOR ), Property::VECTOR4, TEST_LOCATION );
@@ -1518,8 +1518,8 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
         DALI_TEST_EQUALS( weakRef.GetHandle().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ), false, TEST_LOCATION );
       } );
 
-  Stage::GetCurrent().Remove( custom );
-  Stage::GetCurrent().Add( custom );
+  application.GetScene().Remove( custom );
+  application.GetScene().Add( custom );
 
   END_TEST;
 }
@@ -1562,7 +1562,7 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
   Dali::TypeRegistration typeRegistration( typeid( UnregisteredCustomActor ), typeid( Dali::CustomActor ), nullptr );
 
   auto derived = DerivedCustomActor::New();
-  Stage::GetCurrent().Add( derived );
+  application.GetScene().Add( derived );
 
   // should have all actor properties
   DALI_TEST_EQUALS( derived.GetPropertyType( Actor::Property::WORLD_MATRIX ), Property::MATRIX, TEST_LOCATION );

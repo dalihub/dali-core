@@ -1,5 +1,5 @@
 /*
- * Copyright ( c ) 2014 Samsung Electronics Co., Ltd.
+ * Copyright ( c ) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 ( the "License" );
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,56 @@ int UtcDaliQuaternionCtorMatrixP03(void)
       }
     }
   }
+  END_TEST;
+}
+
+int UtcDaliQuaternionCopyConstructor(void)
+{
+  Quaternion q0( 1.0f, 0.1f, 0.2f, 0.3f );
+  Quaternion q1( q0 );
+  DALI_TEST_EQUALS( q1.AsVector().w,  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().x,  0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().y,  0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().z,  0.3f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliQuaternionMoveConstructor(void)
+{
+  Quaternion q0( 1.0f, 0.1f, 0.2f, 0.3f );
+  Quaternion q1 = std::move( q0 );
+  DALI_TEST_EQUALS( q1.AsVector().w,  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().x,  0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().y,  0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().z,  0.3f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliQuaternionCopyAssignment(void)
+{
+  Quaternion q0( 1.0f, 0.1f, 0.2f, 0.3f );
+  Quaternion q1;
+  q1 = q0;
+  DALI_TEST_EQUALS( q1.AsVector().w,  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().x,  0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().y,  0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().z,  0.3f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliQuaternionMoveAssignment(void)
+{
+  Quaternion q0( 1.0f, 0.1f, 0.2f, 0.3f );
+  Quaternion q1;
+  q1 = std::move( q0 );
+  DALI_TEST_EQUALS( q1.AsVector().w,  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().x,  0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().y,  0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( q1.AsVector().z,  0.3f, TEST_LOCATION );
+
   END_TEST;
 }
 

@@ -195,7 +195,7 @@ int UtcDaliCameraActorNewDefaultPerspectiveProjection(void)
   DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   // Add it to the stage, then the values should be updated to reflect a 480.0f by 800.0f scene (default stage size)
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   DALI_TEST_EQUALS( 0.6f, actor.GetProperty( CameraActor::Property::ASPECT_RATIO ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
   DALI_TEST_EQUALS( 0.489957f, actor.GetProperty( CameraActor::Property::FIELD_OF_VIEW ).Get< float >(), FLOAT_EPSILON, TEST_LOCATION );
@@ -839,7 +839,7 @@ int UtcDaliCameraActorSetPerspectiveProjectionP(void)
   DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
 
   // Ensure these values persist after adding to the stage and an update/render pass
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -894,7 +894,7 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   CameraActor actor = CameraActor::New( Size( 1080.0f, 1920.0f ) );
   DALI_TEST_CHECK( actor );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   actor.SetOrthographicProjection( Size( 1080.0f, 1920.0f ) );
   application.SendNotification();
@@ -1203,7 +1203,7 @@ int UtcDaliCameraActorSetCameraOnStage(void)
   tet_infoline( "Testing Dali::CameraActor::SetCamera()" );
 
   CameraActor actor = CameraActor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.Render( 0 );
   application.SendNotification();
 
@@ -1279,12 +1279,12 @@ int UtcDaliCameraActorDefaultProperties(void)
   tet_infoline( "Testing Dali::CameraActor DefaultProperties" );
 
   CameraActor actor = CameraActor::New();
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.GetRenderTaskList().GetTask(0).SetCameraActor( actor );
 
   actor.SetAspectRatio( TEST_ASPECT_RATIO );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.Render( 0 );
   application.SendNotification();
   bool bValue;
@@ -1355,11 +1355,11 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
   TestApplication application;
 
   CameraActor actor = CameraActor::New();
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.GetRenderTaskList().GetTask(0).SetCameraActor( actor );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.Render( 0 );
   application.SendNotification();
 
@@ -1472,7 +1472,7 @@ int UtcDaliCameraActorModelView(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::POSITION, Vector3( 20.0f, 30.0f, 40.0f ));
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render( 0 );
@@ -1482,7 +1482,7 @@ int UtcDaliCameraActorModelView(void)
   Matrix resultMatrix( true );
   resultMatrix.SetTransformComponents( Vector3::ONE, Quaternion::IDENTITY, actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) );
 
-  RenderTask task = Stage::GetCurrent().GetRenderTaskList().GetTask( 0 );
+  RenderTask task = application.GetScene().GetRenderTaskList().GetTask( 0 );
   CameraActor cameraActor = task.GetCameraActor();
 
   Matrix viewMatrix( false );
@@ -1498,7 +1498,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor::ReadProjectionMatrix()" );
 
-  CameraActor camera = Stage::GetCurrent().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
   application.SendNotification();
   application.Render( 0 );
   application.Render();
@@ -1506,7 +1506,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
   Actor actor = CreateRenderableActor( image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Matrix projectionMatrix;
   Matrix viewMatrix;
@@ -1543,10 +1543,10 @@ int UtcDaliCameraActorAnimatedProperties(void)
   TestApplication application;
   tet_infoline( "Testing Dali::Internal::CameraActor::GetSceneObjectAnimatableProperty()" );
 
-  CameraActor camera = Stage::GetCurrent().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Constraint constraint = Constraint::New<Dali::Vector3>( actor, Actor::Property::POSITION, EqualToConstraint() );
   constraint.AddSource( Source( camera, Actor::Property::POSITION ) );
@@ -1563,7 +1563,7 @@ int UtcDaliCameraActorAnimatedProperties(void)
 int UtcDaliCameraActorPropertyIndices(void)
 {
   TestApplication application;
-  CameraActor camera = Stage::GetCurrent().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
+  CameraActor camera = application.GetScene().GetRenderTaskList().GetTask( 0u ).GetCameraActor();
 
   Actor basicActor = Actor::New();
   Property::IndexContainer indices;
@@ -1576,7 +1576,7 @@ int UtcDaliCameraActorPropertyIndices(void)
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   Vector2 stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New( stageSize );
@@ -1636,7 +1636,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   Vector2 stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New( stageSize );
@@ -1700,7 +1700,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 {
   TestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   Vector2 stageSize = stage.GetSize();
 
   Vector3 targetPosition( Vector3::ZERO );
@@ -1747,7 +1747,7 @@ int UtcDaliCameraActorReflectionByPlane(void)
 {
   TestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Vector3 targetPosition( Vector3::ZERO );
   Vector3 cameraOffset( 0.0f, 100.0f, 100.0f );

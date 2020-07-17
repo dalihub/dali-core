@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,13 +90,19 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data ) : GestureReceivedFunctor( data ) { }
+  UnstageActorFunctor( SignalData& data, Integration::Scene scene )
+  : GestureReceivedFunctor( data ),
+    scene( scene )
+  {
+  }
 
   void operator()(Actor actor, const TapGesture& tap)
   {
     GestureReceivedFunctor::operator()( actor, tap );
-    Stage::GetCurrent().Remove( actor );
+    scene.Remove( actor );
   }
+
+  Integration::Scene scene;
 };
 
 // Functor for receiving a touch event
@@ -179,7 +185,7 @@ int UtcDaliTapGestureDetectorNew(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -244,7 +250,7 @@ int UtcDaliTapGestureSetTapsRequiredMinMaxCheck(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -285,7 +291,7 @@ int UtcDaliTapGestureSignalReceptionNegative(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -311,7 +317,7 @@ int UtcDaliTapGestureSignalReceptionPositive(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -340,7 +346,7 @@ int UtcDaliTapGestureSignalReceptionDetach(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -395,7 +401,7 @@ int UtcDaliTapGestureSignalReceptionActorDestroyedWhileTapping(void)
     Actor actor = Actor::New();
     actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     // Render and notify
     application.SendNotification();
@@ -408,7 +414,7 @@ int UtcDaliTapGestureSignalReceptionActorDestroyedWhileTapping(void)
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
-    Stage::GetCurrent().Remove(actor);
+    application.GetScene().Remove(actor);
 
     // Render and notify
     application.SendNotification();
@@ -430,7 +436,7 @@ int UtcDaliTapGestureSignalReceptionRotatedActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -482,7 +488,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
   // Change rotation of child to be different from parent so that we can check if our local coordinate
@@ -535,13 +541,13 @@ int UtcDaliTapGestureSignalReceptionAttachDetachMany(void)
   Actor first = Actor::New();
   first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   second.SetProperty( Actor::Property::POSITION_X, 100.0f);
   second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Render and notify
   application.SendNotification();
@@ -588,7 +594,7 @@ int UtcDaliTapGestureSignalReceptionActorBecomesUntouchable(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -626,7 +632,7 @@ int UtcDaliTapGestureSignalReceptionMultipleGestureDetectors(void)
   Actor first = Actor::New();
   first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -687,7 +693,7 @@ int UtcDaliTapGestureSignalReceptionMultipleDetectorsOnActor(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -721,7 +727,7 @@ int UtcDaliTapGestureSignalReceptionDifferentPossible(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -777,7 +783,7 @@ int UtcDaliTapGestureActorUnstaged(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -785,7 +791,7 @@ int UtcDaliTapGestureActorUnstaged(void)
 
   // Attach actor to detector
   SignalData data;
-  UnstageActorFunctor functor( data );
+  UnstageActorFunctor functor( data, application.GetScene() );
   TapGestureDetector detector = TapGestureDetector::New();
   detector.Attach(actor);
   detector.DetectedSignal().Connect( &application, functor );
@@ -803,7 +809,7 @@ int UtcDaliTapGestureDetectorRemovedWhilePossible(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -833,7 +839,7 @@ int UtcDaliTapGestureActorRemovedWhilePossible(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -850,7 +856,7 @@ int UtcDaliTapGestureActorRemovedWhilePossible(void)
   TestStartLongPress( application, 50.0f, 10.0f, 100 );
 
   // Remove, render and delete actor
-  Stage::GetCurrent().Remove(actor);
+  application.GetScene().Remove(actor);
   application.SendNotification();
   application.Render();
   actor.Reset();
@@ -868,7 +874,7 @@ int UtcDaliTapGestureLayerConsumesTouch(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   // Add a detector
   SignalData data;
@@ -881,7 +887,7 @@ int UtcDaliTapGestureLayerConsumesTouch(void)
   Layer layer = Layer::New();
   layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add( layer );
+  application.GetScene().Add( layer );
   layer.RaiseToTop();
 
   // Render and notify

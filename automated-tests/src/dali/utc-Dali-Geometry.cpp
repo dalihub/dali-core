@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render(0);
@@ -220,7 +220,7 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 1u, TEST_LOCATION );
 
@@ -253,7 +253,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render(0);
@@ -311,7 +311,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
@@ -443,7 +443,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE,Vector3::ONE * 100.f);
   actor.AddRenderer(renderer);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();

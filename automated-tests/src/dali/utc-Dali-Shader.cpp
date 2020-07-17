@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ int UtcDaliShaderConstraint01(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
   Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
@@ -190,7 +190,7 @@ int UtcDaliShaderConstraint02(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render(0);
 
@@ -244,7 +244,7 @@ int UtcDaliShaderAnimatedProperty01(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
   Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
@@ -285,7 +285,7 @@ int UtcDaliShaderAnimatedProperty02(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render(0);
 

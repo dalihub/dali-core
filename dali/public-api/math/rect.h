@@ -100,13 +100,47 @@ struct Rect
   }
 
   /**
-   * @brief Assignment operator.
+   * @brief Copy assignment operator.
    *
    * @SINCE_1_0.0
    * @param[in] rhs The original object
    * @return Reference to this
    */
   Rect<T>& operator= (const Rect<T>& rhs)
+  {
+    if (this != &rhs)
+    {
+      x = rhs.x;
+      y = rhs.y;
+      width = rhs.width;
+      height = rhs.height;
+    }
+
+    return *this;
+  }
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.21
+   * @param[in] rhs The original object
+   */
+  Rect<T>( Rect<T>&& rhs )
+  : x( rhs.x ),
+    y( rhs.y ),
+    width( rhs.width ),
+    height( rhs.height )
+  {
+  }
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.21
+   * @param[in] rhs The original object
+   * @return Reference to this
+   */
+  Rect<T>& operator=( Rect<T>&& rhs )
   {
     if (this != &rhs)
     {
