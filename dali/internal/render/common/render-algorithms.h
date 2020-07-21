@@ -66,8 +66,7 @@ class RenderAlgorithms
                                    Integration::DepthBufferAvailable depthBufferAvailable,
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
-                                   const Rect<int>& rootClippingRect,
-                                   int orientation);
+                                   const Rect<int>& rootClippingRect );
 
   private:
 
@@ -90,7 +89,7 @@ class RenderAlgorithms
      * @param[in] item     The current RenderItem (about to be rendered)
      * @param[in] context  The current Context
      */
-    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context, int orientation );
+    inline void SetupScissorClipping( const Dali::Internal::SceneGraph::RenderItem& item, Context& context );
 
     /**
      * @brief Set up the clipping based on the specified clipping settings.
@@ -106,8 +105,7 @@ class RenderAlgorithms
                                bool& usedStencilBuffer,
                                uint32_t& lastClippingDepth,
                                uint32_t& lastClippingId,
-                               Integration::StencilBufferAvailable stencilBufferAvailable,
-                               int orientation );
+                               Integration::StencilBufferAvailable stencilBufferAvailable );
 
     /**
      * @brief Process a render-list.
@@ -129,8 +127,7 @@ class RenderAlgorithms
                                    Integration::StencilBufferAvailable stencilBufferAvailable,
                                    Vector<GLuint>& boundTextures,
                                    const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
-                                   const Rect<int>& rootClippingRect,
-                                   int orientation );
+                                   const Rect<int>& rootClippingRect );
 
     // Prevent copying:
     RenderAlgorithms( RenderAlgorithms& rhs );
