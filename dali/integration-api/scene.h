@@ -205,8 +205,10 @@ public:
    *
    * @param[in] width The new width of the set surface
    * @param[in] height The new height of the set surface
+   * @param[in] orientation The orientation of the surface
+   * @param[in] forceUpdate The flag to update force
    */
-  void SurfaceResized( float width, float height );
+  void SurfaceResized( float width, float height, int orientation, bool forceUpdate );
 
   /**
    * @brief Informs the scene that the surface has been replaced.
