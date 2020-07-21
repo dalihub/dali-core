@@ -19,49 +19,26 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/stage.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/threading/mutex.h>
-
 #include <dali/integration-api/core.h>
-#include <dali/integration-api/render-controller.h>
-#include <dali/internal/common/shader-data.h>
-#include <dali/integration-api/debug.h>
-
-#include <dali/internal/common/core-impl.h>
-#include <dali/internal/common/message.h>
 
 #include <dali/internal/event/common/notification-manager.h>
-#include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 
-#include <dali/internal/update/animation/scene-graph-animator.h>
-#include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
-#include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/update/manager/frame-callback-processor.h>
 #include <dali/internal/update/manager/render-task-processor.h>
-#include <dali/internal/update/manager/sorted-layers.h>
-#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/update/render-tasks/scene-graph-camera.h>
 
-#include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1

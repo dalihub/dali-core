@@ -3,6 +3,7 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/integration-api/scene.h>
 
 extern std::vector< std::string > MasterCallStack;
 extern bool gOnRelayout;
@@ -42,8 +43,8 @@ public:
   static TestCustomActor NewVariant2();
   static TestCustomActor NewVariant3( Actor childToAdd );
   static TestCustomActor NewVariant4();
-  static TestCustomActor NewVariant5();
-  static TestCustomActor NewVariant6();
+  static TestCustomActor NewVariant5( Dali::Integration::Scene scene );
+  static TestCustomActor NewVariant6( Dali::Integration::Scene scene );
   static TestCustomActor NewVariant7( const char* name );
   static TestCustomActor NewVariant8( Actor rival );
   static TestCustomActor DownCast( Dali::BaseHandle handle );
@@ -285,7 +286,8 @@ struct TestCustomActorVariant5 : public TestCustomActor
   /**
    * Constructor
    */
-  TestCustomActorVariant5()
+  TestCustomActorVariant5(Dali::Integration::Scene scene)
+  : mScene(scene)
   {
   }
 
@@ -299,9 +301,12 @@ struct TestCustomActorVariant5 : public TestCustomActor
     Dali::Actor parent = Self().GetParent();
     if ( parent )
     {
-      Dali::Stage::GetCurrent().Remove( parent );
+      mScene.Remove( parent );
     }
   }
+
+private:
+  Dali::Integration::Scene mScene;
 };
 
 /**
@@ -312,7 +317,8 @@ struct TestCustomActorVariant6 : public TestCustomActor
   /**
    * Constructor
    */
-  TestCustomActorVariant6()
+  TestCustomActorVariant6(Dali::Integration::Scene scene)
+  : mScene(scene)
   {
   }
 
@@ -326,9 +332,12 @@ struct TestCustomActorVariant6 : public TestCustomActor
     Dali::Actor parent = Self().GetParent();
     if ( parent )
     {
-      Dali::Stage::GetCurrent().Add( parent );
+      mScene.Add( parent );
     }
   }
+
+private:
+  Dali::Integration::Scene mScene;
 };
 
 /**

@@ -447,6 +447,13 @@ public:
    */
   float* AsFloat() {return &x;}
 
+public:
+
+  Vector2( const Vector2& ) = default; ///< Default copy constructor
+  Vector2( Vector2&& ) = default; ///< Default move constructor
+  Vector2& operator=( const Vector2& ) = default; ///< Default copy assignment operator
+  Vector2& operator=( Vector2&& ) = default; ///< Default move assignment operator
+
 public: // Data
 
   // NOTE

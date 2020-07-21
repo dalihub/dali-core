@@ -18,6 +18,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/common/stage.h>
 
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/render-task-list-integ.h>
@@ -1988,8 +1989,8 @@ int UtcDaliRendererSetIndexRange(void)
   Renderer renderer = Renderer::New( geometry, shader );
   actor.AddRenderer( renderer );
 
-  Integration::Scene stage = application.GetScene();
-  stage.Add( actor );
+  Integration::Scene scene = application.GetScene();
+  scene.Add( actor );
 
   char buffer[ 128 ];
 
@@ -2081,9 +2082,9 @@ int UtcDaliRendererSetDepthFunction(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Integration::Scene stage = application.GetScene();
-  stage.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
-  stage.Add(actor);
+  Integration::Scene scene = application.GetScene();
+  scene.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
+  scene.Add(actor);
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace(true);
@@ -2290,9 +2291,9 @@ Renderer RendererTestFixture( TestApplication& application )
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  Integration::Scene stage = application.GetScene();
-  stage.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
-  stage.Add( actor );
+  Integration::Scene scene = application.GetScene();
+  scene.GetRootLayer().SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
+  scene.Add( actor );
 
   return renderer;
 }

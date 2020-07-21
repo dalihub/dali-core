@@ -126,6 +126,51 @@ int UtcDaliVector2CopyConstructor03P(void)
   END_TEST;
 }
 
+int UtcDaliVector2CopyConstructor04P(void)
+{
+  TestApplication application;
+  Vector2 vec0( 10.f, 20.f );
+  Vector2 vec1( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector2MoveConstructor(void)
+{
+  TestApplication application;
+  Vector2 vec0( 10.f, 20.f );
+  Vector2 vec1 = std::move( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVector2CopyAssignment(void)
+{
+  TestApplication application;
+  Vector2 vec0( 10.f, 20.f );
+  Vector2 vec1;
+  vec1 = vec0;
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVector2MoveAssignment(void)
+{
+  TestApplication application;
+  Vector2 vec0( 10.f, 20.f );
+  Vector2 vec1;
+  vec1 = std::move( vec0 );
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVector2AssignP(void)
 {
   TestApplication application;

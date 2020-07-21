@@ -21,6 +21,7 @@
 #include <dali/integration-api/scene.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/public-api/events/key-event.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 

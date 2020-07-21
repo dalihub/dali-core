@@ -576,7 +576,7 @@ int UtcDaliCustomActorRemoveParentDuringOnStageConnection(void)
   TestApplication application;
   tet_infoline("Weird test where child removes its own parent from Stage during Dali::CustomActor::OnStageConnection() callback");
 
-  Integration::Scene stage = application.GetScene();
+  Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -588,11 +588,11 @@ int UtcDaliCustomActorRemoveParentDuringOnStageConnection(void)
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
   actorA.SetProperty( Actor::Property::NAME, "ActorA" );
 
-  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant5();
+  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant5(scene);
   actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
-  stage.Add( actorA );
+  scene.Add( actorA );
 
   // Check callback sequence
 
@@ -628,7 +628,7 @@ int UtcDaliCustomActorAddParentDuringOnStageDisconnection(void)
   TestApplication application;
   tet_infoline("Weird test where child adds its own parent to Stage during Dali::CustomActor::OnStageDisconnection() callback");
 
-  Integration::Scene stage = application.GetScene();
+  Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -639,13 +639,13 @@ int UtcDaliCustomActorAddParentDuringOnStageDisconnection(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
   actorA.SetProperty( Actor::Property::NAME, "ActorA" );
-  stage.Add( actorA );
+  scene.Add( actorA );
 
-  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant6();
+  Test::TestCustomActor actorB = Test::TestCustomActor::NewVariant6(scene);
   actorB.SetProperty( Actor::Property::NAME, "ActorB" );
   actorA.Add( actorB );
 
-  stage.Remove( actorA );
+  scene.Remove( actorA );
 
   // Check callback sequence
 
@@ -1269,7 +1269,7 @@ int UtcDaliCustomActorGetExtensionP(void)
 {
   TestApplication application;
 
-  Test::TestCustomActor custom = Test::TestCustomActor::NewVariant5();
+  Test::TestCustomActor custom = Test::TestCustomActor::NewVariant5(application.GetScene());
 
   DALI_TEST_CHECK( NULL == custom.GetImplementation().GetExtension() );
 

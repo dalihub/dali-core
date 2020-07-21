@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,6 +126,20 @@ Matrix::Matrix( const Matrix& matrix )
 Matrix& Matrix::operator=( const Matrix& matrix )
 {
   // no point copying if self assigning
+  if( this != &matrix )
+  {
+    memcpy( mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX );
+  }
+  return *this;
+}
+
+Matrix::Matrix( Matrix&& matrix )
+{
+  memcpy( mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX );
+}
+
+Matrix& Matrix::operator=( Matrix&& matrix )
+{
   if( this != &matrix )
   {
     memcpy( mMatrix, matrix.mMatrix, NUM_BYTES_IN_MATRIX );

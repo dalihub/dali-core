@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include <iostream>
 
 #include <stdlib.h>
@@ -40,6 +57,44 @@ int UtcDaliRadianConstructors01(void)
   Radian radian3( 0.0f );
   radian3 = Degree( 180.0f );
   DALI_TEST_EQUALS( float(radian3), Math::PI, 0.001f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRadianCopyConstructor(void)
+{
+  Radian radian0( Math::PI );
+  Radian radian1( radian0 );
+  DALI_TEST_EQUALS( float(radian1), Math::PI, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRadianMoveConstructor(void)
+{
+  Radian radian0( Math::PI );
+  Radian radian1 = std::move( radian0 );
+  DALI_TEST_EQUALS( float(radian1), Math::PI, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRadianCopyAssignment(void)
+{
+  Radian radian0( Math::PI );
+  Radian radian1;
+  radian1 = radian0;
+  DALI_TEST_EQUALS( float(radian1), Math::PI, 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRadianMoveAssignment(void)
+{
+  Radian radian0( Math::PI );
+  Radian radian1;
+  radian1 = std::move( radian0 );
+  DALI_TEST_EQUALS( float(radian1), Math::PI, 0.001f, TEST_LOCATION );
+
   END_TEST;
 }
 

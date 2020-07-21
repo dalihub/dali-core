@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,17 +85,61 @@ int UtcDaliAngleAxisAssign(void)
   END_TEST;
 }
 
-int UtcDaliAngleAxisCopy(void)
+int UtcDaliAngleAxisCopyConstructor(void)
 {
   TestApplication application;
 
-  Radian r(Math::PI_2);
-  AngleAxis a(r, Vector3::ZAXIS);
-  AngleAxis b(a);
+  Radian r( Math::PI_2 );
+  AngleAxis a( r, Vector3::ZAXIS );
+  AngleAxis b( a );
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAngleAxisMoveConstructor(void)
+{
+  TestApplication application;
+
+  Radian r( Math::PI_2 );
+  AngleAxis a( r, Vector3::ZAXIS );
+  AngleAxis b = std::move( a );
+
+  // AngleAxis stores its angle as a degree, so should only do degree comparison.
+  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAngleAxisCopyAssignmwent(void)
+{
+  TestApplication application;
+
+  Radian r( Math::PI_2 );
+  AngleAxis a( r, Vector3::ZAXIS );
+  AngleAxis b;
+  b = a;
+
+  // AngleAxis stores its angle as a degree, so should only do degree comparison.
+  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAngleAxisMoveAssignmwent(void)
+{
+  TestApplication application;
+
+  Radian r( Math::PI_2 );
+  AngleAxis a( r, Vector3::ZAXIS );
+  AngleAxis b;
+  b = std::move( a );
+
+  // AngleAxis stores its angle as a degree, so should only do degree comparison.
+  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
   END_TEST;
 }
 

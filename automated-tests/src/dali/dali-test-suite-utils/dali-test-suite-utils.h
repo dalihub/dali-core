@@ -411,8 +411,9 @@ public:
 
   /**
    * @brief Call in main part of code
+   * @param[in] objectRegistry The object Registry being used
    */
-  ObjectDestructionTracker();
+  ObjectDestructionTracker( ObjectRegistry objectRegistry );
 
   /**
    * @brief Call in sub bock of code where the Actor being checked is still alive.
@@ -429,6 +430,7 @@ public:
   bool IsDestroyed();
 
 private:
+  ObjectRegistry mObjectRegistry;
   bool mRefObjectDestroyed;
 };
 
