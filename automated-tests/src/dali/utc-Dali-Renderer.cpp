@@ -140,6 +140,57 @@ int UtcDaliRendererAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliRendererMoveConstructor(void)
+{
+  TestApplication application;
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+  DALI_TEST_CHECK( renderer );
+  DALI_TEST_EQUALS( 1, renderer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::TRANSPARENT, TEST_LOCATION );
+
+  renderer.SetProperty( Renderer::Property::BLEND_COLOR, Color::MAGENTA );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::MAGENTA, TEST_LOCATION );
+
+  Renderer move = std::move( renderer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::MAGENTA, TEST_LOCATION );
+  DALI_TEST_CHECK( !renderer );
+
+  END_TEST;
+}
+
+int UtcDaliRendererMoveAssignment(void)
+{
+  TestApplication application;
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc" );
+  Renderer renderer = Renderer::New( geometry, shader );
+  DALI_TEST_CHECK( renderer );
+  DALI_TEST_EQUALS( 1, renderer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::TRANSPARENT, TEST_LOCATION );
+
+  renderer.SetProperty( Renderer::Property::BLEND_COLOR, Color::MAGENTA );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::MAGENTA, TEST_LOCATION );
+
+  Renderer move;
+  move = std::move( renderer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetProperty<Vector4>( Renderer::Property::BLEND_COLOR ), Color::MAGENTA, TEST_LOCATION );
+  DALI_TEST_CHECK( !renderer );
+
+  END_TEST;
+}
+
 int UtcDaliRendererDownCast01(void)
 {
   TestApplication application;

@@ -72,6 +72,25 @@ static void SetupLinearConstrainerUniformProgress( Dali::LinearConstrainer& line
   linearConstrainer.SetProperty( Dali::LinearConstrainer::Property::VALUE, points );
 }
 
+static void VerifyLinearConstrainerUniformProgress( Dali::LinearConstrainer& linearConstrainer )
+{
+  Dali::Property::Array points;
+  points.Resize(3);
+  points[0] = 0.0f;
+  points[1] = 1.0f;
+  points[2] = 0.0f;
+
+  Property::Value value = linearConstrainer.GetProperty( Dali::LinearConstrainer::Property::VALUE );
+  Property::Array* array = value.GetArray();
+  DALI_TEST_CHECK( array );
+
+  const unsigned int noOfPoints = points.Size();
+  for( unsigned int i = 0; i < noOfPoints; ++i )
+  {
+    DALI_TEST_EQUALS( ( *array )[i].Get< float >(), points[i].Get< float >(), TEST_LOCATION );
+  }
+}
+
 static void SetupLinearConstrainerNonUniformProgress( Dali::LinearConstrainer& linearConstrainer)
 {
   Dali::Property::Array points;
@@ -420,6 +439,47 @@ int UtcLinearConstrainerCopyConstructor(void)
   // call the copy constructor
   Dali::LinearConstrainer linearConstrainer2( linearConstrainer );
   DALI_TEST_EQUALS( (bool)linearConstrainer2, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcLinearConstrainerMoveConstructor(void)
+{
+  TestApplication application;
+
+  Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();
+  DALI_TEST_CHECK( linearConstrainer );
+  DALI_TEST_EQUALS( 1, linearConstrainer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  SetupLinearConstrainerUniformProgress( linearConstrainer );
+  VerifyLinearConstrainerUniformProgress( linearConstrainer );
+
+  Dali::LinearConstrainer moved = std::move( linearConstrainer );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  VerifyLinearConstrainerUniformProgress( moved );
+  DALI_TEST_CHECK( !linearConstrainer );
+
+  END_TEST;
+}
+
+int UtcLinearConstrainerMoveAssignment(void)
+{
+  TestApplication application;
+
+  Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();
+  DALI_TEST_CHECK( linearConstrainer );
+  DALI_TEST_EQUALS( 1, linearConstrainer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  SetupLinearConstrainerUniformProgress( linearConstrainer );
+  VerifyLinearConstrainerUniformProgress( linearConstrainer );
+
+  Dali::LinearConstrainer moved;
+  moved = std::move( linearConstrainer );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  VerifyLinearConstrainerUniformProgress( moved );
+  DALI_TEST_CHECK( !linearConstrainer );
 
   END_TEST;
 }

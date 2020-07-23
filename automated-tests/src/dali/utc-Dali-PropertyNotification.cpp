@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,74 @@ int UtcDaliPropertyNotificationDownCastNegative(void)
 
   notificationHandle = PropertyNotification::DownCast( handle );
   DALI_TEST_CHECK(!notificationHandle);
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X, GreaterThanCondition(100.0f));
+  DALI_TEST_CHECK( notification );
+  DALI_TEST_EQUALS( 2, notification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  PropertyNotification movedNotification = std::move( notification );
+  DALI_TEST_CHECK( movedNotification );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedNotification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !notification );
+
+  PropertyCondition condition = movedNotification.GetCondition();
+  DALI_TEST_CHECK( condition );
+  DALI_TEST_EQUALS( 2, condition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, condition.GetArgumentCount(), TEST_LOCATION );
+
+  PropertyCondition movedCondition = std::move( condition );
+  DALI_TEST_CHECK( movedCondition );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedCondition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, movedCondition.GetArgumentCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !condition );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X, GreaterThanCondition(100.0f));
+  DALI_TEST_CHECK( notification );
+  DALI_TEST_EQUALS( 2, notification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  PropertyNotification movedNotification;
+  movedNotification = std::move( notification );
+  DALI_TEST_CHECK( movedNotification );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedNotification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !notification );
+
+  PropertyCondition condition = movedNotification.GetCondition();
+  DALI_TEST_CHECK( condition );
+  DALI_TEST_EQUALS( 2, condition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, condition.GetArgumentCount(), TEST_LOCATION );
+
+  PropertyCondition movedCondition;
+  movedCondition = std::move( condition );
+  DALI_TEST_CHECK( movedCondition );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedCondition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, movedCondition.GetArgumentCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !condition );
+
   END_TEST;
 }
 

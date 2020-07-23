@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,23 @@ public:
    * @return Reference to the assigned object
    */
   PropertyBuffer& operator=( const PropertyBuffer& handle );
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  PropertyBuffer( PropertyBuffer&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  PropertyBuffer& operator=( PropertyBuffer&& rhs );
 
   /**
    * @brief Updates the whole buffer information.

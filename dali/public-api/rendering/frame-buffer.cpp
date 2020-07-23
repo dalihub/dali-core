@@ -86,6 +86,10 @@ FrameBuffer::FrameBuffer( Internal::FrameBuffer* pointer )
 {
 }
 
+FrameBuffer::FrameBuffer( FrameBuffer&& rhs ) =  default;
+
+FrameBuffer& FrameBuffer::operator=( FrameBuffer&& rhs ) =  default;
+
 void FrameBuffer::AttachColorTexture( Texture& texture )
 {
   AttachColorTexture( texture, 0u, 0u );

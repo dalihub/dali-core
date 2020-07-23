@@ -573,6 +573,66 @@ int UtcDaliTypeRegistryAssignmentOperatorP(void)
   END_TEST;
 }
 
+int UtcDaliTypeRegistryMoveConstructor(void)
+{
+  TestApplication application;
+
+  TypeRegistry registry = TypeRegistry::Get();
+  DALI_TEST_CHECK( registry );
+  DALI_TEST_EQUALS( 16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( registry.GetTypeInfo( "Actor" ).GetName() == "Actor" );
+
+  TypeRegistry movedRegistry = std::move( registry );
+  DALI_TEST_CHECK( movedRegistry );
+  DALI_TEST_EQUALS( 16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( movedRegistry.GetTypeInfo( "Actor" ).GetName() == "Actor" );
+  DALI_TEST_CHECK( !registry );
+
+  Dali::TypeInfo info = movedRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( info );
+  DALI_TEST_EQUALS( 2, info.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( info.GetName() == "Actor" );
+
+  Dali::TypeInfo movedInfo = std::move( info );
+  DALI_TEST_CHECK( movedInfo );
+  DALI_TEST_EQUALS( 2, movedInfo.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( movedInfo.GetName() == "Actor" );
+  DALI_TEST_CHECK( !info );
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryMoveAssignment(void)
+{
+  TestApplication application;
+
+  TypeRegistry registry = TypeRegistry::Get();
+  DALI_TEST_CHECK( registry );
+  DALI_TEST_EQUALS( 16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( registry.GetTypeInfo( "Actor" ).GetName() == "Actor" );
+
+  TypeRegistry movedRegistry;
+  movedRegistry = std::move( registry );
+  DALI_TEST_CHECK( movedRegistry );
+  DALI_TEST_EQUALS( 16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( movedRegistry.GetTypeInfo( "Actor" ).GetName() == "Actor" );
+  DALI_TEST_CHECK( !registry );
+
+  Dali::TypeInfo info = movedRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( info );
+  DALI_TEST_EQUALS( 2, info.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( info.GetName() == "Actor" );
+
+  Dali::TypeInfo movedInfo;
+  movedInfo = std::move( info );
+  DALI_TEST_CHECK( movedInfo );
+  DALI_TEST_EQUALS( 2, movedInfo.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( movedInfo.GetName() == "Actor" );
+  DALI_TEST_CHECK( !info );
+
+  END_TEST;
+}
+
 int UtcDaliTypeRegistryAssignP(void)
 {
   TestApplication application;

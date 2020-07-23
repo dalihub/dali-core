@@ -235,6 +235,82 @@ int UtcDaliAnimationAssignmentOperatorP(void)
   END_TEST;
 }
 
+int UtcDaliAnimationMoveConstructor(void)
+{
+  TestApplication application;
+
+  //Animation
+
+  Animation animation = Animation::New( 1.0f );
+  DALI_TEST_CHECK( animation );
+  DALI_TEST_EQUALS( 1, animation.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, animation.GetDuration(), 0.001f, TEST_LOCATION );
+
+  Animation movedAnimation = std::move( animation );
+  DALI_TEST_CHECK( movedAnimation );
+  DALI_TEST_EQUALS( 1, movedAnimation.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, movedAnimation.GetDuration(), 0.001f, TEST_LOCATION );
+  DALI_TEST_CHECK( !animation );
+
+  // KeyFrames
+
+  KeyFrames keyframes = KeyFrames::New();
+  DALI_TEST_CHECK( keyframes );
+  DALI_TEST_EQUALS( 1, keyframes.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::Type::NONE, keyframes.GetType(), TEST_LOCATION );
+
+  keyframes.Add( 0.0f, Vector3( 0.0f, 0.0f, 0.0f ) );
+  keyframes.Add( 1.0f, Vector3( 100.0f, 100.0f, 100.0f ) );
+  DALI_TEST_EQUALS( Property::Type::VECTOR3, keyframes.GetType(), TEST_LOCATION );
+
+  KeyFrames movedKeyFrames = std::move( keyframes );
+  DALI_TEST_CHECK( movedKeyFrames );
+  DALI_TEST_EQUALS( 1, movedKeyFrames.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::Type::VECTOR3, movedKeyFrames.GetType(), TEST_LOCATION );
+  DALI_TEST_CHECK( !keyframes );
+
+  END_TEST;
+}
+
+int UtcDaliAnimationMoveAssignment(void)
+{
+  TestApplication application;
+
+  // Animation
+
+  Animation animation = Animation::New( 1.0f );
+  DALI_TEST_CHECK( animation );
+  DALI_TEST_EQUALS( 1, animation.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, animation.GetDuration(), 0.001f, TEST_LOCATION );
+
+  Animation move;
+  move = std::move( animation );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, move.GetDuration(), 0.001f, TEST_LOCATION );
+  DALI_TEST_CHECK( !animation );
+
+  // KeyFrames
+
+  KeyFrames keyframes = KeyFrames::New();
+  DALI_TEST_CHECK( keyframes );
+  DALI_TEST_EQUALS( 1, keyframes.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::Type::NONE, keyframes.GetType(), TEST_LOCATION );
+
+  keyframes.Add( 0.0f, Vector3( 0.0f, 0.0f, 0.0f ) );
+  keyframes.Add( 1.0f, Vector3( 100.0f, 100.0f, 100.0f ) );
+  DALI_TEST_EQUALS( Property::Type::VECTOR3, keyframes.GetType(), TEST_LOCATION );
+
+  KeyFrames movedKeyFrames;
+  movedKeyFrames = std::move( keyframes );
+  DALI_TEST_CHECK( movedKeyFrames );
+  DALI_TEST_EQUALS( 1, movedKeyFrames.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Property::Type::VECTOR3, movedKeyFrames.GetType(), TEST_LOCATION );
+  DALI_TEST_CHECK( !keyframes );
+
+  END_TEST;
+}
+
 int UtcDaliAnimationSetDurationP(void)
 {
   TestApplication application;

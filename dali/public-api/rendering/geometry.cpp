@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -53,6 +53,10 @@ Geometry& Geometry::operator=( const Geometry& handle )
   BaseHandle::operator=( handle );
   return *this;
 }
+
+Geometry::Geometry( Geometry&& rhs ) =  default;
+
+Geometry& Geometry::operator=( Geometry&& rhs ) =  default;
 
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {

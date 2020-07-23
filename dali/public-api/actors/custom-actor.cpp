@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,10 @@ CustomActor& CustomActor::operator=(const CustomActor& rhs)
   BaseHandle::operator=(rhs);
   return *this;
 }
+
+CustomActor::CustomActor( CustomActor&& rhs ) = default;
+
+CustomActor& CustomActor::operator=( CustomActor&& rhs ) = default;
 
 CustomActorImpl& CustomActor::GetImplementation()
 {

@@ -2,7 +2,7 @@
 #define DALI_PATH_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,23 @@ public:
    * @return A reference to this
    */
   Path& operator=(const Path& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  Path( Path&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  Path& operator=( Path&& rhs );
 
   /**
    * @brief Adds an interpolation point.

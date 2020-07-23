@@ -323,6 +323,41 @@ int UtcDaliActorDownCastN(void)
   END_TEST;
 }
 
+int UtcDaliActorMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  int id = actor.GetProperty< int >( Actor::Property::ID );
+
+  Actor moved = std::move( actor);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_CHECK( !actor );
+
+  END_TEST;
+}
+
+int UtcDaliActorMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  int id = actor.GetProperty< int >( Actor::Property::ID );
+
+  Actor moved;
+  moved = std::move( actor);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_CHECK( !actor );
+
+  END_TEST;
+}
+
 //& purpose: Testing Dali::Actor::GetName()
 int UtcDaliActorGetName(void)
 {

@@ -253,6 +253,53 @@ int UtcDaliFrameBufferAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliFrameBufferMoveConstructor(void)
+{
+  TestApplication application;
+
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
+  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_EQUALS( 1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+  DALI_TEST_EQUALS( frameBuffer.GetColorTexture(), texture, TEST_LOCATION );
+
+  FrameBuffer move = std::move( frameBuffer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetColorTexture(), texture, TEST_LOCATION );
+  DALI_TEST_CHECK( !frameBuffer );
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferMoveAssignment(void)
+{
+  TestApplication application;
+
+  uint32_t width = 64;
+  uint32_t height = 64;
+  FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::DEPTH_STENCIL );
+  DALI_TEST_CHECK( frameBuffer );
+  DALI_TEST_EQUALS( 1, frameBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  frameBuffer.AttachColorTexture( texture );
+  DALI_TEST_EQUALS( frameBuffer.GetColorTexture(), texture, TEST_LOCATION );
+
+  FrameBuffer move;
+  move = std::move( frameBuffer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetColorTexture(), texture, TEST_LOCATION );
+  DALI_TEST_CHECK( !frameBuffer );
+
+  END_TEST;
+}
+
 int UtcDaliFrameBufferDownCast01(void)
 {
   TestApplication application;

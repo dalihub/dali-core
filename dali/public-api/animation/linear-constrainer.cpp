@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,10 @@ LinearConstrainer& LinearConstrainer::operator=(const LinearConstrainer& rhs)
   BaseHandle::operator=(rhs);
   return *this;
 }
+
+LinearConstrainer::LinearConstrainer( LinearConstrainer&& rhs ) = default;
+
+LinearConstrainer& LinearConstrainer::operator=( LinearConstrainer&& rhs ) = default;
 
 void LinearConstrainer::Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap )
 {

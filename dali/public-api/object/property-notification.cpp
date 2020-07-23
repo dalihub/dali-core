@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,10 @@ PropertyNotification& PropertyNotification::operator=(const PropertyNotification
   BaseHandle::operator=(rhs);
   return *this;
 }
+
+PropertyNotification::PropertyNotification( PropertyNotification&& rhs ) = default;
+
+PropertyNotification& PropertyNotification::operator=( PropertyNotification&& rhs ) = default;
 
 PropertyCondition PropertyNotification::GetCondition()
 {

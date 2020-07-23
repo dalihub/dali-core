@@ -135,6 +135,57 @@ int UtcDaliHandleAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliHandleMoveConstructor(void)
+{
+  TestApplication application;
+
+  // Initialize a handle, ref count == 1
+  Handle handle = Actor::New();
+
+  DALI_TEST_EQUALS( 1, handle.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  int value( 20 );
+  Property::Index index = handle.RegisterProperty( "customProperty",  value );
+  DALI_TEST_CHECK( handle.GetProperty<int>( index ) == value );
+
+  // Move the object, ref count == 1
+  Handle move = std::move( handle );
+  DALI_TEST_CHECK( move );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( move.GetProperty<int>( index ) == value );
+  DALI_TEST_CHECK( !handle );
+
+  END_TEST;
+}
+
+int UtcDaliHandleMoveAssignment(void)
+{
+  TestApplication application;
+
+  // Initialize a handle, ref count == 1
+  Handle handle = Actor::New();
+
+  DALI_TEST_EQUALS( 1, handle.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  int value( 20 );
+  Property::Index index = handle.RegisterProperty( "customProperty",  value );
+  DALI_TEST_CHECK( handle.GetProperty<int>( index ) == value );
+
+  // Move the object, ref count == 1
+  Handle move;
+  move = std::move( handle );
+  DALI_TEST_CHECK( move );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( move.GetProperty<int>( index ) == value );
+  DALI_TEST_CHECK( !handle );
+
+  END_TEST;
+}
+
 int UtcDaliHandleSupports(void)
 {
   tet_infoline("Positive Test Dali::Handle::Supports()");

@@ -2795,3 +2795,60 @@ int UtcDaliRenderTaskSetClearEnabled(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskMoveConstrctor(void)
+{
+  TestApplication application;
+
+  Vector4 testColor( 1.0f, 2.0f, 3.0f, 4.0f );
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+  DALI_TEST_CHECK( task );
+  DALI_TEST_EQUALS( 2, task.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( task.GetClearColor() != testColor );
+
+  task.SetClearColor( testColor );
+
+  // Wait a frame.
+  Wait(application);
+
+  DALI_TEST_EQUALS( task.GetClearColor(), testColor, TEST_LOCATION );
+
+  RenderTask move = std::move( task );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetClearColor(), testColor, TEST_LOCATION );
+  DALI_TEST_CHECK( !task );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskMoveAssignment(void)
+{
+  TestApplication application;
+
+  Vector4 testColor( 1.0f, 2.0f, 3.0f, 4.0f );
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+  DALI_TEST_CHECK( task );
+  DALI_TEST_EQUALS( 2, task.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( task.GetClearColor() != testColor );
+
+  task.SetClearColor( testColor );
+
+  // Wait a frame.
+  Wait(application);
+
+  DALI_TEST_EQUALS( task.GetClearColor(), testColor, TEST_LOCATION );
+
+  RenderTask move;
+  move = std::move( task );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetClearColor(), testColor, TEST_LOCATION );
+  DALI_TEST_CHECK( !task );
+
+  END_TEST;
+}

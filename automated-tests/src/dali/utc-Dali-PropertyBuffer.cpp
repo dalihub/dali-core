@@ -110,6 +110,43 @@ int UtcDaliPropertyBufferAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliPropertyBufferMoveConstructor(void)
+{
+  TestApplication application;
+
+  PropertyBuffer propertyBuffer = CreatePropertyBuffer();
+  DALI_TEST_CHECK( propertyBuffer );
+  DALI_TEST_EQUALS( 1, propertyBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, propertyBuffer.GetSize(), TEST_LOCATION );
+
+  PropertyBuffer move = std::move( propertyBuffer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, move.GetSize(), TEST_LOCATION );
+  DALI_TEST_CHECK( !propertyBuffer );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyBufferMoveAssignment(void)
+{
+  TestApplication application;
+
+  PropertyBuffer propertyBuffer = CreatePropertyBuffer();
+  DALI_TEST_CHECK( propertyBuffer );
+  DALI_TEST_EQUALS( 1, propertyBuffer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, propertyBuffer.GetSize(), TEST_LOCATION );
+
+  PropertyBuffer move;
+  move = std::move( propertyBuffer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, move.GetSize(), TEST_LOCATION );
+  DALI_TEST_CHECK( !propertyBuffer );
+
+  END_TEST;
+}
+
 int UtcDaliPropertyBufferSetData01(void)
 {
   TestApplication application;

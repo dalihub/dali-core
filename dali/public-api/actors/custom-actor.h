@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,23 @@ public:
    * @return A reference to this
    */
   CustomActor& operator=(const CustomActor& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs The actor to move
+   */
+  CustomActor( CustomActor&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs The actor to move
+   * @return A reference to this
+   */
+  CustomActor& operator=( CustomActor&& rhs );
 
 public: // Not intended for application developers
 

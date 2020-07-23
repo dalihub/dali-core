@@ -80,6 +80,48 @@ int UtcDaliLayerDownCast2(void)
   END_TEST;
 }
 
+int UtcDaliLayerMoveConstructor(void)
+{
+  TestApplication application;
+  Layer layer = Layer::New();
+  DALI_TEST_CHECK( layer );
+  DALI_TEST_EQUALS( 1, layer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0, layer.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+
+  application.GetScene().Add( layer );
+  DALI_TEST_EQUALS( 2, layer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, layer.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+
+  Layer move = std::move( layer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, move.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+  DALI_TEST_CHECK( !layer );
+
+  END_TEST;
+}
+
+int UtcDaliLayerMoveAssignment(void)
+{
+  TestApplication application;
+  Layer layer = Layer::New();
+  DALI_TEST_CHECK( layer );
+  DALI_TEST_EQUALS( 1, layer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0, layer.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+
+  application.GetScene().Add( layer );
+  DALI_TEST_EQUALS( 2, layer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, layer.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+
+  Layer move;
+  move = std::move( layer );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, move.GetProperty< int >( Layer::Property::DEPTH ), TEST_LOCATION );
+  DALI_TEST_CHECK( !layer );
+
+  END_TEST;
+}
 
 int UtcDaliLayerGetDepth(void)
 {

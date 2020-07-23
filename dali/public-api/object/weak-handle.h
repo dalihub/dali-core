@@ -81,6 +81,23 @@ public:
   WeakHandleBase& operator=( const WeakHandleBase& rhs );
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  WeakHandleBase( WeakHandleBase&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  WeakHandleBase& operator=( WeakHandleBase&& rhs );
+
+  /**
    * @brief Equality operator overload.
    *
    * @SINCE_1_2.60
@@ -162,13 +179,23 @@ public:
   }
 
   /**
-   * @copydoc Dali::WeakHandleBase::operator=()
+   * @copydoc Dali::WeakHandleBase::operator=(const WeakHandleBase& rhs)
    */
   WeakHandle& operator=( const WeakHandle& rhs )
   {
     WeakHandleBase::operator=(rhs);
     return *this;
   }
+
+  /**
+   * @copydoc Dali::WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs)
+   */
+  WeakHandle( WeakHandle&& rhs ) = default;
+
+  /**
+   * @copydoc Dali::WeakHandleBase::operator=(WeakHandleBase&& rhs)
+   */
+  WeakHandle& operator=( WeakHandle&& rhs ) = default;
 
   /**
    * @copydoc Dali::WeakHandleBase::operator==()

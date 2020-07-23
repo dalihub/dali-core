@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,10 @@ Renderer& Renderer::operator=( const Renderer& handle )
   BaseHandle::operator=( handle );
   return *this;
 }
+
+Renderer::Renderer( Renderer&& rhs ) =  default;
+
+Renderer& Renderer::operator=( Renderer&& rhs ) =  default;
 
 void Renderer::SetGeometry( Geometry& geometry )
 {

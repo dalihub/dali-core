@@ -273,6 +273,23 @@ public:
   Layer& operator=(const Layer& rhs);
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs The layer to move
+   */
+  Layer( Layer&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs The layer to move
+   * @return A reference to this
+   */
+  Layer& operator=( Layer&& rhs );
+
+  /**
    * @brief Increments the depth of the layer.
    *
    * @SINCE_1_0.0
