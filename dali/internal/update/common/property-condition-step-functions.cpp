@@ -132,25 +132,26 @@ bool Step::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::Ra
 
 bool Step::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const float propertyValue = value.GetVector2().LengthSquared();
+  const float propertyValue = value.GetVector2().Length();
   return Evaluate( propertyValue, arg );
 }
 
 bool Step::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  float propertyValue = value.GetVector3().LengthSquared();
+  float propertyValue = value.GetVector3().Length();
   return Evaluate( propertyValue, arg );
 }
 
 bool Step::EvalAndCompareVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  float propertyValue = value.GetVector3().LengthSquared();
+  float propertyValue = value.GetVector3().Length();
   bool result = Evaluate( propertyValue, arg );
   if( result == false )
   {
-    if( ( fabsf( arg[ARGINDEX_FIRST_VALUE] - value.GetVector3().x ) > Math::MACHINE_EPSILON_1 )
-        || ( fabsf( arg[ARGINDEX_SECOND_VALUE] - value.GetVector3().y ) > Math::MACHINE_EPSILON_1 )
-        || ( fabsf( arg[ARGINDEX_THIRD_VALUE] - value.GetVector3().z ) > Math::MACHINE_EPSILON_1 ) )
+    const float step = 1.0f / arg[ARGINDEX_STEP_SIZE];
+    if( ( fabsf( arg[ARGINDEX_FIRST_VALUE] - value.GetVector3().x ) > step )
+        || ( fabsf( arg[ARGINDEX_SECOND_VALUE] - value.GetVector3().y ) > step )
+        || ( fabsf( arg[ARGINDEX_THIRD_VALUE] - value.GetVector3().z ) > step ) )
     {
       result = true;
     }
@@ -163,7 +164,7 @@ bool Step::EvalAndCompareVector3( const Dali::PropertyInput& value, PropertyNoti
 
 bool Step::EvalVector4( const  Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
-  const float propertyValue = value.GetVector4().LengthSquared();
+  const float propertyValue = value.GetVector4().Length();
   return Evaluate( propertyValue, arg );
 }
 
