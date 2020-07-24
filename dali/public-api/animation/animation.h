@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,6 +231,23 @@ public:
    * @return A reference to this
    */
   Animation& operator=(const Animation& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  Animation( Animation&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  Animation& operator=( Animation&& rhs );
 
   /**
    * @brief Sets the duration of an animation.

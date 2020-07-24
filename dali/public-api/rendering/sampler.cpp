@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,9 @@ Sampler& Sampler::operator=( const Sampler& handle )
   return *this;
 }
 
+Sampler::Sampler( Sampler&& rhs ) =  default;
+
+Sampler& Sampler::operator=( Sampler&& rhs ) =  default;
 
 void Sampler::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
 {

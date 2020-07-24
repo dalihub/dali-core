@@ -101,6 +101,51 @@ int UtcDaliTextureAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliTextureMoveConstructor(void)
+{
+  TestApplication application;
+
+  uint32_t width = 64;
+  uint32_t height = 64;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  DALI_TEST_CHECK( texture );
+  DALI_TEST_EQUALS( 1, texture.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( texture.GetWidth(), width, TEST_LOCATION );
+  DALI_TEST_EQUALS( texture.GetHeight(), height, TEST_LOCATION );
+
+  Texture move = std::move( texture );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetWidth(), width, TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetHeight(), height, TEST_LOCATION );
+  DALI_TEST_CHECK( !texture );
+
+  END_TEST;
+}
+
+int UtcDaliTextureMoveAssignment(void)
+{
+  TestApplication application;
+
+  uint32_t width = 64;
+  uint32_t height = 64;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  DALI_TEST_CHECK( texture );
+  DALI_TEST_EQUALS( 1, texture.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( texture.GetWidth(), width, TEST_LOCATION );
+  DALI_TEST_EQUALS( texture.GetHeight(), height, TEST_LOCATION );
+
+  Texture move;
+  move = std::move( texture );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetWidth(), width, TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetHeight(), height, TEST_LOCATION );
+  DALI_TEST_CHECK( !texture );
+
+  END_TEST;
+}
+
 int UtcDaliTextureDownCast01(void)
 {
   TestApplication application;

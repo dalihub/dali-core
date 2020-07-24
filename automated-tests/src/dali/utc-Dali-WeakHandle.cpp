@@ -264,6 +264,45 @@ int UtcDaliWeakHandleBaseAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliWeakHandleBaseMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandleBase object( actor );
+  DALI_TEST_CHECK( object.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandleBase move = std::move( object );
+  DALI_TEST_CHECK(move.GetBaseHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_CHECK( !object.GetBaseHandle() ); // object moved
+
+  END_TEST;
+}
+
+int UtcDaliWeakHandleBaseMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandleBase object( actor );
+  DALI_TEST_CHECK( object.GetBaseHandle() == actor);
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandleBase move;
+  move = std::move( object );
+  DALI_TEST_CHECK(move.GetBaseHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_CHECK( !object.GetBaseHandle() ); // object moved
+
+  END_TEST;
+}
+
 int UtcDaliWeakHandleBaseEqualityOperatorP(void)
 {
   TestApplication application;
@@ -412,4 +451,42 @@ int UtcDaliWeakHandleGetHandle(void)
   END_TEST;
 }
 
+int UtcDaliWeakHandleMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandle<Actor> object( actor );
+  DALI_TEST_CHECK( object.GetHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandle<Actor> move = std::move( object );
+  DALI_TEST_CHECK( move.GetHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_CHECK( !object.GetHandle() ); // object moved
+
+  END_TEST;
+}
+
+int UtcDaliWeakHandleMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandle<Actor> object( actor );
+  DALI_TEST_CHECK( object.GetHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+
+  WeakHandle<Actor> move;
+  move = std::move( object );
+  DALI_TEST_CHECK( move.GetHandle() == actor );
+  DALI_TEST_EQUALS( 1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION ); // reference count of the actor is not increased
+  DALI_TEST_CHECK( !object.GetHandle() ); // object moved
+
+  END_TEST;
+}
 

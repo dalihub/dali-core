@@ -226,6 +226,23 @@ public:
   RenderTask& operator=(const RenderTask& rhs);
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  RenderTask( RenderTask&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  RenderTask& operator=( RenderTask&& rhs );
+
+  /**
    * @brief Sets the actors to be rendered.
    * @SINCE_1_0.0
    * @param[in] actor This actor and its children will be rendered.

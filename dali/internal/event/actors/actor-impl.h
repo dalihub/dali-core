@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1374,6 +1374,15 @@ public:
    */
   bool IsHittable() const;
 
+  /**
+   * Query whether the actor captures all touch after it starts even if touch leaves its boundary.
+   * @return true, if it captures all touch after start
+   */
+  bool CapturesAllTouchAfterStart() const
+  {
+    return mCaptureAllTouchAfterStart;
+  }
+
   // Gestures
 
   /**
@@ -2017,6 +2026,7 @@ protected:
   bool mPositionUsesAnchorPoint                    : 1; ///< Cached: Whether the position uses the anchor point or not.
   bool mVisible                                    : 1; ///< Cached: Whether the actor is visible or not.
   bool mInheritLayoutDirection                     : 1; ///< Whether the actor inherits the layout direction from parent.
+  bool mCaptureAllTouchAfterStart                  : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
   LayoutDirection::Type mLayoutDirection           : 2; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type mDrawMode                         : 3; ///< Cached: How the actor and its children should be drawn
   ColorMode mColorMode                             : 3; ///< Cached: Determines whether mWorldColor is inherited

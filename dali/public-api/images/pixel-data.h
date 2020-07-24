@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,23 @@ public:
    * @return A reference to this object
    */
   PixelData& operator=(const PixelData& rhs);
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  PixelData( PixelData&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  PixelData& operator=( PixelData&& rhs );
 
   /**
    * @brief Gets the width of the buffer in pixels.

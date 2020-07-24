@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -501,3 +501,43 @@ int UtcDaliPathRegisterProperty(void)
   END_TEST;
 }
 
+int UtcDaliPathMoveConstrcutor(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+  DALI_TEST_CHECK( path );
+  DALI_TEST_EQUALS( 1, path.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  path.AddPoint(Vector3( 50.0,  50.0, 0.0));
+  DALI_TEST_EQUALS( path.GetPoint(0), Vector3( 50.0,  50.0, 0.0), TEST_LOCATION );
+
+  Dali::Path move = std::move( path );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetPoint(0), Vector3( 50.0,  50.0, 0.0), TEST_LOCATION );
+  DALI_TEST_CHECK( !path );
+
+  END_TEST;
+}
+
+int UtcDaliPathMoveAssignment(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+  DALI_TEST_CHECK( path );
+  DALI_TEST_EQUALS( 1, path.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  path.AddPoint(Vector3( 50.0,  50.0, 0.0));
+  DALI_TEST_EQUALS( path.GetPoint(0), Vector3( 50.0,  50.0, 0.0), TEST_LOCATION );
+
+  Dali::Path move;
+  move = std::move( path );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetPoint(0), Vector3( 50.0,  50.0, 0.0), TEST_LOCATION );
+  DALI_TEST_CHECK( !path );
+
+  END_TEST;
+}

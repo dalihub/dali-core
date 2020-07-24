@@ -134,6 +134,23 @@ public:
   FrameBuffer& operator=( const FrameBuffer& handle );
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   */
+  FrameBuffer( FrameBuffer&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  FrameBuffer& operator=( FrameBuffer&& rhs );
+
+  /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.
    * @note This causes a color attachment to be added.
    * @note Repeated calls to this method add textures as subsequent color attachments.

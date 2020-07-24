@@ -800,6 +800,23 @@ public:
    */
   Actor& operator=(const Actor& rhs);
 
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the actor to move
+   */
+  Actor( Actor&& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.22
+   * @param[in] rhs A reference to the actor to move
+   * @return A reference to this
+   */
+  Actor& operator=( Actor&& rhs );
+
   // Containment
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,3 +98,49 @@ int UtcDaliPixelDataAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliPixelDataMoveConstructor(void)
+{
+  TestApplication application;
+
+  unsigned int width = 10u;
+  unsigned int height = 10u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+  DALI_TEST_CHECK( pixelData );
+  DALI_TEST_EQUALS( width, pixelData.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( height, pixelData.GetHeight(), TEST_LOCATION );
+
+  PixelData moved = std::move( pixelData);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( width, moved.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( height, moved.GetHeight(), TEST_LOCATION );
+  DALI_TEST_CHECK( !pixelData );
+
+  END_TEST;
+}
+
+int UtcDaliPixelDataMoveAssignment(void)
+{
+  TestApplication application;
+
+  unsigned int width = 10u;
+  unsigned int height = 10u;
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::L8 );
+  unsigned char* buffer = new unsigned char [ bufferSize ];
+
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::L8, PixelData::DELETE_ARRAY );
+  DALI_TEST_CHECK( pixelData );
+  DALI_TEST_EQUALS( width, pixelData.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( height, pixelData.GetHeight(), TEST_LOCATION );
+
+  PixelData moved;
+  moved = std::move( pixelData);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( width, moved.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( height, moved.GetHeight(), TEST_LOCATION );
+  DALI_TEST_CHECK( !pixelData );
+
+  END_TEST;
+}

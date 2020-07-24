@@ -75,6 +75,42 @@ int UtcDaliRenderTaskListAssignment(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskListMoveConstructor(void)
+{
+  TestApplication application;
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK( taskList );
+  DALI_TEST_EQUALS( 2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+
+  RenderTaskList move = std::move( taskList );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( 1u == move.GetTaskCount() );
+  DALI_TEST_CHECK( !taskList );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListMoveAssignment(void)
+{
+  TestApplication application;
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK( taskList );
+  DALI_TEST_EQUALS( 2, taskList.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+
+  RenderTaskList move;
+  move = std::move( taskList );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 2, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( 1u == move.GetTaskCount() );
+  DALI_TEST_CHECK( !taskList );
+
+  END_TEST;
+}
 
 int UtcDaliRenderTaskListDownCast(void)
 {

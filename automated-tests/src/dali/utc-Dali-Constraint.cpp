@@ -528,6 +528,53 @@ int UtcDaliConstraintCopyAndAssignment(void)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+int UtcDaliConstraintMoveConstructor(void)
+{
+  // Ensure copy constructor & assignment operators work
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add( actor );
+
+  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
+  DALI_TEST_CHECK( constraint );
+  DALI_TEST_EQUALS( 1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( constraint.GetTargetObject() == actor );
+
+  Constraint moved = std::move( constraint );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetTargetObject() == actor );
+  DALI_TEST_CHECK( !constraint );
+
+  END_TEST;
+}
+
+int UtcDaliConstraintMoveAssignment(void)
+{
+  // Ensure copy constructor & assignment operators work
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add( actor );
+
+  Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
+  DALI_TEST_CHECK( constraint );
+  DALI_TEST_EQUALS( 1, constraint.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( constraint.GetTargetObject() == actor );
+
+  Constraint moved;
+  moved = std::move( constraint );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetTargetObject() == actor );
+  DALI_TEST_CHECK( !constraint );
+
+  END_TEST;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Constraint::DownCast
 ///////////////////////////////////////////////////////////////////////////////

@@ -109,6 +109,23 @@ WeakHandleBase& WeakHandleBase::operator=( const WeakHandleBase& rhs )
   return *this;
 }
 
+WeakHandleBase::WeakHandleBase( WeakHandleBase&& rhs )
+: mImpl( rhs.mImpl )
+{
+  rhs.mImpl = nullptr;
+}
+
+WeakHandleBase& WeakHandleBase::operator=( WeakHandleBase&& rhs )
+{
+  if (this != &rhs)
+  {
+    mImpl = rhs.mImpl;
+    rhs.mImpl = nullptr;
+  }
+
+  return *this;
+}
+
 bool WeakHandleBase::operator==( const WeakHandleBase& rhs ) const
 {
   return this->mImpl->mObject == rhs.mImpl->mObject;
@@ -121,7 +138,7 @@ bool WeakHandleBase::operator!=( const WeakHandleBase& rhs ) const
 
 BaseHandle WeakHandleBase::GetBaseHandle() const
 {
-  return BaseHandle( mImpl->mObject );
+  return mImpl ? BaseHandle( mImpl->mObject ) : BaseHandle();
 }
 
 void WeakHandleBase::Reset()

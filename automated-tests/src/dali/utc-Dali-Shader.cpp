@@ -94,6 +94,51 @@ int UtcDaliShaderAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliShaderMoveConstructor(void)
+{
+  TestApplication application;
+
+  Shader shader = Shader::New(VertexSource, FragmentSource);
+  DALI_TEST_CHECK( shader );
+  DALI_TEST_EQUALS( 1, shader.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  // Register a custom property
+  Vector2 vec( 1.0f, 2.0f );
+  Property::Index customIndex = shader.RegisterProperty( "custom", vec );
+  DALI_TEST_EQUALS( shader.GetProperty<Vector2>( customIndex ), vec, TEST_LOCATION );
+
+  Shader move = std::move( shader );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetProperty<Vector2>( customIndex ), vec, TEST_LOCATION );
+  DALI_TEST_CHECK( !shader );
+
+  END_TEST;
+}
+
+int UtcDaliShaderMoveAssignment(void)
+{
+  TestApplication application;
+
+  Shader shader = Shader::New(VertexSource, FragmentSource);
+  DALI_TEST_CHECK( shader );
+  DALI_TEST_EQUALS( 1, shader.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  // Register a custom property
+  Vector2 vec( 1.0f, 2.0f );
+  Property::Index customIndex = shader.RegisterProperty( "custom", vec );
+  DALI_TEST_EQUALS( shader.GetProperty<Vector2>( customIndex ), vec, TEST_LOCATION );
+
+  Shader move;
+  move = std::move( shader );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( move.GetProperty<Vector2>( customIndex ), vec, TEST_LOCATION );
+  DALI_TEST_CHECK( !shader );
+
+  END_TEST;
+}
+
 int UtcDaliShaderDownCast01(void)
 {
   TestApplication application;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,10 @@ PixelData& PixelData::operator=(const PixelData& rhs)
   BaseHandle::operator=(rhs);
   return *this;
 }
+
+PixelData::PixelData( PixelData&& rhs ) = default;
+
+PixelData& PixelData::operator=( PixelData&& rhs ) = default;
 
 uint32_t PixelData::GetWidth() const
 {

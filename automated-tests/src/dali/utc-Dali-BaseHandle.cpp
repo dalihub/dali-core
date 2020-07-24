@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +181,53 @@ int UtcDaliBaseHandleAssignmentOperator(void)
   {
     DALI_TEST_EQUALS(2, copy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
+  END_TEST;
+}
+
+int UtcDaliBaseHandleMoveConstructor(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  BaseHandle object = Actor::New();
+
+  DALI_TEST_EQUALS( 1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  // Move the object, ref count == 1
+  BaseHandle move = std::move( object );
+  DALI_TEST_CHECK( move );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  if ( move )
+  {
+    DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( !object );
+
+  END_TEST;
+}
+
+int UtcDaliBaseHandleMoveAssignment(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  BaseHandle object = Actor::New();
+
+  DALI_TEST_EQUALS( 1, object.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  // Move the object, ref count == 1
+  BaseHandle move;
+  move = std::move( object );
+  DALI_TEST_CHECK( move );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  if ( move )
+  {
+    DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( !object );
+
   END_TEST;
 }
 
