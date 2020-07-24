@@ -7907,6 +7907,11 @@ int UtcDaliActorCaptureAllTouchAfterStartPropertyP(void)
   DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START).Get<bool>(), false, TEST_LOCATION);
   actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
   DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), "captureAllTouchAfterStart", TEST_LOCATION);
   END_TEST;
 }
 
