@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -529,5 +529,64 @@ int UtcDaliRefObjectAssignmentOperator(void)
     }
     DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliIntrusivePtrMoveConstructor(void)
+{
+  IntrusivePtr<TestObject> testPtr( new TestObject );
+  DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( testPtr->data, 201, TEST_LOCATION );
+
+  IntrusivePtr<TestObject> movePtr = std::move( testPtr );
+  DALI_TEST_EQUALS( movePtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( movePtr->data, 201, TEST_LOCATION );
+  DALI_TEST_CHECK( !testPtr );
+
+  IntrusivePtr<TestObject> anotherTestPtr( new TestObject );
+  DALI_TEST_EQUALS( anotherTestPtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( anotherTestPtr->data, 201, TEST_LOCATION );
+  IntrusivePtr<TestObject> anotherMovePtr = std::move( anotherTestPtr );
+  DALI_TEST_EQUALS( anotherMovePtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( anotherMovePtr->data, 201, TEST_LOCATION );
+  DALI_TEST_CHECK( !anotherTestPtr.Get() );
+
+  IntrusivePtr<CountedSubclass> countedSubclass( new CountedSubclass );
+  DALI_TEST_EQUALS( countedSubclass->ReferenceCount(), 1, TEST_LOCATION );
+
+  IntrusivePtr<Counted> countedMovePtr = std::move( countedSubclass );
+  DALI_TEST_EQUALS( countedMovePtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_CHECK( !countedSubclass );
+
+  END_TEST;
+}
+
+int UtcDaliIntrusivePtrMoveAssignment(void)
+{
+  IntrusivePtr<TestObject> testPtr( new TestObject );
+  DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( testPtr->data, 201, TEST_LOCATION );
+
+  IntrusivePtr<TestObject> secondPtr( testPtr );
+  DALI_TEST_EQUALS( testPtr->ReferenceCount(), 2, TEST_LOCATION );
+
+  IntrusivePtr<TestObject> thirdPtr;
+  testPtr = std::move( thirdPtr );
+  DALI_TEST_EQUALS( secondPtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( secondPtr->data, 201, TEST_LOCATION );
+  DALI_TEST_CHECK( !testPtr.Get() );
+
+  IntrusivePtr<TestObject> fourthPtr( new TestObject );
+  testPtr = std::move( fourthPtr );
+  DALI_TEST_CHECK( !fourthPtr.Get() );
+
+  IntrusivePtr<CountedSubclass> countedSubclassPtr( new CountedSubclass );
+  DALI_TEST_EQUALS( countedSubclassPtr->ReferenceCount(), 1, TEST_LOCATION );
+
+  IntrusivePtr<Counted> countedMovePtr;
+  countedMovePtr = std::move( countedSubclassPtr );
+  DALI_TEST_EQUALS( countedMovePtr->ReferenceCount(), 1, TEST_LOCATION );
+  DALI_TEST_CHECK( !countedSubclassPtr );
+
   END_TEST;
 }
