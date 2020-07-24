@@ -76,7 +76,6 @@ SET( devel_api_core_events_header_files
 
 SET( devel_api_core_images_header_files
   ${devel_api_src_dir}/images/distance-field.h
-  ${devel_api_src_dir}/images/native-image-interface-extension.h
   ${devel_api_src_dir}/images/pixel-data-devel.h
 )
 

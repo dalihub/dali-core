@@ -59,7 +59,7 @@ int UtcDaliTextureNew03(void)
   TestApplication application;
 
   // Create a native image source.
-  TestNativeImageNoExtPointer testNativeImage = TestNativeImageNoExt::New( 64u, 64u );
+  TestNativeImagePointer testNativeImage = TestNativeImage::New( 64u, 64u );
 
   // Create a texture from the native image source.
   Texture nativeTexture = Texture::New( *testNativeImage );
@@ -783,20 +783,74 @@ int UtcDaliTextureContextLoss(void)
   END_TEST;
 }
 
-int UtcDaliNativeImageTexture(void)
+int UtcDaliNativeImageTexture01(void)
 {
   TestApplication application;
-  tet_infoline( "UtcDaliNativeImageTexture" );
+  tet_infoline( "UtcDaliNativeImageTexture01" );
 
   TestNativeImagePointer imageInterface = TestNativeImage::New( 16, 16 );
-  Texture texture = Texture::New( *(imageInterface.Get()) );
-  DALI_TEST_CHECK( texture );
+  {
+    Texture texture = Texture::New( *(imageInterface.Get()) );
+    Actor actor = CreateRenderableActor(texture, "", "");
+    application.GetScene().Add(actor);
 
+    DALI_TEST_CHECK( texture );
+
+    application.SendNotification();
+    application.Render(16);
+
+    DALI_TEST_EQUALS( imageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageInterface->mExtensionDestroyCalls, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetProperty(Actor::Property::SIZE), Property::Value(Vector3(16,16,0)), TEST_LOCATION);
+
+    UnparentAndReset(actor);
+
+    application.SendNotification();
+    application.Render(16);
+  }
   application.SendNotification();
   application.Render(16);
 
-  DALI_TEST_CHECK( texture );
+  DALI_TEST_EQUALS( imageInterface->mExtensionCreateCalls, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageInterface->mExtensionDestroyCalls, 1, TEST_LOCATION );
 
   END_TEST;
 }
 
+
+int UtcDaliNativeImageTexture02(void)
+{
+  TestApplication application;
+  tet_infoline( "UtcDaliNativeImageTexture02 - test error on TargetTexture" );
+
+  TestNativeImagePointer imageInterface = TestNativeImage::New( 16, 16 );
+  imageInterface->mTargetTextureError = 1u;
+  {
+    Texture texture = Texture::New( *(imageInterface.Get()) );
+    Actor actor = CreateRenderableActor(texture, "", "");
+    application.GetScene().Add(actor);
+
+    DALI_TEST_CHECK( texture );
+
+    application.SendNotification();
+    application.Render(16);
+
+    // Expect 2 attempts to create the texture - once when adding the texture
+    // to the scene-graph, and again since that failed, during the Bind.
+    DALI_TEST_EQUALS( imageInterface->mExtensionCreateCalls, 2, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageInterface->mExtensionDestroyCalls, 2, TEST_LOCATION );
+
+    UnparentAndReset(actor);
+
+    application.SendNotification();
+    application.Render(16);
+  }
+  application.SendNotification();
+  application.Render(16);
+
+  // Expect that there are no further calls to create/destroy resource
+  DALI_TEST_EQUALS( imageInterface->mExtensionCreateCalls, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageInterface->mExtensionDestroyCalls, 2, TEST_LOCATION );
+
+  END_TEST;
+}
