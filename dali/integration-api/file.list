@@ -3,6 +3,7 @@ SET( platform_abstraction_src_dir ${ROOT_SRC_DIR}/dali/integration-api )
 
 # Add platform abstraction source files here
 SET( platform_abstraction_src_files
+   ${platform_abstraction_src_dir}/addon-manager.cpp
    ${platform_abstraction_src_dir}/bitmap.cpp
    ${platform_abstraction_src_dir}/core.cpp
    ${platform_abstraction_src_dir}/debug.cpp
@@ -24,6 +25,7 @@ SET( platform_abstraction_src_files
 
 
 SET( platform_abstraction_header_files
+   ${platform_abstraction_src_dir}/addon-manager.h
    ${platform_abstraction_src_dir}/core.h
    ${platform_abstraction_src_dir}/core-enumerations.h
    ${platform_abstraction_src_dir}/context-notifier.h

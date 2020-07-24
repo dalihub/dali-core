@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali")
 
 SET(TC_SOURCES
         utc-Dali-Actor.cpp
+        utc-Dali-AddOn.cpp
         utc-Dali-AlphaFunction.cpp
         utc-Dali-AngleAxis.cpp
         utc-Dali-Animation.cpp
@@ -119,6 +120,7 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-platform-abstraction.cpp
         dali-test-suite-utils/test-render-controller.cpp
         dali-test-suite-utils/test-trace-call-stack.cpp
+        dali-test-suite-utils/test-addon-manager.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
@@ -138,12 +140,30 @@ INCLUDE_DIRECTORIES(
     dali-test-suite-utils
 )
 
+ADD_DEFINITIONS( -DADDON_LIBS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\" )
+
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread --coverage
+    -lpthread -ldl --coverage
 )
+
+# Path to installed precompiled addons
 
 INSTALL(PROGRAMS ${EXEC_NAME}
     DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )
+
+# build addons
+MESSAGE( STATUS "BINDIR: ${CMAKE_CURRENT_BINARY_DIR}")
+SET(ADDON_NAME SampleAddOn )
+SET(ADDON_SOURCES test-sample-addon.cpp )
+ADD_LIBRARY( ${ADDON_NAME} SHARED ${ADDON_SOURCES} )
+TARGET_LINK_LIBRARIES(${ADDON_NAME}
+        -lpthread -ldl --coverage
+        )
+
+INSTALL( TARGETS ${ADDON_NAME} DESTINATION ${BIN_DIR} )
+
+# store AddOn list
+FILE( WRITE ${CMAKE_CURRENT_BINARY_DIR}/addons.txt lib${ADDON_NAME}.so )

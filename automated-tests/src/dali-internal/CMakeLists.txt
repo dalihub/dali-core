@@ -27,6 +27,7 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
         ../dali/dali-test-suite-utils/test-trace-call-stack.cpp
+        ../dali/dali-test-suite-utils/test-addon-manager.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
@@ -51,7 +52,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    --coverage
+    --coverage -ldl
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}
