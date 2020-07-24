@@ -174,6 +174,11 @@ void Renderer::SetGeometry( Render::Geometry* geometry )
   mGeometry = geometry;
   mUpdateAttributesLocation = true;
 }
+void Renderer::SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size )
+{
+  mDrawCommands.clear();
+  mDrawCommands.insert( mDrawCommands.end(), pDrawCommands, pDrawCommands+size );
+}
 
 void Renderer::SetBlending( Context& context, bool blend )
 {
@@ -550,8 +555,31 @@ void Renderer::Render( Context& context,
                        const Vector3& size,
                        bool blend,
                        Vector<GLuint>& boundTextures,
-                       const Dali::Internal::SceneGraph::RenderInstruction& instruction )
+                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+                       uint32_t queueIndex )
 {
+  // Before doing anything test if the call happens in the right queue
+  if( mDrawCommands.empty() && queueIndex > 0 )
+  {
+    return;
+  }
+
+  // Prepare commands
+  std::vector<DevelRenderer::DrawCommand*> commands;
+  for( auto& cmd : mDrawCommands )
+  {
+    if(cmd.queue == queueIndex)
+    {
+      commands.emplace_back( &cmd );
+    }
+  }
+
+  // Have commands but nothing to be drawn - abort
+  if(!mDrawCommands.empty() && commands.empty())
+  {
+    return;
+  }
+
   // Get the program to use:
   Program* program = mRenderDataProvider->GetShader().GetProgram();
   if( !program )
@@ -589,9 +617,6 @@ void Renderer::Render( Context& context,
     context.CullFace( mFaceCullingMode );
   }
 
-  //Set blending mode
-  SetBlending( context, blend );
-
   // Take the program into use so we can send uniforms to it
   program->Use();
 
@@ -626,12 +651,29 @@ void Renderer::Render( Context& context,
       mUpdateAttributesLocation = false;
     }
 
-    mGeometry->Draw( context,
-                     bufferIndex,
-                     mAttributesLocation,
-                     mIndexedDrawFirstElement,
-                     mIndexedDrawElementsCount );
+    if(mDrawCommands.empty())
+    {
+      SetBlending( context, blend );
 
+      mGeometry->Draw( context,
+                       bufferIndex,
+                       mAttributesLocation,
+                       mIndexedDrawFirstElement,
+                       mIndexedDrawElementsCount );
+    }
+    else
+    {
+      for(auto& cmd : commands )
+      {
+        if(cmd->queue == queueIndex )
+        {
+          //Set blending mode
+          SetBlending(context, cmd->queue == DevelRenderer::RENDER_QUEUE_OPAQUE ? false : blend);
+          mGeometry->Draw(context, bufferIndex, mAttributesLocation,
+                          cmd->firstIndex, cmd->elementCount);
+        }
+      }
+    }
     mUpdated = false;
   }
 }

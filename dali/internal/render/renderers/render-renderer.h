@@ -155,6 +155,17 @@ public:
    */
   void SetGeometry( Render::Geometry* geometry );
 
+  void SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size );
+
+  /**
+   * @brief Returns a reference to an array of draw commands
+   * @return Valid array of draw commands (may be empty)
+   */
+  const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
+  {
+    return mDrawCommands;
+  }
+
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
@@ -366,8 +377,8 @@ public:
                const Vector3& size,
                bool blend,
                Vector<GLuint>& boundTextures,
-               const Dali::Internal::SceneGraph::RenderInstruction& instruction //for reflection effect
-               );
+               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+               uint32_t queueIndex );
 
   /**
    * Write the renderer's sort attributes to the passed in reference
@@ -471,6 +482,7 @@ private:
   bool                         mUpdated:1;
 
 
+  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
 };
 
 } // namespace SceneGraph

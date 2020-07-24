@@ -3108,3 +3108,64 @@ int UtcDaliRendererRegenerateUniformMap(void)
 
   END_TEST;
 }
+
+int UtcDaliRendererAddDrawCommands(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test adding draw commands to the renderer");
+
+  TestGlAbstraction &glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace(true);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  renderer.SetProperty( Renderer::Property::BLEND_MODE, Dali::BlendMode::ON );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  application.GetScene().Add(actor);
+
+  // Expect delivering a single draw call
+  auto &drawTrace = glAbstraction.GetDrawTrace();
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION );
+
+  auto drawCommand1 = DevelRenderer::DrawCommand{};
+  drawCommand1.drawType     = DevelRenderer::DrawType::INDEXED;
+  drawCommand1.firstIndex   = 0;
+  drawCommand1.elementCount = 2;
+  drawCommand1.queue        = DevelRenderer::RENDER_QUEUE_OPAQUE;
+
+  auto drawCommand2 = DevelRenderer::DrawCommand{};
+  drawCommand2.drawType     = DevelRenderer::DrawType::INDEXED;
+  drawCommand2.firstIndex   = 2;
+  drawCommand2.elementCount = 2;
+  drawCommand2.queue        = DevelRenderer::RENDER_QUEUE_TRANSPARENT;
+
+  auto drawCommand3 = DevelRenderer::DrawCommand{};
+  drawCommand3.drawType     = DevelRenderer::DrawType::ARRAY;
+  drawCommand3.firstIndex   = 2;
+  drawCommand3.elementCount = 2;
+  drawCommand3.queue        = DevelRenderer::RENDER_QUEUE_OPAQUE;
+
+  DevelRenderer::AddDrawCommand(renderer, drawCommand1);
+  DevelRenderer::AddDrawCommand(renderer, drawCommand2);
+  DevelRenderer::AddDrawCommand(renderer, drawCommand3);
+
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  END_TEST;
+}
