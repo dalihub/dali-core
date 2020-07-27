@@ -114,6 +114,7 @@ enum Flags
   RESEND_STENCIL_OPERATION_ON_Z_PASS = 1 << 17,
   RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18,
   RESEND_SHADER                      = 1 << 19,
+  RESEND_DRAW_COMMANDS               = 1 << 20
 };
 
 } // Anonymous namespace
@@ -221,6 +222,13 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
       typedef MessageValue1< Render::Renderer, Render::Geometry* > DerivedType;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetGeometry, mGeometry );
+    }
+
+    if( mResendFlag & RESEND_DRAW_COMMANDS )
+    {
+      typedef MessageValue2< Render::Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t > DerivedType;
+      uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+      new (slot) DerivedType( mRenderer, &Render::Renderer::SetDrawCommands, mDrawCommands.data(), mDrawCommands.size() );
     }
 
     if( mResendFlag & RESEND_FACE_CULLING_MODE )
@@ -761,6 +769,13 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
   {
     mShader = NULL;
   }
+}
+
+void Renderer::SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size )
+{
+  mDrawCommands.clear();
+  mDrawCommands.insert( mDrawCommands.end(), pDrawCommands, pDrawCommands+size );
+  mResendFlag |= RESEND_DRAW_COMMANDS;
 }
 
 } // namespace SceneGraph

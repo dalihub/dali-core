@@ -8,6 +8,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/animation/animation-data.cpp
   ${devel_api_src_dir}/animation/animation-devel.cpp
   ${devel_api_src_dir}/animation/path-constrainer.cpp
+  ${devel_api_src_dir}/common/addon-binder.cpp
   ${devel_api_src_dir}/common/hash.cpp
   ${devel_api_src_dir}/common/singleton-service.cpp
   ${devel_api_src_dir}/common/stage-devel.cpp
@@ -23,6 +24,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
+  ${devel_api_src_dir}/rendering/renderer-devel.cpp
   ${devel_api_src_dir}/scripting/scripting.cpp
   ${devel_api_src_dir}/signals/signal-delegate.cpp
   ${devel_api_src_dir}/threading/conditional-wait.cpp
@@ -41,6 +43,10 @@ SET( devel_api_core_actors_header_files
   ${devel_api_src_dir}/actors/camera-actor-devel.h
 )
 
+SET( devel_api_core_addons_header_files
+  ${devel_api_src_dir}/addons/addon-base.h
+  ${devel_api_src_dir}/addons/addon-dispatch-table.h
+)
 
 SET( devel_api_core_animation_header_files
   ${devel_api_src_dir}/animation/animation-data.h
@@ -50,6 +56,7 @@ SET( devel_api_core_animation_header_files
 
 
 SET( devel_api_core_common_header_files
+  ${devel_api_src_dir}/common/addon-binder.h
   ${devel_api_src_dir}/common/bitwise-enum.h
   ${devel_api_src_dir}/common/circular-queue.h
   ${devel_api_src_dir}/common/hash.h
@@ -76,7 +83,6 @@ SET( devel_api_core_events_header_files
 
 SET( devel_api_core_images_header_files
   ${devel_api_src_dir}/images/distance-field.h
-  ${devel_api_src_dir}/images/native-image-interface-extension.h
   ${devel_api_src_dir}/images/pixel-data-devel.h
 )
 
@@ -126,6 +132,7 @@ SET( SOURCES ${SOURCES}
 
 SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_core_actors_header_files}
+  ${devel_api_core_addons_header_files}
   ${devel_api_core_animation_header_files}
   ${devel_api_core_common_header_files}
   ${devel_api_core_events_header_files}

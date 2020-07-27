@@ -27,6 +27,45 @@ namespace Dali
 namespace DevelRenderer
 {
 
+/**
+ * The index of render queue used by the DrawCommand
+ */
+using RenderQueueIndex = uint32_t;
+
+constexpr RenderQueueIndex RENDER_QUEUE_OPAQUE = 0; ///< Queue for opaque elements
+constexpr RenderQueueIndex RENDER_QUEUE_TRANSPARENT = 1; ///<Queue for transparent elements
+constexpr RenderQueueIndex RENDER_QUEUE_MAX = 2;
+
+/**
+ * Enum describing way of rendering the primitives (indexed draw, array draw)
+ */
+enum class DrawType
+{
+  INDEXED,
+  ARRAY,
+};
+
+/**
+ * Draw command can be attached to the Dali::Renderer and override the default
+ * rendering functionality. Renderer may have several DrawCommands attached to it
+ * and the will be executed sequentially in the order of the 'queue' index.
+ */
+struct DrawCommand
+{
+  DrawType         drawType; ///< Type of drawing (indexed, array)
+  uint32_t         firstIndex ; ///< First index into the geometry array
+  uint32_t         elementCount; ///< Number of elements to draw
+  RenderQueueIndex queue; ///< Queue index
+};
+
+/**
+ * @brief Adds a draw command to the renderer
+ * Once the draw command is added, the default Renderer's behaviour is overriden.
+ * @param[in] renderer a valid Renderer object
+ * @param[in] drawCommand Valid DrawCommand to add to the Renderer
+ */
+DALI_CORE_API void AddDrawCommand( Dali::Renderer renderer, const DrawCommand& drawCommand );
+
 namespace Property
 {
 
@@ -73,6 +112,8 @@ namespace Property
 
 namespace Rendering
 {
+
+
 
 /**
  * @brief Enumeration for the rendering behavior

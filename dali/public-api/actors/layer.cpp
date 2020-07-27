@@ -57,6 +57,10 @@ Layer& Layer::operator=(const Layer& rhs)
   return *this;
 }
 
+Layer::Layer( Layer&& rhs ) = default;
+
+Layer& Layer::operator=( Layer&& rhs ) = default;
+
 void Layer::Raise()
 {
   GetImplementation(*this).Raise();

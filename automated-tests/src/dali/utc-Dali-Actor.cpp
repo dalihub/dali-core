@@ -323,6 +323,41 @@ int UtcDaliActorDownCastN(void)
   END_TEST;
 }
 
+int UtcDaliActorMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  int id = actor.GetProperty< int >( Actor::Property::ID );
+
+  Actor moved = std::move( actor);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_CHECK( !actor );
+
+  END_TEST;
+}
+
+int UtcDaliActorMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  int id = actor.GetProperty< int >( Actor::Property::ID );
+
+  Actor moved;
+  moved = std::move( actor);
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_CHECK( !actor );
+
+  END_TEST;
+}
+
 //& purpose: Testing Dali::Actor::GetName()
 int UtcDaliActorGetName(void)
 {
@@ -7864,3 +7899,42 @@ int utcDaliActorPartialUpdateActorsWithSizeHint(void)
   END_TEST;
 }
 
+int UtcDaliActorCaptureAllTouchAfterStartPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START).Get<bool>(), false, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START), "captureAllTouchAfterStart", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorCaptureAllTouchAfterStartPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, 1.0f);
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, Property::Map());
+    actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+     tet_result(TET_FAIL);
+  }
+  END_TEST;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,74 @@ int UtcDaliPropertyNotificationDownCastNegative(void)
 
   notificationHandle = PropertyNotification::DownCast( handle );
   DALI_TEST_CHECK(!notificationHandle);
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationMoveConstructor(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X, GreaterThanCondition(100.0f));
+  DALI_TEST_CHECK( notification );
+  DALI_TEST_EQUALS( 2, notification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  PropertyNotification movedNotification = std::move( notification );
+  DALI_TEST_CHECK( movedNotification );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedNotification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !notification );
+
+  PropertyCondition condition = movedNotification.GetCondition();
+  DALI_TEST_CHECK( condition );
+  DALI_TEST_EQUALS( 2, condition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, condition.GetArgumentCount(), TEST_LOCATION );
+
+  PropertyCondition movedCondition = std::move( condition );
+  DALI_TEST_CHECK( movedCondition );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedCondition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, movedCondition.GetArgumentCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !condition );
+
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationMoveAssignment(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X, GreaterThanCondition(100.0f));
+  DALI_TEST_CHECK( notification );
+  DALI_TEST_EQUALS( 2, notification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  PropertyNotification movedNotification;
+  movedNotification = std::move( notification );
+  DALI_TEST_CHECK( movedNotification );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedNotification.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !notification );
+
+  PropertyCondition condition = movedNotification.GetCondition();
+  DALI_TEST_CHECK( condition );
+  DALI_TEST_EQUALS( 2, condition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, condition.GetArgumentCount(), TEST_LOCATION );
+
+  PropertyCondition movedCondition;
+  movedCondition = std::move( condition );
+  DALI_TEST_CHECK( movedCondition );
+
+  // Check that object is moved (not copied, so ref count keeps the same)
+  DALI_TEST_EQUALS( 2, movedCondition.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, movedCondition.GetArgumentCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !condition );
+
   END_TEST;
 }
 
@@ -824,38 +892,206 @@ int UtcDaliPropertyConditionGetArguments(void)
   END_TEST;
 }
 
-int UtcDaliPropertyNotificationStep(void)
+int UtcDaliPropertyNotificationStepVector4(void)
 {
   TestApplication application;
-  tet_infoline(" UtcDaliPropertyNotificationStep");
+  tet_infoline(" UtcDaliPropertyNotificationStepVector4");
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  const float step = 100.0f;
-  // float
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, StepCondition(step, 50.0f) );
+  const float step = 10.0f;
+  float initValue = 5.0f;
+
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::COLOR, StepCondition(step * 2, 0.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
-  // set initial position
-  actor.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
+  actor.SetProperty( Actor::Property::COLOR, Vector4(initValue, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // test both directions
-  for( int i = 1 ; i < 10 ; ++i )
+  for( int i = 1 ; i < 10 ; )
   {
-    // Move x to negative position
+    // Move x to positive
     gCallBackCalled = false;
-    actor.SetProperty( Actor::Property::POSITION, Vector3((i * step), 0.0f, 0.0f));
+    actor.SetProperty( Actor::Property::COLOR, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::COLOR, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }
 
-  for( int i = 1 ; i < 10 ; ++i )
+  initValue = -5.0f;
+  actor.SetProperty( Actor::Property::COLOR, Vector4(initValue, 0.0f, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to negative
+    gCallBackCalled = false;
+    actor.SetProperty( Actor::Property::COLOR, Vector4(initValue -(i++ * step), 0.0f, 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::COLOR, Vector4(initValue -(i++ * step), 0.0f, 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationStepFloat(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStepFloat");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float step = 10.0f;
+  float initValue = 5.0f;
+
+  // float
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, StepCondition(step * 2, 0.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+
+  // set initial position
+  actor.SetProperty( Actor::Property::POSITION, Vector3(initValue, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  // test both directions
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to positive
+    gCallBackCalled = false;
+    actor.SetProperty( Actor::Property::POSITION, Vector3(initValue + (i++ * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::POSITION, Vector3(initValue + (i++ * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+
+  initValue = -5.0f;
+  actor.SetProperty( Actor::Property::POSITION, Vector3(initValue, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to negative
+    gCallBackCalled = false;
+    actor.SetProperty( Actor::Property::POSITION, Vector3(initValue -(i++ * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::POSITION, Vector3(initValue -(i++ * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationStepVector2(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStepVector2");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float step = 10.0f;
+  float initValue = 5.0f;
+
+  Property::Index propertyIndex = actor.RegisterProperty( "testProperty", Vector2::ZERO );
+
+  PropertyNotification notification = actor.AddPropertyNotification( propertyIndex, StepCondition(step * 2, 0.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+
+  actor.SetProperty( propertyIndex, Vector2(initValue, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  // test both directions
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to positive
+    gCallBackCalled = false;
+    actor.SetProperty( propertyIndex, Vector2(initValue + (i++ * step), 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( propertyIndex, Vector2(initValue + (i++ * step), 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+
+  initValue = -5.0f;
+  actor.SetProperty( propertyIndex, Vector2(initValue, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to negative
+    gCallBackCalled = false;
+    actor.SetProperty( propertyIndex, Vector2(initValue -(i++ * step), 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( propertyIndex, Vector2(initValue -(i++ * step), 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+  END_TEST;
+}
+
+int UtcDaliPropertyNotificationStepVector3(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStepVector3");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float step = 10.0f;
+  float initValue = 5.0f;
+
+  // float
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, StepCondition(step * 2, 0.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+
+  // set initial position
+  actor.SetProperty( Actor::Property::POSITION, Vector3(initValue, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  // test both directions
+  for( int i = 1 ; i < 10 ; )
+  {
+    // Move x to positive position
+    gCallBackCalled = false;
+    actor.SetProperty( Actor::Property::POSITION, Vector3( initValue + (i++ * step), 0.0f, 0.0f) );
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::POSITION, Vector3( initValue + (i++ * step), 0.0f, 0.0f) );
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+
+  initValue = -5.0f;
+  actor.SetProperty( Actor::Property::POSITION, Vector3( initValue, 0.0f, 0.0f) );
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for( int i = 1 ; i < 10 ; )
   {
     // Move x to negative position
     gCallBackCalled = false;
-    actor.SetProperty( Actor::Property::POSITION, Vector3(-(i * step), 0.0f, 0.0f));
+    actor.SetProperty( Actor::Property::POSITION, Vector3( initValue -(i++ * step), 0.0f, 0.0f) );
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( !gCallBackCalled );
+
+    actor.SetProperty( Actor::Property::POSITION, Vector3( initValue -(i++ * step), 0.0f, 0.0f) );
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }

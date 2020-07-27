@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,10 @@ PropertyBuffer& PropertyBuffer::operator=( const PropertyBuffer& handle )
   BaseHandle::operator=( handle );
   return *this;
 }
+
+PropertyBuffer::PropertyBuffer( PropertyBuffer&& rhs ) =  default;
+
+PropertyBuffer& PropertyBuffer::operator=( PropertyBuffer&& rhs ) =  default;
 
 void PropertyBuffer::SetData( const void* data, std::size_t size )
 {

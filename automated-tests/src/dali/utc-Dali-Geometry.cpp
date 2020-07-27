@@ -105,6 +105,51 @@ int UtcDaliGeometryAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliGeometryMoveConstructor(void)
+{
+  TestApplication application;
+
+  Geometry geometry = Geometry::New();
+  DALI_TEST_CHECK( geometry );
+  DALI_TEST_EQUALS( 1, geometry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
+
+  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  geometry.AddVertexBuffer( vertexBuffer );
+  DALI_TEST_EQUALS( 1u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
+
+  Geometry move = std::move( geometry );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, move.GetNumberOfVertexBuffers(), TEST_LOCATION );
+  DALI_TEST_CHECK( !geometry );
+
+  END_TEST;
+}
+
+int UtcDaliGeometryMoveAssignment(void)
+{
+  TestApplication application;
+
+  Geometry geometry = Geometry::New();
+  DALI_TEST_CHECK( geometry );
+  DALI_TEST_EQUALS( 1, geometry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
+
+  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  geometry.AddVertexBuffer( vertexBuffer );
+  DALI_TEST_EQUALS( 1u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
+
+  Geometry move;
+  move = std::move( geometry );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, move.GetNumberOfVertexBuffers(), TEST_LOCATION );
+  DALI_TEST_CHECK( !geometry );
+
+  END_TEST;
+}
+
 int UtcDaliGeometryDownCast01(void)
 {
   TestApplication application;

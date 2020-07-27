@@ -1095,6 +1095,24 @@ bool Renderer::GetCurrentPropertyValue( Property::Index index, Property::Value& 
   return valueSet;
 }
 
+void Renderer::AddDrawCommand( const Dali::DevelRenderer::DrawCommand& command )
+{
+  if(!mDrawCommands.capacity())
+  {
+    mDrawCommands.reserve(8);
+  }
+
+  mDrawCommands.emplace_back( command );
+
+  Dali::Internal::SceneGraph::SetDrawCommandsMessage( GetEventThreadServices(),
+                                                      GetRendererSceneObject(),
+                                                      mDrawCommands.data(),
+                                                      uint32_t(mDrawCommands.size())
+
+  );
+}
+
+
 } // namespace Internal
 
 } // namespace Dali

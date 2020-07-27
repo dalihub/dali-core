@@ -220,6 +220,7 @@ DALI_PROPERTY( "connectedToScene",          BOOLEAN,  false, false, false, Dali:
 DALI_PROPERTY( "keyboardFocusable",         BOOLEAN,  true,  false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE )
 DALI_PROPERTY( "siblingOrder",              INTEGER,  true,  false, false, Dali::DevelActor::Property::SIBLING_ORDER )
 DALI_PROPERTY( "updateSizeHint",            VECTOR2,  true,  false, false, Dali::DevelActor::Property::UPDATE_SIZE_HINT )
+DALI_PROPERTY( "captureAllTouchAfterStart", BOOLEAN,  true,  false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties )
 
 // Signals
@@ -2807,6 +2808,16 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
+    case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
+    {
+      bool boolValue = false;
+      if ( property.Get( boolValue ) )
+      {
+        mCaptureAllTouchAfterStart = boolValue;
+      }
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -3936,6 +3947,12 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
     case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
     {
       value = IsKeyboardFocusable();
+      break;
+    }
+
+    case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
+    {
+      value = mCaptureAllTouchAfterStart;
       break;
     }
 

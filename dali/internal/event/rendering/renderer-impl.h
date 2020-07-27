@@ -200,6 +200,14 @@ public: // Default property extensions from Object
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
+  /**
+   * @brief Adds a draw command to the Renderer.
+   * DrawCommands override Renderer's default behaviour.
+   *
+   * @param[in] command Valid reference to a DrawCommand objects
+   */
+  void AddDrawCommand( const Dali::DevelRenderer::DrawCommand& command );
+
 private: // implementation
 
   /**
@@ -269,6 +277,8 @@ private: // data
   DepthTestMode::Type                 mDepthTestMode:3;            ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type      mRenderingBehavior:2;        ///< The rendering behavior
   bool                                mPremultipledAlphaEnabled:1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+
+  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;     ///< list of draw commands
 };
 
 } // namespace Internal

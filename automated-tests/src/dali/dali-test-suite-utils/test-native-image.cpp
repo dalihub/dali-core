@@ -31,25 +31,9 @@ TestNativeImagePointer TestNativeImage::New(uint32_t width, uint32_t height)
 TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
 : mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
 {
-  mExtension = new TestNativeImageExtension();
 }
 
 TestNativeImage::~TestNativeImage()
-{
-}
-
-
-TestNativeImageNoExtPointer TestNativeImageNoExt::New(uint32_t width, uint32_t height)
-{
-  return new TestNativeImageNoExt(width, height);
-}
-
-TestNativeImageNoExt::TestNativeImageNoExt(uint32_t width, uint32_t height)
-: mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
-{
-}
-
-TestNativeImageNoExt::~TestNativeImageNoExt()
 {
 }
 

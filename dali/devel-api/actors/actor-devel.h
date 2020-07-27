@@ -106,14 +106,21 @@ enum Type
    * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
    * sibling order. The values set by this Property will likely change.
    */
-  SIBLING_ORDER = KEYBOARD_FOCUSABLE + 1,
+  SIBLING_ORDER,
 
   /**
    * @brief Sets the update size hint of the actor.
    * @details Name "updateSizeHint", type Property::VECTOR2.
    * @note Overrides the size used for the actor damaged area calculation. Affected by the actor model view matrix.
    */
-  UPDATE_SIZE_HINT = SIBLING_ORDER + 1,
+  UPDATE_SIZE_HINT,
+
+  /**
+    * @brief If this actor receives a touch-start event, then all following touch events are sent to this actor until a touch-end.
+    * @details Name "captureAllTouchAfterStart", type Property::BOOLEAN
+    * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
+    */
+  CAPTURE_ALL_TOUCH_AFTER_START
 };
 
 } // namespace Property

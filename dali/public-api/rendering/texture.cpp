@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -61,6 +61,10 @@ Texture& Texture::operator=( const Texture& handle )
   BaseHandle::operator=( handle );
   return *this;
 }
+
+Texture::Texture( Texture&& rhs ) =  default;
+
+Texture& Texture::operator=( Texture&& rhs ) =  default;
 
 bool Texture::Upload( PixelData pixelData )
 {

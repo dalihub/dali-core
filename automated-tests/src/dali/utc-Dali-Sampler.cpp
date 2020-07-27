@@ -74,6 +74,39 @@ int UtcDaliSamplerCopyConstructor(void)
   END_TEST;
 }
 
+int UtcDaliSamplerMoveConstructor(void)
+{
+  TestApplication application;
+
+  Sampler sampler = Sampler::New();
+  DALI_TEST_CHECK( sampler );
+  DALI_TEST_EQUALS( 1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  Sampler move = std::move( sampler );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !sampler );
+
+  END_TEST;
+}
+
+int UtcDaliSamplerMoveAssignment(void)
+{
+  TestApplication application;
+
+  Sampler sampler = Sampler::New();
+  DALI_TEST_CHECK( sampler );
+  DALI_TEST_EQUALS( 1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  Sampler move;
+  move = std::move( sampler );
+  DALI_TEST_CHECK( move );
+  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !sampler );
+
+  END_TEST;
+}
+
 int UtcDaliSamplerDownCast01(void)
 {
   TestApplication application;

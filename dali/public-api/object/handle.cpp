@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,11 +63,14 @@ Handle& Handle::operator=( const Handle& rhs )
   return *this;
 }
 
+Handle::Handle( Handle&& rhs ) = default;
+
+Handle& Handle::operator=( Handle&& rhs ) = default;
+
 Handle Handle::DownCast( BaseHandle handle )
 {
   return Handle( dynamic_cast<Dali::Internal::Object*>(handle.GetObjectPtr()) );
 }
-
 
 bool Handle::Supports( Capability capability ) const
 {

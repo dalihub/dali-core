@@ -73,6 +73,10 @@ RenderTask& RenderTask::operator=(const RenderTask& rhs)
   return *this;
 }
 
+RenderTask::RenderTask( RenderTask&& rhs ) =  default;
+
+RenderTask& RenderTask::operator=( RenderTask&& rhs ) =  default;
+
 void RenderTask::SetSourceActor( Actor actor )
 {
   // NULL handle is allowed

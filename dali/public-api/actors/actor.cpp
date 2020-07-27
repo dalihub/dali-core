@@ -65,6 +65,10 @@ Actor& Actor::operator=(const Actor& rhs)
   return *this;
 }
 
+Actor::Actor( Actor&& rhs ) = default;
+
+Actor& Actor::operator=( Actor&& rhs ) = default;
+
 Layer Actor::GetLayer()
 {
   return GetImplementation(*this).GetLayer();

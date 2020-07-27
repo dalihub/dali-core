@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,10 @@ PropertyCondition& PropertyCondition::operator=( const PropertyCondition& rhs )
   BaseHandle::operator=(rhs);
   return *this;
 }
+
+PropertyCondition::PropertyCondition( PropertyCondition&& rhs ) = default;
+
+PropertyCondition& PropertyCondition::operator=( PropertyCondition&& rhs ) = default;
 
 std::size_t PropertyCondition::GetArgumentCount() const
 {

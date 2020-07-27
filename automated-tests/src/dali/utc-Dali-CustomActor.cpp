@@ -113,6 +113,45 @@ int UtcDaliCustomActorDownCastNegative(void)
   END_TEST;
 }
 
+int UtcDaliCustomActorMoveConstructor(void)
+{
+  TestApplication application;
+
+  Test::TestCustomActor custom = Test::TestCustomActor::New();
+  DALI_TEST_CHECK( custom );
+  DALI_TEST_EQUALS( 1, custom.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  int id = custom.GetProperty< int >( Actor::Property::ID );
+
+  Test::TestCustomActor moved = std::move( custom );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !custom );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorMoveAssignment(void)
+{
+  TestApplication application;
+
+  Test::TestCustomActor custom = Test::TestCustomActor::New();
+  DALI_TEST_CHECK( custom );
+  DALI_TEST_EQUALS( 1, custom.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  int id = custom.GetProperty< int >( Actor::Property::ID );
+
+  Test::TestCustomActor moved;
+  moved = std::move( custom );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( id, moved.GetProperty< int >( Actor::Property::ID ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !custom );
+
+  END_TEST;
+}
+
 int UtcDaliCustomActorOnStageConnectionDisconnection(void)
 {
   TestApplication application;

@@ -21,7 +21,7 @@
 #include <math.h>   //floor, log2
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/images/native-image-interface-extension.h>
+
 
 namespace Dali
 {
@@ -708,7 +708,7 @@ void Texture::Destroy( Context& context )
 
     if( mNativeImage )
     {
-      mNativeImage->GlExtensionDestroy();
+      mNativeImage->DestroyResource();
     }
   }
 }
@@ -722,13 +722,9 @@ void Texture::Initialize(Context& context)
 {
   if( mNativeImage )
   {
-    if( mNativeImage->GlExtensionCreate() )
+    if( mNativeImage->CreateResource() )
     {
-      NativeImageInterface::Extension* extension = mNativeImage->GetExtension();
-      if( extension )
-      {
-        mTarget = extension->GetEglImageTextureTarget();
-      }
+      mTarget = mNativeImage->GetTextureTarget();
 
       context.GenTextures( 1, &mId );
       context.BindTexture( mTarget, mId );
@@ -744,7 +740,7 @@ void Texture::Initialize(Context& context)
       if( mNativeImage->TargetTexture() != 0u )
       {
         context.DeleteTextures( 1, &mId );
-        mNativeImage->GlExtensionDestroy();
+        mNativeImage->DestroyResource();
         mId = 0u;
       }
     }
