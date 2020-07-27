@@ -720,7 +720,7 @@ public:
        * @brief The flag whether the actor is connected to the Scene.
        * When an actor is connected, it will be directly or indirectly parented to the root Actor.
        * @details Name "connectedToScene", type Property::BOOLEAN. Read-only
-       * @note The root Actor is provided automatically by Dali::Scene, and is always considered to be connected.
+       * @note The root Actor is provided automatically by the Scene, and is always considered to be connected.
        * @SINCE_1_9.17
        */
       CONNECTED_TO_SCENE,
