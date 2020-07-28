@@ -69,7 +69,7 @@ Context::Context( Integration::GlAbstraction& glAbstraction )
 {
 }
 
-Context::Context( Integration::GlAbstraction& glAbstraction, std::vector< Context* >* contexts )
+Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts )
 : mGlAbstraction(glAbstraction),
   mGlContextCreated(false),
   mColorMask(true),
