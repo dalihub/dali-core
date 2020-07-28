@@ -119,6 +119,8 @@ WeakHandleBase& WeakHandleBase::operator=( WeakHandleBase&& rhs )
 {
   if (this != &rhs)
   {
+    delete mImpl;
+
     mImpl = rhs.mImpl;
     rhs.mImpl = nullptr;
   }
