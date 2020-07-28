@@ -149,8 +149,6 @@ public: // Data
 
   Render::FrameBuffer* mFrameBuffer;
 
-  Context* mContext;                    ///< The context holding the GL state of rendering
-
 private: // Data
 
   Camera* mCamera;  ///< camera that is used
