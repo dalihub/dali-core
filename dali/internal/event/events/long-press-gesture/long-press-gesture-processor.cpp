@@ -252,7 +252,7 @@ void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector*
 
   if ( mLongPressGestureDetectors.empty() )
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
   }
   else
   {

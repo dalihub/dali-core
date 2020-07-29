@@ -228,7 +228,7 @@ void RotationGestureProcessor::RemoveGestureDetector( RotationGestureDetector* g
 
   if (mRotationGestureDetectors.empty())
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
   }
 }
 

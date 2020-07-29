@@ -288,7 +288,7 @@ void PinchGestureProcessor::RemoveGestureDetector( PinchGestureDetector* gesture
 
   if (mPinchGestureDetectors.empty())
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
   }
 }
 
