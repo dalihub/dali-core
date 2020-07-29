@@ -167,24 +167,14 @@ bool AddRenderablesForTask( BufferIndex updateBufferIndex,
   // Set the information in the node.
   node.SetClippingInformation( currentClippingId, clippingDepth, scissorDepth );
 
+  RenderableContainer& target = DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) ?
+    layer->colorRenderables : layer->overlayRenderables;
   for( uint32_t i = 0; i < count; ++i )
   {
     SceneGraph::Renderer* renderer = node.GetRendererAt( i );
+    target.PushBack( Renderable( &node, renderer ) );
 
-    // Normal is the more-likely draw mode to occur.
-    if( DALI_LIKELY( inheritedDrawMode == DrawMode::NORMAL ) )
-    {
-      layer->colorRenderables.PushBack( Renderable( &node, renderer ) );
-    }
-    else
-    {
-      layer->overlayRenderables.PushBack( Renderable( &node, renderer ) );
-    }
-
-    if( renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY )
-    {
-      keepRendering = true;
-    }
+    keepRendering = keepRendering || ( renderer->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY );
   }
 
   // Recurse children.
