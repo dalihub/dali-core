@@ -529,6 +529,35 @@ int UtcDaliRefObjectAssignmentOperator(void)
     }
     DALI_TEST_EQUALS( testPtr->ReferenceCount(), 1, TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+
+int UtcDaliRefObjectAssignmentOperatorToNull(void)
+{
+  tet_infoline("Testing Dali::IntrusivePtr = nullptr");
+
+  g_creationCount = g_destructionCount = 0;
+
+  IntrusivePtr<Counted> counted( new Counted );
+
+  DALI_TEST_EQUALS( g_creationCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( g_destructionCount, 0u, TEST_LOCATION);
+
+  IntrusivePtr<Counted> counted2 = counted;
+  DALI_TEST_EQUALS( g_creationCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( g_destructionCount, 0u, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( counted->ReferenceCount(), 2, TEST_LOCATION);
+
+  counted2 = nullptr;
+  DALI_TEST_EQUALS( g_destructionCount, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( counted->ReferenceCount(), 1, TEST_LOCATION);
+
+  counted = nullptr;
+  DALI_TEST_EQUALS( g_destructionCount, 1u, TEST_LOCATION);
+
   END_TEST;
 }
 
