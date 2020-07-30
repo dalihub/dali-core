@@ -34,16 +34,9 @@ TypeInfo::~TypeInfo()
 {
 }
 
-TypeInfo::TypeInfo(const TypeInfo& copy)
-: BaseHandle(copy)
-{
-}
+TypeInfo::TypeInfo(const TypeInfo& copy) = default;
 
-TypeInfo& TypeInfo::operator=(const TypeInfo& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+TypeInfo& TypeInfo::operator=(const TypeInfo& rhs) = default;
 
 TypeInfo::TypeInfo( TypeInfo&& rhs ) = default;
 

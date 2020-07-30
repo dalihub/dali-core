@@ -48,16 +48,9 @@ PropertyNotification::~PropertyNotification()
 {
 }
 
-PropertyNotification::PropertyNotification(const PropertyNotification& copy)
-: BaseHandle(copy)
-{
-}
+PropertyNotification::PropertyNotification(const PropertyNotification& copy) = default;
 
-PropertyNotification& PropertyNotification::operator=(const PropertyNotification& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+PropertyNotification& PropertyNotification::operator=(const PropertyNotification& rhs) = default;
 
 PropertyNotification::PropertyNotification( PropertyNotification&& rhs ) = default;
 

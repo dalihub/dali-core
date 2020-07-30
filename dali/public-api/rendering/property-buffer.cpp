@@ -40,21 +40,14 @@ PropertyBuffer::~PropertyBuffer()
 {
 }
 
-PropertyBuffer::PropertyBuffer( const PropertyBuffer& handle )
-: BaseHandle( handle )
-{
-}
+PropertyBuffer::PropertyBuffer( const PropertyBuffer& handle ) = default;
 
 PropertyBuffer PropertyBuffer::DownCast( BaseHandle handle )
 {
   return PropertyBuffer( dynamic_cast<Dali::Internal::PropertyBuffer*>(handle.GetObjectPtr()));
 }
 
-PropertyBuffer& PropertyBuffer::operator=( const PropertyBuffer& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+PropertyBuffer& PropertyBuffer::operator=( const PropertyBuffer& handle ) = default;
 
 PropertyBuffer::PropertyBuffer( PropertyBuffer&& rhs ) =  default;
 

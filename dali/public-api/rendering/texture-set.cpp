@@ -40,21 +40,14 @@ TextureSet::~TextureSet()
 {
 }
 
-TextureSet::TextureSet( const TextureSet& handle )
-: BaseHandle( handle )
-{
-}
+TextureSet::TextureSet( const TextureSet& handle ) = default;
 
 TextureSet TextureSet::DownCast( BaseHandle handle )
 {
   return TextureSet( dynamic_cast<Dali::Internal::TextureSet*>(handle.GetObjectPtr()));
 }
 
-TextureSet& TextureSet::operator=( const TextureSet& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+TextureSet& TextureSet::operator=( const TextureSet& handle ) = default;
 
 TextureSet::TextureSet( TextureSet&& rhs ) =  default;
 

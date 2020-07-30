@@ -46,16 +46,9 @@ Layer::~Layer()
 {
 }
 
-Layer::Layer(const Layer& copy)
-: Actor(copy)
-{
-}
+Layer::Layer(const Layer& copy) = default;
 
-Layer& Layer::operator=(const Layer& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Layer& Layer::operator=(const Layer& rhs) = default;
 
 Layer::Layer( Layer&& rhs ) = default;
 

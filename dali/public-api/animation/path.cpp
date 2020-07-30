@@ -43,21 +43,14 @@ Path::~Path()
 {
 }
 
-Path::Path(const Path& handle)
-:Handle(handle)
-{
-}
+Path::Path(const Path& handle) = default;
 
 Path::Path(Internal::Path* internal)
 : Handle(internal)
 {
 }
 
-Path& Path::operator=(const Path& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Path& Path::operator=(const Path& rhs) = default;
 
 Path::Path( Path&& rhs ) = default;
 
