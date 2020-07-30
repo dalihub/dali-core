@@ -25,6 +25,7 @@
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
+#include <test-touch-data-utils.h>
 
 using namespace Dali;
 
@@ -993,6 +994,49 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
 
   Integration::SetLongPressMinimumHoldingTime( kMinumumHolding2 );
   DALI_TEST_EQUALS( DevelLongPressGestureDetector::GetMinimumHoldingTime( detector ), kMinumumHolding2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  bool consume = false;
+  TouchDataFunctorConsumeSetter touchFunctor(consume);
+  actor.TouchSignal().Connect(&application,touchFunctor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start gesture within the actor's area, we should receive the gesture as the touch is NOT being consumed
+  TestGenerateLongPress( application, 50.0f, 50.0f );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+  TestEndLongPress(application, 50.0f,50.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Another gesture in the same location, this time we will not receive it as touch is being consumed
+  consume = true;
+  TestGenerateLongPress( application, 50.0f, 50.0f );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+  TestEndLongPress(application, 50.0f,50.0f);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }
