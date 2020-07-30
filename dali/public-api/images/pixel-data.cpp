@@ -48,16 +48,9 @@ PixelData::PixelData( Internal::PixelData* internal )
 {
 }
 
-PixelData::PixelData(const PixelData& handle)
-: BaseHandle( handle )
-{
-}
+PixelData::PixelData(const PixelData& handle) = default;
 
-PixelData& PixelData::operator=(const PixelData& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+PixelData& PixelData::operator=(const PixelData& rhs) = default;
 
 PixelData::PixelData( PixelData&& rhs ) = default;
 

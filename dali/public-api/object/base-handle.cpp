@@ -42,20 +42,9 @@ BaseHandle::~BaseHandle()
 {
 }
 
-BaseHandle::BaseHandle(const BaseHandle& handle)
-  : mObjectHandle(handle.mObjectHandle)
-{
-}
+BaseHandle::BaseHandle(const BaseHandle& handle) = default;
 
-BaseHandle& BaseHandle::operator=(const BaseHandle& rhs)
-{
-  if( this != &rhs )
-  {
-    this->mObjectHandle = rhs.mObjectHandle;
-  }
-
-  return *this;
-}
+BaseHandle& BaseHandle::operator=(const BaseHandle& rhs) = default;
 
 BaseHandle::BaseHandle( BaseHandle&& rhs ) = default;
 

@@ -53,16 +53,9 @@ CustomActor::~CustomActor()
 {
 }
 
-CustomActor::CustomActor(const CustomActor& copy)
-: Actor(copy)
-{
-}
+CustomActor::CustomActor(const CustomActor& copy) = default;
 
-CustomActor& CustomActor::operator=(const CustomActor& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+CustomActor& CustomActor::operator=(const CustomActor& rhs) = default;
 
 CustomActor::CustomActor( CustomActor&& rhs ) = default;
 

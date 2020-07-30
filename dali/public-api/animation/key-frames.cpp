@@ -46,16 +46,9 @@ KeyFrames::~KeyFrames()
 {
 }
 
-KeyFrames::KeyFrames(const KeyFrames& handle)
-: BaseHandle(handle)
-{
-}
+KeyFrames::KeyFrames(const KeyFrames& handle) = default;
 
-KeyFrames& KeyFrames::operator=(const KeyFrames& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+KeyFrames& KeyFrames::operator=(const KeyFrames& rhs) = default;
 
 KeyFrames::KeyFrames( KeyFrames&& rhs ) = default;
 

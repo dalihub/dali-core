@@ -44,21 +44,14 @@ LinearConstrainer::~LinearConstrainer()
 {
 }
 
-LinearConstrainer::LinearConstrainer(const LinearConstrainer& handle)
-:Handle(handle)
-{
-}
+LinearConstrainer::LinearConstrainer(const LinearConstrainer& handle) = default;
 
 LinearConstrainer::LinearConstrainer(Internal::LinearConstrainer* internal)
 : Handle(internal)
 {
 }
 
-LinearConstrainer& LinearConstrainer::operator=(const LinearConstrainer& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+LinearConstrainer& LinearConstrainer::operator=(const LinearConstrainer& rhs) = default;
 
 LinearConstrainer::LinearConstrainer( LinearConstrainer&& rhs ) = default;
 

@@ -54,16 +54,9 @@ Actor::~Actor()
 {
 }
 
-Actor::Actor(const Actor& copy)
-: Handle(copy)
-{
-}
+Actor::Actor(const Actor& copy) = default;
 
-Actor& Actor::operator=(const Actor& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Actor& Actor::operator=(const Actor& rhs) = default;
 
 Actor::Actor( Actor&& rhs ) = default;
 

@@ -46,21 +46,14 @@ Texture::~Texture()
 {
 }
 
-Texture::Texture( const Texture& handle )
-: BaseHandle( handle )
-{
-}
+Texture::Texture( const Texture& handle ) = default;
 
 Texture Texture::DownCast( BaseHandle handle )
 {
   return Texture( dynamic_cast<Dali::Internal::Texture*>(handle.GetObjectPtr()));
 }
 
-Texture& Texture::operator=( const Texture& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+Texture& Texture::operator=( const Texture& handle ) = default;
 
 Texture::Texture( Texture&& rhs ) =  default;
 

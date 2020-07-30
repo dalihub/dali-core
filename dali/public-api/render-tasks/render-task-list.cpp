@@ -37,16 +37,9 @@ RenderTaskList::~RenderTaskList()
 {
 }
 
-RenderTaskList::RenderTaskList(const RenderTaskList& handle)
-: BaseHandle(handle)
-{
-}
+RenderTaskList::RenderTaskList(const RenderTaskList& handle) = default;
 
-RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs) = default;
 
 RenderTaskList::RenderTaskList( RenderTaskList&& rhs ) =  default;
 
