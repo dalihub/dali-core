@@ -56,6 +56,11 @@ LongPressGestureRecognizer::LongPressGestureRecognizer(Observer& observer, Vecto
 
 LongPressGestureRecognizer::~LongPressGestureRecognizer()
 {
+  if( mTimerId != 0 && ThreadLocalStorage::Created() )
+  {
+    Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+    platformAbstraction.CancelTimer(mTimerId);
+  }
 }
 
 void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
@@ -77,6 +82,10 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
         mTouchTime = event.time;
 
+        if( mTimerId != 0 )
+        {
+          platformAbstraction.CancelTimer(mTimerId);
+        }
         mTimerId = platformAbstraction.StartTimer( mMinimumHoldingTime, MakeCallback( this, &LongPressGestureRecognizer::TimerCallback ) );
 
         // A long press gesture may be possible, tell Core about this and change state to Touched.
@@ -96,6 +105,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         EmitGesture( Gesture::Cancelled );
         mTouchPositions.clear();
         platformAbstraction.CancelTimer(mTimerId);
+        mTimerId = 0;
         mState = Failed;
         break;
       }
@@ -122,6 +132,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             EmitGesture( Gesture::Cancelled );
             mTouchPositions.clear();
             platformAbstraction.CancelTimer(mTimerId);
+            mTimerId = 0;
             mState = ( pointCount == 1 ) ? Clear : Failed; // Change state to Clear if only one point, Failed otherwise.
             endLoop = true;
             break;
@@ -137,6 +148,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
               // We have moved more than the allowable motion for a long press gesture. Inform Core and change state to Failed.
               EmitGesture( Gesture::Cancelled );
               platformAbstraction.CancelTimer(mTimerId);
+              mTimerId = 0;
               mState = Failed;
               endLoop = true;
             }
@@ -197,6 +209,8 @@ bool LongPressGestureRecognizer::TimerCallback()
   EmitGesture(Gesture::Started);
 
   mState = Finished;
+
+  mTimerId = 0;
 
   return false;
 }

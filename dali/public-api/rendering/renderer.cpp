@@ -40,21 +40,14 @@ Renderer::~Renderer()
 {
 }
 
-Renderer::Renderer( const Renderer& handle )
-: Handle( handle )
-{
-}
+Renderer::Renderer( const Renderer& handle ) = default;
 
 Renderer Renderer::DownCast( BaseHandle handle )
 {
   return Renderer( dynamic_cast<Dali::Internal::Renderer*>(handle.GetObjectPtr()));
 }
 
-Renderer& Renderer::operator=( const Renderer& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+Renderer& Renderer::operator=( const Renderer& handle ) = default;
 
 Renderer::Renderer( Renderer&& rhs ) =  default;
 

@@ -32,16 +32,9 @@ ObjectRegistry::~ObjectRegistry()
 {
 }
 
-ObjectRegistry::ObjectRegistry(const ObjectRegistry& copy)
-: BaseHandle(copy)
-{
-}
+ObjectRegistry::ObjectRegistry(const ObjectRegistry& copy) = default;
 
-ObjectRegistry& ObjectRegistry::operator=(const ObjectRegistry& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+ObjectRegistry& ObjectRegistry::operator=(const ObjectRegistry& rhs) = default;
 
 ObjectRegistry::ObjectRegistry( ObjectRegistry&& rhs ) = default;
 

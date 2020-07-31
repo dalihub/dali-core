@@ -36,16 +36,9 @@ PropertyCondition::~PropertyCondition()
 
 }
 
-PropertyCondition::PropertyCondition( const PropertyCondition& handle )
-: BaseHandle(handle)
-{
-}
+PropertyCondition::PropertyCondition( const PropertyCondition& handle ) = default;
 
-PropertyCondition& PropertyCondition::operator=( const PropertyCondition& rhs )
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+PropertyCondition& PropertyCondition::operator=( const PropertyCondition& rhs ) = default;
 
 PropertyCondition::PropertyCondition( PropertyCondition&& rhs ) = default;
 

@@ -53,16 +53,9 @@ Constraint::~Constraint()
 {
 }
 
-Constraint::Constraint( const Constraint& constraint )
-: BaseHandle( constraint )
-{
-}
+Constraint::Constraint( const Constraint& constraint ) = default;
 
-Constraint& Constraint::operator=( const Constraint& rhs )
-{
-  BaseHandle::operator=( rhs );
-  return *this;
-}
+Constraint& Constraint::operator=( const Constraint& rhs ) = default;
 
 Constraint::Constraint( Constraint&& rhs ) = default;
 

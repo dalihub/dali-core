@@ -322,7 +322,7 @@ void PanGestureProcessor::RemoveGestureDetector( PanGestureDetector* gestureDete
 
   if (mPanGestureDetectors.empty())
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
   }
   else
   {

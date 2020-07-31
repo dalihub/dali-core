@@ -1,8 +1,8 @@
-#ifndef DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_H
-#define DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_H
+#ifndef DALI_NATIVE_IMAGE_INTERFACE_H
+#define DALI_NATIVE_IMAGE_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/any.h>
 
 namespace Dali
 {
@@ -45,39 +46,39 @@ public:
   class Extension; ///< Forward declare future extension interface
 
   /**
-   * @brief Creates the GL resource for the NativeImage.
+   * @brief Creates the resource for the NativeImage.
    *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR().
-   * @SINCE_1_0.0
+   * @SINCE_1_9.23
    * @return false If the initialization fails
-   * @pre There is a GL context for the current thread.
+   * @pre The graphics subsystem has been initialized
    */
-  virtual bool GlExtensionCreate() = 0;
+  virtual bool CreateResource() = 0;
 
   /**
-   * @brief Destroys the GL resource for the NativeImage.
+   * @brief Destroys the resource for the NativeImage.
    *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR().
-   * @SINCE_1_0.0
-   * @pre There is a GL context for the current thread.
+   * @SINCE_1_9.23
+   * @pre The graphics subsystem has been initialized
    */
-  virtual void GlExtensionDestroy() = 0;
+  virtual void DestroyResource() = 0;
 
   /**
    * @brief Uses the NativeImage as a texture for rendering.
    *
    * @SINCE_1_0.0
-   * @return A GL error code
-   * @pre There is a GL context for the current thread.
+   * @return An error code from the graphics subsystem.
+   * @pre The graphics subsystem has been initialized
    */
   virtual uint32_t TargetTexture() = 0;
 
   /**
-   * @brief Called internally for each Bind call for this texture to allow implementation specific operations.
+   * @brief Called internally when the texture is bound in the GPU
    *
    * The correct texture sampler has already been bound before the function gets called.
    * @SINCE_1_0.0
-   * @pre glAbstraction is being used by context in current thread
+   * @pre The graphics subsystem has been initialized
    */
   virtual void PrepareTexture() = 0;
 
@@ -103,6 +104,47 @@ public:
   * @return True if blending is required
   */
   virtual bool RequiresBlending() const = 0;
+
+  /**
+   * @brief Get the texture target for binding native image as texture.
+   *
+   * @SINCE_1_9.23
+   * @return Texture target.
+   */
+  virtual int GetTextureTarget() const = 0;
+
+  /**
+   * @brief Get custom fragment prefix for rendering native image.
+   *
+   * @SINCE_1_9.23
+   * @return Custom fragment prefix code as string.
+   */
+  virtual const char* GetCustomFragmentPrefix() const = 0;
+
+  /**
+   * @brief Get custom sampler type name for rendering native image.
+   *
+   * @SINCE_1_9.23
+   * @return Custom sampler type name.
+   */
+  virtual const char* GetCustomSamplerTypename() const = 0;
+
+  /**
+   * @brief Retrieves the internal native image.
+   *
+   * @SINCE_1_9.23
+   * @return Any object containing the internal native image source
+   */
+  virtual Any GetNativeImageHandle() const = 0;
+
+  /**
+   * @brief Determine if the source for the native image has changed characteristics.
+   *
+   * @SINCE_1_9.23
+   * @return true if the source data has modified any characteristics of the
+   * native image, for example if the size of the buffer has changed.
+   */
+  virtual bool SourceChanged() const = 0;
 
   /**
    * @brief Retrieves the extension for the interface.
@@ -133,11 +175,11 @@ protected:
  * @brief Pointer to Dali::NativeImageInterface.
  * @SINCE_1_0.0
  */
-typedef Dali::IntrusivePtr<NativeImageInterface>  NativeImageInterfacePtr;
+using NativeImageInterfacePtr = Dali::IntrusivePtr<NativeImageInterface>;
 
 /**
  * @}
  */
 } // namespace Dali
 
-#endif // DALI_INTEGRATION_NATIVE_IMAGE_INTERFACE_H
+#endif // DALI_NATIVE_IMAGE_INTERFACE_H

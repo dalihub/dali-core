@@ -2,7 +2,7 @@
 #define DALI_INTRUSIVE_PTR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,27 @@ public:
   }
 
   /**
+   * @brief Move constructor.
+   * @SINCE_1_9.23
+   * @param[in] rhs Reference to an IntrusivePtr
+   */
+  template<typename U>
+  IntrusivePtr( IntrusivePtr<U>&& rhs )
+  : mPtr( rhs.Detach() )
+  {
+  }
+
+  /**
+   * @brief Move constructor.
+   * @SINCE_1_9.23
+   * @param[in] rhs Reference to an IntrusivePtr
+   */
+  IntrusivePtr( IntrusivePtr&& rhs )
+  : mPtr( rhs.Detach() )
+  {
+  }
+
+  /**
    * @brief Destructor.
    *
    * Object will self-destruct if reference count is zero.
@@ -160,6 +181,49 @@ public:
   IntrusivePtr& operator=( T* rhs )
   {
     IntrusivePtr( rhs ).Swap( *this );
+    return *this;
+  }
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.23
+   * @param rhs Reference to intrusive pointer
+   * @return Reference to moved intrusive pointer
+   */
+  IntrusivePtr& operator=( IntrusivePtr&& rhs )
+  {
+    if ( this != &rhs )
+    {
+      if (mPtr)
+      {
+        mPtr->Unreference();
+      }
+      mPtr = rhs.Detach();
+    }
+
+    return *this;
+  }
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.23
+   * @param rhs Reference to intrusive pointer
+   * @return Reference to moved intrusive pointer
+   */
+  template<typename U>
+  IntrusivePtr& operator=( IntrusivePtr<U>&& rhs )
+  {
+    if ( this != reinterpret_cast<IntrusivePtr<T>*>( &rhs ) )
+    {
+      if (mPtr)
+      {
+        mPtr->Unreference();
+      }
+      mPtr = rhs.Detach();
+    }
+
     return *this;
   }
 

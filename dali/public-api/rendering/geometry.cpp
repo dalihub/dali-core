@@ -38,21 +38,14 @@ Geometry::~Geometry()
 {
 }
 
-Geometry::Geometry( const Geometry& handle )
-: BaseHandle( handle )
-{
-}
+Geometry::Geometry( const Geometry& handle ) = default;
 
 Geometry Geometry::DownCast( BaseHandle handle )
 {
   return Geometry( dynamic_cast<Dali::Internal::Geometry*>(handle.GetObjectPtr()));
 }
 
-Geometry& Geometry::operator=( const Geometry& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+Geometry& Geometry::operator=( const Geometry& handle ) = default;
 
 Geometry::Geometry( Geometry&& rhs ) =  default;
 

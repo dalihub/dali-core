@@ -995,7 +995,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
                                               *scene->taskList,
                                               *scene->root,
                                               scene->sortedLayerList,
-                                              *scene->scene->GetContext(),
                                               scene->scene->GetRenderInstructions(),
                                               renderToFboEnabled,
                                               isRenderingToFbo );

@@ -36,16 +36,9 @@ TypeRegistry::~TypeRegistry()
 {
 }
 
-TypeRegistry::TypeRegistry(const TypeRegistry& copy)
-: BaseHandle(copy)
-{
-}
+TypeRegistry::TypeRegistry(const TypeRegistry& copy) = default;
 
-TypeRegistry& TypeRegistry::operator=(const TypeRegistry& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+TypeRegistry& TypeRegistry::operator=(const TypeRegistry& rhs) = default;
 
 TypeRegistry::TypeRegistry( TypeRegistry&& rhs ) = default;
 

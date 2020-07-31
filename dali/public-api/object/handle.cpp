@@ -48,20 +48,9 @@ Handle::~Handle()
 {
 }
 
-Handle::Handle( const Handle& handle )
-: BaseHandle( handle )
-{
-}
+Handle::Handle( const Handle& handle ) = default;
 
-Handle& Handle::operator=( const Handle& rhs )
-{
-  if( this != &rhs )
-  {
-    BaseHandle::operator=(rhs);
-  }
-
-  return *this;
-}
+Handle& Handle::operator=( const Handle& rhs ) = default;
 
 Handle::Handle( Handle&& rhs ) = default;
 

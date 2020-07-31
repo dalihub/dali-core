@@ -49,7 +49,6 @@ class Renderer;
 struct Degree;
 class Quaternion;
 class Layer;
-struct KeyEvent;
 class TouchData;
 struct TouchEvent;
 struct HoverEvent;
@@ -216,10 +215,6 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *     touch signals are also emitted from the touch-down actor with an "Interrupted" state.
  *   - If the consumed actor on hover-start is not the same as the consumed actor on hover-finished, then
  *     hover signals are also emitted from the hover-started actor with an "Interrupted" state.
- *
- * <h3>Key Events:</h3>
- *
- * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
  *
  * @nosubgrouping
  *
@@ -720,7 +715,7 @@ public:
        * @brief The flag whether the actor is connected to the Scene.
        * When an actor is connected, it will be directly or indirectly parented to the root Actor.
        * @details Name "connectedToScene", type Property::BOOLEAN. Read-only
-       * @note The root Actor is provided automatically by Dali::Scene, and is always considered to be connected.
+       * @note The root Actor is provided automatically by the Scene, and is always considered to be connected.
        * @SINCE_1_9.17
        */
       CONNECTED_TO_SCENE,
@@ -1192,6 +1187,7 @@ public: // Signals
    * @endcode
    * The return value of True, indicates that the touch event has been consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   * A true return will also cancel any ongoing gestures.
    * @SINCE_1_1.37
    * @return The signal to connect to
    * @pre The Actor has been initialized.
