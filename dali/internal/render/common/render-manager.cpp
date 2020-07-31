@@ -151,10 +151,6 @@ struct RenderManager::Impl
   Context* CreateSceneContext()
   {
     Context* context = new Context( glAbstraction );
-
-    //TODO: Need eglMakeCurrent first
-    context->GlContextCreated();
-
     sceneContextContainer.PushBack( context );
     return context;
   }
@@ -174,8 +170,6 @@ struct RenderManager::Impl
     Context* newContext = new Context( glAbstraction );
 
     oldSceneContext->GlContextDestroyed();
-    //TODO: Need eglMakeCurrent first
-    newContext->GlContextCreated();
 
     std::replace( sceneContextContainer.begin(), sceneContextContainer.end(), oldSceneContext, newContext );
     return newContext;
@@ -909,7 +903,8 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
       surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( scene.GetSize().width ), static_cast<int32_t>( scene.GetSize().height ) );
     }
 
-    DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
+    // Make sure that GL context must be created
+     mImpl->currentContext->GlContextCreated();
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
