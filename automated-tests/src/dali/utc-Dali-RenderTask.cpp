@@ -432,7 +432,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetSourceActorOffStage(void)
+int UtcDaliRenderTaskSetSourceActorOffScene(void)
 {
   TestApplication application;
 

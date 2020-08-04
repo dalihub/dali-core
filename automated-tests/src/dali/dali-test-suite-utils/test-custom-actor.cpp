@@ -305,14 +305,14 @@ void TestCustomActor::AddToCallStacks( const char* method )
 }
 
 // From CustomActorImpl
-void TestCustomActor::OnStageConnection( int depth )
+void TestCustomActor::OnSceneConnection( int depth )
 {
-  AddToCallStacks("OnStageConnection");
+  AddToCallStacks("OnSceneConnection");
   mDepth = depth;
 }
-void TestCustomActor::OnStageDisconnection()
+void TestCustomActor::OnSceneDisconnection()
 {
-  AddToCallStacks("OnStageDisconnection");
+  AddToCallStacks("OnSceneDisconnection");
 }
 void TestCustomActor::OnChildAdd(Actor& child)
 {

@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,14 +87,14 @@ public:
   CustomActor Self() const;
 
   /**
-   * @brief Called after the actor has been connected to the stage.
+   * @brief Called after the actor has been connected to the Scene.
    *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.24
    * @param[in] depth The depth in the hierarchy for the actor
    *
-   * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
-   * When the parent of a set of actors is connected to the stage, then all of the children
+   * @note The root Actor is provided automatically by the Scene, and is always considered to be connected.
+   * When the parent of a set of actors is connected to the scene, then all of the children
    * will received this callback.
    * For the following actor tree, the callback order will be A, B, D, E, C, and finally F.
    *
@@ -109,15 +109,15 @@ public:
    * @endcode
    * @param[in] depth The depth in the hierarchy for the actor
    */
-  virtual void OnStageConnection( int32_t depth ) = 0;
+  virtual void OnSceneConnection( int32_t depth ) = 0;
 
   /**
-   * @brief Called after the actor has been disconnected from Stage.
+   * @brief Called after the actor has been disconnected from the Scene.
    *
    * If an actor is disconnected, it either has no parent or is parented to a disconnected actor.
    *
-   * @SINCE_1_0.0
-   * @note When the parent of a set of actors is disconnected to the stage, then all of the children
+   * @SINCE_1_9.24
+   * @note When the parent of a set of actors is disconnected to the scene, then all of the children
    * will received this callback, starting with the leaf actors.
    * For the following actor tree, the callback order will be D, E, B, F, C, and finally A.
    *
@@ -131,7 +131,7 @@ public:
    *
    * @endcode
    */
-  virtual void OnStageDisconnection() = 0;
+  virtual void OnSceneDisconnection() = 0;
 
   /**
    * @brief Called after a child has been added to the owning actor.

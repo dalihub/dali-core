@@ -228,8 +228,8 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultPropert
 const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_HOVERED = "hovered";
 const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
-const char* const SIGNAL_ON_STAGE = "onStage";
-const char* const SIGNAL_OFF_STAGE = "offStage";
+const char* const SIGNAL_ON_SCENE = "onScene";
+const char* const SIGNAL_OFF_SCENE = "offScene";
 const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
 const char* const SIGNAL_TOUCH = "touch";
 const char* const SIGNAL_VISIBILITY_CHANGED = "visibilityChanged";
@@ -252,8 +252,8 @@ TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, 
 SignalConnectorType signalConnector1( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_ON_STAGE, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_OFF_STAGE, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector4( mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector5( mType, SIGNAL_OFF_SCENE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector7( mType, SIGNAL_TOUCH, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector8( mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal );
@@ -448,9 +448,9 @@ uint32_t Actor::GetId() const
   return GetNode().GetId();
 }
 
-bool Actor::OnStage() const
+bool Actor::OnScene() const
 {
-  return mIsOnStage;
+  return mIsOnScene;
 }
 
 Dali::Layer Actor::GetLayer()
@@ -805,7 +805,7 @@ const Vector3& Actor::GetCurrentWorldPosition() const
 
 const Vector2 Actor::GetCurrentScreenPosition() const
 {
-  if( mScene && OnStage() )
+  if( mScene && OnScene() )
   {
     Vector3 worldPosition =  GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
     Vector3 cameraPosition = mScene->GetDefaultCameraActor().GetNode().GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
@@ -1541,7 +1541,7 @@ DrawMode::Type Actor::GetDrawMode() const
 bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
 {
   // only valid when on-stage
-  if( mScene && OnStage() )
+  if( mScene && OnScene() )
   {
     const RenderTaskList& taskList = mScene->GetRenderTaskList();
 
@@ -1566,7 +1566,7 @@ bool Actor::ScreenToLocal( const RenderTask& renderTask, float& localX, float& l
 {
   bool retval = false;
   // only valid when on-stage
-  if( OnStage() )
+  if( OnScene() )
   {
     CameraActor* camera = renderTask.GetCameraActor();
     if( camera )
@@ -1588,7 +1588,7 @@ bool Actor::ScreenToLocal( const RenderTask& renderTask, float& localX, float& l
 bool Actor::ScreenToLocal( const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY ) const
 {
   // Early-out if not on stage
-  if( !OnStage() )
+  if( !OnScene() )
   {
     return false;
   }
@@ -1699,7 +1699,7 @@ bool Actor::RaySphereTest( const Vector4& rayOrigin, const Vector4& rayDir ) con
    */
 
   // Early-out if not on stage
-  if( !OnStage() )
+  if( !OnScene() )
   {
     return false;
   }
@@ -1732,7 +1732,7 @@ bool Actor::RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vecto
 {
   bool hit = false;
 
-  if( OnStage() )
+  if( OnScene() )
   {
     // Transforms the ray to the local reference system.
     // Calculate the inverse of Model matrix
@@ -1943,14 +1943,14 @@ Dali::Actor::WheelEventSignalType& Actor::WheelEventSignal()
   return mWheelEventSignal;
 }
 
-Dali::Actor::OnStageSignalType& Actor::OnStageSignal()
+Dali::Actor::OnSceneSignalType& Actor::OnSceneSignal()
 {
-  return mOnStageSignal;
+  return mOnSceneSignal;
 }
 
-Dali::Actor::OffStageSignalType& Actor::OffStageSignal()
+Dali::Actor::OffSceneSignalType& Actor::OffSceneSignal()
 {
-  return mOffStageSignal;
+  return mOffSceneSignal;
 }
 
 Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
@@ -2000,13 +2000,13 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     actor->WheelEventSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_ON_STAGE ) )
+  else if( 0 == signalName.compare( SIGNAL_ON_SCENE ) )
   {
-    actor->OnStageSignal().Connect( tracker, functor );
+    actor->OnSceneSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_OFF_STAGE ) )
+  else if( 0 == signalName.compare( SIGNAL_OFF_SCENE ) )
   {
-    actor->OffStageSignal().Connect( tracker, functor );
+    actor->OffSceneSignal().Connect( tracker, functor );
   }
   else if( 0 == signalName.compare( SIGNAL_ON_RELAYOUT ) )
   {
@@ -2055,8 +2055,8 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mTouchSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),
-  mOnStageSignal(),
-  mOffStageSignal(),
+  mOnSceneSignal(),
+  mOffSceneSignal(),
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
@@ -2075,14 +2075,14 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mUseAnimatedSize( AnimatedSizeFlag::CLEAR ),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
-  mIsOnStage( false ),
+  mIsOnScene( false ),
   mSensitive( true ),
   mLeaveRequired( false ),
   mKeyboardFocusable( false ),
   mDerivedRequiresTouch( false ),
   mDerivedRequiresHover( false ),
   mDerivedRequiresWheelEvent( false ),
-  mOnStageSignalled( false ),
+  mOnSceneSignalled( false ),
   mInsideOnSizeSet( false ),
   mInheritPosition( true ),
   mInheritOrientation( true ),
@@ -2142,10 +2142,10 @@ Actor::~Actor()
   delete mRelayoutData;
 }
 
-void Actor::ConnectToStage( uint32_t parentDepth )
+void Actor::ConnectToScene( uint32_t parentDepth )
 {
   // This container is used instead of walking the Actor hierarchy.
-  // It protects us when the Actor hierarchy is modified during OnStageConnectionExternal callbacks.
+  // It protects us when the Actor hierarchy is modified during OnSceneConnectionExternal callbacks.
   ActorContainer connectionList;
 
   if( mScene )
@@ -2154,7 +2154,7 @@ void Actor::ConnectToStage( uint32_t parentDepth )
   }
 
   // This stage is atomic i.e. not interrupted by user callbacks.
-  RecursiveConnectToStage( connectionList, parentDepth + 1 );
+  RecursiveConnectToScene( connectionList, parentDepth + 1 );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2166,17 +2166,17 @@ void Actor::ConnectToStage( uint32_t parentDepth )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, uint32_t depth )
+void Actor::RecursiveConnectToScene( ActorContainer& connectionList, uint32_t depth )
 {
-  DALI_ASSERT_ALWAYS( !OnStage() );
+  DALI_ASSERT_ALWAYS( !OnScene() );
 
-  mIsOnStage = true;
+  mIsOnScene = true;
   mDepth = static_cast< uint16_t >( depth ); // overflow ignored, not expected in practice
 
   ConnectToSceneGraph();
 
   // Notification for internal derived classes
-  OnStageConnectionInternal();
+  OnSceneConnectionInternal();
 
   // This stage is atomic; avoid emitting callbacks until all Actors are connected
   connectionList.push_back( ActorPtr( this ) );
@@ -2188,7 +2188,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, uint32_t de
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
       (*iter)->SetScene( *mScene );
-      (*iter)->RecursiveConnectToStage( connectionList, depth + 1 );
+      (*iter)->RecursiveConnectToScene( connectionList, depth + 1 );
     }
   }
 }
@@ -2197,7 +2197,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, uint32_t de
  * This method is called when the Actor is connected to the Stage.
  * The parent must have added its Node to the scene-graph.
  * The child must connect its Node to the parent's Node.
- * This is recursive; the child calls ConnectToStage() for its children.
+ * This is recursive; the child calls ConnectToScene() for its children.
  */
 void Actor::ConnectToSceneGraph()
 {
@@ -2216,22 +2216,22 @@ void Actor::ConnectToSceneGraph()
 void Actor::NotifyStageConnection()
 {
   // Actors can be removed (in a callback), before the on-stage stage is reported.
-  // The actor may also have been reparented, in which case mOnStageSignalled will be true.
-  if( OnStage() && !mOnStageSignalled )
+  // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
+  if( OnScene() && !mOnSceneSignalled )
   {
     // Notification for external (CustomActor) derived classes
-    OnStageConnectionExternal( mDepth );
+    OnSceneConnectionExternal( mDepth );
 
-    if( !mOnStageSignal.Empty() )
+    if( !mOnSceneSignal.Empty() )
     {
       Dali::Actor handle( this );
-      mOnStageSignal.Emit( handle );
+      mOnSceneSignal.Emit( handle );
     }
 
     // Guard against Remove during callbacks
-    if( OnStage() )
+    if( OnScene() )
     {
-      mOnStageSignalled = true; // signal required next time Actor is removed
+      mOnSceneSignalled = true; // signal required next time Actor is removed
     }
   }
 }
@@ -2239,7 +2239,7 @@ void Actor::NotifyStageConnection()
 void Actor::DisconnectFromStage()
 {
   // This container is used instead of walking the Actor hierachy.
-  // It protects us when the Actor hierachy is modified during OnStageDisconnectionExternal callbacks.
+  // It protects us when the Actor hierachy is modified during OnSceneDisconnectionExternal callbacks.
   ActorContainer disconnectionList;
 
   if( mScene )
@@ -2260,8 +2260,8 @@ void Actor::DisconnectFromStage()
 
 void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
 {
-  // need to change state first so that internals relying on IsOnStage() inside OnStageDisconnectionInternal() get the correct value
-  mIsOnStage = false;
+  // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
+  mIsOnScene = false;
 
   // Recursively disconnect children
   if( mChildren )
@@ -2277,7 +2277,7 @@ void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
   disconnectionList.push_back( ActorPtr( this ) );
 
   // Notification for internal derived classes
-  OnStageDisconnectionInternal();
+  OnSceneDisconnectionInternal();
 
   DisconnectFromSceneGraph();
 }
@@ -2295,23 +2295,23 @@ void Actor::DisconnectFromSceneGraph()
 void Actor::NotifyStageDisconnection()
 {
   // Actors can be added (in a callback), before the off-stage state is reported.
-  // Also if the actor was added & removed before mOnStageSignalled was set, then we don't notify here.
+  // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
   // only do this step if there is a stage, i.e. Core is not being shut down
-  if ( EventThreadServices::IsCoreRunning() && !OnStage() && mOnStageSignalled )
+  if ( EventThreadServices::IsCoreRunning() && !OnScene() && mOnSceneSignalled )
   {
     // Notification for external (CustomeActor) derived classes
-    OnStageDisconnectionExternal();
+    OnSceneDisconnectionExternal();
 
-    if( !mOffStageSignal.Empty() )
+    if( !mOffSceneSignal.Empty() )
     {
       Dali::Actor handle( this );
-      mOffStageSignal.Emit( handle );
+      mOffSceneSignal.Emit( handle );
     }
 
     // Guard against Add during callbacks
-    if( !OnStage() )
+    if( !OnScene() )
     {
-      mOnStageSignalled = false; // signal required next time Actor is added
+      mOnSceneSignalled = false; // signal required next time Actor is added
     }
   }
 }
@@ -2320,7 +2320,7 @@ bool Actor::IsNodeConnected() const
 {
   bool connected( false );
 
-  if( OnStage() )
+  if( OnScene() )
   {
     if( IsRoot() || GetNode().GetParent() )
     {
@@ -3545,10 +3545,10 @@ void Actor::SetParent( Actor* parent )
     mScene = parent->mScene;
 
     if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-         parent->OnStage() )
+         parent->OnScene() )
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage( parent->GetHierarchyDepth() );
+      ConnectToScene( parent->GetHierarchyDepth() );
     }
 
     // Resolve the name and index for the child properties if any
@@ -3561,7 +3561,7 @@ void Actor::SetParent( Actor* parent )
     mParent = NULL;
 
     if ( EventThreadServices::IsCoreRunning() && // Don't emit signals or send messages during Core destruction
-         OnStage() )
+         OnScene() )
     {
       // Disconnect the Node & its children from the scene-graph.
       DisconnectNodeMessage( GetEventThreadServices().GetUpdateManager(), GetNode() );
@@ -3940,7 +3940,7 @@ bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& valu
 
     case Dali::Actor::Property::CONNECTED_TO_SCENE:
     {
-      value = OnStage();
+      value = OnScene();
       break;
     }
 
@@ -4979,7 +4979,7 @@ uint32_t Actor::GetSiblingOrder() const
 
 void Actor::RequestRebuildDepthTree()
 {
-  if( mIsOnStage )
+  if( mIsOnScene )
   {
     if( mScene )
     {

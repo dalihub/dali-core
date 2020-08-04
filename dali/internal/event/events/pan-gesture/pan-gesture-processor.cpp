@@ -649,7 +649,7 @@ void PanGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetector
 
   EmitPanSignal( actor, gestureDetectors, *mCurrentPanEvent, actorCoordinates, mCurrentPanEvent->state, mCurrentRenderTask );
 
-  if ( actor->OnStage() )
+  if ( actor->OnScene() )
   {
     mCurrentPanEmitters = gestureDetectors;
     SetActor( actor );

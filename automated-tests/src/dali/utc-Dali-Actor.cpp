@@ -131,19 +131,19 @@ static bool TestCallback3(Actor actor, const HoverEvent& event)
 }
 
 // validation stuff for onstage & offstage signals
-static std::vector< std::string > gActorNamesOnOffStage;
-static int gOnStageCallBackCalled;
-void OnStageCallback( Actor actor )
+static std::vector< std::string > gActorNamesOnOffScene;
+static int gOnSceneCallBackCalled;
+void OnSceneCallback( Actor actor )
 {
-  ++gOnStageCallBackCalled;
-  gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
+  ++gOnSceneCallBackCalled;
+  gActorNamesOnOffScene.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
 }
-static int gOffStageCallBackCalled;
-void OffStageCallback( Actor actor )
+static int gOffSceneCallBackCalled;
+void OffSceneCallback( Actor actor )
 {
-  ++gOffStageCallBackCalled;
-  gActorNamesOnOffStage.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
+  ++gOffSceneCallBackCalled;
+  gActorNamesOnOffScene.push_back( actor.GetProperty< std::string >( Actor::Property::NAME ) );
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == false );
 }
 
@@ -409,7 +409,7 @@ int UtcDaliActorIsRoot(void)
   END_TEST;
 }
 
-int UtcDaliActorOnStage(void)
+int UtcDaliActorOnScene(void)
 {
   TestApplication application;
 
@@ -2693,91 +2693,91 @@ int UtcDaliActorHoveredSignal(void)
   END_TEST;
 }
 
-int UtcDaliActorOnOffStageSignal(void)
+int UtcDaliActorOnOffSceneSignal(void)
 {
-  tet_infoline("Testing Dali::Actor::OnStageSignal() and OffStageSignal()");
+  tet_infoline("Testing Dali::Actor::OnSceneSignal() and OffSceneSignal()");
 
   TestApplication application;
 
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   Actor parent = Actor::New();
   parent.SetProperty( Actor::Property::NAME, "parent" );
-  parent.OnStageSignal().Connect( OnStageCallback );
-  parent.OffStageSignal().Connect( OffStageCallback );
+  parent.OnSceneSignal().Connect( OnSceneCallback );
+  parent.OffSceneSignal().Connect( OffSceneCallback );
   // sanity check
-  DALI_TEST_CHECK( gOnStageCallBackCalled == 0 );
-  DALI_TEST_CHECK( gOffStageCallBackCalled == 0 );
+  DALI_TEST_CHECK( gOnSceneCallBackCalled == 0 );
+  DALI_TEST_CHECK( gOffSceneCallBackCalled == 0 );
 
-  // add parent to stage
+  // add parent to the scene
   application.GetScene().Add( parent );
   // onstage emitted, offstage not
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( "parent", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( "parent", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
 
   // test adding a child, should get onstage emitted
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   Actor child = Actor::New();
   child.SetProperty( Actor::Property::NAME, "child" );
-  child.OnStageSignal().Connect( OnStageCallback );
-  child.OffStageSignal().Connect( OffStageCallback );
+  child.OnSceneSignal().Connect( OnSceneCallback );
+  child.OffSceneSignal().Connect( OffSceneCallback );
   parent.Add( child ); // add child
-  // onstage emitted, offstage not
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( "child", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
+  // onscene emitted, offscene not
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( "child", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
 
-  // test removing parent from stage
+  // test removing parent from the scene
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   application.GetScene().Remove( parent );
-  // onstage not emitted, offstage is
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 2, TEST_LOCATION );
-  DALI_TEST_EQUALS( "child", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "parent", gActorNamesOnOffStage[ 1 ], TEST_LOCATION );
+  // onscene not emitted, offscene is
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( "child", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "parent", gActorNamesOnOffScene[ 1 ], TEST_LOCATION );
 
-  // test adding parent back to stage
+  // test adding parent back to the scene
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   application.GetScene().Add( parent );
-  // onstage emitted, offstage not
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 2, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( "parent", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( "child", gActorNamesOnOffStage[ 1 ], TEST_LOCATION );
+  // onscene emitted, offscene not
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( "parent", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "child", gActorNamesOnOffScene[ 1 ], TEST_LOCATION );
 
   // test removing child
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   parent.Remove( child );
-  // onstage not emitted, offstage is
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( "child", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
+  // onscene not emitted, offscene is
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( "child", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
 
   // test removing parent
   // clean test data
-  gOnStageCallBackCalled = gOffStageCallBackCalled = 0;
-  gActorNamesOnOffStage.clear();
+  gOnSceneCallBackCalled = gOffSceneCallBackCalled = 0;
+  gActorNamesOnOffScene.clear();
 
   application.GetScene().Remove( parent );
-  // onstage not emitted, offstage is
-  DALI_TEST_EQUALS(  gOnStageCallBackCalled, 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( gOffStageCallBackCalled, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( "parent", gActorNamesOnOffStage[ 0 ], TEST_LOCATION );
+  // onscene not emitted, offscene is
+  DALI_TEST_EQUALS(  gOnSceneCallBackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gOffSceneCallBackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( "parent", gActorNamesOnOffScene[ 0 ], TEST_LOCATION );
   END_TEST;
 }
 
@@ -3975,7 +3975,7 @@ int UtcDaliActorAddRendererN02(void)
   END_TEST;
 }
 
-int UtcDaliActorAddRendererOnStage(void)
+int UtcDaliActorAddRendererOnScene(void)
 {
   tet_infoline("Testing Actor::AddRenderer");
   TestApplication application;

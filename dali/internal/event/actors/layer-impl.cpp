@@ -111,10 +111,10 @@ LayerPtr Layer::NewRoot( LayerList& layerList )
   LayerPtr root( new Layer( Actor::ROOT_LAYER, *rootLayer ) );
 
   // root actor is immediately considered to be on-stage
-  root->mIsOnStage = true;
+  root->mIsOnScene = true;
 
   // The root actor will not emit a stage connection signal so set the signalled flag here as well
-  root->mOnStageSignalled = true;
+  root->mOnSceneSignalled = true;
 
   // layer-list must be set for the root layer
   root->mLayerList = &layerList;
@@ -148,7 +148,7 @@ Layer::~Layer()
     // Guard to allow handle destruction after Core has been destroyed
     if( EventThreadServices::IsCoreRunning() )
     {
-      UninstallRootMessage( GetEventThreadServices().GetUpdateManager(), &GetSceneLayerOnStage() );
+      UninstallRootMessage( GetEventThreadServices().GetUpdateManager(), &GetSceneGraphLayer() );
 
       GetEventThreadServices().UnregisterObject( this );
     }
@@ -178,8 +178,8 @@ void Layer::Lower()
 
 void Layer::RaiseAbove( const Internal::Layer& target )
 {
-  // cannot raise above ourself, both have to be on stage
-  if( ( this != &target ) && OnStage() && target.OnStage() )
+  // cannot raise above ourself, both have to be on the scene
+  if( ( this != &target ) && OnScene() && target.OnScene() )
   {
     // get parameters depth
     const uint32_t targetDepth = target.GetDepth();
@@ -192,8 +192,8 @@ void Layer::RaiseAbove( const Internal::Layer& target )
 
 void Layer::LowerBelow( const Internal::Layer& target )
 {
-  // cannot lower below ourself, both have to be on stage
-  if( ( this != &target ) && OnStage() && target.OnStage() )
+  // cannot lower below ourself, both have to be on the scene
+  if( ( this != &target ) && OnScene() && target.OnScene() )
   {
     // get parameters depth
     const uint32_t targetDepth = target.GetDepth();
@@ -222,8 +222,8 @@ void Layer::LowerToBottom()
 
 void Layer::MoveAbove( const Internal::Layer& target )
 {
-  // cannot raise above ourself, both have to be on stage
-  if( ( this != &target ) && mLayerList && target.OnStage() )
+  // cannot raise above ourself, both have to be on the scene
+  if( ( this != &target ) && mLayerList && target.OnScene() )
   {
     mLayerList->MoveLayerAbove(*this, target );
   }
@@ -231,8 +231,8 @@ void Layer::MoveAbove( const Internal::Layer& target )
 
 void Layer::MoveBelow( const Internal::Layer& target )
 {
-  // cannot lower below ourself, both have to be on stage
-  if( ( this != &target ) && mLayerList && target.OnStage() )
+  // cannot lower below ourself, both have to be on the scene
+  if( ( this != &target ) && mLayerList && target.OnScene() )
   {
     mLayerList->MoveLayerBelow(*this, target );
   }
@@ -243,7 +243,7 @@ void Layer::SetBehavior( Dali::Layer::Behavior behavior )
   mBehavior = behavior;
 
   // Notify update side object.
-  SetBehaviorMessage( GetEventThreadServices(), GetSceneLayerOnStage(), behavior );
+  SetBehaviorMessage( GetEventThreadServices(), GetSceneGraphLayer(), behavior );
   // By default, disable depth test for LAYER_UI, and enable for LAYER_3D.
   SetDepthTestDisabled( mBehavior == Dali::Layer::LAYER_UI );
 }
@@ -255,7 +255,7 @@ void Layer::SetClipping(bool enabled)
     mIsClipping = enabled;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mIsClipping );
+    SetClippingMessage( GetEventThreadServices(), GetSceneGraphLayer(), mIsClipping );
   }
 }
 
@@ -277,7 +277,7 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
       clippingBox.y = static_cast<int32_t>( mScene->GetSize().height ) - clippingBox.y - clippingBox.height;
 
       // layerNode is being used in a separate thread; queue a message to set the value
-      SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
+      SetClippingBoxMessage( GetEventThreadServices(), GetSceneGraphLayer(), clippingBox );
     }
   }
 }
@@ -290,7 +290,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
     // Send message.
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mDepthTestDisabled );
+    SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneGraphLayer(), mDepthTestDisabled );
   }
 }
 
@@ -306,7 +306,7 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     mSortFunction = function;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetSortFunctionMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mSortFunction );
+    SetSortFunctionMessage( GetEventThreadServices(), GetSceneGraphLayer(), mSortFunction );
   }
 }
 
@@ -330,7 +330,7 @@ bool Layer::IsHoverConsumed() const
   return mHoverConsumed;
 }
 
-void Layer::OnStageConnectionInternal()
+void Layer::OnSceneConnectionInternal()
 {
   if ( !mIsRoot )
   {
@@ -351,7 +351,7 @@ void Layer::OnStageConnectionInternal()
   mLayerList->RegisterLayer( *this );
 }
 
-void Layer::OnStageDisconnectionInternal()
+void Layer::OnSceneDisconnectionInternal()
 {
   mLayerList->UnregisterLayer(*this);
 
@@ -359,7 +359,7 @@ void Layer::OnStageDisconnectionInternal()
   mLayerList = NULL;
 }
 
-const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
+const SceneGraph::Layer& Layer::GetSceneGraphLayer() const
 {
   return static_cast< const SceneGraph::Layer& >( GetNode() ); // we know our node is a layer node
 }
