@@ -2090,6 +2090,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mPositionUsesAnchorPoint( true ),
   mVisible( true ),
   mInheritLayoutDirection( true ),
+  mCaptureAllTouchAfterStart( false ),
   mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT ),
   mDrawMode( DrawMode::NORMAL ),
   mColorMode( Node::DEFAULT_COLOR_MODE ),
