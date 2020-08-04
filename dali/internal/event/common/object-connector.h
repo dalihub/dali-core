@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_CONNECTOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,16 +75,16 @@ public:
   }
 
   /**
-   * @brief Assigns the object, calling Connect and Disconnect methods accordingly, taking onStage into account.
+   * @brief Assigns the object, calling Connect and Disconnect methods accordingly, taking onScene into account.
    * @param [in] object smart pointer to a object
-   * @param [in] onStage whether the object is used on stage or not
+   * @param [in] onScene whether the object is used on stage or not
    */
-  void Set( Object& object, bool onStage )
+  void Set( Object& object, bool onScene )
   {
     if ( mObject.Get() != &object )
     {
       // Disconnect from old object
-      if ( mObject && onStage )
+      if ( mObject && onScene )
       {
         mObject->Disconnect();
       }
@@ -92,7 +92,7 @@ public:
       mObject = &object;
 
       // Connect to new object
-      if ( mObject && onStage )
+      if ( mObject && onScene )
       {
         mObject->Connect();
       }
@@ -102,9 +102,9 @@ public:
   /**
    * @brief Manages connection reference count.
    *
-   * Must be called from owner when connected to stage.
+   * Must be called from owner when connected to the scene.
    */
-  void OnStageConnect()
+  void OnSceneConnect()
   {
     if ( mObject )
     {
@@ -115,9 +115,9 @@ public:
   /**
    * @brief Manages connection reference count.
    *
-   * Must be called from owner when disconnecting from stage.
+   * Must be called from owner when disconnecting from the scene.
    */
-  void OnStageDisconnect()
+  void OnSceneDisconnect()
   {
     if ( mObject )
     {

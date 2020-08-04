@@ -417,13 +417,13 @@ bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   }
   else
   {
-    // The primaryHitActor may have been removed from the stage so ensure it is still on the stage before setting members.
-    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnStage() )
+    // The primaryHitActor may have been removed from the scene so ensure it is still on the scene before setting members.
+    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnScene() )
     {
       mLastPrimaryHitActor.SetActor( &GetImplementation( primaryHitActor ) );
 
-      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on stage).
-      if ( consumedActor && GetImplementation( consumedActor ).OnStage() )
+      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
+      if ( consumedActor && GetImplementation( consumedActor ).OnScene() )
       {
         mLastConsumedActor.SetActor( &GetImplementation( consumedActor ) );
       }

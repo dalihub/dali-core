@@ -193,7 +193,7 @@ void CameraActor::OnInitialize()
   AddCameraMessage( GetEventThreadServices().GetUpdateManager(), sceneGraphCameraOwner );
 }
 
-void CameraActor::OnStageConnectionInternal()
+void CameraActor::OnSceneConnectionInternal()
 {
   // If the canvas size has not been set, then use the size of the scene we've been added to to set up the perspective projection
   if( ( mCanvasSize.width < Math::MACHINE_EPSILON_1000 ) || ( mCanvasSize.height < Math::MACHINE_EPSILON_1000 ) )
@@ -388,7 +388,7 @@ void CameraActor::SetPerspectiveProjection( const Size& size )
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     // If the size given is invalid, i.e. ZERO, then check if we've been added to a scene
-    if( OnStage() )
+    if( OnScene() )
     {
       // We've been added to a scene already, set the canvas size to the scene's size
       mCanvasSize = GetScene().GetSize();
@@ -498,7 +498,7 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
 
 const Matrix& CameraActor::GetViewMatrix() const
 {
-  if ( OnStage() )
+  if ( OnScene() )
   {
     return mSceneObject->GetViewMatrix( GetEventThreadServices().GetEventBufferIndex() );
   }
@@ -510,7 +510,7 @@ const Matrix& CameraActor::GetViewMatrix() const
 
 const Matrix& CameraActor::GetProjectionMatrix() const
 {
-  if ( OnStage() )
+  if ( OnScene() )
   {
     return mSceneObject->GetProjectionMatrix( GetEventThreadServices().GetEventBufferIndex() );
   }

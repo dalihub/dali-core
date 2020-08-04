@@ -50,9 +50,9 @@ typedef Rect<int32_t> ClippingBox;
 /**
  * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.
  *
- * When added to the stage, a layer can be ordered relative to other
- * layers. The bottom layer is at depth zero. The stage provides a default
- * layer for it's children (see Stage::GetRootLayer()).
+ * When added to a scene, a layer can be ordered relative to other
+ * layers. The bottom layer is at depth zero. A scene provides a default
+ * layer for its children.
  *
  * Layered actors inherit position etc. as normal, but are drawn in an order
  * determined by the layers. In case of LAYER_3D, the depth buffer is cleared

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,7 +268,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
 
   if ( ( primaryPointState == TouchPoint::Started ) &&
        ( hoverEvent.GetPointCount() == 1 ) &&
-       ( consumedActor && GetImplementation( consumedActor ).OnStage() ) )
+       ( consumedActor && GetImplementation( consumedActor ).OnScene() ) )
   {
     mHoverStartConsumedActor.SetActor( &GetImplementation( consumedActor ) );
   }
@@ -345,13 +345,13 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   }
   else
   {
-    // The primaryHitActor may have been removed from the stage so ensure it is still on the stage before setting members.
-    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnStage() )
+    // The primaryHitActor may have been removed from the scene so ensure it is still on the scene before setting members.
+    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnScene() )
     {
       mLastPrimaryHitActor.SetActor( &GetImplementation( primaryHitActor ) );
 
-      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on stage).
-      if ( consumedActor && GetImplementation( consumedActor ).OnStage() )
+      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
+      if ( consumedActor && GetImplementation( consumedActor ).OnScene() )
       {
         mLastConsumedActor.SetActor( &GetImplementation( consumedActor ) );
       }

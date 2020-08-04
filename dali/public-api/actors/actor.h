@@ -103,7 +103,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *       // Only hit-test the actor and its children if it is sensitive and visible
  *       IF ( ACTOR-IS-SENSITIVE &&
  *            ACTOR-IS-VISIBLE &&
- *            ACTOR-IS-ON-STAGE )
+ *            ACTOR-IS-ON-SCENE )
  *       {
  *         // Depth-first traversal within current layer, visiting parent first
  *
@@ -224,8 +224,8 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  * | touched           | @ref TouchedSignal()         |
  * | hovered           | @ref HoveredSignal()         |
  * | wheelEvent        | @ref WheelEventSignal()      |
- * | onStage           | @ref OnStageSignal()         |
- * | offStage          | @ref OffStageSignal()        |
+ * | onScene           | @ref OnSceneSignal()         |
+ * | offScene          | @ref OffSceneSignal()        |
  * | onRelayout        | @ref OnRelayoutSignal()      |
  *
  * Actions
@@ -735,8 +735,8 @@ public:
   typedef Signal< bool (Actor, const TouchData&) >  TouchDataSignalType;    ///< Touch signal type @SINCE_1_1.37
   typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
   typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OnStageSignalType;                         ///< Stage connection signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OffStageSignalType;                        ///< Stage disconnection signal type @SINCE_1_0.0
+  typedef Signal< void (Actor) > OnSceneSignalType;                         ///< Scene connection signal type @SINCE_1_9.24
+  typedef Signal< void (Actor) > OffSceneSignalType;                        ///< Scene disconnection signal type @SINCE_1_9.24
   typedef Signal< void (Actor) > OnRelayoutSignalType;                      ///< Called when the actor is relaid out @SINCE_1_0.0
   typedef Signal< void ( Actor, LayoutDirection::Type ) > LayoutDirectionChangedSignalType; ///< Layout direction changes signal type. @SINCE_1_2.60
 
@@ -1225,12 +1225,12 @@ public: // Signals
   WheelEventSignalType& WheelEventSignal();
 
   /**
-   * @brief This signal is emitted after the actor has been connected to the stage.
+   * @brief This signal is emitted after the actor has been connected to the scene.
    *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.24
    * @return The signal to connect to
-   * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
+   * @note The root Actor is provided automatically by the Scene, and is always considered to be connected.
    *
    * @note When the parent of a set of actors is connected to the stage, then all of the children
    * will received this callback.
@@ -1246,16 +1246,16 @@ public: // Signals
    *
    * @endcode
    */
-  OnStageSignalType& OnStageSignal();
+  OnSceneSignalType& OnSceneSignal();
 
   /**
-   * @brief This signal is emitted after the actor has been disconnected from the stage.
+   * @brief This signal is emitted after the actor has been disconnected from the scene.
    *
    * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.24
    * @return The signal to connect to
-   * @note When the parent of a set of actors is disconnected to the stage, then all of the children
+   * @note When the parent of a set of actors is disconnected to the scene, then all of the children
    * will received this callback, starting with the leaf actors.
    * For the following actor tree, the callback order will be D, E, B, F, C, and finally A.
    *
@@ -1270,7 +1270,7 @@ public: // Signals
    * @endcode
    *
    */
-  OffStageSignalType& OffStageSignal();
+  OffSceneSignalType& OffSceneSignal();
 
   /**
    * @brief This signal is emitted after the size has been set on the actor during relayout
