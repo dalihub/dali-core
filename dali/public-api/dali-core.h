@@ -43,7 +43,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/public-api/events/gesture-detector.h>
