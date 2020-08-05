@@ -37,7 +37,6 @@
 #include <dali/public-api/animation/path.h>
 #include <dali/public-api/animation/time-period.h>
 
-#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
