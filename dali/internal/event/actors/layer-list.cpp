@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -250,12 +250,12 @@ void LayerList::SetLayerDepths()
   // Set the layers (possibly) new depth
   for (LayerIter iter = mLayers.begin(); iter != mLayers.end(); ++iter)
   {
-    SceneGraph::Layer* layerPtr = const_cast< SceneGraph::Layer* >( &( (*iter)->GetSceneLayerOnStage() ) );
+    SceneGraph::Layer* layerPtr = const_cast< SceneGraph::Layer* >( &( (*iter)->GetSceneGraphLayer() ) );
     layers.push_back( layerPtr );
   }
 
   // Layers are being used in a separate thread; queue a message to set order
-  SetLayerDepthsMessage( mUpdateManager, layers, &( mRoot->GetSceneLayerOnStage() ) );
+  SetLayerDepthsMessage( mUpdateManager, layers, &( mRoot->GetSceneGraphLayer() ) );
 }
 
 void LayerList::SetRootLayer(Layer* rootLayer)

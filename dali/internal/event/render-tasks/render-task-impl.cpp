@@ -243,7 +243,7 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
     {
       Vector2 size( stage->GetSize() );
       Actor* sourceActor = mSourceActor.GetActor();
-      if ( sourceActor && sourceActor->OnStage() )
+      if ( sourceActor && sourceActor->OnScene() )
       {
         Scene& scene = sourceActor->GetScene();
         size = scene.GetSize();
@@ -357,9 +357,9 @@ bool RenderTask::IsHittable( Vector2& screenCoords ) const
 
   if ( mInputEnabled  &&
        nullptr != sourceActor &&
-       sourceActor->OnStage() &&
+       sourceActor->OnScene() &&
        nullptr != cameraActor &&
-       cameraActor->OnStage() )
+       cameraActor->OnScene() )
   {
     // If the actors are rendered off-screen, then the screen coordinates must be converted
     // and the conversion function will tell us if they are inside or outside
@@ -391,7 +391,7 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
       Vector2 size( stage->GetSize() );
       CameraActor* defaultCamera( &stage->GetDefaultCameraActor() );
       Actor* sourceActor = mSourceActor.GetActor();
-      if ( sourceActor && sourceActor->OnStage() )
+      if ( sourceActor && sourceActor->OnScene() )
       {
         Scene& scene = sourceActor->GetScene();
         size = scene.GetSize();

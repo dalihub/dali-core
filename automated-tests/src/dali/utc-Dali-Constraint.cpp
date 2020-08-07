@@ -1293,7 +1293,7 @@ void SetHalfOpacity( Vector4& current, const PropertyInputContainer& inputs )
 }
 } // unnamed namespace
 
-int UtcDaliConstraintEnsureResetterAppliedOnStageRemoval(void)
+int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
 {
   // Ensure BOTH double-buffered values of our color property is reset when a constraint is applied to it.
 

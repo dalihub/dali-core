@@ -158,9 +158,9 @@ public:
   }
 
   /**
-   * Query whether the actor is connected to the Stage.
+   * Query whether the actor is connected to the Scene.
    */
-  bool OnStage() const;
+  bool OnScene() const;
 
   /**
    * Query whether the actor has any renderers.
@@ -757,7 +757,7 @@ public:
    */
   inline int32_t GetHierarchyDepth() const
   {
-    if( mIsOnStage )
+    if( mIsOnScene )
     {
       return mDepth;
     }
@@ -981,7 +981,7 @@ public:
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
    *
-   * This method is automatically called from OnStageConnection(), OnChildAdd(),
+   * This method is automatically called from OnSceneConnection(), OnChildAdd(),
    * OnChildRemove(), SetSizePolicy(), SetMinimumSize() and SetMaximumSize().
    *
    * This method can also be called from a derived class every time it needs a different size.
@@ -1472,14 +1472,14 @@ public:
   Dali::Actor::WheelEventSignalType& WheelEventSignal();
 
   /**
-   * @copydoc Dali::Actor::OnStageSignal()
+   * @copydoc Dali::Actor::OnSceneSignal()
    */
-  Dali::Actor::OnStageSignalType& OnStageSignal();
+  Dali::Actor::OnSceneSignalType& OnSceneSignal();
 
   /**
-   * @copydoc Dali::Actor::OffStageSignal()
+   * @copydoc Dali::Actor::OffSceneSignal()
    */
-  Dali::Actor::OffStageSignalType& OffStageSignal();
+  Dali::Actor::OffSceneSignalType& OffSceneSignal();
 
   /**
    * @copydoc Dali::Actor::OnRelayoutSignal()
@@ -1573,18 +1573,18 @@ protected:
   virtual ~Actor();
 
   /**
-   * Called on a child during Add() when the parent actor is connected to the Stage.
+   * Called on a child during Add() when the parent actor is connected to the Scene.
    * @param[in] parentDepth The depth of the parent in the hierarchy.
    */
-  void ConnectToStage( uint32_t parentDepth );
+  void ConnectToScene( uint32_t parentDepth );
 
   /**
-   * Helper for ConnectToStage, to recursively connect a tree of actors.
+   * Helper for ConnectToScene, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
    * @param[in]  depth The depth in the hierarchy of the actor
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( ActorContainer& connectionList, uint32_t depth );
+  void RecursiveConnectToScene( ActorContainer& connectionList, uint32_t depth );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1592,7 +1592,7 @@ protected:
   void ConnectToSceneGraph();
 
   /**
-   * Helper for ConnectToStage, to notify a connected actor through the public API.
+   * Helper for ConnectToScene, to notify a connected actor through the public API.
    */
   void NotifyStageConnection();
 
@@ -1619,8 +1619,8 @@ protected:
   void NotifyStageDisconnection();
 
   /**
-   * When the Actor is OnStage, checks whether the corresponding Node is connected to the scene graph.
-   * @return True if the Actor is OnStage & has a Node connected to the scene graph.
+   * When the Actor is OnScene, checks whether the corresponding Node is connected to the scene graph.
+   * @return True if the Actor is OnScene & has a Node connected to the scene graph.
    */
   bool IsNodeConnected() const;
 
@@ -1780,10 +1780,10 @@ private:
 
   /**
    * For use in internal derived classes.
-   * This is called during ConnectToStage(), after the actor has finished adding its node to the scene-graph.
+   * This is called during ConnectToScene(), after the actor has finished adding its node to the scene-graph.
    * The derived class must not modify the actor hierachy (Add/Remove children) during this callback.
    */
-  virtual void OnStageConnectionInternal()
+  virtual void OnSceneConnectionInternal()
   {
   }
 
@@ -1792,15 +1792,15 @@ private:
    * This is called during DisconnectFromStage(), before the actor removes its node from the scene-graph.
    * The derived class must not modify the actor hierachy (Add/Remove children) during this callback.
    */
-  virtual void OnStageDisconnectionInternal()
+  virtual void OnSceneDisconnectionInternal()
   {
   }
 
   /**
    * For use in external (CustomActor) derived classes.
-   * This is called after the atomic ConnectToStage() traversal has been completed.
+   * This is called after the atomic ConnectToScene() traversal has been completed.
    */
-  virtual void OnStageConnectionExternal( int depth )
+  virtual void OnSceneConnectionExternal( int depth )
   {
   }
 
@@ -1808,7 +1808,7 @@ private:
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic DisconnectFromStage() traversal has been completed.
    */
-  virtual void OnStageDisconnectionExternal()
+  virtual void OnSceneDisconnectionExternal()
   {
   }
 
@@ -1988,8 +1988,8 @@ protected:
   Dali::Actor::TouchDataSignalType         mTouchSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;
-  Dali::Actor::OnStageSignalType           mOnStageSignal;
-  Dali::Actor::OffStageSignalType          mOffStageSignal;
+  Dali::Actor::OnSceneSignalType           mOnSceneSignal;
+  Dali::Actor::OffSceneSignalType          mOffSceneSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
   DevelActor::VisibilityChangedSignalType  mVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType  mLayoutDirectionChangedSignal;
@@ -2011,14 +2011,14 @@ protected:
 
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
-  bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
+  bool mIsOnScene                                  : 1; ///< Flag to identify whether the actor is on-scene
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals
   bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation
   bool mDerivedRequiresTouch                       : 1; ///< Whether the derived actor type requires touch event signals
   bool mDerivedRequiresHover                       : 1; ///< Whether the derived actor type requires hover event signals
   bool mDerivedRequiresWheelEvent                  : 1; ///< Whether the derived actor type requires wheel event signals
-  bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
+  bool mOnSceneSignalled                           : 1; ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
   bool mInsideOnSizeSet                            : 1; ///< Whether we are inside OnSizeSet
   bool mInheritPosition                            : 1; ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.

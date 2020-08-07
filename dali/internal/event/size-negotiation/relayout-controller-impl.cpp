@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -425,8 +425,8 @@ void RelayoutController::Relayout()
     // Clear the flag as we're now doing the relayout
     mRelayoutFlag = false;
 
-    // 1. Finds all top-level controls from the dirty list and allocate them the size of the stage
-    //    These controls are paired with the parent/stage size and added to the stack.
+    // 1. Finds all top-level controls from the dirty list and allocate them the size of the scene
+    //    These controls are paired with the parent/scene size and added to the stack.
     for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
     {
       Internal::Actor* dirtyActor = *it;
@@ -434,8 +434,8 @@ void RelayoutController::Relayout()
       // Need to test if actor is valid (could have been deleted and had the pointer cleared)
       if( dirtyActor )
       {
-        // Only negotiate actors that are on stage
-        if( dirtyActor->OnStage() )
+        // Only negotiate actors that are on the scene
+        if( dirtyActor->OnScene() )
         {
           Internal::Actor* parent = dirtyActor->GetParent();
           QueueActor( dirtyActor, *mRelayoutStack, ( parent ) ? Vector2( parent->GetTargetSize() ) : dirtyActor->GetScene().GetSize() );

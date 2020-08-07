@@ -46,10 +46,10 @@ struct MyTestCustomActor : public CustomActorImpl
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
   }
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
   }
   virtual void OnChildAdd(Actor& child)

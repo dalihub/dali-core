@@ -48,7 +48,7 @@ class RenderTask;
 /**
  * @brief RenderTasks describe how the Dali scene should be rendered.
  *
- * The Stage::GetRenderTaskList() method provides access to an ordered list of render-tasks.
+ * The Scene provides access to an ordered list of render-tasks.
  *
  * Each RenderTask must specify the source actors to be rendered, and a camera actor from
  * which the scene is viewed.
