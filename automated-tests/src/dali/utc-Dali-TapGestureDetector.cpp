@@ -952,3 +952,47 @@ int UtcDaliTapGestureInterruptedWhenTouchConsumed(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureDisableDetectionDuringTapN(void)
+{
+  // Crash sometimes occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Add a detector
+  TapGestureDetector detector = TapGestureDetector::New();
+  bool functorCalled = false;
+  detector.Attach( actor );
+  detector.DetectedSignal().Connect(
+      &application,
+      [&detector, &functorCalled](Actor actor, const TapGesture& gesture)
+      {
+        detector.Detach(actor);
+        functorCalled = true;
+      });
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Try the gesture, should not crash
+  try
+  {
+    TestGenerateTap( application, 50.0f, 10.0f );
+
+    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+  }
+
+  END_TEST;
+}
+

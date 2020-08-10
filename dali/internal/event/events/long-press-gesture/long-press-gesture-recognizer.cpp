@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {
   unsigned int pointCount( event.GetPointCount() );
   Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+  GestureRecognizerPtr ptr(this); // To keep us from being destroyed during the life-time of this method
 
   switch (mState)
   {

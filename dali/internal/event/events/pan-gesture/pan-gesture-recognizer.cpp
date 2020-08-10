@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ PanGestureRecognizer::~PanGestureRecognizer()
 void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {
   PointState::Type primaryPointState(event.points[0].GetState());
+  GestureRecognizerPtr ptr(this); // To keep us from being destroyed during the life-time of this method
 
   if (primaryPointState == PointState::INTERRUPTED)
   {

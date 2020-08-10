@@ -90,6 +90,7 @@ void PinchGestureRecognizer::SetMinimumPinchDistance(float value)
 void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {
   int pointCount = event.GetPointCount();
+  GestureRecognizerPtr ptr(this); // To keep us from being destroyed during the life-time of this method
 
   switch (mState)
   {

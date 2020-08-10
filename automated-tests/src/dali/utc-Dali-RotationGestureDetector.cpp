@@ -1130,7 +1130,7 @@ int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(&application, functor);
 
-  // Start gesture within the actor's area, we should receive the pinch as the touch is NOT being consumed
+  // Start gesture within the actor's area, we should receive the rotation as the touch is NOT being consumed
   TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                    Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
 
@@ -1147,10 +1147,62 @@ int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
   DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
   data.Reset();
 
-  // Start another pinch, we should not even get the callback this time
+  // Start another rotation, we should not even get the callback this time
   TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
                                    Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }
+
+int UtcDaliRotationGestureDisableDetectionDuringRotationN(void)
+{
+  // Crash sometimes occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Add a detector
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  bool functorCalled = false;
+  detector.Attach( actor );
+  detector.DetectedSignal().Connect(
+      &application,
+      [&detector, &functorCalled](Actor actor, const RotationGesture& gesture)
+      {
+        if( gesture.state == Gesture::Finished )
+        {
+          detector.Detach(actor);
+          functorCalled = true;
+        }
+      });
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Try the gesture, should not crash
+  try
+  {
+    TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
+    TestContinueRotation( application, Vector2( 112.0f, 100.0f ), Vector2( 112.0f, 124.0f ),
+                                    Vector2( 5.0f, 5.0f ), Vector2( 35.0f, 35.0f ), 200 );
+    TestEndRotation( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
+
+    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+  }
+
+  END_TEST;
+}
+
