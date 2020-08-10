@@ -81,7 +81,7 @@ public:
    * @param glAbstraction the gl abstraction.
    * @param contexts The list of scene contexts (for surface rendering)
    */
-  Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts );
+  Context( Integration::GlAbstraction& glAbstraction, std::vector< Context* >* contexts );
 
   /**
    * Destructor
@@ -1829,7 +1829,7 @@ private: // Data
 
   FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 
-  OwnerContainer< Context* >* mSceneContexts;      ///< The pointer of the container of contexts for surface rendering
+  std::vector< Context* >* mSceneContexts;      ///< The pointer of the container of contexts for surface rendering
 };
 
 } // namespace Internal

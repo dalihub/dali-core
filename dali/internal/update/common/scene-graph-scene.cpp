@@ -17,9 +17,7 @@
 // CLASS HEADER
 #include <dali/internal/update/common/scene-graph-scene.h>
 
-// INTERNAL INCLUDES
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/render/gl-resources/context.h>
 
 namespace Dali
 {
@@ -37,13 +35,39 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+  if ( mContext )
+  {
+    mContext->GlContextDestroyed();
+
+    delete mContext;
+    mContext = nullptr;
+  }
+
   mFrameRenderedCallbacks.clear();
   mFramePresentedCallbacks.clear();
 }
 
+void Scene::GlContextDestroyed()
+{
+  if ( mContext )
+  {
+    mContext->GlContextDestroyed();
+  }
+}
+
 void Scene::Initialize( Context& context )
 {
-  mContext = &context;
+  if ( mContext != &context )
+  {
+    if ( mContext )
+    {
+      mContext->GlContextDestroyed();
+      delete mContext;
+    }
+
+    mContext = &context;
+    mContext->GlContextCreated();
+  }
 }
 
 Context* Scene::GetContext()

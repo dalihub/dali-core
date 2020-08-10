@@ -19,8 +19,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/scene.h>
+#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -56,6 +58,11 @@ public:
    * @param[in] context The GL context
    */
   void Initialize( Context& context );
+
+  /**
+   * Called by RenderManager to inform the scene that the context has been destroyed
+   */
+  void GlContextDestroyed();
 
   /**
    * Gets the context holding the GL state of rendering for the scene
@@ -117,7 +124,7 @@ public:
 
 private:
 
-  Context*                    mContext;   ///< The context holding the GL state of rendering for the scene, not owned
+  Context*                    mContext;   ///< The context holding the GL state of rendering for the scene
 
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one

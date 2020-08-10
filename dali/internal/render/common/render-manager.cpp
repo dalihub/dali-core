@@ -151,33 +151,22 @@ struct RenderManager::Impl
 
   Context* CreateSceneContext()
   {
-    Context* context = new Context( glAbstraction );
-
-    //TODO: Need eglMakeCurrent first
-    context->GlContextCreated();
-
-    sceneContextContainer.PushBack( context );
-    return context;
+    sceneContextContainer.push_back( new Context( glAbstraction ) );
+    return sceneContextContainer[ sceneContextContainer.size() - 1 ];
   }
 
   void DestroySceneContext( Context* sceneContext )
   {
-    auto iter = std::find( sceneContextContainer.Begin(), sceneContextContainer.End(), sceneContext );
-    if( iter != sceneContextContainer.End() )
+    auto iter = std::find( sceneContextContainer.begin(), sceneContextContainer.end(), sceneContext );
+    if( iter != sceneContextContainer.end() )
     {
-      ( *iter )->GlContextDestroyed();
-      sceneContextContainer.Erase( iter );
+      sceneContextContainer.erase( iter );
     }
   }
 
   Context* ReplaceSceneContext( Context* oldSceneContext )
   {
     Context* newContext = new Context( glAbstraction );
-
-    oldSceneContext->GlContextDestroyed();
-    //TODO: Need eglMakeCurrent first
-    newContext->GlContextCreated();
-
     std::replace( sceneContextContainer.begin(), sceneContextContainer.end(), oldSceneContext, newContext );
     return newContext;
   }
@@ -194,7 +183,7 @@ struct RenderManager::Impl
   // programs are owned by context at the moment.
   Context                                   context;                 ///< Holds the GL state of the share resource context
   Context*                                  currentContext;          ///< Holds the GL state of the current context for rendering
-  OwnerContainer< Context* >                sceneContextContainer;   ///< List of owned contexts holding the GL state per scene
+  std::vector< Context* >                   sceneContextContainer;   ///< List of owned contexts holding the GL state per scene
   Integration::GlAbstraction&               glAbstraction;           ///< GL abstraction
   Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
   Integration::GlContextHelperAbstraction&  glContextHelperAbstraction; ///< GL context helper abstraction
@@ -298,10 +287,10 @@ void RenderManager::ContextDestroyed()
     renderer->GlContextDestroyed();
   }
 
-  // inform context
-  for( auto&& context : mImpl->sceneContextContainer )
+  // inform scenes
+  for( auto&& scene : mImpl->sceneContainer )
   {
-    context->GlContextDestroyed();
+    scene->GlContextDestroyed();
   }
 }
 
