@@ -58,6 +58,7 @@ public:
    * @param[in]  renderTasks        The list of render-tasks.
    * @param[in]  rootNode           The root node of the scene-graph.
    * @param[in]  sortedLayers       The layers containing lists of opaque / transparent renderables.
+   * @param[in]  context            The context holding the GL state of rendering for the rendering instructions.
    * @param[out] instructions       The instructions for rendering the next frame.
    * @param[in]  renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
    * @param[in]  isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
@@ -67,6 +68,7 @@ public:
                 RenderTaskList& renderTasks,
                 Layer& rootNode,
                 SortedLayerPointers& sortedLayers,
+                Context& context,
                 RenderInstructionContainer& instructions,
                 bool renderToFboEnabled,
                 bool isRenderingToFbo );

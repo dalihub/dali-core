@@ -29,6 +29,8 @@ namespace Dali
 namespace Internal
 {
 
+class Context;
+
 namespace Render
 {
 class Geometry;
@@ -97,6 +99,7 @@ public:
    *
    * @param[in]  updateBufferIndex The current update buffer index.
    * @param[in]  sortedLayers      The layers containing lists of opaque/transparent renderables.
+   * @param[in]  context           The context holding the GL state of rendering for the rendering instructions.
    * @param[in]  renderTask        The rendering task information.
    * @param[in]  cull              Whether frustum culling is enabled or not
    * @param[in]  hasClippingNodes  Whether any clipping nodes exist within this layer, to optimize sorting if not
@@ -104,6 +107,7 @@ public:
    */
   void Prepare( BufferIndex updateBufferIndex,
                 SortedLayerPointers& sortedLayers,
+                Context& context,
                 RenderTask& renderTask,
                 bool cull,
                 bool hasClippingNodes,

@@ -39,6 +39,7 @@ RenderInstruction::RenderInstruction()
   mIsClearColorSet( false ),
   mIgnoreRenderToFbo( false ),
   mFrameBuffer( 0 ),
+  mContext( 0 ),
   mCamera( 0 ),
   mNextFreeRenderList( 0 )
 {
