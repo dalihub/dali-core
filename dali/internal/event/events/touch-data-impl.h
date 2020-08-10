@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_DATA_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public:
    *
    * Required because base class copy constructor is not implemented.
    * @param[in]  other  The TouchData to clone from.
-   * @return A new TouchData object which is has the same touch point data.
+   * @return A new TouchData object which has the same touch point data.
    */
   static TouchDataPtr Clone( const TouchData& other );
 
