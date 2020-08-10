@@ -44,54 +44,6 @@ namespace Internal
 namespace SceneGraph
 {
 class Scene;
-
-struct DirtyRect
-{
-  DirtyRect(Node* node, Render::Renderer* renderer, int frame, Rect<int>& rect)
-  : node(node),
-    renderer(renderer),
-    frame(frame),
-    rect(rect),
-    visited(true)
-  {
-  }
-
-  DirtyRect()
-  : node(nullptr),
-    renderer(nullptr),
-    frame(0),
-    rect(),
-    visited(true)
-  {
-  }
-
-  bool operator<(const DirtyRect& rhs) const
-  {
-    if (node == rhs.node)
-    {
-      if (renderer == rhs.renderer)
-      {
-        return frame > rhs.frame; // Most recent rects come first
-      }
-      else
-      {
-        return renderer < rhs.renderer;
-      }
-    }
-    else
-    {
-      return node < rhs.node;
-    }
-  }
-
-  Node* node;
-  Render::Renderer* renderer;
-  int frame;
-
-  Rect<int> rect;
-  bool visited;
-};
-
 }
 
 class EventProcessor;
@@ -319,13 +271,6 @@ public:
    */
   Integration::Scene::WheelEventSignalType& WheelEventSignal();
 
-  /**
-   * @brief Get ItemsDirtyRects
-   *
-   * @return the ItemsDirtyRects
-   */
-  std::vector<Dali::Internal::SceneGraph::DirtyRect>& GetItemsDirtyRects();
-
 public:
 
   /**
@@ -399,8 +344,6 @@ private:
 
   // The wheel event signal
   Integration::Scene::WheelEventSignalType mWheelEventSignal;
-
-  std::vector<Dali::Internal::SceneGraph::DirtyRect>                    mItemsDirtyRects;
 };
 
 } // Internal
