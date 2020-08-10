@@ -2,7 +2,7 @@
 #define DALI_THREAD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,10 +69,11 @@ private:
    */
   static void InternalThreadEntryFunc( Thread& This );
 
-  // Undefined
-  Thread( const Thread& );
-  // Undefined
-  const Thread& operator=( const Thread& );
+  // Not copyable or movable
+  Thread( const Thread& ) = delete; ///< Deleted copy constructor
+  Thread( Thread&& ) = delete; ///< Deleted move constructor
+  Thread& operator=( const Thread& ) = delete; ///< Deleted copy assignment operator
+  Thread& operator=( Thread&& ) = delete; ///< Deleted move assignment operator
 
 private:
 

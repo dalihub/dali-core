@@ -114,13 +114,12 @@ protected:
    */
   void UnregisterObject();
 
-private:
+  // Not copyable or movable
 
-  // Not implemented
-  DALI_INTERNAL BaseObject(const BaseObject& rhs);
-
-  // Not implemented
-  DALI_INTERNAL BaseObject& operator=(const BaseObject& rhs);
+  BaseObject(const BaseObject& rhs) = delete; ///< Deleted copy constructor
+  BaseObject(BaseObject&& rhs) = delete; ///< Deleted move constructor
+  BaseObject& operator=(const BaseObject& rhs) = delete; ///< Deleted copy assignment operator
+  BaseObject& operator=(BaseObject&& rhs) = delete; ///< Deleted move assignment operator
 
 public:
 
