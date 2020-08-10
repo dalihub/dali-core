@@ -207,7 +207,7 @@ TouchEventProcessor::~TouchEventProcessor()
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
-void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
+bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty TouchEvent sent from Integration\n" );
@@ -271,7 +271,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     touchData->AddPoint( currentPoint );
 
     mScene.EmitTouchedSignal( touchEvent, touchDataHandle );
-    return; // No need for hit testing
+    return false; // No need for hit testing & already an interrupted event so just return false
   }
 
   // 2) Hit Testing.
@@ -318,11 +318,14 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 
   // 3) Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
 
+  bool consumed = false;
+
   // Emit the touch signal
   Dali::Actor consumedActor;
   if ( currentRenderTask )
   {
     consumedActor = EmitTouchSignals( touchData->GetPoint( 0 ).GetHitActor(), touchEvent, touchDataHandle );
+    consumed = consumedActor ? true : false;
   }
 
   Integration::Point& primaryPoint = touchData->GetPoint( 0 );
@@ -372,6 +375,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
         }
       }
 
+      consumed |= leaveEventConsumer ? true : false;
+
       // Check if the motion event has been consumed by another actor's listener.  In this case, the previously
       // consumed actor's listeners may need to be informed (through a leave event).
       // Further checks here to ensure we do not signal the same actor twice for the same event.
@@ -412,13 +417,13 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   }
   else
   {
-    // The primaryHitActor may have been removed from the stage so ensure it is still on the stage before setting members.
-    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnStage() )
+    // The primaryHitActor may have been removed from the scene so ensure it is still on the scene before setting members.
+    if ( primaryHitActor && GetImplementation( primaryHitActor ).OnScene() )
     {
       mLastPrimaryHitActor.SetActor( &GetImplementation( primaryHitActor ) );
 
-      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on stage).
-      if ( consumedActor && GetImplementation( consumedActor ).OnStage() )
+      // Only observe the consumed actor if we have a primaryHitActor (check if it is still on the scene).
+      if ( consumedActor && GetImplementation( consumedActor ).OnScene() )
       {
         mLastConsumedActor.SetActor( &GetImplementation( consumedActor ) );
       }
@@ -483,6 +488,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
       }
     }
   }
+
+  return consumed;
 }
 
 void TouchEventProcessor::OnObservedActorDisconnected( Actor* actor )

@@ -62,16 +62,9 @@ RenderTask::~RenderTask()
 {
 }
 
-RenderTask::RenderTask(const RenderTask& handle)
-: Handle(handle)
-{
-}
+RenderTask::RenderTask(const RenderTask& handle) = default;
 
-RenderTask& RenderTask::operator=(const RenderTask& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+RenderTask& RenderTask::operator=(const RenderTask& rhs) = default;
 
 RenderTask::RenderTask( RenderTask&& rhs ) =  default;
 

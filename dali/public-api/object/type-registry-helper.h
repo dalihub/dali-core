@@ -2,7 +2,7 @@
 #define DALI_TYPE_REGISTRY_HELPER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/public-api/object/type-registry.h>
 
 /**
@@ -33,11 +32,11 @@
 
 #define DALI_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
-  DALI_COMPILE_TIME_ASSERT( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+  static_assert( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 #define DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty ); \
-  DALI_COMPILE_TIME_ASSERT( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+  static_assert( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
   Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType );

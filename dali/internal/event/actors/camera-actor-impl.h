@@ -246,9 +246,9 @@ private:
   void OnInitialize() override;
 
   /**
-   * @copydoc Dali::Internal::Actor::OnStageConnectionInternal()
+   * @copydoc Dali::Internal::Actor::OnSceneConnectionInternal()
    */
-  void OnStageConnectionInternal() override;
+  void OnSceneConnectionInternal() override;
 
 private: // Data
 

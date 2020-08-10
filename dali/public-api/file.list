@@ -117,13 +117,11 @@ SET( public_api_core_animation_header_files
 
 
 SET( public_api_core_common_header_files
-  ${public_api_src_dir}/common/compile-time-assert.h
   ${public_api_src_dir}/common/constants.h
   ${public_api_src_dir}/common/dali-common.h
   ${public_api_src_dir}/common/dali-vector.h
   ${public_api_src_dir}/common/extents.h
   ${public_api_src_dir}/common/intrusive-ptr.h
-  ${public_api_src_dir}/common/loading-state.h
   ${public_api_src_dir}/common/type-traits.h
   ${public_api_src_dir}/common/list-wrapper.h
   ${public_api_src_dir}/common/vector-wrapper.h

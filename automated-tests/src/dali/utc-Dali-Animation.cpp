@@ -2150,7 +2150,7 @@ int UtcDaliAnimationPlayP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationPlayOffStageDiscardP(void)
+int UtcDaliAnimationPlayOffSceneDiscardP(void)
 {
   // Test that an animation can be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
@@ -2243,7 +2243,7 @@ int UtcDaliAnimationPlayOffStageDiscardP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationPlayOffStageBakeFinalP(void)
+int UtcDaliAnimationPlayOffSceneBakeFinalP(void)
 {
   // Test that an animation can be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position
@@ -2327,7 +2327,7 @@ int UtcDaliAnimationPlayOffStageBakeFinalP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationPlayOffStageBakeP(void)
+int UtcDaliAnimationPlayOffSceneBakeP(void)
 {
   // Test that an animation can be played, when the actor is off-stage.
   // When the actor is added to the stage, it should appear at the current position

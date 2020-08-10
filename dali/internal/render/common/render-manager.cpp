@@ -150,22 +150,27 @@ struct RenderManager::Impl
 
   Context* CreateSceneContext()
   {
-    sceneContextContainer.push_back( new Context( glAbstraction ) );
-    return sceneContextContainer[ sceneContextContainer.size() - 1 ];
+    Context* context = new Context( glAbstraction );
+    sceneContextContainer.PushBack( context );
+    return context;
   }
 
   void DestroySceneContext( Context* sceneContext )
   {
-    auto iter = std::find( sceneContextContainer.begin(), sceneContextContainer.end(), sceneContext );
-    if( iter != sceneContextContainer.end() )
+    auto iter = std::find( sceneContextContainer.Begin(), sceneContextContainer.End(), sceneContext );
+    if( iter != sceneContextContainer.End() )
     {
-      sceneContextContainer.erase( iter );
+      ( *iter )->GlContextDestroyed();
+      sceneContextContainer.Erase( iter );
     }
   }
 
   Context* ReplaceSceneContext( Context* oldSceneContext )
   {
     Context* newContext = new Context( glAbstraction );
+
+    oldSceneContext->GlContextDestroyed();
+
     std::replace( sceneContextContainer.begin(), sceneContextContainer.end(), oldSceneContext, newContext );
     return newContext;
   }
@@ -182,7 +187,7 @@ struct RenderManager::Impl
   // programs are owned by context at the moment.
   Context                                   context;                 ///< Holds the GL state of the share resource context
   Context*                                  currentContext;          ///< Holds the GL state of the current context for rendering
-  std::vector< Context* >                   sceneContextContainer;   ///< List of owned contexts holding the GL state per scene
+  OwnerContainer< Context* >                sceneContextContainer;   ///< List of owned contexts holding the GL state per scene
   Integration::GlAbstraction&               glAbstraction;           ///< GL abstraction
   Integration::GlSyncAbstraction&           glSyncAbstraction;       ///< GL sync abstraction
   Integration::GlContextHelperAbstraction&  glContextHelperAbstraction; ///< GL context helper abstraction
@@ -285,10 +290,10 @@ void RenderManager::ContextDestroyed()
     renderer->GlContextDestroyed();
   }
 
-  // inform scenes
-  for( auto&& scene : mImpl->sceneContainer )
+  // inform context
+  for( auto&& context : mImpl->sceneContextContainer )
   {
-    scene->GlContextDestroyed();
+    context->GlContextDestroyed();
   }
 }
 
@@ -898,7 +903,8 @@ void RenderManager::RenderScene( Integration::RenderStatus& status, Integration:
       surfaceRect = Rect<int32_t>( 0, 0, static_cast<int32_t>( scene.GetSize().width ), static_cast<int32_t>( scene.GetSize().height ) );
     }
 
-    DALI_ASSERT_DEBUG( mImpl->currentContext->IsGlContextCreated() );
+    // Make sure that GL context must be created
+     mImpl->currentContext->GlContextCreated();
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera

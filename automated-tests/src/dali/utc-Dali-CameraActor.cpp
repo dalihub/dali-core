@@ -1156,7 +1156,7 @@ int UtcDaliCameraActorGetProjectionModeN(void)
   END_TEST;
 }
 
-int UtcDaliCameraActorSetCameraOffStage(void)
+int UtcDaliCameraActorSetCameraOffScene(void)
 {
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor::SetCamera()" );
@@ -1197,7 +1197,7 @@ int UtcDaliCameraActorSetCameraOffStage(void)
   END_TEST;
 }
 
-int UtcDaliCameraActorSetCameraOnStage(void)
+int UtcDaliCameraActorSetCameraOnScene(void)
 {
   TestApplication application;
   tet_infoline( "Testing Dali::CameraActor::SetCamera()" );

@@ -53,16 +53,9 @@ Animation::~Animation()
 {
 }
 
-Animation::Animation(const Animation& handle)
-: BaseHandle(handle)
-{
-}
+Animation::Animation(const Animation& handle) = default;
 
-Animation& Animation::operator=(const Animation& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Animation& Animation::operator=(const Animation& rhs) = default;
 
 Animation::Animation( Animation&& rhs ) = default;
 

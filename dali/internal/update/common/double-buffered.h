@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_DOUBLE_BUFFERED_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,6 @@ namespace Internal
 
 // The number of buffers per scene-graph property
 static const unsigned int NUM_SCENE_GRAPH_BUFFERS = 2;
-
-// Buffer index used when reading off-stage values
-static const unsigned int ARBITRARY_OFF_STAGE_BUFFER = 0;
 
 namespace SceneGraph
 {

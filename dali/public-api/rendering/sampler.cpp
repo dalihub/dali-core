@@ -38,21 +38,14 @@ Sampler::~Sampler()
 {
 }
 
-Sampler::Sampler( const Sampler& handle )
-: BaseHandle( handle )
-{
-}
+Sampler::Sampler( const Sampler& handle ) = default;
 
 Sampler Sampler::DownCast( BaseHandle handle )
 {
   return Sampler( dynamic_cast<Dali::Internal::Sampler*>(handle.GetObjectPtr()));
 }
 
-Sampler& Sampler::operator=( const Sampler& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+Sampler& Sampler::operator=( const Sampler& handle ) = default;
 
 Sampler::Sampler( Sampler&& rhs ) =  default;
 

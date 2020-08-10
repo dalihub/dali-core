@@ -438,7 +438,6 @@ inline void RenderInstructionProcessor::SortRenderItems( BufferIndex bufferIndex
 
 void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
                                           SortedLayerPointers& sortedLayers,
-                                          Context& context,
                                           RenderTask& renderTask,
                                           bool cull,
                                           bool hasClippingNodes,
@@ -518,7 +517,6 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
 
   if( isRenderListAdded || instruction.mIsClearColorSet || isRootLayerDirty )
   {
-    instruction.mContext = &context;
     instructions.PushBack( updateBufferIndex, &instruction );
   }
 }

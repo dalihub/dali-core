@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,19 +75,19 @@ protected:
 private:
 
   /**
-   * @copydoc Internal::Actor::OnStageConnectionExternal
+   * @copydoc Internal::Actor::OnSceneConnectionExternal
    */
-  virtual void OnStageConnectionExternal( int32_t depth )
+  virtual void OnSceneConnectionExternal( int32_t depth )
   {
-    mImpl->OnStageConnection( depth );
+    mImpl->OnSceneConnection( depth );
   }
 
   /**
-   * @copydoc Internal::Actor::OnStageDisconnectionExternal
+   * @copydoc Internal::Actor::OnSceneDisconnectionExternal
    */
-  virtual void OnStageDisconnectionExternal()
+  virtual void OnSceneDisconnectionExternal()
   {
-    mImpl->OnStageDisconnection();
+    mImpl->OnSceneDisconnection();
   }
 
   /**

@@ -42,37 +42,13 @@ BaseHandle::~BaseHandle()
 {
 }
 
-BaseHandle::BaseHandle(const BaseHandle& handle)
-  : mObjectHandle(handle.mObjectHandle)
-{
-}
+BaseHandle::BaseHandle(const BaseHandle& handle) = default;
 
-BaseHandle& BaseHandle::operator=(const BaseHandle& rhs)
-{
-  if( this != &rhs )
-  {
-    this->mObjectHandle = rhs.mObjectHandle;
-  }
+BaseHandle& BaseHandle::operator=(const BaseHandle& rhs) = default;
 
-  return *this;
-}
+BaseHandle::BaseHandle( BaseHandle&& rhs ) = default;
 
-BaseHandle::BaseHandle( BaseHandle&& rhs )
-: mObjectHandle( rhs.mObjectHandle )
-{
-  rhs.mObjectHandle = nullptr;
-}
-
-BaseHandle& BaseHandle::operator=( BaseHandle&& rhs )
-{
-  if (this != &rhs)
-  {
-    mObjectHandle = rhs.mObjectHandle;
-    rhs.mObjectHandle = nullptr;
-  }
-
-  return *this;
-}
+BaseHandle& BaseHandle::operator=( BaseHandle&& rhs ) = default;
 
 bool BaseHandle::DoAction(const std::string& command, const Property::Map& attributes)
 {

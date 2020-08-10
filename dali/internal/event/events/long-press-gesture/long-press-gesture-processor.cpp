@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,7 +252,7 @@ void LongPressGestureProcessor::RemoveGestureDetector( LongPressGestureDetector*
 
   if ( mLongPressGestureDetectors.empty() )
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
   }
   else
   {
@@ -352,7 +352,7 @@ void LongPressGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDe
 
   EmitLongPressSignal( actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates );
 
-  if ( actor->OnStage() )
+  if ( actor->OnScene() )
   {
     mCurrentEmitters = gestureDetectors;
     SetActor( actor );

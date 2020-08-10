@@ -65,21 +65,14 @@ FrameBuffer::~FrameBuffer()
 {
 }
 
-FrameBuffer::FrameBuffer( const FrameBuffer& handle )
-: BaseHandle( handle )
-{
-}
+FrameBuffer::FrameBuffer( const FrameBuffer& handle ) = default;
 
 FrameBuffer FrameBuffer::DownCast( BaseHandle handle )
 {
   return FrameBuffer( dynamic_cast<Dali::Internal::FrameBuffer*>(handle.GetObjectPtr()));
 }
 
-FrameBuffer& FrameBuffer::operator=( const FrameBuffer& handle )
-{
-  BaseHandle::operator=( handle );
-  return *this;
-}
+FrameBuffer& FrameBuffer::operator=( const FrameBuffer& handle ) = default;
 
 FrameBuffer::FrameBuffer( Internal::FrameBuffer* pointer )
 : BaseHandle( pointer )

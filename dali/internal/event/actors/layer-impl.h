@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,10 +199,10 @@ public:
 
   /**
    * Helper function to get the scene object.
-   * This should only be called by Stage
+   *
    * @return the scene object for the layer.
    */
-  const SceneGraph::Layer& GetSceneLayerOnStage() const;
+  const SceneGraph::Layer& GetSceneGraphLayer() const;
 
   /**
    * @copydoc Dali::Internal::Actor::DoAction()
@@ -245,16 +245,16 @@ private: // From Actor
   /**
    * From Actor.
    */
-  virtual void OnStageConnectionInternal();
+  virtual void OnSceneConnectionInternal();
 
   /**
    * From Actor.
    */
-  virtual void OnStageDisconnectionInternal();
+  virtual void OnSceneDisconnectionInternal();
 
 private:
 
-  LayerList* mLayerList; ///< Only valid when layer is on-stage
+  LayerList* mLayerList; ///< Only valid when layer is on-scene
 
   // These properties not animatable; the actor side has the most up-to-date values
   ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates

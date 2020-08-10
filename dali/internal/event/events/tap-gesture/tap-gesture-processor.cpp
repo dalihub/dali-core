@@ -223,7 +223,7 @@ void TapGestureProcessor::RemoveGestureDetector( TapGestureDetector* gestureDete
 
   if ( mTapGestureDetectors.empty() )
   {
-    mGestureRecognizer.Detach();
+    mGestureRecognizer = nullptr;
 
     ResetActor();
   }

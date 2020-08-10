@@ -131,8 +131,8 @@ public:
   virtual void OnInitialize( const char* name );
   void ResetCallStack();
   void AddToCallStacks( const char* method );
-  virtual void OnStageConnection( int depth );
-  virtual void OnStageDisconnection();
+  virtual void OnSceneConnection( int depth );
+  virtual void OnSceneDisconnection();
   virtual void OnChildAdd(Dali::Actor& child);
   virtual void OnChildRemove(Dali::Actor& child);
   virtual void OnPropertySet( Dali::Property::Index index, Dali::Property::Value propertyValue );
@@ -195,7 +195,7 @@ inline const TestCustomActor& GetImpl( const Test::TestCustomActor& handle )
 
 
 /**
- * Variant which adds a new child during OnStageConnection
+ * Variant which adds a new child during OnSceneConnection
  */
 struct TestCustomActorVariant1 : public TestCustomActor
 {
@@ -208,10 +208,10 @@ struct TestCustomActorVariant1 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection( depth );
+    TestCustomActor::OnSceneConnection( depth );
 
     // Add the child
     Self().Add( mChildToAdd );
@@ -221,7 +221,7 @@ struct TestCustomActorVariant1 : public TestCustomActor
 };
 
 /**
- * Variant which removes children during OnStageConnection
+ * Variant which removes children during OnSceneConnection
  */
 struct TestCustomActorVariant2 : public TestCustomActor
 {
@@ -233,10 +233,10 @@ struct TestCustomActorVariant2 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection( depth );
+    TestCustomActor::OnSceneConnection( depth );
 
     // Remove all the children
     for( uint32_t i=0, num=Self().GetChildCount(); i<num; ++i )
@@ -247,7 +247,7 @@ struct TestCustomActorVariant2 : public TestCustomActor
 };
 
 /**
- * Variant which adds a new child during OnStageDisconnection
+ * Variant which adds a new child during OnSceneDisconnection
  */
 struct TestCustomActorVariant3 : public TestCustomActor
 {
@@ -260,10 +260,10 @@ struct TestCustomActorVariant3 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
     // Chain up first
-    TestCustomActor::OnStageDisconnection();
+    TestCustomActor::OnSceneDisconnection();
 
     // Add the child
     Self().Add( mChildToAdd );
@@ -273,7 +273,7 @@ struct TestCustomActorVariant3 : public TestCustomActor
 };
 
 /**
- * Variant which removes children during OnStageDisconnection
+ * Variant which removes children during OnSceneDisconnection
  */
 struct TestCustomActorVariant4 : public TestCustomActor
 {
@@ -285,10 +285,10 @@ struct TestCustomActorVariant4 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
     // Chain up first
-    TestCustomActor::OnStageDisconnection();
+    TestCustomActor::OnSceneDisconnection();
 
     // Remove all the children
     for( uint32_t i=0, num=Self().GetChildCount(); i<num; ++i )
@@ -299,7 +299,7 @@ struct TestCustomActorVariant4 : public TestCustomActor
 };
 
 /**
- * Variant which removes its parent from Stage during OnStageConnection
+ * Variant which removes its parent from Stage during OnSceneConnection
  */
 struct TestCustomActorVariant5 : public TestCustomActor
 {
@@ -312,10 +312,10 @@ struct TestCustomActorVariant5 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
     // Chain up first
-    TestCustomActor::OnStageConnection( depth );
+    TestCustomActor::OnSceneConnection( depth );
 
     // Take parent off-stage
     Dali::Actor parent = Self().GetParent();
@@ -330,7 +330,7 @@ private:
 };
 
 /**
- * Variant which adds its parent to Stage during OnStageDisconnection
+ * Variant which adds its parent to Stage during OnSceneDisconnection
  */
 struct TestCustomActorVariant6 : public TestCustomActor
 {
@@ -343,10 +343,10 @@ struct TestCustomActorVariant6 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
     // Chain up first
-    TestCustomActor::OnStageDisconnection();
+    TestCustomActor::OnSceneDisconnection();
 
     // Put parent on-stage
     Dali::Actor parent = Self().GetParent();
@@ -444,10 +444,10 @@ public:
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
   }
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
   }
   virtual void OnChildAdd(Dali::Actor& child)

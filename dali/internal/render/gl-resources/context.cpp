@@ -69,7 +69,7 @@ Context::Context( Integration::GlAbstraction& glAbstraction )
 {
 }
 
-Context::Context( Integration::GlAbstraction& glAbstraction, std::vector< Context* >* contexts )
+Context::Context( Integration::GlAbstraction& glAbstraction, OwnerContainer< Context* >* contexts )
 : mGlAbstraction(glAbstraction),
   mGlContextCreated(false),
   mColorMask(true),
@@ -119,16 +119,17 @@ void Context::GlContextCreated()
 {
   DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::GlContextCreated()\n");
 
-  DALI_ASSERT_DEBUG(!mGlContextCreated);
+  if( !mGlContextCreated )
+  {
+    mGlContextCreated = true;
 
-  mGlContextCreated = true;
-
-  // Set the initial GL state, and check it.
-  InitializeGlState();
+    // Set the initial GL state, and check it.
+    InitializeGlState();
 
 #ifdef DEBUG_ENABLED
-  PrintCurrentState();
+    PrintCurrentState();
 #endif
+  }
 }
 
 void Context::GlContextDestroyed()

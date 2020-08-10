@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_HELPER_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
-  DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+  static_assert( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY( count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex ) \
   Dali::PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace:: develNamespace ::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty ); \
-  DALI_COMPILE_TIME_ASSERT( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
+  static_assert( ( objectNamespace:: develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
 /**
  * @brief These macros are used to define properties for implementations of CustomActor.

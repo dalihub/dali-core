@@ -54,16 +54,9 @@ Actor::~Actor()
 {
 }
 
-Actor::Actor(const Actor& copy)
-: Handle(copy)
-{
-}
+Actor::Actor(const Actor& copy) = default;
 
-Actor& Actor::operator=(const Actor& rhs)
-{
-  BaseHandle::operator=(rhs);
-  return *this;
-}
+Actor& Actor::operator=(const Actor& rhs) = default;
 
 Actor::Actor( Actor&& rhs ) = default;
 
@@ -231,14 +224,14 @@ Actor::WheelEventSignalType& Actor::WheelEventSignal()
   return GetImplementation(*this).WheelEventSignal();
 }
 
-Actor::OnStageSignalType& Actor::OnStageSignal()
+Actor::OnSceneSignalType& Actor::OnSceneSignal()
 {
-  return GetImplementation(*this).OnStageSignal();
+  return GetImplementation(*this).OnSceneSignal();
 }
 
-Actor::OffStageSignalType& Actor::OffStageSignal()
+Actor::OffSceneSignalType& Actor::OffSceneSignal()
 {
-  return GetImplementation(*this).OffStageSignal();
+  return GetImplementation(*this).OffSceneSignal();
 }
 
 uint32_t Actor::AddRenderer( Renderer& renderer )
