@@ -826,10 +826,7 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
     i++;
   }
 
-  if( j != mImpl->itemsDirtyRects.begin() )
-  {
-    mImpl->itemsDirtyRects.resize(j - mImpl->itemsDirtyRects.begin());
-  }
+  mImpl->itemsDirtyRects.resize(j - mImpl->itemsDirtyRects.begin());
   damagedRectCleaner.SetCleanOnReturn(false);
 }
 
