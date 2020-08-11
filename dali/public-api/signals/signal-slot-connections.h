@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_SLOT_CONNECTIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,8 +80,10 @@ public:
 
 private:
 
-  SlotConnection( const SlotConnection& );            ///< undefined copy constructor @SINCE_1_0.0
-  SlotConnection& operator=( const SlotConnection& ); ///< undefined assignment operator @SINCE_1_0.0
+  SlotConnection( const SlotConnection& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  SlotConnection( SlotConnection&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  SlotConnection& operator=( const SlotConnection& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SlotConnection& operator=( SlotConnection&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
 
@@ -148,8 +150,10 @@ public:
 
 private:
 
-  SignalConnection( const SignalConnection& );            ///< undefined copy constructor @SINCE_1_0.0
-  SignalConnection& operator=( const SignalConnection& ); ///< undefined assignment operator @SINCE_1_0.0
+  SignalConnection( const SignalConnection& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  SignalConnection( SignalConnection&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  SignalConnection& operator=( const SignalConnection& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SignalConnection& operator=( SignalConnection&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
 

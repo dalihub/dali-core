@@ -225,17 +225,10 @@ public:
       }
     };
 
-    /**
-     * @brief Undefined copy constructor.
-     * @SINCE_1_0.0
-     */
-    Function( const Function& );
-
-    /**
-     * @brief Undefined assignment operator.
-     * @SINCE_1_0.0
-     */
-    Function& operator=( const Function& );
+    Function( const Function& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+    Function( Function&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+    Function& operator=( const Function& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+    Function& operator=( Function&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
     /**
      * @brief Constructor used when copying the stored object.

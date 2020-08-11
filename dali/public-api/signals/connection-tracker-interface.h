@@ -2,7 +2,7 @@
 #define DALI_CONNECTION_TRACKER_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,8 +78,10 @@ public:
 
 private:
 
-  ConnectionTrackerInterface( const ConnectionTrackerInterface& );            ///< undefined copy constructor @SINCE_1_0.0
-  ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ); ///< undefined assignment operator @SINCE_1_0.0
+  ConnectionTrackerInterface( const ConnectionTrackerInterface& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  ConnectionTrackerInterface( ConnectionTrackerInterface&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  ConnectionTrackerInterface& operator=( ConnectionTrackerInterface&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 };
 
 /**
