@@ -46,6 +46,24 @@ Mutex::~Mutex()
   delete mImpl;
 }
 
+Mutex::Mutex(Mutex&& rhs) noexcept
+  : mImpl(rhs.mImpl)
+{
+  rhs.mImpl = nullptr;
+}
+
+Mutex &Mutex::operator=(Mutex&& rhs) noexcept
+{
+  if (mImpl != rhs.mImpl)
+  {
+    delete mImpl;
+    mImpl = rhs.mImpl;
+    rhs.mImpl = nullptr;
+  }
+
+  return *this;
+}
+
 bool Mutex::IsLocked()
 {
   return mImpl->locked;

@@ -70,7 +70,7 @@ public:
   UpdateProxy( const UpdateProxy& )            = delete;  ///< Deleted copy constructor.
   UpdateProxy( UpdateProxy&& )                 = default; ///< Default move constructor.
   UpdateProxy& operator=( const UpdateProxy& ) = delete;  ///< Deleted copy assignment operator.
-  UpdateProxy& operator=( UpdateProxy&& )      = default; ///< Default move assignment operator.
+  UpdateProxy& operator=( UpdateProxy&& )      = delete;  ///< Deleted move assignment operator.
 
   /**
    * @copydoc Dali::UpdateProxy::GetPosition()

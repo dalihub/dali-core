@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <type_traits>
+#include <utility>
 
 using Dali::Mutex;
 using Dali::Thread;
@@ -48,6 +49,20 @@ int UtcDaliMutexSingleThread(void)
     Mutex::ScopedLock lock(mutex3);
   }
   DALI_TEST_EQUALS(false, mutex3.IsLocked(), TEST_LOCATION);
+
+  {
+    Mutex mutex4;
+    Mutex mutex5(std::move(mutex4)); // move constructor
+    Mutex::ScopedLock lock(mutex5);
+    DALI_TEST_EQUALS(true, mutex5.IsLocked(), TEST_LOCATION);
+  }
+
+  {
+    Mutex mutex4, mutex5;
+    mutex5 = std::move(mutex4); // move assignment
+    Mutex::ScopedLock lock(mutex5);
+    DALI_TEST_EQUALS(true, mutex5.IsLocked(), TEST_LOCATION);
+  }
 
   END_TEST;
 }

@@ -43,6 +43,16 @@ public:
   ~Mutex();
 
   /**
+   * @brief Move constructor
+   */
+  Mutex(Mutex&& rhs) noexcept;
+
+  /**
+   * @brief Move assignment
+   */
+  Mutex &operator=(Mutex&& rhs) noexcept;
+
+  /**
    * @brief Check if the mutex is locked
    * @return true if the mutex is locked
    */
