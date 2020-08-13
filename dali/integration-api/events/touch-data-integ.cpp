@@ -1,8 +1,5 @@
-#ifndef DALI_TOUCH_DATA_DEVEL_H
-#define DALI_TOUCH_DATA_DEVEL_H
-
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
+#include <dali/integration-api/events/touch-data-integ.h>
+#include <dali/internal/event/events/touch-data-impl.h>
 
 namespace Dali
 {
-
-class TouchData;
-struct TouchEvent;
-
-namespace DevelTouchData
+namespace Integration
 {
 
-/**
- * @brief Convert TouchEvent to TouchData.
- *
- * @return The TouchData convert from Dali::TouchEvent
- *
- * @note Use this API with caution.
-*/
-DALI_CORE_API TouchData Convert( const TouchEvent& touchEvent );
+Dali::TouchData NewTouchData(uint32_t timestamp, const TouchPoint& point)
+{
+  Internal::TouchDataPtr touchDataImpl( new Internal::TouchData(timestamp) );
+  touchDataImpl->AddPoint(Integration::Point(point));
+  Dali::TouchData handle(touchDataImpl.Get());
+  return handle;
+}
 
-} // namespace DevelTouchData
+} // namespace Integration
 
 } // namespace Dali
-
-
-
-#endif // DALI_TOUCH_DATA_DEVEL_H

@@ -24,7 +24,6 @@
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-utils.h>
 #include <test-touch-data-utils.h>
 
 using namespace Dali;
@@ -116,16 +115,15 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 };
 
 // Functor for receiving a touch event
-struct TouchEventFunctor
+struct TouchDataFunctor
 {
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, Dali::TouchData touch)
   {
     //For line coverage
     unsigned int points = touch.GetPointCount();
     if( points > 0)
     {
-      const TouchPoint& touchPoint = touch.GetPoint(0);
-      tet_printf("Touch Point state = %d\n", touchPoint.state);
+      tet_printf("Touch Point state = %d\n", touch.GetState(0));
     }
     return false;
   }
@@ -209,8 +207,8 @@ int UtcDaliLongPressGestureDetectorNew(void)
 
   detector.Attach(actor);
 
-  TouchEventFunctor touchFunctor;
-  actor.TouchedSignal().Connect(&application, touchFunctor);
+  TouchDataFunctor touchFunctor;
+  actor.TouchSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -224,8 +222,6 @@ int UtcDaliLongPressGestureDetectorNew(void)
   application.SendNotification();
   application.Render();
 
-  // For line coverage, Initialise default constructor
-  TouchEvent touchEvent2;
   END_TEST;
 }
 
@@ -493,9 +489,6 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   parent.Add(child);
-
-  TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();

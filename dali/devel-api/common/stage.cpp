@@ -144,13 +144,6 @@ Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
   return GetImplementation(*this).EventProcessingFinishedSignal();
 }
 
-Stage::TouchedSignalType& Stage::TouchedSignal()
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchedSignal() is deprecated and will be removed from next release. Use TouchSignal() instead.\n" );
-
-  return GetImplementation(*this).TouchedSignal();
-}
-
 Stage::TouchSignalType& Stage::TouchSignal()
 {
   return GetImplementation( *this ).TouchSignal();

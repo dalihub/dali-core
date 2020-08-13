@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-data-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -260,26 +261,6 @@ struct OutOfBoundsFunctor
   bool returnValue;
 };
 
-struct TouchEventFunctor
-{
-  /**
-   * Constructor.
-   * @param[in]  functorCalled  Reference to a boolean which is set to true if the touch event functor is called.
-   */
-  TouchEventFunctor( bool& functorCalled )
-  : functorCalled( functorCalled )
-  {
-  }
-
-  bool operator()( Actor actor, const TouchEvent& touch )
-  {
-    functorCalled = true;
-    return true;
-  }
-
-  bool& functorCalled;
-};
-
 Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition )
 {
   Integration::TouchEvent touchEvent;
@@ -309,7 +290,7 @@ int UtcDaliTouchDataNormalProcessing01(void)
   application.SendNotification();
   application.Render();
 
-  // Connect to actor's touched signal
+  // Connect to actor's touch signal
   SignalData data;
   TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
@@ -1914,7 +1895,7 @@ int UtcDaliTouchDataGetPressure(void)
   END_TEST;
 }
 
-int UtcDaliTouchDataAndEventUsage(void)
+int UtcDaliTouchDataUsage(void)
 {
   TestApplication application;
 
@@ -1932,15 +1913,11 @@ int UtcDaliTouchDataAndEventUsage(void)
   TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
-  // Connect to actor's touched signal (OLD)
-  bool touchEventFunctorCalled = false;
-  TouchEventFunctor eventFunctor( touchEventFunctorCalled );
-  actor.TouchedSignal().Connect( &application, eventFunctor );
 
   // Emit a down signal with an angle
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( true, touchEventFunctorCalled, TEST_LOCATION );
+
 
   END_TEST;
 }
@@ -2085,6 +2062,21 @@ int UtcDaliTouchDataCapturePropertySet(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::FINISHED, Vector2( 110.0f, 110.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( data.touchData.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTouchDataIntegNewTouchData(void)
+{
+  uint32_t timestamp = 92858u;
+  TouchPoint tp(1, TouchPoint::State::Started, 34.4f, 123.89f, 5.0f, 7.0f);
+  Dali::TouchData touchData = Integration::NewTouchData(timestamp, tp);
+
+  DALI_TEST_EQUALS(touchData.GetPointCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchData.GetState(0), PointState::Type::STARTED, TEST_LOCATION );
+  DALI_TEST_EQUALS(touchData.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS(touchData.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION );
+
 
   END_TEST;
 }

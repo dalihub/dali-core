@@ -1406,11 +1406,10 @@ public:
 
   /**
    * Used by the EventProcessor to emit touch event signals.
-   * @param[in] event The touch event (Old API).
    * @param[in] touch The touch data.
    * @return True if the event was consumed.
    */
-  bool EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData& touch );
+  bool EmitTouchEventSignal( const Dali::TouchData& touch );
 
   /**
    * Used by the EventProcessor to emit hover event signals.
@@ -1450,11 +1449,6 @@ public:
    * @param[in] child The child actor that has been removed
    */
   void EmitChildRemovedSignal( Actor& child );
-
-  /**
-   * @copydoc Dali::Actor::TouchedSignal()
-   */
-  Dali::Actor::TouchSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Actor::TouchEventSignal()
@@ -1838,17 +1832,6 @@ private:
 
   /**
    * For use in derived classes.
-   * This is only called if mDerivedRequiresTouch is true, and the touch-signal was not consumed.
-   * @param[in] event The touch event.
-   * @return True if the event should be consumed.
-   */
-  virtual bool OnTouchEvent( const TouchEvent& event )
-  {
-    return false;
-  }
-
-  /**
-   * For use in derived classes.
    * This is only called if mDerivedRequiresHover is true, and the hover-signal was not consumed.
    * @param[in] event The hover event.
    * @return True if the event should be consumed.
@@ -1984,7 +1967,6 @@ protected:
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchSignalType             mTouchedSignal;
   Dali::Actor::TouchDataSignalType         mTouchSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;

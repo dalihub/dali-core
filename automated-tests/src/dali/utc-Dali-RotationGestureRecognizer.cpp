@@ -24,7 +24,7 @@
 #include <dali/devel-api/events/rotation-gesture.h>
 #include <dali/devel-api/events/rotation-gesture-detector.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-utils.h>
+
 
 using namespace Dali;
 
