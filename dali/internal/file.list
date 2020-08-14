@@ -58,7 +58,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/hover-event-processor.cpp
   ${internal_src_dir}/event/events/wheel-event-processor.cpp
   ${internal_src_dir}/event/events/multi-point-event-util.cpp
-  ${internal_src_dir}/event/events/touch-data-impl.cpp
+  ${internal_src_dir}/event/events/touch-event-impl.cpp
   ${internal_src_dir}/event/events/touch-event-processor.cpp
   ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-detector-impl.cpp
   ${internal_src_dir}/event/events/long-press-gesture/long-press-gesture-event.cpp
