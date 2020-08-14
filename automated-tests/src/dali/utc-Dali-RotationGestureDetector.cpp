@@ -26,7 +26,6 @@
 #include <dali/devel-api/events/rotation-gesture-detector.h>
 #include <dali-test-suite-utils.h>
 #include <test-touch-utils.h>
-#include <test-touch-data-utils.h>
 
 using namespace Dali;
 
@@ -1106,51 +1105,3 @@ int UtcDaliRotationGestureLayerConsumesTouch(void)
   END_TEST;
 }
 
-int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  application.GetScene().Add(actor);
-
-  bool consume = false;
-  TouchDataFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchSignal().Connect(&application,touchFunctor);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  SignalData data;
-  GestureReceivedFunctor functor(data);
-
-  RotationGestureDetector detector = RotationGestureDetector::New();
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect(&application, functor);
-
-  // Start gesture within the actor's area, we should receive the pinch as the touch is NOT being consumed
-  TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
-                                   Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
-
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
-  data.Reset();
-
-  // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
-  consume = true;
-
-  TestContinueRotation( application, Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
-                                     Vector2( 15.0f, 20.0f ), Vector2( 25.0f, 20.0f ), 500 );
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
-  data.Reset();
-
-  // Start another pinch, we should not even get the callback this time
-  TestStartRotation( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
-                                   Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-
-  END_TEST;
-}
