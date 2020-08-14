@@ -30,6 +30,14 @@ Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point)
   return handle;
 }
 
+Dali::TouchEvent NewTouchEvent( uint32_t timeStamp, const Dali::Integration::Point& point )
+{
+  Internal::TouchEventPtr touchEventImpl( new Internal::TouchEvent( timeStamp ) );
+  touchEventImpl->AddPoint( point );
+  Dali::TouchEvent handle( touchEventImpl.Get() );
+  return handle;
+}
+
 } // namespace Integration
 
 } // namespace Dali
