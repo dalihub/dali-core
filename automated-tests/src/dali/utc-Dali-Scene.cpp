@@ -103,32 +103,13 @@ struct TouchedSignalData
     functorCalled = false;
     createNewScene = false;
     newSceneCreated = false;
-
-    receivedTouchEvent.points.clear();
-    receivedTouchEvent.time = 0;
-
     receivedTouchData.Reset();
   }
 
   bool functorCalled;
   bool createNewScene;
   bool newSceneCreated;
-  TouchEvent receivedTouchEvent;
   TouchData receivedTouchData;
-};
-
-// Functor that sets the data when touched signal is received
-struct TouchedFunctor
-{
-  TouchedFunctor( TouchedSignalData& data ) : signalData( data ) { }
-
-  void operator()( const TouchEvent& touch )
-  {
-    signalData.functorCalled = true;
-    signalData.receivedTouchEvent = touch;
-  }
-
-  TouchedSignalData& signalData;
 };
 
 // Functor that sets the data when touched signal is received
@@ -139,7 +120,8 @@ struct TouchFunctor
   void operator()( const TouchData& touch )
   {
     signalData.functorCalled = true;
-    signalData.receivedTouchData = touch;
+    Dali::TouchData touchData (touch);
+    signalData.receivedTouchData = touchData;
 
     if ( signalData.createNewScene )
     {
@@ -244,7 +226,7 @@ void GenerateTouch( TestApplication& application, PointState::Type state, const 
   application.ProcessEvent( touchEvent );
 }
 
-bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
+bool DummyTouchCallback( Actor actor, const TouchData& touch )
 {
   return true;
 }
@@ -678,7 +660,7 @@ int UtcDaliSceneTouchSignalP(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchedSignal().Connect( &DummyTouchCallback );
+  actor.TouchSignal().Connect( &DummyTouchCallback );
   scene.Add( actor );
 
   // Render and notify.
@@ -801,7 +783,7 @@ int UtcDaliSceneTouchSignalN(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchedSignal().Connect( &DummyTouchCallback );
+  actor.TouchSignal().Connect( &DummyTouchCallback );
   scene.Add( actor );
 
   // Render and notify.
@@ -1195,7 +1177,7 @@ int UtcDaliSceneEmptySceneRendering(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer( renderer );
-  
+
   actor.SetProperty( Actor::Property::SIZE, Vector2( 400, 400 ) );
   application.GetScene().Add( actor );
 

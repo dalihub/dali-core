@@ -24,7 +24,6 @@
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-utils.h>
 #include <test-touch-data-utils.h>
 
 using namespace Dali;
@@ -116,16 +115,15 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 };
 
 // Functor for receiving a touch event
-struct TouchEventFunctor
+struct TouchDataFunctor
 {
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, Dali::TouchData touch)
   {
     //For line coverage
     unsigned int points = touch.GetPointCount();
     if( points > 0)
     {
-      const TouchPoint& touchPoint = touch.GetPoint(0);
-      tet_printf("Touch Point state = %d\n", touchPoint.state);
+      tet_printf("Touch Point state = %d\n", touch.GetState(0));
     }
     return false;
   }
@@ -209,8 +207,8 @@ int UtcDaliLongPressGestureDetectorNew(void)
 
   detector.Attach(actor);
 
-  TouchEventFunctor touchFunctor;
-  actor.TouchedSignal().Connect(&application, touchFunctor);
+  TouchDataFunctor touchFunctor;
+  actor.TouchSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -224,8 +222,6 @@ int UtcDaliLongPressGestureDetectorNew(void)
   application.SendNotification();
   application.Render();
 
-  // For line coverage, Initialise default constructor
-  TouchEvent touchEvent2;
   END_TEST;
 }
 
@@ -493,9 +489,6 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   parent.Add(child);
-
-  TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1040,3 +1033,52 @@ int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
 
   END_TEST;
 }
+
+int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
+{
+  // Crash occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Add a detector
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  bool functorCalled = false;
+  detector.Attach( actor );
+  detector.DetectedSignal().Connect(
+      &application,
+      [&detector, &functorCalled](Actor actor, const LongPressGesture& gesture)
+      {
+        if( gesture.state == Gesture::Finished )
+        {
+          detector.Detach(actor);
+          functorCalled = true;
+        }
+      });
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Try the gesture, should not crash
+  try
+  {
+    TestGenerateLongPress( application, 50.0f, 10.0f );
+    TestEndLongPress( application, 50.0f, 10.0f );
+
+    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+  }
+
+  END_TEST;
+}
+
+

@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
  * class MyClass : public ConnectionTracker
  * {
  *
- *   void Callback( Actor actor, const TouchEvent& event )
+ *   void Callback( Actor actor, const TouchData& event )
  *   {
  *     ...
  *   }
@@ -40,7 +40,7 @@
  *   {
  *     Actor actor = Actor::New();
  *
- *     actor.TouchedSignal().Connect( this, &MyClass::Callback );
+ *     actor.TouchSignal().Connect( this, &MyClass::Callback );
  *   }
  *
  *   ~MyClass()
@@ -294,8 +294,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -461,8 +463,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -628,8 +632,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -796,8 +802,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -967,8 +975,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -1135,8 +1145,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -1304,8 +1316,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 
@@ -1475,8 +1489,10 @@ public:
 
 private:
 
-  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal& operator=( const Signal& );        ///< undefined assignment operator @SINCE_1_0.0
+  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
 

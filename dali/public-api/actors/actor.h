@@ -50,7 +50,6 @@ struct Degree;
 class Quaternion;
 class Layer;
 class TouchData;
-struct TouchEvent;
 struct HoverEvent;
 struct WheelEvent;
 struct Vector2;
@@ -66,7 +65,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *
  * <h3>Multi-Touch Events:</h3>
  *
- * Touch or hover events are received via signals; see Actor::TouchedSignal() and Actor::HoveredSignal() for more details.
+ * Touch or hover events are received via signals; see Actor::TouchSignal() and Actor::HoveredSignal() for more details.
  *
  * <i>Hit Testing Rules Summary:</i>
  *
@@ -221,7 +220,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  * Signals
  * | %Signal Name      | Method                       |
  * |-------------------|------------------------------|
- * | touched           | @ref TouchedSignal()         |
+ * | touch             | @ref TouchSignal()           |
  * | hovered           | @ref HoveredSignal()         |
  * | wheelEvent        | @ref WheelEventSignal()      |
  * | onScene           | @ref OnSceneSignal()         |
@@ -731,7 +730,6 @@ public:
 
   // Typedefs
 
-  typedef Signal< bool (Actor, const TouchEvent&) > TouchSignalType;        ///< @DEPRECATED_1_1.37 @brief Touch signal type @SINCE_1_0.0
   typedef Signal< bool (Actor, const TouchData&) >  TouchDataSignalType;    ///< Touch signal type @SINCE_1_1.37
   typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
   typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
@@ -1161,22 +1159,6 @@ public: // Renderer
   void RemoveRenderer( uint32_t index );
 
 public: // Signals
-
-  /**
-   * @DEPRECATED_1_1.37 Use TouchSignal() instead.
-   * @brief This signal is emitted when touch input is received.
-   *
-   * A callback of the following type may be connected:
-   * @code
-   *   bool YourCallbackName(Actor actor, const TouchEvent& event);
-   * @endcode
-   * The return value of True, indicates that the touch event should be consumed.
-   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
-   * @SINCE_1_0.0
-   * @return The signal to connect to
-   * @pre The Actor has been initialized.
-   */
-  TouchSignalType& TouchedSignal() DALI_DEPRECATED_API;
 
   /**
    * @brief This signal is emitted when touch input is received.

@@ -225,7 +225,6 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultPropert
 
 // Signals
 
-const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_HOVERED = "hovered";
 const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
 const char* const SIGNAL_ON_SCENE = "onScene";
@@ -249,7 +248,6 @@ BaseHandle CreateActor()
 
 TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties );
 
-SignalConnectorType signalConnector1( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_HOVERED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector4( mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal );
@@ -1790,7 +1788,7 @@ bool Actor::IsKeyboardFocusable() const
 
 bool Actor::GetTouchRequired() const
 {
-  return !mTouchedSignal.Empty() || !mTouchSignal.Empty() || mDerivedRequiresTouch;
+  return !mTouchSignal.Empty() || mDerivedRequiresTouch;
 }
 
 bool Actor::GetHoverRequired() const
@@ -1824,7 +1822,7 @@ bool Actor::IsGestureRequred( DevelGesture::Type type ) const
   return mGestureData && mGestureData->IsGestureRequred( type );
 }
 
-bool Actor::EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData& touch )
+bool Actor::EmitTouchEventSignal( const Dali::TouchData& touch )
 {
   bool consumed = false;
 
@@ -1834,22 +1832,10 @@ bool Actor::EmitTouchEventSignal( const TouchEvent& event, const Dali::TouchData
     consumed = mTouchSignal.Emit( handle, touch );
   }
 
-  if( !mTouchedSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    consumed |= mTouchedSignal.Emit( handle, event );
-  }
-
-  if( !consumed )
-  {
-    // Notification for derived classes
-    consumed = OnTouchEvent( event ); // TODO
-  }
-
   return consumed;
 }
 
-bool Actor::EmitHoverEventSignal( const HoverEvent& event )
+bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
 {
   bool consumed = false;
 
@@ -1923,11 +1909,6 @@ void Actor::EmitChildRemovedSignal( Actor& child )
   }
 }
 
-Dali::Actor::TouchSignalType& Actor::TouchedSignal()
-{
-  return mTouchedSignal;
-}
-
 Dali::Actor::TouchDataSignalType& Actor::TouchSignal()
 {
   return mTouchSignal;
@@ -1988,11 +1969,7 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   bool connected( true );
   Actor* actor = static_cast< Actor* >( object ); // TypeRegistry guarantees that this is the correct type.
 
-  if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
-  {
-    actor->TouchedSignal().Connect( tracker, functor );
-  }
-  else if( 0 == signalName.compare( SIGNAL_HOVERED ) )
+  if( 0 == signalName.compare( SIGNAL_HOVERED ) )
   {
     actor->HoveredSignal().Connect( tracker, functor );
   }
@@ -2051,7 +2028,6 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
   mGestureData( NULL ),
-  mTouchedSignal(),
   mTouchSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),

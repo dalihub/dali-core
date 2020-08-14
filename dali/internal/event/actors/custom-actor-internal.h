@@ -134,14 +134,6 @@ private:
   }
 
   /**
-   * @copydoc Internal::Actor::OnTouchEvent
-   */
-  virtual bool OnTouchEvent(const TouchEvent& event)
-  {
-    return mImpl->OnTouchEvent(event);
-  }
-
-  /**
    * @copydoc Internal::Actor::OnHoverEvent
    */
   virtual bool OnHoverEvent(const HoverEvent& event)

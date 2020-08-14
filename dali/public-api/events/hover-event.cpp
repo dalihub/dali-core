@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,67 @@
 #include <dali/public-api/events/hover-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/internal/event/events/hover-event-impl.h>
 
 namespace Dali
 {
 
 HoverEvent::HoverEvent()
-: time(0)
+: BaseHandle()
 {
 }
 
-HoverEvent::HoverEvent(unsigned long time)
-: time(time)
-{
-}
+HoverEvent::HoverEvent( const HoverEvent& rhs ) = default;
+
+HoverEvent::HoverEvent( HoverEvent&& rhs ) = default;
 
 HoverEvent::~HoverEvent()
 {
 }
 
-uint32_t HoverEvent::GetPointCount() const
+HoverEvent& HoverEvent::operator=( const HoverEvent& rhs ) = default;
+
+HoverEvent& HoverEvent::operator=( HoverEvent&& rhs ) = default;
+
+unsigned long HoverEvent::GetTime() const
 {
-  return static_cast<uint32_t>( points.size() );
+  return GetImplementation( *this ).GetTime();
 }
 
-const TouchPoint& HoverEvent::GetPoint( uint32_t point ) const
+std::size_t HoverEvent::GetPointCount() const
 {
-  DALI_ASSERT_ALWAYS( point < points.size() && "No point at index" );
-  return points[point];
+  return GetImplementation( *this ).GetPointCount();
+}
+
+int32_t HoverEvent::GetDeviceId( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceId( point );
+}
+
+PointState::Type HoverEvent::GetState( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetState( point );
+}
+
+Actor HoverEvent::GetHitActor( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetHitActor( point );
+}
+
+const Vector2& HoverEvent::GetLocalPosition( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetLocalPosition( point );
+}
+
+const Vector2& HoverEvent::GetScreenPosition( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetScreenPosition( point );
+}
+
+HoverEvent::HoverEvent( Internal::HoverEvent* internal )
+: BaseHandle( internal )
+{
 }
 
 } // namespace Dali

@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,8 +211,12 @@ protected: // for Derived classes
 private:
 
   // not copyable as it does not know the size of elements
-  VectorBase( const VectorBase& ); ///< Undefined @SINCE_1_0.0
-  VectorBase& operator=( const VectorBase& ); ///< Undefined @SINCE_1_0.0
+  VectorBase( const VectorBase& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  VectorBase& operator=( const VectorBase& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+
+  // not movable as this is handled by deriving classes
+  VectorBase( VectorBase&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  VectorBase& operator=( VectorBase&& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
 protected: // Data
 
@@ -454,8 +458,20 @@ public: // API
    */
   Vector( const Vector& vector )
   {
-    // reuse assignment
+    // reuse copy assignment
     operator=( vector );
+  }
+
+  /**
+   * @brief Default move constructor.
+   *
+   * @SINCE_1_9.25
+   * @param[in] vector Vector to move
+   */
+  Vector( Vector&& vector )
+  {
+    // reuse move assignment
+    operator=( std::move( vector ) );
   }
 
   /**
@@ -470,6 +486,26 @@ public: // API
     if( this != &vector )
     {
       VectorAlgorithms<BaseType>::Copy( vector, sizeof( ItemType ) );
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Default move assignment operator.
+   *
+   * @SINCE_1_9.25
+   * @param[in] vector Vector to move
+   */
+  Vector& operator=( Vector&& vector )
+  {
+    if( this != &vector )
+    {
+      if( VectorBase::mData )
+      {
+        Release();
+      }
+      VectorBase::mData = vector.mData;
+      vector.mData = nullptr;
     }
     return *this;
   }
