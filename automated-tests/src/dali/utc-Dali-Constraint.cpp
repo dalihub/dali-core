@@ -1405,3 +1405,150 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+int UtcDaliConstraintGetTargetObjectNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.GetTargetObject();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintSetRemoveActionNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    Dali::Constraint::RemoveAction arg1(Constraint::Bake);
+    instance.SetRemoveAction(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintGetTargetPropertyNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.GetTargetProperty();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintApplyNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.Apply();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintCloneNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    Dali::Handle arg1;
+    instance.Clone(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintRemoveNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.Remove();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintSetTagNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    unsigned int arg1(0u);
+    instance.SetTag(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintGetRemoveActionNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.GetRemoveAction();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliConstraintGetTagNegative(void)
+{
+  TestApplication application;
+  Dali::Constraint instance;
+  try
+  {
+    instance.GetTag();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

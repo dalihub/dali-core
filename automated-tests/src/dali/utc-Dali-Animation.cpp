@@ -13643,3 +13643,972 @@ int UtcDaliAnimationCountAndGetAnimationAt(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationSetLoopingNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetLooping(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetDurationNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetDuration(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetLoopCountNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetLoopCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetEndActionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Animation::EndAction arg1(Animation::Bake);
+    instance.SetEndAction(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetLoopCountNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    int arg1(0);
+    instance.SetLoopCount(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetPlayRangeNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Vector2 arg1;
+    instance.SetPlayRange(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative01(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    instance.AnimateBetween(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative02(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::Animation::Interpolation arg3(Animation::Linear);
+    instance.AnimateBetween(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative03(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::TimePeriod arg3(1.0f);
+    instance.AnimateBetween(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative04(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::TimePeriod arg3(1.0f);
+    Dali::Animation::Interpolation arg4(Animation::Linear);
+    instance.AnimateBetween(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative05(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::AlphaFunction arg3;
+    instance.AnimateBetween(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative06(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::AlphaFunction arg3;
+    Dali::Animation::Interpolation arg4(Animation::Linear);
+    instance.AnimateBetween(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative07(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::AlphaFunction arg3;
+    Dali::TimePeriod arg4(1.0f);
+    instance.AnimateBetween(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateBetweenNegative08(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::KeyFrames arg2;
+    Dali::AlphaFunction arg3;
+    Dali::TimePeriod arg4(1.0f);
+    Dali::Animation::Interpolation arg5(Animation::Linear);
+    instance.AnimateBetween(arg1,arg2,arg3,arg4,arg5);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationFinishedSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.FinishedSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetCurrentLoopNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetCurrentLoop();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetLoopingModeNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Animation::LoopingMode arg1(Animation::RESTART);
+    instance.SetLoopingMode(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetSpeedFactorNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetSpeedFactor(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetCurrentProgressNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetCurrentProgress();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetCurrentProgressNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetCurrentProgress(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetDisconnectActionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Animation::EndAction arg1(Animation::Bake);
+    instance.SetDisconnectAction(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationSetDefaultAlphaFunctionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::AlphaFunction arg1;
+    instance.SetDefaultAlphaFunction(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationHideNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    float arg2(0.0f);
+    instance.Hide(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.Play();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationShowNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    float arg2(0.0f);
+    instance.Show(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationStopNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.Stop();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationClearNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.Clear();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationPauseNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.Pause();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateNegative01(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    Dali::Path arg2;
+    Dali::Vector3 arg3;
+    instance.Animate(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateNegative02(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    Dali::Path arg2;
+    Dali::Vector3 arg3;
+    Dali::TimePeriod arg4(1.0f);
+    instance.Animate(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateNegative03(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    Dali::Path arg2;
+    Dali::Vector3 arg3;
+    Dali::AlphaFunction arg4;
+    instance.Animate(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateNegative04(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Actor arg1;
+    Dali::Path arg2;
+    Dali::Vector3 arg3;
+    Dali::AlphaFunction arg4;
+    Dali::TimePeriod arg5(1.0f);
+    instance.Animate(arg1,arg2,arg3,arg4,arg5);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayFromNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.PlayFrom(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByNegative01(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    instance.AnimateBy(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByNegative02(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::TimePeriod arg3(1.0f);
+    instance.AnimateBy(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByNegative03(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::AlphaFunction arg3;
+    instance.AnimateBy(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByNegative04(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::AlphaFunction arg3;
+    Dali::TimePeriod arg4(1.0f);
+    instance.AnimateBy(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToNegative01(void)
+{
+  TestApplication application;
+  Dali::Actor actor;
+  Dali::Animation instance;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    instance.AnimateTo(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToNegative02(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::TimePeriod arg3(1.0f);
+    instance.AnimateTo(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToNegative03(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::AlphaFunction arg3;
+    instance.AnimateTo(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToNegative04(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Actor::Property::POSITION);
+    Dali::Property::Value arg2;
+    Dali::AlphaFunction arg3;
+    Dali::TimePeriod arg4(1.0f);
+    instance.AnimateTo(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayAfterNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.PlayAfter(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetDurationNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetDuration();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetEndActionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetEndAction();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetPlayRangeNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetPlayRange();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetLoopingModeNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetLoopingMode();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetSpeedFactorNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetSpeedFactor();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetDisconnectActionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetDisconnectAction();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetDefaultAlphaFunctionNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetDefaultAlphaFunction();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationGetStateNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.GetState();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimationIsLoopingNegative(void)
+{
+  TestApplication application;
+  Dali::Animation instance;
+  try
+  {
+    instance.IsLooping();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliKeyFramesAddNegative01(void)
+{
+  TestApplication application;
+  Dali::KeyFrames instance;
+  try
+  {
+    float arg1(0.0f);
+    Dali::Property::Value arg2;
+    instance.Add(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliKeyFramesAddNegative02(void)
+{
+  TestApplication application;
+  Dali::KeyFrames instance;
+  try
+  {
+    float arg1(0.0f);
+    Dali::Property::Value arg2;
+    Dali::AlphaFunction arg3;
+    instance.Add(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliKeyFramesGetTypeNegative(void)
+{
+  TestApplication application;
+  Dali::KeyFrames instance;
+  try
+  {
+    instance.GetType();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

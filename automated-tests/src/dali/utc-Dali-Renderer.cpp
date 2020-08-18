@@ -3169,3 +3169,101 @@ int UtcDaliRendererAddDrawCommands(void)
 
   END_TEST;
 }
+int UtcDaliRendererSetGeometryNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    Dali::Geometry arg1;
+    instance.SetGeometry(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRendererSetTexturesNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    Dali::TextureSet arg1;
+    instance.SetTextures(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRendererSetShaderNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    Dali::Shader arg1;
+    instance.SetShader(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRendererGetGeometryNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    instance.GetGeometry();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRendererGetTexturesNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    instance.GetTextures();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRendererGetShaderNegative(void)
+{
+  TestApplication application;
+  Dali::Renderer instance;
+  try
+  {
+    instance.GetShader();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

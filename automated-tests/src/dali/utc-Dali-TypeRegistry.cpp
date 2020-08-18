@@ -2894,3 +2894,317 @@ int UtcDaliTypeInfoRegisterChildProperties03(void)
 
   END_TEST;
 }
+
+int UtcDaliTypeInfoGetActionNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetActionName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetSignalName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetCreatorNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetCreator();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetBaseNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetBaseName();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoCreateInstanceNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.CreateInstance();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetActionCountNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetActionCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalCountNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetSignalCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetPropertyNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    int arg1(0);
+    instance.GetPropertyName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetPropertyCountNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetPropertyCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetPropertyIndicesNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    Dali::Vector<int> arg1;
+    instance.GetPropertyIndices(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetChildPropertyNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    int arg1(0);
+    instance.GetChildPropertyName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetChildPropertyTypeNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    int arg1(0);
+    instance.GetChildPropertyType(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetChildPropertyIndexNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    std::string arg1;
+    instance.GetChildPropertyIndex(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetChildPropertyIndicesNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    Dali::Vector<int> arg1;
+    instance.GetChildPropertyIndices(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeInfo instance;
+  try
+  {
+    instance.GetName();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGetTypeInfoNegative01(void)
+{
+  TestApplication application;
+  Dali::TypeRegistry instance;
+  try
+  {
+    std::string arg1;
+    instance.GetTypeInfo(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGetTypeInfoNegative02(void)
+{
+  TestApplication application;
+  Dali::TypeRegistry instance;
+  try
+  {
+    instance.GetTypeInfo(typeid(unsigned int));
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGetTypeNameNegative(void)
+{
+  TestApplication application;
+  Dali::TypeRegistry instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetTypeName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGetTypeNameCountNegative(void)
+{
+  TestApplication application;
+  Dali::TypeRegistry instance;
+  try
+  {
+    instance.GetTypeNameCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

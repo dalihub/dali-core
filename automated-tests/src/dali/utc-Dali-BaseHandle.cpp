@@ -608,3 +608,54 @@ int UtcDaliBaseHandleCompareOperatorN(void)
 
   END_TEST;
 }
+
+int UtcDaliBaseHandleDoActionNegative(void)
+{
+  TestApplication application;
+  Dali::BaseHandle instance;
+  try
+  {
+    std::string arg1;
+    Dali::Property::Map arg2;
+    instance.DoAction(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliBaseHandleGetTypeInfoNegative(void)
+{
+  TestApplication application;
+  Dali::BaseHandle instance;
+  try
+  {
+    Dali::TypeInfo arg1;
+    instance.GetTypeInfo(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliBaseHandleGetTypeNameNegative(void)
+{
+  TestApplication application;
+  Dali::BaseHandle instance;
+  try
+  {
+    instance.GetTypeName();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

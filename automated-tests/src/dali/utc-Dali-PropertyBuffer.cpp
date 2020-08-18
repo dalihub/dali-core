@@ -291,3 +291,37 @@ int UtcDaliPropertyBufferInvalidTypeN(void)
   END_TEST;
 }
 
+
+int UtcDaliPropertyBufferSetDataNegative(void)
+{
+  TestApplication application;
+  Dali::PropertyBuffer instance;
+  try
+  {
+    void* arg1(nullptr);
+    unsigned long arg2(0u);
+    instance.SetData(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPropertyBufferGetSizeNegative(void)
+{
+  TestApplication application;
+  Dali::PropertyBuffer instance;
+  try
+  {
+    instance.GetSize();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

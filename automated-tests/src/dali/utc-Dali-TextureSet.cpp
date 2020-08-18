@@ -451,3 +451,89 @@ int UtcDaliTextureSetGetTextureCount1(void)
 
   END_TEST;
 }
+
+int UtcDaliTextureSetSetSamplerNegative(void)
+{
+  TestApplication application;
+  Dali::TextureSet instance;
+  try
+  {
+    unsigned long arg1(0u);
+    Dali::Sampler arg2;
+    instance.SetSampler(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureSetSetTextureNegative(void)
+{
+  TestApplication application;
+  Dali::TextureSet instance;
+  try
+  {
+    unsigned long arg1(0u);
+    Dali::Texture arg2;
+    instance.SetTexture(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetSamplerNegative(void)
+{
+  TestApplication application;
+  Dali::TextureSet instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetSampler(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetTextureNegative(void)
+{
+  TestApplication application;
+  Dali::TextureSet instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetTexture(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureSetGetTextureCountNegative(void)
+{
+  TestApplication application;
+  Dali::TextureSet instance;
+  try
+  {
+    instance.GetTextureCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
