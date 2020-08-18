@@ -48,6 +48,53 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 } // unnamed namespace
 #endif
 
+struct DirtyRect
+{
+  DirtyRect(Node* node, Render::Renderer* renderer, int frame, Rect<int>& rect)
+  : node(node),
+    renderer(renderer),
+    frame(frame),
+    rect(rect),
+    visited(true)
+  {
+  }
+
+  DirtyRect()
+  : node(nullptr),
+    renderer(nullptr),
+    frame(0),
+    rect(),
+    visited(true)
+  {
+  }
+
+  bool operator<(const DirtyRect& rhs) const
+  {
+    if (node == rhs.node)
+    {
+      if (renderer == rhs.renderer)
+      {
+        return frame > rhs.frame; // Most recent rects come first
+      }
+      else
+      {
+        return renderer < rhs.renderer;
+      }
+    }
+    else
+    {
+      return node < rhs.node;
+    }
+  }
+
+  Node* node;
+  Render::Renderer* renderer;
+  int frame;
+
+  Rect<int> rect;
+  bool visited;
+};
+
 /**
  * Structure to contain internal data
  */
@@ -78,6 +125,7 @@ struct RenderManager::Impl
     depthBufferAvailable( depthBufferAvailableParam ),
     stencilBufferAvailable( stencilBufferAvailableParam ),
     partialUpdateAvailable( partialUpdateAvailableParam ),
+    itemsCheckSum(0),
     defaultSurfaceOrientation( 0 )
   {
      // Create thread pool with just one thread ( there may be a need to create more threads in the future ).
@@ -175,6 +223,8 @@ struct RenderManager::Impl
   std::unique_ptr<Dali::ThreadPool>         threadPool;               ///< The thread pool
   Vector<GLuint>                            boundTextures;            ///< The textures bound for rendering
   Vector<GLuint>                            textureDependencyList;    ///< The dependency list of binded textures
+  std::size_t                               itemsCheckSum;            ///< The damaged render items checksum from previous prerender phase.
+  std::vector<DirtyRect>                    itemsDirtyRects;
   int                                       defaultSurfaceOrientation; ///< defaultSurfaceOrientation for the default surface we are rendering to
 };
 
@@ -611,19 +661,15 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects);
 
-
-
-  Internal::Scene& sceneInternal = GetImplementation(scene);
-  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
-
   // Mark previous dirty rects in the sorted array. The array is already sorted by node and renderer, frame number.
-  // so you don't need to sort: std::stable_sort(itemsDirtyRects.begin(), itemsDirtyRects.end());
-  std::vector<DirtyRect>& itemsDirtyRects = sceneInternal.GetItemsDirtyRects();
-  for (DirtyRect& dirtyRect : itemsDirtyRects)
+  // so you don't need to sort: std::stable_sort(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end());
+  for (DirtyRect& dirtyRect : mImpl->itemsDirtyRects)
   {
     dirtyRect.visited = false;
   }
 
+  Internal::Scene& sceneInternal = GetImplementation(scene);
+  SceneGraph::Scene* sceneObject = sceneInternal.GetSceneObject();
   uint32_t count = sceneObject->GetRenderInstructions().Count( mImpl->renderBufferIndex );
   for (uint32_t i = 0; i < count; ++i)
   {
@@ -726,11 +772,11 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
                 // 2. Mark the related dirty rects as visited so they will not be removed below.
                 // 3. Keep only last 3 dirty rects for the same node and renderer (Tizen uses 3 back buffers, Ubuntu 1).
                 dirtyRect.rect = rect;
-                auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-                dirtyRectPos = itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
+                auto dirtyRectPos = std::lower_bound(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end(), dirtyRect);
+                dirtyRectPos = mImpl->itemsDirtyRects.insert(dirtyRectPos, dirtyRect);
 
                 int c = 1;
-                while (++dirtyRectPos != itemsDirtyRects.end())
+                while (++dirtyRectPos != mImpl->itemsDirtyRects.end())
                 {
                   if (dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
                   {
@@ -744,7 +790,7 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
                   c++;
                   if (c > 3) // no more then 3 previous rects
                   {
-                    itemsDirtyRects.erase(dirtyRectPos);
+                    mImpl->itemsDirtyRects.erase(dirtyRectPos);
                     break;
                   }
                 }
@@ -756,8 +802,8 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
             {
               // 1. The item is not dirty, the node and renderer referenced by the item are still exist.
               // 2. Mark the related dirty rects as visited so they will not be removed below.
-              auto dirtyRectPos = std::lower_bound(itemsDirtyRects.begin(), itemsDirtyRects.end(), dirtyRect);
-              while (dirtyRectPos != itemsDirtyRects.end())
+              auto dirtyRectPos = std::lower_bound(mImpl->itemsDirtyRects.begin(), mImpl->itemsDirtyRects.end(), dirtyRect);
+              while (dirtyRectPos != mImpl->itemsDirtyRects.end())
               {
                 if (dirtyRectPos->node != item.mNode || dirtyRectPos->renderer != item.mRenderer)
                 {
@@ -775,9 +821,9 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
   }
 
   // Check removed nodes or removed renderers dirty rects
-  auto i = itemsDirtyRects.begin();
-  auto j = itemsDirtyRects.begin();
-  while (i != itemsDirtyRects.end())
+  auto i = mImpl->itemsDirtyRects.begin();
+  auto j = mImpl->itemsDirtyRects.begin();
+  while (i != mImpl->itemsDirtyRects.end())
   {
     if (i->visited)
     {
@@ -791,9 +837,9 @@ void RenderManager::PreRender( Integration::Scene& scene, std::vector<Rect<int>>
     i++;
   }
 
-  if( j != itemsDirtyRects.begin() )
+  if( j != mImpl->itemsDirtyRects.begin() )
   {
-    itemsDirtyRects.resize(j - itemsDirtyRects.begin());
+    mImpl->itemsDirtyRects.resize(j - mImpl->itemsDirtyRects.begin());
   }
   damagedRectCleaner.SetCleanOnReturn(false);
 }
