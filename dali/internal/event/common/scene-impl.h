@@ -205,10 +205,9 @@ public:
 
   /**
    * Emits the touched signal.
-   * @param[in] touchEvent The touch event details (Old API).
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch );
+  void EmitTouchedSignal( const Dali::TouchEvent& touch );
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
@@ -250,14 +249,6 @@ public:
    * @copydoc Integration::Scene::SignalEventProcessingFinished()
    */
   Integration::Scene::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
-
-  // The touched signal, to support Stage touched signal, will be removed when deprecated in public Stage API
-  using TouchedSignalType = Signal< void (const TouchEvent&) >;
-
-  /**
-   * Touched signal to support deprecated stage touched signal.
-   */
-  TouchedSignalType& TouchedSignal();
 
   /**
     * @copydoc Integration::Scene::TouchSignal()
@@ -333,9 +324,6 @@ private:
 
   // The touch signal
   Integration::Scene::TouchSignalType mTouchSignal;
-
-  // The touched signal
-  TouchedSignalType mTouchedSignal;
 
   // The wheel event signal
   Integration::Scene::WheelEventSignalType mWheelEventSignal;

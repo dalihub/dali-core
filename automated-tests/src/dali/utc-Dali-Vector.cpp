@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1360,6 +1360,37 @@ int UtcDaliVectorCpp11ForP(void)
   END_TEST;
 }
 
+int UtcDaliVectorMoveConstructor(void)
+{
+  Vector<Vector3> movedFrom;
+  movedFrom.PushBack(Vector3::ONE);
+  movedFrom.PushBack(Vector3::NEGATIVE_YAXIS);
+  movedFrom.PushBack(Vector3::NEGATIVE_ZAXIS);
+
+  Vector<Vector3> movedTo(std::move(movedFrom));
+  DALI_TEST_EQUALS( movedTo.Size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS( movedFrom.Size(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveAssignment(void)
+{
+  Vector<Vector3> movedFrom;
+  movedFrom.PushBack(Vector3::ONE);
+  movedFrom.PushBack(Vector3::NEGATIVE_YAXIS);
+  movedFrom.PushBack(Vector3::NEGATIVE_ZAXIS);
+
+  Vector<Vector3> movedTo;
+  DALI_TEST_EQUALS(movedTo.Size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedFrom.Size(), 3u, TEST_LOCATION);
+
+  movedTo = std::move(movedFrom);
+  DALI_TEST_EQUALS(movedTo.Size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedFrom.Size(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
 
 /*
  * this does not compile at the moment

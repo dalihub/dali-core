@@ -22,8 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-utils.h>
-#include <test-touch-data-utils.h>
+#include <test-touch-event-utils.h>
 
 using namespace Dali;
 
@@ -115,8 +114,7 @@ struct TouchEventFunctor
     unsigned int points = touch.GetPointCount();
     if( points > 0)
     {
-      const TouchPoint& touchPoint = touch.GetPoint(0);
-      tet_printf("Touch Point state = %d\n", touchPoint.state);
+      tet_printf("Touch Point state = %d\n", touch.GetState(0));
     }
     return false;
   }
@@ -195,7 +193,7 @@ int UtcDaliTapGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchedSignal().Connect( &application, touchFunctor );
+  actor.TouchSignal().Connect( &application, touchFunctor );
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -209,8 +207,6 @@ int UtcDaliTapGestureDetectorNew(void)
   application.SendNotification();
   application.Render();
 
-  // For line coverage, Initialise default constructor
-  TouchEvent touchEvent2;
   END_TEST;
 }
 
@@ -502,7 +498,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   parent.Add(child);
 
   TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
+  child.TouchSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -925,7 +921,7 @@ int UtcDaliTapGestureInterruptedWhenTouchConsumed(void)
   application.GetScene().Add(actor);
 
   bool consume = false;
-  TouchDataFunctorConsumeSetter touchFunctor(consume);
+  TouchEventFunctorConsumeSetter touchFunctor(consume);
   actor.TouchSignal().Connect(&application,touchFunctor);
 
   // Render and notify
@@ -952,3 +948,47 @@ int UtcDaliTapGestureInterruptedWhenTouchConsumed(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureDisableDetectionDuringTapN(void)
+{
+  // Crash sometimes occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Add a detector
+  TapGestureDetector detector = TapGestureDetector::New();
+  bool functorCalled = false;
+  detector.Attach( actor );
+  detector.DetectedSignal().Connect(
+      &application,
+      [&detector, &functorCalled](Actor actor, const TapGesture& gesture)
+      {
+        detector.Detach(actor);
+        functorCalled = true;
+      });
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Try the gesture, should not crash
+  try
+  {
+    TestGenerateTap( application, 50.0f, 10.0f );
+
+    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+  }
+
+  END_TEST;
+}
+

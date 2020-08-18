@@ -40,13 +40,12 @@ class Stage;
 class Actor;
 class Layer;
 class ObjectRegistry;
-class TouchData;
+class TouchEvent;
 class RenderTaskList;
 struct Vector2;
 struct Vector3;
 struct Vector4;
 struct KeyEvent;
-struct TouchEvent;
 struct WheelEvent;
 
 /**
@@ -77,7 +76,7 @@ struct WheelEvent;
  * |-------------------------|--------------------------------------|
  * | keyEvent                | @ref KeyEventSignal()                |
  * | eventProcessingFinished | @ref EventProcessingFinishedSignal() |
- * | touched                 | @ref TouchedSignal()                 |
+ * | touch                   | @ref TouchSignal()                   |
  * | wheelEvent              | @ref WheelEventSignal()              |
  * | contextLost             | @ref ContextLostSignal()             |
  * | contextRegained         | @ref ContextRegainedSignal()         |
@@ -90,9 +89,8 @@ public:
 
   typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type @SINCE_1_0.0
   typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchEvent&) > TouchedSignalType;      ///< @DEPRECATED_1_1.37 @brief Touched signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchData&) > TouchSignalType;                ///< Touch signal type @SINCE_1_1.37
-  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Touched signal type @SINCE_1_0.0
+  typedef Signal< void (const TouchEvent&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
   typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
   typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
 
@@ -272,7 +270,6 @@ public:
   EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
-   * @DEPRECATED_1_1.37 Use TouchSignal() instead.
    * @brief This signal is emitted when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
    *
@@ -281,24 +278,7 @@ public:
    * An interrupted event will also be emitted (if it occurs).
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(const TouchEvent& event);
-   * @endcode
-   *
-   * @return The touch signal to connect to
-   * @note Motion events are not emitted.
-   */
-  TouchedSignalType& TouchedSignal() DALI_DEPRECATED_API;
-
-  /**
-   * @brief This signal is emitted when the screen is touched and when the touch ends
-   * (i.e. the down & up touch events only).
-   *
-   * If there are multiple touch points, then this will be emitted when the first touch occurs and
-   * then when the last finger is lifted.
-   * An interrupted event will also be emitted (if it occurs).
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallbackName( TouchData event );
+   *   void YourCallbackName( TouchEvent event );
    * @endcode
    *
    * @return The touch signal to connect to

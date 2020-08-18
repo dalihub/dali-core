@@ -2,7 +2,7 @@
 #define DALI_SLOT_DELEGATE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,8 +139,10 @@ public:
 
 private:
 
-  SlotDelegate( const SlotDelegate& );            ///< undefined copy constructor @SINCE_1_0.0
-  SlotDelegate& operator=( const SlotDelegate& ); ///< undefined assignment operator @SINCE_1_0.0
+  SlotDelegate( const SlotDelegate& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  SlotDelegate( SlotDelegate&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  SlotDelegate& operator=( const SlotDelegate& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  SlotDelegate& operator=( SlotDelegate&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
 

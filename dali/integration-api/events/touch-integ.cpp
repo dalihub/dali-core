@@ -1,6 +1,3 @@
-#ifndef TEST_TOUCH_DATA_UTILS_H
-#define TEST_TOUCH_DATA_UTILS_H
-
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
@@ -15,30 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali/public-api/actors/actor.h>
+#include <dali/integration-api/events/touch-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
 
-/**
- * Functor to be connected to an Actor's TouchSignal.
- * Allows the user to specify whether the functor should return true (consumed) or false.
- */
-struct TouchDataFunctorConsumeSetter
+namespace Dali
 {
-  TouchDataFunctorConsumeSetter( bool& consume )
-  : mConsume( consume )
-  {
-  }
+namespace Integration
+{
 
-  bool operator()(Dali::Actor actor, const Dali::TouchData& touch)
-  {
-    return mConsume;
-  }
+Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point)
+{
+  Internal::TouchEventPtr touchEventImpl( new Internal::TouchEvent(timestamp) );
+  touchEventImpl->AddPoint(Integration::Point(point));
+  Dali::TouchEvent handle(touchEventImpl.Get());
+  return handle;
+}
 
-private:
-  bool& mConsume;
-};
+} // namespace Integration
 
-#endif // TEST_TOUCH_DATA_UTILS_H
-
+} // namespace Dali

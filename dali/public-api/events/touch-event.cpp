@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@
 // CLASS HEADER
 #include <dali/public-api/events/touch-event.h>
 
-// EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+
+#include <cstdio>
 
 namespace Dali
 {
 
 TouchEvent::TouchEvent()
-: time(0)
+: BaseHandle()
 {
 }
 
-TouchEvent::TouchEvent(unsigned long time)
-: time(time)
+TouchEvent::TouchEvent( const TouchEvent& other )
+: BaseHandle( other )
 {
 }
 
@@ -41,15 +41,85 @@ TouchEvent::~TouchEvent()
 {
 }
 
-uint32_t TouchEvent::GetPointCount() const
+TouchEvent& TouchEvent::operator=( const TouchEvent& other )
 {
-  return static_cast<uint32_t>( points.size() );
+  BaseHandle::operator=( other );
+  return *this;
 }
 
-const TouchPoint& TouchEvent::GetPoint( uint32_t point ) const
+unsigned long TouchEvent::GetTime() const
 {
-  DALI_ASSERT_ALWAYS( point < points.size() && "No point at index" );
-  return points[point];
+  return GetImplementation( *this ).GetTime();
+}
+
+std::size_t TouchEvent::GetPointCount() const
+{
+  return GetImplementation( *this ).GetPointCount();
+}
+
+int32_t TouchEvent::GetDeviceId( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceId( point );
+}
+
+PointState::Type TouchEvent::GetState( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetState( point );
+}
+
+Actor TouchEvent::GetHitActor( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetHitActor( point );
+}
+
+const Vector2& TouchEvent::GetLocalPosition( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetLocalPosition( point );
+}
+
+const Vector2& TouchEvent::GetScreenPosition( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetScreenPosition( point );
+}
+
+float TouchEvent::GetRadius( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetRadius( point );
+}
+
+const Vector2& TouchEvent::GetEllipseRadius( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetEllipseRadius( point );
+}
+
+float TouchEvent::GetPressure( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetPressure( point );
+}
+
+Degree TouchEvent::GetAngle( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetAngle( point );
+}
+
+Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceClass( point );
+}
+
+Device::Subclass::Type TouchEvent::GetDeviceSubclass( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetDeviceSubclass( point );
+}
+
+MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
+{
+  return GetImplementation( *this ).GetMouseButton( point );
+}
+
+TouchEvent::TouchEvent( Internal::TouchEvent* internal )
+: BaseHandle( internal )
+{
 }
 
 } // namespace Dali

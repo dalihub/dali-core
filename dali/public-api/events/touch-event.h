@@ -2,7 +2,7 @@
 #define DALI_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,93 +18,252 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <stdint.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/public-api/events/device.h>
+#include <dali/public-api/events/point-state.h>
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/events/mouse-button.h>
 
 namespace Dali
 {
+
+namespace Internal DALI_INTERNAL
+{
+class TouchEvent;
+}
+
 /**
  * @addtogroup dali_core_events
  * @{
  */
 
+class Actor;
+struct Vector2;
+
 /**
- * @DEPRECATED_1_1.37 Use TouchData instead
+ * @brief Touch events are a collection of points at a specific moment in time.
  *
- * @brief Touch events are a collection of touch points at a specific moment in time.
- *
- * When a multi-touch event occurs, each touch point represents the points that are currently being
+ * When a multi-touch event occurs, each point represents the points that are currently being
  * touched or the points where a touch has stopped.
- * @SINCE_1_0.0
+ *
+ * The first point is the primary point that's used for hit-testing.
+ * @SINCE_1_9.26
+ * @note As this is a handle to an internal object, it should not be copied (or used in a container) as all that will do is copy the handle to the same object.
+ * The internal object can change which may not be what an application writer expects.
+ * If data does need to be stored in the application, then only the required data should be saved (retrieved using the methods of this class).
+ *
+ * Should not use this in a TouchEvent container as it is just a handle and the internal object can change.
  */
-struct DALI_CORE_API TouchEvent
+class DALI_CORE_API TouchEvent : public BaseHandle
 {
+public:
+
   // Construction & Destruction
 
   /**
-   * @DEPRECATED_1_1.37
-   * @brief Default constructor.
-   * @SINCE_1_0.0
-   */
-  TouchEvent() DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.37
-   * @brief Constructor.
-   * @SINCE_1_0.0
-   * @param[in] time The time the event occurred
-   */
-  TouchEvent(unsigned long time) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.37
-   * @brief Destructor.
-   * @SINCE_1_0.0
-   */
-  ~TouchEvent() DALI_DEPRECATED_API;
-
-  // Data
-
-  /**
-   * @DEPRECATED_1_1.37
-   * @brief This is a container of points for this touch event.
+   * @brief An uninitialized TouchEvent instance.
    *
-   * The first point in the set is always the
-   * primary touch point (i.e. the first point touched in a multi-touch event).
+   * Calling member functions with an uninitialized TouchEvent handle is not allowed.
+   * @SINCE_1_9.26
    */
-  TouchPointContainer points;
+  TouchEvent();
 
   /**
-   * @DEPRECATED_1_1.37
-   * @brief The time (in ms) that the touch event occurred.
+   * @brief Copy constructor.
+   *
+   * @SINCE_1_9.26
+   * @param[in] other The TouchEvent to copy from
    */
-  unsigned long time;
-
-  // Convenience Methods
+  TouchEvent( const TouchEvent& other );
 
   /**
-   * @DEPRECATED_1_1.37
+   * @brief Destructor.
+   *
+   * @SINCE_1_9.26
+   */
+  ~TouchEvent();
+
+  // Operators
+
+  /**
+   * @brief Assignment Operator.
+   *
+   * @SINCE_1_9.26
+   * @param[in] other The TouchEvent to copy from
+   * @return A reference to this
+   */
+  TouchEvent& operator=( const TouchEvent& other );
+
+  // Getters
+
+  /**
+   * @brief Returns the time (in ms) that the touch event occurred.
+   *
+   * @SINCE_1_9.26
+   * @return The time (in ms) that the touch event occurred
+   */
+  unsigned long GetTime() const;
+
+  /**
    * @brief Returns the total number of points in this TouchEvent.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.26
    * @return Total number of Points
    */
-  uint32_t GetPointCount() const DALI_DEPRECATED_API;
+  std::size_t GetPointCount() const;
 
   /**
-   * @DEPRECATED_1_1.37
-   * @brief Returns a touch point at the index requested.
+   * @brief Returns the ID of the device used for the Point specified.
    *
-   * The first point in the set is always the primary
-   * touch point (i.e. the first point touched in a multi-touch event).
-   * @SINCE_1_0.0
-   * @param[in] point The index of the required Point
-   * @return Point requested
-   * @note "point" should be less than the value returned by GetPointCount().
-   *       If out of range, then program asserts.
+   * Each point has a unique device ID which specifies the device used for that
+   * point. This is returned by this method.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The Device ID of this point
+   * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  const TouchPoint& GetPoint( uint32_t point ) const DALI_DEPRECATED_API;
+  int32_t GetDeviceId( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the State of the point specified.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The state of the point specified
+   * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
+   * @see State
+   */
+  PointState::Type GetState( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the actor that was underneath the point specified.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The actor that was underneath the point specified
+   * @note If point is greater than GetPointCount() then this method will return an empty handle.
+   */
+  Actor GetHitActor( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the co-ordinates relative to the top-left of the hit-actor at the point specified.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The co-ordinates relative to the top-left of the hit-actor of the point specified
+   *
+   * @note The top-left of an actor is (0.0, 0.0, 0.5).
+   * @note If you require the local coordinates of another actor (e.g the parent of the hit actor),
+   * then you should use Actor::ScreenToLocal().
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetLocalPosition( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The co-ordinates relative to the top-left of the screen of the point specified
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetScreenPosition( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the radius of the press point.
+   *
+   * This is the average of both the horizontal and vertical radii of the press point.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The radius of the press point
+   * @note If point is greater than GetPointCount() then this method will return 0.0f.
+   */
+  float GetRadius( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves BOTH the horizontal and the vertical radii of the press point.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The horizontal and vertical radii of the press point
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetEllipseRadius( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the touch pressure.
+   *
+   * The pressure range starts at 0.0f.
+   * Normal pressure is defined as 1.0f.
+   * A value between 0.0f and 1.0f means light pressure has been applied.
+   * A value greater than 1.0f means more pressure than normal has been applied.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The touch pressure
+   * @note If point is greater than GetPointCount() then this method will return 1.0f.
+   */
+  float GetPressure( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the angle of the press point relative to the Y-Axis.
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The angle of the press point
+   * @note If point is greater than GetPointCount() then this method will return Degree().
+   */
+  Degree GetAngle( std::size_t point ) const;
+
+  /**
+   * @brief Gets the device class type from which the mouse/touch event is originated.
+   *
+   * The device class type is classification type of the input device of event received.
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The type of the device class
+   */
+  Device::Class::Type GetDeviceClass( std::size_t point ) const;
+
+  /**
+   * @brief Gets the subclass type of the device from which the mouse/touch event is originated.
+   *
+   * The device subclass type is subclassification type of the input device of event received.
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The type of the device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass( std::size_t point ) const;
+
+
+  /**
+   * @brief Gets the value, which indicates a mouse button. (ex: right/left button)
+   *
+   * @SINCE_1_9.26
+   * @param[in] point The point required
+   * @return The mouse button value
+   */
+  MouseButton::Type GetMouseButton( std::size_t point ) const;
+
+
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized TouchEvent handle.
+   *
+   * @SINCE_1_9.26
+   * @param[in] internal A pointer to a newly allocated Dali resource
+   */
+  explicit DALI_INTERNAL TouchEvent( Internal::TouchEvent* internal );
+  /// @endcond
 };
 
 /**

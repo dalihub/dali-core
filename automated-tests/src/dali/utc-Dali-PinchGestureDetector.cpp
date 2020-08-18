@@ -22,8 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-utils.h>
-#include <test-touch-data-utils.h>
+#include <test-touch-event-utils.h>
 
 using namespace Dali;
 
@@ -112,15 +111,6 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 
   Gesture::State& stateToUnstage;
   Integration::Scene scene;
-};
-
-// Functor for receiving a touch event
-struct TouchEventFunctor
-{
-  bool operator()(Actor actor, const TouchEvent& touch)
-  {
-    return false;
-  }
 };
 
 } // anon namespace
@@ -621,9 +611,6 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   parent.Add(child);
-
-  TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1126,7 +1113,7 @@ int UtcDaliPinchGestureInterruptedWhenTouchConsumed(void)
   application.GetScene().Add(actor);
 
   bool consume = false;
-  TouchDataFunctorConsumeSetter touchFunctor(consume);
+  TouchEventFunctorConsumeSetter touchFunctor(consume);
   actor.TouchSignal().Connect(&application,touchFunctor);
 
   // Render and notify
@@ -1166,3 +1153,54 @@ int UtcDaliPinchGestureInterruptedWhenTouchConsumed(void)
   END_TEST;
 }
 
+
+int UtcDaliPinchGestureDisableDetectionDuringPinchN(void)
+{
+  // Crash sometimes occurred when gesture-recognizer was deleted internally during a signal when the attached actor was detached
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Add a detector
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  bool functorCalled = false;
+  detector.Attach( actor );
+  detector.DetectedSignal().Connect(
+      &application,
+      [&detector, &functorCalled](Actor actor, const PinchGesture& gesture)
+      {
+        if( gesture.state == Gesture::Finished )
+        {
+          detector.Detach(actor);
+          functorCalled = true;
+        }
+      });
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Try the gesture, should not crash
+  try
+  {
+    TestStartPinch( application,  Vector2( 2.0f, 20.0f ), Vector2( 38.0f, 20.0f ),
+                                  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
+    TestContinuePinch( application, Vector2( 112.0f, 100.0f ), Vector2( 112.0f, 124.0f ),
+                                    Vector2( 5.0f, 5.0f ), Vector2( 35.0f, 35.0f ), 200 );
+    TestEndPinch( application,  Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ),
+                                Vector2( 19.0f, 20.0f ), Vector2( 21.0f, 20.0f ), 1000);
+
+    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+  }
+
+  END_TEST;
+}

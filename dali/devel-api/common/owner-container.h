@@ -2,7 +2,7 @@
 #define DALI_OWNER_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,12 @@ public:
     Clear();
     VectorBase::Release();
   }
+
+  // Not copyable or movable
+  OwnerContainer( const OwnerContainer& ) = delete; ///< Deleted copy constructor
+  OwnerContainer( OwnerContainer&& ) = delete; ///< Deleted move constructor
+  OwnerContainer& operator=( const OwnerContainer& ) = delete; ///< Deleted copy assignment operator
+  OwnerContainer& operator=( OwnerContainer&& ) = delete; ///< Deleted move assignment operator
 
   /**
    * Test whether the container is empty.
@@ -180,11 +186,6 @@ public:
   }
 
 private:
-
-  // Undefined copy constructor.
-  OwnerContainer( const OwnerContainer& );
-  // Undefined assignment operator.
-  OwnerContainer& operator=( const OwnerContainer& );
 
   /**
    * @brief delete the contents of the pointer
