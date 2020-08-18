@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
+#include <dali/devel-api/events/wheel-event-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -44,13 +45,7 @@ struct SignalData
   {
     functorCalled = false;
 
-    receivedWheelEvent.type = WheelEvent::MOUSE_WHEEL;
-    receivedWheelEvent.direction = 0;
-    receivedWheelEvent.modifiers = 0;
-    receivedWheelEvent.point = Vector2::ZERO;
-    receivedWheelEvent.z = 0;
-    receivedWheelEvent.timeStamp = 0;
-
+    receivedWheelEvent.Reset();
     wheeledActor.Reset();
   }
 
@@ -82,14 +77,15 @@ int UtcDaliWheelEventConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);  // coustruct a wheel event
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, event.type, TEST_LOCATION); // check type
-  DALI_TEST_EQUALS(1, event.direction, TEST_LOCATION); // check direction
-  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.modifiers, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(Vector2(1.0f, 1.0f), event.point, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1, event.z, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1000u, event.timeStamp, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(Dali::WheelEvent::MOUSE_WHEEL, event.GetType(), TEST_LOCATION); // check type
+  DALI_TEST_EQUALS(1, event.GetDirection(), TEST_LOCATION); // check direction
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetModifiers(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(Vector2(1.0f, 1.0f), event.GetPoint(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1, event.GetDelta(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1000u, event.GetTime(), TEST_LOCATION); // check modifier
   END_TEST;
 }
 
@@ -98,12 +94,10 @@ int UtcDaliWheelEventIsShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event;
-  DALI_TEST_EQUALS(0u, event.modifiers, TEST_LOCATION);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  event.modifiers = SHIFT_MODIFIER; // Set to Shift Modifier
-
-  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.modifiers, TEST_LOCATION); // check able to set
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetModifiers(), TEST_LOCATION);
 
   DALI_TEST_EQUALS(true, event.IsShiftModifier(), TEST_LOCATION); // check IsShiftModifier
 
@@ -115,12 +109,10 @@ int UtcDaliWheelEventIsCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event;
-  DALI_TEST_EQUALS(0u, event.modifiers, TEST_LOCATION);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  event.modifiers = CTRL_MODIFIER; // Set to Ctrl Modifier
-
-  DALI_TEST_EQUALS(CTRL_MODIFIER, event.modifiers, TEST_LOCATION); // check able to set
+  DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetModifiers(), TEST_LOCATION);
 
   DALI_TEST_EQUALS(true, event.IsCtrlModifier(), TEST_LOCATION); // check IsCtrlModifier
   END_TEST;
@@ -131,12 +123,10 @@ int UtcDaliWheelEventIsAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event;
-  DALI_TEST_EQUALS(0u, event.modifiers, TEST_LOCATION);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  event.modifiers = ALT_MODIFIER; // Set to Alt Modifier
-
-  DALI_TEST_EQUALS(ALT_MODIFIER, event.modifiers, TEST_LOCATION); // check able to set
+  DALI_TEST_EQUALS(ALT_MODIFIER, event.GetModifiers(), TEST_LOCATION);
 
   DALI_TEST_EQUALS(true, event.IsAltModifier(), TEST_LOCATION);  // IsAltModifier
   END_TEST;
@@ -147,9 +137,10 @@ int UtcDaliWheelEventIsNotShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  DALI_TEST_EQUALS(CTRL_MODIFIER, event.modifiers, TEST_LOCATION);  // check different modifier used
+  DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetModifiers(), TEST_LOCATION);  // check different modifier used
 
   DALI_TEST_EQUALS(false, event.IsShiftModifier(), TEST_LOCATION);
   END_TEST;
@@ -160,9 +151,10 @@ int UtcDaliWheelEventIsNotCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  DALI_TEST_EQUALS(ALT_MODIFIER, event.modifiers, TEST_LOCATION);  // check different modifier used
+  DALI_TEST_EQUALS(ALT_MODIFIER, event.GetModifiers(), TEST_LOCATION);  // check different modifier used
 
   DALI_TEST_EQUALS(false, event.IsCtrlModifier(), TEST_LOCATION);
   END_TEST;
@@ -173,9 +165,10 @@ int UtcDaliWheelEventIsNotAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
 
-  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.modifiers, TEST_LOCATION);  // check different modifier used
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetModifiers(), TEST_LOCATION);  // check different modifier used
 
   DALI_TEST_EQUALS(false, event.IsAltModifier(), TEST_LOCATION);
   END_TEST;
@@ -186,12 +179,12 @@ int UtcDaliWheelEventANDModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
   DALI_TEST_EQUALS(true, event.IsCtrlModifier() && event.IsShiftModifier(), TEST_LOCATION);
 
-  event.modifiers = SHIFT_MODIFIER;
-
-  DALI_TEST_EQUALS(false, event.IsCtrlModifier() && event.IsShiftModifier(), TEST_LOCATION);
+  Dali::WheelEvent newEvent = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_EQUALS(false, newEvent.IsCtrlModifier() && newEvent.IsShiftModifier(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -200,12 +193,12 @@ int UtcDaliWheelEventORModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  WheelEvent event(WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_CHECK( event );
   DALI_TEST_EQUALS(true, event.IsCtrlModifier() || event.IsAltModifier(), TEST_LOCATION);
 
-  event.modifiers = SHIFT_MODIFIER;
-
-  DALI_TEST_EQUALS(false, event.IsCtrlModifier() && event.IsAltModifier(), TEST_LOCATION);
+  Dali::WheelEvent newEvent = DevelWheelEvent::New( Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2( 1.0f, 1.0f ), 1, 1000u );
+  DALI_TEST_EQUALS(false, newEvent.IsCtrlModifier() && newEvent.IsAltModifier(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -234,12 +227,12 @@ int UtcDaliWheelEventSignalling(void)
   application.ProcessEvent( event );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( actor == data.wheeledActor );
-  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, data.receivedWheelEvent.type, TEST_LOCATION); // check type
-  DALI_TEST_EQUALS(0, data.receivedWheelEvent.direction, TEST_LOCATION); // check direction
-  DALI_TEST_EQUALS(SHIFT_MODIFIER, data.receivedWheelEvent.modifiers, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(screenCoordinates, data.receivedWheelEvent.point, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1, data.receivedWheelEvent.z, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1000u, data.receivedWheelEvent.timeStamp, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, data.receivedWheelEvent.GetType(), TEST_LOCATION); // check type
+  DALI_TEST_EQUALS(0, data.receivedWheelEvent.GetDirection(), TEST_LOCATION); // check direction
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, data.receivedWheelEvent.GetModifiers(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(screenCoordinates, data.receivedWheelEvent.GetPoint(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1, data.receivedWheelEvent.GetDelta(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1000u, data.receivedWheelEvent.GetTime(), TEST_LOCATION); // check modifier
   data.Reset();
 
   // Emit a wheel signal where the actor is not present, will hit the root actor though
@@ -256,12 +249,12 @@ int UtcDaliWheelEventSignalling(void)
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( rootActor == rootData.wheeledActor );
-  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, rootData.receivedWheelEvent.type, TEST_LOCATION); // check type
-  DALI_TEST_EQUALS(0, rootData.receivedWheelEvent.direction, TEST_LOCATION); // check direction
-  DALI_TEST_EQUALS(SHIFT_MODIFIER, rootData.receivedWheelEvent.modifiers, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(screenCoordinates, rootData.receivedWheelEvent.point, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1, rootData.receivedWheelEvent.z, TEST_LOCATION); // check modifier
-  DALI_TEST_EQUALS(1000u, rootData.receivedWheelEvent.timeStamp, TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(WheelEvent::MOUSE_WHEEL, rootData.receivedWheelEvent.GetType(), TEST_LOCATION); // check type
+  DALI_TEST_EQUALS(0, rootData.receivedWheelEvent.GetDirection(), TEST_LOCATION); // check direction
+  DALI_TEST_EQUALS(SHIFT_MODIFIER, rootData.receivedWheelEvent.GetModifiers(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(screenCoordinates, rootData.receivedWheelEvent.GetPoint(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1, rootData.receivedWheelEvent.GetDelta(), TEST_LOCATION); // check modifier
+  DALI_TEST_EQUALS(1000u, rootData.receivedWheelEvent.GetTime(), TEST_LOCATION); // check modifier
 
   // Remove actor from the scene
   application.GetScene().Remove( actor );
