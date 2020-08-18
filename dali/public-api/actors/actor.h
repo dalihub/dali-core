@@ -215,6 +215,10 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *   - If the consumed actor on hover-start is not the same as the consumed actor on hover-finished, then
  *     hover signals are also emitted from the hover-started actor with an "Interrupted" state.
  *
+ * <h3>Key Events:</h3>
+ *
+ * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
+ *
  * @nosubgrouping
  *
  * Signals
@@ -1169,7 +1173,6 @@ public: // Signals
    * @endcode
    * The return value of True, indicates that the touch event has been consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
-   * A true return will also cancel any ongoing gestures.
    * @SINCE_1_1.37
    * @return The signal to connect to
    * @pre The Actor has been initialized.

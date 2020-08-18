@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
         const Integration::Point& currentPoint1 = event.points[0];
         const Integration::Point& currentPoint2 = event.points[1];
 
-        if( currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP || currentPoint1.GetState() == PointState::INTERRUPTED )
+        if( currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP )
         {
           // One of our touch points has an Up event so change our state back to Clear.
           mState = Clear;
@@ -139,15 +139,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
 
     case Started:
     {
-      if(event.points[0].GetState() == PointState::INTERRUPTED)
-      {
-        // System interruption occurred, rotation should be cancelled
-        mTouchEvents.clear();
-        SendRotation(Gesture::Cancelled, event);
-        mState = Clear;
-        mTouchEvents.clear();
-      }
-      else if( pointCount != 2 )
+      if( pointCount != 2 )
       {
         // Send rotation finished event
         SendRotation( Gesture::Finished, event );
