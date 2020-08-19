@@ -50,7 +50,7 @@ struct Degree;
 class Quaternion;
 class Layer;
 class TouchData;
-class HoverEvent;
+struct HoverEvent;
 struct WheelEvent;
 struct Vector2;
 struct Vector3;

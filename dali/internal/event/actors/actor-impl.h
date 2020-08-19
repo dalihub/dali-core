@@ -44,7 +44,7 @@ namespace Dali
 
 struct KeyEvent;
 class TouchData;
-class HoverEvent;
+struct HoverEvent;
 struct WheelEvent;
 
 namespace Internal
