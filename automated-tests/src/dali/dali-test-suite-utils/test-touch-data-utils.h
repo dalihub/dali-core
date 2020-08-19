@@ -1,5 +1,5 @@
-#ifndef TEST_TOUCH_EVENT_UTILS_H
-#define TEST_TOUCH_EVENT_UTILS_H
+#ifndef TEST_TOUCH_DATA_UTILS_H
+#define TEST_TOUCH_DATA_UTILS_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -24,14 +24,14 @@
  * Functor to be connected to an Actor's TouchSignal.
  * Allows the user to specify whether the functor should return true (consumed) or false.
  */
-struct TouchEventFunctorConsumeSetter
+struct TouchDataFunctorConsumeSetter
 {
-  TouchEventFunctorConsumeSetter( bool& consume )
+  TouchDataFunctorConsumeSetter( bool& consume )
   : mConsume( consume )
   {
   }
 
-  bool operator()(Dali::Actor actor, const Dali::TouchEvent& touch)
+  bool operator()(Dali::Actor actor, const Dali::TouchData& touch)
   {
     return mConsume;
   }
@@ -40,5 +40,5 @@ private:
   bool& mConsume;
 };
 
-#endif // TEST_TOUCH_EVENT_UTILS_H
+#endif // TEST_TOUCH_DATA_UTILS_H
 

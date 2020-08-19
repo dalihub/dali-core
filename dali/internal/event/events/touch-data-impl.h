@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_TOUCH_EVENT_H
-#define DALI_INTERNAL_TOUCH_EVENT_H
+#ifndef DALI_INTERNAL_TOUCH_DATA_H
+#define DALI_INTERNAL_TOUCH_DATA_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/point-state.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/events/point.h>
 
@@ -34,13 +34,13 @@ struct Vector2;
 namespace Internal
 {
 
-class TouchEvent;
-typedef IntrusivePtr< TouchEvent > TouchEventPtr;
+class TouchData;
+typedef IntrusivePtr< TouchData > TouchDataPtr;
 
 /**
- * @copydoc Dali::TouchEvent
+ * @copydoc Dali::TouchData
  */
-class TouchEvent : public BaseObject
+class TouchData : public BaseObject
 {
 public:
 
@@ -49,82 +49,82 @@ public:
   /**
    * @brief Default constructor
    */
-  TouchEvent();
+  TouchData();
 
   /**
    * @brief Constructor
    * @param[in]  time  The time the event occurred
    */
-  TouchEvent( unsigned long time );
+  TouchData( unsigned long time );
 
   /**
-   * @brief Clones the TouchEvent object.
+   * @brief Clones the TouchData object.
    *
    * Required because base class copy constructor is not implemented.
-   * @param[in]  other  The TouchEvent to clone from.
-   * @return A new TouchEvent object which has the same touch point data.
+   * @param[in]  other  The TouchData to clone from.
+   * @return A new TouchData object which has the same touch point data.
    */
-  static TouchEventPtr Clone( const TouchEvent& other );
+  static TouchDataPtr Clone( const TouchData& other );
 
   /**
    * @brief Destructor
    */
-  ~TouchEvent();
+  ~TouchData();
 
   // Getters
 
   /**
-   * @copydoc Dali::TouchEvent::GetTime()
+   * @copydoc Dali::TouchData::GetTime()
    */
   unsigned long GetTime() const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetPointCount()
+   * @copydoc Dali::TouchData::GetPointCount()
    */
   std::size_t GetPointCount() const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetDeviceId()
+   * @copydoc Dali::TouchData::GetDeviceId()
    */
   int32_t GetDeviceId( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetGetState()
+   * @copydoc Dali::TouchData::GetGetState()
    */
   PointState::Type GetState( std::size_t point  ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetHitActor()
+   * @copydoc Dali::TouchData::GetHitActor()
    */
   Dali::Actor GetHitActor( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetLocalPosition()
+   * @copydoc Dali::TouchData::GetLocalPosition()
    */
   const Vector2& GetLocalPosition( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetScreenPosition()
+   * @copydoc Dali::TouchData::GetScreenPosition()
    */
   const Vector2& GetScreenPosition( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetRadius()
+   * @copydoc Dali::TouchData::GetRadius()
    */
   float GetRadius( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetEllipseRadius()
+   * @copydoc Dali::TouchData::GetEllipseRadius()
    */
   const Vector2& GetEllipseRadius( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetPressure()
+   * @copydoc Dali::TouchData::GetPressure()
    */
   float GetPressure( std::size_t point ) const;
 
   /**
-   * @copydoc Dali::TouchEvent::GetAngle()
+   * @copydoc Dali::TouchData::GetAngle()
    */
   Degree GetAngle( std::size_t point ) const;
 
@@ -183,10 +183,10 @@ public:
 private:
 
   /// Undefined Copy constructor
-  TouchEvent( const TouchEvent& other );
+  TouchData( const TouchData& other );
 
   /// Undefined
-  TouchEvent& operator=( const TouchEvent& other );
+  TouchData& operator=( const TouchData& other );
 
 private:
 
@@ -198,24 +198,24 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::TouchEvent& GetImplementation( Dali::TouchEvent& touchEvent )
+inline Internal::TouchData& GetImplementation( Dali::TouchData& touchData )
 {
-  DALI_ASSERT_ALWAYS( touchEvent && "Touch Event handle is empty" );
+  DALI_ASSERT_ALWAYS( touchData && "Touch Data handle is empty" );
 
-  BaseObject& object = touchEvent.GetBaseObject();
+  BaseObject& object = touchData.GetBaseObject();
 
-  return static_cast< Internal::TouchEvent& >( object );
+  return static_cast< Internal::TouchData& >( object );
 }
 
-inline const Internal::TouchEvent& GetImplementation( const Dali::TouchEvent& touchEvent )
+inline const Internal::TouchData& GetImplementation( const Dali::TouchData& touchData )
 {
-  DALI_ASSERT_ALWAYS( touchEvent && "Touch Event handle is empty" );
+  DALI_ASSERT_ALWAYS( touchData && "Touch Data handle is empty" );
 
-  const BaseObject& object = touchEvent.GetBaseObject();
+  const BaseObject& object = touchData.GetBaseObject();
 
-  return static_cast< const Internal::TouchEvent& >( object );
+  return static_cast< const Internal::TouchData& >( object );
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_TOUCH_EVENT_H
+#endif // DALI_INTERNAL_TOUCH_DATA_H

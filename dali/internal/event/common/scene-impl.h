@@ -257,7 +257,7 @@ public:
    * Emits the touched signal.
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal( const Dali::TouchEvent& touch );
+  void EmitTouchedSignal( const Dali::TouchData& touch );
 
   /**
    * Used by the EventProcessor to emit wheel event signals.

@@ -31,7 +31,7 @@
  * class MyClass : public ConnectionTracker
  * {
  *
- *   void Callback( Actor actor, const TouchEvent& event )
+ *   void Callback( Actor actor, const TouchData& event )
  *   {
  *     ...
  *   }

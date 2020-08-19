@@ -19,20 +19,20 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-data-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
 
-void utc_dali_touch_processing_startup(void)
+void utc_dali_touch_data_processing_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_touch_processing_cleanup(void)
+void utc_dali_touch_data_processing_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -43,19 +43,22 @@ namespace
 {
 struct TestPoint
 {
-  int32_t deviceId{-1};
-  PointState::Type state{PointState::FINISHED};
+  int32_t deviceId;
+  PointState::Type state;
   Actor hitActor;
   Vector2 local;
   Vector2 screen;
-  float radius{0};
+  float radius;
   Vector2 ellipseRadius;
-  float pressure{0};
+  float pressure;
   Degree angle;
-  Device::Class::Type deviceClass{Device::Class::NONE};
-  Device::Subclass::Type deviceSubclass{Device::Subclass::NONE};
+  Device::Class::Type deviceClass;
+  Device::Subclass::Type deviceSubclass;
 
-  TestPoint() = default;
+  TestPoint()
+  : deviceId(-1), state(PointState::FINISHED), radius(0), pressure(0)
+  {
+  }
   static const TestPoint ZERO;
 };
 
@@ -67,12 +70,12 @@ struct SignalData
 {
   SignalData()
   : functorCalled( false ),
-    receivedTouch(),
+    touchData(),
     touchedActor()
   {
   }
 
-  struct TestTouchEvent
+  struct TestTouchData
   {
     unsigned long time;
     std::vector<TestPoint> points;
@@ -95,54 +98,54 @@ struct SignalData
   {
     functorCalled = false;
 
-    receivedTouch.time = 0u;
-    receivedTouch.points.clear();
+    touchData.time = 0u;
+    touchData.points.clear();
 
     touchedActor.Reset();
   }
 
   bool functorCalled;
-  TestTouchEvent receivedTouch;
+  TestTouchData touchData;
   Actor touchedActor;
 };
 
 // Functor that sets the data when called
-struct TouchEventFunctor
+struct TouchDataFunctor
 {
   /**
    * Constructor.
    * @param[in]  data         Reference to the data to store callback information.
    * @param[in]  returnValue  What the functor should return.
    */
-  TouchEventFunctor( SignalData& data, bool returnValue = true )
+  TouchDataFunctor( SignalData& data, bool returnValue = true )
   : signalData( data ),
     returnValue( returnValue )
   {
   }
 
-  bool operator()( Actor actor, const TouchEvent& touch )
+  bool operator()( Actor actor, const TouchData& touchData )
   {
     signalData.functorCalled = true;
     signalData.touchedActor = actor;
 
-    signalData.receivedTouch.time = touch.GetTime();
-    signalData.receivedTouch.points.clear();
+    signalData.touchData.time = touchData.GetTime();
+    signalData.touchData.points.clear();
 
-    for( size_t i=0; i<touch.GetPointCount(); ++i )
+    for( size_t i=0; i<touchData.GetPointCount(); ++i )
     {
       TestPoint p;
-      p.deviceId = touch.GetDeviceId(i);
-      p.state = touch.GetState(i);
-      p.hitActor = touch.GetHitActor(i);
-      p.local = touch.GetLocalPosition(i);
-      p.screen = touch.GetScreenPosition(i);
-      p.radius = touch.GetRadius(i);
-      p.ellipseRadius = touch.GetEllipseRadius(i);
-      p.pressure = touch.GetPressure(i);
-      p.angle = touch.GetAngle(i);
-      p.deviceClass = touch.GetDeviceClass(i);
-      p.deviceSubclass = touch.GetDeviceSubclass(i);
-      signalData.receivedTouch.points.push_back(p);
+      p.deviceId = touchData.GetDeviceId(i);
+      p.state = touchData.GetState(i);
+      p.hitActor = touchData.GetHitActor(i);
+      p.local = touchData.GetLocalPosition(i);
+      p.screen = touchData.GetScreenPosition(i);
+      p.radius = touchData.GetRadius(i);
+      p.ellipseRadius = touchData.GetEllipseRadius(i);
+      p.pressure = touchData.GetPressure(i);
+      p.angle = touchData.GetAngle(i);
+      p.deviceClass = touchData.GetDeviceClass(i);
+      p.deviceSubclass = touchData.GetDeviceSubclass(i);
+      signalData.touchData.points.push_back(p);
     }
 
     return returnValue;
@@ -155,7 +158,7 @@ struct TouchEventFunctor
 struct HandleData
 {
   bool signalReceived;
-  TouchEvent receivedTouchHandle;
+  TouchData touchData;
 
   HandleData()
   : signalReceived(false)
@@ -163,23 +166,24 @@ struct HandleData
   }
 };
 
-struct TouchEventHandleFunctor
+struct TouchDataHandleFunctor
 {
   /**
    * Constructor.
    * @param[in]  data         Reference to the data to store callback information.
    * @param[in]  returnValue  What the functor should return.
    */
-  TouchEventHandleFunctor( HandleData& handleData, bool returnValue = true )
+  TouchDataHandleFunctor( HandleData& handleData, bool returnValue = true )
   : handleData(handleData),
     returnValue( returnValue )
   {
   }
 
-  bool operator()( Actor actor, const TouchEvent& someTouchEvent )
+  bool operator()( Actor actor, const TouchData& someTouchData )
   {
     handleData.signalReceived = true;
-    handleData.receivedTouchHandle = someTouchEvent;
+    TouchData handle(someTouchData);
+    handleData.touchData = handle;
     return returnValue;
   }
 
@@ -189,7 +193,7 @@ struct TouchEventHandleFunctor
 
 
 // Functor that removes the actor when called.
-struct RemoveActorFunctor : public TouchEventFunctor
+struct RemoveActorFunctor : public TouchDataFunctor
 {
   /**
    * Constructor.
@@ -197,11 +201,11 @@ struct RemoveActorFunctor : public TouchEventFunctor
    * @param[in]  returnValue  What the functor should return.
    */
   RemoveActorFunctor( SignalData& data, bool returnValue = true )
-  : TouchEventFunctor( data, returnValue )
+  : TouchDataFunctor( data, returnValue )
   {
   }
 
-  bool operator()( Actor actor, const TouchEvent& touch )
+  bool operator()( Actor actor, const TouchData& touchData )
   {
     Actor parent( actor.GetParent() );
     if ( parent )
@@ -209,7 +213,7 @@ struct RemoveActorFunctor : public TouchEventFunctor
       parent.Remove( actor );
     }
 
-    return TouchEventFunctor::operator()( actor, touch );
+    return TouchDataFunctor::operator()( actor, touchData );
   }
 };
 
@@ -238,17 +242,17 @@ struct OutOfBoundsFunctor
   {
   }
 
-  bool operator()( Actor actor, const TouchEvent& touch )
+  bool operator()( Actor actor, const TouchData& touchData )
   {
     outOfBoundsData.functorCalled = true;
-    size_t count = touch.GetPointCount();
+    size_t count = touchData.GetPointCount();
 
     // Read out of bounds data
-    outOfBoundsData.point.deviceId = touch.GetDeviceId(count+1);
-    outOfBoundsData.point.state = touch.GetState(count+1);
-    outOfBoundsData.point.hitActor = touch.GetHitActor(count+1);
-    outOfBoundsData.point.local = touch.GetLocalPosition(count+1);
-    outOfBoundsData.point.screen = touch.GetScreenPosition(count+1);
+    outOfBoundsData.point.deviceId = touchData.GetDeviceId(count+1);
+    outOfBoundsData.point.state = touchData.GetState(count+1);
+    outOfBoundsData.point.hitActor = touchData.GetHitActor(count+1);
+    outOfBoundsData.point.local = touchData.GetLocalPosition(count+1);
+    outOfBoundsData.point.screen = touchData.GetScreenPosition(count+1);
 
     return returnValue;
   }
@@ -273,7 +277,7 @@ Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vecto
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int UtcDaliTouchEventNormalProcessing01(void)
+int UtcDaliTouchDataNormalProcessing01(void)
 {
   TestApplication application;
 
@@ -288,7 +292,7 @@ int UtcDaliTouchEventNormalProcessing01(void)
 
   // Connect to actor's touch signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   Vector2 screenCoordinates( 10.0f, 10.0f );
@@ -297,9 +301,9 @@ int UtcDaliTouchEventNormalProcessing01(void)
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
-  const TestPoint *point1 = &data.receivedTouch.GetPoint(0);
+  const TestPoint *point1 = &data.touchData.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( PointState::DOWN, point1->state, TEST_LOCATION );
   DALI_TEST_EQUALS( screenCoordinates, point1->screen, TEST_LOCATION );
   DALI_TEST_EQUALS( localCoordinates, point1->local, 0.1f, TEST_LOCATION );
@@ -309,9 +313,9 @@ int UtcDaliTouchEventNormalProcessing01(void)
   screenCoordinates.x = screenCoordinates.y = 11.0f;
   actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, screenCoordinates ) );
-  const TestPoint *point2 = &data.receivedTouch.GetPoint(0);
+  const TestPoint *point2 = &data.touchData.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( PointState::MOTION, point2->state, TEST_LOCATION );
   DALI_TEST_EQUALS( screenCoordinates, point2->screen, TEST_LOCATION );
   DALI_TEST_EQUALS( localCoordinates, point2->local, 0.1f, TEST_LOCATION );
@@ -321,9 +325,9 @@ int UtcDaliTouchEventNormalProcessing01(void)
   screenCoordinates.x = screenCoordinates.y = 12.0f;
   actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
   application.ProcessEvent( GenerateSingleTouch( PointState::UP, screenCoordinates ) );
-  const TestPoint *point3 = &data.receivedTouch.GetPoint(0);
+  const TestPoint *point3 = &data.touchData.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( PointState::UP, point3->state, TEST_LOCATION );
   DALI_TEST_EQUALS( screenCoordinates, point3->screen, TEST_LOCATION );
   DALI_TEST_EQUALS( localCoordinates, point3->local, 0.1f, TEST_LOCATION );
@@ -337,7 +341,7 @@ int UtcDaliTouchEventNormalProcessing01(void)
 }
 
 
-int UtcDaliTouchEventNormalProcessing02(void)
+int UtcDaliTouchDataNormalProcessing02(void)
 {
   TestApplication application;
 
@@ -352,7 +356,7 @@ int UtcDaliTouchEventNormalProcessing02(void)
 
   // Connect to actor's touched signal
   HandleData handleData;
-  TouchEventHandleFunctor functor( handleData );
+  TouchDataHandleFunctor functor( handleData );
   actor.TouchSignal().Connect( &application, functor );
 
   Vector2 screenCoordinates( 10.0f, 10.0f );
@@ -362,16 +366,16 @@ int UtcDaliTouchEventNormalProcessing02(void)
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
   DALI_TEST_EQUALS( true, handleData.signalReceived, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, handleData.receivedTouchHandle.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, handleData.receivedTouchHandle.GetState(0), TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, handleData.receivedTouchHandle.GetScreenPosition(0), TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, handleData.receivedTouchHandle.GetLocalPosition(0), 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, handleData.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, handleData.touchData.GetState(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, handleData.touchData.GetScreenPosition(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, handleData.touchData.GetLocalPosition(0), 0.1f, TEST_LOCATION );
 
   END_TEST;
 }
 
 
-int UtcDaliTouchEventAPINegative(void)
+int UtcDaliTouchDataAPINegative(void)
 {
   TestApplication application;
 
@@ -407,7 +411,7 @@ int UtcDaliTouchEventAPINegative(void)
 }
 
 
-int UtcDaliTouchEventOutsideCameraNearFarPlanes(void)
+int UtcDaliTouchDataOutsideCameraNearFarPlanes(void)
 {
   TestApplication application;
 
@@ -437,7 +441,7 @@ int UtcDaliTouchEventOutsideCameraNearFarPlanes(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   Vector2 screenCoordinates( sceneSize.x * 0.5f, sceneSize.y * 0.5f );
@@ -493,7 +497,7 @@ int UtcDaliTouchEventOutsideCameraNearFarPlanes(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventEmitEmpty(void)
+int UtcDaliTouchDataEmitEmpty(void)
 {
   TestApplication application;
 
@@ -511,7 +515,7 @@ int UtcDaliTouchEventEmitEmpty(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventInterrupted(void)
+int UtcDaliTouchDataInterrupted(void)
 {
   TestApplication application;
 
@@ -526,19 +530,19 @@ int UtcDaliTouchEventInterrupted(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // Emit an interrupted signal, we should be signalled regardless of whether there is a hit or not.
   application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 200.0f, 200.0f /* Outside actor */ ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // Emit another interrupted signal, our signal handler should not be called.
@@ -547,7 +551,7 @@ int UtcDaliTouchEventInterrupted(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventParentConsumer(void)
+int UtcDaliTouchDataParentConsumer(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
@@ -563,12 +567,12 @@ int UtcDaliTouchEventParentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false );
+  TouchDataFunctor functor( data, false );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to root actor's touched signal
   SignalData rootData;
-  TouchEventFunctor rootFunctor( rootData ); // Consumes signal
+  TouchDataFunctor rootFunctor( rootData ); // Consumes signal
   rootActor.TouchSignal().Connect( &application, rootFunctor );
 
   Vector2 screenCoordinates( 10.0f, 10.0f );
@@ -580,16 +584,16 @@ int UtcDaliTouchEventParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, rootData.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, rootData.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorCoordinates, data.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_EQUALS( rootCoordinates, rootData.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, rootData.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, data.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, rootData.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorCoordinates, data.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( rootCoordinates, rootData.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -600,16 +604,16 @@ int UtcDaliTouchEventParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, screenCoordinates ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, rootData.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, rootData.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorCoordinates, data.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_EQUALS( rootCoordinates, rootData.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, rootData.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::MOTION, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::MOTION, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, data.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, rootData.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorCoordinates, data.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( rootCoordinates, rootData.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -620,16 +624,16 @@ int UtcDaliTouchEventParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::UP, screenCoordinates ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, data.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, rootData.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::UP, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::UP, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, rootData.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( actorCoordinates, data.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_EQUALS( rootCoordinates, rootData.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( 1u, data.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, rootData.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::UP, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::UP, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, data.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, rootData.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( actorCoordinates, data.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( rootCoordinates, rootData.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -639,15 +643,15 @@ int UtcDaliTouchEventParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( 1u, rootData.receivedTouch.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, rootData.receivedTouch.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( rootCoordinates, rootData.receivedTouch.points[0].local, 0.1f, TEST_LOCATION );
-  DALI_TEST_CHECK( rootActor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( 1u, rootData.touchData.GetPointCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, rootData.touchData.points[0].screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( rootCoordinates, rootData.touchData.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_CHECK( rootActor == rootData.touchData.points[0].hitActor );
   END_TEST;
 }
 
-int UtcDaliTouchEventInterruptedParentConsumer(void)
+int UtcDaliTouchDataInterruptedParentConsumer(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
@@ -663,22 +667,22 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false );
+  TouchDataFunctor functor( data, false );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to root actor's touched signal
   SignalData rootData;
-  TouchEventFunctor rootFunctor( rootData ); // Consumes signal
+  TouchDataFunctor rootFunctor( rootData ); // Consumes signal
   rootActor.TouchSignal().Connect( &application, rootFunctor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -686,10 +690,10 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 200.0f, 200.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -697,8 +701,8 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
   rootData.Reset();
 
@@ -715,8 +719,8 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 200.0f, 200.0f /* Outside actor */ ) ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( rootActor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( rootActor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -727,7 +731,7 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventLeave(void)
+int UtcDaliTouchDataLeave(void)
 {
   TestApplication application;
 
@@ -742,7 +746,7 @@ int UtcDaliTouchEventLeave(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Set actor to require leave events
@@ -751,13 +755,13 @@ int UtcDaliTouchEventLeave(void)
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // Emit a motion signal outside of actor, should be signalled with a Leave
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 200.0f, 200.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::LEAVE, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::LEAVE, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // Another motion outside of actor, no signalling
@@ -768,7 +772,7 @@ int UtcDaliTouchEventLeave(void)
   // Another motion event inside actor, signalled with motion
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 10.0f, 10.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::MOTION, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // We do not want to listen to leave events anymore
@@ -781,7 +785,7 @@ int UtcDaliTouchEventLeave(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventLeaveParentConsumer(void)
+int UtcDaliTouchDataLeaveParentConsumer(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
@@ -797,12 +801,12 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false );
+  TouchDataFunctor functor( data, false );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to root actor's touched signal
   SignalData rootData;
-  TouchEventFunctor rootFunctor( rootData ); // Consumes signal
+  TouchDataFunctor rootFunctor( rootData ); // Consumes signal
   rootActor.TouchSignal().Connect( &application, rootFunctor );
 
   // Set actor to require leave events
@@ -813,10 +817,10 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -824,10 +828,10 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 200.0f, 200.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::LEAVE, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::LEAVE, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::LEAVE, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::LEAVE, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -835,8 +839,8 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 201.0f, 201.0f )) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( rootActor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::MOTION, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( rootActor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -844,10 +848,10 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 10.0f, 10.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::MOTION, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::MOTION, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::MOTION, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -859,11 +863,11 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( sceneSize.width + 10.0f, sceneSize.height + 10.0f )) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::LEAVE, rootData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::LEAVE, rootData.touchData.points[0].state, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTouchEventActorBecomesInsensitive(void)
+int UtcDaliTouchDataActorBecomesInsensitive(void)
 {
   TestApplication application;
 
@@ -878,13 +882,13 @@ int UtcDaliTouchEventActorBecomesInsensitive(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   // Change actor to insensitive
@@ -893,12 +897,12 @@ int UtcDaliTouchEventActorBecomesInsensitive(void)
   // Emit a motion signal, signalled with an interrupted
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 200.0f, 200.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
   END_TEST;
 }
 
-int UtcDaliTouchEventActorBecomesInsensitiveParentConsumer(void)
+int UtcDaliTouchDataActorBecomesInsensitiveParentConsumer(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
@@ -914,22 +918,22 @@ int UtcDaliTouchEventActorBecomesInsensitiveParentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false );
+  TouchDataFunctor functor( data, false );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to root actor's touched signal
   SignalData rootData;
-  TouchEventFunctor rootFunctor( rootData ); // Consumes signal
+  TouchDataFunctor rootFunctor( rootData ); // Consumes signal
   rootActor.TouchSignal().Connect( &application, rootFunctor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   data.Reset();
   rootData.Reset();
 
@@ -943,20 +947,20 @@ int UtcDaliTouchEventActorBecomesInsensitiveParentConsumer(void)
   // Emit a motion signal, signalled with an interrupted (should get interrupted even if within root actor)
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2 ( 200.0f, 200.0f )) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.touchData.points[0].state, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTouchEventMultipleLayers(void)
+int UtcDaliTouchDataMultipleLayers(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
 
   Layer layer1 ( Layer::New() );
   layer1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
@@ -1068,7 +1072,7 @@ int UtcDaliTouchEventMultipleLayers(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventMultipleRenderTasks(void)
+int UtcDaliTouchDataMultipleRenderTasks(void)
 {
   TestApplication application;
   Integration::Scene scene ( application.GetScene() );
@@ -1091,7 +1095,7 @@ int UtcDaliTouchEventMultipleRenderTasks(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
@@ -1112,7 +1116,7 @@ int UtcDaliTouchEventMultipleRenderTasks(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
+int UtcDaliTouchDataMultipleRenderTasksWithChildLayer(void)
 {
   TestApplication application;
   Integration::Scene scene ( application.GetScene() );
@@ -1141,7 +1145,7 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
 
   // Connect to layer's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
   layer.TouchSignal().Connect( &application, functor );
 
@@ -1163,7 +1167,7 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventOffscreenRenderTasks(void)
+int UtcDaliTouchDataOffscreenRenderTasks(void)
 {
   TestApplication application;
   Integration::Scene scene ( application.GetScene() );
@@ -1203,7 +1207,7 @@ int UtcDaliTouchEventOffscreenRenderTasks(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
@@ -1213,7 +1217,7 @@ int UtcDaliTouchEventOffscreenRenderTasks(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventMultipleRenderableActors(void)
+int UtcDaliTouchDataMultipleRenderableActors(void)
 {
   TestApplication application;
   Integration::Scene scene ( application.GetScene() );
@@ -1235,7 +1239,7 @@ int UtcDaliTouchEventMultipleRenderableActors(void)
 
   // Connect to layer's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   parent.TouchSignal().Connect( &application, functor );
   actor.TouchSignal().Connect( &application, functor );
 
@@ -1246,7 +1250,7 @@ int UtcDaliTouchEventMultipleRenderableActors(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventActorRemovedInSignal(void)
+int UtcDaliTouchDataActorRemovedInSignal(void)
 {
   TestApplication application;
 
@@ -1315,7 +1319,7 @@ int UtcDaliTouchEventActorRemovedInSignal(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventActorSignalNotConsumed(void)
+int UtcDaliTouchDataActorSignalNotConsumed(void)
 {
   TestApplication application;
 
@@ -1330,7 +1334,7 @@ int UtcDaliTouchEventActorSignalNotConsumed(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false );
+  TouchDataFunctor functor( data, false );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
@@ -1339,7 +1343,7 @@ int UtcDaliTouchEventActorSignalNotConsumed(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventActorRemovedFromScene(void)
+int UtcDaliTouchDataActorRemovedFromScene(void)
 {
   TestApplication application;
 
@@ -1354,7 +1358,7 @@ int UtcDaliTouchEventActorRemovedFromScene(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
@@ -1377,7 +1381,7 @@ int UtcDaliTouchEventActorRemovedFromScene(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventLayerConsumesTouch(void)
+int UtcDaliTouchDataLayerConsumesTouch(void)
 {
   TestApplication application;
 
@@ -1392,7 +1396,7 @@ int UtcDaliTouchEventLayerConsumesTouch(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Add a layer to overlap the actor
@@ -1428,7 +1432,7 @@ int UtcDaliTouchEventLayerConsumesTouch(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventLeaveActorReadded(void)
+int UtcDaliTouchDataLeaveActorReadded(void)
 {
   TestApplication application;
   Integration::Scene scene = application.GetScene();
@@ -1447,7 +1451,7 @@ int UtcDaliTouchEventLeaveActorReadded(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down and motion
@@ -1468,13 +1472,13 @@ int UtcDaliTouchEventLeaveActorReadded(void)
   // Emit a motion outside the actor's bounds
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 200.0f, 200.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::LEAVE, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::LEAVE, data.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
 
   END_TEST;
 }
 
-int UtcDaliTouchEventClippedActor(void)
+int UtcDaliTouchDataClippedActor(void)
 {
   TestApplication application;
   Integration::Scene scene = application.GetScene();
@@ -1503,7 +1507,7 @@ int UtcDaliTouchEventClippedActor(void)
 
   // Connect to actor's touch signal.
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit an event within clipped area - no hit.
@@ -1526,7 +1530,7 @@ int UtcDaliTouchEventClippedActor(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventActorUnparented(void)
+int UtcDaliTouchDataActorUnparented(void)
 {
   TestApplication application;
 
@@ -1541,14 +1545,14 @@ int UtcDaliTouchEventActorUnparented(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
   data.Reset();
 
   // Render and notify
@@ -1560,11 +1564,11 @@ int UtcDaliTouchEventActorUnparented(void)
 
   // Should receive an interrupted event
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTouchEventParentRemovedFromScene(void)
+int UtcDaliTouchDataParentRemovedFromScene(void)
 {
   TestApplication application;
 
@@ -1584,14 +1588,14 @@ int UtcDaliTouchEventParentRemovedFromScene(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
   data.Reset();
 
   // Render and notify
@@ -1603,11 +1607,11 @@ int UtcDaliTouchEventParentRemovedFromScene(void)
 
   // Should receive an interrupted event
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
+int UtcDaliTouchDataActorRemovedFromSceneDifferentConsumer(void)
 {
   TestApplication application;
 
@@ -1627,23 +1631,23 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false /* Do not consume */ );
+  TouchDataFunctor functor( data, false /* Do not consume */ );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to parent's touched signal
   SignalData parentData;
-  TouchEventFunctor parentFunctor( parentData );
+  TouchDataFunctor parentFunctor( parentData );
   parent.TouchSignal().Connect( &application, parentFunctor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
   DALI_TEST_CHECK( actor == data.touchedActor );
   DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, parentData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == parentData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, parentData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == parentData.touchData.points[0].hitActor );
   DALI_TEST_CHECK( parent == parentData.touchedActor );
   data.Reset();
   parentData.Reset();
@@ -1657,9 +1661,9 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
 
   // Should receive an interrupted event for both actor & parent
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
   parentData.Reset();
 
@@ -1679,7 +1683,7 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
 
   // Parent is now consumer, connect again to the touched signal of the actor so that it becomes the consumer
   SignalData secondData;
-  TouchEventFunctor secondFunctor( secondData /* Consume */ );
+  TouchDataFunctor secondFunctor( secondData /* Consume */ );
   actor.TouchSignal().Connect( &application, secondFunctor );
 
   // Unparent the actor
@@ -1687,11 +1691,11 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
 
   // Should receive an interrupted event for both actor functors & the parent as well as it was last consumer
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, secondData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, secondData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, secondData.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
   parentData.Reset();
   secondData.Reset();
@@ -1699,7 +1703,7 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventInterruptedDifferentConsumer(void)
+int UtcDaliTouchDataInterruptedDifferentConsumer(void)
 {
   TestApplication application;
   Actor rootActor( application.GetScene().GetRootLayer() );
@@ -1720,32 +1724,32 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data, false /* Do not consume */ );
+  TouchDataFunctor functor( data, false /* Do not consume */ );
   actor.TouchSignal().Connect( &application, functor );
 
   // Connect to parent's touched signal
   SignalData parentData;
-  TouchEventFunctor parentFunctor( parentData, false /* Do not consume */ );
+  TouchDataFunctor parentFunctor( parentData, false /* Do not consume */ );
   parent.TouchSignal().Connect( &application, parentFunctor );
 
   // Connect to root's touched signal and consume
   SignalData rootData;
-  TouchEventFunctor rootFunctor( rootData );
+  TouchDataFunctor rootFunctor( rootData );
   rootActor.TouchSignal().Connect( &application, rootFunctor );
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == data.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == data.touchData.points[0].hitActor );
   DALI_TEST_CHECK( actor == data.touchedActor );
   DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, parentData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == parentData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, parentData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == parentData.touchData.points[0].hitActor );
   DALI_TEST_CHECK( parent == parentData.touchedActor );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, rootData.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_CHECK( actor == rootData.receivedTouch.points[0].hitActor );
+  DALI_TEST_EQUALS( PointState::DOWN, rootData.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_CHECK( actor == rootData.touchData.points[0].hitActor );
   DALI_TEST_CHECK( rootActor == rootData.touchedActor );
   data.Reset();
   parentData.Reset();
@@ -1753,17 +1757,17 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
 
   // Root is now consumer, connect to the touched signal of the parent so that it becomes the consumer
   SignalData secondData;
-  TouchEventFunctor secondFunctor( secondData /* Consume */ );
+  TouchDataFunctor secondFunctor( secondData /* Consume */ );
   parent.TouchSignal().Connect( &application, secondFunctor );
 
   // Emit an interrupted signal, all three should STILL be called
   application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, data.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, parentData.touchData.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::INTERRUPTED, rootData.touchData.points[0].state, TEST_LOCATION );
   data.Reset();
   parentData.Reset();
   rootData.Reset();
@@ -1771,7 +1775,7 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventGetRadius(void)
+int UtcDaliTouchDataGetRadius(void)
 {
   TestApplication application;
 
@@ -1786,7 +1790,7 @@ int UtcDaliTouchEventGetRadius(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with an angle
@@ -1794,15 +1798,15 @@ int UtcDaliTouchEventGetRadius(void)
   touchEvent.points[ 0 ].SetRadius( 100.0f );
   application.ProcessEvent( touchEvent );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( 100.0f, data.receivedTouch.points[0].radius, TEST_LOCATION );
-  DALI_TEST_EQUALS( 100.0f, data.receivedTouch.points[0].ellipseRadius.x, TEST_LOCATION );
-  DALI_TEST_EQUALS( 100.0f, data.receivedTouch.points[0].ellipseRadius.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( 100.0f, data.touchData.points[0].radius, TEST_LOCATION );
+  DALI_TEST_EQUALS( 100.0f, data.touchData.points[0].ellipseRadius.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( 100.0f, data.touchData.points[0].ellipseRadius.y, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventGetEllipseRadius(void)
+int UtcDaliTouchDataGetEllipseRadius(void)
 {
   TestApplication application;
 
@@ -1817,7 +1821,7 @@ int UtcDaliTouchEventGetEllipseRadius(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with an angle
@@ -1825,15 +1829,15 @@ int UtcDaliTouchEventGetEllipseRadius(void)
   touchEvent.points[ 0 ].SetRadius( 100.0f, Vector2( 20.0f, 10.0f ) );
   application.ProcessEvent( touchEvent );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( 100.0f, data.receivedTouch.points[0].radius, TEST_LOCATION );
-  DALI_TEST_EQUALS( 20.0f, data.receivedTouch.points[0].ellipseRadius.x, TEST_LOCATION );
-  DALI_TEST_EQUALS( 10.0f, data.receivedTouch.points[0].ellipseRadius.y, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( 100.0f, data.touchData.points[0].radius, TEST_LOCATION );
+  DALI_TEST_EQUALS( 20.0f, data.touchData.points[0].ellipseRadius.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( 10.0f, data.touchData.points[0].ellipseRadius.y, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventGetAngle(void)
+int UtcDaliTouchDataGetAngle(void)
 {
   TestApplication application;
 
@@ -1848,7 +1852,7 @@ int UtcDaliTouchEventGetAngle(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with an angle
@@ -1856,13 +1860,13 @@ int UtcDaliTouchEventGetAngle(void)
   touchEvent.points[ 0 ].SetAngle( Degree( 90.0f ) );
   application.ProcessEvent( touchEvent );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( Degree( 90.0f ), data.receivedTouch.points[0].angle, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( Degree( 90.0f ), data.touchData.points[0].angle, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventGetPressure(void)
+int UtcDaliTouchDataGetPressure(void)
 {
   TestApplication application;
 
@@ -1877,7 +1881,7 @@ int UtcDaliTouchEventGetPressure(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with an angle
@@ -1885,13 +1889,13 @@ int UtcDaliTouchEventGetPressure(void)
   touchEvent.points[ 0 ].SetPressure( 10.0f );
   application.ProcessEvent( touchEvent );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( 10.0f, data.receivedTouch.points[0].pressure, TEST_LOCATION );
+  DALI_TEST_EQUALS( PointState::DOWN, data.touchData.points[0].state, TEST_LOCATION );
+  DALI_TEST_EQUALS( 10.0f, data.touchData.points[0].pressure, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventUsage(void)
+int UtcDaliTouchDataUsage(void)
 {
   TestApplication application;
 
@@ -1906,7 +1910,7 @@ int UtcDaliTouchEventUsage(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
 
@@ -1918,7 +1922,7 @@ int UtcDaliTouchEventUsage(void)
   END_TEST;
 }
 
-int UtcDaliTouchEventGetDeviceAPINegative(void)
+int UtcDaliTouchDataGetDeviceAPINegative(void)
 {
   TestApplication application;
 
@@ -1933,7 +1937,7 @@ int UtcDaliTouchEventGetDeviceAPINegative(void)
 
   // Connect to actor's touched signal
   HandleData handleData;
-  TouchEventHandleFunctor functor( handleData );
+  TouchDataHandleFunctor functor( handleData );
   actor.TouchSignal().Connect( &application, functor );
 
   Vector2 screenCoordinates( 10.0f, 10.0f );
@@ -1943,13 +1947,13 @@ int UtcDaliTouchEventGetDeviceAPINegative(void)
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, screenCoordinates ) );
 
-  TouchEvent data = handleData.receivedTouchHandle;
+  TouchData data = handleData.touchData;
   DALI_TEST_EQUALS( data.GetDeviceClass( -1 ), Device::Class::NONE, TEST_LOCATION );
   DALI_TEST_EQUALS( data.GetDeviceSubclass( -1 ), Device::Subclass::NONE, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTouchEventGetMouseButtonPositive(void)
+int UtcDaliTouchDataGetMouseButtonPositive(void)
 {
   TestApplication application;
 
@@ -1964,7 +1968,7 @@ int UtcDaliTouchEventGetMouseButtonPositive(void)
 
   // Connect to actor's touched signal
   HandleData handleData;
-  TouchEventHandleFunctor functor( handleData );
+  TouchDataHandleFunctor functor( handleData );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with MouseButton
@@ -1972,13 +1976,13 @@ int UtcDaliTouchEventGetMouseButtonPositive(void)
   touchEvent.points[ 0 ].SetMouseButton( static_cast< MouseButton::Type >( 3 ) );
   application.ProcessEvent( touchEvent );
 
-  TouchEvent data = handleData.receivedTouchHandle;
+  TouchData data = handleData.touchData;
   DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::SECONDARY, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventGetMouseButtonNagative(void)
+int UtcDaliTouchDataGetMouseButtonNagative(void)
 {
   TestApplication application;
 
@@ -1993,7 +1997,7 @@ int UtcDaliTouchEventGetMouseButtonNagative(void)
 
   // Connect to actor's touched signal
   HandleData handleData;
-  TouchEventHandleFunctor functor( handleData );
+  TouchDataHandleFunctor functor( handleData );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal with MouseButton
@@ -2001,14 +2005,14 @@ int UtcDaliTouchEventGetMouseButtonNagative(void)
   touchEvent.points[ 0 ].SetMouseButton( static_cast< MouseButton::Type >( 2 ) );
   application.ProcessEvent( touchEvent );
 
-  TouchEvent data = handleData.receivedTouchHandle;
+  TouchData data = handleData.touchData;
   DALI_TEST_EQUALS( data.GetMouseButton( 0 ), MouseButton::TERTIARY, TEST_LOCATION );
   DALI_TEST_EQUALS( data.GetMouseButton( 3 ), MouseButton::INVALID, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventCapturePropertySet(void)
+int UtcDaliTouchDataCapturePropertySet(void)
 {
   TestApplication application;
 
@@ -2023,7 +2027,7 @@ int UtcDaliTouchEventCapturePropertySet(void)
 
   // Connect to actor's touched signal
   SignalData data;
-  TouchEventFunctor functor( data );
+  TouchDataFunctor functor( data );
   actor.TouchSignal().Connect( &application, functor );
 
   // Emit a down signal
@@ -2039,7 +2043,7 @@ int UtcDaliTouchEventCapturePropertySet(void)
   // Up event, should receive an interrupted
   application.ProcessEvent( GenerateSingleTouch( PointState::FINISHED, Vector2( 110.0f, 110.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( data.receivedTouch.GetPoint(0).state, PointState::INTERRUPTED, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.touchData.GetPoint(0).state, PointState::INTERRUPTED, TEST_LOCATION );
 
   // Now set the capture property
   actor.SetProperty( DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
@@ -2057,21 +2061,21 @@ int UtcDaliTouchEventCapturePropertySet(void)
   // Up event, we should receive it again, but as ended rather than interrupted
   application.ProcessEvent( GenerateSingleTouch( PointState::FINISHED, Vector2( 110.0f, 110.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( data.receivedTouch.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION );
+  DALI_TEST_EQUALS( data.touchData.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliTouchEventIntegNewTouchEvent(void)
+int UtcDaliTouchDataIntegNewTouchData(void)
 {
   uint32_t timestamp = 92858u;
   TouchPoint tp(1, TouchPoint::State::Started, 34.4f, 123.89f, 5.0f, 7.0f);
-  Dali::TouchEvent touchEvent = Integration::NewTouchEvent(timestamp, tp);
+  Dali::TouchData touchData = Integration::NewTouchData(timestamp, tp);
 
-  DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(touchEvent.GetState(0), PointState::Type::STARTED, TEST_LOCATION );
-  DALI_TEST_EQUALS(touchEvent.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS(touchEvent.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION );
+  DALI_TEST_EQUALS(touchData.GetPointCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchData.GetState(0), PointState::Type::STARTED, TEST_LOCATION );
+  DALI_TEST_EQUALS(touchData.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS(touchData.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION );
 
 
   END_TEST;

@@ -89,21 +89,21 @@ struct TestConstraintRef
 };
 
 
-static bool TestTouchCallback(Actor, const TouchEvent&)
+static bool TestTouchCallback(Actor actor, const TouchData& touchData )
 {
   gTouchCallBackCalled = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback2(Actor, const TouchEvent&)
+static bool TestTouchCallback2(Actor actor, const TouchData& touchData )
 {
   gTouchCallBackCalled2 = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback3(Actor, const TouchEvent&)
+static bool TestTouchCallback3(Actor actor, const TouchData& touchData )
 {
   gTouchCallBackCalled3 = true;
   return true;

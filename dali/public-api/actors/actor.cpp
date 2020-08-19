@@ -202,7 +202,7 @@ float Actor::GetRelayoutSize( Dimension::Type dimension ) const
   return GetImplementation(*this).GetRelayoutSize( dimension );
 }
 
-Actor::TouchEventSignalType& Actor::TouchSignal()
+Actor::TouchDataSignalType& Actor::TouchSignal()
 {
   return GetImplementation( *this ).TouchSignal();
 }

@@ -24,7 +24,7 @@
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-event-utils.h>
+#include <test-touch-data-utils.h>
 
 using namespace Dali;
 
@@ -115,9 +115,9 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 };
 
 // Functor for receiving a touch event
-struct TouchEventFunctor
+struct TouchDataFunctor
 {
-  bool operator()(Actor actor, Dali::TouchEvent touch)
+  bool operator()(Actor actor, Dali::TouchData touch)
   {
     //For line coverage
     unsigned int points = touch.GetPointCount();
@@ -207,7 +207,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
 
   detector.Attach(actor);
 
-  TouchEventFunctor touchFunctor;
+  TouchDataFunctor touchFunctor;
   actor.TouchSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
@@ -1001,7 +1001,7 @@ int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
   application.GetScene().Add(actor);
 
   bool consume = false;
-  TouchEventFunctorConsumeSetter touchFunctor(consume);
+  TouchDataFunctorConsumeSetter touchFunctor(consume);
   actor.TouchSignal().Connect(&application,touchFunctor);
 
   // Render and notify

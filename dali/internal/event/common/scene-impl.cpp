@@ -320,7 +320,7 @@ void Scene::EmitEventProcessingFinishedSignal()
   }
 }
 
-void Scene::EmitTouchedSignal( const Dali::TouchEvent& touch )
+void Scene::EmitTouchedSignal( const Dali::TouchData& touch )
 {
   Dali::Integration::Scene handle( this );
   if ( !mTouchSignal.Empty() )

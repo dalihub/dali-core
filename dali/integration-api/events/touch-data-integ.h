@@ -1,5 +1,5 @@
-#ifndef DALI_INTEGRATION_TOUCH_INTEG_H
-#define DALI_INTEGRATION_TOUCH_INTEG_H
+#ifndef DALI_INTEGRATION_TOUCH_DATA_INTEG_H
+#define DALI_INTEGRATION_TOUCH_DATA_INTEG_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -17,9 +17,7 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/touch-point.h>
 
 namespace Dali
@@ -35,10 +33,10 @@ namespace Integration
  * @param[in] point The point on screen where the touch occurred.
  * @return A new touch data handle.
  */
-DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point);
+DALI_CORE_API Dali::TouchData NewTouchData(uint32_t timestamp, const TouchPoint& point);
 
 } // namespace Integration
 
 } // namespace Dali
 
-#endif //DALI_INTEGRATION_TOUCH_INTEG_H
+#endif //DALI_INTEGRATION_TOUCH_DATA_INTEG_H

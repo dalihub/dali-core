@@ -36,7 +36,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
@@ -273,7 +273,7 @@ void Stage::OnKeyEvent( const Dali::KeyEvent& event )
   }
 }
 
-void Stage::OnTouchEvent( const Dali::TouchEvent& touch )
+void Stage::OnTouchEvent( const Dali::TouchData& touch )
 {
   mTouchSignal.Emit( touch );
 }
@@ -302,7 +302,7 @@ void Stage::EmitEventProcessingFinishedSignal()
    mEventProcessingFinishedSignal.Emit();
 }
 
-void Stage::EmitTouchedSignal( const Dali::TouchEvent& touch )
+void Stage::EmitTouchedSignal( const Dali::TouchData& touch )
 {
   mTouchSignal.Emit( touch );
 }

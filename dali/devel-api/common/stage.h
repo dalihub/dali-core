@@ -40,7 +40,7 @@ class Stage;
 class Actor;
 class Layer;
 class ObjectRegistry;
-class TouchEvent;
+class TouchData;
 class RenderTaskList;
 struct Vector2;
 struct Vector3;
@@ -89,7 +89,7 @@ public:
 
   typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type @SINCE_1_0.0
   typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchEvent&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< void (const TouchData&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
   typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
   typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
   typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
@@ -278,7 +278,7 @@ public:
    * An interrupted event will also be emitted (if it occurs).
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( TouchEvent event );
+   *   void YourCallbackName( TouchData event );
    * @endcode
    *
    * @return The touch signal to connect to

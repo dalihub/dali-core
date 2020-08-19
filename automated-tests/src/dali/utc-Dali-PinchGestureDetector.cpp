@@ -22,7 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-event-utils.h>
+#include <test-touch-data-utils.h>
 
 using namespace Dali;
 
@@ -1113,7 +1113,7 @@ int UtcDaliPinchGestureInterruptedWhenTouchConsumed(void)
   application.GetScene().Add(actor);
 
   bool consume = false;
-  TouchEventFunctorConsumeSetter touchFunctor(consume);
+  TouchDataFunctorConsumeSetter touchFunctor(consume);
   actor.TouchSignal().Connect(&application,touchFunctor);
 
   // Render and notify
