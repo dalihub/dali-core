@@ -206,6 +206,11 @@ public:
   void OnKeyEvent( const Dali::KeyEvent& event );
 
   /**
+   * Callback for Internal::Scene TouchedEventSignal signal
+   */
+  void OnTouchedEvent( const Dali::TouchEvent& touch );
+
+  /**
    * Callback for Internal::Scene TouchSignal signal
    */
   void OnTouchEvent( const Dali::TouchData& touch );
@@ -237,9 +242,10 @@ public:
 
   /**
    * Emits the touched signal.
+   * @param[in] touchEvent The touch event details (Old API).
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal( const Dali::TouchData& touch );
+  void EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch );
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
@@ -261,6 +267,11 @@ public:
    * @copydoc Dali::Stage::SignalEventProcessingFinished()
    */
   Dali::Stage::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
+
+  /**
+    * @copydoc Dali::Stage::TouchedSignal()
+    */
+  Dali::Stage::TouchedSignalType& TouchedSignal();
 
   /**
     * @copydoc Dali::Stage::TouchSignal()
@@ -350,7 +361,8 @@ private:
   // The event processing finished signal
   Dali::Stage::EventProcessingFinishedSignalType  mEventProcessingFinishedSignal;
 
-  // The touched signal
+  // The touched signals
+  Dali::Stage::TouchedSignalType                  mTouchedSignal;
   Dali::Stage::TouchSignalType                    mTouchSignal;
 
   // The wheel event signal

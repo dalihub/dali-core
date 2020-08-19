@@ -336,6 +336,11 @@ void TestCustomActor::OnSizeAnimation(Animation& animation, const Vector3& targe
   mTargetSize = targetSize;
   AddToCallStacks("OnSizeAnimation");
 }
+bool TestCustomActor::OnTouchEvent(const TouchEvent& event)
+{
+  AddToCallStacks("OnTouchEvent");
+  return true;
+}
 bool TestCustomActor::OnHoverEvent(const HoverEvent& event)
 {
   AddToCallStacks("OnHoverEvent");

@@ -131,27 +131,28 @@ public:
   virtual void OnInitialize( const char* name );
   void ResetCallStack();
   void AddToCallStacks( const char* method );
-  void OnSceneConnection( int depth ) override;
-  void OnSceneDisconnection() override;
-  void OnChildAdd(Dali::Actor& child) override;
-  void OnChildRemove(Dali::Actor& child) override;
-  void OnPropertySet( Dali::Property::Index index, Dali::Property::Value propertyValue ) override;
-  void OnSizeSet(const Dali::Vector3& targetSize) override;
-  void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override;
-  bool OnHoverEvent(const Dali::HoverEvent& event) override;
-  bool OnWheelEvent(const Dali::WheelEvent& event) override;
-  bool OnKeyEvent(const Dali::KeyEvent& event) override;
+  virtual void OnSceneConnection( int depth );
+  virtual void OnSceneDisconnection();
+  virtual void OnChildAdd(Dali::Actor& child);
+  virtual void OnChildRemove(Dali::Actor& child);
+  virtual void OnPropertySet( Dali::Property::Index index, Dali::Property::Value propertyValue );
+  virtual void OnSizeSet(const Dali::Vector3& targetSize);
+  virtual void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize);
+  virtual bool OnTouchEvent(const Dali::TouchEvent& event);
+  virtual bool OnHoverEvent(const Dali::HoverEvent& event);
+  virtual bool OnWheelEvent(const Dali::WheelEvent& event);
+  virtual bool OnKeyEvent(const Dali::KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
-  Dali::Vector3 GetNaturalSize() override;
-  float GetHeightForWidth( float width ) override;
-  float GetWidthForHeight( float height ) override;
-  void OnRelayout( const Dali::Vector2& size, Dali::RelayoutContainer& container ) override;
-  void OnSetResizePolicy( Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension ) override;
-  void OnCalculateRelayoutSize( Dali::Dimension::Type dimension ) override;
-  float CalculateChildSize( const Dali::Actor& child, Dali::Dimension::Type dimension ) override;
-  void OnLayoutNegotiated( float size, Dali::Dimension::Type dimension ) override;
-  bool RelayoutDependentOnChildren( Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS ) override;
+  virtual Dali::Vector3 GetNaturalSize();
+  virtual float GetHeightForWidth( float width );
+  virtual float GetWidthForHeight( float height );
+  virtual void OnRelayout( const Dali::Vector2& size, Dali::RelayoutContainer& container );
+  virtual void OnSetResizePolicy( Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension );
+  virtual void OnCalculateRelayoutSize( Dali::Dimension::Type dimension );
+  virtual float CalculateChildSize( const Dali::Actor& child, Dali::Dimension::Type dimension );
+  virtual void OnLayoutNegotiated( float size, Dali::Dimension::Type dimension );
+  virtual bool RelayoutDependentOnChildren( Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS );
   static void SetProperty( Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value );
   static Dali::Property::Value GetProperty( Dali::BaseObject* object, Dali::Property::Index index );
 
@@ -207,7 +208,7 @@ struct TestCustomActorVariant1 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  void OnSceneConnection( int depth ) override
+  virtual void OnSceneConnection( int depth )
   {
     // Chain up first
     TestCustomActor::OnSceneConnection( depth );
@@ -443,33 +444,37 @@ public:
   }
 
   // From CustomActorImpl
-  void OnSceneConnection( int depth ) override
+  virtual void OnSceneConnection( int depth )
   {
   }
-  void OnSceneDisconnection() override
+  virtual void OnSceneDisconnection()
   {
   }
-  void OnChildAdd(Dali::Actor& child) override
+  virtual void OnChildAdd(Dali::Actor& child)
   {
   }
-  void OnChildRemove(Dali::Actor& child) override
+  virtual void OnChildRemove(Dali::Actor& child)
   {
   }
-  void OnSizeSet(const Dali::Vector3& targetSize) override
+  virtual void OnSizeSet(const Dali::Vector3& targetSize)
   {
   }
-  void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override
+  virtual void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize)
   {
   }
-  bool OnHoverEvent(const Dali::HoverEvent& event) override
-  {
-    return true;
-  }
-  bool OnWheelEvent(const Dali::WheelEvent& event) override
+  virtual bool OnTouchEvent(const Dali::TouchEvent& event)
   {
     return true;
   }
-  bool OnKeyEvent(const Dali::KeyEvent& event) override
+  virtual bool OnHoverEvent(const Dali::HoverEvent& event)
+  {
+    return true;
+  }
+  virtual bool OnWheelEvent(const Dali::WheelEvent& event)
+  {
+    return true;
+  }
+  virtual bool OnKeyEvent(const Dali::KeyEvent& event)
   {
     return true;
   }
@@ -480,43 +485,43 @@ public:
   {
   }
 
-  Dali::Vector3 GetNaturalSize() override
+  virtual Dali::Vector3 GetNaturalSize()
   {
     return Dali::Vector3( 0.0f, 0.0f, 0.0f );
   }
 
-  float GetHeightForWidth( float width ) override
+  virtual float GetHeightForWidth( float width )
   {
     return 0.0f;
   }
 
-  float GetWidthForHeight( float height ) override
+  virtual float GetWidthForHeight( float height )
   {
     return 0.0f;
   }
 
-  void OnRelayout( const Dali::Vector2& size, Dali::RelayoutContainer& container ) override
+  virtual void OnRelayout( const Dali::Vector2& size, Dali::RelayoutContainer& container )
   {
   }
 
-  void OnSetResizePolicy( Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension ) override
+  virtual void OnSetResizePolicy( Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension )
   {
   }
 
-  void OnCalculateRelayoutSize( Dali::Dimension::Type dimension ) override
+  virtual void OnCalculateRelayoutSize( Dali::Dimension::Type dimension )
   {
   }
 
-  float CalculateChildSize( const Dali::Actor& child, Dali::Dimension::Type dimension ) override
+  virtual float CalculateChildSize( const Dali::Actor& child, Dali::Dimension::Type dimension )
   {
     return 0.0f;
   }
 
-  void OnLayoutNegotiated( float size, Dali::Dimension::Type dimension ) override
+  virtual void OnLayoutNegotiated( float size, Dali::Dimension::Type dimension )
   {
   }
 
-  bool RelayoutDependentOnChildren( Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS ) override
+  virtual bool RelayoutDependentOnChildren( Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS )
   {
     return false;
   }

@@ -202,6 +202,13 @@ float Actor::GetRelayoutSize( Dimension::Type dimension ) const
   return GetImplementation(*this).GetRelayoutSize( dimension );
 }
 
+Actor::TouchSignalType& Actor::TouchedSignal()
+{
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: TouchedSignal() is deprecated and will be removed from next release. Use TouchSignal() instead.\n" );
+
+  return GetImplementation(*this).TouchedSignal();
+}
+
 Actor::TouchDataSignalType& Actor::TouchSignal()
 {
   return GetImplementation( *this ).TouchSignal();

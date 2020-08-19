@@ -59,6 +59,7 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 
 #include <dali/public-api/images/native-image-interface.h>

@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
+#include <test-touch-utils.h>
 #include <test-touch-data-utils.h>
 
 using namespace Dali;
@@ -111,6 +112,15 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 
   Gesture::State& stateToUnstage;
   Integration::Scene scene;
+};
+
+// Functor for receiving a touch event
+struct TouchEventFunctor
+{
+  bool operator()(Actor actor, const TouchEvent& touch)
+  {
+    return false;
+  }
 };
 
 } // anon namespace
@@ -611,6 +621,9 @@ int UtcDaliPinchGestureSignalReceptionChildHit(void)
   child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
   parent.Add(child);
+
+  TouchEventFunctor touchFunctor;
+  child.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1152,7 +1165,6 @@ int UtcDaliPinchGestureInterruptedWhenTouchConsumed(void)
 
   END_TEST;
 }
-
 
 int UtcDaliPinchGestureDisableDetectionDuringPinchN(void)
 {

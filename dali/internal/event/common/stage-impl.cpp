@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -64,6 +65,7 @@ namespace
 const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
 const char* const SIGNAL_KEY_EVENT_GENERATED =       "keyEventGenerated";
 const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
+const char* const SIGNAL_TOUCHED =                   "touched";
 const char* const SIGNAL_TOUCH =                     "touch";
 const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
 const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
@@ -74,6 +76,7 @@ TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
+SignalConnectorType signalConnector3( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
 SignalConnectorType signalConnector4( mType, SIGNAL_WHEEL_EVENT,               &Stage::DoConnectSignal );
 SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
@@ -94,6 +97,7 @@ void Stage::Initialize( Scene& scene )
   mScene->SetBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR );
   mScene->EventProcessingFinishedSignal().Connect( this, &Stage::OnEventProcessingFinished );
   mScene->KeyEventSignal().Connect( this, &Stage::OnKeyEvent );
+  mScene->TouchedSignal().Connect( this, &Stage::OnTouchedEvent );
   mScene->TouchSignal().Connect( this, &Stage::OnTouchEvent );
   mScene->WheelEventSignal().Connect( this, &Stage::OnWheelEvent );
 }
@@ -230,6 +234,10 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     stage->EventProcessingFinishedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
+  {
+    stage->TouchedSignal().Connect( tracker, functor );
+  }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCH ) )
   {
     stage->TouchSignal().Connect( tracker, functor );
@@ -273,6 +281,11 @@ void Stage::OnKeyEvent( const Dali::KeyEvent& event )
   }
 }
 
+void Stage::OnTouchedEvent( const Dali::TouchEvent& touchEvent )
+{
+  mTouchedSignal.Emit( touchEvent );
+}
+
 void Stage::OnTouchEvent( const Dali::TouchData& touch )
 {
   mTouchSignal.Emit( touch );
@@ -302,8 +315,9 @@ void Stage::EmitEventProcessingFinishedSignal()
    mEventProcessingFinishedSignal.Emit();
 }
 
-void Stage::EmitTouchedSignal( const Dali::TouchData& touch )
+void Stage::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch )
 {
+  mTouchedSignal.Emit( touchEvent );
   mTouchSignal.Emit( touch );
 }
 
@@ -350,6 +364,12 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
   return mEventProcessingFinishedSignal;
 }
 
+Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
+{
+  DALI_LOG_WARNING( "Deprecated. Use TouchSignal() instead.\n" );
+  return mTouchedSignal;
+}
+
 Dali::Stage::TouchSignalType& Stage::TouchSignal()
 {
   return mTouchSignal;
@@ -390,6 +410,7 @@ Stage::Stage( SceneGraph::UpdateManager& updateManager )
   mKeyEventSignal(),
   mKeyEventGeneratedSignal(),
   mEventProcessingFinishedSignal(),
+  mTouchedSignal(),
   mTouchSignal(),
   mWheelEventSignal(),
   mContextLostSignal(),

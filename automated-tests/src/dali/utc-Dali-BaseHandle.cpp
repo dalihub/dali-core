@@ -475,7 +475,7 @@ int UtcDaliBaseHandleConnectSignal(void)
   DALI_TEST_CHECK( gTouchCallBackCalled == false );
 
   // connect to its touch signal
-  actor.ConnectSignal( &application, "touch", TestCallback() );
+  actor.ConnectSignal( &application, "touched", TestCallback() );
 
   application.SendNotification();
   application.Render(1000);

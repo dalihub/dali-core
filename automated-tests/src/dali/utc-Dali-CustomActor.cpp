@@ -997,6 +997,40 @@ int UtcDaliCustomActorSizeComponentAnimation(void)
   DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 2 ], TEST_LOCATION );
 
   END_TEST;
+
+}
+
+int UtcDaliCustomActorOnTouchEvent(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CustomActor::OnTouchEvent()");
+
+  Test::TestCustomActor custom = Test::TestCustomActor::New();
+  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+
+  // set size for custom actor
+  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
+  // add the custom actor to stage
+  application.GetScene().Add( custom );
+  custom.ResetCallStack();
+
+  // Render and notify a couple of times
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // simulate a touch event
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 1, 1 ) );
+  Dali::Integration::TouchEvent event;
+  event.AddPoint( point );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnTouchEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  END_TEST;
 }
 
 int UtcDaliCustomActorOnHoverEvent(void)
@@ -1414,6 +1448,8 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   { }
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   { }
+  virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API
+  { return false; }
   virtual bool OnHoverEvent(const HoverEvent& event)
   { return false; }
   virtual bool OnKeyEvent(const KeyEvent& event)
@@ -1584,3 +1620,4 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
 
   END_TEST;
 }
+

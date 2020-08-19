@@ -17,6 +17,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/events/long-press-gesture-detector-devel.cpp
   ${devel_api_src_dir}/events/rotation-gesture.cpp
   ${devel_api_src_dir}/events/rotation-gesture-detector.cpp
+  ${devel_api_src_dir}/events/touch-data-devel.cpp
   ${devel_api_src_dir}/events/key-event-devel.cpp
   ${devel_api_src_dir}/images/distance-field.cpp
   ${devel_api_src_dir}/images/pixel-data-devel.cpp
@@ -75,6 +76,7 @@ SET( devel_api_core_events_header_files
   ${devel_api_src_dir}/events/long-press-gesture-detector-devel.h
   ${devel_api_src_dir}/events/rotation-gesture.h
   ${devel_api_src_dir}/events/rotation-gesture-detector.h
+  ${devel_api_src_dir}/events/touch-data-devel.h
   ${devel_api_src_dir}/events/key-event-devel.h
 )
 

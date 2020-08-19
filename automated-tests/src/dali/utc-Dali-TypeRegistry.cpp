@@ -155,6 +155,10 @@ struct MyTestCustomActor : public CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   {
   }
+  virtual bool OnTouchEvent(const TouchEvent& event)
+  {
+    return true;
+  }
   virtual bool OnHoverEvent(const HoverEvent& event)
   {
     return true;
@@ -2389,7 +2393,7 @@ int UtcDaliTypeInfoGetSignalNameP(void)
 
   std::string name = typeInfo.GetSignalName(0);
 
-  DALI_TEST_EQUALS( name, "hovered", TEST_LOCATION );
+  DALI_TEST_EQUALS( name, "touched", TEST_LOCATION );
 
   TypeInfo typeInfo2 = typeRegistry.GetTypeInfo( "MyTestCustomActor" );
 
@@ -2397,11 +2401,13 @@ int UtcDaliTypeInfoGetSignalNameP(void)
   bool foundSignal = false;
   for( std::size_t i = 0; i < typeInfo2.GetSignalCount(); i++ )
   {
-    std::string name = typeInfo2.GetSignalName( i );
-    if( name == "hovered")
-    {
-      foundSignal = true;
-    }
+
+       std::string name = typeInfo2.GetSignalName( i );
+       if( name == "touched")
+       {
+         foundSignal = true;
+       }
+
   }
 
   DALI_TEST_EQUALS( foundSignal, true, TEST_LOCATION );

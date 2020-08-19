@@ -64,6 +64,10 @@ struct MyTestCustomActor : public CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   {
   }
+  virtual bool OnTouchEvent(const TouchEvent& event)
+  {
+    return true;
+  }
   virtual bool OnHoverEvent(const HoverEvent& event)
   {
     return true;
@@ -485,3 +489,4 @@ int UtcDaliWeakHandleMoveAssignment(void)
 
   END_TEST;
 }
+

@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
+#include <test-touch-utils.h>
 #include <test-touch-data-utils.h>
 
 using namespace Dali;
@@ -108,13 +109,14 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 // Functor for receiving a touch event
 struct TouchEventFunctor
 {
-  bool operator()(Actor actor, const TouchData& touch)
+  bool operator()(Actor actor, const TouchEvent& touch)
   {
     //For line coverage
     unsigned int points = touch.GetPointCount();
     if( points > 0)
     {
-      tet_printf("Touch Point state = %d\n", touch.GetState(0));
+      const TouchPoint& touchPoint = touch.GetPoint(0);
+      tet_printf("Touch Point state = %d\n", touchPoint.state);
     }
     return false;
   }
@@ -193,7 +195,7 @@ int UtcDaliTapGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchSignal().Connect( &application, touchFunctor );
+  actor.TouchedSignal().Connect( &application, touchFunctor );
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -207,6 +209,8 @@ int UtcDaliTapGestureDetectorNew(void)
   application.SendNotification();
   application.Render();
 
+  // For line coverage, Initialise default constructor
+  TouchEvent touchEvent2;
   END_TEST;
 }
 
@@ -498,7 +502,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   parent.Add(child);
 
   TouchEventFunctor touchFunctor;
-  child.TouchSignal().Connect(&application, touchFunctor);
+  child.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();

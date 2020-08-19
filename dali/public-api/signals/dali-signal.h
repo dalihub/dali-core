@@ -31,7 +31,7 @@
  * class MyClass : public ConnectionTracker
  * {
  *
- *   void Callback( Actor actor, const TouchData& event )
+ *   void Callback( Actor actor, const TouchEvent& event )
  *   {
  *     ...
  *   }
@@ -40,7 +40,7 @@
  *   {
  *     Actor actor = Actor::New();
  *
- *     actor.TouchSignal().Connect( this, &MyClass::Callback );
+ *     actor.TouchedSignal().Connect( this, &MyClass::Callback );
  *   }
  *
  *   ~MyClass()
