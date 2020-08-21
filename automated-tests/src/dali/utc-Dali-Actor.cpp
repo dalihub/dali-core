@@ -89,21 +89,21 @@ struct TestConstraintRef
 };
 
 
-static bool TestTouchCallback(Actor actor, const TouchData& touchData )
+static bool TestTouchCallback(Actor, const TouchEvent&)
 {
   gTouchCallBackCalled = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback2(Actor actor, const TouchData& touchData )
+static bool TestTouchCallback2(Actor, const TouchEvent&)
 {
   gTouchCallBackCalled2 = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback3(Actor actor, const TouchData& touchData )
+static bool TestTouchCallback3(Actor, const TouchEvent&)
 {
   gTouchCallBackCalled3 = true;
   return true;
@@ -7929,6 +7929,656 @@ int UtcDaliActorCaptureAllTouchAfterStartPropertyN(void)
   catch(...)
   {
      tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliActorLowerBelowNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.LowerBelow(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRaiseAboveNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.RaiseAbove(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRaiseToTopNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.RaiseToTop();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorAddRendererNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Renderer arg1;
+    instance.AddRenderer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorTouchSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.TouchSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorTranslateByNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    instance.TranslateBy(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorFindChildByIdNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    unsigned int arg1 = 0u;
+    instance.FindChildById(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetRendererAtNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    unsigned int arg1 = 0u;
+    instance.GetRendererAt(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorHoveredSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.HoveredSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorLowerToBottomNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.LowerToBottom();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorOnSceneSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.OnSceneSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorOffSceneSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.OffSceneSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRemoveRendererNegative01(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    unsigned int arg1 = 0u;
+    instance.RemoveRenderer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRemoveRendererNegative02(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Renderer arg1;
+    instance.RemoveRenderer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorFindChildByNameNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    std::string arg1;
+    instance.FindChildByName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorSetResizePolicyNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::ResizePolicy::Type arg1 = ResizePolicy::USE_NATURAL_SIZE;
+    Dali::Dimension::Type arg2 = Dimension::ALL_DIMENSIONS;
+    instance.SetResizePolicy(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorOnRelayoutSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.OnRelayoutSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorWheelEventSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.WheelEventSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetHeightForWidthNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    float arg1 = 0.0f;
+    instance.GetHeightForWidth(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetWidthForHeightNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    float arg1 = 0.0f;
+    instance.GetWidthForHeight(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorLayoutDirectionChangedSignalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.LayoutDirectionChangedSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorAddNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.Add(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorLowerNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.Lower();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRaiseNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.Raise();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRemoveNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.Remove(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorScaleByNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    instance.ScaleBy(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetLayerNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetLayer();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRotateByNegative01(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Quaternion arg1;
+    instance.RotateBy(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorRotateByNegative02(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Radian arg1;
+    Dali::Vector3 arg2;
+    instance.RotateBy(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorUnparentNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.Unparent();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetChildAtNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    unsigned int arg1 = 0u;
+    instance.GetChildAt(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetChildCountNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetChildCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetTargetSizeNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetTargetSize();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorScreenToLocalNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    float arg1 = 0.0f;
+    float arg2 = 0.0f;
+    float arg3 = 0.0f;
+    float arg4 = 0.0f;
+    instance.ScreenToLocal(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetNaturalSizeNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetNaturalSize();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetRelayoutSizeNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Dimension::Type arg1 = Dimension::HEIGHT;
+    instance.GetRelayoutSize(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetResizePolicyNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    Dali::Dimension::Type arg1 = Dimension::ALL_DIMENSIONS;
+    instance.GetResizePolicy(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetRendererCountNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetRendererCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliActorGetParentNegative(void)
+{
+  TestApplication application;
+  Dali::Actor instance;
+  try
+  {
+    instance.GetParent();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
   }
   END_TEST;
 }

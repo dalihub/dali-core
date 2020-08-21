@@ -1800,3 +1800,323 @@ int UtcDaliCameraActorReflectionByPlane(void)
 
   END_TEST;
 }
+
+int UtcDaliCameraActorGetAspectRatioNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetAspectRatio();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetFieldOfViewNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetFieldOfView();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetInvertYAxisNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetInvertYAxis();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetAspectRatioNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetAspectRatio(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetFieldOfViewNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetFieldOfView(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetInvertYAxisNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetInvertYAxis(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetProjectionModeNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    Dali::Camera::ProjectionMode arg1(Camera::PERSPECTIVE_PROJECTION);
+    instance.SetProjectionMode(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetTargetPositionNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    instance.SetTargetPosition(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetFarClippingPlaneNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetFarClippingPlane();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetFarClippingPlaneNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetFarClippingPlane(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetNearClippingPlaneNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetNearClippingPlane();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetNearClippingPlaneNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.SetNearClippingPlane(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetPerspectiveProjectionNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    Dali::Vector2 arg1;
+    instance.SetPerspectiveProjection(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetOrthographicProjectionNegative01(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    float arg1(0.0f);
+    float arg2(0.0f);
+    float arg3(0.0f);
+    float arg4(0.0f);
+    float arg5(0.0f);
+    float arg6(0.0f);
+    instance.SetOrthographicProjection(arg1,arg2,arg3,arg4,arg5,arg6);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetOrthographicProjectionNegative02(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    Dali::Vector2 arg1;
+    instance.SetOrthographicProjection(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorSetTypeNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    Dali::Camera::Type arg1(Camera::FREE_LOOK);
+    instance.SetType(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetProjectionModeNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetProjectionMode();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetTargetPositionNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetTargetPosition();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliCameraActorGetTypeNegative(void)
+{
+  TestApplication application;
+  Dali::CameraActor instance;
+  try
+  {
+    instance.GetType();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,108 +16,108 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/internal/event/events/touch-data-impl.h>
+#include <dali/internal/event/events/touch-event-impl.h>
 
 #include <cstdio>
 
 namespace Dali
 {
 
-TouchData::TouchData()
+TouchEvent::TouchEvent()
 : BaseHandle()
 {
 }
 
-TouchData::TouchData( const TouchData& other )
+TouchEvent::TouchEvent( const TouchEvent& other )
 : BaseHandle( other )
 {
 }
 
-TouchData::~TouchData()
+TouchEvent::~TouchEvent()
 {
 }
 
-TouchData& TouchData::operator=( const TouchData& other )
+TouchEvent& TouchEvent::operator=( const TouchEvent& other )
 {
   BaseHandle::operator=( other );
   return *this;
 }
 
-unsigned long TouchData::GetTime() const
+unsigned long TouchEvent::GetTime() const
 {
   return GetImplementation( *this ).GetTime();
 }
 
-std::size_t TouchData::GetPointCount() const
+std::size_t TouchEvent::GetPointCount() const
 {
   return GetImplementation( *this ).GetPointCount();
 }
 
-int32_t TouchData::GetDeviceId( std::size_t point ) const
+int32_t TouchEvent::GetDeviceId( std::size_t point ) const
 {
   return GetImplementation( *this ).GetDeviceId( point );
 }
 
-PointState::Type TouchData::GetState( std::size_t point ) const
+PointState::Type TouchEvent::GetState( std::size_t point ) const
 {
   return GetImplementation( *this ).GetState( point );
 }
 
-Actor TouchData::GetHitActor( std::size_t point ) const
+Actor TouchEvent::GetHitActor( std::size_t point ) const
 {
   return GetImplementation( *this ).GetHitActor( point );
 }
 
-const Vector2& TouchData::GetLocalPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetLocalPosition( std::size_t point ) const
 {
   return GetImplementation( *this ).GetLocalPosition( point );
 }
 
-const Vector2& TouchData::GetScreenPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetScreenPosition( std::size_t point ) const
 {
   return GetImplementation( *this ).GetScreenPosition( point );
 }
 
-float TouchData::GetRadius( std::size_t point ) const
+float TouchEvent::GetRadius( std::size_t point ) const
 {
   return GetImplementation( *this ).GetRadius( point );
 }
 
-const Vector2& TouchData::GetEllipseRadius( std::size_t point ) const
+const Vector2& TouchEvent::GetEllipseRadius( std::size_t point ) const
 {
   return GetImplementation( *this ).GetEllipseRadius( point );
 }
 
-float TouchData::GetPressure( std::size_t point ) const
+float TouchEvent::GetPressure( std::size_t point ) const
 {
   return GetImplementation( *this ).GetPressure( point );
 }
 
-Degree TouchData::GetAngle( std::size_t point ) const
+Degree TouchEvent::GetAngle( std::size_t point ) const
 {
   return GetImplementation( *this ).GetAngle( point );
 }
 
-Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
+Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
 {
   return GetImplementation( *this ).GetDeviceClass( point );
 }
 
-Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass( std::size_t point ) const
 {
   return GetImplementation( *this ).GetDeviceSubclass( point );
 }
 
-MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
+MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
 {
   return GetImplementation( *this ).GetMouseButton( point );
 }
 
-TouchData::TouchData( Internal::TouchData* internal )
+TouchEvent::TouchEvent( Internal::TouchEvent* internal )
 : BaseHandle( internal )
 {
 }

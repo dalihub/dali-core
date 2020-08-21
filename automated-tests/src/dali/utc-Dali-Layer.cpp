@@ -675,3 +675,152 @@ int UtcDaliLayer3DSort(void)
 
   END_TEST;
 }
+
+int UtcDaliLayerLowerBelowNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    Dali::Layer arg1;
+    instance.LowerBelow(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerRaiseAboveNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    Dali::Layer arg1;
+    instance.RaiseAbove(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerRaiseToTopNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    instance.RaiseToTop();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerLowerToBottomNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    instance.LowerToBottom();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerSetSortFunctionNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    Layer::SortFunctionType function = nullptr;
+    instance.SetSortFunction(function);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerLowerNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    instance.Lower();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerRaiseNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    instance.Raise();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerMoveAboveNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    Dali::Layer arg1;
+    instance.MoveAbove(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLayerMoveBelowNegative(void)
+{
+  TestApplication application;
+  Dali::Layer instance;
+  try
+  {
+    Dali::Layer arg1;
+    instance.MoveBelow(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

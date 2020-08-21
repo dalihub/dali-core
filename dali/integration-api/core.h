@@ -51,7 +51,7 @@ class Processor;
 class RenderController;
 class Scene;
 struct Event;
-struct TouchData;
+struct TouchEvent;
 
 
 /**

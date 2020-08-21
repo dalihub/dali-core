@@ -809,3 +809,41 @@ int UtcDaliPathConstrainerDetectorRegisterProperty(void)
 
   END_TEST;
 }
+
+int UtcDaliLinearConstrainerApplyNegative(void)
+{
+  TestApplication application;
+  Dali::LinearConstrainer instance;
+  Dali::Actor actor;
+  try
+  {
+    Dali::Property arg1(actor, Dali::Actor::Property::POSITION);
+    Dali::Property arg2(actor, Dali::Actor::Property::POSITION);
+    Dali::Vector2 arg3;
+    Dali::Vector2 arg4;
+    instance.Apply(arg1,arg2,arg3,arg4);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliLinearConstrainerRemoveNegative(void)
+{
+  TestApplication application;
+  Dali::LinearConstrainer instance;
+  try
+  {
+    Dali::Handle arg1;
+    instance.Remove(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

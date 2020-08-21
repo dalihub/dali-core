@@ -1827,3 +1827,347 @@ int UtcDaliHandleGetProperties(void)
 
   END_TEST;
 }
+
+int UtcDaliHandleSetPropertyNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    Dali::Property::Value arg2;
+    instance.SetProperty(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterPropertyNegative01(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    std::string arg1;
+    Dali::Property::Value arg2;
+    instance.RegisterProperty(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRegisterPropertyNegative02(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    std::string arg1;
+    Dali::Property::Value arg2;
+    Dali::Property::AccessMode arg3(Property::READ_ONLY);
+    instance.RegisterProperty(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemoveConstraintsNegative01(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    unsigned int arg1(0u);
+    instance.RemoveConstraints(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemoveConstraintsNegative02(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    instance.RemoveConstraints();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleAddPropertyNotificationNegative01(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    int arg2(0);
+    Dali::PropertyCondition arg3;
+    instance.AddPropertyNotification(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleAddPropertyNotificationNegative02(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    Dali::PropertyCondition arg2;
+    instance.AddPropertyNotification(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemovePropertyNotificationNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    Dali::PropertyNotification arg1;
+    instance.RemovePropertyNotification(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemovePropertyNotificationsNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    instance.RemovePropertyNotifications();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.GetProperty(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyNameNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.GetPropertyName(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyTypeNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.GetPropertyType(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyCountNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    instance.GetPropertyCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyIndexNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    std::string arg1;
+    instance.GetPropertyIndex(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetCurrentPropertyNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.GetCurrentProperty(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleGetPropertyIndicesNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    Dali::Vector<int> arg1;
+    instance.GetPropertyIndices(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleIsPropertyWritableNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.IsPropertyWritable(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleIsPropertyAnimatableNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.IsPropertyAnimatable(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleIsPropertyAConstraintInputNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    int arg1(0);
+    instance.IsPropertyAConstraintInput(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleSupportsNegative(void)
+{
+  TestApplication application;
+  Dali::Handle instance;
+  try
+  {
+    Dali::Handle::Capability arg1(Handle::DYNAMIC_PROPERTIES);
+    instance.Supports(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

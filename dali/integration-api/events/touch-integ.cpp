@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#include <dali/integration-api/events/touch-data-integ.h>
-#include <dali/internal/event/events/touch-data-impl.h>
+#include <dali/integration-api/events/touch-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
 
 namespace Dali
 {
 namespace Integration
 {
 
-Dali::TouchData NewTouchData(uint32_t timestamp, const TouchPoint& point)
+Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point)
 {
-  Internal::TouchDataPtr touchDataImpl( new Internal::TouchData(timestamp) );
-  touchDataImpl->AddPoint(Integration::Point(point));
-  Dali::TouchData handle(touchDataImpl.Get());
+  Internal::TouchEventPtr touchEventImpl( new Internal::TouchEvent(timestamp) );
+  touchEventImpl->AddPoint(Integration::Point(point));
+  Dali::TouchEvent handle(touchEventImpl.Get());
   return handle;
 }
 

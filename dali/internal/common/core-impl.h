@@ -45,7 +45,7 @@ class GlContextHelperAbstraction;
 class UpdateStatus;
 class RenderStatus;
 struct Event;
-struct TouchData;
+struct TouchEvent;
 }
 
 namespace Internal

@@ -1,9 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
 CMAKE_POLICY(SET CMP0012 NEW) # Prevent dereferencing of OFF/ON as variables
 
 SET(name "dali2-core")
 
 SET(CMAKE_C_STANDARD 99)
+SET(CMAKE_CXX_STANDARD 17)
 PROJECT(${name})
 SET(PKG_NAME ${name})
 
@@ -135,13 +136,11 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
 
   ADD_COMPILE_OPTIONS( /FIdali-windows-dependencies.h ) # Adds missing definitions.
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
-  ADD_COMPILE_OPTIONS( /std:c++17 )                     # c++17 support
   ADD_COMPILE_OPTIONS( /wd4251 )                        # Ignores warning C4251: "'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'"
 
 ELSEIF( UNIX )
 
   # Set up compiler flags and warnings
-  ADD_COMPILE_OPTIONS( -std=c++17 )                     # c++17 support
   ADD_COMPILE_OPTIONS( -Wnon-virtual-dtor -Woverloaded-virtual -Wold-style-cast )
 
   # TODO: Clang is a lot more strict with warnings, we should address

@@ -419,3 +419,58 @@ int UtcSamplerSetWrapMode2(void)
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3u, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliSamplerSetWrapModeNegative01(void)
+{
+  TestApplication application;
+  Dali::Sampler instance;
+  try
+  {
+    Dali::WrapMode::Type arg1(static_cast<Dali::WrapMode::Type>(-1));
+    Dali::WrapMode::Type arg2(static_cast<Dali::WrapMode::Type>(-1));
+    instance.SetWrapMode(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliSamplerSetWrapModeNegative02(void)
+{
+  TestApplication application;
+  Dali::Sampler instance;
+  try
+  {
+    Dali::WrapMode::Type arg1(static_cast<Dali::WrapMode::Type>(-1));
+    Dali::WrapMode::Type arg2(static_cast<Dali::WrapMode::Type>(-1));
+    Dali::WrapMode::Type arg3(static_cast<Dali::WrapMode::Type>(-1));
+    instance.SetWrapMode(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliSamplerSetFilterModeNegative(void)
+{
+  TestApplication application;
+  Dali::Sampler instance;
+  try
+  {
+    Dali::FilterMode::Type arg1(static_cast<Dali::FilterMode::Type>(-1));
+    Dali::FilterMode::Type arg2(static_cast<Dali::FilterMode::Type>(-1));
+    instance.SetFilterMode(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

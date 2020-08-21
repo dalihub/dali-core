@@ -144,3 +144,51 @@ int UtcDaliPixelDataMoveAssignment(void)
 
   END_TEST;
 }
+
+int UtcDaliPixelDataGetPixelFormatNegative(void)
+{
+  TestApplication application;
+  Dali::PixelData instance;
+  try
+  {
+    instance.GetPixelFormat();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPixelDataGetWidthNegative(void)
+{
+  TestApplication application;
+  Dali::PixelData instance;
+  try
+  {
+    instance.GetWidth();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPixelDataGetHeightNegative(void)
+{
+  TestApplication application;
+  Dali::PixelData instance;
+  try
+  {
+    instance.GetHeight();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

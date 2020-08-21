@@ -40,13 +40,13 @@ class Stage;
 class Actor;
 class Layer;
 class ObjectRegistry;
-class TouchData;
+class TouchEvent;
 class RenderTaskList;
+class WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
 struct KeyEvent;
-struct WheelEvent;
 
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
@@ -89,7 +89,7 @@ public:
 
   typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type @SINCE_1_0.0
   typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchData&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< void (const TouchEvent&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
   typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
   typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
   typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
@@ -278,7 +278,7 @@ public:
    * An interrupted event will also be emitted (if it occurs).
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( TouchData event );
+   *   void YourCallbackName( TouchEvent event );
    * @endcode
    *
    * @return The touch signal to connect to

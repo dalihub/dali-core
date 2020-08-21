@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/touch-data-impl.h>
+#include <dali/internal/event/events/touch-event-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
@@ -27,41 +27,41 @@ namespace Dali
 namespace Internal
 {
 
-TouchData::TouchData()
+TouchEvent::TouchEvent()
 : mPoints(),
   mTime( 0 )
 {
 }
 
-TouchData::TouchData( unsigned long time )
+TouchEvent::TouchEvent( unsigned long time )
 : mPoints(),
   mTime( time )
 {
 }
 
-TouchDataPtr TouchData::Clone( const TouchData& other )
+TouchEventPtr TouchEvent::Clone( const TouchEvent& other )
 {
-  TouchDataPtr touchData( new TouchData );
-  touchData->mPoints = other.mPoints;
-  touchData->mTime = other.mTime;
-  return touchData;
+  TouchEventPtr touchEvent( new TouchEvent );
+  touchEvent->mPoints = other.mPoints;
+  touchEvent->mTime = other.mTime;
+  return touchEvent;
 }
 
-TouchData::~TouchData()
+TouchEvent::~TouchEvent()
 {
 }
 
-unsigned long TouchData::GetTime() const
+unsigned long TouchEvent::GetTime() const
 {
   return mTime;
 }
 
-std::size_t TouchData::GetPointCount() const
+std::size_t TouchEvent::GetPointCount() const
 {
   return mPoints.size();
 }
 
-int32_t TouchData::GetDeviceId( std::size_t point ) const
+int32_t TouchEvent::GetDeviceId( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -70,7 +70,7 @@ int32_t TouchData::GetDeviceId( std::size_t point ) const
   return -1;
 }
 
-PointState::Type TouchData::GetState( std::size_t point ) const
+PointState::Type TouchEvent::GetState( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -79,7 +79,7 @@ PointState::Type TouchData::GetState( std::size_t point ) const
   return PointState::FINISHED;
 }
 
-Dali::Actor TouchData::GetHitActor( std::size_t point ) const
+Dali::Actor TouchEvent::GetHitActor( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -88,7 +88,7 @@ Dali::Actor TouchData::GetHitActor( std::size_t point ) const
   return Dali::Actor();
 }
 
-const Vector2& TouchData::GetLocalPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetLocalPosition( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -97,7 +97,7 @@ const Vector2& TouchData::GetLocalPosition( std::size_t point ) const
   return Vector2::ZERO;
 }
 
-const Vector2& TouchData::GetScreenPosition( std::size_t point ) const
+const Vector2& TouchEvent::GetScreenPosition( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -106,7 +106,7 @@ const Vector2& TouchData::GetScreenPosition( std::size_t point ) const
   return Vector2::ZERO;
 }
 
-float TouchData::GetRadius( std::size_t point ) const
+float TouchEvent::GetRadius( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -115,7 +115,7 @@ float TouchData::GetRadius( std::size_t point ) const
   return 0.0f;
 }
 
-const Vector2& TouchData::GetEllipseRadius( std::size_t point ) const
+const Vector2& TouchEvent::GetEllipseRadius( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -124,7 +124,7 @@ const Vector2& TouchData::GetEllipseRadius( std::size_t point ) const
   return Vector2::ZERO;
 }
 
-float TouchData::GetPressure( std::size_t point ) const
+float TouchEvent::GetPressure( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -133,7 +133,7 @@ float TouchData::GetPressure( std::size_t point ) const
   return 1.0f;
 }
 
-Degree TouchData::GetAngle( std::size_t point ) const
+Degree TouchEvent::GetAngle( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -142,24 +142,24 @@ Degree TouchData::GetAngle( std::size_t point ) const
   return Degree();
 }
 
-const Integration::Point& TouchData::GetPoint( std::size_t point ) const
+const Integration::Point& TouchEvent::GetPoint( std::size_t point ) const
 {
   DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
   return mPoints[ point ];
 }
 
-Integration::Point& TouchData::GetPoint( std::size_t point )
+Integration::Point& TouchEvent::GetPoint( std::size_t point )
 {
   DALI_ASSERT_DEBUG( point < mPoints.size() && "No point at index" );
   return mPoints[ point ];
 }
 
-void TouchData::AddPoint( const Integration::Point& point )
+void TouchEvent::AddPoint( const Integration::Point& point )
 {
   mPoints.push_back( point );
 }
 
-Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
+Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -168,7 +168,7 @@ Device::Class::Type TouchData::GetDeviceClass( std::size_t point ) const
   return Device::Class::NONE;
 }
 
-Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
@@ -177,7 +177,7 @@ Device::Subclass::Type TouchData::GetDeviceSubclass( std::size_t point ) const
   return Device::Subclass::NONE;
 }
 
-MouseButton::Type TouchData::GetMouseButton( std::size_t point ) const
+MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
 {
   if( point < mPoints.size() )
   {
