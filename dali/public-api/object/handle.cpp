@@ -29,11 +29,11 @@
 namespace Dali
 {
 
+
 Handle::Handle( Dali::Internal::Object* handle )
 : BaseHandle(handle)
 {
 }
-
 
 Handle::Handle()
 {
@@ -76,9 +76,9 @@ std::string Handle::GetPropertyName( Property::Index index ) const
   return GetImplementation(*this).GetPropertyName( index );
 }
 
-Property::Index Handle::GetPropertyIndex( const std::string& name ) const
+Property::Index Handle::GetPropertyIndex( Property::Key key ) const
 {
-  return GetImplementation(*this).GetPropertyIndex( name );
+  return GetImplementation( *this ).GetPropertyIndex( key );
 }
 
 bool Handle::IsPropertyWritable( Property::Index index ) const
@@ -111,6 +111,11 @@ Property::Index Handle::RegisterProperty( const std::string& name, const Propert
   return GetImplementation(*this).RegisterProperty( name, propertyValue );
 }
 
+Property::Index Handle::RegisterProperty( Property::Index key, const std::string& name, const Property::Value& propertyValue )
+{
+  return GetImplementation( *this ).RegisterProperty( name, key, propertyValue );
+}
+
 Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
   return GetImplementation(*this).RegisterProperty( name, propertyValue, accessMode );
@@ -126,9 +131,24 @@ Property::Value Handle::GetCurrentProperty( Property::Index index ) const
   return GetImplementation(*this).GetCurrentProperty( index );
 }
 
+void Handle::SetProperties( const Property::Map& properties )
+{
+  GetImplementation( *this ).SetProperties( properties );
+}
+
+void Handle::GetProperties( Property::Map& properties )
+{
+  GetImplementation( *this ).GetProperties( properties );
+}
+
 void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
   GetImplementation(*this).GetPropertyIndices( indices );
+}
+
+bool Handle::DoesCustomPropertyExist( Property::Index index )
+{
+  return GetImplementation( *this ).DoesCustomPropertyExist( index );
 }
 
 Dali::PropertyNotification Handle::AddPropertyNotification( Property::Index index,
@@ -175,6 +195,12 @@ IndirectValue Handle::operator[]( const std::string& name )
   // Will assert immediately when GetPropertyIndex is called if handle is empty
   return IndirectValue(*this, GetPropertyIndex(name));
 }
+
+Handle::PropertySetSignalType& Handle::PropertySetSignal()
+{
+  return GetImplementation( *this ).PropertySetSignal();
+}
+
 
 namespace WeightObject
 {

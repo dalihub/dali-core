@@ -2,7 +2,7 @@
 #define DALI_HANDLE_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,95 +28,6 @@ namespace DevelHandle
 {
 
 /**
- * @brief Query the index of a custom property matching the given key.
- *
- * Returns the first custom property that matches the given integer key. This is
- * useful for other classes that know the key but not the name. Requires the property
- * to have been registered with the associated key.
- *
- * @note This key is not the same as the Property enum found in
- * objects such as Actor (which is a preset index).
- *
- * @param[in] handle The handle from where to retrieve the property index.
- * @param[in] key The integer key of the property
- *
- * @return The index of the property, or Property::INVALID_INDEX if no property exists with the given key.
- *
- * @note The key is not the same as the returned index, though it has the same type.
- */
-DALI_CORE_API Property::Index GetPropertyIndex( const Handle& handle, Property::Index key );
-
-/**
- * @brief Query the index of a property using the given key from a Property::Map
- *
- * @param[in] handle The handle from where to retrieve the property index.
- * @param[in] key The key of the property to search for.
- *
- * @return the matching property index of either the string key or the matching
- * custom property index of the index key, or Property::INVALID_INDEX if no
- * property matches the given key.
- *
- * @note See also, GetPropertyIndex(Property::Index) and GetPropertyIndex(const std::string&)
- */
-DALI_CORE_API Property::Index GetPropertyIndex( const Handle& handle, Property::Key key );
-
-/**
- * @brief Register a new animatable property with an integer key.
- *
- * @param[in] handle The handle where to register the property.
- * @param[in] key  The integer key of the property.
- * @param[in] name The text key of the property.
- * @param[in] propertyValue The new value of the property.
- *
- * @return The index of the property or Property::INVALID_INDEX if registration failed
- *
- * @pre The object supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
- * Property names and keys are expected to be unique, but this is not enforced.
- * Property indices are unique to each registered custom property in a given object.
- *
- * @note Returns Property::INVALID_INDEX if registration failed. This can happen if you try to register
- * animatable property on an object that does not have scene graph object.
- *
- * @note The returned property index is not the same as the integer key (though it shares a type)
- *
- * This version of RegisterProperty associates both an integer key
- * and the text key with the property, allowing for lookup of the
- * property index by either key or name ( which is useful when other
- * classes know the key but not the name )
- *
- * @note Only the following types can be animated:
- *       - Property::BOOLEAN
- *       - Property::FLOAT
- *       - Property::INTEGER
- *       - Property::VECTOR2
- *       - Property::VECTOR3
- *       - Property::VECTOR4
- *       - Property::MATRIX3
- *       - Property::MATRIX
- *       - Property::ROTATION
- * @note If a property with the desired name already exists, then the value given is just set.
- */
-DALI_CORE_API Property::Index RegisterProperty( Handle handle, Property::Index key, const std::string& name, const Property::Value& propertyValue );
-
-/**
- * @brief Sets all the properties in the given property map.
- *
- * @param[in] handle The handle to set the properties on
- * @param[in] properties The properties to set
- */
-DALI_CORE_API void SetProperties( Handle handle, const Property::Map& properties );
-
-/**
- * @brief Retrieves all the properties and the values for a handle.
- *
- * @param[in] handle The handle to retrieve properties from
- * @param[out] properties A map which is populated with the index-value pairs
- *
- * @note The properties map will be cleared by this method first.
- */
-DALI_CORE_API void GetProperties( Handle handle, Property::Map& properties );
-
-/**
  * @brief Set the type-info that the object is created by.
  *
  * @note This is particularly useful to link C# custom control with its correct type-info in the native side
@@ -125,44 +36,6 @@ DALI_CORE_API void GetProperties( Handle handle, Property::Map& properties );
  * @param[in] typeInfo The TypeInfo that creates the handle.
  */
 DALI_CORE_API void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo );
-
-
-/**
- * @brief Determine if the custom property index exists on this object without throwing a Dali::Exception.
- *
- * @note This does not check default properties.
- * @param[in] handle The handle to check
- * @param[in] index The index of the property to test for
- */
-DALI_CORE_API bool DoesCustomPropertyExist( Handle& handle, Property::Index index );
-
-/**
- * @brief PropertySetSignal function prototype for signal handler. Called when a property is set on this object.
- */
-using PropertySetSignalType = Signal< void( Handle& handle, Property::Index index, Property::Value value ) >;
-
-/**
- * @brief Get a signal when a property is set on this object through the API (i.e. not when animating)
- *
- * @param[in] handle The handle of the object to listen to.
- * @return The signal to attach a connection to.
- */
-DALI_CORE_API PropertySetSignalType& PropertySetSignal( Handle handle );
-
-/**
- * @brief Template to create a derived handle and set properties on it.
- *
- * @tparam T The derived class to create
- *
- * @param[in] properties The properties to set
- */
-template< typename T >
-DALI_INTERNAL T New( const Property::Map& properties )
-{
-  T handle = T::New();
-  SetProperties( handle, properties );
-  return handle;
-}
 
 } // namespace DevelHandle
 
