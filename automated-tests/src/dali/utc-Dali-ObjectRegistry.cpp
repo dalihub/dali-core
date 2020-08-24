@@ -287,3 +287,35 @@ int UtcDaliObjectRegistrySignalAnimationCreated(void)
   DALI_TEST_CHECK( test.mSignalVerified );
   END_TEST;
 }
+
+int UtcDaliObjectRegistryObjectCreatedSignalNegative(void)
+{
+  TestApplication application;
+  Dali::ObjectRegistry instance;
+  try
+  {
+    instance.ObjectCreatedSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliObjectRegistryObjectDestroyedSignalNegative(void)
+{
+  TestApplication application;
+  Dali::ObjectRegistry instance;
+  try
+  {
+    instance.ObjectDestroyedSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

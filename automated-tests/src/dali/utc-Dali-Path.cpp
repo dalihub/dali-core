@@ -541,3 +541,123 @@ int UtcDaliPathMoveAssignment(void)
 
   END_TEST;
 }
+
+int UtcDaliPathAddControlPointNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    instance.AddControlPoint(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathGetControlPointNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetControlPoint(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathGenerateControlPointsNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    float arg1(0.0f);
+    instance.GenerateControlPoints(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathAddPointNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    instance.AddPoint(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathGetPointNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.GetPoint(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathGetPointCountNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    instance.GetPointCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliPathSampleNegative(void)
+{
+  TestApplication application;
+  Dali::Path instance;
+  try
+  {
+    float arg1(0.0f);
+    Dali::Vector3 arg2;
+    Dali::Vector3 arg3;
+    instance.Sample(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

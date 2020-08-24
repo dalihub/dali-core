@@ -25,10 +25,12 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/object/indirect-value.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/ref-object.h>
+
 
 namespace Dali
 {
@@ -409,6 +411,28 @@ public:
    * @pre The Object has been initialized.
    */
   void RemoveConstraints( uint32_t tag );
+
+  /**
+   * @brief Index operator, using integer lookup.
+   *
+   * Returns an object that can be assigned to or cast from, enabling
+   * the indexed property to be either read or written.
+   *
+   * @param[in] index The index of the property to access.
+   * @return indirect value. Should have shorter scope than the handle
+   */
+  IndirectValue operator[]( Property::Index index );
+
+  /**
+   * @brief Index operator, using name lookup.
+   *
+   * Returns an object that can be assigned to or cast from, enabling
+   * the named property to be either read or written.
+   *
+   * @param[in] name The name of the property to access.
+   * @return indirect value. Should have shorter scope than the handle
+   */
+  IndirectValue operator[]( const std::string& name );
 };
 
 /**

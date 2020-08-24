@@ -594,3 +594,104 @@ int UtcDaliGeometrySetGetGeometryType02(void)
 
   END_TEST;
 }
+
+int UtcDaliGeometrySetIndexBufferNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    unsigned short* arg1(nullptr);
+    unsigned long arg2(0u);
+    instance.SetIndexBuffer(arg1,arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliGeometryAddVertexBufferNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    Dali::PropertyBuffer arg1;
+    instance.AddVertexBuffer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliGeometryRemoveVertexBufferNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    unsigned long arg1(0u);
+    instance.RemoveVertexBuffer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliGeometrySetTypeNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    Dali::Geometry::Type arg1(Geometry::POINTS);
+    instance.SetType(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliGeometryGetNumberOfVertexBuffersNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    instance.GetNumberOfVertexBuffers();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliGeometryGetTypeNegative(void)
+{
+  TestApplication application;
+  Dali::Geometry instance;
+  try
+  {
+    instance.GetType();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

@@ -1854,7 +1854,7 @@ bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
   return consumed;
 }
 
-bool Actor::EmitWheelEventSignal( const WheelEvent& event )
+bool Actor::EmitWheelEventSignal( const Dali::WheelEvent& event )
 {
   bool consumed = false;
 

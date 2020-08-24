@@ -2852,3 +2852,521 @@ int UtcDaliRenderTaskMoveAssignment(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskSetCullModeNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetCullMode(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetViewportNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Rect<int> arg1;
+    instance.SetViewport(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetExclusiveNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetExclusive(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetClearColorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Vector4 arg1;
+    instance.SetClearColor(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskFinishedSignalNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.FinishedSignal();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetCameraActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::CameraActor arg1;
+    instance.SetCameraActor(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetFrameBufferNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::FrameBuffer arg1;
+    instance.SetFrameBuffer(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetRefreshRateNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    unsigned int arg1(0u);
+    instance.SetRefreshRate(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetSourceActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.SetSourceActor(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetClearEnabledNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetClearEnabled(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetInputEnabledNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    bool arg1(false);
+    instance.SetInputEnabled(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetViewportSizeNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Vector2 arg1;
+    instance.SetViewportSize(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetViewportPositionNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Vector2 arg1;
+    instance.SetViewportPosition(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetScreenToFrameBufferFunctionNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    RenderTask::ScreenToFrameBufferFunction arg1(nullptr);
+    instance.SetScreenToFrameBufferFunction(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetScreenToFrameBufferMappingActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Actor arg1;
+    instance.SetScreenToFrameBufferMappingActor(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCullModeNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetCullMode();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetViewport();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskIsExclusiveNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.IsExclusive();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetClearColorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetClearColor();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCameraActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetCameraActor();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetFrameBufferNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetFrameBuffer();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetRefreshRateNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetRefreshRate();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetSourceActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetSourceActor();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetClearEnabledNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetClearEnabled();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetInputEnabledNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetInputEnabled();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskViewportToLocalNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Actor arg1(Actor::New());
+    float arg2(0.0f);
+    float arg3(0.0f);
+    float arg4(0.0f);
+    float arg5(0.0f);
+    instance.ViewportToLocal(arg1,arg2,arg3,arg4,arg5);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskWorldToViewportNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    Dali::Vector3 arg1;
+    float arg2(0.0f);
+    float arg3(0.0f);
+    instance.WorldToViewport(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCurrentViewportSizeNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetCurrentViewportSize();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCurrentViewportPositionNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetCurrentViewportPosition();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetScreenToFrameBufferFunctionNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetScreenToFrameBufferFunction();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTask instance;
+  try
+  {
+    instance.GetScreenToFrameBufferMappingActor();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

@@ -47,8 +47,9 @@ SET( public_api_src_files
   ${public_api_src_dir}/math/vector4.cpp
   ${public_api_src_dir}/object/any.cpp
   ${public_api_src_dir}/object/base-handle.cpp
-  ${public_api_src_dir}/object/handle.cpp
   ${public_api_src_dir}/object/base-object.cpp
+  ${public_api_src_dir}/object/handle.cpp
+  ${public_api_src_dir}/object/indirect-value.cpp
   ${public_api_src_dir}/object/object-registry.cpp
   ${public_api_src_dir}/object/property.cpp
   ${public_api_src_dir}/object/property-array.cpp
@@ -181,6 +182,7 @@ SET( public_api_core_object_header_files
   ${public_api_src_dir}/object/base-handle.h
   ${public_api_src_dir}/object/base-object.h
   ${public_api_src_dir}/object/handle.h
+  ${public_api_src_dir}/object/indirect-value.h
   ${public_api_src_dir}/object/object-registry.h
   ${public_api_src_dir}/object/property-array.h
   ${public_api_src_dir}/object/property-conditions.h

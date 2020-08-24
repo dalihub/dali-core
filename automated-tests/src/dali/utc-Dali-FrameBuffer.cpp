@@ -621,3 +621,55 @@ int UtcDaliFramebufferContextLoss(void)
 
   END_TEST;
 }
+
+int UtcDaliFrameBufferGetColorTextureNegative(void)
+{
+  TestApplication application;
+  Dali::FrameBuffer instance;
+  try
+  {
+    instance.GetColorTexture();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachColorTextureNegative01(void)
+{
+  TestApplication application;
+  Dali::FrameBuffer instance;
+  try
+  {
+    Dali::Texture arg1 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 400u, 400u);
+    instance.AttachColorTexture(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachColorTextureNegative02(void)
+{
+  TestApplication application;
+  Dali::FrameBuffer instance;
+  try
+  {
+    Dali::Texture arg1 = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 400u, 400u);
+    unsigned int arg2(0u);
+    unsigned int arg3(0u);
+    instance.AttachColorTexture(arg1,arg2,arg3);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

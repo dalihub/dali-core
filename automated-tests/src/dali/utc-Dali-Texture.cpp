@@ -854,3 +854,91 @@ int UtcDaliNativeImageTexture02(void)
 
   END_TEST;
 }
+
+int UtcDaliTextureGenerateMipmapsNegative(void)
+{
+  TestApplication application;
+  Dali::Texture instance;
+  try
+  {
+    instance.GenerateMipmaps();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureUploadNegative01(void)
+{
+  TestApplication application;
+  Dali::Texture instance;
+  try
+  {
+    Dali::PixelData arg1;
+    instance.Upload(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureUploadNegative02(void)
+{
+  TestApplication application;
+  Dali::Texture instance;
+  try
+  {
+    Dali::PixelData arg1;
+    unsigned int arg2(0u);
+    unsigned int arg3(0u);
+    unsigned int arg4(0u);
+    unsigned int arg5(0u);
+    unsigned int arg6(0u);
+    unsigned int arg7(0u);
+    instance.Upload(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureGetWidthNegative(void)
+{
+  TestApplication application;
+  Dali::Texture instance;
+  try
+  {
+    instance.GetWidth();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureGetHeightNegative(void)
+{
+  TestApplication application;
+  Dali::Texture instance;
+  try
+  {
+    instance.GetHeight();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}

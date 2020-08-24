@@ -227,3 +227,69 @@ int UtcDaliRenderTaskListGetTask(void)
   DALI_TEST_CHECK( taskList.GetTask( 0u ) == newTask );
   END_TEST;
 }
+
+int UtcDaliRenderTaskListCreateTaskNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTaskList instance;
+  try
+  {
+    instance.CreateTask();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListRemoveTaskNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTaskList instance;
+  try
+  {
+    Dali::RenderTask arg1(application.GetScene().GetRenderTaskList().GetTask(0u));
+    instance.RemoveTask(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListGetTaskCountNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTaskList instance;
+  try
+  {
+    instance.GetTaskCount();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListGetTaskNegative(void)
+{
+  TestApplication application;
+  Dali::RenderTaskList instance;
+  try
+  {
+    unsigned int arg1(0u);
+    instance.GetTask(arg1);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
