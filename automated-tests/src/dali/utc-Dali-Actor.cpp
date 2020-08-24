@@ -88,12 +88,6 @@ struct TestConstraintRef
   unsigned int mValue;
 };
 
-static bool TestCallback(Actor actor, const TouchEvent& event)
-{
-  gTouchCallBackCalled = true;
-  return false;
-  END_TEST;
-}
 
 static bool TestTouchCallback(Actor actor, const TouchData& touchData )
 {
@@ -2647,7 +2641,7 @@ int UtcDaliActorTouchedSignal(void)
   application.Render();
 
   // connect to its touch signal
-  actor.TouchedSignal().Connect( TestCallback );
+  actor.TouchSignal().Connect( TestTouchCallback );
 
   // simulate a touch event in the middle of the screen
   Vector2 touchPoint( application.GetScene().GetSize() * 0.5 );
@@ -2888,7 +2882,7 @@ int UtcDaliActorHitTest(void)
     DALI_TEST_CHECK( !gTouchCallBackCalled );
 
     // connect to its touch signal
-    actor.TouchedSignal().Connect(TestCallback);
+    actor.TouchSignal().Connect(TestTouchCallback);
 
     Dali::Integration::Point point;
     point.SetState( PointState::DOWN );
@@ -7742,7 +7736,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
     TestApplication::DEFAULT_VERTICAL_DPI,
     true,
     true);
- 
+
   tet_infoline( "Set/Update property with partial update" );
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());

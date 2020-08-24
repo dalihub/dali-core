@@ -320,13 +320,9 @@ void Scene::EmitEventProcessingFinishedSignal()
   }
 }
 
-void Scene::EmitTouchedSignal( const TouchEvent& touchEvent, const Dali::TouchData& touch )
+void Scene::EmitTouchedSignal( const Dali::TouchData& touch )
 {
   Dali::Integration::Scene handle( this );
-  if ( !mTouchedSignal.Empty() )
-  {
-    mTouchedSignal.Emit( touchEvent );
-  }
   if ( !mTouchSignal.Empty() )
   {
     mTouchSignal.Emit( touch );
@@ -377,11 +373,6 @@ Integration::Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal(
 Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return mEventProcessingFinishedSignal;
-}
-
-Scene::TouchedSignalType& Scene::TouchedSignal()
-{
-  return mTouchedSignal;
 }
 
 Integration::Scene::TouchSignalType& Scene::TouchSignal()

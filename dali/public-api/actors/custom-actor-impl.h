@@ -45,7 +45,6 @@ class CustomActor;
 class CustomActorImpl;
 class RelayoutContainer;
 struct KeyEvent;
-struct TouchEvent;
 struct HoverEvent;
 struct WheelEvent;
 struct Vector2;
@@ -174,18 +173,6 @@ public:
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
-
-  /**
-   * @DEPRECATED_1_1.37 Connect to TouchSignal() instead.
-   *
-   * @brief Called after a touch-event is received by the owning actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] event The touch event
-   * @return True if the event should be consumed
-   * @note CustomActorImpl::REQUIRES_TOUCH_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
-   */
-  virtual bool OnTouchEvent(const TouchEvent& event) DALI_DEPRECATED_API = 0;
 
   /**
    * @brief Called after a hover-event is received by the owning actor.
