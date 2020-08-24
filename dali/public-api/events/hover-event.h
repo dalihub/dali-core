@@ -2,7 +2,7 @@
 #define DALI_HOVER_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,24 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/events/point-state.h>
 
 namespace Dali
 {
+
+namespace Internal DALI_INTERNAL
+{
+class HoverEvent;
+}
+
 /**
  * @addtogroup dali_core_events
  * @{
  */
+
+class Actor;
+struct Vector2;
 
 /**
  * @brief Hover events are a collection of touch points at a specific moment in time.
@@ -39,22 +49,36 @@ namespace Dali
  * hovered or the points where a hover has stopped.
  * @SINCE_1_0.0
  */
-struct DALI_CORE_API HoverEvent
+class DALI_CORE_API HoverEvent : public BaseHandle
 {
+
+public:
+
   // Construction & Destruction
 
   /**
-   * @brief Default constructor.
+   * @brief An uninitialized HoverEvent instance.
+   *
+   * Calling member functions with an uninitialized HoverEvent handle is not allowed.
    * @SINCE_1_0.0
    */
   HoverEvent();
 
   /**
-   * @brief Constructor.
-   * @SINCE_1_0.0
-   * @param[in] time The time the event occurred
+   * @brief Copy constructor.
+   *
+   * @SINCE_1_9.25
+   * @param[in] rhs The HoverEvent to copy from
    */
-  HoverEvent(unsigned long time);
+  HoverEvent( const HoverEvent& rhs );
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.25
+   * @param[in] rhs A reference to the moved HoverEvent
+   */
+  HoverEvent( HoverEvent&& rhs );
 
   /**
    * @brief Destructor.
@@ -62,43 +86,113 @@ struct DALI_CORE_API HoverEvent
    */
   ~HoverEvent();
 
-  // Data
+  // Operators
 
   /**
-   * @brief This is a container of points for this hover event.
+   * @brief Copy assignment operator.
    *
-   * The first point in the set is always the
-   * primary touch point (i.e. the first point touched in a multi-touch event).
+   * @SINCE_1_1.37
+   * @param[in] rhs The HoverEvent to copy from
+   * @return A reference to this
    */
-  TouchPointContainer points;
+  HoverEvent& operator=( const HoverEvent& rhs );
 
   /**
-   * @brief The time (in ms) that the hover event occurred.
-   */
-  unsigned long time;
-
-  // Convenience Methods
-
-  /**
-   * @brief Returns the total number of points in this HoverEvent.
+   * @brief Move assignment operator.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.25
+   * @param[in] rhs A reference to the moved HoverEvent
+   * @return A reference to this
+   */
+  HoverEvent& operator=( HoverEvent&& rhs );
+
+  // Getters
+
+  /**
+   * @brief Returns the time (in ms) that the hover event occurred.
+   *
+   * @SINCE_1_9.25
+   * @return The time (in ms) that the hover event occurred
+   */
+  unsigned long GetTime() const;
+
+  /**
+   * @brief Returns the total number of points in this hover event.
+   *
+   * @SINCE_1_9.25
    * @return Total number of Points
    */
-  uint32_t GetPointCount() const;
+  std::size_t GetPointCount() const;
 
   /**
-   * @brief Returns a touch point at the index requested.
+   * @brief Returns the ID of the device used for the Point specified.
    *
-   * The first point in the set is always the primary
-   * touch point (i.e. the first point touched in a multi-touch event).
-   * @SINCE_1_0.0
-   * @param[in] point The index of the required Point
-   * @return Point requested
-   * @note "point" should be less than the value returned by GetPointCount().
-   *       If out of range, then program asserts.
+   * Each point has a unique device ID which specifies the device used for that
+   * point. This is returned by this method.
+   *
+   * @SINCE_1_9.25
+   * @param[in] point The point required
+   * @return The Device ID of this point
+   * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  const TouchPoint& GetPoint( uint32_t point) const;
+  int32_t GetDeviceId( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the State of the point specified.
+   *
+   * @SINCE_1_9.25
+   * @param[in] point The point required
+   * @return The state of the point specified
+   * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
+   * @see State
+   */
+  PointState::Type GetState( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the actor that was underneath the point specified.
+   *
+   * @SINCE_1_9.25
+   * @param[in] point The point required
+   * @return The actor that was underneath the point specified
+   * @note If point is greater than GetPointCount() then this method will return an empty handle.
+   */
+  Actor GetHitActor( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the co-ordinates relative to the top-left of the hit-actor at the point specified.
+   *
+   * @SINCE_1_9.25
+   * @param[in] point The point required
+   * @return The co-ordinates relative to the top-left of the hit-actor of the point specified
+   *
+   * @note The top-left of an actor is (0.0, 0.0, 0.5).
+   * @note If you require the local coordinates of another actor (e.g the parent of the hit actor),
+   * then you should use Actor::ScreenToLocal().
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetLocalPosition( std::size_t point ) const;
+
+  /**
+   * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
+   *
+   * @SINCE_1_9.25
+   * @param[in] point The point required
+   * @return The co-ordinates relative to the top-left of the screen of the point specified
+   * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
+   */
+  const Vector2& GetScreenPosition( std::size_t point ) const;
+
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized HoverEvent handle.
+   *
+   * @SINCE_1_9.25
+   * @param[in] hoverEvent A pointer to a newly allocated Dali resource
+   */
+  explicit DALI_INTERNAL HoverEvent( Internal::HoverEvent* hoverEvent );
+  /// @endcond
 };
 
 /**
