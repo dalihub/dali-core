@@ -103,13 +103,13 @@ struct TouchedSignalData
     functorCalled = false;
     createNewScene = false;
     newSceneCreated = false;
-    receivedTouchData.Reset();
+    receivedTouchEvent.Reset();
   }
 
   bool functorCalled;
   bool createNewScene;
   bool newSceneCreated;
-  TouchData receivedTouchData;
+  TouchEvent receivedTouchEvent;
 };
 
 // Functor that sets the data when touched signal is received
@@ -117,11 +117,10 @@ struct TouchFunctor
 {
   TouchFunctor( TouchedSignalData& data ) : signalData( data ) { }
 
-  void operator()( const TouchData& touch )
+  void operator()( const TouchEvent& touch )
   {
     signalData.functorCalled = true;
-    Dali::TouchData touchData (touch);
-    signalData.receivedTouchData = touchData;
+    signalData.receivedTouchEvent = touch;
 
     if ( signalData.createNewScene )
     {
@@ -226,7 +225,7 @@ void GenerateTouch( TestApplication& application, PointState::Type state, const 
   application.ProcessEvent( touchEvent );
 }
 
-bool DummyTouchCallback( Actor actor, const TouchData& touch )
+bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
 {
   return true;
 }
@@ -643,15 +642,15 @@ int UtcDaliSceneTouchSignalP(void)
     GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0) );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
     data.Reset();
 
     GenerateTouch( application, PointState::UP, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0) );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
     data.Reset();
   }
 
@@ -672,8 +671,8 @@ int UtcDaliSceneTouchSignalP(void)
     GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchData.GetHitActor(0) == actor );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
     data.Reset();
 
     GenerateTouch( application, PointState::MOTION, Vector2( 150.0f, 10.0f ) ); // Some motion
@@ -684,8 +683,8 @@ int UtcDaliSceneTouchSignalP(void)
     GenerateTouch( application, PointState::UP, Vector2( 150.0f, 10.0f ) ); // Some motion
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0) );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
     data.Reset();
   }
 
@@ -700,7 +699,7 @@ int UtcDaliSceneTouchSignalP(void)
     touchEvent.points.push_back( point );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchData.GetPointCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
     data.Reset();
 
     // 2nd point
@@ -731,7 +730,7 @@ int UtcDaliSceneTouchSignalP(void)
     touchEvent.points[0].SetState( PointState::UP );
     application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchData.GetPointCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
     data.Reset();
   }
   END_TEST;
@@ -758,8 +757,8 @@ int UtcDaliSceneTouchSignalN(void)
     GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0));
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
 
     data.Reset();
 
@@ -773,8 +772,8 @@ int UtcDaliSceneTouchSignalN(void)
     GenerateTouch( application, PointState::UP, Vector2( 1200.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0));
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
     data.Reset();
   }
 
@@ -795,30 +794,30 @@ int UtcDaliSceneTouchSignalN(void)
     GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchData.GetState(0) == PointState::INTERRUPTED );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
     data.Reset();
 
     GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchData.GetHitActor(0) == actor );
-    DALI_TEST_CHECK( data.receivedTouchData.GetState(0) == PointState::DOWN );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::DOWN );
     data.Reset();
 
     GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchData.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchData.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchData.GetState(0) == PointState::INTERRUPTED );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
+    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
+    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
 
-    DALI_TEST_EQUALS( data.receivedTouchData.GetPointCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
 
     // Check that getting info about a non-existent point returns an empty handle
-    Actor actor = data.receivedTouchData.GetHitActor( 1 );
+    Actor actor = data.receivedTouchEvent.GetHitActor( 1 );
     DALI_TEST_CHECK( !actor );
 
     data.Reset();

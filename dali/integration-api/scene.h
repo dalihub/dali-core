@@ -34,7 +34,7 @@ class Actor;
 struct KeyEvent;
 class Layer;
 class RenderTaskList;
-class TouchData;
+class TouchEvent;
 struct WheelEvent;
 
 namespace Internal DALI_INTERNAL
@@ -59,7 +59,7 @@ public:
   typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
   typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
   typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
-  typedef Signal< void (const Dali::TouchData&) > TouchSignalType; ///< Touch signal type
+  typedef Signal< void (const Dali::TouchEvent&) > TouchSignalType; ///< Touch signal type
   typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< Touched signal type
 
   using FrameCallbackContainer = std::vector< std::pair< std::unique_ptr< CallbackBase >, int32_t > >;
@@ -330,7 +330,7 @@ public:
    * An interrupted event will also be emitted (if it occurs).
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( TouchData event );
+   *   void YourCallbackName( TouchEvent event );
    * @endcode
    *
    * @return The touch signal to connect to

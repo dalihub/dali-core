@@ -25,7 +25,7 @@
 #include <dali/devel-api/events/rotation-gesture.h>
 #include <dali/devel-api/events/rotation-gesture-detector.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-data-utils.h>
+#include <test-touch-event-utils.h>
 
 using namespace Dali;
 
@@ -1103,7 +1103,7 @@ int UtcDaliRotationGestureInterruptedWhenTouchConsumed(void)
   application.GetScene().Add(actor);
 
   bool consume = false;
-  TouchDataFunctorConsumeSetter touchFunctor(consume);
+  TouchEventFunctorConsumeSetter touchFunctor(consume);
   actor.TouchSignal().Connect(&application,touchFunctor);
 
   // Render and notify

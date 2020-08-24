@@ -27,7 +27,7 @@
 #include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
@@ -1822,7 +1822,7 @@ bool Actor::IsGestureRequred( DevelGesture::Type type ) const
   return mGestureData && mGestureData->IsGestureRequred( type );
 }
 
-bool Actor::EmitTouchEventSignal( const Dali::TouchData& touch )
+bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
 {
   bool consumed = false;
 
@@ -1909,7 +1909,7 @@ void Actor::EmitChildRemovedSignal( Actor& child )
   }
 }
 
-Dali::Actor::TouchDataSignalType& Actor::TouchSignal()
+Dali::Actor::TouchEventSignalType& Actor::TouchSignal()
 {
   return mTouchSignal;
 }

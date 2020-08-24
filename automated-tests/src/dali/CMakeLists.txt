@@ -93,7 +93,7 @@ SET(TC_SOURCES
         utc-Dali-Thread.cpp
         utc-Dali-ThreadPool.cpp
         utc-Dali-TouchEventCombiner.cpp
-        utc-Dali-TouchDataProcessing.cpp
+        utc-Dali-TouchProcessing.cpp
         utc-Dali-TypeRegistry.cpp
         utc-Dali-CSharp-TypeRegistry.cpp
         utc-Dali-Uint16Pair.cpp
