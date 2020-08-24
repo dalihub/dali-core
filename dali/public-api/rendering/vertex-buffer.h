@@ -1,5 +1,5 @@
-#ifndef DALI_PROPERTY_BUFFER_H
-#define DALI_PROPERTY_BUFFER_H
+#ifndef DALI_VERTEX_BUFFER_H
+#define DALI_VERTEX_BUFFER_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -35,13 +35,13 @@ namespace Dali
 
 namespace Internal DALI_INTERNAL
 {
-class PropertyBuffer;
+class VertexBuffer;
 }
 
 /**
- * @brief PropertyBuffer is a handle to an object that contains a buffer of structured properties.
+ * @brief VertexBuffer is a handle to an object that contains a buffer of structured data.
  *
- * PropertyBuffers can be used to provide data to Geometry objects.
+ * VertexBuffers can be used to provide data to Geometry objects.
  *
  * Example:
  *
@@ -56,7 +56,7 @@ class PropertyBuffer;
  *  Property::Map texturedQuadVertexFormat;
  *  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
  *  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
- *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat );
+ *  VertexBuffer texturedQuadVertices = VertexBuffer::New( texturedQuadVertexFormat );
  *  texturedQuadVertices.SetData( texturedQuadVertexData, 4 );
  *
  *  // Create indices
@@ -69,77 +69,76 @@ class PropertyBuffer;
  *
  * @SINCE_1_1.43
  */
-class DALI_CORE_API PropertyBuffer : public BaseHandle
+class DALI_CORE_API VertexBuffer : public BaseHandle
 {
 public:
 
   /**
-   * @brief Creates a PropertyBuffer.
-   * Static property buffers use less memory.
+   * @brief Creates a VertexBuffer.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
-   * @return Handle to a newly allocated PropertyBuffer
+   * @return Handle to a newly allocated VertexBuffer
    */
-  static PropertyBuffer New( Dali::Property::Map& bufferFormat );
+  static VertexBuffer New( Dali::Property::Map& bufferFormat );
 
   /**
    * @brief Default constructor, creates an empty handle.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    */
-  PropertyBuffer();
+  VertexBuffer();
 
   /**
    * @brief Destructor.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    */
-  ~PropertyBuffer();
+  ~VertexBuffer();
 
   /**
    * @brief Copy constructor, creates a new handle to the same object.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @param[in] handle Handle to an object
    */
-  PropertyBuffer( const PropertyBuffer& handle );
+  VertexBuffer( const VertexBuffer& handle );
 
   /**
    * @brief Downcasts to a property buffer handle.
    * If not, a property buffer the returned property buffer handle is left uninitialized.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @param[in] handle Handle to an object
    * @return Property buffer handle or an uninitialized handle
    */
-  static PropertyBuffer DownCast( BaseHandle handle );
+  static VertexBuffer DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  PropertyBuffer& operator=( const PropertyBuffer& handle );
+  VertexBuffer& operator=( const VertexBuffer& handle );
 
   /**
    * @brief Move constructor.
    *
-   * @SINCE_1_9.22
+   * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    */
-  PropertyBuffer( PropertyBuffer&& rhs );
+  VertexBuffer( VertexBuffer&& rhs );
 
   /**
    * @brief Move assignment operator.
    *
-   * @SINCE_1_9.22
+   * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  PropertyBuffer& operator=( PropertyBuffer&& rhs );
+  VertexBuffer& operator=( VertexBuffer&& rhs );
 
   /**
    * @brief Updates the whole buffer information.
@@ -156,10 +155,10 @@ public:
    *   Dali::Vector2 uv;
    * };
    * Vertex vertices[ 10 ] = { ... };
-   * propertyBuffer.SetData( vertices );
+   * vertexBuffer.SetData( vertices );
    * </pre>
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @param[in] data A pointer to the data that will be copied to the buffer
    * @param[in] size Number of elements to expand or contract the buffer
    */
@@ -168,7 +167,7 @@ public:
   /**
    * @brief Gets the number of elements in the buffer.
    *
-   * @SINCE_1_1.43
+   * @SINCE_1_9.27
    * @return Number of elements to expand or contract the buffer
    */
   std::size_t GetSize() const;
@@ -178,10 +177,10 @@ public:
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
-   * @SINCE_1_1.43
-   * @param[in] pointer A pointer to a newly allocated PropertyBuffer
+   * @SINCE_1_9.27
+   * @param[in] pointer A pointer to a newly allocated VertexBuffer
    */
-  explicit DALI_INTERNAL PropertyBuffer( Internal::PropertyBuffer* pointer );
+  explicit DALI_INTERNAL VertexBuffer( Internal::VertexBuffer* pointer );
 };
 
 /**
@@ -189,4 +188,4 @@ public:
  */
 } // namespace Dali
 
-#endif // DALI_PROPERTY_BUFFER_H
+#endif // DALI_VERTEX_BUFFER_H

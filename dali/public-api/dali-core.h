@@ -104,12 +104,12 @@
 
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/property-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/vertex-buffer.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>
