@@ -209,7 +209,7 @@ void Animation::Pause()
 
 void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 {
-  if( action == Dali::Animation::BakeFinal )
+  if( action == Dali::Animation::BAKE_FINAL )
   {
     if( mSpeedFactor > 0.0f )
     {
@@ -240,7 +240,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
   {
     animationFinished = true; // The actor-thread should be notified of this
 
-    if( mEndAction != Dali::Animation::Discard )
+    if( mEndAction != Dali::Animation::DISCARD )
     {
       Bake( bufferIndex, mEndAction );
 
@@ -266,7 +266,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 {
   if (mState == Playing || mState == Paused)
   {
-    if (mEndAction != Dali::Animation::Discard)
+    if (mEndAction != Dali::Animation::DISCARD)
     {
       Bake( bufferIndex, mEndAction );
 
@@ -378,7 +378,7 @@ void Animation::Update( BufferIndex bufferIndex, float elapsedSeconds, bool& loo
 
           // Make elapsed second as edge of range forcely.
           mElapsedSeconds = edgeRangeSeconds + signSpeedFactor * Math::MACHINE_EPSILON_10;
-          UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::Discard), finished );
+          UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::DISCARD), finished );
 
           // After update animation, mElapsedSeconds must be begin of value
           mElapsedSeconds = playRangeStartSeconds + playRangeEndSeconds - edgeRangeSeconds;

@@ -77,9 +77,9 @@ TypeAction action1( mType, ACTION_PLAY,  &Animation::DoAction );
 TypeAction action2( mType, ACTION_STOP,  &Animation::DoAction );
 TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
 
-const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
-const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BakeFinal );
-const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::Linear );
+const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::BAKE );
+const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BAKE_FINAL );
+const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::LINEAR );
 const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION( Dali::AlphaFunction::DEFAULT );
 
 /**
@@ -389,7 +389,7 @@ void Animation::Stop()
   StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
 
   // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
-  if( mEndAction == EndAction::Bake )
+  if( mEndAction == EndAction::BAKE )
   {
     NotifyObjects( Notify::USE_CURRENT_VALUE );
   }
@@ -400,7 +400,7 @@ void Animation::Clear()
   DALI_ASSERT_DEBUG(mAnimation);
 
   // Only notify the objects with the current values if the end action is set to BAKE
-  if( mEndAction == EndAction::Bake )
+  if( mEndAction == EndAction::BAKE )
   {
     NotifyObjects( Notify::USE_CURRENT_VALUE );
   }
@@ -1091,7 +1091,7 @@ bool Animation::CompareConnectorEndTimes( const Animation::ConnectorTargetValues
 void Animation::NotifyObjects( Animation::Notify notifyValueType )
 {
   // If the animation is discarded, then we do not want to change the target values unless we want to force the current values
-  if( mEndAction != EndAction::Discard || notifyValueType == Notify::FORCE_CURRENT_VALUE )
+  if( mEndAction != EndAction::DISCARD || notifyValueType == Notify::FORCE_CURRENT_VALUE )
   {
     // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
     // Only do this if we're using the target value
