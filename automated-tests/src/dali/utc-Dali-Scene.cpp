@@ -877,7 +877,8 @@ int UtcDaliSceneSurfaceResizedDefaultScene(void)
   // Resize the scene
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+
+  defaultScene.SurfaceResized( newSize.width, newSize.height, 0, false );
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
@@ -920,7 +921,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   std::string viewportParams( "0, 0, 1000, 2000" ); // to match newSize
   DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+  defaultScene.SurfaceResized( newSize.width, newSize.height, 0, false );
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
@@ -992,7 +993,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   Vector2 newSize( 1000.0f, 2000.0f );
   std::string viewportParams( "0, 0, 1000, 2000" ); // to match newSize
   DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+  defaultScene.SurfaceResized( newSize.width, newSize.height, 0, false );
 
   DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
   DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
@@ -1032,7 +1033,8 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   // Resize the surface and inform the scene accordingly
   Vector2 newSize( 1000.0f, 2000.0f );
   DALI_TEST_CHECK( stage.GetSize() != newSize );
-  scene.SurfaceResized( newSize.width, newSize.height );
+
+  scene.SurfaceResized( newSize.width, newSize.height, 0, false );
 
   // Ensure the stage hasn't been resized
   DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
