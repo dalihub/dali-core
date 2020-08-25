@@ -147,7 +147,7 @@ public:
     mCurrentProgress( 0.f ),
     mLoopCount( 1 ),
     mAlphaFunction( alphaFunction ),
-    mDisconnectAction( Dali::Animation::BakeFinal ),
+    mDisconnectAction( Dali::Animation::BAKE_FINAL ),
     mAnimationPlaying( false ),
     mEnabled( true ),
     mConnectedToSceneGraph( false ),
@@ -197,10 +197,10 @@ private: // From PropertyOwner::Observer
   void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override final
   {
     // If we are active, then bake the value if required
-    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::Discard )
+    if ( mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD )
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
-      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
+      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f ), true );
     }
 
     mEnabled = false;
@@ -1038,7 +1038,7 @@ struct KeyFrameBooleanFunctor : public AnimatorFunctionBase
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, Dali::Animation::Linear);
+      return mKeyFrames->GetValue(progress, Dali::Animation::LINEAR);
     }
     return property;
   }
@@ -1164,7 +1164,7 @@ struct KeyFrameQuaternionFunctor : public AnimatorFunctionBase
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress, Dali::Animation::Linear);
+      return mKeyFrames->GetValue(progress, Dali::Animation::LINEAR);
     }
     return property;
   }

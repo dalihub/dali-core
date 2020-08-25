@@ -134,9 +134,9 @@ public:
    */
   enum EndAction
   {
-    Bake,     ///< When the animation ends, the animated property values are saved. @SINCE_1_0.0
-    Discard,  ///< When the animation ends, the animated property values are forgotten. @SINCE_1_0.0
-    BakeFinal ///< If the animation is stopped, the animated property values are saved as if the animation had run to completion, otherwise behaves like Bake. @SINCE_1_0.0
+    BAKE,     ///< When the animation ends, the animated property values are saved. @SINCE_1_0.0
+    DISCARD,  ///< When the animation ends, the animated property values are forgotten. @SINCE_1_0.0
+    BAKE_FINAL ///< If the animation is stopped, the animated property values are saved as if the animation had run to completion, otherwise behaves like Bake. @SINCE_1_0.0
   };
 
   /**
@@ -145,8 +145,8 @@ public:
    */
   enum Interpolation
   {
-    Linear,   ///< Values in between key frames are interpolated using a linear polynomial. (Default) @SINCE_1_0.0
-    Cubic     ///< Values in between key frames are interpolated using a cubic polynomial. @SINCE_1_0.0
+    LINEAR,   ///< Values in between key frames are interpolated using a linear polynomial. (Default) @SINCE_1_0.0
+    CUBIC     ///< Values in between key frames are interpolated using a cubic polynomial. @SINCE_1_0.0
   };
 
   /**

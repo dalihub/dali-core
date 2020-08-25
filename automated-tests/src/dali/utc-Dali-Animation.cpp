@@ -549,7 +549,7 @@ int UtcDaliAnimationSetLoopCountP2(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(10.0f, 10.0f, 10.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
-  animation.SetEndAction(Animation::Discard);
+  animation.SetEndAction(Animation::DISCARD);
 
   // Start the animation
   animation.SetLoopCount(3);
@@ -670,7 +670,7 @@ int UtcDaliAnimationSetLoopCountP3(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(10.0f, 10.0f, 10.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
-  animation.SetEndAction(Animation::Discard);
+  animation.SetEndAction(Animation::DISCARD);
 
   float intervalSeconds = 3.0f;
 
@@ -734,7 +734,7 @@ int UtcDaliAnimationSetLoopCountP4(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(10.0f, 10.0f, 10.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
-  animation.SetEndAction(Animation::Bake);
+  animation.SetEndAction(Animation::BAKE);
 
   float intervalSeconds = 3.0f;
 
@@ -902,7 +902,7 @@ int UtcDaliAnimationSetEndActionN(void)
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::Bake);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
 
   Vector3 targetPosition(10.0f, 10.0f, 10.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
@@ -930,8 +930,8 @@ int UtcDaliAnimationSetEndActionN(void)
 
   // Test BakeFinal, animate again, for half the duration
   finishCheck.Reset();
-  animation.SetEndAction(Animation::BakeFinal);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BakeFinal);
+  animation.SetEndAction(Animation::BAKE_FINAL);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE_FINAL);
   animation.Play();
 
   application.SendNotification();
@@ -957,8 +957,8 @@ int UtcDaliAnimationSetEndActionN(void)
 
   // Test EndAction::Discard, animate again, but don't bake this time
   finishCheck.Reset();
-  animation.SetEndAction(Animation::Discard);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::Discard);
+  animation.SetEndAction(Animation::DISCARD);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
   animation.Play();
 
   application.SendNotification();
@@ -986,13 +986,13 @@ int UtcDaliAnimationGetEndActionP(void)
   TestApplication application;
 
   Animation animation = Animation::New(1.0f);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::Bake);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
 
-  animation.SetEndAction(Animation::Discard);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::Discard);
+  animation.SetEndAction(Animation::DISCARD);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
 
-  animation.SetEndAction(Animation::BakeFinal);
-  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BakeFinal);
+  animation.SetEndAction(Animation::BAKE_FINAL);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE_FINAL);
 
   END_TEST;
 }
@@ -1010,7 +1010,7 @@ int UtcDaliAnimationSetDisconnectActionP(void)
     // Build the animation
     float durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BakeFinal);
+    DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BAKE_FINAL);
 
     Vector3 targetPosition(10.0f, 10.0f, 10.0f);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
@@ -1037,7 +1037,7 @@ int UtcDaliAnimationSetDisconnectActionP(void)
     // Build the animation
     float durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetDisconnectAction( Animation::Bake );
+    animation.SetDisconnectAction( Animation::BAKE );
 
     Vector3 targetPosition(10.0f, 10.0f, 10.0f);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
@@ -1064,7 +1064,7 @@ int UtcDaliAnimationSetDisconnectActionP(void)
     // Build the animation
     float durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetDisconnectAction( Animation::Discard );
+    animation.SetDisconnectAction( Animation::DISCARD );
 
     Vector3 targetPosition(10.0f, 10.0f, 10.0f);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
@@ -1113,13 +1113,13 @@ int UtcDaliAnimationGetDisconnectActionP(void)
 {
   TestApplication application;
   Animation animation = Animation::New(1.0f);
-  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BakeFinal); // default!
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BAKE_FINAL); // default!
 
-  animation.SetDisconnectAction(Animation::Discard);
-  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::Discard);
+  animation.SetDisconnectAction(Animation::DISCARD);
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::DISCARD);
 
-  animation.SetDisconnectAction(Animation::Bake);
-  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::Bake);
+  animation.SetDisconnectAction(Animation::BAKE);
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BAKE);
 
   END_TEST;
 }
@@ -2166,7 +2166,7 @@ int UtcDaliAnimationPlayOffSceneDiscardP(void)
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.SetDisconnectAction( Animation::Discard );
+  animation.SetDisconnectAction( Animation::DISCARD );
   Vector3 targetPosition(100.0f, 100.0f, 100.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
@@ -2343,7 +2343,7 @@ int UtcDaliAnimationPlayOffSceneBakeP(void)
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.SetDisconnectAction( Animation::Bake );
+  animation.SetDisconnectAction( Animation::BAKE );
   Vector3 targetPosition(100.0f, 100.0f, 100.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
@@ -9160,7 +9160,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaCubicP(void)
   keyFrames.Add(0.8f, 0.7f);
   keyFrames.Add(1.0f, 0.9f);
 
-  animation.AnimateBetween( Property(actor, Actor::Property::COLOR_ALPHA), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR_ALPHA), keyFrames, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9335,7 +9335,7 @@ int UtcDaliAnimationAnimateBetweenActorColorCubicP(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9460,7 +9460,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleCubicP(void)
   keyFrames.Add(1.0f, true);
 
   //Cubic interpolation for boolean values should be ignored
-  animation.AnimateBetween( Property(actor, Actor::Property::VISIBLE), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::VISIBLE), keyFrames, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9613,7 +9613,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation01CubicP(void)
   keyFrames.Add(0.0f, AngleAxis(Degree(60), Vector3::ZAXIS));
 
   //Cubic interpolation should be ignored for quaternions
-  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9659,7 +9659,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation02CubicP(void)
   keyFrames.Add(1.0f, AngleAxis(Degree(120), Vector3::YAXIS));
 
   //Cubic interpolation should be ignored for quaternions
-  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9808,7 +9808,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaFunctionCubicP(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunction::LINEAR, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunction::LINEAR, Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -9969,7 +9969,7 @@ int UtcDaliAnimationAnimateBetweenActorColorTimePeriodCubicP(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, TimePeriod( delay, durationSeconds - delay ), Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, TimePeriod( delay, durationSeconds - delay ), Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -10132,7 +10132,7 @@ int UtcDaliAnimationAnimateBetweenActorColorCubicWithDelayP(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunction::LINEAR, TimePeriod( delay, durationSeconds - delay ), Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunction::LINEAR, TimePeriod( delay, durationSeconds - delay ), Animation::CUBIC );
 
   // Start the animation
   animation.Play();
@@ -13418,9 +13418,9 @@ void CheckPropertyValuesWhenCallingAnimationMethod( TestFunction functionToTest,
 
   ExpectedValue expectedValueTable[] =
   {
-   { Animation::Bake,      halfWayToTarget  }, // When baking, the current value is the final value.
-   { Animation::BakeFinal, targetPosition   }, // When BakeFinal, we should jump to the final value when clearing or stopping.
-   { Animation::Discard,   originalPosition }, // When discarding, we should jump back to the original value when clearing or stopping.
+   { Animation::BAKE,      halfWayToTarget  }, // When baking, the current value is the final value.
+   { Animation::BAKE_FINAL, targetPosition   }, // When BakeFinal, we should jump to the final value when clearing or stopping.
+   { Animation::DISCARD,   originalPosition }, // When discarding, we should jump back to the original value when clearing or stopping.
   };
   const auto expectedValueTableCount = sizeof( expectedValueTable ) / sizeof( ExpectedValue );
 
@@ -13488,9 +13488,9 @@ int UtcDaliAnimationPausePropertyValue(void)
 
   Animation::EndAction endActions[] =
   {
-   Animation::Bake,
-   Animation::BakeFinal,
-   Animation::Discard,
+   Animation::BAKE,
+   Animation::BAKE_FINAL,
+   Animation::DISCARD,
   };
   const auto endActionCount = sizeof( endActions ) / sizeof( endActions[0] );
 
@@ -13700,7 +13700,7 @@ int UtcDaliAnimationSetEndActionNegative(void)
   Dali::Animation instance;
   try
   {
-    Dali::Animation::EndAction arg1(Animation::Bake);
+    Dali::Animation::EndAction arg1(Animation::BAKE);
     instance.SetEndAction(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -13773,7 +13773,7 @@ int UtcDaliAnimationAnimateBetweenNegative02(void)
   {
     Dali::Property arg1(actor, Actor::Property::POSITION);
     Dali::KeyFrames arg2;
-    Dali::Animation::Interpolation arg3(Animation::Linear);
+    Dali::Animation::Interpolation arg3(Animation::LINEAR);
     instance.AnimateBetween(arg1,arg2,arg3);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -13814,7 +13814,7 @@ int UtcDaliAnimationAnimateBetweenNegative04(void)
     Dali::Property arg1(actor, Actor::Property::POSITION);
     Dali::KeyFrames arg2;
     Dali::TimePeriod arg3(1.0f);
-    Dali::Animation::Interpolation arg4(Animation::Linear);
+    Dali::Animation::Interpolation arg4(Animation::LINEAR);
     instance.AnimateBetween(arg1,arg2,arg3,arg4);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -13855,7 +13855,7 @@ int UtcDaliAnimationAnimateBetweenNegative06(void)
     Dali::Property arg1(actor, Actor::Property::POSITION);
     Dali::KeyFrames arg2;
     Dali::AlphaFunction arg3;
-    Dali::Animation::Interpolation arg4(Animation::Linear);
+    Dali::Animation::Interpolation arg4(Animation::LINEAR);
     instance.AnimateBetween(arg1,arg2,arg3,arg4);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -13898,7 +13898,7 @@ int UtcDaliAnimationAnimateBetweenNegative08(void)
     Dali::KeyFrames arg2;
     Dali::AlphaFunction arg3;
     Dali::TimePeriod arg4(1.0f);
-    Dali::Animation::Interpolation arg5(Animation::Linear);
+    Dali::Animation::Interpolation arg5(Animation::LINEAR);
     instance.AnimateBetween(arg1,arg2,arg3,arg4,arg5);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -14014,7 +14014,7 @@ int UtcDaliAnimationSetDisconnectActionNegative(void)
   Dali::Animation instance;
   try
   {
-    Dali::Animation::EndAction arg1(Animation::Bake);
+    Dali::Animation::EndAction arg1(Animation::BAKE);
     instance.SetDisconnectAction(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
