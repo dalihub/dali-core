@@ -2028,7 +2028,7 @@ int UtcDaliRendererSetIndexRange(void)
   };
   Property::Map vertexFormat;
   vertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer vertexBuffer = PropertyBuffer::New( vertexFormat );
+  VertexBuffer vertexBuffer = VertexBuffer::New( vertexFormat );
   vertexBuffer.SetData( shapes, sizeof(shapes)/sizeof(shapes[0]));
 
   // --------------------------------------------------------------------------

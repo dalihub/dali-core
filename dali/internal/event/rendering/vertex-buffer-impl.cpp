@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/common/property-buffer-impl.h>
+#include <dali/internal/event/rendering/vertex-buffer-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/rendering/property-buffer.h>
+#include <dali/public-api/rendering/vertex-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 #if defined (ANDROID) || defined(WIN32)
@@ -135,24 +135,24 @@ uint32_t GetPropertyImplementationAlignment( Property::Type& propertyType )
 
 } // unnamed namespace
 
-PropertyBufferPtr PropertyBuffer::New( Dali::Property::Map& format )
+VertexBufferPtr VertexBuffer::New( Dali::Property::Map& format )
 {
   DALI_ASSERT_ALWAYS( format.Count() && "Format cannot be empty." );
 
-  PropertyBufferPtr propertyBuffer( new PropertyBuffer() );
-  propertyBuffer->Initialize( format );
+  VertexBufferPtr vertexBuffer( new VertexBuffer() );
+  vertexBuffer->Initialize( format );
 
-  return propertyBuffer;
+  return vertexBuffer;
 }
 
-void PropertyBuffer::SetData( const void* data, uint32_t size )
+void VertexBuffer::SetData( const void* data, uint32_t size )
 {
   mSize = size; // size is the number of elements
 
   uint32_t bufferSize = mBufferFormatSize * mSize;
 
   // create a new DALi vector to store the buffer data
-  // the heap allocated vector will end up being owned by Render::PropertyBuffer
+  // the heap allocated vector will end up being owned by Render::VertexBuffer
   OwnerPointer< Vector<uint8_t> > bufferCopy = new Dali::Vector<uint8_t>();
   bufferCopy->Resize( bufferSize );
 
@@ -162,28 +162,28 @@ void PropertyBuffer::SetData( const void* data, uint32_t size )
   std::copy( source, source + bufferSize, destination );
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
-  SceneGraph::SetPropertyBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
+  SceneGraph::SetVertexBufferData( mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize );
 }
 
-uint32_t PropertyBuffer::GetSize() const
+uint32_t VertexBuffer::GetSize() const
 {
   return mSize;
 }
 
-const Render::PropertyBuffer* PropertyBuffer::GetRenderObject() const
+const Render::VertexBuffer* VertexBuffer::GetRenderObject() const
 {
   return mRenderObject;
 }
 
-PropertyBuffer::~PropertyBuffer()
+VertexBuffer::~VertexBuffer()
 {
   if( EventThreadServices::IsCoreRunning() && mRenderObject)
   {
-    SceneGraph::RemovePropertyBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    SceneGraph::RemoveVertexBuffer( mEventThreadServices.GetUpdateManager(), *mRenderObject );
   }
 }
 
-PropertyBuffer::PropertyBuffer()
+VertexBuffer::VertexBuffer()
 : mEventThreadServices( EventThreadServices::Get() ),
   mRenderObject( NULL ),
   mBufferFormatSize( 0 ),
@@ -191,16 +191,16 @@ PropertyBuffer::PropertyBuffer()
 {
 }
 
-void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
+void VertexBuffer::Initialize( Dali::Property::Map& formatMap )
 {
-  mRenderObject = new Render::PropertyBuffer();
-  OwnerPointer< Render::PropertyBuffer > transferOwnership( mRenderObject );
-  SceneGraph::AddPropertyBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
+  mRenderObject = new Render::VertexBuffer();
+  OwnerPointer< Render::VertexBuffer > transferOwnership( mRenderObject );
+  SceneGraph::AddVertexBuffer( mEventThreadServices.GetUpdateManager(), transferOwnership );
 
   uint32_t numComponents = static_cast<uint32_t>( formatMap.Count() );
 
   // Create the format
-  OwnerPointer< Render::PropertyBuffer::Format> format = new Render::PropertyBuffer::Format();
+  OwnerPointer< Render::VertexBuffer::Format> format = new Render::VertexBuffer::Format();
   format->components.resize( numComponents );
 
   uint32_t currentAlignment = 0u;
@@ -226,7 +226,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
         ( type == Property::ARRAY  ) ||
         ( type == Property::MAP    ) )
     {
-      DALI_ABORT( "Property::Type not supported in PropertyBuffer" );
+      DALI_ABORT( "Property::Type not supported in VertexBuffer" );
     }
     uint32_t elementSize = GetPropertyImplementationSize( type );
     uint32_t elementAlignment = GetPropertyImplementationAlignment( type );
@@ -269,7 +269,7 @@ void PropertyBuffer::Initialize( Dali::Property::Map& formatMap )
 
   mBufferFormatSize = format->size;
 
-  SceneGraph::SetPropertyBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
+  SceneGraph::SetVertexBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format );
 }
 
 uint32_t GetPropertyImplementationSize( Property::Type& propertyType )

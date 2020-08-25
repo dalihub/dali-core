@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_GEOMETRY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class GpuBuffer;
 
 namespace Render
 {
-class PropertyBuffer;
+class VertexBuffer;
 
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
@@ -68,9 +68,9 @@ public:
 
   /**
    * Adds a property buffer to the geometry
-   * @param[in] dataProvider The PropertyBuffer data provider
+   * @param[in] dataProvider The VertexBuffer data provider
    */
-  void AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer );
+  void AddVertexBuffer( Render::VertexBuffer* vertexBuffer );
 
   /**
    * Set the data for the index buffer to be used by the geometry
@@ -79,10 +79,10 @@ public:
   void SetIndexBuffer( Dali::Vector<uint16_t>& indices );
 
   /**
-   * Removes a PropertyBuffer from the geometry
-   * @param[in] propertyBuffer The property buffer to be removed
+   * Removes a VertexBuffer from the geometry
+   * @param[in] vertexBuffer The property buffer to be removed
    */
-  void RemovePropertyBuffer(  const Render::PropertyBuffer* propertyBuffer );
+  void RemoveVertexBuffer(  const Render::VertexBuffer* vertexBuffer );
 
   /**
    * Gets the attribute locations on the shader for the attributes defined in the geometry RenderBuffers
@@ -137,8 +137,8 @@ public:
 
 private:
 
-  // PropertyBuffers
-  Vector< Render::PropertyBuffer* > mVertexBuffers;
+  // VertexBuffers
+  Vector< Render::VertexBuffer* > mVertexBuffers;
 
   Dali::Vector< uint16_t > mIndices;
   OwnerPointer< GpuBuffer > mIndexBuffer;

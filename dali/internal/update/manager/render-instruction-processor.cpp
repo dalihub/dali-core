@@ -31,7 +31,6 @@
 #include <dali/internal/render/common/render-instruction-container.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 namespace

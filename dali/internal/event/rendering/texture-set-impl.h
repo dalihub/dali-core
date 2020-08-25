@@ -26,10 +26,10 @@
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/rendering/texture-set.h> // Dali::TextureSet
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
-#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 #include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
+
 
 namespace Dali
 {

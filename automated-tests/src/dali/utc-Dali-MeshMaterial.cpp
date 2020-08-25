@@ -77,10 +77,8 @@ void mesh_material_test_cleanup(void)
  *
  * Check rendered vertex buffer is the right size for the initial property buffer
  *
- * Check PropertyBuffer set via SetData can be read thru property system
- * Check PropertyBuffer property setters / getters
- * Check vertex PropertyBuffer set via properties renders as expected
- * Check Index propertyBuffer set via properties renders as expected
+ * Check VertexBuffer set via SetData renders as expected
+ * Check IndexBuffer set via properties renders as expected
  *
  * Check geometry type renders correctly as the matching GL draw call and type
  *

@@ -37,7 +37,7 @@ namespace
 
 struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
 
-PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::string& aTexCoord )
+VertexBuffer CreateVertexBuffer( const std::string& aPosition, const std::string& aTexCoord )
 {
   const float halfQuadSize = .5f;
   TexturedQuadVertex texturedQuadVertexData[4] = {
@@ -50,7 +50,7 @@ PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::stri
   vertexFormat[aPosition] = Property::VECTOR2;
   vertexFormat[aTexCoord] = Property::VECTOR2;
 
-  PropertyBuffer vertexData = PropertyBuffer::New( vertexFormat );
+  VertexBuffer vertexData = VertexBuffer::New( vertexFormat );
   vertexData.SetData( texturedQuadVertexData, 4 );
 
   return vertexData;
@@ -114,7 +114,7 @@ int UtcDaliGeometryMoveConstructor(void)
   DALI_TEST_EQUALS( 1, geometry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( 0u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
 
-  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
   geometry.AddVertexBuffer( vertexBuffer );
   DALI_TEST_EQUALS( 1u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
 
@@ -136,7 +136,7 @@ int UtcDaliGeometryMoveAssignment(void)
   DALI_TEST_EQUALS( 1, geometry.GetBaseObject().ReferenceCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( 0u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
 
-  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
   geometry.AddVertexBuffer( vertexBuffer );
   DALI_TEST_EQUALS( 1u, geometry.GetNumberOfVertexBuffers(), TEST_LOCATION );
 
@@ -178,7 +178,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
 
   tet_infoline("Test AddVertexBuffer");
 
-  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  VertexBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
 
@@ -206,7 +206,7 @@ int UtcDaliGeometryAddVertexBuffer(void)
   // add the second vertex buffer
   application.GetGlAbstraction().ResetBufferDataCalls();
 
-  PropertyBuffer vertexBuffer2 = CreateVertexBuffer( "aPosition2", "aTexCoord2" );
+  VertexBuffer vertexBuffer2 = CreateVertexBuffer( "aPosition2", "aTexCoord2" );
   geometry.AddVertexBuffer( vertexBuffer2 );
   application.SendNotification();
   application.Render(0);
@@ -230,9 +230,9 @@ int UtcDaliGeometryGetNumberOfVertexBuffers(void)
   TestApplication application;
 
   tet_infoline("Test GetNumberOfVertexBuffers");
-  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
-  PropertyBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
-  PropertyBuffer vertexBuffer3 = CreateVertexBuffer("aPosition3", "aTexCoord3" );
+  VertexBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  VertexBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
+  VertexBuffer vertexBuffer3 = CreateVertexBuffer("aPosition3", "aTexCoord3" );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
@@ -254,8 +254,8 @@ int UtcDaliGeometryRemoveVertexBuffer(void)
 
   tet_infoline("Test RemoveVertexBuffer");
 
-  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
-  PropertyBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
+  VertexBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  VertexBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer1 );
@@ -288,7 +288,7 @@ int UtcDaliGeometrySetIndexBuffer(void)
 
   tet_infoline("Test SetIndexBuffer");
 
-  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
@@ -346,7 +346,7 @@ int UtcDaliGeometrySetGetGeometryType01(void)
   tet_infoline("Test SetType and GetType: without index buffer");
 
   unsigned int numVertex = 4u;
-  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexBuffer );
@@ -475,7 +475,7 @@ int UtcDaliGeometrySetGetGeometryType02(void)
 
   unsigned int numVertex = 4u;
   unsigned int numIndex = 6u; // 6 unsigned short
-  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  VertexBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
 
 
   Geometry geometry = Geometry::New();
@@ -619,7 +619,7 @@ int UtcDaliGeometryAddVertexBufferNegative(void)
   Dali::Geometry instance;
   try
   {
-    Dali::PropertyBuffer arg1;
+    Dali::VertexBuffer arg1;
     instance.AddVertexBuffer(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
