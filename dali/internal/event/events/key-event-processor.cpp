@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/key-event.h>
 #include <dali/internal/event/events/key-event-impl.h>
-#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
@@ -42,18 +41,14 @@ KeyEventProcessor::~KeyEventProcessor()
 
 void KeyEventProcessor::ProcessKeyEvent( const Integration::KeyEvent& event )
 {
-  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
-  GetImplementation( &keyEvent )->SetLogicalKey( event.logicalKey );
-  GetImplementation( &keyEvent )->SetCompose( event.compose );
-  GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
-  GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
-  GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
+  KeyEventPtr keyEvent( new KeyEvent( event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>( event.state ), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass ) );
+  Dali::KeyEvent keyEventHandle( keyEvent.Get() );
 
   // Emit the key event signal from the scene.
-  bool consumed = mScene.EmitKeyEventGeneratedSignal( keyEvent );
+  bool consumed = mScene.EmitKeyEventGeneratedSignal( keyEventHandle );
   if( !consumed )
   {
-    mScene.EmitKeyEventSignal(keyEvent);
+    mScene.EmitKeyEventSignal( keyEventHandle );
   }
 
 }
