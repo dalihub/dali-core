@@ -31,7 +31,7 @@ namespace Dali
 {
 
 class Actor;
-struct KeyEvent;
+class KeyEvent;
 class Layer;
 class RenderTaskList;
 class TouchEvent;
