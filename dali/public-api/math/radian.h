@@ -53,7 +53,7 @@ struct Radian
    * @SINCE_1_0.0
    * @param[in] value The initial value in radians
    */
-  explicit Radian( float value )
+  explicit constexpr Radian( float value )
   : radian( value )
   { }
 
@@ -311,6 +311,20 @@ inline Radian Clamp( Radian angle, float min, float max )
 {
   return Radian( Clamp<float>( angle.radian, min, max ) );
 }
+
+// useful constant angles
+inline constexpr Radian ANGLE_360( Math::PI * 2.f     );
+inline constexpr Radian ANGLE_315( Math::PI * 1.75f   );
+inline constexpr Radian ANGLE_270( Math::PI * 1.5f    );
+inline constexpr Radian ANGLE_225( Math::PI * 1.25f   );
+inline constexpr Radian ANGLE_180( Math::PI           );
+inline constexpr Radian ANGLE_135( Math::PI * 0.75f   );
+inline constexpr Radian ANGLE_120( Math::PI * 2.f/3.f );
+inline constexpr Radian ANGLE_90 ( Math::PI_2         );
+inline constexpr Radian ANGLE_60 ( Math::PI / 3.f     );
+inline constexpr Radian ANGLE_45 ( Math::PI_4         );
+inline constexpr Radian ANGLE_30 ( Math::PI / 6.f     );
+inline constexpr Radian ANGLE_0  ( 0.0f               );
 
 /**
  * @}

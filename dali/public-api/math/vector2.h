@@ -68,7 +68,7 @@ public:
    * @param[in] x x or width component
    * @param[in] y y or height component
    */
-  explicit Vector2(float x, float y)
+  explicit constexpr Vector2(float x, float y)
   : x(x), y(y)
   {
   }

@@ -24,10 +24,6 @@
 namespace Dali
 {
 
-const int32_t Property::INVALID_INDEX           = -1;
-const int32_t Property::INVALID_KEY             = -1;
-const int32_t Property::INVALID_COMPONENT_INDEX = -1;
-
 Property::Property(Handle& obj, Property::Index propIndex)
 : object(obj),
   propertyIndex(propIndex),

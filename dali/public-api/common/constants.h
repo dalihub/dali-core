@@ -2,7 +2,7 @@
 #define DALI_CONSTANTS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <math.h> // M_PI
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -40,23 +41,21 @@ namespace Dali
  */
 namespace ParentOrigin
 {
-extern const Vector3 DEFAULT; ///< TOP_LEFT
-static const float TOP = 0.0f;
-static const float BOTTOM = 1.0f;
-static const float LEFT = 0.0f;
-static const float RIGHT = 1.0f;
-static const float MIDDLE = 0.5f;
-
-DALI_CORE_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
-
+static constexpr float TOP = 0.0f;
+static constexpr float BOTTOM = 1.0f;
+static constexpr float LEFT = 0.0f;
+static constexpr float RIGHT = 1.0f;
+static constexpr float MIDDLE = 0.5f;
+static constexpr Vector3 TOP_LEFT     (0.0f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_CENTER   (0.5f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_RIGHT    (1.0f, 0.0f, 0.5f);
+static constexpr Vector3 CENTER_LEFT  (0.0f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER       (0.5f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER_RIGHT (1.0f, 0.5f, 0.5f);
+static constexpr Vector3 BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
+static constexpr Vector3 BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
+static constexpr Vector3 BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
+static constexpr Vector3 DEFAULT( TOP_LEFT );
 }
 
 /**
@@ -67,23 +66,21 @@ DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
  */
 namespace AnchorPoint
 {
-static const float TOP = 0.0f;
-static const float BOTTOM = 1.0f;
-static const float LEFT = 0.0f;
-static const float RIGHT = 1.0f;
-static const float MIDDLE = 0.5f;
-
-extern const Vector3 DEFAULT; ///< CENTER
-DALI_CORE_API extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
-
+static constexpr float TOP = 0.0f;
+static constexpr float BOTTOM = 1.0f;
+static constexpr float LEFT = 0.0f;
+static constexpr float RIGHT = 1.0f;
+static constexpr float MIDDLE = 0.5f;
+static constexpr Vector3 TOP_LEFT     (0.0f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_CENTER   (0.5f, 0.0f, 0.5f);
+static constexpr Vector3 TOP_RIGHT    (1.0f, 0.0f, 0.5f);
+static constexpr Vector3 CENTER_LEFT  (0.0f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER       (0.5f, 0.5f, 0.5f);
+static constexpr Vector3 CENTER_RIGHT (1.0f, 0.5f, 0.5f);
+static constexpr Vector3 BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
+static constexpr Vector3 BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
+static constexpr Vector3 BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
+static constexpr Vector3 DEFAULT( CENTER );
 }
 
 
@@ -95,18 +92,15 @@ DALI_CORE_API extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
  */
 namespace Color
 {
-DALI_CORE_API extern const Vector4 BLACK;       ///< Pure black (0.0f, 0.0f, 0.0f, 1.0f);
-DALI_CORE_API extern const Vector4 WHITE;       ///< Pure white (1.0f, 1.0f, 1.0f, 1.0f);
-
-DALI_CORE_API extern const Vector4 RED;         ///< Pure red   (1.0f, 0.0f, 0.0f, 1.0f);
-DALI_CORE_API extern const Vector4 GREEN;       ///< Pure green (0.0f, 1.0f, 0.0f, 1.0f);
-DALI_CORE_API extern const Vector4 BLUE;        ///< Pure blue  (0.0f, 0.0f, 1.0f, 1.0f);
-
-DALI_CORE_API extern const Vector4 YELLOW;      ///< Pure yellow  (1.0f, 1.0f, 0.0f, 1.0f);
-DALI_CORE_API extern const Vector4 MAGENTA;     ///< Pure magenta (1.0f, 0.0f, 1.0f, 1.0f);
-DALI_CORE_API extern const Vector4 CYAN;        ///< Pure cyan    (0.0f, 1.0f, 1.0f, 1.0f);
-
-DALI_CORE_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f);
+static constexpr Vector4 BLACK( 0.0f, 0.0f, 0.0f, 1.0f );
+static constexpr Vector4 WHITE( 1.0f, 1.0f, 1.0f, 1.0f );
+static constexpr Vector4 RED(   1.0f, 0.0f, 0.0f, 1.0f );
+static constexpr Vector4 GREEN( 0.0f, 1.0f, 0.0f, 1.0f );
+static constexpr Vector4 BLUE(  0.0f, 0.0f, 1.0f, 1.0f );
+static constexpr Vector4 YELLOW(  1.0f, 1.0f, 0.0f, 1.0f );
+static constexpr Vector4 MAGENTA( 1.0f, 0.0f, 1.0f, 1.0f );
+static constexpr Vector4 CYAN(    0.0f, 1.0f, 1.0f, 1.0f );
+static constexpr Vector4 TRANSPARENT( 0.0f, 0.0f, 0.0f, 0.0f );
 
 } // namespace Color
 
@@ -116,19 +110,19 @@ DALI_CORE_API extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.
  */
 namespace Math
 {
-DALI_CORE_API extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
-DALI_CORE_API extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
-DALI_CORE_API extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
-DALI_CORE_API extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
-DALI_CORE_API extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
-DALI_CORE_API extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
+static constexpr float MACHINE_EPSILON_0     = Epsilon<0>::value;
+static constexpr float MACHINE_EPSILON_1     = Epsilon<1>::value;
+static constexpr float MACHINE_EPSILON_10    = Epsilon<10>::value;
+static constexpr float MACHINE_EPSILON_100   = Epsilon<100>::value;
+static constexpr float MACHINE_EPSILON_1000  = Epsilon<1000>::value;
+static constexpr float MACHINE_EPSILON_10000 = Epsilon<10000>::value;
 
 // float is preferred to double for performance on ARM targets
-static const float PI   = static_cast<float>(M_PI);       ///< Constant representing PI
-static const float PI_2 = static_cast<float>(M_PI_2);     ///< Constant representing PI/2
-static const float PI_4 = static_cast<float>(M_PI_4);     ///< Constant representing PI/4
-static const float PI_OVER_180 = Dali::Math::PI/180.0f;   ///< Constant used to convert degree to radian
-static const float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to convert radian to degree
+static constexpr float PI   = static_cast<float>(M_PI);       ///< Pi
+static constexpr float PI_2 = static_cast<float>(M_PI_2);     ///< Pi/2
+static constexpr float PI_4 = static_cast<float>(M_PI_4);     ///< Pi/4
+static constexpr float PI_OVER_180 = Dali::Math::PI/180.0f;   ///< Constant used to convert degree to radian
+static constexpr float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to convert radian to degree
 
 } // namespace Math
 

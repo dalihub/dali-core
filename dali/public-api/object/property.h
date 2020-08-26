@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,9 @@ struct DALI_CORE_API Property
    */
   typedef int32_t Index;
 
-  static const int32_t INVALID_INDEX; ///< -1 is not a valid property index
-  static const int32_t INVALID_KEY;   ///< -1 is not a valid property key
-  static const int32_t INVALID_COMPONENT_INDEX; ///< -1 is not a valid property index
+  static constexpr int32_t INVALID_INDEX{-1}; ///< -1 is not a valid property index
+  static constexpr int32_t INVALID_KEY{-1};   ///< -1 is not a valid property key
+  static constexpr int32_t INVALID_COMPONENT_INDEX{-1}; ///< -1 is not a valid property index
 
   typedef Dali::Vector< Index > IndexContainer; ///< A vector of property indices @SINCE_1_0.0
 
