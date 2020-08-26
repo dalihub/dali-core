@@ -692,6 +692,19 @@ public: // API
   }
 
   /**
+   * @brief Resizes the vector without initializing the data.
+   *
+   * Can be used as a data container for reading whole file content.
+   * @SINCE_1_9.27
+   * @param[in] count Count to resize to
+   */
+  void ResizeUninitialized( SizeType count )
+  {
+    Reserve( count );
+    VectorBase::SetCount( count );
+  }
+
+  /**
    * @brief Resizes the vector. Does not change capacity.
    *
    * @SINCE_1_0.0
