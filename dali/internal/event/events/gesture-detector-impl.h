@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ public:
    * Retrieves the type of GestureDetector
    * @return The GestureDetector Type
    */
-  DevelGesture::Type GetType() const
+  Gesture::Type GetType() const
   {
     return mType;
   }
@@ -117,11 +117,6 @@ protected: // Creation & Destruction
    * @param type the type of gesture
    * @param pointer to the scene object, nullptr if none
    * by default GestureDetectors don't have our own scene object
-   */
-  GestureDetector( DevelGesture::Type type, const SceneGraph::PropertyOwner* sceneObject  = nullptr );
-
-  /**
-   * @copydoc GestureDetector( DevelGesture::Type, const SceneGraph::PropertyOwner* )
    */
   GestureDetector( Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject  = nullptr );
 
@@ -174,7 +169,7 @@ private:
 
 protected:
 
-  DevelGesture::Type            mType;                  ///< The gesture detector will detect this type of gesture.
+  Gesture::Type                 mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
   GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.

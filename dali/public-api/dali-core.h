@@ -56,6 +56,8 @@
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/point-state.h>
+#include <dali/public-api/events/rotation-gesture-detector.h>
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/touch-event.h>

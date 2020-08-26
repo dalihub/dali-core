@@ -31,6 +31,8 @@ SET( public_api_src_files
   ${public_api_src_dir}/events/pan-gesture-detector.cpp
   ${public_api_src_dir}/events/pinch-gesture.cpp
   ${public_api_src_dir}/events/pinch-gesture-detector.cpp
+  ${public_api_src_dir}/events/rotation-gesture.cpp
+  ${public_api_src_dir}/events/rotation-gesture-detector.cpp
   ${public_api_src_dir}/events/tap-gesture.cpp
   ${public_api_src_dir}/events/tap-gesture-detector.cpp
   ${public_api_src_dir}/events/touch-point.cpp
@@ -143,6 +145,8 @@ SET( public_api_core_events_header_files
   ${public_api_src_dir}/events/pinch-gesture.h
   ${public_api_src_dir}/events/pinch-gesture-detector.h
   ${public_api_src_dir}/events/point-state.h
+  ${public_api_src_dir}/events/rotation-gesture.h
+  ${public_api_src_dir}/events/rotation-gesture-detector.h
   ${public_api_src_dir}/events/tap-gesture.h
   ${public_api_src_dir}/events/tap-gesture-detector.h
   ${public_api_src_dir}/events/touch-point.h

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,35 +65,35 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector,
 {
   switch (gestureDetector->GetType())
   {
-    case DevelGesture::LongPress:
+    case Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.AddGestureDetector(longPress, scene);
       break;
     }
 
-    case DevelGesture::Pan:
+    case Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.AddGestureDetector(pan, scene, envOptionMinimumPanDistance, envOptionMinimumPanEvents);
       break;
     }
 
-    case DevelGesture::Pinch:
+    case Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.AddGestureDetector(pinch, scene);
       break;
     }
 
-    case DevelGesture::Tap:
+    case Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.AddGestureDetector(tap, scene);
       break;
     }
 
-    case DevelGesture::Rotation:
+    case Gesture::Rotation:
     {
       RotationGestureDetector* rotation = static_cast<RotationGestureDetector*>(gestureDetector);
       mRotationGestureProcessor.AddGestureDetector(rotation, scene);
@@ -106,35 +106,35 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
 {
   switch (gestureDetector->GetType())
   {
-    case DevelGesture::LongPress:
+    case Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.RemoveGestureDetector(longPress);
       break;
     }
 
-    case DevelGesture::Pan:
+    case Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.RemoveGestureDetector(pan);
       break;
     }
 
-    case DevelGesture::Pinch:
+    case Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.RemoveGestureDetector(pinch);
       break;
     }
 
-    case DevelGesture::Tap:
+    case Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.RemoveGestureDetector(tap);
       break;
     }
 
-    case DevelGesture::Rotation:
+    case Gesture::Rotation:
     {
       RotationGestureDetector* rotation = static_cast<RotationGestureDetector*>(gestureDetector);
       mRotationGestureProcessor.RemoveGestureDetector(rotation);
@@ -147,35 +147,35 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
 {
   switch (gestureDetector->GetType())
   {
-    case DevelGesture::LongPress:
+    case Gesture::LongPress:
     {
       LongPressGestureDetector* longPress = static_cast<LongPressGestureDetector*>(gestureDetector);
       mLongPressGestureProcessor.GestureDetectorUpdated(longPress);
       break;
     }
 
-    case DevelGesture::Pan:
+    case Gesture::Pan:
     {
       PanGestureDetector* pan = static_cast<PanGestureDetector*>(gestureDetector);
       mPanGestureProcessor.GestureDetectorUpdated(pan);
       break;
     }
 
-    case DevelGesture::Pinch:
+    case Gesture::Pinch:
     {
       PinchGestureDetector* pinch = static_cast<PinchGestureDetector*>(gestureDetector);
       mPinchGestureProcessor.GestureDetectorUpdated(pinch);
       break;
     }
 
-    case DevelGesture::Tap:
+    case Gesture::Tap:
     {
       TapGestureDetector* tap = static_cast<TapGestureDetector*>(gestureDetector);
       mTapGestureProcessor.GestureDetectorUpdated(tap);
       break;
     }
 
-    case DevelGesture::Rotation:
+    case Gesture::Rotation:
     {
       // Nothing to do
       break;
@@ -185,28 +185,10 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
 
 void GestureEventProcessor::SetGestureProperties( const Gesture& gesture )
 {
-  bool requestUpdate = false;
+  DALI_ASSERT_DEBUG( gesture.type == Gesture::Pan && "Only PanGesture has a scene object\n" );
 
-  switch ( static_cast< DevelGesture::Type >( gesture.type ) )
-  {
-    case DevelGesture::Pan:
-    {
-      const PanGesture& pan = static_cast< const PanGesture& >( gesture );
-      requestUpdate = mPanGestureProcessor.SetPanGestureProperties( pan );
-      break;
-    }
-
-    case DevelGesture::LongPress:
-    case DevelGesture::Pinch:
-    case DevelGesture::Tap:
-    case DevelGesture::Rotation:
-    {
-      DALI_ASSERT_DEBUG( false && "Gesture type does not have scene object\n" );
-      break;
-    }
-  }
-
-  if( requestUpdate )
+  const PanGesture& pan = static_cast< const PanGesture& >( gesture );
+  if( mPanGestureProcessor.SetPanGestureProperties( pan ) )
   {
     // We may not be updating so we need to ask the render controller for an update.
     mRenderController.RequestUpdate( false );

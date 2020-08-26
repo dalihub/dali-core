@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_GESTURE_DATA_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
@@ -67,7 +66,7 @@ public:
    * @param[in] type The gesture type.
    * @return true if the gesture is required, false otherwise.
    */
-  inline bool IsGestureRequred( DevelGesture::Type type ) const
+  inline bool IsGestureRequred( Gesture::Type type ) const
   {
     return type & gesturesRequired;
   }
@@ -77,7 +76,7 @@ public:
    * @param[in] type The container type required
    * @pre Ensure IsGestureRequired() is used to check if the container is actually available.
    */
-  GestureDetectorContainer& GetGestureDetectorContainer( DevelGesture::Type type );
+  GestureDetectorContainer& GetGestureDetectorContainer( Gesture::Type type );
 
 private:
 
@@ -85,11 +84,11 @@ private:
    * Helper to retrieve the appropriate container type.
    * @param[in] type The container type required.
    */
-  inline GestureDetectorContainer*& GetContainerPtr( DevelGesture::Type type );
+  inline GestureDetectorContainer*& GetContainerPtr( Gesture::Type type );
 
 private:
 
-  DevelGesture::Type gesturesRequired; ///< Stores which gestures are required
+  Gesture::Type gesturesRequired; ///< Stores which gestures are required
 
   GestureDetectorContainer* panDetectors;       ///< Pointer to a container of pan-detectors
   GestureDetectorContainer* pinchDetectors;     ///< Pointer to a container of pinch-detectors

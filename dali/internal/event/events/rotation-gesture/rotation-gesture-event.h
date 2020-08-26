@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ROTATION_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-event.h>
 
 namespace Dali
@@ -48,7 +47,7 @@ struct RotationGestureEvent : public GestureEvent
    * @param[in]  state  The state of the gesture
    */
   RotationGestureEvent( Gesture::State state )
-  : GestureEvent( DevelGesture::Rotation, state )
+  : GestureEvent( Gesture::Rotation, state )
   {
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,8 @@ namespace
  */
 struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
 {
-  GestureHitTestCheck( DevelGesture::Type type )
-  : mType( type )
-  {
-  }
-
   GestureHitTestCheck( Gesture::Type type )
-  : GestureHitTestCheck( static_cast< DevelGesture::Type >( type ) )
+  : mType( type )
   {
   }
 
@@ -68,13 +63,13 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  DevelGesture::Type mType;
+  Gesture::Type mType;
 };
 
 } // unnamed namespace
 
 
-GestureProcessor::GestureProcessor( DevelGesture::Type type )
+GestureProcessor::GestureProcessor( Gesture::Type type )
 : mGestureRecognizer(),
   mNeedsUpdate( false ),
   mType( type ),
@@ -82,12 +77,6 @@ GestureProcessor::GestureProcessor( DevelGesture::Type type )
   mGesturedActorDisconnected( false )
 {
 }
-
-GestureProcessor::GestureProcessor( Gesture::Type type )
-: GestureProcessor( static_cast< DevelGesture::Type >( type ) )
-{
-}
-
 
 GestureProcessor::~GestureProcessor()
 {
