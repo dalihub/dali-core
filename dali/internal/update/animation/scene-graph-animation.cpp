@@ -430,60 +430,53 @@ void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animat
   const Vector2 playRange( mPlayRange * mDurationSeconds );
   float elapsedSecondsClamped = Clamp( mElapsedSeconds, playRange.x, playRange.y );
 
-  //Loop through all animators
-  bool applied(true);
-  for ( auto&& iter = mAnimators.Begin(); iter != mAnimators.End(); )
-  {
-    AnimatorBase *animator = *iter;
+  //Remove animators whose PropertyOwner has been destroyed
+  mAnimators.Erase(std::remove_if(mAnimators.begin(),
+                                  mAnimators.end(),
+                                  [](auto animator) { return animator->Orphan(); }),
+                   mAnimators.end());
 
-    if( animator->Orphan() )
+  //Loop through all animators
+  for(auto& animator : mAnimators)
+  {
+    bool applied(true);
+    if(animator->IsEnabled())
     {
-      //Remove animators whose PropertyOwner has been destroyed
-      iter = mAnimators.Erase(iter);
+      const float intervalDelay(animator->GetIntervalDelay());
+
+      if(elapsedSecondsClamped >= intervalDelay)
+      {
+        // Calculate a progress specific to each individual animator
+        float       progress(1.0f);
+        const float animatorDuration = animator->GetDuration();
+        if(animatorDuration > 0.0f) // animators can be "immediate"
+        {
+          progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f, 1.0f);
+        }
+        animator->Update(bufferIndex, progress, bake);
+
+        if (animatorDuration > 0.0f && (elapsedSecondsClamped - intervalDelay) <= animatorDuration)
+        {
+          mIsActive[bufferIndex] = true;
+        }
+      }
+      applied = true;
     }
     else
     {
-      if( animator->IsEnabled() )
-      {
-        const float intervalDelay( animator->GetIntervalDelay() );
+      applied = false;
+    }
 
-        if( elapsedSecondsClamped >= intervalDelay )
-        {
-          // Calculate a progress specific to each individual animator
-          float progress(1.0f);
-          const float animatorDuration = animator->GetDuration();
-          if (animatorDuration > 0.0f) // animators can be "immediate"
-          {
-            progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f , 1.0f );
-          }
-          animator->Update(bufferIndex, progress, bake);
+    if(animationFinished)
+    {
+      animator->SetActive(false);
+    }
 
-          if (animatorDuration > 0.0f && (elapsedSecondsClamped - intervalDelay) <= animatorDuration)
-          {
-            mIsActive[bufferIndex] = true;
-          }
-        }
-        applied = true;
-      }
-      else
-      {
-        applied = false;
-      }
-
-      if ( animationFinished )
-      {
-        animator->SetActive( false );
-      }
-
-      if (applied)
-      {
-        INCREASE_COUNTER(PerformanceMonitor::ANIMATORS_APPLIED);
-      }
-
-      ++iter;
+    if(applied)
+    {
+      INCREASE_COUNTER(PerformanceMonitor::ANIMATORS_APPLIED);
     }
   }
-
 }
 
 } // namespace SceneGraph
