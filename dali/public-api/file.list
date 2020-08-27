@@ -16,7 +16,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/animation/linear-constrainer.cpp
   ${public_api_src_dir}/animation/path.cpp
   ${public_api_src_dir}/animation/time-period.cpp
-  ${public_api_src_dir}/common/constants.cpp
   ${public_api_src_dir}/common/dali-common.cpp
   ${public_api_src_dir}/common/dali-vector.cpp
   ${public_api_src_dir}/common/extents.cpp

@@ -68,7 +68,7 @@ struct DALI_CORE_API Vector3
    * @param[in] y (or height) component
    * @param[in] z (or depth) component
    */
-  explicit Vector3(float x, float y, float z)
+  explicit constexpr Vector3(float x, float y, float z)
   : x(x),
     y(y),
     z(z)
