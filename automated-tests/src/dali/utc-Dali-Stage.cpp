@@ -862,7 +862,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   KeyEventGeneratedReceivedFunctor functor2( data2 );
   GetImplementation( stage ).ConnectSignal( &application, "keyEventGenerated", functor2 );
 
-  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -873,7 +873,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::Up, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -884,7 +884,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -895,7 +895,7 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -915,7 +915,7 @@ int UtcDaliStageSignalKeyEventP(void)
   KeyEventReceivedFunctor functor( data );
   stage.KeyEventSignal().Connect( &application, functor );
 
-  Integration::KeyEvent event( "i", "", "i", 0, 0, 0, Integration::KeyEvent::Down, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event( "i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -926,7 +926,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::Up, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -937,7 +937,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
@@ -948,7 +948,7 @@ int UtcDaliStageSignalKeyEventP(void)
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );

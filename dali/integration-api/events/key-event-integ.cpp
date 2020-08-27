@@ -35,7 +35,7 @@ KeyEvent::KeyEvent()
   keyCode( -1 ),
   keyModifier( 0 ),
   time( 0 ),
-  state( KeyEvent::Down ),
+  state( KeyEvent::DOWN ),
   compose( "" ),
   deviceName( "" ),
   deviceClass( Device::Class::NONE ),

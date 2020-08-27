@@ -42,7 +42,7 @@ KeyEvent::KeyEvent()
   mKeyCode( KEY_INVALID_CODE ),
   mKeyModifier( 0 ),
   mTime( 0 ),
-  mState( Dali::KeyEvent::Down ),
+  mState( Dali::KeyEvent::DOWN ),
   mCompose( "" ),
   mDeviceName( "" ),
   mDeviceClass( Device::Class::NONE ),
