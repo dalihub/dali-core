@@ -135,7 +135,7 @@ public:
   void OnSceneDisconnection() override;
   void OnChildAdd(Dali::Actor& child) override;
   void OnChildRemove(Dali::Actor& child) override;
-  void OnPropertySet( Dali::Property::Index index, Dali::Property::Value propertyValue ) override;
+  void OnPropertySet( Dali::Property::Index index, const Dali::Property::Value& propertyValue ) override;
   void OnSizeSet(const Dali::Vector3& targetSize) override;
   void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override;
   bool OnHoverEvent(const Dali::HoverEvent& event) override;

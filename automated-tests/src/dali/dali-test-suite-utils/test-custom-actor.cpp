@@ -322,7 +322,7 @@ void TestCustomActor::OnChildRemove(Actor& child)
 {
   AddToCallStacks("OnChildRemove");
 }
-void TestCustomActor::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void TestCustomActor::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   AddToCallStacks("OnPropertySet");
 }

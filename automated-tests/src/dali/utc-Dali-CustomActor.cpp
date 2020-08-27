@@ -1408,7 +1408,7 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   { }
   virtual void OnChildRemove(Actor& child)
   { }
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
   { }
   virtual void OnSizeSet(const Vector3& targetSize)
   { }

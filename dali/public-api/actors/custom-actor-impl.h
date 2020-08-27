@@ -155,7 +155,7 @@ public:
    * @param[in] index The Property index that was set
    * @param[in] propertyValue The value to set
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().

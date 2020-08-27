@@ -30,7 +30,7 @@ CustomActor CustomActorImpl::Self() const
   return CustomActor(mOwner);
 }
 
-void CustomActorImpl::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void CustomActorImpl::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
 }
 

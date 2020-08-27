@@ -111,7 +111,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnPropertySet
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
   {
     mImpl->OnPropertySet(index, propertyValue);
   }
