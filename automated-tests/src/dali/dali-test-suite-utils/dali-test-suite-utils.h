@@ -29,8 +29,11 @@
 #include <dali/public-api/dali-core.h>
 #include <test-compare-types.h>
 
+extern "C"
+{
 void tet_infoline(const char*str);
 void tet_printf(const char *format, ...);
+}
 
 #include "test-application.h"
 #include "test-actor-utils.h"
@@ -303,6 +306,17 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
  * @param[in] location The TEST_LOCATION macro should be used here
  */
 void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location);
+
+/**
+ * Test if a property value type is equal to a trivial type.
+ */
+template<typename Type>
+inline void DALI_TEST_VALUE_EQUALS( Property::Value&& value1, Type value2, float epsilon, const char* location)
+{
+  Property::Value value2b(value2);
+  DALI_TEST_EQUALS(value1, value2b, epsilon, location);
+}
+
 
 /**
  * Test whether one unsigned integer value is greater than another.

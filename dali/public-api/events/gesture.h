@@ -2,7 +2,7 @@
 #define DALI_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,8 @@ struct DALI_CORE_API Gesture
     Pinch      = 1 << 0, ///< When two touch points move away or towards each other. @SINCE_1_0.0
     Pan        = 1 << 1, ///< When the user drags their finger(s) in a particular direction. @SINCE_1_0.0
     Tap        = 1 << 2, ///< When the user taps the screen. @SINCE_1_0.0
-    LongPress  = 1 << 3  ///< When the user continues to touch the same area on the screen for the device configured time. @SINCE_1_0.0
+    LongPress  = 1 << 3, ///< When the user continues to touch the same area on the screen for the device configured time. @SINCE_1_0.0
+    Rotation   = 1 << 4, ///< When the user rotates two fingers around a particular ares of the screen. @SINCE_1_9.27
   };
 
   /**

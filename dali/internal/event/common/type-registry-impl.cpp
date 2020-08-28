@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,26 +99,34 @@ std::string TypeRegistry::GetTypeName( uint32_t index ) const
   return name;
 }
 
-std::string TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
-                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
+std::string TypeRegistry::Register( const std::type_info& theTypeInfo,
+                                    const std::type_info& baseTypeInfo,
+                                    Dali::TypeInfo::CreateFunction createInstance,
+                                    bool callCreateOnInit )
 {
   std::string uniqueTypeName  = DemangleClassName( theTypeInfo.name() );
 
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit );
 }
 
-std::string TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
-                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
-                             const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount )
+std::string TypeRegistry::Register( const std::type_info& theTypeInfo,
+                                    const std::type_info& baseTypeInfo,
+                                    Dali::TypeInfo::CreateFunction createInstance,
+                                    bool callCreateOnInit,
+                                    const Dali::PropertyDetails* defaultProperties,
+                                    Property::Index defaultPropertyCount )
 {
   std::string uniqueTypeName  = DemangleClassName( theTypeInfo.name() );
 
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount );
 }
 
-std::string TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_info& baseTypeInfo,
-                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit,
-                             const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount )
+std::string TypeRegistry::Register( const std::string& uniqueTypeName,
+                                    const std::type_info& baseTypeInfo,
+                                    Dali::TypeInfo::CreateFunction createInstance,
+                                    bool callCreateOnInit,
+                                    const Dali::PropertyDetails* defaultProperties,
+                                    Property::Index defaultPropertyCount )
 {
   std::string baseTypeName = DemangleClassName( baseTypeInfo.name() );
 
@@ -133,7 +141,8 @@ std::string TypeRegistry::Register( const std::string& uniqueTypeName, const std
     }
   }
 
-  mRegistryLut.push_back( TypeRegistry::TypeInfoPointer( new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount ) ) );
+  mRegistryLut.push_back( TypeRegistry::TypeInfoPointer(
+                            new Internal::TypeInfo( uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount ) ) );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str() );
 
   if( callCreateOnInit )

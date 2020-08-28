@@ -61,7 +61,6 @@ SET(TC_SOURCES
         utc-Dali-PixelData.cpp
         utc-Dali-Processors.cpp
         utc-Dali-PropertyArray.cpp
-        utc-Dali-PropertyBuffer.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
         utc-Dali-PropertyTypes.cpp
@@ -101,6 +100,7 @@ SET(TC_SOURCES
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
+        utc-Dali-VertexBuffer.cpp
         utc-Dali-WeakHandle.cpp
         utc-Dali-WheelEvent.cpp
 )
@@ -126,6 +126,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali2-core
 )
 
+ADD_COMPILE_OPTIONS( -rdynamic )
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
@@ -144,7 +145,7 @@ ADD_DEFINITIONS( -DADDON_LIBS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\" )
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread -ldl --coverage
+    -lpthread -ldl --coverage -rdynamic
 )
 
 # Path to installed precompiled addons

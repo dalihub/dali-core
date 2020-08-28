@@ -1817,7 +1817,7 @@ ActorGestureData& Actor::GetGestureData()
   return *mGestureData;
 }
 
-bool Actor::IsGestureRequred( DevelGesture::Type type ) const
+bool Actor::IsGestureRequred( Gesture::Type type ) const
 {
   return mGestureData && mGestureData->IsGestureRequred( type );
 }

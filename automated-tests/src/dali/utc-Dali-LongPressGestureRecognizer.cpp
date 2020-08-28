@@ -324,8 +324,6 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
 
   LongPressGestureDetector detector = LongPressGestureDetector::New();
 
-  detector.SetTouchesRequired(2,2);
-
   Actor actor = Actor::New();
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
@@ -336,6 +334,7 @@ int UtcDaliLongPressGestureRecognizerMultiplePointsLongPress(void)
   application.Render();
 
   detector.Attach(actor);
+  detector.SetTouchesRequired(2,2); // Set after we've attached forcing us to change things internally
 
   SignalData data;
   GestureReceivedFunctor functor(data);

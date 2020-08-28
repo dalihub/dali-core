@@ -44,7 +44,7 @@ class Animation;
 class CustomActor;
 class CustomActorImpl;
 class RelayoutContainer;
-struct KeyEvent;
+class KeyEvent;
 class HoverEvent;
 class WheelEvent;
 struct Vector2;
@@ -326,7 +326,7 @@ protected: // For derived classes
     LAST_ACTOR_FLAG                             ///< Special marker for last actor flag @SINCE_1_0.0
   };
 
-  static const int32_t ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
+  static constexpr int32_t ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
 
   /**
    * @brief Creates a CustomActorImpl.

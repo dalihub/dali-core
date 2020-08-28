@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ KeyEvent::KeyEvent()
   keyCode( -1 ),
   keyModifier( 0 ),
   time( 0 ),
-  state( KeyEvent::Down ),
+  state( KeyEvent::DOWN ),
   compose( "" ),
   deviceName( "" ),
   deviceClass( Device::Class::NONE ),
@@ -59,28 +59,6 @@ KeyEvent::KeyEvent( const std::string& keyName, const std::string& logicalKey, c
   deviceClass( deviceClass ),
   deviceSubclass( deviceSubclass )
 {
-}
-
-KeyEvent::KeyEvent( const Dali::KeyEvent& event )
-: Event( Key ),
-  keyName( event.keyPressedName ),
-  logicalKey( "" ),
-  keyString( event.keyPressed ),
-  keyCode( event.keyCode ),
-  keyModifier( event.keyModifier ),
-  time( event.time ),
-  state( static_cast< Integration::KeyEvent::State >( event.state ) ),
-  compose( "" ),
-  deviceName( "" ),
-  deviceClass( Device::Class::NONE ),
-  deviceSubclass( Device::Subclass::NONE )
-{
-  const Internal::KeyEventImpl* keyEventImpl = GetImplementation( &event );
-  logicalKey = keyEventImpl->GetLogicalKey();
-  compose = keyEventImpl->GetCompose();
-  deviceName = keyEventImpl->GetDeviceName();
-  deviceClass = keyEventImpl->GetDeviceClass();
-  deviceSubclass = keyEventImpl->GetDeviceSubclass();
 }
 
 KeyEvent::~KeyEvent()

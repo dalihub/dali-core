@@ -12,28 +12,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-// FILE HEADER
-#include <dali/devel-api/object/handle-devel.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/object/property-key.h>
+#include <dali/public-api/object/indirect-value.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/common/type-info-impl.h>
 
 namespace Dali
 {
 
-namespace DevelHandle
+IndirectValue::IndirectValue( Handle& handle, Property::Index index )
+: mHandle(handle.GetObjectPtr()),
+  mIndex(index),
+  mExtension(nullptr)
 {
-
-void SetTypeInfo( Handle& handle, const TypeInfo& typeInfo )
-{
-  GetImplementation( handle ).SetTypeInfo( &GetImplementation( typeInfo ) );
 }
 
-} // namespace DevelHandle
+void IndirectValue::operator= (Property::Value value)
+{
+  Handle(static_cast<Dali::Internal::Object*>(mHandle.Get())).SetProperty(mIndex, value);
+}
+
+Property::Value IndirectValue::GetProperty()
+{
+  return Handle(static_cast<Dali::Internal::Object*>(mHandle.Get())).GetProperty(mIndex);
+}
+
+IndirectValue& IndirectValue::operator=( IndirectValue&& ) = default;
+
+IndirectValue::IndirectValue( IndirectValue&& ) = default;
+
 
 } // namespace Dali

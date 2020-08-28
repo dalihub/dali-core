@@ -1,8 +1,5 @@
-#ifndef DALI_GESTURE_DEVEL_H
-#define DALI_GESTURE_DEVEL_H
-
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +15,12 @@
  *
  */
 
-#include <dali/public-api/events/gesture.h>
+// CLASS HEADER
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
-
-namespace DevelGesture
-{
-
-/**
- * @copydoc Dali::Gesture::Type
- */
-enum Type
-{
-  Pinch      = Gesture::Pinch,
-  Pan        = Gesture::Pan,
-  Tap        = Gesture::Tap,
-  LongPress  = Gesture::LongPress,
-
-  // Devel Gesture Types
-  Rotation   = 1 << 4, ///< When the user rotates two fingers around a particular ares of the screen.
-};
-
-} // namespace DevelGesture
-
+// Ensure Rect is maintained as a trivially copyable type
+static_assert(std::is_trivially_copyable<Rect<float>>::value);
 } // namespace Dali
 
-#endif // DALI_GESTURE_DEVEL_H

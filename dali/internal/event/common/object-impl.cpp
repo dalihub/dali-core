@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,15 +136,19 @@ std::string Object::GetPropertyName( Property::Index index ) const
   return std::string();
 }
 
-Property::Index Object::GetPropertyIndex( const std::string& name ) const
+Property::Index Object::GetPropertyIndex( Property::Key key ) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  const TypeInfo* typeInfo( GetTypeInfo() );
-  if ( typeInfo )
+  if( key.type == Property::Key::STRING )
   {
-    index = typeInfo->GetPropertyIndex( name );
+    const TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      index = typeInfo->GetPropertyIndex( key.stringKey );
+    }
   }
+
   if( (index == Property::INVALID_INDEX)&&( mCustomProperties.Count() > 0 ) )
   {
     Property::Index count = PROPERTY_CUSTOM_START_INDEX;
@@ -152,7 +156,9 @@ Property::Index Object::GetPropertyIndex( const std::string& name ) const
     for( auto iter = mCustomProperties.Begin(); iter != end; ++iter, ++count )
     {
       CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
-      if ( custom->name == name )
+
+      if( ( key.type == Property::Key::STRING && custom->name == key.stringKey) ||
+          ( key.type == Property::Key::INDEX && custom->key == key.indexKey ) )
       {
         if ( custom->childPropertyIndex != Property::INVALID_INDEX )
         {
@@ -168,50 +174,6 @@ Property::Index Object::GetPropertyIndex( const std::string& name ) const
     }
   }
 
-  return index;
-}
-
-Property::Index Object::GetPropertyIndex( Property::Index key ) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-
-  if( mCustomProperties.Count() > 0 )
-  {
-    Property::Index count = PROPERTY_CUSTOM_START_INDEX;
-    const auto end = mCustomProperties.End();
-    for( auto iter = mCustomProperties.Begin(); iter != end; ++iter, ++count )
-    {
-      CustomPropertyMetadata* custom = static_cast<CustomPropertyMetadata*>(*iter);
-      if( custom->key == key )
-      {
-        if( custom->childPropertyIndex != Property::INVALID_INDEX )
-        {
-          // If it is a child property, return the child property index
-          index = custom->childPropertyIndex;
-        }
-        else
-        {
-          index = count;
-        }
-        break;
-      }
-    }
-  }
-
-  return index;
-}
-
-Property::Index Object::GetPropertyIndex( Property::Key key ) const
-{
-  Property::Index index = Property::INVALID_INDEX;
-  if( key.type == Property::Key::INDEX )
-  {
-    index = GetPropertyIndex( key.indexKey );
-  }
-  else
-  {
-    index = GetPropertyIndex( key.stringKey );
-  }
   return index;
 }
 
@@ -453,7 +415,7 @@ Property::Value Object::GetProperty( Property::Index index ) const
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // check whether the animatable property is registered already, if not then register one.
-	  // this is needed because property value may have been set as full property and get as a property component
+    // this is needed because property value may have been set as full property and get as a property component
     AnimatablePropertyMetadata* animatableProperty = GetSceneAnimatableProperty( index, nullptr );
     if( animatableProperty )
     {
@@ -507,7 +469,7 @@ Property::Value Object::GetCurrentProperty( Property::Index index ) const
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // check whether the animatable property is registered already, if not then register one.
-	  // this is needed because property value may have been set as full property and get as a property component
+    // this is needed because property value may have been set as full property and get as a property component
     AnimatablePropertyMetadata* animatableProperty = GetSceneAnimatableProperty( index, nullptr );
     if( animatableProperty )
     {
@@ -590,7 +552,7 @@ void Object::SetProperties( const Property::Map& properties )
     // Iterating twice to get the value we want should still be fairly quick in a Property::Map.
 
     const auto& key = properties.GetKeyAt( position );
-    const auto propertyIndex = ( key.type == Property::Key::INDEX ) ? key.indexKey : GetPropertyIndex( key.stringKey );
+    const auto propertyIndex = ( key.type == Property::Key::INDEX ) ? key.indexKey : GetPropertyIndex( key );
 
     if( propertyIndex != Property::INVALID_INDEX )
     {
@@ -974,7 +936,7 @@ int32_t Object::GetPropertyComponentIndex( Property::Index index ) const
   return componentIndex;
 }
 
-DevelHandle::PropertySetSignalType& Object::PropertySetSignal()
+Handle::PropertySetSignalType& Object::PropertySetSignal()
 {
   return mPropertySetSignal;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,10 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/events/rotation-gesture.h>
 
 namespace Dali
 {
@@ -59,7 +58,7 @@ RotationGestureDetectorPtr RotationGestureDetector::New()
 }
 
 RotationGestureDetector::RotationGestureDetector()
-: GestureDetector( DevelGesture::Rotation )
+: GestureDetector( Gesture::Rotation )
 {
 }
 

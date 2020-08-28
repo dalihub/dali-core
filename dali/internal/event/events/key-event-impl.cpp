@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,135 +26,190 @@ namespace Dali
 
 namespace
 {
-/**
- * This container stores a mapping between public key event and impl as we cannot add data members in public one.
- * In practice this keeps the impl "alive" in between KeyEvent constructor and destructor calls so that getter
- * methods can be called to access the new data members. There is a 1:1 mapping between KeyEvent and KeyEventImpl.
- */
-struct KeyImplMapping
-{
-  KeyEvent* keyEvent;
-  Internal::KeyEventImpl* impl;
-};
-Vector< KeyImplMapping > gKeyEventToImplMapping;
-
+const uint32_t MODIFIER_SHIFT   = 0x1;
+const uint32_t MODIFIER_CTRL    = 0x2;
+const uint32_t MODIFIER_ALT     = 0x4;
+const int32_t  KEY_INVALID_CODE = -1;
 }
 
 namespace Internal
 {
 
-KeyEventImpl::KeyEventImpl( KeyEvent* keyEvent )
-: mLogicalKey( "" ),
+KeyEvent::KeyEvent()
+: mKeyName( "" ),
+  mLogicalKey( "" ),
+  mKeyString( "" ),
+  mKeyCode( KEY_INVALID_CODE ),
+  mKeyModifier( 0 ),
+  mTime( 0 ),
+  mState( Dali::KeyEvent::DOWN ),
   mCompose( "" ),
   mDeviceName( "" ),
   mDeviceClass( Device::Class::NONE ),
   mDeviceSubclass( Device::Subclass::NONE )
 {
-  gKeyEventToImplMapping.PushBack( { keyEvent, this } );
 }
 
-KeyEventImpl::~KeyEventImpl()
+KeyEvent::KeyEvent( const std::string& keyName,
+          const std::string& logicalKey,
+          const std::string& keyString,
+          int keyCode,
+          int keyModifier,
+          unsigned long timeStamp,
+          const Dali::KeyEvent::State& keyState,
+          const std::string& compose,
+          const std::string& deviceName,
+          const Device::Class::Type deviceClass,
+          const Device::Subclass::Type deviceSubclass )
+: mKeyName( keyName ),
+  mLogicalKey( logicalKey ),
+  mKeyString( keyString ),
+  mKeyCode( keyCode ),
+  mKeyModifier( keyModifier ),
+  mTime( timeStamp ),
+  mState( keyState ),
+  mCompose( compose ),
+  mDeviceName( deviceName ),
+  mDeviceClass( deviceClass ),
+  mDeviceSubclass( deviceSubclass )
 {
-  for( auto&& iter : gKeyEventToImplMapping )
-  {
-    if( this == iter.impl )
-    {
-      gKeyEventToImplMapping.Erase( &iter ); // iter is reference to KeyImplMapping, take address of it for Erase
-      return;
-    }
-  }
 }
 
-KeyEventImpl& KeyEventImpl::operator=( const KeyEventImpl& rhs )
+KeyEvent::~KeyEvent()
 {
-  if( this != &rhs )
-  {
-    mLogicalKey = rhs.mLogicalKey;
-    mCompose = rhs.mCompose;
-    mDeviceName = rhs.mDeviceName;
-    mDeviceClass = rhs.mDeviceClass;
-    mDeviceSubclass = rhs.mDeviceSubclass;
-  }
-
-  return *this;
 }
 
-std::string KeyEventImpl::GetLogicalKey() const
+KeyEventPtr KeyEvent::New( const std::string& keyName,
+                           const std::string& logicalKey,
+                           const std::string& keyString,
+                           int keyCode,
+                           int keyModifier,
+                           unsigned long timeStamp,
+                           const Dali::KeyEvent::State& keyState,
+                           const std::string& compose,
+                           const std::string& deviceName,
+                           const Device::Class::Type deviceClass,
+                           const Device::Subclass::Type deviceSubclass )
 {
-  return mLogicalKey;
+  KeyEventPtr keyEvent = new KeyEvent( keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
+  return keyEvent;
 }
 
-void KeyEventImpl::SetLogicalKey( const std::string& logicalKey )
+bool KeyEvent::IsShiftModifier() const
 {
-  mLogicalKey = logicalKey;
+  return ( ( MODIFIER_SHIFT & mKeyModifier ) == MODIFIER_SHIFT );
 }
 
-std::string KeyEventImpl::GetCompose() const
+bool KeyEvent::IsCtrlModifier() const
+{
+  return ( ( MODIFIER_CTRL & mKeyModifier ) == MODIFIER_CTRL );
+}
+
+bool KeyEvent::IsAltModifier() const
+{
+  return ( ( MODIFIER_ALT & mKeyModifier ) == MODIFIER_ALT );
+}
+
+const std::string& KeyEvent::GetCompose() const
 {
   return mCompose;
 }
 
-void KeyEventImpl::SetCompose( const std::string& compose )
-{
-  mCompose = compose;
-}
-
-std::string KeyEventImpl::GetDeviceName() const
+const std::string& KeyEvent::GetDeviceName() const
 {
   return mDeviceName;
 }
 
-void KeyEventImpl::SetDeviceName( const std::string& deviceName )
-{
-  mDeviceName = deviceName;
-}
 
-Device::Class::Type KeyEventImpl::GetDeviceClass() const
+Device::Class::Type KeyEvent::GetDeviceClass() const
 {
   return mDeviceClass;
 }
 
-void KeyEventImpl::SetDeviceClass( Device::Class::Type deviceClass )
-{
-  mDeviceClass = deviceClass;
-}
 
-Device::Subclass::Type KeyEventImpl::GetDeviceSubclass() const
+Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
 {
   return mDeviceSubclass;
 }
 
-void KeyEventImpl::SetDeviceSubclass( Device::Subclass::Type deviceSubclass )
+
+const std::string& KeyEvent::GetKeyName() const
 {
-  mDeviceSubclass = deviceSubclass;
+  return mKeyName;
 }
 
-} // namsespace Internal
 
-Internal::KeyEventImpl* GetImplementation( KeyEvent* keyEvent )
+const std::string& KeyEvent::GetKeyString() const
 {
-  Internal::KeyEventImpl* impl( NULL );
-  for( auto&& iter : gKeyEventToImplMapping )
-  {
-    if( iter.keyEvent == keyEvent )
-    {
-      impl = iter.impl;
-    }
-  }
-  return impl;
+  return mKeyString;
 }
 
-const Internal::KeyEventImpl* GetImplementation( const KeyEvent* keyEvent )
+
+const std::string& KeyEvent::GetLogicalKey() const
 {
-  Internal::KeyEventImpl* impl( NULL );
-  for( auto&& iter : gKeyEventToImplMapping )
-  {
-    if( iter.keyEvent == keyEvent )
-    {
-      impl = iter.impl;
-    }
-  }
-  return impl;
+  return mLogicalKey;
 }
+
+
+int32_t KeyEvent::GetKeyCode() const
+{
+  return mKeyCode;
+}
+
+
+int32_t KeyEvent::GetKeyModifier() const
+{
+  return mKeyModifier;
+}
+
+
+unsigned long KeyEvent::GetTime() const
+{
+  return mTime;
+}
+
+
+Dali::KeyEvent::State KeyEvent::GetState() const
+{
+  return mState;
+}
+
+
+void KeyEvent::SetKeyName( const std::string& keyName )
+{
+  mKeyName = keyName;
+}
+
+
+void KeyEvent::SetKeyString( const std::string& keyString )
+{
+  mKeyString = keyString;
+}
+
+
+void KeyEvent::SetKeyCode( int32_t keyCode )
+{
+  mKeyCode = keyCode;
+}
+
+
+void KeyEvent::SetKeyModifier( int32_t keyModifier )
+{
+  mKeyModifier = keyModifier;
+}
+
+
+void KeyEvent::SetTime( unsigned long time )
+{
+  mTime = time;
+}
+
+
+void KeyEvent::SetState( const Dali::KeyEvent::State& state )
+{
+  mState = state;
+}
+
+} // namespace Internal
 
 } // namespace Dali

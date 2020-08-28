@@ -2,7 +2,7 @@
 #define DALI_KEY_EVENT_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,87 @@ namespace DevelKeyEvent
 {
 
 /**
- * @brief Gets the logical key string.
+ * @brief Creates an initialized WheelEvent.
  *
- * For example, when the user presses 'shift' key and '1' key together, the logical key is "exclamation".
- * Plus, the keyPressedName is "1", and the keyPressed is "!".
- *
- * @param[in] keyEvent The instance of KeyEvent.
- * @return The logical key symbol
+ * @SINCE_1_9.27
+ * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
+ * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
+ * @param[in]  keyString       The string of input characters or key pressed
+ * @param[in]  keyCode         The unique key code for the key pressed.
+ * @param[in]  keyModifier     The key modifier for special keys like shift and alt
+ * @param[in]  timeStamp       The time (in ms) that the key event occurred.
+ * @param[in]  keyState        The state of the key event.
+ * @param[in]  compose         The key compose
+ * @param[in]  deviceName      The name of device the key event originated from
+ * @param[in]  deviceClass     The class of device the key event originated from
+ * @param[in]  deviceSubclass  The subclass of device the key event originated from
+ * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API std::string GetLogicalKey( KeyEvent keyEvent );
+DALI_CORE_API KeyEvent New( const std::string& keyName,
+                            const std::string& logicalKey,
+                            const std::string& keyString,
+                            int keyCode,
+                            int keyModifier,
+                            unsigned long timeStamp,
+                            const Dali::KeyEvent::State& keyState,
+                            const std::string& compose,
+                            const std::string& deviceName,
+                            const Device::Class::Type deviceClass,
+                            const Device::Subclass::Type deviceSubclass );
+
+/**
+ * @brief Set the name given to the key pressed
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] keyName The name given to the key pressed.
+ */
+void SetKeyName( KeyEvent keyEvent, const std::string& keyName );
+
+/**
+ * @brief Set the actual string of input characters that should be used for input editors.
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] keyString The actual string of input characters
+ */
+void SetKeyString( KeyEvent keyEvent, const std::string& keyString );
+
+/**
+ * @brief Set the unique key code for the key pressed.
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] keyCode The unique key code for the key pressed
+ */
+void SetKeyCode( KeyEvent keyEvent, int32_t keyCode );
+
+/**
+ * @brief Set the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] keyModifier The key modifier
+ */
+void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier );
+
+/**
+ * @brief Set the time (in ms) that the key event occurred.
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] time The time (in ms)
+ */
+void SetTime( KeyEvent keyEvent, unsigned long time );
+
+/**
+ * @brief Set the state of the key event.
+ *
+ * @SINCE_1_9.27
+ * @param[in] keyEvent The instance of KeyEvent.
+ * @param[in] state The state of the key event
+ */
+void SetState( KeyEvent keyEvent, const KeyEvent::State& state );
 
 } // namespace DevelKeyEvent
 

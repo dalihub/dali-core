@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_GESTURE_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/integration-api/events/event.h>
 
 namespace Dali
@@ -47,7 +46,7 @@ struct GestureEvent
   /**
    * Gesture Type.
    */
-  DevelGesture::Type gestureType;
+  Gesture::Type gestureType;
 
   /**
    * The state of the gesture.
@@ -66,12 +65,7 @@ protected:  // Constructors only to be used by derived structures.
    * @param[in] gesture       The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */
-  GestureEvent( DevelGesture::Type gesture, Gesture::State gestureState);
-
-  /**
-   * @copydoc GestureEvent( DevelGesture::Type, Gesture::State )
-   */
-  GestureEvent( Gesture::Type gesture, Gesture::State gestureState );
+  GestureEvent( Gesture::Type gesture, Gesture::State gestureState);
 };
 
 } // namespace Internal

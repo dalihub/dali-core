@@ -72,7 +72,7 @@ struct DALI_CORE_API Vector4
    * @param[in] z z (or b/p) component
    * @param[in] w w (or a/q) component
    */
-  explicit Vector4(float x, float y, float z, float w)
+  explicit constexpr Vector4(float x, float y, float z, float w)
   : x(x),
     y(y),
     z(z),

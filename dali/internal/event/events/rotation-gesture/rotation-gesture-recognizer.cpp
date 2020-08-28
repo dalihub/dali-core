@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -56,7 +55,7 @@ inline Vector2 GetCenterPoint( const Integration::Point& point1, const Integrati
 } // unnamed namespace
 
 RotationGestureRecognizer::RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
-: GestureRecognizer( DevelGesture::Rotation ),
+: GestureRecognizer( Gesture::Rotation ),
   mObserver( observer ),
   mState( Clear ),
   mTouchEvents(),

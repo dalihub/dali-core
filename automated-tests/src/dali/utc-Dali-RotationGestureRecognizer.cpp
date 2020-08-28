@@ -21,8 +21,6 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/input-options.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/devel-api/events/rotation-gesture.h>
-#include <dali/devel-api/events/rotation-gesture-detector.h>
 #include <dali-test-suite-utils.h>
 
 

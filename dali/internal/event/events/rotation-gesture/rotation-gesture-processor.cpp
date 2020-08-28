@@ -23,15 +23,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 #include <dali/internal/event/events/gesture-requests.h>
-#include <dali/devel-api/events/rotation-gesture.h>
 
 namespace Dali
 {
@@ -102,7 +101,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 RotationGestureProcessor::RotationGestureProcessor()
-: GestureProcessor( DevelGesture::Rotation ),
+: GestureProcessor( Gesture::Rotation ),
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
   mCurrentRotationEvent( nullptr ),

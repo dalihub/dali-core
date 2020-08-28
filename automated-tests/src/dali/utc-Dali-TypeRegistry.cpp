@@ -23,7 +23,6 @@
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
-#include <dali/devel-api/events/rotation-gesture-detector.h>
 
 using namespace Dali;
 

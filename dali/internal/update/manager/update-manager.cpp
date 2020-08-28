@@ -1235,51 +1235,51 @@ void UpdateManager::SetWrapMode( Render::Sampler* sampler, uint32_t rWrapMode, u
   new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetWrapMode, sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
-void UpdateManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
+void UpdateManager::AddVertexBuffer( OwnerPointer< Render::VertexBuffer >& vertexBuffer )
 {
   // Message has ownership of format while in transit from update -> render
-  typedef MessageValue1< RenderManager, OwnerPointer< Render::PropertyBuffer > > DerivedType;
+  typedef MessageValue1< RenderManager, OwnerPointer< Render::VertexBuffer > > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddPropertyBuffer, propertyBuffer );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AddVertexBuffer, vertexBuffer );
 }
 
-void UpdateManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::RemoveVertexBuffer( Render::VertexBuffer* vertexBuffer )
 {
-  typedef MessageValue1< RenderManager, Render::PropertyBuffer* > DerivedType;
+  typedef MessageValue1< RenderManager, Render::VertexBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemovePropertyBuffer, propertyBuffer );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, vertexBuffer );
 }
 
-void UpdateManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
-{
-  // Message has ownership of format while in transit from update -> render
-  typedef MessageValue2< RenderManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format > > DerivedType;
-
-  // Reserve some memory inside the render queue
-  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetPropertyBufferFormat, propertyBuffer, format );
-}
-
-void UpdateManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
+void UpdateManager::SetVertexBufferFormat( Render::VertexBuffer* vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format )
 {
   // Message has ownership of format while in transit from update -> render
-  typedef MessageValue3< RenderManager, Render::PropertyBuffer*, OwnerPointer< Dali::Vector<uint8_t> >, uint32_t > DerivedType;
+  typedef MessageValue2< RenderManager, Render::VertexBuffer*, OwnerPointer< Render::VertexBuffer::Format > > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetPropertyBufferData, propertyBuffer, data, size );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::SetVertexBufferFormat, vertexBuffer, format );
+}
+
+void UpdateManager::SetVertexBufferData( Render::VertexBuffer* vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
+{
+  // Message has ownership of format while in transit from update -> render
+  typedef MessageValue3< RenderManager, Render::VertexBuffer*, OwnerPointer< Dali::Vector<uint8_t> >, uint32_t > DerivedType;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetVertexBufferData, vertexBuffer, data, size );
 }
 
 void UpdateManager::AddGeometry( OwnerPointer< Render::Geometry >& geometry )
@@ -1327,26 +1327,26 @@ void UpdateManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uin
   new (slot) DerivedType( &mImpl->renderManager, geometry, indices );
 }
 
-void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer )
 {
-  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+  typedef MessageValue2< RenderManager, Render::Geometry*, Render::VertexBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, propertyBuffer );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::RemoveVertexBuffer, geometry, vertexBuffer );
 }
 
-void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
+void UpdateManager::AttachVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer )
 {
-  typedef MessageValue2< RenderManager, Render::Geometry*, Render::PropertyBuffer* > DerivedType;
+  typedef MessageValue2< RenderManager, Render::Geometry*, Render::VertexBuffer* > DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, propertyBuffer );
+  new (slot) DerivedType( &mImpl->renderManager,  &RenderManager::AttachVertexBuffer, geometry, vertexBuffer );
 }
 
 void UpdateManager::AddTexture( OwnerPointer< Render::Texture >& texture )
