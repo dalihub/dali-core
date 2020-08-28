@@ -1416,7 +1416,7 @@ public:
    * @param[in] event The hover event.
    * @return True if the event was consumed.
    */
-  bool EmitHoverEventSignal( const Dali::HoverEvent& event );
+  bool EmitHoverEventSignal( const HoverEvent& event );
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
