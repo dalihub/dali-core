@@ -61,7 +61,7 @@ void PropertyNotificationManager::NotifyProperty( SceneGraph::PropertyNotificati
     // found one with the matching SceneGraph::PropertyNotification?
     if( (*iter)->CompareSceneObject( propertyNotification ) )
     {
-      // allow application to access the value that triggered this emit incase of NotifyOnChanged mode
+      // allow application to access the value that triggered this emit incase of NOTIFY_ON_CHANGED mode
       (*iter)->SetNotifyResult(validity);
       // yes..emit signal
       (*iter)->EmitSignalNotify();

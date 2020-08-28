@@ -86,7 +86,7 @@ TouchEventCombiner::~TouchEventCombiner()
 
 TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent )
 {
-  TouchEventCombiner::EventDispatchType dispatchEvent( TouchEventCombiner::DispatchNone );
+  TouchEventCombiner::EventDispatchType dispatchEvent( TouchEventCombiner::DISPATCH_NONE );
   const PointState::Type state = point.GetState();
   const int deviceId = point.GetDeviceId();
 
@@ -121,7 +121,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
       {
         mPressedPoints.push_back( PointInfo( point, time ) );
         touchEvent.AddPoint( point );
-        dispatchEvent = TouchEventCombiner::DispatchTouch; // Only dispatch touch event if just added to container
+        dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // Only dispatch touch event if just added to container
 
         // Check whether hover event was dispatched previously
         if ( !mHoveredPoints.empty() )
@@ -148,7 +148,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
           if ( match != mHoveredPoints.end() )
           {
             mHoveredPoints.erase( match );
-            dispatchEvent = TouchEventCombiner::DispatchBoth; // We should only dispatch hover events if the point was actually hovered in this window
+            dispatchEvent = TouchEventCombiner::DISPATCH_BOTH; // We should only dispatch hover events if the point was actually hovered in this window
           }
         }
       }
@@ -181,7 +181,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
       if ( match != mPressedPoints.end() )
       {
         mPressedPoints.erase( match );
-        dispatchEvent = TouchEventCombiner::DispatchTouch; // We should only dispatch touch events if the point was actually pressed in this window
+        dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // We should only dispatch touch events if the point was actually pressed in this window
 
         // Iterate through already stored touch points for HoverEvent and delete them
         for ( PointInfoContainer::iterator iter = mHoveredPoints.begin(), endIter = mHoveredPoints.end(); iter != endIter; ++iter )
@@ -245,7 +245,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
           PointInfo matchedPoint( point, time );
           std::swap( *match, matchedPoint );
 
-          dispatchEvent = TouchEventCombiner::DispatchTouch; // Dispatch touch event
+          dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // Dispatch touch event
         }
         else if(!ignore)
         {
@@ -312,13 +312,13 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
             std::swap( *match, matchedPoint );
           }
 
-          if(dispatchEvent == TouchEventCombiner::DispatchTouch)
+          if(dispatchEvent == TouchEventCombiner::DISPATCH_TOUCH)
           {
-            dispatchEvent = TouchEventCombiner::DispatchBoth;
+            dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
           }
           else
           {
-            dispatchEvent = TouchEventCombiner::DispatchHover;
+            dispatchEvent = TouchEventCombiner::DISPATCH_HOVER;
           }
         }
       }
@@ -332,7 +332,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
       // We should still tell core about the interruption.
       touchEvent.AddPoint( point );
       hoverEvent.AddPoint( point );
-      dispatchEvent = TouchEventCombiner::DispatchBoth;
+      dispatchEvent = TouchEventCombiner::DISPATCH_BOTH;
       break;
     }
 

@@ -485,7 +485,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   constraint.AddSource( LocalSource( Actor::Property::ORIENTATION ) );
   constraint.AddSource( LocalSource( Actor::Property::COLOR ) );
   constraint.AddSource( LocalSource( Actor::Property::VISIBLE ) );
-  constraint.SetRemoveAction( Constraint::Discard );
+  constraint.SetRemoveAction( Constraint::DISCARD );
   constraint.SetTag( 123 );
 
   // Clone the constraint & apply the clone
@@ -751,11 +751,11 @@ int UtcDaliConstraintRemoveActionP(void)
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
   DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::DEFAULT_REMOVE_ACTION, TEST_LOCATION );
 
-  constraint.SetRemoveAction( Constraint::Discard );
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::Discard, TEST_LOCATION );
+  constraint.SetRemoveAction( Constraint::DISCARD );
+  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::DISCARD, TEST_LOCATION );
 
-  constraint.SetRemoveAction( Constraint::Bake );
-  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::Bake, TEST_LOCATION );
+  constraint.SetRemoveAction( Constraint::BAKE );
+  DALI_TEST_EQUALS( constraint.GetRemoveAction(), Constraint::BAKE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -769,7 +769,7 @@ int UtcDaliConstraintSetRemoveActionN(void)
   Constraint constraint;
   try
   {
-    constraint.SetRemoveAction( Constraint::Discard );
+    constraint.SetRemoveAction( Constraint::DISCARD );
     DALI_TEST_CHECK( false ); // Should not reach here!
   }
   catch( ... )
@@ -819,7 +819,7 @@ int UtcDaliConstraintBakeRemoveAction(void)
 
   // Create a constraint that constrains to position
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
-  constraint.SetRemoveAction( Constraint::Bake );
+  constraint.SetRemoveAction( Constraint::BAKE );
   constraint.Apply();
 
   application.SendNotification();
@@ -859,7 +859,7 @@ int UtcDaliConstraintDiscardRemoveAction(void)
 
   // Create a constraint that constrains to position
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, SetValueFunctor< Vector3 >( position ) );
-  constraint.SetRemoveAction( Constraint::Discard );
+  constraint.SetRemoveAction( Constraint::DISCARD );
   constraint.Apply();
 
   application.SendNotification();
@@ -1309,7 +1309,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
 
   // Create a constraint whose value is discarded when it is removed
   Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
-  constraint.SetRemoveAction( Constraint::RemoveAction::Discard );
+  constraint.SetRemoveAction( Constraint::RemoveAction::DISCARD );
   constraint.Apply();
 
   // Check value after one render, it should be constrained
@@ -1364,7 +1364,7 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
 
   // Create a constraint whose value is discarded when it is removed
   Constraint constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SetHalfOpacity );
-  constraint.SetRemoveAction( Constraint::RemoveAction::Discard );
+  constraint.SetRemoveAction( Constraint::RemoveAction::DISCARD );
   constraint.Apply();
 
   // Check value after one render, it should be constrained
@@ -1428,7 +1428,7 @@ int UtcDaliConstraintSetRemoveActionNegative(void)
   Dali::Constraint instance;
   try
   {
-    Dali::Constraint::RemoveAction arg1(Constraint::Bake);
+    Dali::Constraint::RemoveAction arg1(Constraint::BAKE);
     instance.SetRemoveAction(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }

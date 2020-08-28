@@ -52,10 +52,10 @@ public:
    */
   enum NotifyMode
   {
-    Disabled,                             ///< Don't notify, regardless of result of Condition @SINCE_1_0.0
-    NotifyOnTrue,                         ///< Notify whenever condition changes from false to true. @SINCE_1_0.0
-    NotifyOnFalse,                        ///< Notify whenever condition changes from true to false. @SINCE_1_0.0
-    NotifyOnChanged                       ///< Notify whenever condition changes (false to true, and true to false) @SINCE_1_0.0
+    DISABLED,                             ///< Don't notify, regardless of result of Condition @SINCE_1_9.28
+    NOTIFY_ON_TRUE,                       ///< Notify whenever condition changes from false to true. @SINCE_1_9.28
+    NOTIFY_ON_FALSE,                      ///< Notify whenever condition changes from true to false. @SINCE_1_9.28
+    NOTIFY_ON_CHANGED                     ///< Notify whenever condition changes (false to true, and true to false) @SINCE_1_9.28
   };
 
 public:
@@ -162,7 +162,7 @@ public:
    * notification should respond to the result of a condition.
    *
    * @SINCE_1_0.0
-   * @param[in] mode Notification mode (Default is PropertyNotification::NotifyOnTrue)
+   * @param[in] mode Notification mode (Default is PropertyNotification::NOTIFY_ON_TRUE)
    */
   void SetNotifyMode( NotifyMode mode );
 
@@ -176,7 +176,7 @@ public:
 
   /**
    * @brief Gets the result of the last condition check that caused a signal emit,
-   * useful when using NotifyOnChanged mode and need to know what it changed to.
+   * useful when using NOTIFY_ON_CHANGED mode and need to know what it changed to.
    *
    * @SINCE_1_0.0
    * @return whether condition result that triggered last emit was true or false

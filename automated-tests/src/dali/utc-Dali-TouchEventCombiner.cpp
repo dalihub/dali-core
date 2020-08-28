@@ -232,7 +232,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -247,7 +247,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 101.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -262,7 +262,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 101.0f, 101.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -275,7 +275,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
 
   time++;
@@ -286,7 +286,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -301,7 +301,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
 
   // Up event, no time diff, no movement
@@ -310,7 +310,7 @@ int UtcDaliTouchEventCombinerSingleTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -330,7 +330,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionWithoutDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION );
@@ -345,7 +345,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionWithoutDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -365,7 +365,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionFollowedByDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION );
@@ -380,7 +380,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionFollowedByDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -395,7 +395,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionFollowedByDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 103.0f, 103.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -410,7 +410,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionFollowedByDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 103.0f, 103.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchBoth, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -434,7 +434,7 @@ int UtcDaliTouchEventCombinerSingleTouchTwoDowns(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -449,7 +449,7 @@ int UtcDaliTouchEventCombinerSingleTouchTwoDowns(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -465,7 +465,7 @@ int UtcDaliTouchEventCombinerSingleTouchUpWithoutDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
 
   time++;
@@ -476,7 +476,7 @@ int UtcDaliTouchEventCombinerSingleTouchUpWithoutDown(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -492,7 +492,7 @@ int UtcDaliTouchEventCombinerSingleTouchTwoUps(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -507,7 +507,7 @@ int UtcDaliTouchEventCombinerSingleTouchTwoUps(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -522,7 +522,7 @@ int UtcDaliTouchEventCombinerSingleTouchTwoUps(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -538,7 +538,7 @@ int UtcDaliTouchEventCombinerSingleTouchUpWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -553,7 +553,7 @@ int UtcDaliTouchEventCombinerSingleTouchUpWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
 
   time++;
@@ -564,7 +564,7 @@ int UtcDaliTouchEventCombinerSingleTouchUpWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -584,7 +584,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -599,7 +599,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::MOTION, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchHover, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_HOVER, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.points[0].GetState(), PointState::STARTED, TEST_LOCATION );
@@ -614,7 +614,7 @@ int UtcDaliTouchEventCombinerSingleTouchMotionWithDifferentId(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 102.0f, 102.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -634,7 +634,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -649,7 +649,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::DOWN, 200.0f, 200.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 2u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[1].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), PointState::STATIONARY, TEST_LOCATION );
@@ -665,7 +665,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::MOTION, 101.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 2u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -679,7 +679,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::MOTION, 200.0f, 200.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
 
   time++;
@@ -690,7 +690,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::MOTION, 201.0f, 201.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 2u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[1].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), PointState::STATIONARY, TEST_LOCATION );
@@ -706,7 +706,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 101.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 2u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -722,7 +722,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::MOTION, 202.0f, 202.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -737,7 +737,7 @@ int UtcDaliTouchEventCombinerMultiTouchNormal(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 2, PointState::UP, 202.0f, 202.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -759,7 +759,7 @@ int UtcDaliTouchEventCombinerSeveralPoints(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( pointCount, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time++, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time++, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), pointCount, TEST_LOCATION );
   }
 
@@ -770,7 +770,7 @@ int UtcDaliTouchEventCombinerSeveralPoints(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( pointCount, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time++, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time++, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), pointCount, TEST_LOCATION );
   }
   END_TEST;
@@ -787,7 +787,7 @@ int UtcDaliTouchEventCombinerReset(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -805,7 +805,7 @@ int UtcDaliTouchEventCombinerReset(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -821,7 +821,7 @@ int UtcDaliTouchEventCombinerSingleTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetDeviceId(), point.GetDeviceId(), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
@@ -836,7 +836,7 @@ int UtcDaliTouchEventCombinerSingleTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::INTERRUPTED, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchBoth, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
@@ -850,7 +850,7 @@ int UtcDaliTouchEventCombinerSingleTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -868,7 +868,7 @@ int UtcDaliTouchEventCombinerMultiTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( pointCount, PointState::DOWN, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchTouch, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), pointCount, TEST_LOCATION );
   }
 
@@ -878,7 +878,7 @@ int UtcDaliTouchEventCombinerMultiTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::INTERRUPTED, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchBoth, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_BOTH, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.GetPointCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( touchEvent.points[0].GetState(), point.GetState(), TEST_LOCATION );
     DALI_TEST_EQUALS( hoverEvent.GetPointCount(), 1u, TEST_LOCATION );
@@ -892,7 +892,7 @@ int UtcDaliTouchEventCombinerMultiTouchInterrupted(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::UP, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }
@@ -908,7 +908,7 @@ int UtcDaliTouchEventCombinerInvalidState(void)
     Integration::HoverEvent hoverEvent;
     Integration::Point point = GeneratePoint( 1, PointState::STATIONARY, 100.0f, 100.0f );
 
-    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DispatchNone, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
+    DALI_TEST_EQUALS( Integration::TouchEventCombiner::DISPATCH_NONE, combiner.GetNextTouchEvent( point, time, touchEvent, hoverEvent ), TEST_LOCATION );
   }
   END_TEST;
 }

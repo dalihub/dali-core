@@ -143,7 +143,7 @@ void LinearConstrainer::Apply( Property target, Property source, const Vector2& 
   constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
   constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
-  constraint.SetRemoveAction( Dali::Constraint::Discard );
+  constraint.SetRemoveAction( Dali::Constraint::DISCARD );
   constraint.Apply();
 
   //Start observing the object

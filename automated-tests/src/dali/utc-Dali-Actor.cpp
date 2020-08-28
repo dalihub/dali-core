@@ -7251,7 +7251,7 @@ int utcDaliActorCulled(void)
   DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::CULLED ), false, TEST_LOCATION );
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::CULLED, LessThanCondition( 0.5f ) );
-  notification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+  notification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
   // Connect NotifySignal
   bool propertyNotificationSignal( false );
