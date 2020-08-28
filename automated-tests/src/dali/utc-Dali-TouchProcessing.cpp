@@ -2065,11 +2065,11 @@ int UtcDaliTouchEventCapturePropertySet(void)
 int UtcDaliTouchEventIntegNewTouchEvent(void)
 {
   uint32_t timestamp = 92858u;
-  TouchPoint tp(1, TouchPoint::State::Started, 34.4f, 123.89f, 5.0f, 7.0f);
+  TouchPoint tp(1, PointState::STARTED, 34.4f, 123.89f, 5.0f, 7.0f);
   Dali::TouchEvent touchEvent = Integration::NewTouchEvent(timestamp, tp);
 
   DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(touchEvent.GetState(0), PointState::Type::STARTED, TEST_LOCATION );
+  DALI_TEST_EQUALS(touchEvent.GetState(0), PointState::STARTED, TEST_LOCATION );
   DALI_TEST_EQUALS(touchEvent.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION );
   DALI_TEST_EQUALS(touchEvent.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION );
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/hover-event.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/events/point.h>
 
