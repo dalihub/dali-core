@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
-#include <dali/internal/event/events/wheel-event-impl.h>
 
 namespace Dali
 {
@@ -44,7 +43,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_WHE
 /**
  *  Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
  */
-Dali::Actor EmitWheelSignals( Dali::Actor actor, const Dali::WheelEvent& event )
+Dali::Actor EmitWheelSignals( Dali::Actor actor, const WheelEvent& event )
 {
   Dali::Actor consumedActor;
 
@@ -134,10 +133,9 @@ WheelEventProcessor::~WheelEventProcessor()
 
 void WheelEventProcessor::ProcessWheelEvent( const Integration::WheelEvent& event )
 {
-  WheelEventPtr wheelEvent = WheelEvent::New( static_cast< Dali::WheelEvent::Type >( event.type ), event.direction, event.modifiers, event.point, event.delta, event.timeStamp );
-  Dali::WheelEvent wheelEventHandle( wheelEvent.Get() );
+  WheelEvent wheelEvent( static_cast< WheelEvent::Type >( event.type ), event.direction, event.modifiers, event.point, event.z, event.timeStamp );
 
-  if( wheelEvent->GetType() == Dali::WheelEvent::MOUSE_WHEEL )
+  if( wheelEvent.type == WheelEvent::MOUSE_WHEEL )
   {
     Dali::HitTestAlgorithm::Results hitTestResults;
     HitTestAlgorithm::HitTest( mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), event.point, hitTestResults, IsActorWheelableFunction );
@@ -149,7 +147,7 @@ void WheelEventProcessor::ProcessWheelEvent( const Integration::WheelEvent& even
                    hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y );
 
     // Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
-    Dali::Actor consumedActor = EmitWheelSignals( hitTestResults.actor, wheelEventHandle );
+    Dali::Actor consumedActor = EmitWheelSignals( hitTestResults.actor, wheelEvent );
 
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "HitActor:      (%p) %s\n", hitTestResults.actor ? reinterpret_cast< void* >( &hitTestResults.actor.GetBaseObject() ) : NULL, hitTestResults.actor ? hitTestResults.actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor: (%p) %s\n", consumedActor ? reinterpret_cast< void* >( &consumedActor.GetBaseObject() ) : NULL, consumedActor ? consumedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() : "" );
@@ -157,7 +155,7 @@ void WheelEventProcessor::ProcessWheelEvent( const Integration::WheelEvent& even
   else
   {
     // if CUSTOM_WHEEL, emit the wheel event signal from the scene.
-    mScene.EmitWheelEventSignal( wheelEventHandle );
+    mScene.EmitWheelEventSignal( wheelEvent );
   }
 }
 

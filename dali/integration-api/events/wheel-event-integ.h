@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,10 +60,10 @@ struct DALI_CORE_API WheelEvent : public Event
    * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
    * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
    * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
-   * @param[in]  delta      The offset of rolling (positive value means roll down, and negative value means roll up)
+   * @param[in]  z          The offset of rolling (positive value means roll down, and negative value means roll up)
    * @param[in]  timeStamp  The time the wheel is being rolled.
    */
-  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp );
+  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp );
 
   /**
    * Virtual destructor
@@ -73,32 +73,32 @@ struct DALI_CORE_API WheelEvent : public Event
   // Data
 
   /**
-   *@copydoc Dali::WheelEvent::GetType
+   *@copydoc Dali::WheelEvent::type
    */
   Type type;
 
   /**
-   *@copydoc Dali::WheelEvent::GetDrection
+   *@copydoc Dali::WheelEvent::direction
    */
   int direction;
 
   /**
-   *@copydoc Dali::WheelEvent::GetModifiers
+   *@copydoc Dali::WheelEvent::modifiers
    */
   unsigned int modifiers;
 
   /**
-   *@copydoc Dali::WheelEvent::GetPoint
+   *@copydoc Dali::WheelEvent::point
    */
   Vector2 point;
 
   /**
-   *@copydoc Dali::WheelEvent::GetDelta
+   *@copydoc Dali::WheelEvent::z
    */
-  int delta;
+  int z;
 
   /**
-   *@copydoc Dali::WheelEvent::GetTime
+   *@copydoc Dali::WheelEvent::timeStamp
    */
   unsigned int timeStamp;
 

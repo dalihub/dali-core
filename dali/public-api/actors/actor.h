@@ -51,7 +51,7 @@ class Quaternion;
 class Layer;
 class TouchEvent;
 class HoverEvent;
-class WheelEvent;
+struct WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
