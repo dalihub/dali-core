@@ -163,7 +163,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] stringValue A string
    */
-  Value(const std::string& stringValue);
+  Value(std::string stringValue);
 
   /**
    * @brief Creates a string property value.
@@ -176,34 +176,18 @@ public:
   /**
    * @brief Creates an array property value.
    *
-   * @SINCE_1_0.0
-   * @param[in] arrayValue An array
+   * @SINCE_1_9.30
+   * @param[in] arrayValue A property array
    */
-  Value(Property::Array& arrayValue);
-
-  /**
-   * @brief Creates an array property value.
-   *
-   * @SINCE_1_4.16
-   * @param[in] arrayValue An r-value array
-   */
-  Value(Property::Array&& arrayValue);
+  Value(Property::Array arrayValue);
 
   /**
    * @brief Creates a map property value.
    *
-   * @SINCE_1_0.0
-   * @param[in] mapValue A map
+   * @SINCE_1_9.30
+   * @param[in] mapValue A property map
    */
-  Value(Property::Map& mapValue);
-
-  /**
-   * @brief Creates a map property value.
-   *
-   * @SINCE_1_4.16
-   * @param[in] mapValue An r-value map
-   */
-  Value(Property::Map&& mapValue);
+  Value(Property::Map mapValue);
 
   /**
    * @brief Create a map property value from an initializer_list.
@@ -256,7 +240,7 @@ public:
    * @SINCE_1_4.16
    * @param[in] value The property value to move from
    */
-  Value(Value&& value);
+  Value(Value&& value) noexcept;
 
   /**
    * @brief Assigns a property value.
@@ -274,7 +258,7 @@ public:
    * @param[in] value The property value to move from
    * @return a reference to this
    */
-  Value& operator=(Value&& value);
+  Value& operator=(Value&& value) noexcept;
 
   /**
    * @brief Non-virtual destructor.
