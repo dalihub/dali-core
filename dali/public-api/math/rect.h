@@ -36,7 +36,6 @@ namespace Dali
  * @brief Template class to create and operate on rectangles.
  * @SINCE_1_0.0
  */
-
 template< typename T = float >
 struct Rect
 {
@@ -86,72 +85,38 @@ struct Rect
   }
 
   /**
-   * @brief Copy constructor.
+   * @brief Default copy constructor.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect(const Rect<T>& rhs)
-  {
-    x = rhs.x;
-    y = rhs.y;
-    width = rhs.width;
-    height = rhs.height;
-  }
+  Rect( const Rect<T>& rhs ) = default;
 
   /**
-   * @brief Copy assignment operator.
+   * @brief Default copy assignment operator.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.27
    * @param[in] rhs The original object
    * @return Reference to this
    */
-  Rect<T>& operator= (const Rect<T>& rhs)
-  {
-    if (this != &rhs)
-    {
-      x = rhs.x;
-      y = rhs.y;
-      width = rhs.width;
-      height = rhs.height;
-    }
-
-    return *this;
-  }
+  Rect<T>& operator=( const Rect<T>& rhs ) = default;
 
   /**
-   * @brief Move constructor.
+   * @brief Default move constructor.
    *
-   * @SINCE_1_9.21
+   * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect<T>( Rect<T>&& rhs )
-  : x( rhs.x ),
-    y( rhs.y ),
-    width( rhs.width ),
-    height( rhs.height )
-  {
-  }
+  Rect<T>( Rect<T>&& rhs ) = default;
 
   /**
-   * @brief Move assignment operator.
+   * @brief Default move assignment operator.
    *
-   * @SINCE_1_9.21
+   * @SINCE_1_9.27
    * @param[in] rhs The original object
    * @return Reference to this
    */
-  Rect<T>& operator=( Rect<T>&& rhs )
-  {
-    if (this != &rhs)
-    {
-      x = rhs.x;
-      y = rhs.y;
-      width = rhs.width;
-      height = rhs.height;
-    }
-
-    return *this;
-  }
+  Rect<T>& operator=( Rect<T>&& rhs ) = default;
 
   /**
    * @brief Assignment operator.
@@ -160,7 +125,7 @@ struct Rect
    * @param[in] vec4 The Vector4 to assign
    * @return Reference to this
    */
-  Rect<T>& operator= (const Vector4& vec4)
+  Rect<T>& operator=(const Vector4& vec4)
   {
     x = vec4.x;
     y = vec4.y;

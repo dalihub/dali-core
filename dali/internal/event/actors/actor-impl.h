@@ -30,7 +30,6 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -42,7 +41,7 @@
 namespace Dali
 {
 
-struct KeyEvent;
+class KeyEvent;
 class TouchData;
 class TouchEvent;
 class WheelEvent;
@@ -1400,7 +1399,7 @@ public:
    * @param[in] type The gesture type.
    * @return True if the gesture is required, false otherwise.
    */
-  bool IsGestureRequred( DevelGesture::Type type ) const;
+  bool IsGestureRequred( Gesture::Type type ) const;
 
   // Signals
 

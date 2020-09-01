@@ -2,7 +2,7 @@
 #define DALI_ROTATION_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ namespace Dali
  *
  * A rotation gesture will continue to be sent to the actor under the center point of the rotation
  * until the rotation ends.
+ * @SINCE_1_9.27
  */
 struct DALI_CORE_API RotationGesture: public Gesture
 {
@@ -44,19 +45,21 @@ struct DALI_CORE_API RotationGesture: public Gesture
 
   /**
    * @brief Default Constructor.
-   *
+   * @SINCE_1_9.27
    * @param[in] state The state of the gesture
    */
   RotationGesture( Gesture::State state );
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_9.27
    * @param[in] rhs A reference to the copied handle
    */
   RotationGesture( const RotationGesture& rhs );
 
   /**
    * @brief Assignment operator.
+   * @SINCE_1_9.27
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
@@ -64,6 +67,7 @@ struct DALI_CORE_API RotationGesture: public Gesture
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_9.27
    */
   virtual ~RotationGesture();
 
@@ -71,16 +75,19 @@ struct DALI_CORE_API RotationGesture: public Gesture
 
   /**
    * @brief The overall rotation from the start of the rotation gesture till the latest rotation gesture.
+   * @SINCE_1_9.27
    */
   Radian rotation;
 
   /**
    * @brief The center point of the two points that caused the rotation gesture in screen coordinates.
+   * @SINCE_1_9.27
    */
   Vector2 screenCenterPoint;
 
   /**
    * @brief The center point of the two points that caused the rotation gesture in local actor coordinates.
+   * @SINCE_1_9.27
    */
   Vector2 localCenterPoint;
 };

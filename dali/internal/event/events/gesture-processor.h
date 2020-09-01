@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/events/gesture-devel.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/gesture-recognizer.h>
@@ -61,11 +60,6 @@ public:
 protected:
 
   // Construction & Destruction
-
-  /**
-   * Protected constructor.  Cannot create an instance of GestureProcessor
-   */
-  GestureProcessor( DevelGesture::Type type );
 
   /**
    * Protected constructor.  Cannot create an instance of GestureProcessor
@@ -196,7 +190,7 @@ protected:  //Data
 
 private: // Data
 
-  DevelGesture::Type mType;            ///< Type of GestureProcessor
+  Gesture::Type mType;                 ///< Type of GestureProcessor
   Actor* mCurrentGesturedActor;        ///< The current actor that has been gestured.
   bool   mGesturedActorDisconnected:1; ///< Indicates whether the gestured actor has been disconnected from the scene
 };

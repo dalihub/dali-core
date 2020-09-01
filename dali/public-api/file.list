@@ -16,7 +16,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/animation/linear-constrainer.cpp
   ${public_api_src_dir}/animation/path.cpp
   ${public_api_src_dir}/animation/time-period.cpp
-  ${public_api_src_dir}/common/constants.cpp
   ${public_api_src_dir}/common/dali-common.cpp
   ${public_api_src_dir}/common/dali-vector.cpp
   ${public_api_src_dir}/common/extents.cpp
@@ -31,9 +30,10 @@ SET( public_api_src_files
   ${public_api_src_dir}/events/pan-gesture-detector.cpp
   ${public_api_src_dir}/events/pinch-gesture.cpp
   ${public_api_src_dir}/events/pinch-gesture-detector.cpp
+  ${public_api_src_dir}/events/rotation-gesture.cpp
+  ${public_api_src_dir}/events/rotation-gesture-detector.cpp
   ${public_api_src_dir}/events/tap-gesture.cpp
   ${public_api_src_dir}/events/tap-gesture-detector.cpp
-  ${public_api_src_dir}/events/touch-point.cpp
   ${public_api_src_dir}/events/touch-event.cpp
   ${public_api_src_dir}/images/pixel.cpp
   ${public_api_src_dir}/images/pixel-data.cpp
@@ -42,6 +42,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/math/matrix.cpp
   ${public_api_src_dir}/math/matrix3.cpp
   ${public_api_src_dir}/math/quaternion.cpp
+  ${public_api_src_dir}/math/rect.cpp
   ${public_api_src_dir}/math/vector2.cpp
   ${public_api_src_dir}/math/vector3.cpp
   ${public_api_src_dir}/math/vector4.cpp
@@ -65,7 +66,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/render-tasks/render-task-list.cpp
   ${public_api_src_dir}/rendering/frame-buffer.cpp
   ${public_api_src_dir}/rendering/geometry.cpp
-  ${public_api_src_dir}/rendering/property-buffer.cpp
+  ${public_api_src_dir}/rendering/vertex-buffer.cpp
   ${public_api_src_dir}/rendering/texture.cpp
   ${public_api_src_dir}/rendering/texture-set.cpp
   ${public_api_src_dir}/rendering/renderer.cpp
@@ -142,9 +143,10 @@ SET( public_api_core_events_header_files
   ${public_api_src_dir}/events/pinch-gesture.h
   ${public_api_src_dir}/events/pinch-gesture-detector.h
   ${public_api_src_dir}/events/point-state.h
+  ${public_api_src_dir}/events/rotation-gesture.h
+  ${public_api_src_dir}/events/rotation-gesture-detector.h
   ${public_api_src_dir}/events/tap-gesture.h
   ${public_api_src_dir}/events/tap-gesture-detector.h
-  ${public_api_src_dir}/events/touch-point.h
   ${public_api_src_dir}/events/touch-event.h
   ${public_api_src_dir}/events/mouse-button.h
 )
@@ -212,7 +214,7 @@ SET( public_api_core_render_tasks_header_files
 SET( public_api_core_rendering_header_files
   ${public_api_src_dir}/rendering/frame-buffer.h
   ${public_api_src_dir}/rendering/geometry.h
-  ${public_api_src_dir}/rendering/property-buffer.h
+  ${public_api_src_dir}/rendering/vertex-buffer.h
   ${public_api_src_dir}/rendering/texture.h
   ${public_api_src_dir}/rendering/texture-set.h
   ${public_api_src_dir}/rendering/renderer.h

@@ -291,7 +291,7 @@ SceneGraph::Scene* Scene::GetSceneObject() const
   return mSceneObject;
 }
 
-void Scene::EmitKeyEventSignal(const KeyEvent& event)
+void Scene::EmitKeyEventSignal(const Dali::KeyEvent& event)
 {
   if ( !mKeyEventSignal.Empty() )
   {
@@ -300,9 +300,10 @@ void Scene::EmitKeyEventSignal(const KeyEvent& event)
   }
 }
 
-bool Scene::EmitKeyEventGeneratedSignal(const KeyEvent& event)
+bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated
+  Dali::Integration::Scene handle( this );
   return mKeyEventGeneratedSignal.Emit( event );
 }
 

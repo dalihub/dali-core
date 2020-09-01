@@ -187,14 +187,14 @@ public:
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
-  void EmitKeyEventSignal(const KeyEvent& event);
+  void EmitKeyEventSignal(const Dali::KeyEvent& event);
 
   /**
    * Used by the KeyEventProcessor to emit KeyEventGenerated signals.
    * @param[in] event The key event.
    * @return The return is true if KeyEvent is consumed, otherwise false.
    */
-  bool EmitKeyEventGeneratedSignal(const KeyEvent& event);
+  bool EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event);
 
   /**
    * Emits the event processing finished signal.

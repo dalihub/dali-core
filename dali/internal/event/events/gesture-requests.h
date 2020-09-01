@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_REQUESTS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture.h>
-#include <dali/devel-api/events/gesture-devel.h>
 
 namespace Dali
 {
@@ -39,16 +38,8 @@ struct GestureRequest
    * Default Constructor
    * @param[in]  typeRequired  The gesture type required
    */
-  GestureRequest( DevelGesture::Type typeRequired )
-  : type( typeRequired )
-  {
-  }
-
-  /**
-   * @copydoc GestureRequest( DevelGesture::Type )
-   */
   GestureRequest( Gesture::Type typeRequired )
-  : GestureRequest( static_cast< DevelGesture::Type >( typeRequired ) )
+  : type( typeRequired )
   {
   }
 
@@ -59,7 +50,7 @@ struct GestureRequest
 
   // Data Members
 
-  DevelGesture::Type type; ///< The type of gesture required.
+  Gesture::Type type; ///< The type of gesture required.
 };
 
 /**

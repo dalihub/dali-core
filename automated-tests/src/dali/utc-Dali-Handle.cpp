@@ -263,17 +263,17 @@ int UtcDaliHandleGetPropertyIndex02(void)
   const float withFlake(99.f);
 
   Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
-  Property::Index index2 = DevelHandle::RegisterProperty( actor, key1, "sideColor", testColor);
+  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
   Property::Index index3 = actor.RegisterProperty( "MyPropertyTwo", Vector3::ONE );
-  Property::Index index4 = DevelHandle::RegisterProperty( actor, key2, "iceCream", withFlake );
+  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
   Property::Index index5 = actor.RegisterProperty( "MyPropertyThree", Vector3::ONE );
 
   application.SendNotification();
   application.Render();
 
   // Test that we can get the property index from the integer key
-  Property::Index testIndex1 = DevelHandle::GetPropertyIndex( actor, key1 );
-  Property::Index testIndex2 = DevelHandle::GetPropertyIndex( actor, key2 );
+  Property::Index testIndex1 = actor.GetPropertyIndex( key1 );
+  Property::Index testIndex2 = actor.GetPropertyIndex( key2 );
 
   DALI_TEST_EQUALS( index2, testIndex1, TEST_LOCATION );
   DALI_TEST_EQUALS( index4, testIndex2, TEST_LOCATION );
@@ -303,15 +303,15 @@ int UtcDaliHandleGetPropertyIndex03(void)
   std::string myName("croydon");
   Property::Index intKey = CORE_PROPERTY_MAX_INDEX+1;
   Property::Value value( Color::GREEN );
-  Property::Index myIndex = DevelHandle::RegisterProperty( actor, intKey, myName, value );
+  Property::Index myIndex = actor.RegisterProperty( intKey, myName, value );
 
-  DALI_TEST_EQUALS( myIndex, DevelHandle::GetPropertyIndex( actor, intKey ), TEST_LOCATION );
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( intKey ), TEST_LOCATION );
 
   Property::Key key1(myName);
   Property::Key key2(intKey);
 
-  DALI_TEST_EQUALS( myIndex, DevelHandle::GetPropertyIndex( actor, key1 ), TEST_LOCATION );
-  DALI_TEST_EQUALS( myIndex, DevelHandle::GetPropertyIndex( actor, key2 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( key1 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( myIndex, actor.GetPropertyIndex( key2 ), TEST_LOCATION );
   END_TEST;
 }
 
@@ -750,8 +750,8 @@ int UtcDaliHandleRegisterProperty02(void)
   const float withFlake(99.f);
 
   Property::Index index1 = actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
-  Property::Index index2 = DevelHandle::RegisterProperty( actor, key1, "sideColor", testColor);
-  Property::Index index3 = DevelHandle::RegisterProperty( actor, key2, "iceCream", withFlake );
+  Property::Index index2 = actor.RegisterProperty( key1, "sideColor", testColor);
+  Property::Index index3 = actor.RegisterProperty( key2, "iceCream", withFlake );
 
   application.SendNotification();
   application.Render();
@@ -852,9 +852,9 @@ int UtcDaliHandleGetPropertyIndices(void)
   Property::Index key2 = CORE_PROPERTY_MAX_INDEX+2;
 
   actor.RegisterProperty( "MyPropertyOne", Vector3::ONE );
-  DevelHandle::RegisterProperty( actor, key1, "sideColor", testColor);
+  actor.RegisterProperty( key1, "sideColor", testColor);
   actor.RegisterProperty( "MyPropertyTwo", 1234 );
-  Property::Index index4 = DevelHandle::RegisterProperty( actor, key2, "iceCream", withFlake );
+  Property::Index index4 = actor.RegisterProperty( key2, "iceCream", withFlake );
   actor.RegisterProperty( "MyPropertyThree", Vector2(.2f,.7f) );
 
   actor.GetPropertyIndices( indices );
@@ -1501,7 +1501,7 @@ int UtcDaliHandleDoesCustomPropertyExistP1(void)
   Actor actor = Actor::New();
   auto propertyIndex = actor.RegisterProperty("customProperty1", 1.0f);
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, propertyIndex ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.DoesCustomPropertyExist( propertyIndex ), true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1514,7 +1514,7 @@ int UtcDaliHandleDoesCustomPropertyExistN1(void)
   Actor actor = Actor::New();
   auto propertyIndex = actor.RegisterProperty("customProperty1", 1.0f);
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, propertyIndex+1 ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.DoesCustomPropertyExist( propertyIndex+1 ), false, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1525,7 +1525,7 @@ int UtcDaliHandleDoesCustomPropertyExistN2(void)
   tet_infoline( "Test that a default property does not show as a custom property on object" );
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( actor, Actor::Property::POSITION ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.DoesCustomPropertyExist( Actor::Property::POSITION ), false, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1548,7 +1548,7 @@ int UtcDaliHandleDoesCustomPropertyExistN3(void)
   auto child = Actor::New();
   container.Add( child ); // Resolve child properties (if any)
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.DoesCustomPropertyExist( CHILD_PROPERTY ), false, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1572,7 +1572,7 @@ int UtcDaliHandleDoesCustomPropertyExistP2(void)
   container.Add( child ); // Resolve child properties (if any)
   child.SetProperty( CHILD_PROPERTY, 2 );
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.DoesCustomPropertyExist( CHILD_PROPERTY ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 2, TEST_LOCATION );
   END_TEST;
 }
@@ -1597,7 +1597,7 @@ int UtcDaliHandleDoesCustomPropertyExistP3(void)
   child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
   container.Add( child ); // Resolve child properties (if any)
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.DoesCustomPropertyExist( CHILD_PROPERTY ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 3, TEST_LOCATION );
   END_TEST;
 }
@@ -1654,7 +1654,7 @@ int UtcDaliHandlePropertySetSignal01(void)
   tet_infoline( "Test that setting a default property triggers a signal" );
 
   auto actor = Actor::New();
-  DevelHandle::PropertySetSignal(actor).Connect(&application, propertySetCheck);
+  actor.PropertySetSignal().Connect(&application, propertySetCheck);
 
   actor.SetProperty( Actor::Property::POSITION, Vector3::XAXIS );
   propertySetCheck.CheckSignalReceived();
@@ -1674,7 +1674,7 @@ int UtcDaliHandlePropertySetSignal02(void)
   tet_infoline( "Test that setting a custom property triggers a signal" );
 
   auto actor = Actor::New();
-  DevelHandle::PropertySetSignal(actor).Connect(&application, propertySetCheck);
+  actor.PropertySetSignal().Connect(&application, propertySetCheck);
 
   auto propertyIndex = actor.RegisterProperty("propName", 3.0f);
   actor.SetProperty( propertyIndex, 5.0f );
@@ -1706,10 +1706,10 @@ int UtcDaliHandlePropertySetSignal03(void)
   application.GetScene().Add( container );
   auto child = Actor::New();
   child.RegisterProperty( CHILD_PROPERTY_NAME, Property::Value(3) );
-  DevelHandle::PropertySetSignal(child).Connect(&application, propertySetCheck);
+  child.PropertySetSignal().Connect(&application, propertySetCheck);
   container.Add( child ); // Resolve child properties (if any)
 
-  DALI_TEST_EQUALS( DevelHandle::DoesCustomPropertyExist( child, CHILD_PROPERTY ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.DoesCustomPropertyExist( CHILD_PROPERTY ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetProperty<int>( CHILD_PROPERTY ), 3, TEST_LOCATION );
 
   child.SetProperty( CHILD_PROPERTY, 29 );
@@ -1717,6 +1717,43 @@ int UtcDaliHandlePropertySetSignal03(void)
   DALI_TEST_EQUALS( propertySetCheck.mValue, Property::Value( 29 ), TEST_LOCATION );
   END_TEST;
 }
+
+
+
+int UtcDaliHandlePropertySetSignal04(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  bool signalReceived(false);
+  Property::Value value;
+  PropertySetSignalCheck propertySetCheck(signalReceived, value);
+
+  tet_infoline( "Test that setting a property on a vanilla Object triggers a signal" );
+
+  constexpr Property::Index TEST_PROPERTY_KEY_INDEX = 1;
+  const std::string TEST_PROPERTY_KEY_NAME = "testProperty";
+
+  Handle vanillaObject = Handle::New();
+  auto propertyIndex = vanillaObject.RegisterProperty(
+    TEST_PROPERTY_KEY_INDEX,
+    TEST_PROPERTY_KEY_NAME,
+    Color::WHITE );
+
+  vanillaObject.PropertySetSignal().Connect(&application, propertySetCheck);
+
+  DALI_TEST_EQUALS( vanillaObject.DoesCustomPropertyExist( propertyIndex ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( vanillaObject.GetProperty<Vector4>( propertyIndex ), Color::WHITE, 0.001f, TEST_LOCATION );
+
+  vanillaObject[TEST_PROPERTY_KEY_NAME] = Color::RED;
+
+  propertySetCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( propertySetCheck.mValue, Property::Value( Color::RED ), 0.001f, TEST_LOCATION );
+  DALI_TEST_VALUE_EQUALS( vanillaObject[propertyIndex], Property::Value( Color::RED), 0.001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliHandlePropertySetProperties(void)
 {
@@ -1726,8 +1763,7 @@ int UtcDaliHandlePropertySetProperties(void)
   const Vector4 color( 0.1f, 0.2, 0.3f, 0.4f );
 
   Handle handle = Actor::New();
-  DevelHandle::SetProperties(
-    handle,
+  handle.SetProperties(
     Property::Map
     {
       { Actor::Property::SIZE, actorSize },
@@ -1743,14 +1779,14 @@ int UtcDaliHandlePropertySetProperties(void)
   END_TEST;
 }
 
-int UtcDaliHandleTemplateNew(void)
+int UtcDaliHandleTemplateNew01(void)
 {
   TestApplication application;
   const Vector3 actorSize( 10.0f, 20.0f, 30.0f );
   const Vector3 anchorPoint( 1.0f, 0.5f, 0.0f );
   const Vector4 color( 0.1f, 0.2, 0.3f, 0.4f );
 
-  Handle handle = DevelHandle::New< Actor >(
+  Handle handle = Handle::New< Actor >(
     Property::Map
     {
       { Actor::Property::SIZE, actorSize },
@@ -1772,8 +1808,7 @@ int UtcDaliHandleGetProperties(void)
   TestApplication application;
 
   Handle handle = Actor::New();
-  DevelHandle::SetProperties(
-    handle,
+  handle.SetProperties(
     Property::Map
     {
       { Actor::Property::SIZE, Vector3( 400.0f, 200.0f, 100.0f ) },
@@ -1786,7 +1821,7 @@ int UtcDaliHandleGetProperties(void)
   );
 
   Property::Map map;
-  DevelHandle::GetProperties( handle, map );
+  handle.GetProperties( map );
 
   // Get all the properties and ensure they match
 
@@ -1822,7 +1857,7 @@ int UtcDaliHandleGetProperties(void)
   // Add a custom property and ensure the count goes up by one.
   const auto countBefore = map.Count();
   handle.RegisterProperty( "tempProperty", Color::GREEN );
-  DevelHandle::GetProperties( handle, map );
+  handle.GetProperties( map );
   DALI_TEST_EQUALS( countBefore + 1, map.Count(), TEST_LOCATION );
 
   END_TEST;

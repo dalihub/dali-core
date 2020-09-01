@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,16 +146,6 @@ public:
    * @copydoc Dali::Handle::GetPropertyName()
    */
   std::string GetPropertyName( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Handle::GetPropertyIndex()
-   */
-  Property::Index GetPropertyIndex( const std::string& name ) const;
-
-  /**
-   * @copydoc Dali::Handle::GetPropertyIndex()
-   */
-  Property::Index GetPropertyIndex( Property::Index key ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
@@ -361,7 +351,7 @@ public:
   /**
    * @copydoc Dali::Handle::PropertySetSignal()
    */
-  DevelHandle::PropertySetSignalType& PropertySetSignal();
+  Handle::PropertySetSignalType& PropertySetSignal();
 
 protected:
 
@@ -571,8 +561,8 @@ private:
 
   using PropertyNotificationContainer = std::vector< Dali::PropertyNotification >;
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
-  DevelHandle::PropertySetSignalType mPropertySetSignal;
 
+  Handle::PropertySetSignalType mPropertySetSignal;
 };
 
 } // namespace Internal

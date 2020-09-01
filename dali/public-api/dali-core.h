@@ -56,10 +56,11 @@
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/point-state.h>
+#include <dali/public-api/events/rotation-gesture-detector.h>
+#include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/events/touch-point.h>
 
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/pixel.h>
@@ -104,12 +105,12 @@
 
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/property-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/vertex-buffer.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>

@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_PROPERTY_BUFFER_H
-#define DALI_INTERNAL_PROPERTY_BUFFER_H
+#ifndef DALI_INTERNAL_VERTEX_BUFFER_H
+#define DALI_INTERNAL_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,28 +24,28 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/render/renderers/render-vertex-buffer.h>
 
 namespace Dali
 {
 namespace Internal
 {
 
-class PropertyBuffer;
-typedef IntrusivePtr<PropertyBuffer> PropertyBufferPtr;
+class VertexBuffer;
+typedef IntrusivePtr<VertexBuffer> VertexBufferPtr;
 
 /**
- * PropertyBuffer is an object that contains an array of structures of values that
+ * VertexBuffer is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class PropertyBuffer : public BaseObject
+class VertexBuffer : public BaseObject
 {
 public:
 
   /**
    * @copydoc PropertBuffer::New()
    */
-  static PropertyBufferPtr New( Dali::Property::Map& format );
+  static VertexBufferPtr New( Dali::Property::Map& format );
 
   /**
    * @copydoc PropertBuffer::SetData()
@@ -60,23 +60,23 @@ public:
 public: // Default property extensions from Object
 
   /**
-   * @brief Get the render thread side of the PropertyBuffer
+   * @brief Get the render thread side of the VertexBuffer
    *
-   * @return The render thread side of this PropertyBuffer
+   * @return The render thread side of this VertexBuffer
    */
-  const Render::PropertyBuffer* GetRenderObject() const;
+  const Render::VertexBuffer* GetRenderObject() const;
 
 protected:
   /**
    * @brief Destructor
    */
-  ~PropertyBuffer();
+  ~VertexBuffer();
 
 private: // implementation
   /**
    * @brief Default constructor
    */
-  PropertyBuffer();
+  VertexBuffer();
 
   /**
    * Second stage initialization
@@ -84,12 +84,12 @@ private: // implementation
   void Initialize( Dali::Property::Map& format );
 
 private: // unimplemented methods
-  PropertyBuffer( const PropertyBuffer& );
-  PropertyBuffer& operator=( const PropertyBuffer& );
+  VertexBuffer( const VertexBuffer& );
+  VertexBuffer& operator=( const VertexBuffer& );
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
-  Render::PropertyBuffer* mRenderObject;        ///<Render side object
+  Render::VertexBuffer* mRenderObject;        ///<Render side object
   uint32_t mBufferFormatSize;
   uint32_t mSize; ///< Number of elements in the buffer
 };
@@ -99,7 +99,7 @@ private: // data
  */
 template<Property::Type type> struct PropertyImplementationType
 {
-  // typedef ... Type; not defined, only support types declared bellow
+  // typedef ... Type; not defined, only support types declared below
 };
 template<> struct PropertyImplementationType< Property::BOOLEAN > { typedef bool Type; };
 template<> struct PropertyImplementationType< Property::FLOAT > { typedef float Type; };
@@ -117,24 +117,24 @@ uint32_t GetPropertyImplementationSize( Property::Type& propertyType );
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::PropertyBuffer& GetImplementation(Dali::PropertyBuffer& handle)
+inline Internal::VertexBuffer& GetImplementation(Dali::VertexBuffer& handle)
 {
-  DALI_ASSERT_ALWAYS(handle && "PropertyBuffer handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "VertexBuffer handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::PropertyBuffer&>(object);
+  return static_cast<Internal::VertexBuffer&>(object);
 }
 
-inline const Internal::PropertyBuffer& GetImplementation(const Dali::PropertyBuffer& handle)
+inline const Internal::VertexBuffer& GetImplementation(const Dali::VertexBuffer& handle)
 {
-  DALI_ASSERT_ALWAYS(handle && "PropertyBuffer handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "VertexBuffer handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::PropertyBuffer&>(object);
+  return static_cast<const Internal::VertexBuffer&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_PROPERTY_BUFFER_H
+#endif // DALI_INTERNAL_VERTEX_BUFFER_H

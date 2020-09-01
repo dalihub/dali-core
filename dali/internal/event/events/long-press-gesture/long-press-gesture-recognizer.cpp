@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cmath>
 
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
 
 #include <dali/internal/event/common/thread-local-storage.h>

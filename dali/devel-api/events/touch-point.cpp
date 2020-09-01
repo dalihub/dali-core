@@ -1,8 +1,5 @@
-#ifndef DALI_GESTURE_DEVEL_H
-#define DALI_GESTURE_DEVEL_H
-
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +15,30 @@
  *
  */
 
-#include <dali/public-api/events/gesture.h>
+// CLASS HEADER
+#include <dali/devel-api/events/touch-point.h>
 
 namespace Dali
 {
 
-namespace DevelGesture
+TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY)
+: deviceId(id),
+  state(state),
+  local(screenX, screenY),
+  screen(screenX, screenY)
 {
+}
 
-/**
- * @copydoc Dali::Gesture::Type
- */
-enum Type
+TouchPoint::TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY, float localX, float localY)
+: deviceId(id),
+  state(state),
+  local(localX, localY),
+  screen(screenX, screenY)
 {
-  Pinch      = Gesture::Pinch,
-  Pan        = Gesture::Pan,
-  Tap        = Gesture::Tap,
-  LongPress  = Gesture::LongPress,
+}
 
-  // Devel Gesture Types
-  Rotation   = 1 << 4, ///< When the user rotates two fingers around a particular ares of the screen.
-};
-
-} // namespace DevelGesture
+TouchPoint::~TouchPoint()
+{
+}
 
 } // namespace Dali
-
-#endif // DALI_GESTURE_DEVEL_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Internal
 {
 
 ActorGestureData::ActorGestureData()
-: gesturesRequired( DevelGesture::Type( 0 ) ),
+: gesturesRequired( Gesture::Type( 0 ) ),
   panDetectors( nullptr ),
   pinchDetectors( nullptr ),
   longPressDetectors( nullptr ),
@@ -45,7 +45,7 @@ ActorGestureData::~ActorGestureData()
 
 void ActorGestureData::AddGestureDetector( GestureDetector& detector )
 {
-  const DevelGesture::Type type( detector.GetType() );
+  const Gesture::Type type( detector.GetType() );
 
   GestureDetectorContainer*& containerPtr( GetContainerPtr( type ) );
   if ( NULL == containerPtr )
@@ -54,12 +54,12 @@ void ActorGestureData::AddGestureDetector( GestureDetector& detector )
   }
   containerPtr->push_back( &detector );
 
-  gesturesRequired = DevelGesture::Type( gesturesRequired | type );
+  gesturesRequired = Gesture::Type( gesturesRequired | type );
 }
 
 void ActorGestureData::RemoveGestureDetector( GestureDetector& detector )
 {
-  const DevelGesture::Type type( detector.GetType() );
+  const Gesture::Type type( detector.GetType() );
 
   GestureDetectorContainer*& containerPtr( GetContainerPtr( type ) );
   DALI_ASSERT_DEBUG( containerPtr && "Container had not been created" );
@@ -71,42 +71,42 @@ void ActorGestureData::RemoveGestureDetector( GestureDetector& detector )
 
   if ( container.empty() )
   {
-    gesturesRequired = DevelGesture::Type( gesturesRequired & ~type );
+    gesturesRequired = Gesture::Type( gesturesRequired & ~type );
     delete containerPtr;
     containerPtr = NULL;
   }
 }
 
-GestureDetectorContainer& ActorGestureData::GetGestureDetectorContainer( DevelGesture::Type type )
+GestureDetectorContainer& ActorGestureData::GetGestureDetectorContainer( Gesture::Type type )
 {
   return *GetContainerPtr( type );
 }
 
-GestureDetectorContainer*& ActorGestureData::GetContainerPtr( DevelGesture::Type type )
+GestureDetectorContainer*& ActorGestureData::GetContainerPtr( Gesture::Type type )
 {
   switch ( type )
   {
-    case DevelGesture::Pan:
+    case Gesture::Pan:
     {
       return panDetectors;
     }
 
-    case DevelGesture::Pinch:
+    case Gesture::Pinch:
     {
       return pinchDetectors;
     }
 
-    case DevelGesture::LongPress:
+    case Gesture::LongPress:
     {
       return longPressDetectors;
     }
 
-    case DevelGesture::Tap:
+    case Gesture::Tap:
     {
       return tapDetectors;
     }
 
-    case DevelGesture::Rotation:
+    case Gesture::Rotation:
     {
       return rotationDetectors;
     }

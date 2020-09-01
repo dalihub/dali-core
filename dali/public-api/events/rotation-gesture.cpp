@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/events/rotation-gesture.h>
+#include <dali/public-api/events/rotation-gesture.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/devel-api/events/gesture-devel.h>
 
 namespace Dali
 {
 
 RotationGesture::RotationGesture( Gesture::State state )
-: Gesture( static_cast< Gesture::Type >( DevelGesture::Rotation ), state )
+: Gesture( Gesture::Rotation, state )
 {
 }
 

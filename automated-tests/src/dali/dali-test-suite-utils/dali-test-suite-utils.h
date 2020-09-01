@@ -29,8 +29,11 @@
 #include <dali/public-api/dali-core.h>
 #include <test-compare-types.h>
 
+extern "C"
+{
 void tet_infoline(const char*str);
 void tet_printf(const char *format, ...);
+}
 
 #include "test-application.h"
 #include "test-actor-utils.h"

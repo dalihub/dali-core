@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,10 @@ GestureEvent::~GestureEvent()
 {
 }
 
-GestureEvent::GestureEvent( DevelGesture::Type gesture, Gesture::State gestureState )
+GestureEvent::GestureEvent( Gesture::Type gesture, Gesture::State gestureState )
 : gestureType( gesture ),
   state( gestureState ),
   time( 0 )
-{
-}
-
-GestureEvent::GestureEvent(Gesture::Type gesture, Gesture::State gestureState)
-: GestureEvent( static_cast< DevelGesture::Type >( gesture ), gestureState )
 {
 }
 } // namespace Internal

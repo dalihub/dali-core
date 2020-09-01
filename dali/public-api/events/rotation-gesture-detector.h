@@ -2,7 +2,7 @@
 #define DALI_ROTATION_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ struct RotationGesture;
  * | %Signal Name      | Method                |
  * |-------------------|-----------------------|
  * | rotationDetected  | @ref DetectedSignal() |
+ *
+ * @SINCE_1_9.27
  */
 class DALI_CORE_API RotationGestureDetector : public GestureDetector
 {
@@ -66,6 +68,7 @@ public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized RotationGestureDetector; this can be initialized with RotationGestureDetector::New().
    *
+   * @SINCE_1_9.27
    * Calling member functions with an uninitialized RotationGestureDetector handle is not allowed.
    */
   RotationGestureDetector();
@@ -73,6 +76,7 @@ public: // Creation & Destruction
   /**
    * @brief Creates an initialized RotationGestureDetector.
    *
+   * @SINCE_1_9.27
    * @return A handle to a newly allocated Dali resource
    */
   static RotationGestureDetector New();
@@ -80,6 +84,7 @@ public: // Creation & Destruction
   /**
    * @brief Downcasts a handle to RotationGestureDetector handle.
    *
+   * @SINCE_1_9.27
    * If handle points to a RotationGestureDetector object, the
    * downcast produces valid handle. If not, the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
@@ -90,6 +95,7 @@ public: // Creation & Destruction
   /**
    * @brief Destructor.
    *
+   * @SINCE_1_9.27
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
   ~RotationGestureDetector();
@@ -97,6 +103,7 @@ public: // Creation & Destruction
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
+   * @SINCE_1_9.27
    * @param[in] handle A reference to the copied handle
    */
   RotationGestureDetector(const RotationGestureDetector& handle);
@@ -104,6 +111,7 @@ public: // Creation & Destruction
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
+   * @SINCE_1_9.27
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
@@ -118,6 +126,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, const RotationGesture& gesture );
    * @endcode
+   * @SINCE_1_9.27
    * @return The signal to connect to
    * @pre The gesture detector has been initialized.
    */
@@ -129,6 +138,7 @@ public: // Not intended for Application developers
   /**
    * @brief This constructor is used by RotationGestureDetector::New() methods.
    *
+   * @SINCE_1_9.27
    * @param[in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL RotationGestureDetector(Internal::RotationGestureDetector* internal);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,6 @@
 
 namespace Dali
 {
-
-const int32_t Property::INVALID_INDEX           = -1;
-const int32_t Property::INVALID_KEY             = -1;
-const int32_t Property::INVALID_COMPONENT_INDEX = -1;
 
 Property::Property(Handle& obj, Property::Index propIndex)
 : object(obj),

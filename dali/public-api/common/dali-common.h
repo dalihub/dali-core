@@ -33,11 +33,13 @@
 #if __GNUC__ >= 4
 #  ifndef HIDE_DALI_INTERNALS
 #    define DALI_EXPORT_API
+#    define DALI_NO_EXPORT_API
 #    define DALI_IMPORT_API
 #    define DALI_CORE_API
 #    define DALI_INTERNAL
 #  else
 #    define DALI_EXPORT_API __attribute__ ((visibility ("default")))
+#    define DALI_NO_EXPORT_API __attribute__ ((visibility ("hidden")))
 #    define DALI_IMPORT_API __attribute__ ((visibility ("default")))
 #    define DALI_CORE_API   __attribute__ ((visibility ("default")))
 #    define DALI_INTERNAL   __attribute__ ((visibility ("hidden")))
@@ -65,6 +67,7 @@
 #endif
 /** Visibility attribute to hide declarations */
 #  define DALI_INTERNAL
+#  define DALI_NO_EXPORT_API
 #endif
 
 #ifdef DEPRECATION_WARNING

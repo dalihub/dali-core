@@ -40,6 +40,8 @@ void tet_result(int32_t value)
 #define END_TEST \
   return ((test_return_value>0)?1:0)
 
+extern "C"
+{
 
 void tet_infoline(const char* str)
 {
@@ -53,6 +55,8 @@ void tet_printf(const char *format, ...)
   vfprintf(stderr, format, arg);
   va_end(arg);
 }
+}
+
 
 bool operator==(TimePeriod a, TimePeriod b)
 {

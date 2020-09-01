@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/render/renderers/render-property-buffer.h>
 
 namespace Dali
 {
@@ -35,12 +33,13 @@ namespace Render
 {
 class RenderTracker;
 }
+
 namespace SceneGraph
 {
 
 class RenderManager;
 class RenderQueue;
-class PropertyBufferDataProvider;
+
 /**
  * A utility class for sending messages to the render-thread.
  */

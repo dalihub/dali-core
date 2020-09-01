@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 
 namespace Dali
 {

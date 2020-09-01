@@ -34,15 +34,10 @@ namespace Dali
 namespace Internal
 {
 
-GestureDetector::GestureDetector( DevelGesture::Type type, const SceneGraph::PropertyOwner* sceneObject )
+GestureDetector::GestureDetector( Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject )
 : Object( sceneObject ),
   mType( type ),
   mGestureEventProcessor( ThreadLocalStorage::Get().GetGestureEventProcessor() )
-{
-}
-
-GestureDetector::GestureDetector( Gesture::Type type, const SceneGraph::PropertyOwner* sceneObject )
-: GestureDetector( static_cast< DevelGesture::Type >( type ), sceneObject )
 {
 }
 

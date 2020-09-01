@@ -155,7 +155,7 @@ V KeyFrameChannel<V>::GetValue (float progress, Dali::Animation::Interpolation i
   {
     float frameProgress = (progress - start->GetProgress()) / (end->GetProgress() - start->GetProgress());
 
-    if( interpolation == Dali::Animation::Linear )
+    if( interpolation == Dali::Animation::LINEAR )
     {
       Interpolate(interpolatedV, start->GetValue(), end->GetValue(), frameProgress);
     }
