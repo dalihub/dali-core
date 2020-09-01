@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/public-api/rendering/vertex-buffer.h> // Dali::VertexBuffer
+#include <dali/public-api/rendering/property-buffer.h> // Dali::PropertyBuffer
 
 namespace Dali
 {
@@ -131,19 +131,19 @@ public:
   Geometry& operator=( Geometry&& rhs );
 
   /**
-   * @brief Adds a VertexBuffer to be used as source of geometry vertices.
+   * @brief Adds a PropertyBuffer to be used as source of geometry vertices.
    *
-   * @SINCE_1_9.27
-   * @param[in] vertexBuffer VertexBuffer to be used as source of geometry vertices
+   * @SINCE_1_1.43
+   * @param[in] vertexBuffer PropertyBuffer to be used as source of geometry vertices
    * @return Index of the newly added buffer, can be used with RemoveVertexBuffer to remove
    *         this buffer if no longer required
    */
-  std::size_t AddVertexBuffer( VertexBuffer& vertexBuffer );
+  std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
 
   /**
    * @brief Retrieves the number of vertex buffers that have been added to this geometry.
    *
-   * @SINCE_1_9.27
+   * @SINCE_1_1.43
    * @return Number of vertex buffers that have been added to this geometry
    */
   std::size_t GetNumberOfVertexBuffers() const;
@@ -152,7 +152,7 @@ public:
    * @brief Removes a vertex buffer.
    * The index must be between 0 and GetNumberOfVertexBuffers().
    *
-   * @SINCE_1_9.27
+   * @SINCE_1_1.43
    * @param[in] index Index to the vertex buffer to remove
    */
   void RemoveVertexBuffer( std::size_t index );

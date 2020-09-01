@@ -22,9 +22,9 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/shader-saver.h>
-#include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
 {
@@ -62,6 +62,7 @@ class RenderQueue;
 class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
+class PropertyBufferDataProvider;
 class Scene;
 
 /**
@@ -181,17 +182,17 @@ public:
 
   /**
    * Add a property buffer to the render manager.
-   * @param[in] vertexBuffer The property buffer to add.
+   * @param[in] propertyBuffer The property buffer to add.
    * @post propertBuffer is owned by RenderManager
    */
-  void AddVertexBuffer( OwnerPointer< Render::VertexBuffer >& vertexBuffer );
+  void AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer );
 
   /**
    * Remove a property buffer from the render manager.
-   * @param[in] vertexBuffer The property buffer to remove.
-   * @post vertexBuffer is destroyed.
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @post propertyBuffer is destroyed.
    */
-  void RemoveVertexBuffer( Render::VertexBuffer* vertexBuffer );
+  void RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Add a geometry to the render manager.
@@ -210,32 +211,32 @@ public:
   /**
    * Adds a property buffer to a geometry from the render manager.
    * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer to remove.
+   * @param[in] propertyBuffer The property buffer to remove.
    */
-  void AttachVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer );
+  void AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Remove a property buffer from a Render::Geometry from the render manager.
    * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer to remove.
+   * @param[in] propertyBuffer The property buffer to remove.
    * @post property buffer is destroyed.
    */
-  void RemoveVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer );
+  void RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Sets the format of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
+   * @param[in] propertyBuffer The property buffer.
    * @param[in] format The new format of the buffer
    */
-  void SetVertexBufferFormat( Render::VertexBuffer* vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format );
+  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format );
 
   /**
    * Sets the data of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
+   * @param[in] propertyBuffer The property buffer.
    * @param[in] data The new data of the buffer
    * @param[in] size The new size of the buffer
    */
-  void SetVertexBufferData( Render::VertexBuffer* vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size );
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size );
 
   /**
    * Sets the data for the index buffer of an existing geometry

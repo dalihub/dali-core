@@ -61,6 +61,7 @@ SET(TC_SOURCES
         utc-Dali-PixelData.cpp
         utc-Dali-Processors.cpp
         utc-Dali-PropertyArray.cpp
+        utc-Dali-PropertyBuffer.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
         utc-Dali-PropertyTypes.cpp
@@ -100,7 +101,6 @@ SET(TC_SOURCES
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
-        utc-Dali-VertexBuffer.cpp
         utc-Dali-WeakHandle.cpp
         utc-Dali-WheelEvent.cpp
 )

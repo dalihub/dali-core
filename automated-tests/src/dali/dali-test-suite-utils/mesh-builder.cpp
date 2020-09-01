@@ -38,19 +38,19 @@ TextureSet CreateTextureSet( Texture texture )
   return textureSet;
 }
 
-VertexBuffer CreateVertexBuffer()
+PropertyBuffer CreatePropertyBuffer()
 {
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  VertexBuffer vertexData = VertexBuffer::New( texturedQuadVertexFormat );
+  PropertyBuffer vertexData = PropertyBuffer::New( texturedQuadVertexFormat );
   return vertexData;
 }
 
 Geometry CreateQuadGeometry(void)
 {
-  VertexBuffer vertexData = CreateVertexBuffer();
+  PropertyBuffer vertexData = CreatePropertyBuffer();
   const float halfQuadSize = .5f;
   struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
   TexturedQuadVertex texturedQuadVertexData[4] = {

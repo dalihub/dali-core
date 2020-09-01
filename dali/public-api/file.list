@@ -67,7 +67,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/render-tasks/render-task-list.cpp
   ${public_api_src_dir}/rendering/frame-buffer.cpp
   ${public_api_src_dir}/rendering/geometry.cpp
-  ${public_api_src_dir}/rendering/vertex-buffer.cpp
+  ${public_api_src_dir}/rendering/property-buffer.cpp
   ${public_api_src_dir}/rendering/texture.cpp
   ${public_api_src_dir}/rendering/texture-set.cpp
   ${public_api_src_dir}/rendering/renderer.cpp
@@ -216,7 +216,7 @@ SET( public_api_core_render_tasks_header_files
 SET( public_api_core_rendering_header_files
   ${public_api_src_dir}/rendering/frame-buffer.h
   ${public_api_src_dir}/rendering/geometry.h
-  ${public_api_src_dir}/rendering/vertex-buffer.h
+  ${public_api_src_dir}/rendering/property-buffer.h
   ${public_api_src_dir}/rendering/texture.h
   ${public_api_src_dir}/rendering/texture-set.h
   ${public_api_src_dir}/rendering/renderer.h

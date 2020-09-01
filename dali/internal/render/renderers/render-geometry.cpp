@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
 namespace Dali
@@ -53,9 +53,9 @@ void Geometry::GlContextDestroyed()
 {
 }
 
-void Geometry::AddVertexBuffer( Render::VertexBuffer* vertexBuffer )
+void Geometry::AddPropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  mVertexBuffers.PushBack( vertexBuffer );
+  mVertexBuffers.PushBack( propertyBuffer );
   mAttributesChanged = true;
 }
 
@@ -65,14 +65,14 @@ void Geometry::SetIndexBuffer( Dali::Vector<uint16_t>& indices )
   mIndicesChanged = true;
 }
 
-void Geometry::RemoveVertexBuffer( const Render::VertexBuffer* vertexBuffer )
+void Geometry::RemovePropertyBuffer( const Render::PropertyBuffer* propertyBuffer )
 {
   const auto&& end = mVertexBuffers.End();
   for( auto&& iter = mVertexBuffers.Begin(); iter != end; ++iter )
   {
-    if( *iter == vertexBuffer )
+    if( *iter == propertyBuffer )
     {
-      //This will delete the gpu buffer associated to the RenderVertexBuffer if there is one
+      //This will delete the gpu buffer associated to the RenderPropertyBuffer if there is one
       mVertexBuffers.Remove( iter );
       mAttributesChanged = true;
       break;

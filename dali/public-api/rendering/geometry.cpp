@@ -51,7 +51,7 @@ Geometry::Geometry( Geometry&& rhs ) =  default;
 
 Geometry& Geometry::operator=( Geometry&& rhs ) =  default;
 
-std::size_t Geometry::AddVertexBuffer( VertexBuffer& vertexBuffer )
+std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   DALI_ASSERT_ALWAYS( vertexBuffer && "VertexBuffer is not initialized ");
   return GetImplementation(*this).AddVertexBuffer( GetImplementation( vertexBuffer ) );

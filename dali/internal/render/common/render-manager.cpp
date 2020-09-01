@@ -159,7 +159,7 @@ struct RenderManager::Impl
   OwnerContainer< Render::Sampler* >        samplerContainer;        ///< List of owned samplers
   OwnerContainer< Render::Texture* >        textureContainer;        ///< List of owned textures
   OwnerContainer< Render::FrameBuffer* >    frameBufferContainer;    ///< List of owned framebuffers
-  OwnerContainer< Render::VertexBuffer* >   vertexBufferContainer;   ///< List of owned vertex buffers
+  OwnerContainer< Render::PropertyBuffer* > propertyBufferContainer; ///< List of owned property buffers
   OwnerContainer< Render::Geometry* >       geometryContainer;       ///< List of owned Geometries
 
   bool                                      lastFrameWasRendered;    ///< Keeps track of the last frame being rendered due to having render instructions
@@ -393,24 +393,24 @@ void RenderManager::AttachDepthStencilTextureToFrameBuffer( Render::FrameBuffer*
   frameBuffer->AttachDepthStencilTexture( mImpl->context, texture, mipmapLevel );
 }
 
-void RenderManager::AddVertexBuffer( OwnerPointer< Render::VertexBuffer >& vertexBuffer )
+void RenderManager::AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
-  mImpl->vertexBufferContainer.PushBack( vertexBuffer.Release() );
+  mImpl->propertyBufferContainer.PushBack( propertyBuffer.Release() );
 }
 
-void RenderManager::RemoveVertexBuffer( Render::VertexBuffer* vertexBuffer )
+void RenderManager::RemovePropertyBuffer( Render::PropertyBuffer* propertyBuffer )
 {
-  mImpl->vertexBufferContainer.EraseObject( vertexBuffer );
+  mImpl->propertyBufferContainer.EraseObject( propertyBuffer );
 }
 
-void RenderManager::SetVertexBufferFormat( Render::VertexBuffer* vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format )
+void RenderManager::SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
-  vertexBuffer->SetFormat( format.Release() );
+  propertyBuffer->SetFormat( format.Release() );
 }
 
-void RenderManager::SetVertexBufferData( Render::VertexBuffer* vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
+void RenderManager::SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
 {
-  vertexBuffer->SetData( data.Release(), size );
+  propertyBuffer->SetData( data.Release(), size );
 }
 
 void RenderManager::SetIndexBuffer( Render::Geometry* geometry, Dali::Vector<uint16_t>& indices )
@@ -428,7 +428,7 @@ void RenderManager::RemoveGeometry( Render::Geometry* geometry )
   mImpl->geometryContainer.EraseObject( geometry );
 }
 
-void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer )
+void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
@@ -437,13 +437,13 @@ void RenderManager::AttachVertexBuffer( Render::Geometry* geometry, Render::Vert
   {
     if ( iter == geometry )
     {
-      iter->AddVertexBuffer( vertexBuffer );
+      iter->AddPropertyBuffer( propertyBuffer );
       break;
     }
   }
 }
 
-void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer )
+void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != geometry );
 
@@ -452,7 +452,7 @@ void RenderManager::RemoveVertexBuffer( Render::Geometry* geometry, Render::Vert
   {
     if ( iter == geometry )
     {
-      iter->RemoveVertexBuffer( vertexBuffer );
+      iter->RemovePropertyBuffer( propertyBuffer );
       break;
     }
   }

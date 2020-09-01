@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
-#include <dali/internal/event/rendering/vertex-buffer-impl.h>  // Dali::Internal::VertexBuffer
+#include <dali/internal/render/renderers/render-property-buffer.h>
+#include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
 
 namespace
 {
@@ -116,7 +116,7 @@ namespace Internal
 namespace Render
 {
 
-VertexBuffer::VertexBuffer()
+PropertyBuffer::PropertyBuffer()
 :mFormat(NULL),
  mData(NULL),
  mGpuBuffer(NULL),
@@ -125,24 +125,24 @@ VertexBuffer::VertexBuffer()
 {
 }
 
-VertexBuffer::~VertexBuffer()
+PropertyBuffer::~PropertyBuffer()
 {
 }
 
-void VertexBuffer::SetFormat( VertexBuffer::Format* format )
+void PropertyBuffer::SetFormat( PropertyBuffer::Format* format )
 {
   mFormat = format;
   mDataChanged = true;
 }
 
-void VertexBuffer::SetData( Dali::Vector<uint8_t>* data, uint32_t size )
+void PropertyBuffer::SetData( Dali::Vector<uint8_t>* data, uint32_t size )
 {
   mData = data;
   mSize = size;
   mDataChanged = true;
 }
 
-bool VertexBuffer::Update( Context& context )
+bool PropertyBuffer::Update( Context& context )
 {
   if( !mData || !mFormat || !mSize )
   {
@@ -169,7 +169,7 @@ bool VertexBuffer::Update( Context& context )
   return true;
 }
 
-void VertexBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
+void PropertyBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
 {
   if(mGpuBuffer)
   {
@@ -177,7 +177,7 @@ void VertexBuffer::BindBuffer( Context& context, GpuBuffer::Target target )
   }
 }
 
-uint32_t VertexBuffer::EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase )
+uint32_t PropertyBuffer::EnableVertexAttributes( Context& context, Vector<GLint>& vAttributeLocation, uint32_t locationBase )
 {
   const uint32_t attributeCount = static_cast<uint32_t>( mFormat->components.size() );
 

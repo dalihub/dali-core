@@ -42,7 +42,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 #include <dali/internal/render/renderers/render-geometry.h>
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
@@ -103,8 +103,8 @@ const std::size_t GEOMETRY_MEMORY_SIZE(
   sizeof( Internal::Geometry ) +
   sizeof( Internal::Render::Geometry) );
 const std::size_t PROPERTY_BUFFER_MEMORY_SIZE(
-  sizeof( Internal::VertexBuffer ) +
-  sizeof( Internal::Render::VertexBuffer ) );
+  sizeof( Internal::PropertyBuffer ) +
+  sizeof( Internal::Render::PropertyBuffer ) );
 const std::size_t TEXTURE_SET_MEMORY_SIZE(
   sizeof( Internal::TextureSet ) +
   sizeof( Internal::SceneGraph::TextureSet ) );

@@ -42,7 +42,7 @@
 #include <dali/internal/update/render-tasks/scene-graph-camera.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>   // for OwnerPointer< Shader >
-#include <dali/internal/render/renderers/render-vertex-buffer.h>
+#include <dali/internal/render/renderers/render-property-buffer.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali
@@ -83,7 +83,7 @@ class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
 class RenderQueue;
-class VertexBuffer;
+class PropertyBuffer;
 
 struct NodeDepthPair
 {
@@ -470,31 +470,31 @@ public:
    * @post Sends a message to RenderManager to add the property buffer.
    * The property buffer will be owned by RenderManager
    */
-  void AddVertexBuffer( OwnerPointer< Render::VertexBuffer >& propertryBuffer );
+  void AddPropertyBuffer( OwnerPointer< Render::PropertyBuffer >& propertryBuffer );
 
   /**
-   * Removes an existing VertexBuffer from RenderManager
+   * Removes an existing PropertyBuffer from RenderManager
    * @param[in] propertryBuffer The property buffer to remove
    * @post The property buffer will be destroyed in the render thread
    */
-  void RemoveVertexBuffer( Render::VertexBuffer* propertryBuffer );
+  void RemovePropertyBuffer( Render::PropertyBuffer* propertryBuffer );
 
   /**
    * Sets the format of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
+   * @param[in] propertyBuffer The property buffer.
    * @param[in] format The new format of the buffer
    * @post Sends a message to RenderManager to set the new format to the property buffer.
    */
-  void SetVertexBufferFormat( Render::VertexBuffer* vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format );
+  void SetPropertyBufferFormat( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format );
 
   /**
    * Sets the data of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
+   * @param[in] propertyBuffer The property buffer.
    * @param[in] data The new data of the buffer
    * @param[in] size The new size of the buffer
    * @post Sends a message to RenderManager to set the new data to the property buffer.
    */
-  void SetVertexBufferData( Render::VertexBuffer* vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size );
+  void SetPropertyBufferData( Render::PropertyBuffer* propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size );
 
   /**
    * Adds a geometry to the RenderManager
@@ -528,16 +528,16 @@ public:
   /**
    * Adds a vertex buffer to a geometry
    * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer
+   * @param[in] propertyBuffer The property buffer
    */
-  void AttachVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer );
+  void AttachVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Removes a vertex buffer from a geometry
    * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer
+   * @param[in] propertyBuffer The property buffer
    */
-  void RemoveVertexBuffer( Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer );
+  void RemoveVertexBuffer( Render::Geometry* geometry, Render::PropertyBuffer* propertyBuffer );
 
   /**
    * Adds a texture to the render manager
@@ -1233,51 +1233,51 @@ inline void SetWrapModeMessage( UpdateManager& manager, Render::Sampler& sampler
   new (slot) LocalType( &manager, &UpdateManager::SetWrapMode, &sampler, rWrapMode, sWrapMode, tWrapMode );
 }
 
-inline void AddVertexBuffer( UpdateManager& manager, OwnerPointer< Render::VertexBuffer >& vertexBuffer )
+inline void AddPropertyBuffer( UpdateManager& manager, OwnerPointer< Render::PropertyBuffer >& propertyBuffer )
 {
-  // Message has ownership of vertexBuffer while in transit from event -> update
-  typedef MessageValue1< UpdateManager, OwnerPointer< Render::VertexBuffer > > LocalType;
+  // Message has ownership of propertyBuffer while in transit from event -> update
+  typedef MessageValue1< UpdateManager, OwnerPointer< Render::PropertyBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddVertexBuffer, vertexBuffer );
+  new (slot) LocalType( &manager, &UpdateManager::AddPropertyBuffer, propertyBuffer );
 }
 
-inline void RemoveVertexBuffer( UpdateManager& manager, Render::VertexBuffer& vertexBuffer )
+inline void RemovePropertyBuffer( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer )
 {
-  typedef MessageValue1< UpdateManager, Render::VertexBuffer*  > LocalType;
+  typedef MessageValue1< UpdateManager, Render::PropertyBuffer*  > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveVertexBuffer, &vertexBuffer );
+  new (slot) LocalType( &manager, &UpdateManager::RemovePropertyBuffer, &propertyBuffer );
 }
 
-inline void SetVertexBufferFormat( UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer< Render::VertexBuffer::Format>& format )
+inline void SetPropertyBufferFormat( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Render::PropertyBuffer::Format>& format )
 {
-  // Message has ownership of VertexBuffer::Format while in transit from event -> update
-  typedef MessageValue2< UpdateManager, Render::VertexBuffer*, OwnerPointer< Render::VertexBuffer::Format> > LocalType;
+  // Message has ownership of PropertyBuffer::Format while in transit from event -> update
+  typedef MessageValue2< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Render::PropertyBuffer::Format> > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetVertexBufferFormat, &vertexBuffer, format );
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferFormat, &propertyBuffer, format );
 }
 
-inline void SetVertexBufferData( UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
+inline void SetPropertyBufferData( UpdateManager& manager, Render::PropertyBuffer& propertyBuffer, OwnerPointer< Vector<uint8_t> >& data, uint32_t size )
 {
-  // Message has ownership of VertexBuffer data while in transit from event -> update
-  typedef MessageValue3< UpdateManager, Render::VertexBuffer*, OwnerPointer< Vector<uint8_t> >, uint32_t  > LocalType;
+  // Message has ownership of PropertyBuffer data while in transit from event -> update
+  typedef MessageValue3< UpdateManager, Render::PropertyBuffer*, OwnerPointer< Vector<uint8_t> >, uint32_t  > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetVertexBufferData, &vertexBuffer, data, size );
+  new (slot) LocalType( &manager, &UpdateManager::SetPropertyBufferData, &propertyBuffer, data, size );
 }
 
 inline void AddGeometry( UpdateManager& manager, OwnerPointer< Render::Geometry >& geometry )
@@ -1303,26 +1303,26 @@ inline void RemoveGeometry( UpdateManager& manager, Render::Geometry& geometry )
   new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
 }
 
-inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer )
+inline void AttachVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::VertexBuffer* > LocalType;
+  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AttachVertexBuffer, &geometry, const_cast<Render::VertexBuffer*>(&vertexBuffer) );
+  new (slot) LocalType( &manager, &UpdateManager::AttachVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
 }
 
-inline void RemoveVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer )
+inline void RemoveVertexBufferMessage( UpdateManager& manager, Render::Geometry& geometry, const Render::PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::VertexBuffer* > LocalType;
+  typedef MessageValue2< UpdateManager, Render::Geometry*, Render::PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveVertexBuffer, &geometry, const_cast<Render::VertexBuffer*>(&vertexBuffer) );
+  new (slot) LocalType( &manager, &UpdateManager::RemoveVertexBuffer, &geometry, const_cast<Render::PropertyBuffer*>(&vertexBuffer) );
 }
 
 // Custom message type for SetIndexBuffer() used to move data with Vector::Swap()

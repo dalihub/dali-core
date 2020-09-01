@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ GeometryPtr Geometry::New()
   return geometry;
 }
 
-uint32_t Geometry::AddVertexBuffer( VertexBuffer& vertexBuffer )
+uint32_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   mVertexBuffers.push_back( &vertexBuffer );
   SceneGraph::AttachVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject() );
@@ -49,8 +49,8 @@ uint32_t Geometry::GetNumberOfVertexBuffers() const
 
 void Geometry::RemoveVertexBuffer( uint32_t index )
 {
-  const Render::VertexBuffer& renderVertexBuffer = static_cast<const Render::VertexBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
-  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderVertexBuffer );
+  const Render::PropertyBuffer& renderPropertyBuffer = static_cast<const Render::PropertyBuffer&>( *(mVertexBuffers[index]->GetRenderObject()) );
+  SceneGraph::RemoveVertexBufferMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, renderPropertyBuffer );
 
   mVertexBuffers.erase( mVertexBuffers.begin() + index );
 }
