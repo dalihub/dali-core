@@ -90,14 +90,6 @@ struct DALI_CORE_API KeyEvent : public Event
    */
   virtual ~KeyEvent();
 
-  /**
-   * @brief Creates a Dali::KeyEvent from a Integration::KeyEvent
-   *
-   * @param[in] event Integration::KeyEvent to convert from
-   * @return The Dali::KeyEvent
-   */
-  static Dali::KeyEvent Convert( const Dali::Integration::KeyEvent& event );
-
   // Data
 
   /**
