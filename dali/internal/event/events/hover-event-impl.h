@@ -63,11 +63,6 @@ public:
    */
   static HoverEventPtr Clone( const HoverEvent& rhs );
 
-  /**
-   * @brief Destructor
-   */
-  ~HoverEvent();
-
   // Getters
 
   /**
@@ -136,6 +131,13 @@ public:
   void AddPoint( const Integration::Point& point );
 
 private:
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~HoverEvent() = default;
 
   // Not copyable or movable
 

@@ -58,11 +58,6 @@ public:
   WheelEvent( Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp );
 
   /**
-   * @brief Destructor
-   */
-  ~WheelEvent();
-
-  /**
    * Create a new WheelEvent.
    *
    * @param[in] type      The type of the wheel event
@@ -123,6 +118,13 @@ public:
   uint32_t GetTime() const;
 
 private:
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~WheelEvent() = default;
 
   // Not copyable or movable
 
