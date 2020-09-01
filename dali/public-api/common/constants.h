@@ -126,6 +126,10 @@ static constexpr float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used
 
 } // namespace Math
 
+// background colors
+static constexpr Vector4 DEFAULT_BACKGROUND_COLOR = Color::BLACK;
+static constexpr Vector4 DEBUG_BACKGROUND_COLOR(0.2f, 0.5f, 0.2f, 1.0f); ///< Dark green, useful for debugging visuals (texture / shader issues / culling etc.).
+
 /**
  * @}
  */

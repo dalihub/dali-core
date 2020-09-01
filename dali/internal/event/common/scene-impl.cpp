@@ -29,6 +29,7 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
@@ -41,13 +42,6 @@ namespace Dali
 
 namespace Internal
 {
-
-namespace
-{
-
-const Vector4 DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f); // Default background color
-
-} //Unnamed namespace
 
 ScenePtr Scene::New( Size size )
 {

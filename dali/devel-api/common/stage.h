@@ -94,9 +94,6 @@ public:
   typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
   typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
 
-  static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
-  static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
-
   /**
    * @brief Allows the creation of an empty stage handle.
    *
