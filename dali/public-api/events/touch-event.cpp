@@ -27,25 +27,17 @@
 namespace Dali
 {
 
-TouchEvent::TouchEvent()
-: BaseHandle()
-{
-}
+TouchEvent::TouchEvent() = default;
 
-TouchEvent::TouchEvent( const TouchEvent& other )
-: BaseHandle( other )
-{
-}
+TouchEvent::TouchEvent( const TouchEvent& other ) = default;
 
-TouchEvent::~TouchEvent()
-{
-}
+TouchEvent::TouchEvent( TouchEvent&& other ) = default;
 
-TouchEvent& TouchEvent::operator=( const TouchEvent& other )
-{
-  BaseHandle::operator=( other );
-  return *this;
-}
+TouchEvent::~TouchEvent() = default;
+
+TouchEvent& TouchEvent::operator=( const TouchEvent& other ) = default;
+
+TouchEvent& TouchEvent::operator=( TouchEvent&& other ) = default;
 
 unsigned long TouchEvent::GetTime() const
 {
