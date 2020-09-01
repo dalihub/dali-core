@@ -64,12 +64,13 @@ public:
 
   /**
    * @brief Enumeration for specifying the state of the key event.
-   * @SINCE_1_9.27
+   * @SINCE_1_0.0
    */
   enum State
   {
-    DOWN,        ///< Key down @SINCE_1_9.27
-    UP,          ///< Key up @SINCE_1_9.27
+    Down,        ///< Key down @SINCE_1_0.0
+    Up,          ///< Key up @SINCE_1_0.0
+    Last
   };
 
   /**

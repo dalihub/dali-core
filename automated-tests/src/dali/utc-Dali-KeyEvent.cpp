@@ -94,7 +94,7 @@ int UtcDaliKeyEventConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event.GetKeyName(), TEST_LOCATION); // check key name
@@ -103,7 +103,7 @@ int UtcDaliKeyEventConstructor(void)
   DALI_TEST_EQUALS(99, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -115,7 +115,7 @@ int UtcDaliKeyEventConstructor(void)
 int UtcDaliKeyEventCopyAssignment(void)
 {
   // Test Assignment operator
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event.GetKeyName(), TEST_LOCATION); // check key name
@@ -124,13 +124,13 @@ int UtcDaliKeyEventCopyAssignment(void)
   DALI_TEST_EQUALS(99, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION); // check device class
   DALI_TEST_EQUALS(Device::Subclass::NONE, event.GetDeviceSubclass(), TEST_LOCATION); // check device subclass
 
-  Dali::KeyEvent event2 = DevelKeyEvent::New(TEST_STRING_1, "J", "j", 88, CTRL_MODIFIER, 0lu, KeyEvent::UP, "", "", Device::Class::USER, Device::Subclass::FINGER);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event2 = DevelKeyEvent::New(TEST_STRING_1, "J", "j", 88, CTRL_MODIFIER, 0lu, KeyEvent::Up, "", "", Device::Class::USER, Device::Subclass::FINGER);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event2 );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event2.GetKeyName(), TEST_LOCATION); // check key name
@@ -139,7 +139,7 @@ int UtcDaliKeyEventCopyAssignment(void)
   DALI_TEST_EQUALS(88, event2.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(CTRL_MODIFIER, event2.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event2.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::UP, event2.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Up, event2.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event2.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event2.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::USER, event2.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -154,7 +154,7 @@ int UtcDaliKeyEventCopyAssignment(void)
   DALI_TEST_EQUALS(88, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::UP, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Up, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::USER, event.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -166,7 +166,7 @@ int UtcDaliKeyEventCopyAssignment(void)
 int UtcDaliKeyEventCopyConstructor(void)
 {
   // Test Assignment operator
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event.GetKeyName(), TEST_LOCATION); // check key name
@@ -175,7 +175,7 @@ int UtcDaliKeyEventCopyConstructor(void)
   DALI_TEST_EQUALS(99, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -190,7 +190,7 @@ int UtcDaliKeyEventCopyConstructor(void)
   DALI_TEST_EQUALS(99, event2.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event2.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event2.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event2.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event2.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event2.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event2.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event2.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -202,7 +202,7 @@ int UtcDaliKeyEventCopyConstructor(void)
 int UtcDaliKeyEventMoveAssignment(void)
 {
   // Test Assignment operator
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event.GetKeyName(), TEST_LOCATION); // check key name
@@ -211,7 +211,7 @@ int UtcDaliKeyEventMoveAssignment(void)
   DALI_TEST_EQUALS(99, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -227,7 +227,7 @@ int UtcDaliKeyEventMoveAssignment(void)
   DALI_TEST_EQUALS(99, move.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, move.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, move.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, move.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, move.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", move.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", move.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, move.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -241,7 +241,7 @@ int UtcDaliKeyEventMoveAssignment(void)
 int UtcDaliKeyEventMoveConstructor(void)
 {
   // Test Assignment operator
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(TEST_STRING_1, event.GetKeyName(), TEST_LOCATION); // check key name
@@ -250,7 +250,7 @@ int UtcDaliKeyEventMoveConstructor(void)
   DALI_TEST_EQUALS(99, event.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, event.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, event.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, event.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", event.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", event.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, event.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -265,7 +265,7 @@ int UtcDaliKeyEventMoveConstructor(void)
   DALI_TEST_EQUALS(99, move.GetKeyCode(), TEST_LOCATION); // check keyCode
   DALI_TEST_EQUALS(SHIFT_MODIFIER, move.GetKeyModifier(), TEST_LOCATION); // check modifier
   DALI_TEST_EQUALS(0lu, move.GetTime(), TEST_LOCATION); // check time
-  DALI_TEST_EQUALS(KeyEvent::DOWN, move.GetState(), TEST_LOCATION); // check state
+  DALI_TEST_EQUALS(KeyEvent::Down, move.GetState(), TEST_LOCATION); // check state
   DALI_TEST_EQUALS("", move.GetCompose(), TEST_LOCATION); // check compose
   DALI_TEST_EQUALS("", move.GetDeviceName(), TEST_LOCATION); // check device name
   DALI_TEST_EQUALS(Device::Class::NONE, move.GetDeviceClass(), TEST_LOCATION); // check device class
@@ -281,7 +281,7 @@ int UtcDaliKeyEventIsShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, CTRL_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
@@ -301,7 +301,7 @@ int UtcDaliKeyEventIsCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
@@ -320,7 +320,7 @@ int UtcDaliKeyEventIsAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);  // set name to test, key string to i and modifier to shift
   DALI_TEST_CHECK( event );
 
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
@@ -339,7 +339,7 @@ int UtcDaliKeyEventIsNotShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, CTRL_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
 
@@ -352,7 +352,7 @@ int UtcDaliKeyEventIsNotCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, ALT_MODIFIER, 0lu, KeyEvent::UP, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, ALT_MODIFIER, 0lu, KeyEvent::Up, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS(ALT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
 
@@ -365,7 +365,7 @@ int UtcDaliKeyEventIsNotAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_MODIFIER, 0lu, KeyEvent::UP, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_MODIFIER, 0lu, KeyEvent::Up, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION);
 
@@ -378,7 +378,7 @@ int UtcDaliKeyEventANDModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
   DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() & event.IsShiftModifier()), TEST_LOCATION);
 
   DevelKeyEvent::SetKeyModifier( event, SHIFT_MODIFIER ); // Set to Shift Modifier
@@ -392,7 +392,7 @@ int UtcDaliKeyEventORModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
   DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() | event.IsAltModifier()), TEST_LOCATION);
 
   DevelKeyEvent::SetKeyModifier( event, SHIFT_MODIFIER ); // Set to Shift Modifier
@@ -414,7 +414,7 @@ int UtcDaliIntegrationKeyEvent(void)
     DALI_TEST_EQUALS( keyEvent.keyCode, -1, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.keyModifier, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( keyEvent.time, 0lu, TEST_LOCATION );
-    DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::DOWN, TEST_LOCATION);
+    DALI_TEST_EQUALS( keyEvent.state, Integration::KeyEvent::Down, TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.compose, std::string(), TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceName, std::string(), TEST_LOCATION);
     DALI_TEST_EQUALS( keyEvent.deviceClass, Device::Class::NONE, TEST_LOCATION);
@@ -428,7 +428,7 @@ int UtcDaliIntegrationKeyEvent(void)
     const int keyCode(333);
     const int keyModifier(312);
     const unsigned long timeStamp(132);
-    const Integration::KeyEvent::State keyState(Integration::KeyEvent::UP);
+    const Integration::KeyEvent::State keyState(Integration::KeyEvent::Up);
     const std::string compose("compose");
     const std::string deviceName("hwKeyboard");
     const Device::Class::Type deviceClass = Device::Class::KEYBOARD;
@@ -455,7 +455,7 @@ int UtcDaliKeyEventSetKeyName(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS( TEST_STRING_1, event.GetKeyName(), TEST_LOCATION );
 
@@ -469,7 +469,7 @@ int UtcDaliKeyEventSetKeyString(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS( "i", event.GetKeyString(), TEST_LOCATION );
 
@@ -483,7 +483,7 @@ int UtcDaliKeyEventSetKeyCode(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS( 99, event.GetKeyCode(), TEST_LOCATION );
 
@@ -497,7 +497,7 @@ int UtcDaliKeyEventSetKeyModifier(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS( SHIFT_MODIFIER, event.GetKeyModifier(), TEST_LOCATION );
 
@@ -511,7 +511,7 @@ int UtcDaliKeyEventSetTime(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
   DALI_TEST_EQUALS( 0lu, event.GetTime(), TEST_LOCATION );
 
@@ -525,12 +525,12 @@ int UtcDaliKeyEventSetState(void)
 {
   TestApplication application;
 
-  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE);
 
-  DALI_TEST_EQUALS( KeyEvent::DOWN, event.GetState(), TEST_LOCATION );
+  DALI_TEST_EQUALS( KeyEvent::Down, event.GetState(), TEST_LOCATION );
 
-  DevelKeyEvent::SetState( event, KeyEvent::UP );
-  DALI_TEST_EQUALS( KeyEvent::UP, event.GetState(), TEST_LOCATION );
+  DevelKeyEvent::SetState( event, KeyEvent::Up );
+  DALI_TEST_EQUALS( KeyEvent::Up, event.GetState(), TEST_LOCATION );
 
   END_TEST;
 }
