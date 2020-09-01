@@ -35,7 +35,7 @@ struct KeyEvent;
 class Layer;
 class RenderTaskList;
 class TouchEvent;
-class WheelEvent;
+struct WheelEvent;
 
 namespace Internal DALI_INTERNAL
 {

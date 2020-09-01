@@ -44,7 +44,7 @@ namespace Dali
 struct KeyEvent;
 class TouchData;
 class TouchEvent;
-class WheelEvent;
+struct WheelEvent;
 
 namespace Internal
 {
@@ -1422,7 +1422,7 @@ public:
    * @param[in] event The wheel event.
    * @return True if the event was consumed.
    */
-  bool EmitWheelEventSignal( const Dali::WheelEvent& event );
+  bool EmitWheelEventSignal( const WheelEvent& event );
 
   /**
    * @brief Emits the visibility change signal for this actor and all its children.

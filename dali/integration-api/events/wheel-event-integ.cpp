@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ WheelEvent::WheelEvent()
   direction( 0 ),
   modifiers( 0 ),
   point( Vector2::ZERO ),
-  delta( 0 ),
+  z( 0 ),
   timeStamp( 0 )
 {
 }
 
-WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp )
+WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp )
 : Event( Wheel ),
   type( type ),
   direction( direction ),
   modifiers( modifiers ),
   point( point ),
-  delta( delta ),
+  z( z ),
   timeStamp( timeStamp )
 {
 }

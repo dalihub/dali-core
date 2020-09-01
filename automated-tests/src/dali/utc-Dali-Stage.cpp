@@ -1406,12 +1406,12 @@ int UtcDaliStageSignalWheelEventP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event.type) == data.receivedWheelEvent.GetType() );
-  DALI_TEST_CHECK( event.direction == data.receivedWheelEvent.GetDirection() );
-  DALI_TEST_CHECK( event.modifiers == data.receivedWheelEvent.GetModifiers() );
-  DALI_TEST_CHECK( event.point == data.receivedWheelEvent.GetPoint() );
-  DALI_TEST_CHECK( event.delta == data.receivedWheelEvent.GetDelta() );
-  DALI_TEST_CHECK( event.timeStamp == data.receivedWheelEvent.GetTime() );
+  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event.type) == data.receivedWheelEvent.type );
+  DALI_TEST_CHECK( event.direction == data.receivedWheelEvent.direction );
+  DALI_TEST_CHECK( event.modifiers == data.receivedWheelEvent.modifiers );
+  DALI_TEST_CHECK( event.point == data.receivedWheelEvent.point );
+  DALI_TEST_CHECK( event.z == data.receivedWheelEvent.z );
+  DALI_TEST_CHECK( event.timeStamp == data.receivedWheelEvent.timeStamp );
 
   data.Reset();
 
@@ -1419,12 +1419,12 @@ int UtcDaliStageSignalWheelEventP(void)
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event2.type) == data.receivedWheelEvent.GetType() );
-  DALI_TEST_CHECK( event2.direction == data.receivedWheelEvent.GetDirection() );
-  DALI_TEST_CHECK( event2.modifiers == data.receivedWheelEvent.GetModifiers() );
-  DALI_TEST_CHECK( event2.point == data.receivedWheelEvent.GetPoint() );
-  DALI_TEST_CHECK( event2.delta == data.receivedWheelEvent.GetDelta() );
-  DALI_TEST_CHECK( event2.timeStamp == data.receivedWheelEvent.GetTime() );
+  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event2.type) == data.receivedWheelEvent.type );
+  DALI_TEST_CHECK( event2.direction == data.receivedWheelEvent.direction );
+  DALI_TEST_CHECK( event2.modifiers == data.receivedWheelEvent.modifiers );
+  DALI_TEST_CHECK( event2.point == data.receivedWheelEvent.point );
+  DALI_TEST_CHECK( event2.z == data.receivedWheelEvent.z );
+  DALI_TEST_CHECK( event2.timeStamp == data.receivedWheelEvent.timeStamp );
   END_TEST;
 }
 
