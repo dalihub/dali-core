@@ -44,7 +44,7 @@ class Animation;
 class CustomActor;
 class CustomActorImpl;
 class RelayoutContainer;
-class KeyEvent;
+struct KeyEvent;
 class HoverEvent;
 class WheelEvent;
 struct Vector2;

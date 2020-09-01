@@ -41,7 +41,7 @@
 namespace Dali
 {
 
-class KeyEvent;
+struct KeyEvent;
 class TouchData;
 class TouchEvent;
 class WheelEvent;

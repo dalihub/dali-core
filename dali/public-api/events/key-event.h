@@ -2,7 +2,7 @@
 #define DALI_KEY_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,24 +24,17 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/events/device.h>
 
 namespace Dali
 {
-
-namespace Internal DALI_INTERNAL
-{
-class KeyEvent;
-}
-
 /**
  * @addtogroup dali_core_events
  * @{
  */
 
 /**
- * @brief The key event class is used to store a key press.
+ * @brief The key event structure is used to store a key press.
  *
  * It facilitates processing of these key presses and passing to other
  * libraries like Toolkit. The keyString is the actual character you
@@ -55,11 +48,8 @@ class KeyEvent;
  * module.
  * @SINCE_1_0.0
  */
-class DALI_CORE_API KeyEvent : public BaseHandle
+struct DALI_CORE_API KeyEvent
 {
-
-public:
-
   // Enumerations
 
   /**
@@ -74,12 +64,23 @@ public:
   };
 
   /**
-   * @brief An uninitialized KeyEvent instance.
-   *
-   * Calling member functions with an uninitialized KeyEvent handle is not allowed.
+   * @brief Default constructor.
    * @SINCE_1_0.0
    */
   KeyEvent();
+
+  /**
+   * @brief Constructor.
+   *
+   * @SINCE_1_0.0
+   * @param[in] keyName The name of the key pressed or command from the IMF, if later then the some following parameters will be needed
+   * @param[in] keyString A string of input characters or key pressed
+   * @param[in] keyCode The unique key code for the key pressed
+   * @param[in] keyModifier The key modifier for special keys like shift and alt
+   * @param[in] timeStamp The time (in ms) that the key event occurred
+   * @param[in] keyState The state of the key event
+   */
+  KeyEvent(const std::string& keyName, const std::string& keyString, int32_t keyCode, int32_t keyModifier, unsigned long timeStamp, const State& keyState);
 
   /**
    * @brief Copy constructor.
@@ -89,29 +90,12 @@ public:
   KeyEvent( const KeyEvent& rhs );
 
   /**
-   * @brief Move constructor.
-   *
-   * @SINCE_1_9.27
-   * @param[in] rhs A reference to the moved handle
-   */
-  KeyEvent( KeyEvent&& rhs );
-
-  /**
-   * @brief Copy assignment operator.
+   * @brief Assignment operator.
    * @SINCE_1_2.36
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   KeyEvent& operator=( const KeyEvent& rhs );
-
-  /**
-   * @brief Move assignment operator.
-   *
-   * @SINCE_1_9.27
-   * @param[in] rhs A reference to the moved handle
-   * @return A reference to this
-   */
-  KeyEvent& operator=( KeyEvent&& rhs );
 
   /**
    * @brief Destructor.
@@ -146,18 +130,18 @@ public:
   /**
    * @brief Get the key compose string.
    *
-   * @SINCE_1_9.27
+   * @SINCE_1_3.22
    * @return The compose string
    */
-  const std::string& GetCompose() const;
+  std::string GetCompose() const;
 
   /**
    * @brief Get the device name the key event originated from.
    *
-   * @SINCE_1_9.27
+   * @SINCE_1_2.60
    * @return The device name
    */
-  const std::string& GetDeviceName() const;
+  std::string GetDeviceName() const;
 
   /**
    * @brief Get the device class the key event originated from.
@@ -177,83 +161,45 @@ public:
    */
   Device::Subclass::Type GetDeviceSubclass() const;
 
-  /**
-   * @brief Get the name given to the key pressed or command from the IMF
-   *
-   * @SINCE_1_9.27
-   * @return The name given to the key pressed.
-   */
-  const std::string& GetKeyName() const;
+  // Data
 
   /**
-   * @brief Get the actual string of input characters that should be used for input editors.
-   *
-   * @SINCE_1_9.27
-   * @return The actual string of input characters
+   * @brief Name given to the key pressed.
    */
-  const std::string& GetKeyString() const;
+  std::string keyPressedName;
 
   /**
-   * @brief Gets the logical key string.
-   *
-   * For example, when the user presses 'shift' key and '1' key together, the logical key is "exclamation".
-   * Plus, the key name is "1", and the key string is "!".
-   *
-   * @SINCE_1_9.27
-   * @return The logical key symbol
+   * @brief The actual string returned that should be used for input editors.
    */
-  const std::string& GetLogicalKey() const;
+  std::string keyPressed;
 
   /**
-   * @brief Get the unique key code for the key pressed.
+   * @brief Keycode for the key pressed.
    *
-   * @SINCE_1_9.27
-   * @return The unique key code for the key pressed
-   *
-   * @remarks We recommend not to use this key code value directly because its meaning
-   * might be changed in the future. Currently, it means a platform-specific key code.
-   * You need to use IsKey() to know what a key event means instead of direct comparison
-   * of key code value.
+   * @remarks We recommend not to use this key code value
+   * directly because its meaning might be changed in the future. Currently, it means a
+   * platform-specific key code. You need to use IsKey() to know what a key event means
+   * instead of direct comparison of key code value.
    */
-  int32_t GetKeyCode() const;
+  int32_t keyCode;
 
   /**
-   * @brief Return the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
-   *
-   * @SINCE_1_9.27
-   * @return The key modifier
+   * @brief special keys like shift, alt and control which modify the next key pressed.
    */
-  int32_t GetKeyModifier() const;
+  int32_t keyModifier;
 
   /**
-   * @brief Get the time (in ms) that the key event occurred.
-   *
-   * @SINCE_1_9.27
-   * @return The time (in ms)
+   * @brief The time (in ms) that the key event occurred.
    */
-  unsigned long GetTime() const;
+  unsigned long time;
 
   /**
-   * @brief Get the state of the key event.
+   * @brief State of the key event.
    *
    * @see State
-   *
-   * @SINCE_1_9.27
-   * @return The state of the key event
    */
-  State GetState() const;
+  State state;
 
-public: // Not intended for application developers
-
-  /// @cond internal
-  /**
-   * @brief This constructor is used internally to Create an initialized KeyEvent handle.
-   *
-   * @SINCE_1_9.27
-   * @param[in] keyEvent A pointer to a newly allocated Dali resource
-   */
-  explicit DALI_INTERNAL KeyEvent( Internal::KeyEvent* keyEvent );
-  /// @endcond
 };
 
 /**

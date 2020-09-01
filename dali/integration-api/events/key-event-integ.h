@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_KEY_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,17 +55,17 @@ struct DALI_CORE_API KeyEvent : public Event
 
   /**
    * Constructor
-   * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
-   * @param[in]  logicalKey      The logical key symbol (eg. shift + 1 == "exclamation")
-   * @param[in]  keyString       The string of input characters or key pressed
-   * @param[in]  keyCode         The unique key code for the key pressed.
-   * @param[in]  keyModifier     The key modifier for special keys like shift and alt
-   * @param[in]  timeStamp       The time (in ms) that the key event occurred.
-   * @param[in]  keyState        The state of the key event.
-   * @param[in]  compose         The key compose
-   * @param[in]  deviceName      The name of device KeyEvent originated from
-   * @param[in]  deviceClass     The class of device KeyEvent originated from
-   * @param[in]  deviceSubclass  The subclass of device KeyEvent originated from
+   * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
+   * @param[in]  logicalKey    The logical key symbol (eg. shift + 1 == "exclamation")
+   * @param[in]  keyString     A string of input characters or key pressed
+   * @param[in]  keyCode       The unique key code for the key pressed.
+   * @param[in]  keyModifier   The key modifier for special keys like shift and alt
+   * @param[in]  timeStamp     The time (in ms) that the key event occurred.
+   * @param[in]  keyState      The state of the key event.
+   * @param[in]  compose       The key compose
+   * @param[in]  deviceName    Name of device KeyEvent originated from
+   * @param[in]  deviceClass   Class of device KeyEvent originated from
+   * @param[in]  deviceSubclass  Subclass of device KeyEvent originated from
    */
   KeyEvent(const std::string& keyName,
            const std::string& logicalKey,
@@ -80,6 +80,12 @@ struct DALI_CORE_API KeyEvent : public Event
            const Device::Subclass::Type deviceSubclass );
 
   /**
+   * Constructor, creates a Integration::KeyEvent from a Dali::KeyEvent
+   * @param[in] event Dali::KeyEvent to convert from
+   */
+  explicit KeyEvent( const Dali::KeyEvent& event );
+
+  /**
    * Virtual destructor
    */
   virtual ~KeyEvent();
@@ -87,7 +93,7 @@ struct DALI_CORE_API KeyEvent : public Event
   // Data
 
   /**
-   * The name of the key pressed or command from the IMF
+   *@copydoc Dali::KeyEvent::keyPressedName
    */
   std::string keyName;
 
@@ -97,22 +103,22 @@ struct DALI_CORE_API KeyEvent : public Event
   std::string logicalKey;
 
   /**
-   * The string of input characters or key pressed
+   *@copydoc Dali::KeyEvent::keyPressed
    */
   std::string keyString;
 
   /**
-   * The unique key code for the key pressed.
+   * @copydoc Dali::KeyEvent::keyCode
    */
   int  keyCode;
 
   /**
-   * The key modifier for special keys like shift and alt
+   *@copydoc Dali::KeyEvent::keyModifier
    */
   int  keyModifier;
 
   /**
-   * The time (in ms) that the key event occurred.
+   *@copydoc Dali::KeyEvent::time
    */
   unsigned long time;
 
@@ -123,22 +129,22 @@ struct DALI_CORE_API KeyEvent : public Event
   State state;
 
   /**
-   * If this keystroke has modified a string in the middle of being composed - this string replaces the previous one.
+   * A string if this keystroke has modified a string in the middle of being composed - this string replaces the previous one.
    */
   std::string compose;
 
   /**
-   * The name of device KeyEvent originated from
+   * Name of device KeyEvent originated from
    */
   std::string deviceName;
 
   /**
-   * The class of device KeyEvent originated from
+   * Class of device KeyEvent originated from
    */
   Device::Class::Type deviceClass;
 
   /**
-   * The subclass of device KeyEvent originated from
+   * Subclass of device KeyEvent originated from
    */
   Device::Subclass::Type deviceSubclass;
 };

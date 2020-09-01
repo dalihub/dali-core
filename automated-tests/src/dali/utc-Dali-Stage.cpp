@@ -75,7 +75,9 @@ struct KeyEventGeneratedSignalData
   {
     functorCalled = false;
 
-    receivedKeyEvent.Reset();
+    receivedKeyEvent.keyModifier = 0;
+    receivedKeyEvent.keyPressedName.clear();
+    receivedKeyEvent.keyPressed.clear();
   }
 
   bool functorCalled;
@@ -117,7 +119,9 @@ struct KeyEventSignalData
   {
     functorCalled = false;
 
-    receivedKeyEvent.Reset();
+    receivedKeyEvent.keyModifier = 0;
+    receivedKeyEvent.keyPressedName.clear();
+    receivedKeyEvent.keyPressed.clear();
   }
 
   bool functorCalled;
@@ -866,10 +870,10 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -877,10 +881,10 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -888,10 +892,10 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -899,10 +903,10 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
   END_TEST;
 }
 
@@ -919,10 +923,10 @@ int UtcDaliStageSignalKeyEventP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -930,10 +934,10 @@ int UtcDaliStageSignalKeyEventP(void)
   application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -941,10 +945,10 @@ int UtcDaliStageSignalKeyEventP(void)
   application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
@@ -952,10 +956,10 @@ int UtcDaliStageSignalKeyEventP(void)
   application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.keyModifier );
+  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.keyPressedName );
+  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.keyPressed );
+  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.state ) );
   END_TEST;
 }
 

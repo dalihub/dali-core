@@ -46,7 +46,7 @@ class WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
-class KeyEvent;
+struct KeyEvent;
 
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
