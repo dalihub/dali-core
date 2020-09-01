@@ -34,6 +34,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/events/rotation-gesture-detector.cpp
   ${public_api_src_dir}/events/tap-gesture.cpp
   ${public_api_src_dir}/events/tap-gesture-detector.cpp
+  ${public_api_src_dir}/events/touch-point.cpp
   ${public_api_src_dir}/events/touch-event.cpp
   ${public_api_src_dir}/images/pixel.cpp
   ${public_api_src_dir}/images/pixel-data.cpp
@@ -147,6 +148,7 @@ SET( public_api_core_events_header_files
   ${public_api_src_dir}/events/rotation-gesture-detector.h
   ${public_api_src_dir}/events/tap-gesture.h
   ${public_api_src_dir}/events/tap-gesture-detector.h
+  ${public_api_src_dir}/events/touch-point.h
   ${public_api_src_dir}/events/touch-event.h
   ${public_api_src_dir}/events/mouse-button.h
 )

@@ -46,14 +46,14 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_HOVER_PROCESSOR" );
 
-const char * TOUCH_POINT_STATE[PointState::INTERRUPTED + 1] =
+const char * TOUCH_POINT_STATE[TouchPoint::Last] =
 {
-  "STARTED",
-  "FINISHED",
-  "MOTION",
-  "LEAVE",
-  "STATIONARY",
-  "INTERRUPTED",
+  "Started",
+  "Finished",
+  "Motion",
+  "Leave",
+  "Stationary",
+  "Interrupted",
 };
 
 #endif // defined(DEBUG_ENABLED)
@@ -176,7 +176,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   DALI_LOG_TRACE_METHOD( gLogFilter );
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty HoverEvent sent from Integration\n" );
 
-  PointState::Type state = static_cast< PointState::Type >( event.points[0].GetState() );
+  TouchPoint::State state = static_cast< TouchPoint::State >( event.points[0].GetState() );
 
   PRINT_HIERARCHY(gLogFilter);
 
@@ -186,7 +186,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
 
-  if ( state == PointState::INTERRUPTED )
+  if ( state == TouchPoint::Interrupted )
   {
     Dali::Actor consumingActor;
     Integration::Point currentPoint( event.points[0] );
