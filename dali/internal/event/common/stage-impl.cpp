@@ -40,6 +40,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/common/constants.h>
 
 using Dali::Internal::SceneGraph::Node;
 
@@ -91,7 +92,7 @@ StagePtr Stage::New( SceneGraph::UpdateManager& updateManager )
 void Stage::Initialize( Scene& scene )
 {
   mScene = &scene;
-  mScene->SetBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR );
+  mScene->SetBackgroundColor( Dali::DEFAULT_BACKGROUND_COLOR );
   mScene->EventProcessingFinishedSignal().Connect( this, &Stage::OnEventProcessingFinished );
   mScene->KeyEventSignal().Connect( this, &Stage::OnKeyEvent );
   mScene->TouchSignal().Connect( this, &Stage::OnTouchEvent );

@@ -746,7 +746,7 @@ int UtcDaliStageGetBackgroundColorP(void)
 
   Stage stage = Stage::GetCurrent();
 
-  DALI_TEST_EQUALS( Stage::DEFAULT_BACKGROUND_COLOR, stage.GetBackgroundColor(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DEFAULT_BACKGROUND_COLOR, stage.GetBackgroundColor(), TEST_LOCATION );
   END_TEST;
 }
 
