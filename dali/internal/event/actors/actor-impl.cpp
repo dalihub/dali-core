@@ -1835,7 +1835,7 @@ bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
   return consumed;
 }
 
-bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
+bool Actor::EmitHoverEventSignal( const HoverEvent& event )
 {
   bool consumed = false;
 
