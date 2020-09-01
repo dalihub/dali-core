@@ -441,7 +441,7 @@ std::string TypeInfo::GetPropertyName( Property::Index index ) const
   return propertyName;
 }
 
-void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
+void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionFunction function)
 {
   if( nullptr == function)
   {
@@ -454,7 +454,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
 
     if( iter == mActions.end() )
     {
-      mActions.push_back( ActionPair( actionName, function ) );
+      mActions.push_back(ActionPair(std::move(actionName), function));
     }
     else
     {
@@ -463,7 +463,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
   }
 }
 
-void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunction function )
+void TypeInfo::AddConnectorFunction(std::string signalName, Dali::TypeInfo::SignalConnectorFunction function)
 {
   if( nullptr == function)
   {
@@ -476,7 +476,7 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
 
     if( iter == mSignalConnectors.end() )
     {
-      mSignalConnectors.push_back( ConnectionPair( signalName, function ) );
+      mSignalConnectors.push_back(ConnectionPair(std::move(signalName), function));
     }
     else
     {
@@ -485,7 +485,7 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
   }
 }
 
-void TypeInfo::AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
+void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
   // The setter can be empty as a property can be read-only.
 
@@ -500,7 +500,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
     }
     else
     {
@@ -509,7 +509,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
   }
 }
 
-void TypeInfo::AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc)
+void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Type type, Dali::CSharpTypeInfo::SetPropertyFunction setFunc, Dali::CSharpTypeInfo::GetPropertyFunction getFunc)
 {
 
   // The setter can be empty as a property can be read-only.
@@ -525,7 +525,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
     }
     else
     {
@@ -535,15 +535,14 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 
 }
 
-
-void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type )
+void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Type type)
 {
   RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                         PairFinder< Property::Index, RegisteredPropertyPair>(index) );
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
   }
   else
   {
@@ -551,15 +550,15 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
   }
 }
 
-void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index index, const Property::Value& defaultValue )
+void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue)
 {
   RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                         PairFinder< Property::Index, RegisteredPropertyPair>(index) );
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( defaultValue.GetType(), name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
-    mPropertyDefaultValues.push_back( PropertyDefaultValuePair( index, defaultValue ) );
+    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(defaultValue.GetType(), std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
+    mPropertyDefaultValues.push_back(PropertyDefaultValuePair(index, std::move(defaultValue)));
   }
   else
   {
@@ -567,7 +566,7 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
   }
 }
 
-void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex )
+void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)
 {
   Property::Type type = GetPropertyType( baseIndex );
   DALI_ASSERT_ALWAYS( ( type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4 ) && "Base property does not support component" );
@@ -584,7 +583,7 @@ void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, baseIndex, componentIndex ) ) );
+      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), baseIndex, componentIndex)));
       success = true;
     }
   }
@@ -592,14 +591,14 @@ void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property
   DALI_ASSERT_ALWAYS( success && "Property component already registered" );
 }
 
-void TypeInfo::AddChildProperty( const std::string& name, Property::Index index, Property::Type type )
+void TypeInfo::AddChildProperty(std::string name, Property::Index index, Property::Type type)
 {
   RegisteredPropertyContainer::iterator iter = find_if( mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(),
                                                         PairFinder< Property::Index, RegisteredPropertyPair>(index) );
 
   if ( iter == mRegisteredChildProperties.end() )
   {
-    mRegisteredChildProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
+    mRegisteredChildProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, std::move(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
   }
   else
   {
@@ -950,7 +949,7 @@ Property::Value TypeInfo::GetPropertyDefaultValue( Property::Index index ) const
   return Property::Value(); // return none
 }
 
-void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const
+void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::Value value) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                               PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
@@ -967,14 +966,14 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
       }
       else
       {
-        iter->second.setFunc( object, index, value );
+        iter->second.setFunc(object, index, std::move(value));
       }
     }
   }
   else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
     // call base type recursively
-    mBaseType->SetProperty( object, index, value );
+    mBaseType->SetProperty(object, index, std::move(value));
   }
   else
   {
@@ -982,7 +981,7 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
   }
 }
 
-void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const Property::Value& value ) const
+void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property::Value value) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                               PropertyNameFinder< RegisteredPropertyPair >( name ) );
@@ -997,13 +996,13 @@ void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const P
     }
     else
     {
-      iter->second.setFunc( object, iter->first, value );
+      iter->second.setFunc(object, iter->first, std::move(value));
     }
   }
   else if( GetBaseType( mBaseType, mTypeRegistry, mBaseTypeName ) )
   {
     // call base type recursively
-    mBaseType->SetProperty( object, name, value );
+    mBaseType->SetProperty(object, name, std::move(value));
   }
   else
   {
