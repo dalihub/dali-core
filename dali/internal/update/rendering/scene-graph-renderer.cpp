@@ -49,8 +49,14 @@ MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
 {
   // Iterate thru uniformMap.
-  //   Any maps that aren't in localMap should be added in a single step
-  CollectedUniformMap newUniformMappings;
+  // Any maps that aren't in localMap should be added in a single step
+
+  // keep a static vector to avoid temporary heap allocation.
+  // As this function gets called only from update thread we don't have to
+  // make it thread safe (so no need to keep a thread_local variable).
+  static CollectedUniformMap newUniformMappings;
+
+  newUniformMappings.Clear();
 
   for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
   {
