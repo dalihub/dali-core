@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GEOMETRY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 #include <dali/internal/render/renderers/render-geometry.h>
 
 namespace Dali
@@ -60,7 +60,7 @@ public:
   /**
    * @copydoc Dali::Geometry::AddVertexBuffer()
    */
-  uint32_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
+  uint32_t AddVertexBuffer( VertexBuffer& vertexBuffer );
 
   /**
    * @copydoc Dali::Geometry::GetNumberOfVertexBuffers()
@@ -122,7 +122,7 @@ private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via update thread
   Render::Geometry* mRenderObject;
 
-  std::vector<PropertyBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
+  std::vector<VertexBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
   Dali::Geometry::Type mType;      ///< Geometry type (cached)
 };
 

@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_RENDER_PROPERTY_BUFFER_H
-#define DALI_INTERNAL_RENDER_PROPERTY_BUFFER_H
+#ifndef DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
+#define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace Internal
 namespace Render
 {
 
-class PropertyBuffer
+class VertexBuffer
 {
 public:
 
@@ -45,7 +45,7 @@ public:
   };
 
   /**
-   * Structure that holds the meta-data of the format of PropertyBuffer.
+   * Structure that holds the meta-data of the format of VertexBuffer.
    */
   struct Format
   {
@@ -56,27 +56,27 @@ public:
   /**
    * @brief Default constructor
    */
-  PropertyBuffer();
+  VertexBuffer();
 
   /**
    * @brief Destructor
    */
-  ~PropertyBuffer();
+  ~VertexBuffer();
 
   /**
    * @brief Set the format of the buffer
    *
    * This function takes ownership of the pointer
    *
-   * @param[in] format The format for the PropertyBuffer
+   * @param[in] format The format for the VertexBuffer
    */
-  void SetFormat( PropertyBuffer::Format* format );
+  void SetFormat( VertexBuffer::Format* format );
 
   /**
-   * @brief Set the data of the PropertyBuffer
+   * @brief Set the data of the VertexBuffer
    *
    * This function takes ownership of the pointer
-   * @param[in] data The new data of the PropertyBuffer
+   * @param[in] data The new data of the VertexBuffer
    * @param[in] size The new size of the buffer
    */
   void SetData( Dali::Vector<uint8_t>* data, uint32_t size );
@@ -180,15 +180,15 @@ public:
     return reinterpret_cast<T*>( &data->operator[]( 0 ) );
   }
 
-  inline const PropertyBuffer::Format* GetFormat() const
+  inline const VertexBuffer::Format* GetFormat() const
   {
     return mFormat.Get();
   }
 
 private:
-  OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
+  OwnerPointer< VertexBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
-  OwnerPointer< GpuBuffer >               mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
+  OwnerPointer< GpuBuffer >               mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
 
   uint32_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
@@ -201,4 +201,4 @@ private:
 } // namespace Dali
 
 
-#endif //  DALI_INTERNAL_RENDER_PROPERTY_BUFFER_H
+#endif //  DALI_INTERNAL_RENDER_VERTEX_BUFFER_H

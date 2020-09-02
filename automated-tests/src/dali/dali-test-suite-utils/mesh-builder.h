@@ -28,7 +28,7 @@ Shader CreateShader();
 TextureSet CreateTextureSet();
 TextureSet CreateTextureSet( Texture texture );
 Geometry CreateQuadGeometry();
-PropertyBuffer CreatePropertyBuffer();
+VertexBuffer CreateVertexBuffer();
 
 }
 
