@@ -206,7 +206,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchSignal().Connect(&application, touchFunctor);
+  actor.TouchedSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -1000,7 +1000,7 @@ int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
 
   bool consume = false;
   TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchSignal().Connect(&application,touchFunctor);
+  actor.TouchedSignal().Connect(&application,touchFunctor);
 
   // Render and notify
   application.SendNotification();

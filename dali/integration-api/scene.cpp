@@ -184,9 +184,9 @@ Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal()
   return GetImplementation(*this).KeyEventGeneratedSignal();
 }
 
-Scene::TouchSignalType& Scene::TouchSignal()
+Scene::TouchEventSignalType& Scene::TouchedSignal()
 {
-  return GetImplementation(*this).TouchSignal();
+  return GetImplementation(*this).TouchedSignal();
 }
 
 Scene::WheelEventSignalType& Scene::WheelEventSignal()

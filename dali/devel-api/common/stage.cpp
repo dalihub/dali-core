@@ -141,9 +141,9 @@ Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
   return GetImplementation(*this).EventProcessingFinishedSignal();
 }
 
-Stage::TouchSignalType& Stage::TouchSignal()
+Stage::TouchEventSignalType& Stage::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchSignal();
+  return GetImplementation( *this ).TouchedSignal();
 }
 
 Stage::WheelEventSignalType& Stage::WheelEventSignal()
