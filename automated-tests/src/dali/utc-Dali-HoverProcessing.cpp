@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/devel-api/events/hover-event-devel.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -1280,3 +1281,18 @@ int UtcDaliHoverClippingActor(void)
 
   END_TEST;
 }
+
+int UtcDaliHoverEventCreate(void)
+{
+  TestApplication application;
+
+  Dali::HoverEvent hoverEvent = DevelHoverEvent::New( 100 );
+  DALI_TEST_CHECK( hoverEvent );
+
+  // Emit a started signal
+  DALI_TEST_EQUALS( 100, hoverEvent.GetTime(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0, hoverEvent.GetPointCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
