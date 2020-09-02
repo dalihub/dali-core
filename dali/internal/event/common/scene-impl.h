@@ -251,9 +251,9 @@ public:
   Integration::Scene::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
-    * @copydoc Integration::Scene::TouchSignal()
+    * @copydoc Integration::Scene::TouchedSignal()
     */
-  Integration::Scene::TouchSignalType& TouchSignal();
+  Integration::Scene::TouchEventSignalType& TouchedSignal();
 
   /**
    * @copydoc Integration::Scene::sWheelEventSignal()
@@ -323,7 +323,7 @@ private:
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
 
   // The touch signal
-  Integration::Scene::TouchSignalType mTouchSignal;
+  Integration::Scene::TouchEventSignalType mTouchedSignal;
 
   // The wheel event signal
   Integration::Scene::WheelEventSignalType mWheelEventSignal;

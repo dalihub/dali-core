@@ -163,7 +163,7 @@ int UtcDaliScriptingNewActorNegative(void)
     DALI_TEST_CHECK( !handle.WheelEventSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OffSceneSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OnSceneSignal().GetConnectionCount() );
-    DALI_TEST_CHECK( !handle.TouchSignal().GetConnectionCount() );
+    DALI_TEST_CHECK( !handle.TouchedSignal().GetConnectionCount() );
   }
   END_TEST;
 }

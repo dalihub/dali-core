@@ -1450,9 +1450,9 @@ public:
   void EmitChildRemovedSignal( Actor& child );
 
   /**
-   * @copydoc Dali::Actor::TouchEventSignal()
+   * @copydoc Dali::Actor::TouchedSignal()
    */
-  Dali::Actor::TouchEventSignalType& TouchSignal();
+  Dali::Actor::TouchEventSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
@@ -1966,7 +1966,7 @@ protected:
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchEventSignalType         mTouchSignal;
+  Dali::Actor::TouchEventSignalType        mTouchedSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;
   Dali::Actor::OnSceneSignalType           mOnSceneSignal;

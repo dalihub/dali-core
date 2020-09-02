@@ -40,7 +40,7 @@
  *   {
  *     Actor actor = Actor::New();
  *
- *     actor.TouchSignal().Connect( this, &MyClass::Callback );
+ *     actor.TouchedSignal().Connect( this, &MyClass::Callback );
  *   }
  *
  *   ~MyClass()
