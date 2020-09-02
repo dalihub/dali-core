@@ -25,7 +25,7 @@ namespace Internal
 {
 
 ActorGestureData::ActorGestureData()
-: gesturesRequired( Gesture::Type( 0 ) ),
+: gesturesRequired( GestureType::Value( 0 ) ),
   panDetectors( nullptr ),
   pinchDetectors( nullptr ),
   longPressDetectors( nullptr ),
@@ -45,7 +45,7 @@ ActorGestureData::~ActorGestureData()
 
 void ActorGestureData::AddGestureDetector( GestureDetector& detector )
 {
-  const Gesture::Type type( detector.GetType() );
+  const GestureType::Value type( detector.GetType() );
 
   GestureDetectorContainer*& containerPtr( GetContainerPtr( type ) );
   if ( NULL == containerPtr )
@@ -54,12 +54,12 @@ void ActorGestureData::AddGestureDetector( GestureDetector& detector )
   }
   containerPtr->push_back( &detector );
 
-  gesturesRequired = Gesture::Type( gesturesRequired | type );
+  gesturesRequired = GestureType::Value( gesturesRequired | type );
 }
 
 void ActorGestureData::RemoveGestureDetector( GestureDetector& detector )
 {
-  const Gesture::Type type( detector.GetType() );
+  const GestureType::Value type( detector.GetType() );
 
   GestureDetectorContainer*& containerPtr( GetContainerPtr( type ) );
   DALI_ASSERT_DEBUG( containerPtr && "Container had not been created" );
@@ -71,42 +71,42 @@ void ActorGestureData::RemoveGestureDetector( GestureDetector& detector )
 
   if ( container.empty() )
   {
-    gesturesRequired = Gesture::Type( gesturesRequired & ~type );
+    gesturesRequired = GestureType::Value( gesturesRequired & ~type );
     delete containerPtr;
     containerPtr = NULL;
   }
 }
 
-GestureDetectorContainer& ActorGestureData::GetGestureDetectorContainer( Gesture::Type type )
+GestureDetectorContainer& ActorGestureData::GetGestureDetectorContainer( GestureType::Value type )
 {
   return *GetContainerPtr( type );
 }
 
-GestureDetectorContainer*& ActorGestureData::GetContainerPtr( Gesture::Type type )
+GestureDetectorContainer*& ActorGestureData::GetContainerPtr( GestureType::Value type )
 {
   switch ( type )
   {
-    case Dali::Gesture::Pan:
+    case GestureType::PAN:
     {
       return panDetectors;
     }
 
-    case Dali::Gesture::Pinch:
+    case GestureType::PINCH:
     {
       return pinchDetectors;
     }
 
-    case Dali::Gesture::LongPress:
+    case GestureType::LONG_PRESS:
     {
       return longPressDetectors;
     }
 
-    case Dali::Gesture::Tap:
+    case GestureType::TAP:
     {
       return tapDetectors;
     }
 
-    case Dali::Gesture::Rotation:
+    case GestureType::ROTATION:
     {
       return rotationDetectors;
     }

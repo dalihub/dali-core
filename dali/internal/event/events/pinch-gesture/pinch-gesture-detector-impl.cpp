@@ -58,7 +58,7 @@ PinchGestureDetectorPtr PinchGestureDetector::New()
 }
 
 PinchGestureDetector::PinchGestureDetector()
-: GestureDetector(Dali::Gesture::Pinch)
+: GestureDetector(GestureType::PINCH)
 {
 }
 

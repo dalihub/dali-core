@@ -66,7 +66,7 @@ public:
    * @param[in] type The gesture type.
    * @return true if the gesture is required, false otherwise.
    */
-  inline bool IsGestureRequred( Gesture::Type type ) const
+  inline bool IsGestureRequired( GestureType::Value type ) const
   {
     return type & gesturesRequired;
   }
@@ -76,7 +76,7 @@ public:
    * @param[in] type The container type required
    * @pre Ensure IsGestureRequired() is used to check if the container is actually available.
    */
-  GestureDetectorContainer& GetGestureDetectorContainer( Gesture::Type type );
+  GestureDetectorContainer& GetGestureDetectorContainer( GestureType::Value type );
 
 private:
 
@@ -84,11 +84,11 @@ private:
    * Helper to retrieve the appropriate container type.
    * @param[in] type The container type required.
    */
-  inline GestureDetectorContainer*& GetContainerPtr( Gesture::Type type );
+  inline GestureDetectorContainer*& GetContainerPtr( GestureType::Value type );
 
 private:
 
-  Gesture::Type gesturesRequired; ///< Stores which gestures are required
+  GestureType::Value gesturesRequired; ///< Stores which gestures are required
 
   GestureDetectorContainer* panDetectors;       ///< Pointer to a container of pan-detectors
   GestureDetectorContainer* pinchDetectors;     ///< Pointer to a container of pinch-detectors

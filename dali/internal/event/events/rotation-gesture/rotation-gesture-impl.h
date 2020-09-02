@@ -43,8 +43,8 @@ public:
   /**
    * @brief Default constructor
    */
-  RotationGesture( Gesture::State state )
-  : Gesture( Dali::Gesture::Rotation, state )
+  RotationGesture( GestureState state )
+  : Gesture( GestureType::ROTATION, state )
   {
   }
 

@@ -350,7 +350,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     }
   }
 
-  // 5) If our primary point is an Finished event, then the primary point (in multi-touch) will change next
+  // 5) If our primary point is a FINISHED event, then the primary point (in multi-touch) will change next
   //    time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
   if ( primaryPointState == PointState::FINISHED )
@@ -386,7 +386,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     }
   }
 
-  // 6) Emit an interrupted event to the hover-started actor if it hasn't consumed the Finished.
+  // 6) Emit an interrupted event to the hover-started actor if it hasn't consumed the FINISHED.
 
   if ( hoverEvent->GetPointCount() == 1 ) // Only want the first hover started
   {

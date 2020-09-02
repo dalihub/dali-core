@@ -43,8 +43,8 @@ public:
   /**
    * @brief Default constructor
    */
-  PinchGesture( Gesture::State state )
-  : Gesture(Dali::Gesture::Pinch, state)
+  PinchGesture( GestureState state )
+  : Gesture(GestureType::PINCH, state)
   {
   }
 

@@ -60,7 +60,7 @@ public:
   typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
   typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
   typedef Signal< void (const Dali::TouchEvent&) > TouchEventSignalType; ///< Touch signal type
-  typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< Touched signal type
+  typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< WheelEvent signal type
 
   using FrameCallbackContainer = std::vector< std::pair< std::unique_ptr< CallbackBase >, int32_t > >;
 

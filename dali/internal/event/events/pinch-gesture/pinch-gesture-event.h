@@ -33,10 +33,10 @@ namespace Internal
  * send it to the Core.
  *
  * A Pinch Gesture event should be in one of four states:
- * - Started:    If a pinch is detected.
- * - Continuing: If after a pinch is detected, it continues.
- * - Finished:   If after a pinch, the user lifts their finger(s).
- * - Cancelled:  If there is a system interruption.
+ * - STARTED:    If a pinch is detected.
+ * - CONTINUING: If after a pinch is detected, it continues.
+ * - FINISHED:   If after a pinch, the user lifts their finger(s).
+ * - CANCELLED:  If there is a system interruption.
  */
 struct PinchGestureEvent : public GestureEvent
 {
@@ -46,7 +46,7 @@ struct PinchGestureEvent : public GestureEvent
    * Default Constructor
    * @param[in]  state  The state of the gesture
    */
-  PinchGestureEvent(Gesture::State state);
+  PinchGestureEvent(GestureState state);
 
   /**
    * Virtual destructor

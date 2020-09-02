@@ -38,9 +38,9 @@ class PanGesture;
 /**
  * @brief A PanGesture is emitted when the user moves one or more fingers in a particular direction.
  *
- * This gesture can be in one of three states, when the pan gesture is first detected: Gesture::Started
- * when the pan gesture is continuing: Gesture::Continuing and finally, when the pan gesture ends:
- * Gesture::Finished.
+ * This gesture can be in one of three states, when the pan gesture is first detected: GestureState::STARTED
+ * when the pan gesture is continuing: GestureState::CONTINUING and finally, when the pan gesture ends:
+ * GestureState::FINISHED.
  *
  * A pan gesture will end in the following ways:
  * - User releases the primary finger (the first touch).

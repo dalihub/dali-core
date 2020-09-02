@@ -36,9 +36,9 @@ class RotationGesture;
  * in a rotational/circular gesture.
  *
  * This gesture can be in one of three states; when the rotation gesture is first detected, its
- * state is set to Gesture::Started.  After this, if there is change in the gesture, the state will
- * be Gesture::Continuing. Finally, when the gesture ends, the state of the gesture changes to
- * Gesture::Finished.
+ * state is set to GestureState::STARTED.  After this, if there is change in the gesture, the state will
+ * be GestureState::CONTINUING. Finally, when the gesture ends, the state of the gesture changes to
+ * GestureState::FINISHED.
  *
  * A rotation gesture will continue to be sent to the actor under the center point of the rotation
  * until the rotation ends.

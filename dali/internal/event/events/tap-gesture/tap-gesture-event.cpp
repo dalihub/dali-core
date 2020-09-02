@@ -24,8 +24,8 @@ namespace Dali
 namespace Internal
 {
 
-TapGestureEvent::TapGestureEvent( Gesture::State state )
-: GestureEvent(Dali::Gesture::Tap, state),
+TapGestureEvent::TapGestureEvent( GestureState state )
+: GestureEvent(GestureType::TAP, state),
   numberOfTaps(1),
   numberOfTouches(1)
 {

@@ -39,41 +39,41 @@ int UtcDaliPanGestureConstructorP(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  PanGesture gesture = DevelPanGesture::New( Gesture::Clear );
+  PanGesture gesture = DevelPanGesture::New( GestureState::CLEAR );
 
-  DALI_TEST_EQUALS(Gesture::Clear, gesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CLEAR, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture.GetType(), TEST_LOCATION);
 
-  PanGesture gesture2 = DevelPanGesture::New( Gesture::Started );
-  DALI_TEST_EQUALS(Gesture::Started, gesture2.GetState(), TEST_LOCATION);
+  PanGesture gesture2 = DevelPanGesture::New( GestureState::STARTED );
+  DALI_TEST_EQUALS(GestureState::STARTED, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture2.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture2.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture2.GetType(), TEST_LOCATION);
 
-  PanGesture gesture3 = DevelPanGesture::New( Gesture::Continuing );
-  DALI_TEST_EQUALS(Gesture::Continuing, gesture3.GetState(), TEST_LOCATION);
+  PanGesture gesture3 = DevelPanGesture::New( GestureState::CONTINUING );
+  DALI_TEST_EQUALS(GestureState::CONTINUING, gesture3.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture3.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture3.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture3.GetType(), TEST_LOCATION);
 
-  PanGesture gesture4 = DevelPanGesture::New( Gesture::Finished );
+  PanGesture gesture4 = DevelPanGesture::New( GestureState::FINISHED );
 
-  DALI_TEST_EQUALS(Gesture::Finished, gesture4.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, gesture4.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture4.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture4.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture4.GetType(), TEST_LOCATION);
 
   // Test copy constructor
   DevelPanGesture::SetNumberOfTouches( gesture4, 3u );
 
   PanGesture pan(gesture4);
-  DALI_TEST_EQUALS(Gesture::Finished, pan.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, pan.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(3u, pan.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, pan.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, pan.GetType(), TEST_LOCATION);
 
   // Test move constructor
   const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
   PanGesture gesture5( std::move( gesture ) );
   DALI_TEST_CHECK(!gesture);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture5.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture5.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(gesture5.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
 
   END_TEST;
@@ -82,23 +82,23 @@ int UtcDaliPanGestureConstructorP(void)
 int UtcDaliPanGestureAssignmentP(void)
 {
   // Test Assignment operator
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
-  DALI_TEST_EQUALS(Gesture::Started, gesture.GetState(), TEST_LOCATION);
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
+  DALI_TEST_EQUALS(GestureState::STARTED, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture.GetType(), TEST_LOCATION);
 
-  PanGesture gesture2 = DevelPanGesture::New( Gesture::Continuing );
+  PanGesture gesture2 = DevelPanGesture::New( GestureState::CONTINUING );
 
-  DALI_TEST_EQUALS(Gesture::Continuing, gesture2.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, gesture2.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture2.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture2.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture2.GetType(), TEST_LOCATION);
 
   DevelPanGesture::SetNumberOfTouches( gesture2, 3u );
 
   gesture = gesture2;
-  DALI_TEST_EQUALS(Gesture::Continuing, gesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, gesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(3u, gesture.GetNumberOfTouches(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture.GetType(), TEST_LOCATION);
 
   // Move assignment
   const auto refCount = gesture.GetObjectPtr()->ReferenceCount();
@@ -106,7 +106,7 @@ int UtcDaliPanGestureAssignmentP(void)
   DALI_TEST_EQUALS(gesture3, Gesture(), TEST_LOCATION);
   gesture3 = std::move(gesture);
   DALI_TEST_CHECK(!gesture);
-  DALI_TEST_EQUALS(Gesture::Pan, gesture3.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, gesture3.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(gesture3.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
 
   END_TEST;
@@ -114,7 +114,7 @@ int UtcDaliPanGestureAssignmentP(void)
 
 int UtcDaliPanGestureGetSpeedP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(0.0f, gesture.GetSpeed(), TEST_LOCATION);
 
   DevelPanGesture::SetVelocity( gesture, Vector2( 3.0f, -4.0f ) );
@@ -125,7 +125,7 @@ int UtcDaliPanGestureGetSpeedP(void)
 
 int UtcDaliPanGestureGetDistanceP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(0.0f, gesture.GetDistance(), TEST_LOCATION);
 
   DevelPanGesture::SetDisplacement( gesture, Vector2( -30.0f, -40.0f ) );
@@ -136,7 +136,7 @@ int UtcDaliPanGestureGetDistanceP(void)
 
 int UtcDaliPanGestureGetScreenSpeedP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(0.0f, gesture.GetScreenSpeed(), TEST_LOCATION);
 
   DevelPanGesture::SetScreenVelocity( gesture, Vector2( 3.0f, -4.0f ) );
@@ -147,7 +147,7 @@ int UtcDaliPanGestureGetScreenSpeedP(void)
 
 int UtcDaliPanGestureGetScreenDistanceP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(0.0f, gesture.GetScreenDistance(), TEST_LOCATION);
 
   DevelPanGesture::SetScreenDisplacement( gesture, Vector2( -30.0f, -40.0f ) );
@@ -209,7 +209,7 @@ int UtcDaliPanGestureDetectorRegisterPropertyP(void)
 
 int UtcDaliPanGestureSetGetTimeP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(0, gesture.GetTime(), TEST_LOCATION);
 
   DevelPanGesture::SetTime( gesture, 123123 );
@@ -220,7 +220,7 @@ int UtcDaliPanGestureSetGetTimeP(void)
 
 int UtcDaliPanGestureSetGetVelocityP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetVelocity(), TEST_LOCATION);
 
   DevelPanGesture::SetVelocity( gesture, Vector2(123.0f, 321.0f) );
@@ -231,7 +231,7 @@ int UtcDaliPanGestureSetGetVelocityP(void)
 
 int UtcDaliPanGestureSetGetDisplacementP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetDisplacement(), TEST_LOCATION);
 
   DevelPanGesture::SetDisplacement( gesture, Vector2(123.0f, 321.0f) );
@@ -242,7 +242,7 @@ int UtcDaliPanGestureSetGetDisplacementP(void)
 
 int UtcDaliPanGestureSetGetPositionP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetPosition(), TEST_LOCATION);
 
   DevelPanGesture::SetPosition( gesture, Vector2(123.0f, 321.0f) );
@@ -253,7 +253,7 @@ int UtcDaliPanGestureSetGetPositionP(void)
 
 int UtcDaliPanGestureSetGetScreenVelocityP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetScreenVelocity(), TEST_LOCATION);
 
   DevelPanGesture::SetScreenVelocity( gesture, Vector2(123.0f, 321.0f) );
@@ -264,7 +264,7 @@ int UtcDaliPanGestureSetGetScreenVelocityP(void)
 
 int UtcDaliPanGestureSetGetScreenDisplacementP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetScreenDisplacement(), TEST_LOCATION);
 
   DevelPanGesture::SetScreenDisplacement( gesture, Vector2(123.0f, 321.0f) );
@@ -275,7 +275,7 @@ int UtcDaliPanGestureSetGetScreenDisplacementP(void)
 
 int UtcDaliPanGestureSetGetScreenPositionP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(Vector2::ZERO, gesture.GetScreenPosition(), TEST_LOCATION);
 
   DevelPanGesture::SetScreenPosition( gesture, Vector2(123.0f, 321.0f) );
@@ -286,7 +286,7 @@ int UtcDaliPanGestureSetGetScreenPositionP(void)
 
 int UtcDaliPanGestureSetGetNumberOfTouchesP(void)
 {
-  PanGesture gesture = DevelPanGesture::New( Gesture::Started );
+  PanGesture gesture = DevelPanGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
 
   DevelPanGesture::SetNumberOfTouches( gesture, 3123 );

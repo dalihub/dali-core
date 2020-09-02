@@ -296,7 +296,7 @@ void PanGestureDetector::SetPanGestureProperties( const Dali::PanGesture& pan )
 }
 
 PanGestureDetector::PanGestureDetector( const SceneGraph::PanGesture& sceneObject )
-: GestureDetector( Dali::Gesture::Pan, &sceneObject ),
+: GestureDetector( GestureType::PAN, &sceneObject ),
   mMinimumTouches(1),
   mMaximumTouches(1)
 {

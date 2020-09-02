@@ -91,7 +91,7 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage, Integration::Scene scene )
+  UnstageActorFunctor( SignalData& data, GestureState& stateToUnstage, Integration::Scene scene )
   : GestureReceivedFunctor( data ),
     stateToUnstage( stateToUnstage ),
     scene( scene )
@@ -108,7 +108,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
     }
   }
 
-  Gesture::State& stateToUnstage;
+  GestureState& stateToUnstage;
   Integration::Scene scene;
 };
 
@@ -699,7 +699,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit STARTED event, we should not receive the long press.
   TestTriggerLongPress( application );
   TestEndLongPress( application, 50.0f, 10.0f );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
@@ -767,7 +767,7 @@ int UtcDaliLongPressGestureDetachAfterStarted(void)
   // Detach actor
   detector.Detach(actor);
 
-  // Emit Finished, no signal
+  // Emit FINISHED, no signal
   TestEndLongPress( application, 50.0f, 10.0f );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -787,7 +787,7 @@ int UtcDaliLongPressGestureActorUnstaged(void)
   application.Render();
 
   // State to remove actor in.
-  Gesture::State stateToUnstage( Gesture::Started );
+  GestureState stateToUnstage( GestureState::STARTED );
 
   // Attach actor to detector
   SignalData data;
@@ -814,8 +814,8 @@ int UtcDaliLongPressGestureActorUnstaged(void)
   application.SendNotification();
   application.Render();
 
-  // Change state to Gesture::Continuing to remove
-  stateToUnstage = Gesture::Finished;
+  // Change state to GestureState::CONTINUING to remove
+  stateToUnstage = GestureState::FINISHED;
 
   // Emit signals
   TestGenerateLongPress( application, 50.0f, 10.0f );
@@ -848,7 +848,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // State to remove actor in.
-  Gesture::State stateToUnstage( Gesture::Started );
+  GestureState stateToUnstage( GestureState::STARTED );
 
   // Attach actor to detector
   SignalData data;
@@ -858,7 +858,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   detector.Attach(dummyActor);
   detector.DetectedSignal().Connect( &application, functor );
 
-  // Here we are testing a Started actor which is removed in the Started callback, but then added back
+  // Here we are testing a STARTED actor which is removed in the STARTED callback, but then added back
   // before we get a finished state.  As we were removed from the stage, even if we're at the same
   // position, we should still not be signalled.
 
@@ -1051,7 +1051,7 @@ int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
       &application,
       [&detector, &functorCalled](Actor actor, const LongPressGesture& gesture)
       {
-        if( gesture.GetState() == Gesture::Finished )
+        if( gesture.GetState() == GestureState::FINISHED )
         {
           detector.Detach(actor);
           functorCalled = true;

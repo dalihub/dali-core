@@ -46,9 +46,9 @@ const unsigned int MINIMUM_MOTION_EVENTS_BEFORE_PAN(2);
 } // unnamed namespace
 
 PanGestureRecognizer::PanGestureRecognizer( Observer& observer, Vector2 screenSize, const PanGestureRequest& request, int32_t minimumDistance, int32_t minimumPanEvents )
-: GestureRecognizer( screenSize, Dali::Gesture::Pan ),
+: GestureRecognizer( screenSize, GestureType::PAN ),
   mObserver( observer ),
-  mState( Clear ),
+  mState( CLEAR ),
   mThresholdAdjustmentsRemaining( 0 ),
   mThresholdTotalAdjustments( static_cast<unsigned int>( MINIMUM_MOTION_DISTANCE_BEFORE_PAN * MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO ) ),
   mPrimaryTouchDownTime( 0 ),
@@ -85,20 +85,20 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
   if (primaryPointState == PointState::INTERRUPTED)
   {
-    if ( ( mState == Started ) || ( mState == Possible ) )
+    if ( ( mState == STARTED ) || ( mState == POSSIBLE ) )
     {
       // If our pan had started and we are interrupted, then tell Core that pan is cancelled.
       mTouchEvents.push_back(event);
-      SendPan(Dali::Gesture::Cancelled, event);
+      SendPan(GestureState::CANCELLED, event);
     }
-    mState = Clear; // We should change our state to Clear.
+    mState = CLEAR; // We should change our state to CLEAR.
     mTouchEvents.clear();
   }
   else
   {
     switch (mState)
     {
-      case Clear:
+      case CLEAR:
       {
         if ( ( primaryPointState == PointState::DOWN ) || ( primaryPointState == PointState::STATIONARY ) || ( primaryPointState == PointState::MOTION ))
         {
@@ -108,8 +108,8 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           if (event.GetPointCount() == mMinimumTouchesRequired)
           {
             // We have satisfied the minimum touches required for a pan, tell core that a gesture may be possible and change our state accordingly.
-            mState = Possible;
-            SendPan(Dali::Gesture::Possible, event);
+            mState = POSSIBLE;
+            SendPan(GestureState::POSSIBLE, event);
           }
 
           mTouchEvents.push_back(event);
@@ -117,7 +117,7 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         break;
       }
 
-      case Possible:
+      case POSSIBLE:
       {
         unsigned int pointCount(event.GetPointCount());
         if ( (pointCount >= mMinimumTouchesRequired)&&(pointCount <= mMaximumTouchesRequired) )
@@ -133,8 +133,8 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
                  ( delta.LengthSquared() >= static_cast<float>( mMinimumDistanceSquared ) ) )
             {
               // If the touch point(s) have moved enough distance to be considered a pan, then tell Core that the pan gesture has started and change our state accordingly.
-              mState = Started;
-              SendPan(Dali::Gesture::Started, event);
+              mState = STARTED;
+              SendPan(GestureState::STARTED, event);
             }
           }
           else if (primaryPointState == PointState::UP)
@@ -142,40 +142,40 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             Vector2 delta(event.points[0].GetScreenPosition() - mPrimaryTouchDownLocation);
             if (delta.LengthSquared() >= static_cast<float>( mMinimumDistanceSquared ) )
             {
-              SendPan(Dali::Gesture::Started, event);
+              SendPan(GestureState::STARTED, event);
               mTouchEvents.push_back(event);
-              SendPan(Dali::Gesture::Finished, event);
+              SendPan(GestureState::FINISHED, event);
             }
             else
             {
-              // If we have lifted the primary touch point then tell core the pan is cancelled and change our state to Clear.
-              SendPan(Dali::Gesture::Cancelled, event);
+              // If we have lifted the primary touch point then tell core the pan is cancelled and change our state to CLEAR.
+              SendPan(GestureState::CANCELLED, event);
             }
-            mState = Clear;
+            mState = CLEAR;
             mTouchEvents.clear();
           }
         }
         else
         {
           // We do not satisfy pan conditions, tell Core our Gesture has been cancelled.
-          SendPan(Dali::Gesture::Cancelled, event);
+          SendPan(GestureState::CANCELLED, event);
 
           if (pointCount == 1 && primaryPointState == PointState::UP)
           {
-            // If we have lifted the primary touch point, then change our state to Clear...
-            mState = Clear;
+            // If we have lifted the primary touch point, then change our state to CLEAR...
+            mState = CLEAR;
             mTouchEvents.clear();
           }
           else
           {
-            // ...otherwise change it to Failed.
-            mState = Failed;
+            // ...otherwise change it to FAILED.
+            mState = FAILED;
           }
         }
         break;
       }
 
-      case Started:
+      case STARTED:
       {
         mTouchEvents.push_back(event);
 
@@ -186,13 +186,13 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           {
             case PointState::MOTION:
               // Pan is continuing, tell Core.
-              SendPan(Dali::Gesture::Continuing, event);
+              SendPan(GestureState::CONTINUING, event);
               break;
 
             case PointState::UP:
-              // Pan is finally finished when our primary point is lifted, tell Core and change our state to Clear.
-              mState = Clear;
-              SendPan(Dali::Gesture::Finished, event);
+              // Pan is finally finished when our primary point is lifted, tell Core and change our state to CLEAR.
+              mState = CLEAR;
+              SendPan(GestureState::FINISHED, event);
               mTouchEvents.clear();
               break;
 
@@ -204,9 +204,9 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
                 {
                   if(iter->GetState() == PointState::UP)
                   {
-                    // The number of touch points will be less than the minimum required.  Inform core and change our state to Finished.
-                    SendPan(Dali::Gesture::Finished, event);
-                    mState = Finished;
+                    // The number of touch points will be less than the minimum required.  Inform core and change our state to FINISHED.
+                    SendPan(GestureState::FINISHED, event);
+                    mState = FINISHED;
                     break;
                   }
                 }
@@ -220,30 +220,30 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         else
         {
           // We have gone outside of the pan requirements, inform Core that the gesture is finished.
-          SendPan(Dali::Gesture::Finished, event);
+          SendPan(GestureState::FINISHED, event);
 
           if (pointCount == 1 && primaryPointState == PointState::UP)
           {
-            // If this was the primary point being released, then we change our state back to Clear...
-            mState = Clear;
+            // If this was the primary point being released, then we change our state back to CLEAR...
+            mState = CLEAR;
             mTouchEvents.clear();
           }
           else
           {
-            // ...otherwise we change it to Finished.
-            mState = Finished;
+            // ...otherwise we change it to FINISHED.
+            mState = FINISHED;
           }
         }
         break;
       }
 
-      case Finished:
-      case Failed:
+      case FINISHED:
+      case FAILED:
       {
         if (primaryPointState == PointState::UP)
         {
           // Change our state back to clear when the primary touch point is released.
-          mState = Clear;
+          mState = CLEAR;
           mTouchEvents.clear();
         }
         break;
@@ -260,7 +260,7 @@ void PanGestureRecognizer::Update(const GestureRequest& request)
   mMaximumTouchesRequired = pan.maxTouches;
 }
 
-void PanGestureRecognizer::SendPan(Gesture::State state, const Integration::TouchEvent& currentEvent)
+void PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchEvent& currentEvent)
 {
   PanGestureEvent gesture(state);
   gesture.currentPosition = currentEvent.points[0].GetScreenPosition();
@@ -275,7 +275,7 @@ void PanGestureRecognizer::SendPan(Gesture::State state, const Integration::Touc
     uint32_t previousTime( previousEvent.time );
 
     // If we've just started then we want to remove the threshold from Core calculations.
-    if ( state == Dali::Gesture::Started )
+    if ( state == GestureState::STARTED )
     {
       previousPosition = mPrimaryTouchDownLocation;
       previousTime = mPrimaryTouchDownTime;

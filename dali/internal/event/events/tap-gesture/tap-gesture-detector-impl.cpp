@@ -64,7 +64,7 @@ TapGestureDetectorPtr TapGestureDetector::New( unsigned int tapsRequired )
 }
 
 TapGestureDetector::TapGestureDetector()
-: GestureDetector( Dali::Gesture::Tap ),
+: GestureDetector( GestureType::TAP ),
   mMinimumTapsRequired( DEFAULT_TAPS_REQUIRED ),
   mMaximumTapsRequired( DEFAULT_TAPS_REQUIRED ),
   mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
@@ -72,7 +72,7 @@ TapGestureDetector::TapGestureDetector()
 }
 
 TapGestureDetector::TapGestureDetector( unsigned int tapsRequired )
-: GestureDetector( Dali::Gesture::Tap ),
+: GestureDetector( GestureType::TAP ),
   mMinimumTapsRequired( tapsRequired ),
   mMaximumTapsRequired( tapsRequired ),
   mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )

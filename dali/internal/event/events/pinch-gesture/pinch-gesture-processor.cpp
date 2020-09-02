@@ -105,7 +105,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 PinchGestureProcessor::PinchGestureProcessor()
-: GestureProcessor( Dali::Gesture::Pinch ),
+: GestureProcessor( GestureType::PINCH ),
   mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
   mCurrentPinchEvent(NULL),
@@ -171,7 +171,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
 {
   switch ( pinchEvent.state )
   {
-    case Dali::Gesture::Started:
+    case GestureState::STARTED:
     {
       // The pinch gesture should only be sent to the gesture detector which first received it so that
       // it can be told when the gesture ends as well.
@@ -193,9 +193,9 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       break;
     }
 
-    case Dali::Gesture::Continuing:
-    case Dali::Gesture::Finished:
-    case Dali::Gesture::Cancelled:
+    case GestureState::CONTINUING:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       // Only send subsequent pinch gesture signals if we processed the pinch gesture when it started.
       // Check if actor is still touchable.
@@ -224,7 +224,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
           }
 
           // Clear current emitters if pinch gesture has ended or been cancelled.
-          if ( pinchEvent.state == Dali::Gesture::Finished || pinchEvent.state == Dali::Gesture::Cancelled )
+          if ( pinchEvent.state == GestureState::FINISHED || pinchEvent.state == GestureState::CANCELLED )
           {
             mCurrentPinchEmitters.clear();
             ResetActor();
@@ -239,14 +239,14 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       break;
     }
 
-    case Dali::Gesture::Clear:
+    case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
       break;
     }
-    case Dali::Gesture::Possible:
+    case GestureState::POSSIBLE:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Possible\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: POSSIBLE\n" );
       break;
     }
   }

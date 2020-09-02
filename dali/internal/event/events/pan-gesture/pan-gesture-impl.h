@@ -43,8 +43,8 @@ public:
   /**
    * @brief Default constructor
    */
-  PanGesture(Gesture::State state)
-  : Gesture(Dali::Gesture::Pan, state)
+  PanGesture(GestureState state)
+  : Gesture(GestureType::PAN, state)
   {
   }
 

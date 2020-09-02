@@ -16,8 +16,10 @@ SET(TC_SOURCES
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-OwnerPointer.cpp
         utc-Dali-Internal-PinchGesture.cpp
+        utc-Dali-Internal-PinchGestureProcessor.cpp
         utc-Dali-Internal-RotationGesture.cpp
         utc-Dali-Internal-TapGesture.cpp
+        utc-Dali-Internal-TapGestureProcessor.cpp
 )
 
 LIST(APPEND TC_SOURCES

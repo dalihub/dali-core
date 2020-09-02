@@ -1399,7 +1399,7 @@ public:
    * @param[in] type The gesture type.
    * @return True if the gesture is required, false otherwise.
    */
-  bool IsGestureRequred( Gesture::Type type ) const;
+  bool IsGestureRequired( GestureType::Value type ) const;
 
   // Signals
 

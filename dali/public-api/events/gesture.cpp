@@ -45,12 +45,12 @@ Gesture::~Gesture()
 {
 }
 
-Gesture::Type Gesture::GetType() const
+GestureType::Value Gesture::GetType() const
 {
   return GetImplementation(*this).GetType();
 }
 
-Gesture::State Gesture::GetState() const
+GestureState Gesture::GetState() const
 {
   return GetImplementation(*this).GetState();
 }

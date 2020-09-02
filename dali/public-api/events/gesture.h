@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 
 namespace Dali
 {
@@ -101,38 +102,11 @@ public:
   ~Gesture();
 
   /**
-   * @brief Enumeration for type of gesture.
-   * @SINCE_1_0.0
-   */
-  enum Type
-  {
-    Pinch      = 1 << 0, ///< When two touch points move away or towards each other. @SINCE_1_0.0
-    Pan        = 1 << 1, ///< When the user drags their finger(s) in a particular direction. @SINCE_1_0.0
-    Tap        = 1 << 2, ///< When the user taps the screen. @SINCE_1_0.0
-    LongPress  = 1 << 3, ///< When the user continues to touch the same area on the screen for the device configured time. @SINCE_1_0.0
-    Rotation   = 1 << 4, ///< When the user rotates two fingers around a particular ares of the screen. @SINCE_1_9.27
-  };
-
-  /**
-   * @brief Enumeration for state of the gesture.
-   * @SINCE_1_0.0
-   */
-  enum State
-  {
-    Clear,      ///< There is no state associated with this gesture. @SINCE_1_0.0
-    Started,    ///< The touched points on the screen have moved enough to be considered a gesture. @SINCE_1_0.0
-    Continuing, ///< The gesture is continuing. @SINCE_1_0.0
-    Finished,   ///< The user has lifted a finger or touched an additional point on the screen. @SINCE_1_0.0
-    Cancelled,  ///< The gesture has been cancelled. @SINCE_1_0.0
-    Possible    ///< A gesture is possible. @SINCE_1_0.0
-  };
-
-  /**
    * @brief The gesture type.
    * @SINCE_1_9.28
    * @return The gesture type
    */
-  Type GetType() const;
+  GestureType::Value GetType() const;
 
   /**
    * @brief The gesture state.
@@ -142,7 +116,7 @@ public:
    * @SINCE_1_9.28
    * @return The state of the gesture
    */
-  State GetState() const;
+  GestureState GetState() const;
 
   /**
    * @brief The time the gesture took place.

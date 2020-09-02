@@ -24,8 +24,8 @@ namespace Dali
 namespace Internal
 {
 
-LongPressGestureEvent::LongPressGestureEvent( Gesture::State state )
-: GestureEvent( Dali::Gesture::LongPress, state ),
+LongPressGestureEvent::LongPressGestureEvent( GestureState state )
+: GestureEvent( GestureType::LONG_PRESS, state ),
   numberOfTouches(1)
 {
 }

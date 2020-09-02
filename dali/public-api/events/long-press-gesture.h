@@ -38,8 +38,8 @@ class LongPressGesture;
 /**
  * @brief A LongPressGesture is emitted when the user touches and holds the screen with the stated number of fingers.
  *
- * This gesture can be in one of two states, when the long-press gesture is first detected: Gesture::Started
- * and when the long-press gesture ends: Gesture::Finished.
+ * This gesture can be in one of two states, when the long-press gesture is first detected: GestureState::STARTED
+ * and when the long-press gesture ends: GestureState::FINISHED.
  *
  * Long press gesture finishes when all touches have been released.
  *

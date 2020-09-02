@@ -254,7 +254,7 @@ private:
                       const GestureDetectorContainer& gestureDetectors,
                       const PanGestureEvent& panEvent,
                       Vector2 localCurrent,
-                      Gesture::State state,
+                      GestureState state,
                       RenderTaskPtr renderTask );
 
   // GestureProcessor overrides

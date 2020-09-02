@@ -28,7 +28,7 @@ namespace Dali
 namespace DevelPanGesture
 {
 
-Dali::PanGesture New( Gesture::State state )
+Dali::PanGesture New( GestureState state )
 {
   return PanGesture( new Internal::PanGesture( state ) );
 }

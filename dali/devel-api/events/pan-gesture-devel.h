@@ -32,7 +32,7 @@ namespace DevelPanGesture
  * @brief Create a PanGeture for internal.
  * @param[in] state The state of the PanGesture
  */
-DALI_CORE_API Dali::PanGesture New(Gesture::State state);
+DALI_CORE_API Dali::PanGesture New(GestureState state);
 
 /**
  * @brief Set the time the gesture took place.

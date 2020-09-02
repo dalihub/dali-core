@@ -43,8 +43,8 @@ public:
   /**
    * @brief Default constructor
    */
-  TapGesture( Gesture::State state )
-  : Gesture(Dali::Gesture::Tap, state)
+  TapGesture( GestureState state )
+  : Gesture(GestureType::TAP, state)
   {
   }
 

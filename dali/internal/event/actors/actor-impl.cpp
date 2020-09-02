@@ -1817,9 +1817,9 @@ ActorGestureData& Actor::GetGestureData()
   return *mGestureData;
 }
 
-bool Actor::IsGestureRequred( Gesture::Type type ) const
+bool Actor::IsGestureRequired( GestureType::Value type ) const
 {
-  return mGestureData && mGestureData->IsGestureRequred( type );
+  return mGestureData && mGestureData->IsGestureRequired( type );
 }
 
 bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )

@@ -669,7 +669,7 @@ int UtcDaliTapGestureSignalReceptionMultipleGestureDetectors(void)
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, first == data.tappedActor, TEST_LOCATION);
 
-    // Pan changes to double-touch - we shouldn't receive event
+    // Tap changes to double-touch - we shouldn't receive event
     data.Reset();
 
     TestGenerateTwoPointTap( application, 50.0f, 10.0f, 60.0f, 20.0f, 2000 );
@@ -745,7 +745,7 @@ int UtcDaliTapGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the tap.
+  // Emit STARTED event, we should not receive the tap.
   TestEndPan( application, Vector2(50.0f, 10.0f), 120 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
@@ -760,7 +760,7 @@ int UtcDaliTapGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the tap.
+  // Emit STARTED event, we should not receive the tap.
   TestEndPan( application, Vector2(50.0f, 10.0f), 720 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
@@ -819,7 +819,7 @@ int UtcDaliTapGestureDetectorRemovedWhilePossible(void)
   // Emit a possible - Down press, as emitted by long press function
   TestStartLongPress( application, 50.0f, 10.0f, 100 );
 
-  // Detach actor and send a Started state, no signal.
+  // Detach actor and send a STARTED state, no signal.
   detector.DetachAll();
   TestEndPan( application, Vector2(50.0f, 10.0f), 120 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
@@ -855,7 +855,7 @@ int UtcDaliTapGestureActorRemovedWhilePossible(void)
   application.Render();
   actor.Reset();
 
-  // Send a Started state, no signal - Up motion as provided by end pan function
+  // Send a STARTED state, no signal - Up motion as provided by end pan function
   TestEndPan( application, Vector2(50.0f, 10.0f), 120 );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;

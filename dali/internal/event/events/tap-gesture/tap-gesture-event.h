@@ -33,12 +33,12 @@ namespace Internal
  * send it to the Core.
  *
  * A Tap Gesture event should be in one of three states:
- * - Possible:  When the user first puts their finger down - Core needs to hit test the down point so
+ * - POSSIBLE:  When the user first puts their finger down - Core needs to hit test the down point so
  *              that a tap (down and up quickly) is also on the same actor.
- * - Started:   If a tap is detected (No Finished state is expected).
- * - Cancelled: If, after a down event, no tap is detected, or a system interruption.
+ * - STARTED:   If a tap is detected (No FINISHED state is expected).
+ * - CANCELLED: If, after a down event, no tap is detected, or a system interruption.
  *
- * A Started state will be ignored if a Possible state does not precede it.
+ * A STARTED state will be ignored if a POSSIBLE state does not precede it.
  */
 struct TapGestureEvent : public GestureEvent
 {
@@ -46,11 +46,11 @@ struct TapGestureEvent : public GestureEvent
 
   /**
    * Default Constructor
-   * @param[in]  state  Possible, denotes down press;
-   *                    Started, of a tap occurs; and
-   *                    Cancelled, when tap does not occur.
+   * @param[in]  state  POSSIBLE, denotes down press;
+   *                    STARTED, of a tap occurs; and
+   *                    CANCELLED, when tap does not occur.
    */
-  TapGestureEvent( Gesture::State state );
+  TapGestureEvent( GestureState state );
 
   /**
    * Virtual destructor

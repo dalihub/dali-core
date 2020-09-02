@@ -543,7 +543,7 @@ int UtcDaliPanGestureRecognizerOtherEvent(void)
   application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 152 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 60.0f ), 153 ) );      // Exercise default case in Started case. Not sure if realistic
+  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 60.0f ), 153 ) );      // Exercise default case in STARTED case. Not sure if realistic
   application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 65.0f ), 154 ) );
 
   application.SendNotification();

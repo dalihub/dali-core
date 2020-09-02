@@ -45,6 +45,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/public-api/events/gesture-detector.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/key-event.h>

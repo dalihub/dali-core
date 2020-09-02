@@ -41,11 +41,11 @@ public:
 
   /**
    * Default Constructor
-   * @param[in]  state  Started, when we detect a long press.
-   *                    Finished, when all touches are finished.
+   * @param[in]  state  STARTED, when we detect a long press.
+   *                    FINISHED, when all touches are finished.
    */
-  LongPressGesture( Gesture::State state )
-  : Gesture( Dali::Gesture::LongPress, state )
+  LongPressGesture( GestureState state )
+  : Gesture( GestureType::LONG_PRESS, state )
   {
   }
 

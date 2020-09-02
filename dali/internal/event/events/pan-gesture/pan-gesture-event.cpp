@@ -25,8 +25,8 @@ namespace Internal
 {
 
 
-PanGestureEvent::PanGestureEvent(Gesture::State state)
-: GestureEvent(Dali::Gesture::Pan, state),
+PanGestureEvent::PanGestureEvent(GestureState state)
+: GestureEvent(GestureType::PAN, state),
   timeDelta(0),
   numberOfTouches(1)
 {

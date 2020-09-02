@@ -75,7 +75,7 @@ public:
    * Returns the type of gesture detector.
    * @return Type of gesture detector.
    */
-  Gesture::Type GetType() const { return mType; }
+  GestureType::Value GetType() const { return mType; }
 
   /**
    * Called when we get a touch event.
@@ -95,7 +95,7 @@ protected:
    * @param[in]  screenSize    The size of the screen.
    * @param[in]  detectorType  The type of gesture detector.
    */
-  GestureRecognizer( Vector2 screenSize, Gesture::Type detectorType )
+  GestureRecognizer( Vector2 screenSize, GestureType::Value detectorType )
   : mScreenSize( screenSize ),
     mType( detectorType ),
     mScene( nullptr )
@@ -108,7 +108,7 @@ protected:
    * Use this constructor with the screen size is not used in the dereived class.
    * @param[in]  detectorType  The type of gesture detector.
    */
-  GestureRecognizer( Gesture::Type detectorType )
+  GestureRecognizer( GestureType::Value detectorType )
   : GestureRecognizer( Vector2::ZERO, detectorType )
   {
   }
@@ -120,7 +120,7 @@ protected:
 
 protected:
   Vector2 mScreenSize;
-  Gesture::Type mType;
+  GestureType::Value mType;
   Scene* mScene;
 };
 

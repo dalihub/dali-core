@@ -40,17 +40,12 @@ class Gesture : public BaseObject
 {
 public:
 
-  using State = Dali::Gesture::State;
-  using Type = Dali::Gesture::Type;
-
-public:
-
   /**
    * @brief Get the gesture type.
    *
    * @return The gesture type.
    */
-  inline Type GetType() const
+  inline GestureType::Value GetType() const
   {
     return mGestureType;
   }
@@ -59,7 +54,7 @@ public:
    * @brief Set the state of the gesture.
    * @param[in] state The state of the gesture to set
    */
-  inline void SetState( State state )
+  inline void SetState( GestureState state )
   {
     mState = state;
   }
@@ -69,7 +64,7 @@ public:
    *
    * @return The state of the gesture.
    */
-  inline State GetState() const
+  inline GestureState GetState() const
   {
     return mState;
   }
@@ -105,7 +100,7 @@ protected:
    * @param[in] gestureType   The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */
-  Gesture(Type gestureType, State gestureState)
+  Gesture(GestureType::Value gestureType, GestureState gestureState)
   : mGestureType( gestureType ),
     mState( gestureState )
   {
@@ -119,8 +114,8 @@ protected:
   virtual ~Gesture() = default;
 
 private:
-  Type mGestureType;
-  State mState;
+  GestureType::Value mGestureType;
+  GestureState mState;
   uint32_t mTime{0u};
 };
 

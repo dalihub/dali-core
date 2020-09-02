@@ -118,7 +118,7 @@ public:
      */
     PanInfo()
     : time( 0u ),
-      state( Dali::Gesture::Clear ),
+      state( GestureState::CLEAR ),
       read( true )
     {
     }
@@ -174,7 +174,7 @@ public:
 
     // Data
     unsigned int time;
-    Gesture::State state;
+    GestureState state;
     Info local;
     Info screen;
     volatile bool read;
@@ -561,7 +561,7 @@ private:
   volatile unsigned int mWritePosition;       ///< The next PanInfo buffer to write to. (starts at 0).
   unsigned int mReadPosition;                 ///< The next PanInfo buffer to read. (starts at 0).
   bool mNotAtTarget;                          ///< Keeps track of if the last gesture used was the most recent received.
-  bool mInGesture;                            ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled.
+  bool mInGesture;                            ///< True if the gesture is currently being handled i.e. between STARTED <-> FINISHED/CANCELLED.
   bool mPredictionAmountOverridden;
   bool mSmoothingAmountOverridden;
 

@@ -213,7 +213,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEvents(void)
   application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 90.0f, 90.0f ), 160 ) );
 
-  DALI_TEST_EQUALS( Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION );
+  DALI_TEST_EQUALS( GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   data.Reset();
 
@@ -257,20 +257,20 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEventsAfterStart(void)
   application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), PointState::DOWN, Vector2( 20.0f, 90.0f ), 150 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 90.0f, 90.0f ), 160 ) );
 
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 170 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 180 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 190 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 200 ) );
-  // > Test : not enough touch events to make the gesture state "Continuing"
-  DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.GetState(), TEST_LOCATION);
+  // > Test : not enough touch events to make the gesture state "CONTINUING"
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
 
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 210 ) );
   application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 20.0f ), PointState::MOTION, Vector2( 20.0f, 90.0f ), 220 ) );
-  // > Test : 6 touch events after start make the gesture state "Continuing"
-  DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.GetState(), TEST_LOCATION);
+  // > Test : 6 touch events after start make the gesture state "CONTINUING"
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
 
   END_TEST;
 }

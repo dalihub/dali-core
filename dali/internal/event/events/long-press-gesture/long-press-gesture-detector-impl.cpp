@@ -72,14 +72,14 @@ LongPressGestureDetectorPtr LongPressGestureDetector::New(unsigned int minTouche
 }
 
 LongPressGestureDetector::LongPressGestureDetector()
-: GestureDetector(Dali::Gesture::LongPress),
+: GestureDetector(GestureType::LONG_PRESS),
   mMinimumTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
   mMaximumTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
 {
 }
 
 LongPressGestureDetector::LongPressGestureDetector(unsigned int minTouches, unsigned int maxTouches)
-: GestureDetector(Dali::Gesture::LongPress),
+: GestureDetector(GestureType::LONG_PRESS),
   mMinimumTouchesRequired(minTouches),
   mMaximumTouchesRequired(maxTouches)
 {

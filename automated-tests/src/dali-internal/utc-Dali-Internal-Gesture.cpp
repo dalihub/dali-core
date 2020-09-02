@@ -41,7 +41,7 @@ namespace
 struct TestGesture : public Internal::Gesture
 {
 public:
-  TestGesture(Gesture::Type type, Gesture::State state)
+  TestGesture(GestureType::Value type, GestureState state)
   : Gesture(type, state) {}
 
   virtual ~TestGesture() {}
@@ -56,25 +56,25 @@ int UtcDaliGestureConstructorP(void)
   Gesture empty;
   DALI_TEST_CHECK( !empty );
 
-  Gesture pan( new TestGesture(Gesture::Pan, Gesture::Started) );
-  DALI_TEST_EQUALS(Gesture::Pan, pan.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, pan.GetState(), TEST_LOCATION);
+  Gesture pan( new TestGesture(GestureType::PAN, GestureState::STARTED) );
+  DALI_TEST_EQUALS(GestureType::PAN, pan.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, pan.GetState(), TEST_LOCATION);
 
-  Gesture pinch( new TestGesture(Gesture::Pinch, Gesture::Clear) );
-  DALI_TEST_EQUALS(Gesture::Pinch, pinch.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Clear, pinch.GetState(), TEST_LOCATION);
+  Gesture pinch( new TestGesture(GestureType::PINCH, GestureState::CLEAR) );
+  DALI_TEST_EQUALS(GestureType::PINCH, pinch.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CLEAR, pinch.GetState(), TEST_LOCATION);
 
   // Test copy constructor
   Gesture pan2(pan);
-  DALI_TEST_EQUALS(Gesture::Pan, pan2.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, pan2.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, pan2.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, pan2.GetState(), TEST_LOCATION);
   END_TEST;
 
   // Test move constructor
   const auto refCount = pan.GetObjectPtr()->ReferenceCount();
   Gesture pan3( std::move( pan ) );
   DALI_TEST_EQUALS(pan, Gesture(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, pan3.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, pan3.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(pan3.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
 
   END_TEST;
@@ -85,18 +85,18 @@ int UtcDaliGestureAssignmentP(void)
   TestApplication application; // Reset all test adapter return codes
 
   // Test Assignment operator
-  Gesture pan( new TestGesture(Gesture::Pan, Gesture::Finished) );
-  DALI_TEST_EQUALS(Gesture::Pan, pan.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, pan.GetState(), TEST_LOCATION);
+  Gesture pan( new TestGesture(GestureType::PAN, GestureState::FINISHED) );
+  DALI_TEST_EQUALS(GestureType::PAN, pan.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, pan.GetState(), TEST_LOCATION);
 
-  Gesture test( new TestGesture(Gesture::Pinch, Gesture::Started) );
-  DALI_TEST_EQUALS(Gesture::Pinch, test.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Started, test.GetState(), TEST_LOCATION);
+  Gesture test( new TestGesture(GestureType::PINCH, GestureState::STARTED) );
+  DALI_TEST_EQUALS(GestureType::PINCH, test.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, test.GetState(), TEST_LOCATION);
 
   // Copy assignment
   test = pan;
-  DALI_TEST_EQUALS(Gesture::Pan, test.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Finished, test.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, test.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, test.GetState(), TEST_LOCATION);
 
   // Move assignment
   const auto refCount = pan.GetObjectPtr()->ReferenceCount();
@@ -104,7 +104,7 @@ int UtcDaliGestureAssignmentP(void)
   DALI_TEST_EQUALS(pan3, Gesture(), TEST_LOCATION);
   pan3 = std::move(pan);
   DALI_TEST_EQUALS(pan, Gesture(), TEST_LOCATION);
-  DALI_TEST_EQUALS(Gesture::Pan, pan3.GetType(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureType::PAN, pan3.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(pan3.GetBaseObject().ReferenceCount(), refCount, TEST_LOCATION);
 
   END_TEST;
@@ -114,8 +114,8 @@ int UtcDaliGestureGetTypeP(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Gesture pan( new TestGesture(Gesture::Pan, Gesture::Started) );
-  DALI_TEST_EQUALS(Gesture::Pan, pan.GetType(), TEST_LOCATION);
+  Gesture pan( new TestGesture(GestureType::PAN, GestureState::STARTED) );
+  DALI_TEST_EQUALS(GestureType::PAN, pan.GetType(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -124,11 +124,11 @@ int UtcDaliGestureGetStateP(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Gesture pan( new TestGesture(Gesture::Pan, Gesture::Started) );
-  DALI_TEST_EQUALS(Gesture::Started, pan.GetState(), TEST_LOCATION);
+  Gesture pan( new TestGesture(GestureType::PAN, GestureState::STARTED) );
+  DALI_TEST_EQUALS(GestureState::STARTED, pan.GetState(), TEST_LOCATION);
 
-  GetImplementation(pan).SetState(Gesture::Finished);
-  DALI_TEST_EQUALS(Gesture::Finished, pan.GetState(), TEST_LOCATION);
+  GetImplementation(pan).SetState(GestureState::FINISHED);
+  DALI_TEST_EQUALS(GestureState::FINISHED, pan.GetState(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -137,7 +137,7 @@ int UtcDaliGestureGetTimeP(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Gesture pan( new TestGesture(Gesture::Pan, Gesture::Started) );
+  Gesture pan( new TestGesture(GestureType::PAN, GestureState::STARTED) );
   DALI_TEST_EQUALS(0, pan.GetTime(), TEST_LOCATION);
 
   GetImplementation(pan).SetTime(61282);

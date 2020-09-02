@@ -75,7 +75,7 @@ void EmitTapSignal(
 } // unnamed namespace
 
 TapGestureProcessor::TapGestureProcessor()
-: GestureProcessor( Dali::Gesture::Tap ),
+: GestureProcessor( GestureType::TAP ),
   mTapGestureDetectors(),
   mMinTapsRequired( 1 ),
   mMaxTapsRequired( 1 ),
@@ -94,7 +94,7 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
 {
   switch ( tapEvent.state )
   {
-    case Dali::Gesture::Possible:
+    case GestureState::POSSIBLE:
     {
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
@@ -113,7 +113,7 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
       break;
     }
 
-    case Dali::Gesture::Started:
+    case GestureState::STARTED:
     {
       // Ensure that we're processing a hit on the current actor and that we've already processed a touch down
       HitTestAlgorithm::Results hitTestResults;
@@ -131,26 +131,26 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
       break;
     }
 
-    case Dali::Gesture::Cancelled:
+    case GestureState::CANCELLED:
     {
       mPossibleProcessed = false;
       ResetActor();
       break;
     }
 
-    case Dali::Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CONTINUING\n" );
       break;
     }
-    case Dali::Gesture::Finished:
+    case GestureState::FINISHED:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Finished\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: FINISHED\n" );
       break;
     }
-    case Dali::Gesture::Clear:
+    case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
       break;
     }
   }

@@ -102,7 +102,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 LongPressGestureProcessor::LongPressGestureProcessor()
-: GestureProcessor( Dali::Gesture::LongPress ),
+: GestureProcessor( GestureType::LONG_PRESS ),
   mLongPressGestureDetectors(),
   mCurrentEmitters(),
   mCurrentRenderTask(),
@@ -121,7 +121,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
 {
   switch ( longPressEvent.state )
   {
-    case Dali::Gesture::Possible:
+    case GestureState::POSSIBLE:
     {
       mCurrentEmitters.clear();
       ResetActor();
@@ -134,7 +134,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Dali::Gesture::Started:
+    case GestureState::STARTED:
     {
       Actor* currentGesturedActor = GetCurrentGesturedActor();
       if ( currentGesturedActor )
@@ -161,7 +161,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Dali::Gesture::Finished:
+    case GestureState::FINISHED:
     {
       // The gesture should only be sent to the gesture detector which first received it so that it
       // can be told when the gesture ends as well.
@@ -195,22 +195,22 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
       break;
     }
 
-    case Dali::Gesture::Cancelled:
+    case GestureState::CANCELLED:
     {
       mCurrentEmitters.clear();
       ResetActor();
       break;
     }
 
-    case Dali::Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Continuing\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CONTINUING\n" );
       break;
     }
 
-    case Dali::Gesture::Clear:
+    case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
       break;
     }
   }

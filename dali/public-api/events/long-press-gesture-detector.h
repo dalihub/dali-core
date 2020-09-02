@@ -44,8 +44,8 @@ class LongPressGesture;
  * @SINCE_1_0.0
  *
  * For any valid long press, two signals will be emitted:
- * - First identifying the beginning (state = Started) i.e. when fingers held down for the required time.
- * - Second identifying the ending (state = Finished) i.e. when fingers are released.
+ * - First identifying the beginning (state = GestureState::STARTED) i.e. when fingers held down for the required time.
+ * - Second identifying the ending (state = GestureState::FINISHED) i.e. when fingers are released.
  *
  * The application programmer can use this gesture detector as follows:
  * @code

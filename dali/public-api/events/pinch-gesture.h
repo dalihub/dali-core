@@ -39,9 +39,9 @@ class PinchGesture;
  * @brief A PinchGesture is emitted when the user moves two fingers towards or away from each other.
  *
  * This gesture can be in one of three states; when the pinch gesture is first detected, its
- * state is set to Gesture::Started.  After this, if there is change in the gesture, the state will
- * be Gesture::Continuing. Finally, when the gesture ends, the state of the gesture changes to
- * Gesture::Finished.
+ * state is set to GestureState::STARTED.  After this, if there is change in the gesture, the state will
+ * be GestureState::CONTINUING. Finally, when the gesture ends, the state of the gesture changes to
+ * GestureState::FINISHED.
  *
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch
  * until the pinch ends.

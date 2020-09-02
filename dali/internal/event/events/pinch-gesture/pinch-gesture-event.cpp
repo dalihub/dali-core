@@ -27,8 +27,8 @@ namespace Dali
 namespace Internal
 {
 
-PinchGestureEvent::PinchGestureEvent(Gesture::State state)
-: GestureEvent(Dali::Gesture::Pinch, state),
+PinchGestureEvent::PinchGestureEvent(GestureState state)
+: GestureEvent(GestureType::PINCH, state),
   scale(0.0f),
   speed(0.0f),
   centerPoint()

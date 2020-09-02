@@ -102,7 +102,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 RotationGestureProcessor::RotationGestureProcessor()
-: GestureProcessor( Dali::Gesture::Rotation ),
+: GestureProcessor( GestureType::ROTATION ),
   mRotationGestureDetectors(),
   mCurrentRotationEmitters(),
   mCurrentRotationEvent( nullptr ),
@@ -115,7 +115,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
 {
   switch ( rotationEvent.state )
   {
-    case Dali::Gesture::Started:
+    case GestureState::STARTED:
     {
       // The rotation gesture should only be sent to the gesture detector which first received it so that
       // it can be told when the gesture ends as well.
@@ -137,9 +137,9 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       break;
     }
 
-    case Dali::Gesture::Continuing:
-    case Dali::Gesture::Finished:
-    case Dali::Gesture::Cancelled:
+    case GestureState::CONTINUING:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       // Only send subsequent rotation gesture signals if we processed the rotation gesture when it started.
       // Check if actor is still touchable.
@@ -168,7 +168,7 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
           }
 
           // Clear current emitters if rotation gesture has ended or been cancelled.
-          if ( rotationEvent.state == Dali::Gesture::Finished || rotationEvent.state == Dali::Gesture::Cancelled )
+          if ( rotationEvent.state == GestureState::FINISHED || rotationEvent.state == GestureState::CANCELLED )
           {
             mCurrentRotationEmitters.clear();
             ResetActor();
@@ -183,8 +183,8 @@ void RotationGestureProcessor::Process( Scene& scene, const RotationGestureEvent
       break;
     }
 
-    case Dali::Gesture::Clear:
-    case Dali::Gesture::Possible:
+    case GestureState::CLEAR:
+    case GestureState::POSSIBLE:
     {
       // Nothing to do
       break;

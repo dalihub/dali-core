@@ -58,7 +58,7 @@ RotationGestureDetectorPtr RotationGestureDetector::New()
 }
 
 RotationGestureDetector::RotationGestureDetector()
-: GestureDetector( Dali::Gesture::Rotation )
+: GestureDetector( GestureType::ROTATION )
 {
 }
 
