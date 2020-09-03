@@ -56,21 +56,6 @@ Internal::CustomActor* CustomActorImpl::GetOwner() const
   return mOwner;
 }
 
-bool CustomActorImpl::RequiresTouchEvents() const
-{
-  return ( mFlags & REQUIRES_TOUCH_EVENTS );
-}
-
-bool CustomActorImpl::RequiresHoverEvents() const
-{
-  return ( mFlags & REQUIRES_HOVER_EVENTS );
-}
-
-bool CustomActorImpl::RequiresWheelEvents() const
-{
-  return ( mFlags & REQUIRES_WHEEL_EVENTS );
-}
-
 bool CustomActorImpl::IsRelayoutEnabled() const
 {
   return ( mFlags & DISABLE_SIZE_NEGOTIATION ) == 0;

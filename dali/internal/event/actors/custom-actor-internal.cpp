@@ -40,9 +40,6 @@ CustomActor::CustomActor( const SceneGraph::Node& node, CustomActorImpl& extensi
 : Actor( Actor::BASIC, node ),
   mImpl( &extension )
 {
-  mDerivedRequiresTouch = extension.RequiresTouchEvents();
-  mDerivedRequiresHover = extension.RequiresHoverEvents();
-  mDerivedRequiresWheelEvent = extension.RequiresWheelEvents();
   SetRelayoutEnabled( extension.IsRelayoutEnabled() );
 }
 

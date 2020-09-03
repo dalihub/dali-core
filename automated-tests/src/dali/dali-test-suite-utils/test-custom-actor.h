@@ -138,9 +138,6 @@ public:
   void OnPropertySet( Dali::Property::Index index, Dali::Property::Value propertyValue ) override;
   void OnSizeSet(const Dali::Vector3& targetSize) override;
   void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override;
-  bool OnHoverEvent(const Dali::HoverEvent& event) override;
-  bool OnWheelEvent(const Dali::WheelEvent& event) override;
-  bool OnKeyEvent(const Dali::KeyEvent& event) override;
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
   Dali::Vector3 GetNaturalSize() override;
@@ -431,7 +428,7 @@ public:
    * Constructor
    */
   SimpleTestCustomActor()
-  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | DISABLE_SIZE_NEGOTIATION ) )
+  : CustomActorImpl( ActorFlags( DISABLE_SIZE_NEGOTIATION ) )
   {
   }
 
@@ -461,25 +458,12 @@ public:
   void OnSizeAnimation(Dali::Animation& animation, const Dali::Vector3& targetSize) override
   {
   }
-  bool OnHoverEvent(const Dali::HoverEvent& event) override
-  {
-    return true;
-  }
-  bool OnWheelEvent(const Dali::WheelEvent& event) override
-  {
-    return true;
-  }
-  bool OnKeyEvent(const Dali::KeyEvent& event) override
-  {
-    return true;
-  }
   virtual void OnKeyInputFocusGained()
   {
   }
   virtual void OnKeyInputFocusLost()
   {
   }
-
   Dali::Vector3 GetNaturalSize() override
   {
     return Dali::Vector3( 0.0f, 0.0f, 0.0f );
