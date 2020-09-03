@@ -1788,17 +1788,17 @@ bool Actor::IsKeyboardFocusable() const
 
 bool Actor::GetTouchRequired() const
 {
-  return !mTouchedSignal.Empty() || mDerivedRequiresTouch;
+  return !mTouchedSignal.Empty();
 }
 
 bool Actor::GetHoverRequired() const
 {
-  return !mHoveredSignal.Empty() || mDerivedRequiresHover;
+  return !mHoveredSignal.Empty();
 }
 
 bool Actor::GetWheelEventRequired() const
 {
-  return !mWheelEventSignal.Empty() || mDerivedRequiresWheelEvent;
+  return !mWheelEventSignal.Empty();
 }
 
 bool Actor::IsHittable() const
@@ -1845,12 +1845,6 @@ bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
     consumed = mHoveredSignal.Emit( handle, event );
   }
 
-  if( !consumed )
-  {
-    // Notification for derived classes
-    consumed = OnHoverEvent( event );
-  }
-
   return consumed;
 }
 
@@ -1862,12 +1856,6 @@ bool Actor::EmitWheelEventSignal( const Dali::WheelEvent& event )
   {
     Dali::Actor handle( this );
     consumed = mWheelEventSignal.Emit( handle, event );
-  }
-
-  if( !consumed )
-  {
-    // Notification for derived classes
-    consumed = OnWheelEvent( event );
   }
 
   return consumed;
@@ -2055,9 +2043,6 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mSensitive( true ),
   mLeaveRequired( false ),
   mKeyboardFocusable( false ),
-  mDerivedRequiresTouch( false ),
-  mDerivedRequiresHover( false ),
-  mDerivedRequiresWheelEvent( false ),
   mOnSceneSignalled( false ),
   mInsideOnSizeSet( false ),
   mInheritPosition( true ),

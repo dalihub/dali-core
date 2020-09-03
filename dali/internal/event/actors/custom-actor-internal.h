@@ -134,30 +134,6 @@ private:
   }
 
   /**
-   * @copydoc Internal::Actor::OnHoverEvent
-   */
-  virtual bool OnHoverEvent(const HoverEvent& event)
-  {
-    return mImpl->OnHoverEvent(event);
-  }
-
-  /**
-   * @copydoc Internal::Actor::OnKeyEvent
-   */
-  virtual bool OnKeyEvent(const KeyEvent& event)
-  {
-    return mImpl->OnKeyEvent(event);
-  }
-
-  /**
-   * @copydoc Internal::Actor::OnWheelEvent
-   */
-  virtual bool OnWheelEvent(const WheelEvent& event)
-  {
-    return mImpl->OnWheelEvent(event);
-  }
-
-  /**
    * @copydoc Internal::Actor::OnRelayout
    */
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )

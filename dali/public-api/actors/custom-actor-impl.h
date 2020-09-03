@@ -175,35 +175,6 @@ public:
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
 
   /**
-   * @brief Called after a hover-event is received by the owning actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] event The hover event
-   * @return True if the event should be consumed
-   * @note CustomActorImpl::REQUIRES_HOVER_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
-   */
-  virtual bool OnHoverEvent(const HoverEvent& event) = 0;
-
-  /**
-   * @brief Called after a key-event is received by the actor that has had its focus set.
-   *
-   * @SINCE_1_0.0
-   * @param[in] event The Key Event
-   * @return True if the event should be consumed
-   */
-  virtual bool OnKeyEvent(const KeyEvent& event) = 0;
-
-  /**
-   * @brief Called after a wheel-event is received by the owning actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] event The wheel event
-   * @return True if the event should be consumed
-   * @note CustomActorImpl::REQUIRES_WHEEL_EVENTS must be enabled during construction. See CustomActorImpl::CustomActorImpl( ActorFlags flags ).
-   */
-  virtual bool OnWheelEvent(const WheelEvent& event) = 0;
-
-  /**
    * @brief Called after the size negotiation has been finished for this control.
    *
    * The control is expected to assign this given size to itself/its children.
@@ -319,9 +290,6 @@ protected: // For derived classes
   {
     ACTOR_BEHAVIOUR_DEFAULT       = 0,          ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
     DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
-    REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required. @SINCE_1_0.0
-    REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required. @SINCE_1_0.0
-    REQUIRES_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnWheelEvent() callback is required. @SINCE_1_0.0
 
     LAST_ACTOR_FLAG                             ///< Special marker for last actor flag @SINCE_1_0.0
   };
@@ -408,30 +376,6 @@ public: // Not intended for application developers
   Internal::CustomActor* GetOwner() const;
 
   /**
-   * @brief Returns whether the OnTouchEvent() callback is required.
-   * @SINCE_1_0.0
-   * @return True if the OnTouchEvent() callback is required
-   * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   */
-  bool RequiresTouchEvents() const;
-
-  /**
-   * @brief Returns whether the OnHoverEvent() callback is required.
-   * @SINCE_1_0.0
-   * @return True if the OnHoverEvent() callback is required
-   * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   */
-  bool RequiresHoverEvents() const;
-
-  /**
-   * @brief Returns whether the OnWheelEvent() callback is required.
-   * @SINCE_1_0.0
-   * @return True if the OnWheelEvent() callback is required
-   * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   */
-  bool RequiresWheelEvents() const;
-
-  /**
    * @brief Returns whether relayout is enabled.
    * @SINCE_1_0.0
    * @return Return true if relayout is enabled on the custom actor
@@ -442,7 +386,7 @@ public: // Not intended for application developers
 private:
 
   Internal::CustomActor* mOwner;        ///< Internal owner of this custom actor implementation
-  ActorFlags mFlags :ACTOR_FLAG_COUNT;  ///< ActorFlags flags to determine behaviour
+  ActorFlags mFlags;  ///< ActorFlags flags to determine behaviour
 };
 
 /**
