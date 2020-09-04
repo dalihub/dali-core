@@ -28,7 +28,7 @@ GestureEvent::~GestureEvent()
 {
 }
 
-GestureEvent::GestureEvent( Gesture::Type gesture, Gesture::State gestureState )
+GestureEvent::GestureEvent( GestureType::Value gesture, GestureState gestureState )
 : gestureType( gesture ),
   state( gestureState ),
   time( 0 )

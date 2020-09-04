@@ -437,7 +437,7 @@ int UtcDaliSceneCreateNewSceneDuringCoreEventProcessing(void)
   TouchedSignalData data;
   data.createNewScene = true;
   TouchFunctor functor( data );
-  scene.TouchSignal().Connect( &application, functor );
+  scene.TouchedSignal().Connect( &application, functor );
 
   // Render and notify.
   application.SendNotification();
@@ -620,14 +620,14 @@ int UtcDaliSceneSignalKeyEventN(void)
   END_TEST;
 }
 
-int UtcDaliSceneTouchSignalP(void)
+int UtcDaliSceneTouchedSignalP(void)
 {
   TestApplication application;
   Dali::Integration::Scene scene = application.GetScene();
 
   TouchedSignalData data;
   TouchFunctor functor( data );
-  scene.TouchSignal().Connect( &application, functor );
+  scene.TouchedSignal().Connect( &application, functor );
 
   // Render and notify.
   application.SendNotification();
@@ -655,7 +655,7 @@ int UtcDaliSceneTouchSignalP(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
+  actor.TouchedSignal().Connect( &DummyTouchCallback );
   scene.Add( actor );
 
   // Render and notify.
@@ -732,14 +732,14 @@ int UtcDaliSceneTouchSignalP(void)
   END_TEST;
 }
 
-int UtcDaliSceneTouchSignalN(void)
+int UtcDaliSceneTouchedSignalN(void)
 {
   TestApplication application;
   Dali::Integration::Scene scene = application.GetScene();
 
   TouchedSignalData data;
   TouchFunctor functor( data );
-  scene.TouchSignal().Connect( &application, functor );
+  scene.TouchedSignal().Connect( &application, functor );
 
   // Render and notify.
   application.SendNotification();
@@ -778,7 +778,7 @@ int UtcDaliSceneTouchSignalN(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
+  actor.TouchedSignal().Connect( &DummyTouchCallback );
   scene.Add( actor );
 
   // Render and notify.

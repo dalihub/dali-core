@@ -22,7 +22,7 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
@@ -55,9 +55,9 @@ inline Vector2 GetCenterPoint( const Integration::Point& point1, const Integrati
 } // unnamed namespace
 
 RotationGestureRecognizer::RotationGestureRecognizer( Observer& observer, uint32_t minimumTouchEvents, uint32_t minimumTouchEventsAfterStart )
-: GestureRecognizer( Gesture::Rotation ),
+: GestureRecognizer( GestureType::ROTATION ),
   mObserver( observer ),
-  mState( Clear ),
+  mState( CLEAR ),
   mTouchEvents(),
   mStartingAngle( 0.0f ),
   mMinimumTouchEvents( minimumTouchEvents ),
@@ -72,23 +72,23 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
 
   switch( mState )
   {
-    case Clear:
+    case CLEAR:
     {
       if( pointCount == 2 )
       {
         // Change state to possible as we have two touch points.
-        mState = Possible;
+        mState = POSSIBLE;
         mTouchEvents.push_back( event );
       }
       break;
     }
 
-    case Possible:
+    case POSSIBLE:
     {
       if ( pointCount != 2 )
       {
-        // We no longer have two touch points so change state back to Clear.
-        mState = Clear;
+        // We no longer have two touch points so change state back to CLEAR.
+        mState = CLEAR;
         mTouchEvents.clear();
       }
       else
@@ -98,8 +98,8 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
 
         if( currentPoint1.GetState() == PointState::UP || currentPoint2.GetState() == PointState::UP || currentPoint1.GetState() == PointState::INTERRUPTED )
         {
-          // One of our touch points has an Up event so change our state back to Clear.
-          mState = Clear;
+          // One of our touch points has an Up event so change our state back to CLEAR.
+          mState = CLEAR;
           mTouchEvents.clear();
         }
         else
@@ -117,17 +117,17 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
               mStartingAngle = GetAngle( mTouchEvents.begin()->points[0], mTouchEvents.begin()->points[1] );
 
               // Send rotation started
-              SendRotation( Gesture::Started, event );
+              SendRotation( GestureState::STARTED, event );
 
-              mState = Started;
+              mState = STARTED;
             }
 
             mTouchEvents.clear();
 
-            if( mState == Possible )
+            if( mState == POSSIBLE )
             {
               // No rotation, so restart detection
-              mState = Clear;
+              mState = CLEAR;
               mTouchEvents.clear();
             }
           }
@@ -136,22 +136,22 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
       break;
     }
 
-    case Started:
+    case STARTED:
     {
       if(event.points[0].GetState() == PointState::INTERRUPTED)
       {
         // System interruption occurred, rotation should be cancelled
         mTouchEvents.clear();
-        SendRotation(Gesture::Cancelled, event);
-        mState = Clear;
+        SendRotation(GestureState::CANCELLED, event);
+        mState = CLEAR;
         mTouchEvents.clear();
       }
       else if( pointCount != 2 )
       {
         // Send rotation finished event
-        SendRotation( Gesture::Finished, event );
+        SendRotation( GestureState::FINISHED, event );
 
-        mState = Clear;
+        mState = CLEAR;
         mTouchEvents.clear();
       }
       else
@@ -164,9 +164,9 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
         {
           mTouchEvents.push_back( event );
           // Send rotation finished event
-          SendRotation( Gesture::Finished, event );
+          SendRotation( GestureState::FINISHED, event );
 
-          mState = Clear;
+          mState = CLEAR;
           mTouchEvents.clear();
         }
         else
@@ -176,7 +176,7 @@ void RotationGestureRecognizer::SendEvent( const Integration::TouchEvent& event 
           if( mTouchEvents.size() >= mMinimumTouchEventsAfterStart )
           {
             // Send rotation continuing
-            SendRotation( Gesture::Continuing, event );
+            SendRotation( GestureState::CONTINUING, event );
 
             mTouchEvents.clear();
           }
@@ -197,10 +197,9 @@ void RotationGestureRecognizer::SetMinimumTouchEventsAfterStart( uint32_t value 
   mMinimumTouchEventsAfterStart = value;
 }
 
-void RotationGestureRecognizer::SendRotation( Gesture::State state, const Integration::TouchEvent& currentEvent )
+void RotationGestureRecognizer::SendRotation( GestureState state, const Integration::TouchEvent& currentEvent )
 {
   RotationGestureEvent gesture( state );
-
   if( !mTouchEvents.empty() )
   {
     // Assert if we have been holding TouchEvents that do not have 2 points
@@ -223,7 +222,7 @@ void RotationGestureRecognizer::SendRotation( Gesture::State state, const Integr
   else
   {
     // Something has gone wrong, just cancel the gesture.
-    gesture.state = Gesture::Cancelled;
+    gesture.state = GestureState::CANCELLED;
   }
 
   gesture.time = currentEvent.time;

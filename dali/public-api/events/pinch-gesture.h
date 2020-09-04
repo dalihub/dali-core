@@ -2,7 +2,7 @@
 #define DALI_PINCH_GESTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@
 
 namespace Dali
 {
+
+namespace Internal DALI_INTERNAL
+{
+class PinchGesture;
+}
+
 /**
  * @addtogroup dali_core_events
  * @{
@@ -33,74 +39,108 @@ namespace Dali
  * @brief A PinchGesture is emitted when the user moves two fingers towards or away from each other.
  *
  * This gesture can be in one of three states; when the pinch gesture is first detected, its
- * state is set to Gesture::Started.  After this, if there is change in the gesture, the state will
- * be Gesture::Continuing. Finally, when the gesture ends, the state of the gesture changes to
- * Gesture::Finished.
+ * state is set to GestureState::STARTED.  After this, if there is change in the gesture, the state will
+ * be GestureState::CONTINUING. Finally, when the gesture ends, the state of the gesture changes to
+ * GestureState::FINISHED.
  *
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch
  * until the pinch ends.
- * @SINCE_1_0.0
+ * @SINCE_1_9.28
  */
-struct DALI_CORE_API PinchGesture: public Gesture
+class DALI_CORE_API PinchGesture: public Gesture
 {
-  // Construction & Destruction
+public:
 
   /**
-   * @brief Default Constructor.
+   * @brief Creates an uninitialized PinchGesture handle.
    *
-   * @SINCE_1_0.0
-   * @param[in] state The state of the gesture
+   * Calling member functions with an uninitialized Actor handle is not allowed.
+   * @SINCE_1_9.28
    */
-  PinchGesture(Gesture::State state);
+  PinchGesture();
 
   /**
    * @brief Copy constructor.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    */
   PinchGesture( const PinchGesture& rhs );
 
   /**
+   * @brief Move constructor.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   */
+  PinchGesture( PinchGesture&& rhs );
+
+  /**
    * @brief Assignment operator.
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
   PinchGesture& operator=( const PinchGesture& rhs );
 
   /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
+   * @brief Assignment operator.
+   * @SINCE_1_9.28
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
    */
-  virtual ~PinchGesture();
+  PinchGesture& operator=( PinchGesture&& rhs );
 
-  // Data
+  /**
+   * @brief Non virtual destructor.
+   * @SINCE_1_9.28
+   */
+  ~PinchGesture();
 
   /**
    * @brief The scale factor from the start of the pinch gesture till the latest pinch gesture.
    *
-   * If the user is moving their fingers away from each other, then
-   * this value increases.  Conversely, if the user is moving their
-   * fingers towards each other, this value will decrease.
+   * If the user is moving their fingers away from each other, then this value increases.
+   * Conversely, if the user is moving their fingers towards each other, this value will
+   * decrease.
+   * @SINCE_1_9.28
+   * @return The scale of the pinch (from the pinch start)
    */
-  float scale;
+  float GetScale() const;
 
   /**
    * @brief The speed at which the user is moving their fingers.
    *
    * This is the pixel movement per second.
+   * @SINCE_1_9.28
+   * @return The speed of the pinch (pixels per second)
    */
-  float speed;
+  float GetSpeed() const;
 
   /**
    * @brief The center point of the two points that caused the pinch gesture in screen coordinates.
+   * @SINCE_1_9.28
+   * @return The current center point of the pinch (in screen coordinates)
    */
-  Vector2 screenCenterPoint;
+  const Vector2& GetScreenCenterPoint() const;
 
   /**
    * @brief The center point of the two points that caused the pinch gesture in local actor coordinates.
+   * @SINCE_1_9.28
+   * @return The current center point of the pinch (in local actor coordinates)
    */
-  Vector2 localCenterPoint;
+  const Vector2& GetLocalCenterPoint() const;
+
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized PinchGesture handle.
+   *
+   * @param[in] PinchGesture A pointer to a newly allocated Dali resource
+   * @SINCE_1_9.28
+   */
+  explicit DALI_INTERNAL PinchGesture( Internal::PinchGesture* pinchGesture );
+  /// @endcond
+
 };
 
 /**

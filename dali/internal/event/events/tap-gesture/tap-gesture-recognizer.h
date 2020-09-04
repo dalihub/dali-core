@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ private:
    * @param[in] state current state of incomplete gesture
    * @param[in] time time of this latest touch event
    */
-  void EmitGesture( Gesture::State state, uint32_t time );
+  void EmitGesture( GestureState state, uint32_t time );
 
   /**
    * Initialises tap gesture detector for next tap sequence
@@ -132,10 +132,10 @@ private:
    */
   enum State
   {
-    Clear,      ///< No gesture detected.
-    Touched,    ///< User is touching the screen.
-    Registered, ///< At least one tap has been registered.
-    Failed,     ///< Gesture has failed.
+    CLEAR,      ///< No gesture detected.
+    TOUCHED,    ///< User is touching the screen.
+    REGISTERED, ///< At least one tap has been registered.
+    FAILED,     ///< Gesture has failed.
   };
 
   State mState; ///< Current state of the detector.

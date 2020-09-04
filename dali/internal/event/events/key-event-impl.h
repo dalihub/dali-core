@@ -71,11 +71,6 @@ public:
             const Device::Subclass::Type deviceSubclass );
 
   /**
-   * @brief Destructor.
-   */
-  ~KeyEvent();
-
-  /**
    * Create a new KeyEvent.
    *
    * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
@@ -216,6 +211,13 @@ public:
   void SetState( const Dali::KeyEvent::State& state );
 
 private:
+
+  /**
+   * @brief Destructor.
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~KeyEvent() = default;
 
   // Not copyable or movable
 

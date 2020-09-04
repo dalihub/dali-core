@@ -2641,7 +2641,7 @@ int UtcDaliActorTouchedSignal(void)
   application.Render();
 
   // connect to its touch signal
-  actor.TouchSignal().Connect( TestTouchCallback );
+  actor.TouchedSignal().Connect( TestTouchCallback );
 
   // simulate a touch event in the middle of the screen
   Vector2 touchPoint( application.GetScene().GetSize() * 0.5 );
@@ -2882,7 +2882,7 @@ int UtcDaliActorHitTest(void)
     DALI_TEST_CHECK( !gTouchCallBackCalled );
 
     // connect to its touch signal
-    actor.TouchSignal().Connect(TestTouchCallback);
+    actor.TouchedSignal().Connect(TestTouchCallback);
 
     Dali::Integration::Point point;
     point.SetState( PointState::DOWN );
@@ -4855,9 +4855,9 @@ int UtcDaliActorRaiseLower(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   // Connect ChildOrderChangedSignal
   bool orderChangedSignal( false );
@@ -5034,9 +5034,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
@@ -5221,9 +5221,9 @@ int UtcDaliActorRaiseAbove(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   bool orderChangedSignal( false );
   Actor orderChangedActor;
@@ -5386,9 +5386,9 @@ int UtcDaliActorLowerBelow(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
@@ -5580,9 +5580,9 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
@@ -5666,9 +5666,9 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
@@ -5827,9 +5827,9 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   Dali::Integration::Point point;
   point.SetDeviceId( 1 );
@@ -5984,9 +5984,9 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchSignal().Connect( TestTouchCallback );
-  actorB.TouchSignal().Connect( TestTouchCallback2 );
-  actorC.TouchSignal().Connect( TestTouchCallback3 );
+  actorA.TouchedSignal().Connect( TestTouchCallback );
+  actorB.TouchedSignal().Connect( TestTouchCallback2 );
+  actorC.TouchedSignal().Connect( TestTouchCallback3 );
 
   ResetTouchCallbacks();
 
@@ -7251,7 +7251,7 @@ int utcDaliActorCulled(void)
   DALI_TEST_EQUALS( actor.GetProperty< bool >( Actor::Property::CULLED ), false, TEST_LOCATION );
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::CULLED, LessThanCondition( 0.5f ) );
-  notification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+  notification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
   // Connect NotifySignal
   bool propertyNotificationSignal( false );
@@ -8000,13 +8000,13 @@ int UtcDaliActorAddRendererNegative(void)
   END_TEST;
 }
 
-int UtcDaliActorTouchSignalNegative(void)
+int UtcDaliActorTouchedSignalNegative(void)
 {
   TestApplication application;
   Dali::Actor instance;
   try
   {
-    instance.TouchSignal();
+    instance.TouchedSignal();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)

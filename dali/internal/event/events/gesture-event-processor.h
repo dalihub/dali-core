@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/events/gesture.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-processor.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-processor.h>
@@ -29,8 +30,6 @@
 
 namespace Dali
 {
-
-struct Gesture;
 
 namespace Integration
 {
@@ -105,7 +104,7 @@ public: // To be called by gesture detectors
    * @param[in]  gesture  The gesture whose values will be used in the Update object.
    * @note If we are in the middle of processing the gesture being set, then this call is ignored.
    */
-  void SetGestureProperties( const Gesture& gesture );
+  void SetGestureProperties( const Dali::Gesture& gesture );
 
 public: // Called by Core
 

@@ -75,10 +75,6 @@ KeyEvent::KeyEvent( const std::string& keyName,
 {
 }
 
-KeyEvent::~KeyEvent()
-{
-}
-
 KeyEventPtr KeyEvent::New( const std::string& keyName,
                            const std::string& logicalKey,
                            const std::string& keyString,

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PINCH_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ private:
    * @param[in]  state         The state of the pinch (whether it's starting, continuing or finished).
    * @param[in]  currentEvent  The latest touch event.
    */
-  void SendPinch(Gesture::State state, const Integration::TouchEvent& currentEvent);
+  void SendPinch(GestureState state, const Integration::TouchEvent& currentEvent);
 
 private:
 
@@ -105,9 +105,9 @@ private:
    */
   enum State
   {
-    Clear,    ///< No gesture detected.
-    Possible, ///< The current touch event data suggests that a gesture is possible.
-    Started,  ///< A gesture has been detected.
+    CLEAR,    ///< No gesture detected.
+    POSSIBLE, ///< The current touch event data suggests that a gesture is possible.
+    STARTED,  ///< A gesture has been detected.
   };
 
   State mState; ///< The current state of the detector.

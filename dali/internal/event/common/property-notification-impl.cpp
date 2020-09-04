@@ -68,7 +68,7 @@ PropertyNotification::PropertyNotification( UpdateManager& updateManager,
   mPropertyType( Property::NONE ),
   mComponentIndex( componentIndex ),
   mCondition( condition ),
-  mNotifyMode( Dali::PropertyNotification::NotifyOnTrue ),
+  mNotifyMode( Dali::PropertyNotification::NOTIFY_ON_TRUE ),
   mNotifyResult( false ),
   mCompare( false )
 {

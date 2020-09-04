@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,7 +259,7 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
   return allowed;
 }
 
-void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const PanGesture& pan)
+void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::PanGesture& pan)
 {
   if ( !mDetectedSignal.Empty() )
   {
@@ -290,13 +290,13 @@ bool PanGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerI
   return connected;
 }
 
-void PanGestureDetector::SetPanGestureProperties( const PanGesture& pan )
+void PanGestureDetector::SetPanGestureProperties( const Dali::PanGesture& pan )
 {
   ThreadLocalStorage::Get().GetGestureEventProcessor().SetGestureProperties( pan );
 }
 
 PanGestureDetector::PanGestureDetector( const SceneGraph::PanGesture& sceneObject )
-: GestureDetector(Gesture::Pan, &sceneObject ),
+: GestureDetector( GestureType::PAN, &sceneObject ),
   mMinimumTouches(1),
   mMaximumTouches(1)
 {

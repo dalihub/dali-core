@@ -46,14 +46,14 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_HOVER_PROCESSOR" );
 
-const char * TOUCH_POINT_STATE[TouchPoint::Last] =
+const char * TOUCH_POINT_STATE[PointState::INTERRUPTED + 1] =
 {
-  "Started",
-  "Finished",
-  "Motion",
-  "Leave",
-  "Stationary",
-  "Interrupted",
+  "STARTED",
+  "FINISHED",
+  "MOTION",
+  "LEAVE",
+  "STATIONARY",
+  "INTERRUPTED",
 };
 
 #endif // defined(DEBUG_ENABLED)
@@ -176,7 +176,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   DALI_LOG_TRACE_METHOD( gLogFilter );
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty HoverEvent sent from Integration\n" );
 
-  TouchPoint::State state = static_cast< TouchPoint::State >( event.points[0].GetState() );
+  PointState::Type state = static_cast< PointState::Type >( event.points[0].GetState() );
 
   PRINT_HIERARCHY(gLogFilter);
 
@@ -186,7 +186,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
 
-  if ( state == TouchPoint::Interrupted )
+  if ( state == PointState::INTERRUPTED )
   {
     Dali::Actor consumingActor;
     Integration::Point currentPoint( event.points[0] );
@@ -350,7 +350,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     }
   }
 
-  // 5) If our primary point is an Finished event, then the primary point (in multi-touch) will change next
+  // 5) If our primary point is a FINISHED event, then the primary point (in multi-touch) will change next
   //    time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
   if ( primaryPointState == PointState::FINISHED )
@@ -386,7 +386,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     }
   }
 
-  // 6) Emit an interrupted event to the hover-started actor if it hasn't consumed the Finished.
+  // 6) Emit an interrupted event to the hover-started actor if it hasn't consumed the FINISHED.
 
   if ( hoverEvent->GetPointCount() == 1 ) // Only want the first hover started
   {

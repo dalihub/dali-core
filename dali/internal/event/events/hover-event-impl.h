@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/hover-event.h>
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/events/point.h>
 
@@ -62,11 +62,6 @@ public:
    * @return A new HoverEvent object which is has the same hover event data.
    */
   static HoverEventPtr Clone( const HoverEvent& rhs );
-
-  /**
-   * @brief Destructor
-   */
-  ~HoverEvent();
 
   // Getters
 
@@ -136,6 +131,13 @@ public:
   void AddPoint( const Integration::Point& point );
 
 private:
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~HoverEvent() = default;
 
   // Not copyable or movable
 

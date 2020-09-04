@@ -174,7 +174,7 @@ struct UpdateManager::Impl
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderTaskProcessor( renderTaskProcessor ),
-    backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
+    backgroundColor( Dali::DEFAULT_BACKGROUND_COLOR ),
     renderers(),
     textureSets(),
     shaders(),

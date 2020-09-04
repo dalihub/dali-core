@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/tap-gesture-detector.h>
+#include <dali/public-api/events/tap-gesture.h>
 #include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
-
-struct TapGesture;
 
 namespace Internal
 {
@@ -106,7 +105,7 @@ public:
    * @param[in]  tappedActor  The tapped actor.
    * @param[in]  tap          The tap gesture.
    */
-  void EmitTapGestureSignal(Dali::Actor tappedActor, const TapGesture& tap);
+  void EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap);
 
 public: // Signals
 

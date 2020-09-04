@@ -41,15 +41,15 @@ namespace
  */
 struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
 {
-  GestureHitTestCheck( Gesture::Type type )
+  GestureHitTestCheck( GestureType::Value type )
   : mType( type )
   {
   }
 
   virtual bool IsActorHittable( Actor* actor )
   {
-    return actor->IsGestureRequred( mType ) && // Does the Application or derived actor type require the gesture?
-           actor->IsHittable();                // Is actor sensitive, visible and on the scene?
+    return actor->IsGestureRequired( mType ) && // Does the Application or derived actor type require the gesture?
+           actor->IsHittable();                 // Is actor sensitive, visible and on the scene?
   }
 
   virtual bool DescendActorHierarchy( Actor* actor )
@@ -63,13 +63,13 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  Gesture::Type mType;
+  GestureType::Value mType;
 };
 
 } // unnamed namespace
 
 
-GestureProcessor::GestureProcessor( Gesture::Type type )
+GestureProcessor::GestureProcessor( GestureType::Value type )
 : mGestureRecognizer(),
   mNeedsUpdate( false ),
   mType( type ),
@@ -96,7 +96,7 @@ void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer
   while ( actor )
   {
     // We may be checking a parent so ensure the parent requires this gesture (and do not unintentionally create the gesture data for the parent)
-    if ( actor->IsGestureRequred( mType ) )
+    if ( actor->IsGestureRequired( mType ) )
     {
       // Retrieve the actor's detectors and check if they satisfy current gesture
       const GestureDetectorContainer& connectedDetectors( actor->GetGestureData().GetGestureDetectorContainer( mType ) );

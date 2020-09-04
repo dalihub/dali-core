@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 
 namespace Dali
 {
@@ -32,7 +33,7 @@ struct PanGestureProfiling
 {
   struct Position
   {
-    Position( unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, int state )
+    Position( unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, GestureState state )
     : time( time ), position( position ), displacement( displacement ), velocity( velocity ), state( state )
     {
     }
@@ -41,7 +42,7 @@ struct PanGestureProfiling
     Vector2 position;
     Vector2 displacement;
     Vector2 velocity;
-    int state;
+    GestureState state;
   };
 
   typedef std::vector< PanGestureProfiling::Position > PanPositionContainer;

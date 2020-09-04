@@ -54,10 +54,10 @@ public:
 
   enum EventDispatchType
   {
-    DispatchTouch,      ///< The touch event should be dispatched.
-    DispatchHover,      ///< The hover event should be dispatched.
-    DispatchBoth,       ///< Both touch event and hover event should be dispatched.
-    DispatchNone        ///< Neither touch event nor hover event should be dispatched.
+    DISPATCH_TOUCH,      ///< The touch event should be dispatched.
+    DISPATCH_HOVER,      ///< The hover event should be dispatched.
+    DISPATCH_BOTH,       ///< Both touch event and hover event should be dispatched.
+    DISPATCH_NONE        ///< Neither touch event nor hover event should be dispatched.
   };
 
   /**

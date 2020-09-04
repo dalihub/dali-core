@@ -33,14 +33,14 @@ namespace Internal
  * send it to the Core.
  *
  * A Pan Gesture event should be in one of five states:
- * - Possible:   When the user first puts their finger down - Core needs to hit test the down point.
- * - Started:    If a pan is detected.
- * - Continuing: If after a pan is detected, it continues.
- * - Finished:   If after a pan, the user lifts their finger(s).
- * - Cancelled:  If, after a down event, no pan is detected or a system interruption.
+ * - POSSIBLE:   When the user first puts their finger down - Core needs to hit test the down point.
+ * - STARTED:    If a pan is detected.
+ * - CONTINUING: If after a pan is detected, it continues.
+ * - FINISHED:   If after a pan, the user lifts their finger(s).
+ * - CANCELLED:  If, after a down event, no pan is detected or a system interruption.
  *
- * A Started state will be ignored if a Possible state does not precede it.
- * Likewise, a Continuing or Finished state will be ignored if a Started state does not precede it.
+ * A STARTED state will be ignored if a POSSIBLE state does not precede it.
+ * Likewise, a CONTINUING or FINISHED state will be ignored if a STARTED state does not precede it.
  */
 struct PanGestureEvent: public GestureEvent
 {
@@ -50,7 +50,7 @@ struct PanGestureEvent: public GestureEvent
    * Default Constructor
    * @param[in]  state  The state of the gesture
    */
-  PanGestureEvent(Gesture::State state);
+  PanGestureEvent(GestureState state);
 
   /**
    * Virtual destructor

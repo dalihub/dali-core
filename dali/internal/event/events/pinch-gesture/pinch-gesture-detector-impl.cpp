@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ PinchGestureDetectorPtr PinchGestureDetector::New()
 }
 
 PinchGestureDetector::PinchGestureDetector()
-: GestureDetector(Gesture::Pinch)
+: GestureDetector(GestureType::PINCH)
 {
 }
 
@@ -66,7 +66,7 @@ PinchGestureDetector::~PinchGestureDetector()
 {
 }
 
-void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const PinchGesture& pinch)
+void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Dali::PinchGesture& pinch)
 {
   // Guard against destruction during signal emission
   Dali::PinchGestureDetector handle( this );

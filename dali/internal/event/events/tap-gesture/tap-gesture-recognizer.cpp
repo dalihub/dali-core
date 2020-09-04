@@ -43,9 +43,9 @@ const unsigned long MAXIMUM_TIME_ALLOWED = 500u;
 } // unnamed namespace
 
 TapGestureRecognizer::TapGestureRecognizer( Observer& observer, Vector2 screenSize, const TapGestureRequest& request)
-: GestureRecognizer( screenSize, Gesture::Tap ),
+: GestureRecognizer( screenSize, GestureType::TAP ),
   mObserver(observer),
-  mState(Clear),
+  mState(CLEAR),
   mMinimumTapsRequired(request.minTaps),
   mMaximumTapsRequired(request.maxTaps),
   mTapsRegistered(0),
@@ -70,7 +70,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 
     switch (mState)
     {
-      case Clear:
+      case CLEAR:
       {
         if (pointState == PointState::DOWN)
         {
@@ -79,7 +79,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         break;
       }
 
-      case Touched:
+      case TOUCHED:
       {
         uint32_t deltaBetweenTouchDownTouchUp = event.time - mTouchTime;
 
@@ -89,21 +89,21 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           {
             mLastTapTime = mTouchTime;
             EmitSingleTap( event.time, point );
-            mState = Registered;
+            mState = REGISTERED;
           }
           else
           {
-            mState = Clear;
+            mState = CLEAR;
           }
         }
         else if (pointState == PointState::INTERRUPTED)
         {
-          mState = Clear;
+          mState = CLEAR;
         }
         break;
       }
 
-      case Registered:
+      case REGISTERED:
       {
         if ( pointState == PointState::UP )
         {
@@ -117,18 +117,18 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
             {
               mLastTapTime = event.time;
               EmitSingleTap(event.time, point);
-              mState = Registered;
+              mState = REGISTERED;
             }
             else
             {
               ++mTapsRegistered;
-              EmitGesture( Gesture::Started, event.time );
-              mState = Clear;
+              EmitGesture( GestureState::STARTED, event.time );
+              mState = CLEAR;
             }
           }
-          else // Delta between touch down and touch up too long to be considered a Tap event
+          else // Delta between touch down and touch up too long to be considered a TAP event
           {
-            mState = Clear;
+            mState = CLEAR;
           }
         }
         else if (pointState == PointState::DOWN)
@@ -153,20 +153,20 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         break;
       }
 
-      case Failed:
+      case FAILED:
       default:
       {
-        mState = Clear;
+        mState = CLEAR;
         break;
       }
     }
   }
   else
   {
-    mState = Failed;
+    mState = FAILED;
 
     // We have entered a multi-touch event so emit registered gestures if required.
-    EmitGesture(Gesture::Started, event.time);
+    EmitGesture(GestureState::STARTED, event.time);
   }
 }
 
@@ -176,13 +176,13 @@ void TapGestureRecognizer::SetupForTouchDown( const Integration::TouchEvent& eve
   mTouchTime = event.time;
   mLastTapTime = 0u;
   mTapsRegistered = 0;
-  mState = Touched;
+  mState = TOUCHED;
   EmitPossibleState( event );
 }
 
 void TapGestureRecognizer::EmitPossibleState( const Integration::TouchEvent& event )
 {
-  TapGestureEvent tapEvent( Gesture::Possible );
+  TapGestureEvent tapEvent( GestureState::POSSIBLE );
   tapEvent.point = mTouchPosition;
   tapEvent.time = event.time;
 
@@ -198,9 +198,9 @@ void TapGestureRecognizer::Update(const GestureRequest& request)
   mMaximumTapsRequired = tap.maxTaps;
 }
 
-void TapGestureRecognizer::EmitGesture( Gesture::State state, uint32_t time )
+void TapGestureRecognizer::EmitGesture( GestureState state, uint32_t time )
 {
-  if ( (state == Gesture::Cancelled) ||
+  if ( (state == GestureState::CANCELLED) ||
        (mTapsRegistered >= mMinimumTapsRequired && mTapsRegistered <= mMaximumTapsRequired) )
 
   {
@@ -211,7 +211,7 @@ void TapGestureRecognizer::EmitGesture( Gesture::State state, uint32_t time )
 
 void TapGestureRecognizer::EmitSingleTap( uint32_t time, const Integration::Point& point )
 {
-  TapGestureEvent event( Gesture::Started );
+  TapGestureEvent event( GestureState::STARTED );
   const Vector2& screen( point.GetScreenPosition() );
   Vector2 distanceDelta(std::abs(mTouchPosition.x - screen.x),
                         std::abs(mTouchPosition.y - screen.y));
@@ -219,7 +219,7 @@ void TapGestureRecognizer::EmitSingleTap( uint32_t time, const Integration::Poin
   if (distanceDelta.x > MAXIMUM_MOTION_ALLOWED ||
       distanceDelta.y > MAXIMUM_MOTION_ALLOWED )
   {
-    event.state = Gesture::Cancelled;
+    event.state = GestureState::CANCELLED;
   }
   mTapsRegistered = 1u;
   EmitTap( time, event );

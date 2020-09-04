@@ -36,7 +36,7 @@ struct SignalData
   SignalData()
   : functorCalled( false ),
     voidFunctorCalled( false ),
-    receivedGesture( Gesture::Clear ),
+    receivedGesture( ),
     pressedActor()
   {}
 
@@ -45,9 +45,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.numberOfTouches = 0u;
-    receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
-    receivedGesture.localPoint = Vector2(0.0f, 0.0f);
+    receivedGesture.Reset();
 
     pressedActor.Reset();
   }
@@ -125,7 +123,7 @@ struct MyTestCustomActor : public CustomActorImpl
   typedef Signal< void ()> SignalType;
   typedef Signal< void (float)> SignalTypeFloat;
 
-  MyTestCustomActor() : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS ) )
+  MyTestCustomActor() : CustomActorImpl( ActorFlags() )
   { }
 
   virtual ~MyTestCustomActor()
@@ -153,18 +151,6 @@ struct MyTestCustomActor : public CustomActorImpl
   }
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   {
-  }
-  virtual bool OnHoverEvent(const HoverEvent& event)
-  {
-    return true;
-  }
-  virtual bool OnWheelEvent(const WheelEvent& event)
-  {
-    return true;
-  }
-  virtual bool OnKeyEvent(const KeyEvent& event)
-  {
-    return true;
   }
   virtual void OnKeyInputFocusGained()
   {

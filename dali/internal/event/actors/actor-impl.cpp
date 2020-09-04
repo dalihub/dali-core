@@ -230,7 +230,7 @@ const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
 const char* const SIGNAL_ON_SCENE = "onScene";
 const char* const SIGNAL_OFF_SCENE = "offScene";
 const char* const SIGNAL_ON_RELAYOUT = "onRelayout";
-const char* const SIGNAL_TOUCH = "touch";
+const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_VISIBILITY_CHANGED = "visibilityChanged";
 const char* const SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
 const char* const SIGNAL_CHILD_ADDED = "childAdded";
@@ -253,7 +253,7 @@ SignalConnectorType signalConnector3( mType, SIGNAL_WHEEL_EVENT, &Actor::DoConne
 SignalConnectorType signalConnector4( mType, SIGNAL_ON_SCENE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector5( mType, SIGNAL_OFF_SCENE, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector6( mType, SIGNAL_ON_RELAYOUT, &Actor::DoConnectSignal );
-SignalConnectorType signalConnector7( mType, SIGNAL_TOUCH, &Actor::DoConnectSignal );
+SignalConnectorType signalConnector7( mType, SIGNAL_TOUCHED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector8( mType, SIGNAL_VISIBILITY_CHANGED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector9( mType, SIGNAL_LAYOUT_DIRECTION_CHANGED, &Actor::DoConnectSignal );
 SignalConnectorType signalConnector10( mType, SIGNAL_CHILD_ADDED, &Actor::DoConnectSignal );
@@ -1788,17 +1788,17 @@ bool Actor::IsKeyboardFocusable() const
 
 bool Actor::GetTouchRequired() const
 {
-  return !mTouchSignal.Empty() || mDerivedRequiresTouch;
+  return !mTouchedSignal.Empty();
 }
 
 bool Actor::GetHoverRequired() const
 {
-  return !mHoveredSignal.Empty() || mDerivedRequiresHover;
+  return !mHoveredSignal.Empty();
 }
 
 bool Actor::GetWheelEventRequired() const
 {
-  return !mWheelEventSignal.Empty() || mDerivedRequiresWheelEvent;
+  return !mWheelEventSignal.Empty();
 }
 
 bool Actor::IsHittable() const
@@ -1817,19 +1817,19 @@ ActorGestureData& Actor::GetGestureData()
   return *mGestureData;
 }
 
-bool Actor::IsGestureRequred( Gesture::Type type ) const
+bool Actor::IsGestureRequired( GestureType::Value type ) const
 {
-  return mGestureData && mGestureData->IsGestureRequred( type );
+  return mGestureData && mGestureData->IsGestureRequired( type );
 }
 
 bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
 {
   bool consumed = false;
 
-  if( !mTouchSignal.Empty() )
+  if( !mTouchedSignal.Empty() )
   {
     Dali::Actor handle( this );
-    consumed = mTouchSignal.Emit( handle, touch );
+    consumed = mTouchedSignal.Emit( handle, touch );
   }
 
   return consumed;
@@ -1845,12 +1845,6 @@ bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
     consumed = mHoveredSignal.Emit( handle, event );
   }
 
-  if( !consumed )
-  {
-    // Notification for derived classes
-    consumed = OnHoverEvent( event );
-  }
-
   return consumed;
 }
 
@@ -1862,12 +1856,6 @@ bool Actor::EmitWheelEventSignal( const Dali::WheelEvent& event )
   {
     Dali::Actor handle( this );
     consumed = mWheelEventSignal.Emit( handle, event );
-  }
-
-  if( !consumed )
-  {
-    // Notification for derived classes
-    consumed = OnWheelEvent( event );
   }
 
   return consumed;
@@ -1909,9 +1897,9 @@ void Actor::EmitChildRemovedSignal( Actor& child )
   }
 }
 
-Dali::Actor::TouchEventSignalType& Actor::TouchSignal()
+Dali::Actor::TouchEventSignalType& Actor::TouchedSignal()
 {
-  return mTouchSignal;
+  return mTouchedSignal;
 }
 
 Dali::Actor::HoverSignalType& Actor::HoveredSignal()
@@ -1989,9 +1977,9 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     actor->OnRelayoutSignal().Connect( tracker, functor );
   }
-  else if( 0 == signalName.compare( SIGNAL_TOUCH ) )
+  else if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
   {
-    actor->TouchSignal().Connect( tracker, functor );
+    actor->TouchedSignal().Connect( tracker, functor );
   }
   else if( 0 == signalName.compare( SIGNAL_VISIBILITY_CHANGED ) )
   {
@@ -2028,7 +2016,7 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
   mGestureData( NULL ),
-  mTouchSignal(),
+  mTouchedSignal(),
   mHoveredSignal(),
   mWheelEventSignal(),
   mOnSceneSignal(),
@@ -2055,9 +2043,6 @@ Actor::Actor( DerivedType derivedType, const SceneGraph::Node& node )
   mSensitive( true ),
   mLeaveRequired( false ),
   mKeyboardFocusable( false ),
-  mDerivedRequiresTouch( false ),
-  mDerivedRequiresHover( false ),
-  mDerivedRequiresWheelEvent( false ),
   mOnSceneSignalled( false ),
   mInsideOnSizeSet( false ),
   mInheritPosition( true ),

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_DETECTOR_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 
 namespace Dali
 {
-
-struct LongPressGesture;
 
 namespace Internal
 {
@@ -110,7 +108,7 @@ public:
    * @param[in]  pressedActor  The pressed actor.
    * @param[in]  longPress     The long press
    */
-  void EmitLongPressGestureSignal(Dali::Actor pressedActor, const LongPressGesture& longPress);
+  void EmitLongPressGestureSignal(Dali::Actor pressedActor, const Dali::LongPressGesture& longPress);
 
 public: // Signals
 

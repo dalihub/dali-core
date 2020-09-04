@@ -62,7 +62,7 @@ PropertyNotification::PropertyNotification(Object& object,
   mConditionType(condition),
   mArguments(arguments),
   mValid(false),
-  mNotifyMode( Dali::PropertyNotification::Disabled ),
+  mNotifyMode( Dali::PropertyNotification::DISABLED ),
   mConditionFunction(NULL)
 {
   SetNotifyMode(notifyMode);
@@ -163,22 +163,22 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
     //  means don't notify so notifyRequired stays false
     switch( mNotifyMode )
     {
-      case Dali::PropertyNotification::Disabled:
+      case Dali::PropertyNotification::DISABLED:
       {
         // notify never, already initialized to false
         break;
       }
-      case Dali::PropertyNotification::NotifyOnTrue:
+      case Dali::PropertyNotification::NOTIFY_ON_TRUE:
       {
         notifyRequired = mValid; // notify if value is true
         break;
       }
-      case Dali::PropertyNotification::NotifyOnFalse:
+      case Dali::PropertyNotification::NOTIFY_ON_FALSE:
       {
         notifyRequired = !mValid; // notify when its false
         break;
       }
-      case Dali::PropertyNotification::NotifyOnChanged:
+      case Dali::PropertyNotification::NOTIFY_ON_CHANGED:
       {
         notifyRequired = true; // notify whenever changed
         break;

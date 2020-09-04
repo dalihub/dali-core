@@ -2,7 +2,7 @@
 #define DALI_LONG_PRESS_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,15 +37,15 @@ namespace Internal DALI_INTERNAL
 class LongPressGestureDetector;
 }
 
-struct LongPressGesture;
+class LongPressGesture;
 
 /**
  * @brief This class emits a signals when a long press gesture occurs that meets the requirements set by the application.
  * @SINCE_1_0.0
  *
  * For any valid long press, two signals will be emitted:
- * - First identifying the beginning (state = Started) i.e. when fingers held down for the required time.
- * - Second identifying the ending (state = Finished) i.e. when fingers are released.
+ * - First identifying the beginning (state = GestureState::STARTED) i.e. when fingers held down for the required time.
+ * - Second identifying the ending (state = GestureState::FINISHED) i.e. when fingers are released.
  *
  * The application programmer can use this gesture detector as follows:
  * @code

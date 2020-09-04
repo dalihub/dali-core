@@ -30,6 +30,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
@@ -56,20 +57,20 @@ void EmitPinchSignal(
     const PinchGestureEvent& pinchEvent,
     Vector2 localCenter)
 {
-  PinchGesture pinch(pinchEvent.state);
-  pinch.time = pinchEvent.time;
+  Internal::PinchGesturePtr pinch( new Internal::PinchGesture(pinchEvent.state ) );
+  pinch->SetTime( pinchEvent.time );
 
-  pinch.scale = pinchEvent.scale;
-  pinch.speed = pinchEvent.speed;
-  pinch.screenCenterPoint = pinchEvent.centerPoint;
+  pinch->SetScale( pinchEvent.scale );
+  pinch->SetSpeed( pinchEvent.speed );
+  pinch->SetScreenCenterPoint( pinchEvent.centerPoint );
 
-  pinch.localCenterPoint = localCenter;
+  pinch->SetLocalCenterPoint( localCenter );
 
   Dali::Actor actorHandle( actor );
   const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
   for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    static_cast< PinchGestureDetector* >( *iter )->EmitPinchGestureSignal( actorHandle, pinch );
+    static_cast< PinchGestureDetector* >( *iter )->EmitPinchGestureSignal( actorHandle, Dali::PinchGesture( pinch.Get() ) );
   }
 }
 
@@ -104,7 +105,7 @@ struct IsNotAttachedFunctor
 } // unnamed namespace
 
 PinchGestureProcessor::PinchGestureProcessor()
-: GestureProcessor( Gesture::Pinch ),
+: GestureProcessor( GestureType::PINCH ),
   mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
   mCurrentPinchEvent(NULL),
@@ -170,7 +171,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
 {
   switch ( pinchEvent.state )
   {
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       // The pinch gesture should only be sent to the gesture detector which first received it so that
       // it can be told when the gesture ends as well.
@@ -192,9 +193,9 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       break;
     }
 
-    case Gesture::Continuing:
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case GestureState::CONTINUING:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       // Only send subsequent pinch gesture signals if we processed the pinch gesture when it started.
       // Check if actor is still touchable.
@@ -223,7 +224,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
           }
 
           // Clear current emitters if pinch gesture has ended or been cancelled.
-          if ( pinchEvent.state == Gesture::Finished || pinchEvent.state == Gesture::Cancelled )
+          if ( pinchEvent.state == GestureState::FINISHED || pinchEvent.state == GestureState::CANCELLED )
           {
             mCurrentPinchEmitters.clear();
             ResetActor();
@@ -238,14 +239,14 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
       break;
     }
 
-    case Gesture::Clear:
+    case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
       break;
     }
-    case Gesture::Possible:
+    case GestureState::POSSIBLE:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Possible\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: POSSIBLE\n" );
       break;
     }
   }

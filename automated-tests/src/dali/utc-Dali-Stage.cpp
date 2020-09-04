@@ -141,9 +141,9 @@ struct KeyEventReceivedFunctor
 };
 
 // Stores data that is populated in the touched signal callback and will be read by the TET cases
-struct TouchSignalData
+struct TouchedSignalData
 {
-  TouchSignalData()
+  TouchedSignalData()
   : functorCalled(false)
   {}
 
@@ -161,7 +161,7 @@ struct TouchSignalData
 // Functor that sets the data when touched signal is received
 struct TouchFunctor
 {
-  TouchFunctor( TouchSignalData& data ) : signalData( data ) { }
+  TouchFunctor( TouchedSignalData& data ) : signalData( data ) { }
 
   void operator()( const TouchEvent& touch )
   {
@@ -175,7 +175,7 @@ struct TouchFunctor
     signalData.functorCalled = true;
   }
 
-  TouchSignalData& signalData;
+  TouchedSignalData& signalData;
 };
 
 // Stores data that is populated in the wheel-event callback and will be read by the TET cases
@@ -746,7 +746,7 @@ int UtcDaliStageGetBackgroundColorP(void)
 
   Stage stage = Stage::GetCurrent();
 
-  DALI_TEST_EQUALS( Stage::DEFAULT_BACKGROUND_COLOR, stage.GetBackgroundColor(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DEFAULT_BACKGROUND_COLOR, stage.GetBackgroundColor(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -979,9 +979,9 @@ int UtcDaliStageTouchedSignalP(void)
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  TouchSignalData data;
+  TouchedSignalData data;
   TouchFunctor functor( data );
-  stage.TouchSignal().Connect( &application, functor );
+  stage.TouchedSignal().Connect( &application, functor );
 
   // Render and notify.
   application.SendNotification();
@@ -1010,7 +1010,7 @@ int UtcDaliStageTouchedSignalP(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
+  actor.TouchedSignal().Connect( &DummyTouchCallback );
   stage.Add( actor );
 
   // Render and notify.
@@ -1095,9 +1095,9 @@ int UtcDaliStageTouchedSignalN(void)
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  TouchSignalData data;
+  TouchedSignalData data;
   TouchFunctor functor( data );
-  stage.TouchSignal().Connect( &application, functor );
+  stage.TouchedSignal().Connect( &application, functor );
 
   // Render and notify.
   application.SendNotification();
@@ -1135,7 +1135,7 @@ int UtcDaliStageTouchedSignalN(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
+  actor.TouchedSignal().Connect( &DummyTouchCallback );
   stage.Add( actor );
 
   // Render and notify.
@@ -1171,217 +1171,6 @@ int UtcDaliStageTouchedSignalN(void)
 
     // Check that getting info about a non-existent point causes an assert.
     DALI_TEST_EQUALS( data.receivedTouchEvent.GetState( 1 ), PointState::FINISHED, TEST_LOCATION );
-
-    data.Reset();
-  }
-
-  END_TEST;
-}
-
-
-int UtcDaliStageTouchSignalP(void)
-{
-  TestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  TouchSignalData data;
-  TouchFunctor functor( data );
-  stage.TouchSignal().Connect( &application, functor );
-
-  // Render and notify.
-  application.SendNotification();
-  application.Render();
-
-  // Basic test: No actors, single touch (down then up).
-  {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    data.Reset();
-
-    GenerateTouch( application, PointState::UP, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    data.Reset();
-  }
-
-  // Add an actor to the scene.
-  Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
-  stage.Add( actor );
-
-  // Render and notify.
-  application.SendNotification();
-  application.Render();
-
-  // Actor on scene, single touch, down in actor, motion, then up outside actor.
-  {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
-    data.Reset();
-
-    GenerateTouch( application, PointState::MOTION, Vector2( 150.0f, 10.0f ) ); // Some motion
-
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-    data.Reset();
-
-    GenerateTouch( application, PointState::UP, Vector2( 150.0f, 10.0f ) ); // Some motion
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    data.Reset();
-  }
-
-  // Multiple touch. Should only receive a touch on first down and last up.
-  {
-    Integration::TouchEvent touchEvent;
-    Integration::Point point;
-
-    // 1st point
-    point.SetState( PointState::DOWN );
-    point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    touchEvent.points.push_back( point );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
-    data.Reset();
-
-    // 2nd point
-    touchEvent.points[0].SetState( PointState::STATIONARY );
-    point.SetDeviceId( 1 );
-    point.SetScreenPosition( Vector2( 50.0f, 50.0f ) );
-    touchEvent.points.push_back( point );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-    data.Reset();
-
-    // Primary point is up
-    touchEvent.points[0].SetState( PointState::UP );
-    touchEvent.points[1].SetState( PointState::STATIONARY );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-    data.Reset();
-
-    // Remove 1st point now, 2nd point is now in motion
-    touchEvent.points.erase( touchEvent.points.begin() );
-    touchEvent.points[0].SetState( PointState::MOTION );
-    touchEvent.points[0].SetScreenPosition( Vector2( 150.0f, 50.0f ) );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-    data.Reset();
-
-    // Final point Up
-    touchEvent.points[0].SetState( PointState::UP );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
-    data.Reset();
-  }
-  END_TEST;
-}
-
-int UtcDaliStageTouchSignalN(void)
-{
-  TestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  TouchSignalData data;
-  TouchFunctor functor( data );
-  stage.TouchSignal().Connect( &application, functor );
-
-  TouchSignalData data2;
-  TouchFunctor functor2( data2 );
-  GetImplementation( stage ).ConnectSignal( &application, "touch", functor2 );
-
-  // Render and notify.
-  application.SendNotification();
-  application.Render();
-
-  // Confirm functor not called before there has been any touch event.
-  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, data2.functorCalled, TEST_LOCATION );
-
-  // No actors, single touch, down, motion then up.
-  {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
-
-    DALI_TEST_EQUALS( true, data2.functorCalled, TEST_LOCATION );
-
-    data.Reset();
-    data2.Reset();
-
-    // Confirm there is no signal when the touchpoint is only moved.
-    GenerateTouch( application, PointState::MOTION, Vector2( 1200.0f, 10.0f ) ); // Some motion
-
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
-    data.Reset();
-
-    // Confirm a following up event generates a signal.
-    GenerateTouch( application, PointState::UP, Vector2( 1200.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
-    data.Reset();
-  }
-
-  // Add an actor to the scene.
-  Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchSignal().Connect( &DummyTouchCallback );
-  stage.Add( actor );
-
-  // Render and notify.
-  application.SendNotification();
-  application.Render();
-
-  // Actor on scene. Interrupted before down and interrupted after down.
-  {
-    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
-    data.Reset();
-
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::DOWN );
-    data.Reset();
-
-    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
-
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
-
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
-
-    // Check that getting info about a non-existent point returns an empty handle
-    Actor actor = data.receivedTouchEvent.GetHitActor( 1 );
-    DALI_TEST_CHECK( !actor );
 
     data.Reset();
   }

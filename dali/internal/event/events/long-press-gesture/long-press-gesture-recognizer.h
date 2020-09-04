@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ class CoreEventInterface;
 
 /**
  * When given a set of touch events, this detector attempts to determine if a long press gesture has taken place.
- * Emits a LongPressGestureEvent (state = Started) when a long press has been detected (Touch held down for more than duration).
- * Emits a further LongPressGestureEvent (state = Finished) when a long press has been completed (Touch Release).
+ * Emits a LongPressGestureEvent (state = GestureState::STARTED) when a long press has been detected (Touch held down for more than duration).
+ * Emits a further LongPressGestureEvent (state = GestureState::FINISHED) when a long press has been completed (Touch Release).
  */
 class LongPressGestureRecognizer : public GestureRecognizer
 {
@@ -96,7 +96,7 @@ private:
    * Emits the long press gesture if all conditions are applicable.
    * @param[in] state The state of this gesture event.
    */
-  void EmitGesture(Gesture::State state);
+  void EmitGesture( GestureState state );
 
 private:
 
@@ -108,10 +108,10 @@ private:
    */
   enum State
   {
-    Clear,      ///< No gesture detected.
-    Touched,    ///< User is touching the screen.
-    Failed,     ///< Gesture has failed.
-    Finished    ///< Gesture has been detected and sent.
+    CLEAR,      ///< No gesture detected.
+    TOUCHED,    ///< User is touching the screen.
+    FAILED,     ///< Gesture has failed.
+    FINISHED    ///< Gesture has been detected and sent.
   };
 
   State mState; ///< The current state of the detector.

@@ -1399,7 +1399,7 @@ public:
    * @param[in] type The gesture type.
    * @return True if the gesture is required, false otherwise.
    */
-  bool IsGestureRequred( Gesture::Type type ) const;
+  bool IsGestureRequired( GestureType::Value type ) const;
 
   // Signals
 
@@ -1450,9 +1450,9 @@ public:
   void EmitChildRemovedSignal( Actor& child );
 
   /**
-   * @copydoc Dali::Actor::TouchEventSignal()
+   * @copydoc Dali::Actor::TouchedSignal()
    */
-  Dali::Actor::TouchEventSignalType& TouchSignal();
+  Dali::Actor::TouchEventSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
@@ -1830,28 +1830,6 @@ private:
   }
 
   /**
-   * For use in derived classes.
-   * This is only called if mDerivedRequiresHover is true, and the hover-signal was not consumed.
-   * @param[in] event The hover event.
-   * @return True if the event should be consumed.
-   */
-  virtual bool OnHoverEvent( const HoverEvent& event )
-  {
-    return false;
-  }
-
-  /**
-   * For use in derived classes.
-   * This is only called if the wheel signal was not consumed.
-   * @param[in] event The wheel event.
-   * @return True if the event should be consumed.
-   */
-  virtual bool OnWheelEvent( const WheelEvent& event )
-  {
-    return false;
-  }
-
-  /**
    * @brief Retrieves the cached event side value of a default property.
    * @param[in]  index  The index of the property
    * @param[out] value  Is set with the cached value of the property if found.
@@ -1966,7 +1944,7 @@ protected:
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchEventSignalType         mTouchSignal;
+  Dali::Actor::TouchEventSignalType        mTouchedSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::WheelEventSignalType        mWheelEventSignal;
   Dali::Actor::OnSceneSignalType           mOnSceneSignal;
@@ -1996,9 +1974,6 @@ protected:
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals
   bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation
-  bool mDerivedRequiresTouch                       : 1; ///< Whether the derived actor type requires touch event signals
-  bool mDerivedRequiresHover                       : 1; ///< Whether the derived actor type requires hover event signals
-  bool mDerivedRequiresWheelEvent                  : 1; ///< Whether the derived actor type requires wheel event signals
   bool mOnSceneSignalled                           : 1; ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
   bool mInsideOnSizeSet                            : 1; ///< Whether we are inside OnSizeSet
   bool mInheritPosition                            : 1; ///< Cached: Whether the parent's position should be inherited.

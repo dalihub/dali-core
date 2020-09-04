@@ -51,10 +51,6 @@ WheelEvent::WheelEvent( Dali::WheelEvent::Type type, int32_t direction, uint32_t
 {
 }
 
-WheelEvent::~WheelEvent()
-{
-}
-
 WheelEventPtr WheelEvent::New( Dali::WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp )
 {
   WheelEventPtr wheelEvent = new WheelEvent( type, direction, modifiers, point, delta, timeStamp );

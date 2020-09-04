@@ -44,10 +44,6 @@ HoverEventPtr HoverEvent::Clone( const HoverEvent& rhs )
   return hoverEvent;
 }
 
-HoverEvent::~HoverEvent()
-{
-}
-
 unsigned long HoverEvent::GetTime() const
 {
   return mTime;

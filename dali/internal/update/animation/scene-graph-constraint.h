@@ -89,7 +89,7 @@ public:
         mFunc->Apply( updateBufferIndex, current );
 
         // Optionally bake the final value
-        if ( Dali::Constraint::Bake == mRemoveAction )
+        if ( Dali::Constraint::BAKE == mRemoveAction )
         {
           mTargetProperty.Bake( updateBufferIndex, current );
         }

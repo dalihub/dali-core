@@ -459,10 +459,10 @@ int UtcDaliPropertyNotificationGetNotifyMode(void)
 
   PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X,
                                                                     GreaterThanCondition(100.0f));
-  notification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+  notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
   PropertyNotification::NotifyMode notifyMode = notification.GetNotifyMode();
 
-  DALI_TEST_EQUALS( notifyMode, PropertyNotification::NotifyOnChanged, TEST_LOCATION );
+  DALI_TEST_EQUALS( notifyMode, PropertyNotification::NOTIFY_ON_CHANGED, TEST_LOCATION );
   END_TEST;
 }
 
@@ -475,7 +475,7 @@ int UtcDaliPropertyNotificationGetNotifyResultP(void)
 
   PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::POSITION_X,
                                                                     GreaterThanCondition(100.0f));
-  notification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+  notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
   gCallBackCalled = false;
   notification.NotifySignal().Connect( &TestCallback );
 
@@ -840,7 +840,7 @@ int UtcDaliPropertyNotificationSetSizeResultP(void)
   Actor actor = Actor::New();
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ) );
-  notification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+  notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
   gCallBackCalled = false;
   notification.NotifySignal().Connect( &TestCallback );
 

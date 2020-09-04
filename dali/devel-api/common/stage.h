@@ -76,26 +76,22 @@ class KeyEvent;
  * |-------------------------|--------------------------------------|
  * | keyEvent                | @ref KeyEventSignal()                |
  * | eventProcessingFinished | @ref EventProcessingFinishedSignal() |
- * | touch                   | @ref TouchSignal()                   |
+ * | touched                 | @ref TouchedSignal()                 |
  * | wheelEvent              | @ref WheelEventSignal()              |
  * | contextLost             | @ref ContextLostSignal()             |
  * | contextRegained         | @ref ContextRegainedSignal()         |
  * | sceneCreated            | @ref SceneCreatedSignal()            |
- * @SINCE_1_0.0
  */
 class DALI_CORE_API Stage : public BaseHandle
 {
 public:
 
-  typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type @SINCE_1_0.0
-  typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type @SINCE_1_0.0
-  typedef Signal< void (const TouchEvent&) > TouchSignalType;         ///< Touch signal type @SINCE_1_1.37
-  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
-  typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type @SINCE_1_0.0
-  typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type @SINCE_1_0.0
-
-  static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
-  static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
+  typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type
+  typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type
+  typedef Signal< void (const TouchEvent&) > TouchEventSignalType;   ///< Touch signal type
+  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type
+  typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type
+  typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type
 
   /**
    * @brief Allows the creation of an empty stage handle.
@@ -167,7 +163,6 @@ public:
    * The x component will be the width of the Stage in pixels.
    * The y component will be the height of the Stage in pixels.
    * The z component will be the distance between far and near planes.
-   * @SINCE_1_0.0
    * @return The size of the Stage as a Vector
    */
   Vector2 GetSize() const;
@@ -257,7 +252,6 @@ public:
    * @code
    *   void YourCallbackName(const KeyEvent& event);
    * @endcode
-   * @SINCE_1_0.0
    * @return The signal to connect to
    */
   KeyEventSignalType& KeyEventSignal();
@@ -284,7 +278,7 @@ public:
    * @return The touch signal to connect to
    * @note Motion events are not emitted.
    */
-  TouchSignalType& TouchSignal();
+  TouchEventSignalType& TouchedSignal();
 
   /**
    * @brief This signal is emitted when wheel event is received.

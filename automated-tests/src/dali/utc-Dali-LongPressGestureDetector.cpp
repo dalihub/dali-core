@@ -48,7 +48,7 @@ struct SignalData
   SignalData()
   : functorCalled( false ),
     voidFunctorCalled( false ),
-    receivedGesture( Gesture::Clear ),
+    receivedGesture(),
     pressedActor()
   {}
 
@@ -57,9 +57,7 @@ struct SignalData
     functorCalled = false;
     voidFunctorCalled = false;
 
-    receivedGesture.numberOfTouches = 0u;
-    receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
-    receivedGesture.localPoint = Vector2(0.0f, 0.0f);
+    receivedGesture.Reset();
 
     pressedActor.Reset();
   }
@@ -93,7 +91,7 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data, Gesture::State& stateToUnstage, Integration::Scene scene )
+  UnstageActorFunctor( SignalData& data, GestureState& stateToUnstage, Integration::Scene scene )
   : GestureReceivedFunctor( data ),
     stateToUnstage( stateToUnstage ),
     scene( scene )
@@ -104,13 +102,13 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
     GestureReceivedFunctor::operator()( actor, longPress );
 
-    if ( longPress.state == stateToUnstage )
+    if ( longPress.GetState() == stateToUnstage )
     {
       scene.Remove( actor );
     }
   }
 
-  Gesture::State& stateToUnstage;
+  GestureState& stateToUnstage;
   Integration::Scene scene;
 };
 
@@ -208,7 +206,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchSignal().Connect(&application, touchFunctor);
+  actor.TouchedSignal().Connect(&application, touchFunctor);
 
   Integration::TouchEvent touchEvent(1);
   Integration::Point point;
@@ -322,8 +320,8 @@ int UtcDaliLongPressGestureSignalReceptionPositive(void)
   // Do a long press inside actor's area
   TestGenerateLongPress( application, 50.0f, 50.0f );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
   TestEndLongPress( application, 50.0f, 50.0f);
   END_TEST;
 }
@@ -351,16 +349,16 @@ int UtcDaliLongPressGestureSignalReceptionDetach(void)
   // Start long press within the actor's area
   TestGenerateLongPress( application, 20.0f, 20.0f );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(20.0f, 20.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
   TestEndLongPress( application, 20.0f, 20.0f);
 
   // repeat the long press within the actor's area - we should still receive the signal
   data.Reset();
   TestGenerateLongPress( application, 50.0f, 50.0f );
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
   TestEndLongPress( application, 50.0f, 50.0f);
 
   // Detach actor
@@ -442,8 +440,8 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
   TestGenerateLongPress( application, 5.0f, 5.0f );
   TestEndLongPress( application, 5.0f, 5.0f);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
@@ -455,8 +453,8 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
   TestGenerateLongPress( application, 5.0f, 5.0f );
   TestEndLongPress( application, 5.0f, 5.0f);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.GetScreenPoint(), 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
   actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::YAXIS) );
@@ -506,7 +504,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   TestEndLongPress( application, 50.0f, 50.0f);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pressedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetScreenPoint(), 0.01f, TEST_LOCATION);
 
   // Attach child and generate same touch points
   // (Also proves that you can detach and then re-attach another actor)
@@ -519,7 +517,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   TestEndLongPress( application, 51.0f, 51.0f);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pressedActor, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.GetScreenPoint(), 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -701,7 +699,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit STARTED event, we should not receive the long press.
   TestTriggerLongPress( application );
   TestEndLongPress( application, 50.0f, 10.0f );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
@@ -769,7 +767,7 @@ int UtcDaliLongPressGestureDetachAfterStarted(void)
   // Detach actor
   detector.Detach(actor);
 
-  // Emit Finished, no signal
+  // Emit FINISHED, no signal
   TestEndLongPress( application, 50.0f, 10.0f );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -789,7 +787,7 @@ int UtcDaliLongPressGestureActorUnstaged(void)
   application.Render();
 
   // State to remove actor in.
-  Gesture::State stateToUnstage( Gesture::Started );
+  GestureState stateToUnstage( GestureState::STARTED );
 
   // Attach actor to detector
   SignalData data;
@@ -816,8 +814,8 @@ int UtcDaliLongPressGestureActorUnstaged(void)
   application.SendNotification();
   application.Render();
 
-  // Change state to Gesture::Continuing to remove
-  stateToUnstage = Gesture::Finished;
+  // Change state to GestureState::CONTINUING to remove
+  stateToUnstage = GestureState::FINISHED;
 
   // Emit signals
   TestGenerateLongPress( application, 50.0f, 10.0f );
@@ -850,7 +848,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // State to remove actor in.
-  Gesture::State stateToUnstage( Gesture::Started );
+  GestureState stateToUnstage( GestureState::STARTED );
 
   // Attach actor to detector
   SignalData data;
@@ -860,7 +858,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   detector.Attach(dummyActor);
   detector.DetectedSignal().Connect( &application, functor );
 
-  // Here we are testing a Started actor which is removed in the Started callback, but then added back
+  // Here we are testing a STARTED actor which is removed in the STARTED callback, but then added back
   // before we get a finished state.  As we were removed from the stage, even if we're at the same
   // position, we should still not be signalled.
 
@@ -1002,7 +1000,7 @@ int UtcDaliLongPressGestureInterruptedWhenTouchConsumed(void)
 
   bool consume = false;
   TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchSignal().Connect(&application,touchFunctor);
+  actor.TouchedSignal().Connect(&application,touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1053,7 +1051,7 @@ int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
       &application,
       [&detector, &functorCalled](Actor actor, const LongPressGesture& gesture)
       {
-        if( gesture.state == Gesture::Finished )
+        if( gesture.GetState() == GestureState::FINISHED )
         {
           detector.Detach(actor);
           functorCalled = true;

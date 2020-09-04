@@ -240,7 +240,7 @@ namespace Impl
 {
 
 TestCustomActor::TestCustomActor()
-: CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
+: CustomActorImpl( ActorFlags( DISABLE_SIZE_NEGOTIATION ) ),
   mDaliProperty( Property::INVALID_INDEX ),
   mSizeSet( Vector3::ZERO ),
   mTargetSize( Vector3::ZERO ),
@@ -251,7 +251,7 @@ TestCustomActor::TestCustomActor()
 }
 
 TestCustomActor::TestCustomActor(bool nego)
-: CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS ) ),
+: CustomActorImpl( ActorFlags() ),
   mDaliProperty( Property::INVALID_INDEX ),
   mSizeSet( Vector3::ZERO ),
   mTargetSize( Vector3::ZERO ),
@@ -322,7 +322,7 @@ void TestCustomActor::OnChildRemove(Actor& child)
 {
   AddToCallStacks("OnChildRemove");
 }
-void TestCustomActor::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void TestCustomActor::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   AddToCallStacks("OnPropertySet");
 }
@@ -335,21 +335,6 @@ void TestCustomActor::OnSizeAnimation(Animation& animation, const Vector3& targe
 {
   mTargetSize = targetSize;
   AddToCallStacks("OnSizeAnimation");
-}
-bool TestCustomActor::OnHoverEvent(const HoverEvent& event)
-{
-  AddToCallStacks("OnHoverEvent");
-  return true;
-}
-bool TestCustomActor::OnWheelEvent(const WheelEvent& event)
-{
-  AddToCallStacks("OnWheelEvent");
-  return true;
-}
-bool TestCustomActor::OnKeyEvent(const KeyEvent& event)
-{
-  AddToCallStacks("OnKeyEvent");
-  return true;
 }
 void TestCustomActor::OnKeyInputFocusGained()
 {

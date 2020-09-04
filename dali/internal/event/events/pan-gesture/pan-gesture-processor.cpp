@@ -37,6 +37,7 @@
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-recognizer.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
 namespace Dali
@@ -53,12 +54,12 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PAN
 
 const char * GESTURE_STATES[ 6 ] =
 {
-  "Clear",
-  "Started",
-  "Continuing",
-  "Finished",
-  "Cancelled",
-  "Possible"
+  "CLEAR",
+  "STARTED",
+  "CONTINUING",
+  "FINISHED",
+  "CANCELLED",
+  "POSSIBLE"
 };
 
 #endif // defined(DEBUG_ENABLED)
@@ -123,7 +124,7 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 } // unnamed namespace
 
 PanGestureProcessor::PanGestureProcessor( SceneGraph::UpdateManager& updateManager )
-: GestureProcessor( Gesture::Pan ),
+: GestureProcessor( GestureType::PAN ),
   mPanGestureDetectors(),
   mCurrentPanEmitters(),
   mCurrentRenderTask(),
@@ -149,14 +150,14 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
 
   DALI_LOG_INFO( gLogFilter, Debug::General, "    Pan Event\n");
   DALI_LOG_INFO( gLogFilter, Debug::General, "      State: %s  Touches: %d  Time: %d  TimeDelta: %d\n",
-                                             GESTURE_STATES[panEvent.state], panEvent.numberOfTouches, panEvent.time, panEvent.timeDelta);
+                                             GESTURE_STATES[static_cast<uint8_t>(panEvent.state)], panEvent.numberOfTouches, panEvent.time, panEvent.timeDelta);
   DALI_LOG_INFO( gLogFilter, Debug::General, "      Positions: Current: (%.0f, %.0f), Previous: (%.0f, %.0f)\n",
                                              panEvent.currentPosition.x, panEvent.currentPosition.y, panEvent.previousPosition.x, panEvent.previousPosition.y);
 #endif
 
   switch( panEvent.state )
   {
-    case Gesture::Possible:
+    case GestureState::POSSIBLE:
     {
       mCurrentPanEmitters.clear();
       ResetActor();
@@ -170,7 +171,7 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       break;
     }
 
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       // Requires a core update
       mNeedsUpdate = true;
@@ -206,7 +207,7 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       break;
     }
 
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       // Requires a core update
       mNeedsUpdate = true;
@@ -214,8 +215,8 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       DALI_FALLTHROUGH;
     }
 
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       // Only send subsequent pan gesture signals if we processed the pan gesture when it started.
       // Check if actor is still touchable.
@@ -240,7 +241,7 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
             currentGesturedActor->ScreenToLocal( *mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
 
             // EmitPanSignal checks whether we have a valid actor and whether the container we are passing in has emitters before it emits the pan.
-            EmitPanSignal( currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, Gesture::Finished, mCurrentRenderTask);
+            EmitPanSignal( currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, GestureState::FINISHED, mCurrentRenderTask);
             EmitPanSignal( currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
           }
 
@@ -251,7 +252,7 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
           }
 
           // Clear current gesture detectors if pan gesture has ended or been cancelled.
-          if ( ( panEvent.state == Gesture::Finished ) || ( panEvent.state == Gesture::Cancelled ) )
+          if ( ( panEvent.state == GestureState::FINISHED ) || ( panEvent.state == GestureState::CANCELLED ) )
           {
             mCurrentPanEmitters.clear();
             ResetActor();
@@ -266,9 +267,9 @@ void PanGestureProcessor::Process( Scene& scene, const PanGestureEvent& panEvent
       break;
     }
 
-    case Gesture::Clear:
+    case GestureState::CLEAR:
     {
-      DALI_ABORT( "Incorrect state received from Integration layer: Clear\n" );
+      DALI_ABORT( "Incorrect state received from Integration layer: CLEAR\n" );
       break;
     }
   }
@@ -337,16 +338,18 @@ void PanGestureProcessor::GestureDetectorUpdated( PanGestureDetector* gestureDet
   UpdateDetection();
 }
 
-bool PanGestureProcessor::SetPanGestureProperties( const PanGesture& pan )
+bool PanGestureProcessor::SetPanGestureProperties( const Dali::PanGesture& pan )
 {
   // If we are currently processing a pan gesture then just ignore
   if ( mCurrentPanEmitters.empty() && mSceneObject )
   {
+    const PanGesture& panImpl( GetImplementation(pan) );
+
     // We update the scene object directly rather than sending a message.
     // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
-    mSceneObject->AddGesture( pan );
+    mSceneObject->AddGesture( panImpl );
 
-    if( Gesture::Started == pan.state || Gesture::Continuing == pan.state )
+    if( GestureState::STARTED == panImpl.GetState() || GestureState::CONTINUING == panImpl.GetState() )
     {
       mNeedsUpdate = true;
     }
@@ -495,62 +498,67 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
                                          const GestureDetectorContainer& gestureDetectors,
                                          const PanGestureEvent& panEvent,
                                          Vector2 localCurrent,
-                                         Gesture::State state,
+                                         GestureState state,
                                          RenderTaskPtr renderTask )
 {
   if ( actor && !gestureDetectors.empty() )
   {
-    PanGesture pan(state);
-    pan.time = panEvent.time;
+    Internal::PanGesturePtr pan( new Internal::PanGesture(state ) );
 
-    pan.numberOfTouches = panEvent.numberOfTouches;
-    pan.screenPosition = panEvent.currentPosition;
-    pan.position = localCurrent;
+    pan->SetTime( panEvent.time );
+
+    pan->SetNumberOfTouches( panEvent.numberOfTouches );
+    pan->SetScreenPosition( panEvent.currentPosition );
+    pan->SetPosition( localCurrent );
 
     RenderTask& renderTaskImpl( *renderTask.Get() );
 
     Vector2 localPrevious;
     actor->ScreenToLocal( renderTaskImpl, localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
 
-    pan.displacement = localCurrent - localPrevious;
+    pan->SetDisplacement( localCurrent - localPrevious );
     Vector2 previousPos( panEvent.previousPosition );
-    if ( state == Gesture::Started )
+    if ( state == GestureState::STARTED )
     {
       previousPos = mPossiblePanPosition;
     }
 
-    pan.screenDisplacement = panEvent.currentPosition - previousPos;
+    pan->SetScreenDisplacement( panEvent.currentPosition - previousPos );
 
     // Avoid dividing by 0
     if ( panEvent.timeDelta > 0 )
     {
-      pan.velocity.x = pan.displacement.x / static_cast<float>( panEvent.timeDelta );
-      pan.velocity.y = pan.displacement.y / static_cast<float>( panEvent.timeDelta );
+      Vector2 velocity;
+      velocity.x = pan->GetDisplacement().x / static_cast<float>( panEvent.timeDelta );
+      velocity.y = pan->GetDisplacement().y / static_cast<float>( panEvent.timeDelta );
+      pan->SetVelocity( velocity );
 
-      pan.screenVelocity.x = pan.screenDisplacement.x / static_cast<float>( panEvent.timeDelta );
-      pan.screenVelocity.y = pan.screenDisplacement.y / static_cast<float>( panEvent.timeDelta );
+      Vector2 screenVelocity;
+      screenVelocity.x = pan->GetScreenDisplacement().x / static_cast<float>( panEvent.timeDelta );
+      screenVelocity.y = pan->GetScreenDisplacement().y / static_cast<float>( panEvent.timeDelta );
+      pan->SetScreenVelocity( screenVelocity );
     }
 
     // When the gesture ends, we may incorrectly get a ZERO velocity (as we have lifted our finger without any movement)
     // so we should use the last recorded velocity instead in this scenario.
-    if ( ( state == Gesture::Finished ) && ( pan.screenVelocity == Vector2::ZERO ) &&
+    if ( ( state == GestureState::FINISHED ) && ( pan->GetScreenVelocity() == Vector2::ZERO ) &&
          ( panEvent.timeDelta < MAXIMUM_TIME_WITH_VALID_LAST_VELOCITY ) )
     {
-      pan.velocity = mLastVelocity;
-      pan.screenVelocity = mLastScreenVelocity;
+      pan->SetVelocity( mLastVelocity );
+      pan->SetScreenVelocity( mLastScreenVelocity );
     }
     else
     {
       // Store the current velocity for future iterations.
-      mLastVelocity = pan.velocity;
-      mLastScreenVelocity = pan.screenVelocity;
+      mLastVelocity = pan->GetVelocity();
+      mLastScreenVelocity = pan->GetScreenVelocity();
     }
 
     if ( mSceneObject )
     {
       // We update the scene object directly rather than sending a message.
       // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
-      mSceneObject->AddGesture( pan );
+      mSceneObject->AddGesture( *pan.Get() );
     }
 
     Dali::Actor actorHandle( actor );
@@ -558,7 +566,7 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
     const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
     for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
     {
-      static_cast< PanGestureDetector* >( *iter )->EmitPanGestureSignal( actorHandle, pan );
+      static_cast< PanGestureDetector* >( *iter )->EmitPanGestureSignal( actorHandle, Dali::PanGesture( pan.Get() ) );
     }
   }
 }

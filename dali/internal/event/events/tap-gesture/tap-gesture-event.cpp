@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ namespace Dali
 namespace Internal
 {
 
-TapGestureEvent::TapGestureEvent( Gesture::State state )
-: GestureEvent(Gesture::Tap, state),
+TapGestureEvent::TapGestureEvent( GestureState state )
+: GestureEvent(GestureType::TAP, state),
   numberOfTaps(1),
   numberOfTouches(1)
 {

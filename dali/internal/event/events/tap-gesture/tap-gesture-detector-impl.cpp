@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ TapGestureDetectorPtr TapGestureDetector::New( unsigned int tapsRequired )
 }
 
 TapGestureDetector::TapGestureDetector()
-: GestureDetector( Gesture::Tap ),
+: GestureDetector( GestureType::TAP ),
   mMinimumTapsRequired( DEFAULT_TAPS_REQUIRED ),
   mMaximumTapsRequired( DEFAULT_TAPS_REQUIRED ),
   mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
@@ -72,7 +72,7 @@ TapGestureDetector::TapGestureDetector()
 }
 
 TapGestureDetector::TapGestureDetector( unsigned int tapsRequired )
-: GestureDetector( Gesture::Tap ),
+: GestureDetector( GestureType::TAP ),
   mMinimumTapsRequired( tapsRequired ),
   mMaximumTapsRequired( tapsRequired ),
   mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
@@ -137,7 +137,7 @@ unsigned int TapGestureDetector::GetTouchesRequired() const
   return mTouchesRequired;
 }
 
-void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const TapGesture& tap)
+void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dali::TapGesture& tap)
 {
   // Guard against destruction during signal emission
   Dali::TapGestureDetector handle( this );
