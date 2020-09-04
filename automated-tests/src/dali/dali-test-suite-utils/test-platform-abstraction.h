@@ -72,17 +72,17 @@ public:
   /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
    */
-  virtual Integration::ResourcePointer LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath );
+  Integration::ResourcePointer LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath ) override;
 
   /**
    * @copydoc PlatformAbstraction::DecodeBuffer()
    */
-  virtual Integration::BitmapPtr DecodeBuffer( const Dali::Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size );
+  Integration::BitmapPtr DecodeBuffer( const Dali::Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size ) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
    */
-  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const;
+  bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const override;
 
   /**
    * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
@@ -92,12 +92,12 @@ public:
   /**
    * @copydoc PlatformAbstraction::StartTimer()
    */
-  virtual uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback );
+  uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback ) override;
 
   /*
    * @copydoc PlatformAbstraction::CancelTimer()
    */
-  virtual void CancelTimer ( uint32_t timerId );
+  void CancelTimer ( uint32_t timerId ) override;
 
 public: // TEST FUNCTIONS
 

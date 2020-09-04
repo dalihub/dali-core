@@ -66,13 +66,13 @@ public:
    * Create a sync object
    * @return the sync object
    */
-  virtual Integration::GlSyncAbstraction::SyncObject* CreateSyncObject( );
+  Integration::GlSyncAbstraction::SyncObject* CreateSyncObject( ) override;
 
   /**
    * Destroy a sync object
    * @param[in] syncObject The object to destroy
    */
-  virtual void DestroySyncObject( Integration::GlSyncAbstraction::SyncObject* syncObject );
+  void DestroySyncObject( Integration::GlSyncAbstraction::SyncObject* syncObject ) override;
 
 
 public: // TEST FUNCTIONS
