@@ -324,7 +324,7 @@ void Scene::EmitTouchedSignal( const Dali::TouchEvent& touch )
   }
 }
 
-void Scene::EmitWheelEventSignal(const WheelEvent& event)
+void Scene::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
   if ( !mWheelEventSignal.Empty() )
   {

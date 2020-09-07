@@ -213,7 +213,7 @@ public:
    * Used by the EventProcessor to emit wheel event signals.
    * @param[in] event The wheel event.
    */
-  void EmitWheelEventSignal( const WheelEvent& event );
+  void EmitWheelEventSignal( const Dali::WheelEvent& event );
 
   /**
    * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback

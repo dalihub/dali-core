@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,69 +18,77 @@
 // CLASS HEADER
 #include <dali/public-api/events/wheel-event.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/wheel-event-impl.h>
+
 namespace Dali
 {
 
-namespace
-{
-const uint32_t MODIFIER_SHIFT = 0x1;
-const uint32_t MODIFIER_CTRL  = 0x2;
-const uint32_t MODIFIER_ALT   = 0x4;
-
-}
-
 WheelEvent::WheelEvent()
-: type( MOUSE_WHEEL ),
-  direction( 0 ),
-  modifiers( 0 ),
-  point( Vector2::ZERO ),
-  z( 0 ),
-  timeStamp( 0 )
+: BaseHandle()
 {
 }
 
-WheelEvent::WheelEvent( Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t z, uint32_t timeStamp )
-: type( type ),
-  direction( direction ),
-  modifiers( modifiers ),
-  point( point ),
-  z( z ),
-  timeStamp( timeStamp )
-{
-}
+WheelEvent::WheelEvent( const WheelEvent& rhs ) = default;
+
+WheelEvent::WheelEvent( WheelEvent&& rhs ) = default;
 
 WheelEvent::~WheelEvent()
 {
 }
 
+WheelEvent& WheelEvent::operator=( const WheelEvent& rhs ) = default;
+
+WheelEvent& WheelEvent::operator=( WheelEvent&& rhs ) = default;
+
 bool WheelEvent::IsShiftModifier() const
 {
-  if ((MODIFIER_SHIFT & modifiers) == MODIFIER_SHIFT)
-  {
-    return true;
-  }
-
-  return false;
+  return GetImplementation( *this ).IsShiftModifier();
 }
 
 bool WheelEvent::IsCtrlModifier() const
 {
-  if ((MODIFIER_CTRL & modifiers) == MODIFIER_CTRL)
-  {
-    return true;
-  }
-
-  return false;
+  return GetImplementation( *this ).IsCtrlModifier();
 }
 
 bool WheelEvent::IsAltModifier() const
 {
-  if ((MODIFIER_ALT & modifiers) == MODIFIER_ALT)
-  {
-    return true;
-  }
+  return GetImplementation( *this ).IsAltModifier();
+}
 
-  return false;
+WheelEvent::Type WheelEvent::GetType() const
+{
+  return GetImplementation( *this ).GetType();
+}
+
+int32_t WheelEvent::GetDirection() const
+{
+  return GetImplementation( *this ).GetDirection();
+}
+
+uint32_t WheelEvent::GetModifiers() const
+{
+  return GetImplementation( *this ).GetModifiers();
+}
+
+const Vector2& WheelEvent::GetPoint() const
+{
+  return GetImplementation( *this ).GetPoint();
+}
+
+int32_t WheelEvent::GetDelta() const
+{
+  return GetImplementation( *this ).GetDelta();
+}
+
+uint32_t WheelEvent::GetTime() const
+{
+  return GetImplementation( *this ).GetTime();
+}
+
+WheelEvent::WheelEvent( Internal::WheelEvent* internal )
+: BaseHandle( internal )
+{
 }
 
 } // namespace Dali

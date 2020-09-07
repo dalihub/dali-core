@@ -2,7 +2,7 @@
 #define DALI_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,23 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
-
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
+
+namespace Internal DALI_INTERNAL
+{
+class WheelEvent;
+}
+
 /**
  * @addtogroup dali_core_events
  * @{
  */
 
 /**
- * @brief The wheel event structure is used to store a wheel rolling, it facilitates
+ * @brief The wheel event class is used to store a wheel rolling, it facilitates
  * processing of the wheel rolling and passing to other libraries like Toolkit.
  *
  * There is a key modifier which relates to keys like alt, shift and control functions are
@@ -44,8 +50,11 @@ namespace Dali
  * The mouse wheel event can be sent to the specific actor but the custom wheel event will be sent to the stage.
  * @SINCE_1_0.0
  */
-struct DALI_CORE_API WheelEvent
+class DALI_CORE_API WheelEvent : public BaseHandle
 {
+
+public:
+
   // Enumerations
 
   /**
@@ -58,30 +67,55 @@ struct DALI_CORE_API WheelEvent
     CUSTOM_WHEEL      ///< Custom wheel event @SINCE_1_0.0
   };
 
+  // Construction & Destruction
+
   /**
-   * @brief Default constructor.
+   * @brief An uninitialized WheelEvent instance.
+   *
+   * Calling member functions with an uninitialized WheelEvent handle is not allowed.
    * @SINCE_1_0.0
    */
   WheelEvent();
 
   /**
-   * @brief Constructor.
+   * @brief Copy constructor.
    *
-   * @SINCE_1_0.0
-   * @param[in] type      The type of the wheel event
-   * @param[in] direction The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
-   * @param[in] modifiers Modifier keys pressed during the event (such as shift, alt and control)
-   * @param[in] point     The co-ordinates of the cursor relative to the top-left of the screen
-   * @param[in] z         The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
-   * @param[in] timeStamp The time the wheel is being rolled
+   * @SINCE_1_9.26
+   * @param[in] rhs The WheelEvent to copy from
    */
-  WheelEvent( Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t z, uint32_t timeStamp );
+  WheelEvent( const WheelEvent& rhs );
+
+  /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.26
+   * @param[in] rhs A reference to the moved WheelEvent
+   */
+  WheelEvent( WheelEvent&& rhs );
 
   /**
    * @brief Destructor.
    * @SINCE_1_0.0
    */
   ~WheelEvent();
+
+  /**
+   * @brief Copy assignment operator.
+   *
+   * @SINCE_1_9.26
+   * @param[in] rhs The WheelEvent to copy from
+   * @return A reference to this
+   */
+  WheelEvent& operator=( const WheelEvent& rhs );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.26
+   * @param[in] rhs A reference to the moved WheelEvent
+   * @return A reference to this
+   */
+  WheelEvent& operator=( WheelEvent&& rhs );
 
   /**
    * @brief Checks to see if Shift key modifier has been supplied.
@@ -107,44 +141,68 @@ struct DALI_CORE_API WheelEvent
    */
   bool IsAltModifier() const;
 
-  // Data
+  // Getters
 
   /**
-   * @brief Type of the event.
+   * @brief Get the type of the wheel event.
    *
-   * @see Type
+   * @SINCE_1_9.26
+   * @return The type of the wheel event
    */
-  Type type;
+  Type GetType() const;
 
   /**
-   * @brief The direction in which the wheel is being rolled.
+   * @brief Get the direction in which the wheel is being rolled.
    *
-   * 0 means the default vertical wheel, and 1 means horizontal wheel.
+   * @SINCE_1_9.26
+   * @return The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
    */
-  int32_t direction;
+  int32_t GetDirection() const;
 
   /**
-   * @brief Modifier keys pressed during the event (such as shift, alt and control).
+   * @brief Get the modifier keys pressed during the event (such as shift, alt and control).
+   *
+   * @SINCE_1_9.26
+   * @return The modifier keys pressed during the event
    */
-  uint32_t modifiers;
+  uint32_t GetModifiers() const;
 
   /**
-   * @brief The co-ordinates of the cursor relative to the top-left of the screen
+   * @brief Get the co-ordinates of the cursor relative to the top-left of the screen
    * when the wheel is being rolled.
+   *
+   * @SINCE_1_9.26
+   * @return The co-ordinates of the cursor relative to the top-left of the screen
    */
-  Vector2 point;
+  const Vector2& GetPoint() const;
 
   /**
-   * @brief The offset of the wheel rolling, where positive value means rolling down or clockwise
-   * and negative value means rolling up or counter-clockwise.
+   * @brief Get the offset of the wheel rolling
+   *
+   * @SINCE_1_9.26
+   * @return The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
    */
-  int32_t z;
+  int32_t GetDelta() const;
 
   /**
-   * @brief The time when the wheel is being rolled.
+   * @brief Get the time when the wheel is being rolled.
+   *
+   * @SINCE_1_9.26
+   * @return The time when the wheel is being rolled
    */
-  uint32_t timeStamp;
+  uint32_t GetTime() const;
 
+public: // Not intended for application developers
+
+  /// @cond internal
+  /**
+   * @brief This constructor is used internally to Create an initialized WheelEvent handle.
+   *
+   * @SINCE_1_9.26
+   * @param[in] wheelEvent A pointer to a newly allocated Dali resource
+   */
+  explicit DALI_INTERNAL WheelEvent( Internal::WheelEvent* hoverEvent );
+  /// @endcond
 };
 
 /**

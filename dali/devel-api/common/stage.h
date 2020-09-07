@@ -42,11 +42,11 @@ class Layer;
 class ObjectRegistry;
 class TouchEvent;
 class RenderTaskList;
+class WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
 struct KeyEvent;
-struct WheelEvent;
 
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
