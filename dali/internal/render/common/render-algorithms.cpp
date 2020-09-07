@@ -449,7 +449,6 @@ inline void RenderAlgorithms::ProcessRenderList( const RenderList& renderList,
   if (!rootClippingRect.IsEmpty())
   {
     context.SetScissorTest( true );
-    context.Scissor( rootClippingRect.x, rootClippingRect.y, rootClippingRect.width, rootClippingRect.height );
     mScissorStack.push_back( rootClippingRect );
   }
   // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
