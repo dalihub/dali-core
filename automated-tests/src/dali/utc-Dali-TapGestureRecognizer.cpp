@@ -15,32 +15,31 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
+#include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
-#include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
 
+#include <iostream>
 
 using namespace Dali;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-
 struct SignalData
 {
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
     receivedGesture()
-  {}
+  {
+  }
 
   void Reset()
   {
-    functorCalled = false;
+    functorCalled     = false;
     voidFunctorCalled = false;
 
     receivedGesture.Reset();
@@ -48,22 +47,25 @@ struct SignalData
     tappedActor.Reset();
   }
 
-  bool functorCalled;
-  bool voidFunctorCalled;
+  bool       functorCalled;
+  bool       voidFunctorCalled;
   TapGesture receivedGesture;
-  Actor tappedActor;
+  Actor      tappedActor;
 };
 
 // Functor that sets the data when called
 struct GestureReceivedFunctor
 {
-  GestureReceivedFunctor(SignalData& data) : signalData(data) { }
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
 
   void operator()(Actor actor, const TapGesture& tap)
   {
-    signalData.functorCalled = true;
+    signalData.functorCalled   = true;
     signalData.receivedGesture = tap;
-    signalData.tappedActor = actor;
+    signalData.tappedActor     = actor;
   }
 
   void operator()()
@@ -74,40 +76,37 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-
-Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
-  point.SetScreenPosition( screenPosition );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch( PointState::Type state, const Vector2& screenPositionA, const Vector2& screenPositionB, uint32_t time )
+Integration::TouchEvent GenerateDoubleTouch(PointState::Type state, const Vector2& screenPositionA, const Vector2& screenPositionB, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
-  point.SetScreenPosition( screenPositionA );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
-  point.SetScreenPosition( screenPositionB );
-  touchEvent.points.push_back( point );
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(screenPositionA);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  point.SetScreenPosition(screenPositionB);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-
-} // anon namespace
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 int UtcDaliTapGestureRecognizerBasic(void)
 {
@@ -116,8 +115,8 @@ int UtcDaliTapGestureRecognizerBasic(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -126,13 +125,13 @@ int UtcDaliTapGestureRecognizerBasic(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -140,7 +139,6 @@ int UtcDaliTapGestureRecognizerBasic(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerGapTooLong(void)
 {
@@ -149,8 +147,8 @@ int UtcDaliTapGestureRecognizerGapTooLong(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -159,13 +157,13 @@ int UtcDaliTapGestureRecognizerGapTooLong(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 651 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 651));
 
   application.SendNotification();
 
@@ -173,7 +171,6 @@ int UtcDaliTapGestureRecognizerGapTooLong(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerInterrupted(void)
 {
@@ -182,8 +179,8 @@ int UtcDaliTapGestureRecognizerInterrupted(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -192,15 +189,15 @@ int UtcDaliTapGestureRecognizerInterrupted(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 20.0f, 20.0f ), 175 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(20.0f, 20.0f), 175));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -208,7 +205,6 @@ int UtcDaliTapGestureRecognizerInterrupted(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerMoveTooFar(void)
 {
@@ -217,8 +213,8 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -227,13 +223,13 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -241,7 +237,6 @@ int UtcDaliTapGestureRecognizerMoveTooFar(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerStartDouble(void)
 {
@@ -250,8 +245,8 @@ int UtcDaliTapGestureRecognizerStartDouble(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -260,13 +255,13 @@ int UtcDaliTapGestureRecognizerStartDouble(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), Vector2( 25.0f, 25.0f ), 150 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), Vector2(25.0f, 25.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -274,7 +269,6 @@ int UtcDaliTapGestureRecognizerStartDouble(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerEndDouble(void)
 {
@@ -283,8 +277,8 @@ int UtcDaliTapGestureRecognizerEndDouble(void)
   TapGestureDetector detector = TapGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -293,15 +287,15 @@ int UtcDaliTapGestureRecognizerEndDouble(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), Vector2( 25.0f, 25.0f ), 200 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), Vector2(25.0f, 25.0f), 200));
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), Vector2( 25.0f, 25.0f ), 200 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::UP, Vector2(20.0f, 20.0f), Vector2(25.0f, 25.0f), 200));
 
   application.SendNotification();
 
@@ -309,7 +303,6 @@ int UtcDaliTapGestureRecognizerEndDouble(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerDoubleTap(void)
 {
@@ -318,8 +311,8 @@ int UtcDaliTapGestureRecognizerDoubleTap(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -328,21 +321,21 @@ int UtcDaliTapGestureRecognizerDoubleTap(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 250 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 250));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 300 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 300));
 
   application.SendNotification();
 
@@ -350,7 +343,6 @@ int UtcDaliTapGestureRecognizerDoubleTap(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerDoubleTapMoveTooFar(void)
 {
@@ -359,8 +351,8 @@ int UtcDaliTapGestureRecognizerDoubleTapMoveTooFar(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -369,33 +361,33 @@ int UtcDaliTapGestureRecognizerDoubleTapMoveTooFar(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
-
-  application.SendNotification();
-
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), 250 ) );
-
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 50.0f ), 300 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 50.0f, 50.0f ), 450 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), 250));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 50.0f ), 500 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 50.0f), 300));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 50.0f, 50.0f ), 550 ) );
+  application.SendNotification();
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 50.0f ), 600 ) );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 450));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 500));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 550));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 600));
 
   application.SendNotification();
 
@@ -403,7 +395,6 @@ int UtcDaliTapGestureRecognizerDoubleTapMoveTooFar(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
 {
@@ -412,8 +403,8 @@ int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
   TapGestureDetector detector = TapGestureDetector::New(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -422,33 +413,33 @@ int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
-
-  application.SendNotification();
-
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 650 ) );
-
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 750 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 50.0f, 50.0f ), 950 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 650));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 50.0f ), 1000 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 750));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 50.0f, 50.0f ), 1050 ) );
+  application.SendNotification();
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 50.0f ), 1000 ) );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 950));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1000));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1050));
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1000));
 
   application.SendNotification();
 
@@ -457,20 +448,19 @@ int UtcDaliTapGestureRecognizerDoubleTapWaitTooLong(void)
   END_TEST;
 }
 
-
 int UtcDaliTapGestureRecognizerMultipleDetectors(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
-  actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  actor2.SetProperty( Actor::Property::POSITION_X, 100.0f);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::POSITION_X, 100.0f);
   application.GetScene().Add(actor2);
 
   // Render and notify
@@ -483,17 +473,17 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
   TapGestureDetector detector2 = TapGestureDetector::New(2);
   detector2.Attach(actor2);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  SignalData data2;
+  SignalData             data2;
   GestureReceivedFunctor functor2(data2);
   detector2.DetectedSignal().Connect(&application, functor2);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -502,17 +492,17 @@ int UtcDaliTapGestureRecognizerMultipleDetectors(void)
   data.Reset();
   DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 120.0f, 20.0f ), 250 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(120.0f, 20.0f), 250));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 120.0f, 20.0f ), 300 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(120.0f, 20.0f), 300));
 
   application.SendNotification();
 
   DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 120.0f, 20.0f ), 350 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(120.0f, 20.0f), 350));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 120.0f, 20.0f ), 400 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(120.0f, 20.0f), 400));
 
   application.SendNotification();
 

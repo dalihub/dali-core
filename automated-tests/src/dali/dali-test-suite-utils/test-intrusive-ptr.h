@@ -2,7 +2,7 @@
 #define TEST_INTRUSIVE_PTR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@
  */
 
 // INTERNAL INCLUDES
-#include <iostream>
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 namespace Dali
 {
-
-template <typename T>
+template<typename T>
 struct UtcCoverageIntrusivePtr
 {
   typedef IntrusivePtr<T> (*Creator)();
 
-  void Check( Creator creator)
+  void Check(Creator creator)
   {
     IntrusivePtr<T> a = creator();
     IntrusivePtr<T> b = creator();
 
-    DALI_TEST_CHECK( a.Get() );
+    DALI_TEST_CHECK(a.Get());
 
     a.Reset();
 
@@ -48,13 +48,9 @@ struct UtcCoverageIntrusivePtr
     DALI_TEST_CHECK(a);
 
     a.Reset();
-
   };
-
 };
 
-} // Dali
+} // namespace Dali
 
 #endif // TEST_INTRUSIVE_PTR_H
-
-

@@ -26,68 +26,66 @@
 
 namespace Dali
 {
-
 namespace
 {
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
+  attribute mediump vec2   aPosition;\n
+    uniform mediump mat4   uMvpMatrix;\n
+      uniform mediump vec3 uSize;\n
+  \n void main()\n {
+        \n
+          mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
+        \n
+          vertexPosition.xyz *= uSize;
+        \n
+          gl_Position = uMvpMatrix * vertexPosition;
+        \n
+      }\n);
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = uColor;\n
-  }\n
-);
+  \n void main()\n {
+    \n
+      gl_FragColor = uColor;
+    \n
+  }\n);
 
 } // unnamed namespace
 
 Actor CreateRenderableActor()
 {
-  return CreateRenderableActor( Texture(), VERTEX_SHADER, FRAGMENT_SHADER );
+  return CreateRenderableActor(Texture(), VERTEX_SHADER, FRAGMENT_SHADER);
 }
 
-Actor CreateRenderableActor( Texture texture )
+Actor CreateRenderableActor(Texture texture)
 {
-  return CreateRenderableActor( texture, VERTEX_SHADER, FRAGMENT_SHADER );
+  return CreateRenderableActor(texture, VERTEX_SHADER, FRAGMENT_SHADER);
 }
 
-Actor CreateRenderableActor( Texture texture, const std::string& vertexShader, const std::string& fragmentShader )
+Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, const std::string& fragmentShader)
 {
   // Create the geometry
   Geometry geometry = CreateQuadGeometry();
 
   // Create Shader
-  Shader shader = Shader::New( vertexShader, fragmentShader );
+  Shader shader = Shader::New(vertexShader, fragmentShader);
 
   // Create renderer from geometry and material
-  Renderer renderer = Renderer::New( geometry, shader );
+  Renderer renderer = Renderer::New(geometry, shader);
 
   // Create actor and set renderer
   Actor actor = Actor::New();
-  actor.AddRenderer( renderer );
+  actor.AddRenderer(renderer);
 
   // If we a texture, then create a texture-set and add to renderer
-  if( texture )
+  if(texture)
   {
     TextureSet textureSet = TextureSet::New();
-    textureSet.SetTexture( 0u, texture );
-    renderer.SetTextures( textureSet );
+    textureSet.SetTexture(0u, texture);
+    renderer.SetTextures(textureSet);
 
     // Set actor to the size of the texture if set
-    actor.SetProperty( Actor::Property::SIZE, Vector2( texture.GetWidth(), texture.GetHeight() ) );
+    actor.SetProperty(Actor::Property::SIZE, Vector2(texture.GetWidth(), texture.GetHeight()));
   }
 
   return actor;

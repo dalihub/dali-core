@@ -15,18 +15,18 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <cmath>
-#include <dali/public-api/dali-core.h>
-#include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/render-task-list-integ.h>
-#include <dali/integration-api/profiling.h>
-#include <dali/integration-api/input-options.h>
 #include <dali-test-suite-utils.h>
-#include <test-touch-event-utils.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/input-options.h>
+#include <dali/integration-api/profiling.h>
+#include <dali/integration-api/render-task-list-integ.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+#include <test-touch-event-utils.h>
+
+#include <cmath>
+#include <iostream>
 
 using namespace Dali;
 
@@ -43,7 +43,7 @@ void utc_dali_pan_gesture_detector_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-const int PAN_EVENT_TIME_DELTA = 8;
+const int PAN_EVENT_TIME_DELTA     = 8;
 const int PAN_GESTURE_UPDATE_COUNT = 50;
 
 // Stores data that is populated in the callback and will be read by the test cases
@@ -53,11 +53,12 @@ struct SignalData
   : functorCalled(false),
     voidFunctorCalled(false),
     receivedGesture()
-  {}
+  {
+  }
 
   void Reset()
   {
-    functorCalled = false;
+    functorCalled     = false;
     voidFunctorCalled = false;
 
     receivedGesture.Reset();
@@ -65,22 +66,25 @@ struct SignalData
     pannedActor.Reset();
   }
 
-  bool functorCalled;
-  bool voidFunctorCalled;
+  bool       functorCalled;
+  bool       voidFunctorCalled;
   PanGesture receivedGesture;
-  Actor pannedActor;
+  Actor      pannedActor;
 };
 
 // Functor that sets the data when called
 struct GestureReceivedFunctor
 {
-  GestureReceivedFunctor(SignalData& data) : signalData(data) { }
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
 
   void operator()(Actor actor, const PanGesture& pan)
   {
-    signalData.functorCalled = true;
+    signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
-    signalData.pannedActor = actor;
+    signalData.pannedActor     = actor;
   }
 
   void operator()()
@@ -94,24 +98,24 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor( SignalData& data, GestureState& stateToUnstage, Integration::Scene scene )
-  : GestureReceivedFunctor( data ),
-    stateToUnstage( stateToUnstage ),
-    scene( scene )
+  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Integration::Scene scene)
+  : GestureReceivedFunctor(data),
+    stateToUnstage(stateToUnstage),
+    scene(scene)
   {
   }
 
-  void operator()( Actor actor, const PanGesture& pan )
+  void operator()(Actor actor, const PanGesture& pan)
   {
-    GestureReceivedFunctor::operator()( actor, pan );
+    GestureReceivedFunctor::operator()(actor, pan);
 
-    if ( pan.GetState() == stateToUnstage )
+    if(pan.GetState() == stateToUnstage)
     {
-      scene.Remove( actor );
+      scene.Remove(actor);
     }
   }
 
-  GestureState& stateToUnstage;
+  GestureState&      stateToUnstage;
   Integration::Scene scene;
 };
 
@@ -119,8 +123,8 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 struct ConstraintData
 {
   ConstraintData()
-  : panning( false ),
-    called( false )
+  : panning(false),
+    called(false)
   {
   }
 
@@ -130,68 +134,71 @@ struct ConstraintData
   Vector2 localPosition;
   Vector2 localDisplacement;
   Vector2 localVelocity;
-  bool panning;
-  bool called;
+  bool    panning;
+  bool    called;
 
   void Reset()
   {
     screenPosition = screenDisplacement = screenVelocity = localPosition = localDisplacement = localVelocity = Vector2::ZERO;
-    panning = false;
-    called = false;
+    panning                                                                                                  = false;
+    called                                                                                                   = false;
   }
 };
 
 // Constraint used with panning properties
 struct PanConstraint
 {
-  PanConstraint( ConstraintData& data ) : constraintData(data) { }
-
-  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  PanConstraint(ConstraintData& data)
+  : constraintData(data)
   {
-    constraintData.screenPosition = inputs[0]->GetVector2();
+  }
+
+  void operator()(Vector3& current, const PropertyInputContainer& inputs)
+  {
+    constraintData.screenPosition     = inputs[0]->GetVector2();
     constraintData.screenDisplacement = inputs[1]->GetVector2();
-    constraintData.screenVelocity = inputs[2]->GetVector2();
-    constraintData.localPosition = inputs[3]->GetVector2();
-    constraintData.localDisplacement = inputs[4]->GetVector2();
-    constraintData.localVelocity = inputs[5]->GetVector2();
-    constraintData.panning = inputs[6]->GetBoolean();
-    constraintData.called = true;
-    current = Vector3::ZERO;
+    constraintData.screenVelocity     = inputs[2]->GetVector2();
+    constraintData.localPosition      = inputs[3]->GetVector2();
+    constraintData.localDisplacement  = inputs[4]->GetVector2();
+    constraintData.localVelocity      = inputs[5]->GetVector2();
+    constraintData.panning            = inputs[6]->GetBoolean();
+    constraintData.called             = true;
+    current                           = Vector3::ZERO;
   }
 
   ConstraintData& constraintData;
 };
 
 // Generate a PanGesture
-PanGesture GeneratePan( unsigned int time,
-                        GestureState state,
-                        Vector2 screenPosition,
-                        Vector2 localPosition,
-                        Vector2 screenDisplacement = Vector2::ONE,
-                        Vector2 localDisplacement = Vector2::ONE,
-                        Vector2 screenVelocity = Vector2::ONE,
-                        Vector2 localVelocity = Vector2::ONE,
-                        unsigned int numberOfTouches = 1 )
+PanGesture GeneratePan(unsigned int time,
+                       GestureState state,
+                       Vector2      screenPosition,
+                       Vector2      localPosition,
+                       Vector2      screenDisplacement = Vector2::ONE,
+                       Vector2      localDisplacement  = Vector2::ONE,
+                       Vector2      screenVelocity     = Vector2::ONE,
+                       Vector2      localVelocity      = Vector2::ONE,
+                       unsigned int numberOfTouches    = 1)
 {
-  Dali::PanGesture pan = DevelPanGesture::New( state );
+  Dali::PanGesture pan = DevelPanGesture::New(state);
 
-  DevelPanGesture::SetTime( pan, time );
+  DevelPanGesture::SetTime(pan, time);
 
-  DevelPanGesture::SetScreenPosition( pan, screenPosition );
-  DevelPanGesture::SetPosition( pan, localPosition );
+  DevelPanGesture::SetScreenPosition(pan, screenPosition);
+  DevelPanGesture::SetPosition(pan, localPosition);
 
-  DevelPanGesture::SetScreenDisplacement( pan, screenDisplacement );
-  DevelPanGesture::SetDisplacement( pan, localDisplacement );
+  DevelPanGesture::SetScreenDisplacement(pan, screenDisplacement);
+  DevelPanGesture::SetDisplacement(pan, localDisplacement);
 
-  DevelPanGesture::SetScreenVelocity( pan, screenVelocity );
-  DevelPanGesture::SetVelocity( pan, localVelocity );
+  DevelPanGesture::SetScreenVelocity(pan, screenVelocity);
+  DevelPanGesture::SetVelocity(pan, localVelocity);
 
-  DevelPanGesture::SetNumberOfTouches( pan, numberOfTouches );
+  DevelPanGesture::SetNumberOfTouches(pan, numberOfTouches);
 
   return pan;
 }
 
-} // anon namespace
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -211,8 +218,8 @@ int UtcDaliPanGestureDetectorCopyConstructorP(void)
 
   PanGestureDetector detector = PanGestureDetector::New();
 
-  PanGestureDetector copy( detector );
-  DALI_TEST_CHECK( detector );
+  PanGestureDetector copy(detector);
+  DALI_TEST_CHECK(detector);
   END_TEST;
 }
 
@@ -224,9 +231,9 @@ int UtcDaliPanGestureDetectorAssignmentOperatorP(void)
 
   PanGestureDetector assign;
   assign = detector;
-  DALI_TEST_CHECK( detector );
+  DALI_TEST_CHECK(detector);
 
-  DALI_TEST_CHECK( detector == assign );
+  DALI_TEST_CHECK(detector == assign);
   END_TEST;
 }
 
@@ -244,8 +251,8 @@ int UtcDaliPanGestureDetectorNew(void)
 
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   detector.Attach(actor);
 
   application.GetScene().Add(actor);
@@ -255,7 +262,7 @@ int UtcDaliPanGestureDetectorNew(void)
   application.Render();
 
   // Use long press function for touch event
-  TestStartLongPress( application );
+  TestStartLongPress(application);
 
   END_TEST;
 }
@@ -272,17 +279,17 @@ int UtcDaliPanGestureDetectorDownCast(void)
   PanGestureDetector detector2 = PanGestureDetector::DownCast(object);
   DALI_TEST_CHECK(detector2);
 
-  PanGestureDetector detector3 = DownCast< PanGestureDetector >(object);
+  PanGestureDetector detector3 = DownCast<PanGestureDetector>(object);
   DALI_TEST_CHECK(detector3);
 
-  BaseHandle unInitializedObject;
+  BaseHandle         unInitializedObject;
   PanGestureDetector detector4 = PanGestureDetector::DownCast(unInitializedObject);
   DALI_TEST_CHECK(!detector4);
 
-  PanGestureDetector detector5 = DownCast< PanGestureDetector >(unInitializedObject);
+  PanGestureDetector detector5 = DownCast<PanGestureDetector>(unInitializedObject);
   DALI_TEST_CHECK(!detector5);
 
-  GestureDetector detector6 = PanGestureDetector::New();
+  GestureDetector    detector6 = PanGestureDetector::New();
   PanGestureDetector detector7 = PanGestureDetector::DownCast(detector6);
   DALI_TEST_CHECK(detector7);
   END_TEST;
@@ -305,15 +312,15 @@ int UtcDaliPanGestureSetMinimumTouchesRequired(void)
   // Attach an actor and change the minimum touches
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   detector.Attach(actor);
@@ -347,15 +354,15 @@ int UtcDaliPanGestureSetMaximumTouchesRequired(void)
   // Attach an actor and change the maximum touches
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   detector.Attach(actor);
@@ -391,15 +398,15 @@ int UtcDaliPanGestureSignalReceptionNegative(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -408,19 +415,19 @@ int UtcDaliPanGestureSignalReceptionNegative(void)
 
   // Do a pan outside actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2(110.0f, 110.0f), Vector2(121.0f, 121.0f), time );
+  TestStartPan(application, Vector2(110.0f, 110.0f), Vector2(121.0f, 121.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Continue pan into actor's area - we should still not receive the signal
   data.Reset();
-  TestMovePan( application, Vector2(20.0f, 20.0f), time );
+  TestMovePan(application, Vector2(20.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Stop panning - we should still not receive the signal
   data.Reset();
-  TestEndPan( application, Vector2(12.0f, 12.0f), time);
+  TestEndPan(application, Vector2(12.0f, 12.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -431,15 +438,15 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -448,7 +455,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
 
   // Start pan within the actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
@@ -461,7 +468,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -475,7 +482,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   // Pan Gesture leaves actor's area - we should still receive the signal
   data.Reset();
 
-  TestMovePan( application, Vector2(346.0f, 4.0f), time );
+  TestMovePan(application, Vector2(346.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -489,7 +496,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
   // Gesture ends - we would receive a finished state
   data.Reset();
 
-  TestEndPan( application, Vector2(314.0f, 4.0f), time );
+  TestEndPan(application, Vector2(314.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureState::FINISHED, data.receivedGesture.GetState(), TEST_LOCATION);
@@ -506,15 +513,15 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -523,7 +530,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
 
   // Start pan within the actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
@@ -536,7 +543,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -550,7 +557,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
   // Gesture ends within actor's area - we would receive a finished state
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureState::FINISHED, data.receivedGesture.GetState(), TEST_LOCATION);
@@ -567,15 +574,15 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -584,13 +591,13 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
 
   // Start pan within the actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -598,7 +605,7 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
   // Gesture ends within actor's area
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -609,10 +616,10 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
   // Ensure we are no longer signalled
   data.Reset();
 
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -623,15 +630,15 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -640,7 +647,7 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
 
   // Start pan within the actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -648,7 +655,7 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -659,7 +666,7 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
   // Gesture ends within actor's area
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -669,7 +676,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
 {
   TestApplication application;
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -678,8 +685,8 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   // Attach a temporary actor to stop detector being removed from PanGestureProcessor when main actor
   // is destroyed.
   Actor tempActor = Actor::New();
-  tempActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  tempActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
+  tempActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  tempActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
   application.GetScene().Add(tempActor);
   detector.Attach(tempActor);
 
@@ -688,8 +695,8 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   // Actor lifetime is scoped
   {
     Actor actor = Actor::New();
-    actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
     application.GetScene().Add(actor);
 
     // Render and notify
@@ -699,14 +706,14 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
     detector.Attach(actor);
 
     // Start pan within the actor's area
-    TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+    TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Continue the pan within the actor's area - we should still receive the signal
     data.Reset();
 
-    TestMovePan( application, Vector2(26.0f, 4.0f), time );
+    TestMovePan(application, Vector2(26.0f, 4.0f), time);
     time += TestGetFrameInterval();
 
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -724,7 +731,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   // Gesture ends within the area where the actor used to be
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -735,15 +742,15 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS));
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -752,41 +759,41 @@ int UtcDaliPanGestureSignalReceptionRotatedActor(void)
 
   // Do an entire pan, only check finished value
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 11.0f, 12.0f ),  Vector2( 27.0f, 12.0f ), time );
+  TestStartPan(application, Vector2(11.0f, 12.0f), Vector2(27.0f, 12.0f), time);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(25.0f, 28.0f), time );
+  TestEndPan(application, Vector2(25.0f, 28.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(16.0f, 2.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
-  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS) );
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(180.0f), Vector3::ZAXIS));
   application.SendNotification();
   application.Render();
 
   // Do an entire pan, only check finished value
-  TestStartPan( application, Vector2( 11.0f, 12.0f ),  Vector2( 27.0f, 12.0f ), time );
+  TestStartPan(application, Vector2(11.0f, 12.0f), Vector2(27.0f, 12.0f), time);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(25.0f, 28.0f), time );
+  TestEndPan(application, Vector2(25.0f, 28.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(2.0f, -16.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
 
   // Rotate actor again and render a couple of times
-  actor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(270.0f), Vector3::ZAXIS) );
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(270.0f), Vector3::ZAXIS));
   application.SendNotification();
   application.Render();
 
   // Do an entire pan, only check finished value
-  TestStartPan( application, Vector2( 11.0f, 12.0f ),  Vector2( 27.0f, 12.0f ), time );
+  TestStartPan(application, Vector2(11.0f, 12.0f), Vector2(27.0f, 12.0f), time);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(25.0f, 28.0f), time );
+  TestEndPan(application, Vector2(25.0f, 28.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(-16.0f, -2.0f), data.receivedGesture.GetDisplacement(), 0.01f, TEST_LOCATION); // Actor relative
@@ -798,26 +805,25 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
   // Change rotation of child to be different from parent so that we can check if our local coordinate
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
-  child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
-  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  child.SetProperty( Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS) );
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  child.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS));
   parent.Add(child);
-
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -826,11 +832,11 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
 
   // Do an entire pan, only check finished value - hits child area but parent should still receive it
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 11.0f, 12.0f ),  Vector2( 27.0f, 12.0f ), time );
+  TestStartPan(application, Vector2(11.0f, 12.0f), Vector2(27.0f, 12.0f), time);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(25.0f, 28.0f), time );
+  TestEndPan(application, Vector2(25.0f, 28.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pannedActor, TEST_LOCATION);
@@ -842,11 +848,11 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
   detector.Detach(parent);
 
   // Do an entire pan, only check finished value
-  TestStartPan( application, Vector2( 11.0f, 12.0f ),  Vector2( 27.0f, 12.0f ), time );
+  TestStartPan(application, Vector2(11.0f, 12.0f), Vector2(27.0f, 12.0f), time);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(25.0f, 28.0f), time );
+  TestEndPan(application, Vector2(25.0f, 28.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pannedActor, TEST_LOCATION);
@@ -859,21 +865,21 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
   TestApplication application;
 
   Actor first = Actor::New();
-  first.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  first.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(first);
 
   Actor second = Actor::New();
-  second.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  second.SetProperty( Actor::Property::POSITION_X, 100.0f);
-  second.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  second.SetProperty(Actor::Property::POSITION_X, 100.0f);
+  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(second);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -886,7 +892,7 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
 
   // Start pan within second actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 110.0f, 20.0f ),  Vector2( 126.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(110.0f, 20.0f), Vector2(126.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), first.GetParent(), TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetScene().GetRootLayer(), second.GetParent(), TEST_LOCATION);
@@ -897,7 +903,7 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
   // Pan moves into first actor's area - second actor should receive the pan
   data.Reset();
 
-  TestMovePan( application, Vector2(126.0f, 20.0f), time );
+  TestMovePan(application, Vector2(126.0f, 20.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -909,8 +915,8 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
   // Gesture ends within actor's area
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 20.0f), time );
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
@@ -922,15 +928,15 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -939,20 +945,20 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
 
   // Start pan in actor's area
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Pan continues within actor's area
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor become invisible - actor should not receive the next pan
-  actor.SetProperty( Actor::Property::VISIBLE,false);
+  actor.SetProperty(Actor::Property::VISIBLE, false);
 
   // Render and notify
   application.SendNotification();
@@ -961,7 +967,7 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
   // Gesture ends within actor's area
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -972,13 +978,13 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
-  actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
 
   // Render and notify
@@ -986,16 +992,16 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   application.Render();
 
   // Attach actor to one detector
-  SignalData firstData;
+  SignalData             firstData;
   GestureReceivedFunctor firstFunctor(firstData);
-  PanGestureDetector firstDetector = PanGestureDetector::New();
+  PanGestureDetector     firstDetector = PanGestureDetector::New();
   firstDetector.Attach(actor);
   firstDetector.DetectedSignal().Connect(&application, firstFunctor);
 
   // Attach actor to another detector
-  SignalData secondData;
+  SignalData             secondData;
   GestureReceivedFunctor secondFunctor(secondData);
-  PanGestureDetector secondDetector = PanGestureDetector::New();
+  PanGestureDetector     secondDetector = PanGestureDetector::New();
   secondDetector.Attach(actor);
   secondDetector.DetectedSignal().Connect(&application, secondFunctor);
 
@@ -1006,7 +1012,7 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
 
   // Pan in actor's area - both detector's functors should be called
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
@@ -1015,7 +1021,7 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   firstData.Reset();
   secondData.Reset();
 
-  TestMovePan( application, Vector2(10.0f, 20.0f), time );
+  TestMovePan(application, Vector2(10.0f, 20.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
@@ -1026,7 +1032,7 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   firstData.Reset();
   secondData.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
@@ -1035,7 +1041,7 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   firstData.Reset();
   secondData.Reset();
 
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
@@ -1045,7 +1051,7 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
   firstData.Reset();
   secondData.Reset();
 
-  TestMovePan( application, Vector2(10.0f, 20.0f), time );
+  TestMovePan(application, Vector2(10.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, secondData.functorCalled, TEST_LOCATION);
@@ -1058,23 +1064,23 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
   TestApplication application;
 
   Actor actor1 = Actor::New();
-  actor1.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor1);
-  SignalData data1;
+  SignalData             data1;
   GestureReceivedFunctor functor1(data1);
-  PanGestureDetector detector1 = PanGestureDetector::New();
+  PanGestureDetector     detector1 = PanGestureDetector::New();
   detector1.Attach(actor1);
   detector1.DetectedSignal().Connect(&application, functor1);
 
   Actor actor2 = Actor::New();
-  actor2.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::BOTTOM_RIGHT);
-  actor2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
-  SignalData data2;
+  SignalData             data2;
   GestureReceivedFunctor functor2(data2);
-  PanGestureDetector detector2 = PanGestureDetector::New();
+  PanGestureDetector     detector2 = PanGestureDetector::New();
   detector2.Attach(actor2);
   detector2.DetectedSignal().Connect(&application, functor2);
 
@@ -1084,7 +1090,7 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
 
   // Start pan in actor1's area, only data1 should be set
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
@@ -1098,8 +1104,8 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDown(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1108,31 +1114,31 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDown(void)
 
   // Gesture possible in actor's area (using long-press)
   uint32_t time = 100;
-  TestStartLongPress( application, 10.0f, 20.0f, time );
+  TestStartLongPress(application, 10.0f, 20.0f, time);
   time += TestGetFrameInterval();
 
   // Attach actor to detector
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  PanGestureDetector detector = PanGestureDetector::New();
-  detector.DetectedSignal().Connect( &application, functor );
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  PanGestureDetector     detector = PanGestureDetector::New();
+  detector.DetectedSignal().Connect(&application, functor);
   detector.Attach(actor);
 
   // Start a pan, initially it'll only be possible, we shouldn't receive it
-  TestMovePan( application, Vector2( 10.0f, 20.0f ), time );
+  TestMovePan(application, Vector2(10.0f, 20.0f), time);
   time += TestGetFrameInterval();
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Now the pan truly starts, we should receive a signal
-  TestMovePan( application, Vector2( 26.0f, 20.0f ), time );
+  TestMovePan(application, Vector2(26.0f, 20.0f), time);
   time += TestGetFrameInterval();
-  TestMovePan( application, Vector2( 32.0f, 32.0f ), time );
+  TestMovePan(application, Vector2(32.0f, 32.0f), time);
   time += TestGetFrameInterval();
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Finish the pan, we should still receive a signal
   data.Reset();
-  TestEndPan( application, Vector2( 32.0f, 32.0f ), time );
+  TestEndPan(application, Vector2(32.0f, 32.0f), time);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
@@ -1146,28 +1152,28 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDownAfterInitialPanToAnother
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  application.GetScene().Add( parent );
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(parent);
 
   Actor child = Actor::New();
-  child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
-  child.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  parent.Add( child );
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parent.Add(child);
 
   // Create detector for parent and attach
-  SignalData parentData;
-  GestureReceivedFunctor parentFunctor( parentData );
-  PanGestureDetector parentDetector = PanGestureDetector::New();
-  parentDetector.DetectedSignal().Connect( &application, parentFunctor );
-  parentDetector.Attach( parent );
+  SignalData             parentData;
+  GestureReceivedFunctor parentFunctor(parentData);
+  PanGestureDetector     parentDetector = PanGestureDetector::New();
+  parentDetector.DetectedSignal().Connect(&application, parentFunctor);
+  parentDetector.Attach(parent);
 
   // Create detector for child but do not attach
-  SignalData childData;
-  GestureReceivedFunctor childFunctor( childData );
-  PanGestureDetector childDetector = PanGestureDetector::New();
-  childDetector.DetectedSignal().Connect( &application, childFunctor );
+  SignalData             childData;
+  GestureReceivedFunctor childFunctor(childData);
+  PanGestureDetector     childDetector = PanGestureDetector::New();
+  childDetector.DetectedSignal().Connect(&application, childFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1175,40 +1181,40 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDownAfterInitialPanToAnother
 
   // Do a full pan in both actors' area, only the parent's functor should be called
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ), Vector2( 26.0f, 20.0f ), time );
-  DALI_TEST_EQUALS( parentData.functorCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  DALI_TEST_EQUALS(parentData.functorCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(childData.functorCalled, false, TEST_LOCATION);
   parentData.Reset();
   childData.Reset();
-  TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
-  DALI_TEST_EQUALS( parentData.functorCalled, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
+  DALI_TEST_EQUALS(parentData.functorCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(childData.functorCalled, false, TEST_LOCATION);
   parentData.Reset();
   childData.Reset();
 
   // Gesture possible in both actors' area (using long-press), no functors called
-  TestStartLongPress( application, 10.0f, 20.0f, time );
+  TestStartLongPress(application, 10.0f, 20.0f, time);
   time += TestGetFrameInterval();
-  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( childData.functorCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(parentData.functorCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(childData.functorCalled, false, TEST_LOCATION);
 
   // Attach the child as well now
-  childDetector.Attach( child );
+  childDetector.Attach(child);
 
   // Now the pan truly starts, we should receive a signal for the child only
-  TestMovePan( application, Vector2( 26.0f, 20.0f ), time );
+  TestMovePan(application, Vector2(26.0f, 20.0f), time);
   time += TestGetFrameInterval();
-  TestMovePan( application, Vector2( 32.0f, 32.0f ), time );
+  TestMovePan(application, Vector2(32.0f, 32.0f), time);
   time += TestGetFrameInterval();
-  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( childData.functorCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(parentData.functorCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(childData.functorCalled, true, TEST_LOCATION);
   parentData.Reset();
   childData.Reset();
 
   // Finish the pan, again only the child should still receive a signal
-  TestEndPan( application, Vector2( 32.0f, 32.0f ), time );
-  DALI_TEST_EQUALS( parentData.functorCalled, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( childData.functorCalled, true, TEST_LOCATION );
+  TestEndPan(application, Vector2(32.0f, 32.0f), time);
+  DALI_TEST_EQUALS(parentData.functorCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(childData.functorCalled, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1218,8 +1224,8 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1227,57 +1233,57 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
   application.Render();
 
   // Attach actor to detector
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  PanGestureDetector detector = PanGestureDetector::New();
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  PanGestureDetector     detector = PanGestureDetector::New();
   detector.Attach(actor);
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.DetectedSignal().Connect(&application, functor);
 
   // Gesture possible in actor's area.
   uint32_t time = 100;
-  TestStartLongPress( application, 10.0f, 20.0f, time );
+  TestStartLongPress(application, 10.0f, 20.0f, time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor somewhere else
-  actor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Emit STARTED event, we should not receive the pan.
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // LONG_PRESS possible in empty area.
-  TestStartLongPress( application, 10.0f, 20.0f, time );
+  TestStartLongPress(application, 10.0f, 20.0f, time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor in to the long press position.
-  actor.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Emit STARTED event, we should be receiving the pan now.
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Normal pan in actor's area for completeness.
   data.Reset();
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestEndPan( application, Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -1287,8 +1293,8 @@ int UtcDaliPanGestureActorUnstaged(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1296,23 +1302,23 @@ int UtcDaliPanGestureActorUnstaged(void)
   application.Render();
 
   // State to remove actor in.
-  GestureState stateToUnstage( GestureState::STARTED );
+  GestureState stateToUnstage(GestureState::STARTED);
 
   // Attach actor to detector
-  SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
-  PanGestureDetector detector = PanGestureDetector::New();
+  SignalData          data;
+  UnstageActorFunctor functor(data, stateToUnstage, application.GetScene());
+  PanGestureDetector  detector = PanGestureDetector::New();
   detector.Attach(actor);
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.DetectedSignal().Connect(&application, functor);
 
   // Emit signals
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestEndPan( application, Vector2(26.0f, 20.0f), time );
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
@@ -1332,19 +1338,19 @@ int UtcDaliPanGestureActorUnstaged(void)
   stateToUnstage = GestureState::CONTINUING;
 
   // Emit signals
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
@@ -1364,21 +1370,21 @@ int UtcDaliPanGestureActorUnstaged(void)
   stateToUnstage = GestureState::FINISHED;
 
   // Emit signals
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  tet_result( TET_PASS ); // If we get here then we have handled actor stage removal gracefully.
+  tet_result(TET_PASS); // If we get here then we have handled actor stage removal gracefully.
   END_TEST;
 }
 
@@ -1387,15 +1393,15 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
-  Actor dummyActor( Actor::New() );
-  dummyActor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  dummyActor.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
-  dummyActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  Actor dummyActor(Actor::New());
+  dummyActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  dummyActor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  dummyActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(dummyActor);
 
   // Render and notify
@@ -1403,15 +1409,15 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // State to remove actor in.
-  GestureState stateToUnstage( GestureState::STARTED );
+  GestureState stateToUnstage(GestureState::STARTED);
 
   // Attach actor to detector
-  SignalData data;
-  UnstageActorFunctor functor( data, stateToUnstage, application.GetScene() );
-  PanGestureDetector detector = PanGestureDetector::New();
+  SignalData          data;
+  UnstageActorFunctor functor(data, stateToUnstage, application.GetScene());
+  PanGestureDetector  detector = PanGestureDetector::New();
   detector.Attach(actor);
   detector.Attach(dummyActor);
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.DetectedSignal().Connect(&application, functor);
 
   // Here we are testing a STARTED actor which is removed in the STARTED callback, but then added back
   // before we get a continuing state.  As we were removed from the stage, even if we're at the same
@@ -1419,7 +1425,7 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
 
   // Emit signals
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
@@ -1436,13 +1442,13 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Continue signal emission
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
@@ -1451,7 +1457,7 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   // Here we delete an actor in started, we should not receive any subsequent signalling.
 
   // Emit signals
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
@@ -1468,13 +1474,13 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Continue signal emission
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  TestEndPan( application, Vector2(10.0f, 4.0f), time );
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -1485,48 +1491,48 @@ int UtcDaliPanGestureAngleHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0u, TEST_LOCATION);
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 1u, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_LEFT, Radian(Math::PI * 0.25));
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 1u, TEST_LOCATION);
   bool found = false;
-  for( size_t i = 0; i < detector.GetAngleCount(); i++)
+  for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT )
+    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
     {
-      tet_result( TET_PASS );
+      tet_result(TET_PASS);
       found = true;
       break;
     }
   }
 
-  if(!found )
+  if(!found)
   {
-    tet_printf("%s, angle not added\n", TEST_LOCATION );
-    tet_result( TET_FAIL );
+    tet_printf("%s, angle not added\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
   }
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Radian(Math::PI * 0.25));
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
 
   // Remove something not in the container.
-  detector.RemoveAngle( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
+  detector.RemoveAngle(PanGestureDetector::DIRECTION_UP);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
 
-  detector.RemoveAngle( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 1u, TEST_LOCATION );
-  for ( size_t i = 0; i < detector.GetAngleCount(); i++)
+  detector.RemoveAngle(PanGestureDetector::DIRECTION_RIGHT);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 1u, TEST_LOCATION);
+  for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if ( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT )
+    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
     {
-      tet_printf("%s, angle not removed\n", TEST_LOCATION );
-      tet_result( TET_FAIL );
+      tet_printf("%s, angle not removed\n", TEST_LOCATION);
+      tet_result(TET_FAIL);
       break;
     }
   }
 
   detector.ClearAngles();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0u, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1535,29 +1541,29 @@ int UtcDaliPanGestureGetAngle(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0, TEST_LOCATION);
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_LEFT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_LEFT);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 1, TEST_LOCATION);
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2, TEST_LOCATION);
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 3, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_UP);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 3, TEST_LOCATION);
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_DOWN );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 4, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_DOWN);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 4, TEST_LOCATION);
 
-  DALI_TEST_EQUALS( detector.GetAngle(0).first,  PanGestureDetector::DIRECTION_LEFT, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetAngle(1).first,  PanGestureDetector::DIRECTION_RIGHT, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetAngle(2).first,  PanGestureDetector::DIRECTION_UP, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetAngle(3).first,  PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, PanGestureDetector::DIRECTION_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(1).first, PanGestureDetector::DIRECTION_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(2).first, PanGestureDetector::DIRECTION_UP, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(3).first, PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION);
 
   END_TEST;
 }
 
-inline float RadiansToDegrees( float radian )
+inline float RadiansToDegrees(float radian)
 {
   return radian * 180.0f / Math::PI;
 }
@@ -1567,58 +1573,58 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0u, TEST_LOCATION);
 
   //
   // Angle
   //
 
-  detector.AddAngle( Degree(180.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-180.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(180.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(190.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-170.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(190.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-170.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(-190.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(170.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(-190.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(170.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(350.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(350.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(-350.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(-350.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(370.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(370.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( Degree(-370.0f) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(Degree(-370.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   //
   // Threshold
   //
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( 0.0f ) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(0.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(0.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(0.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( -10.0f ) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-10.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( -181.0f ) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-181.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
-  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( 181.0f ) );
-  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
+  detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(181.0f));
+  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
   END_TEST;
 }
@@ -1628,13 +1634,13 @@ int UtcDaliPanGestureAngleProcessing(void)
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
-  child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1643,61 +1649,61 @@ int UtcDaliPanGestureAngleProcessing(void)
 
   // Parent detector only requires up pans
   PanGestureDetector parentDetector = PanGestureDetector::New();
-  parentDetector.Attach( parent );
-  parentDetector.AddAngle( PanGestureDetector::DIRECTION_UP, Degree( 30.0f ) );
-  SignalData parentData;
+  parentDetector.Attach(parent);
+  parentDetector.AddAngle(PanGestureDetector::DIRECTION_UP, Degree(30.0f));
+  SignalData             parentData;
   GestureReceivedFunctor parentFunctor(parentData);
   parentDetector.DetectedSignal().Connect(&application, parentFunctor);
 
   // Child detector only requires right pans
   PanGestureDetector childDetector = PanGestureDetector::New();
-  childDetector.Attach( child );
-  childDetector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( 30.0f ) );
-  SignalData childData;
+  childDetector.Attach(child);
+  childDetector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(30.0f));
+  SignalData             childData;
   GestureReceivedFunctor childFunctor(childData);
   childDetector.DetectedSignal().Connect(&application, childFunctor);
 
   // Generate an Up pan gesture, only parent should receive it.
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 20.0f, 4.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(20.0f, 4.0f), time);
 
-  DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 4.0f), time );
+  TestEndPan(application, Vector2(20.0f, 4.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Right pan gesture, only child should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 36.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(36.0f, 20.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(4.0f, 20.0f), time );
+  TestEndPan(application, Vector2(4.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Down pan gesture, no one should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 20.0f, 36.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(20.0f, 36.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 36.0f), time );
+  TestEndPan(application, Vector2(20.0f, 36.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Left pan gesture, no one should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 4.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(4.0f, 20.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(4.0f, 20.0f), time );
+  TestEndPan(application, Vector2(4.0f, 20.0f), time);
   parentData.Reset();
   childData.Reset();
   END_TEST;
@@ -1708,51 +1714,50 @@ int UtcDaliPanGestureDirectionHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0u, TEST_LOCATION);
 
-  detector.AddDirection( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
+  detector.AddDirection(PanGestureDetector::DIRECTION_LEFT, Radian(Math::PI * 0.25));
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
   bool found = false;
-  for ( size_t i = 0; detector.GetAngleCount(); i++)
+  for(size_t i = 0; detector.GetAngleCount(); i++)
   {
-    if ( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT )
+    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
     {
-      tet_result( TET_PASS );
+      tet_result(TET_PASS);
       found = true;
       break;
     }
-
   }
 
-  if (!found )
+  if(!found)
   {
-    tet_printf("%s, angle not added\n", TEST_LOCATION );
-    tet_result( TET_FAIL );
+    tet_printf("%s, angle not added\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
   }
 
   found = false;
-  for( size_t i = 0; i < detector.GetAngleCount(); i++)
+  for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT )
+    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
     {
-      tet_result( TET_PASS );
+      tet_result(TET_PASS);
       found = true;
       break;
     }
   }
 
-  if(!found )
+  if(!found)
   {
-    tet_printf("%s, angle not added\n", TEST_LOCATION );
-    tet_result( TET_FAIL );
+    tet_printf("%s, angle not added\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
   }
 
   // Remove something not in the container.
-  detector.RemoveDirection( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
+  detector.RemoveDirection(PanGestureDetector::DIRECTION_UP);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
 
-  detector.RemoveDirection( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
+  detector.RemoveDirection(PanGestureDetector::DIRECTION_RIGHT);
+  DALI_TEST_EQUALS(detector.GetAngleCount(), 0u, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1761,13 +1766,13 @@ int UtcDaliPanGestureDirectionProcessing(void)
   TestApplication application;
 
   Actor parent = Actor::New();
-  parent.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  parent.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
-  child.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  child.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1776,94 +1781,94 @@ int UtcDaliPanGestureDirectionProcessing(void)
 
   // Parent detector only requires vertical panning
   PanGestureDetector parentDetector = PanGestureDetector::New();
-  parentDetector.Attach( parent );
-  parentDetector.AddDirection( PanGestureDetector::DIRECTION_VERTICAL, Degree( 30.0f ) );
-  SignalData parentData;
+  parentDetector.Attach(parent);
+  parentDetector.AddDirection(PanGestureDetector::DIRECTION_VERTICAL, Degree(30.0f));
+  SignalData             parentData;
   GestureReceivedFunctor parentFunctor(parentData);
   parentDetector.DetectedSignal().Connect(&application, parentFunctor);
 
   // Child detector only requires horizontal panning
   PanGestureDetector childDetector = PanGestureDetector::New();
-  childDetector.Attach( child );
-  childDetector.AddDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 30.0f ) );
-  SignalData childData;
+  childDetector.Attach(child);
+  childDetector.AddDirection(PanGestureDetector::DIRECTION_HORIZONTAL, Degree(30.0f));
+  SignalData             childData;
   GestureReceivedFunctor childFunctor(childData);
   childDetector.DetectedSignal().Connect(&application, childFunctor);
 
   // Generate an Up pan gesture, only parent should receive it.
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 20.0f, 4.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(20.0f, 4.0f), time);
 
-  DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Right pan gesture, only child should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 36.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(36.0f, 20.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Down pan gesture, only parent should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 20.0f, 36.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(20.0f, 36.0f), time);
 
-  DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a Left pan gesture, only child should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 4.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(4.0f, 20.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at -45 degrees, no one should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 9.0f, 31.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(9.0f, 31.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at 45 degrees, no one should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 31.0f, 31.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(31.0f, 31.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   time += TestGetFrameInterval();
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at -135 degrees, no one should receive it.
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  Vector2( 4.0f, 4.0f ), time );
+  TestStartPan(application, Vector2(20.0f, 20.0f), Vector2(4.0f, 4.0f), time);
 
-  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, childData.functorCalled, TEST_LOCATION);
 
-  TestEndPan( application, Vector2(20.0f, 20.0f), time );
+  TestEndPan(application, Vector2(20.0f, 20.0f), time);
   parentData.Reset();
   childData.Reset();
   END_TEST;
@@ -1876,57 +1881,57 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
   Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 1.0f, 1.0f );
-  Vector2 position( -14.0f, 1.0f );
-  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2  startPosition(1.0f, 1.0f);
+  Vector2  position(-14.0f, 1.0f);
+  Vector2  direction(Vector2::XAXIS * -5.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 47; i++ )
+  for(int i = 0; i < 47; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -1939,58 +1944,58 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
   Integration::SetPanGestureSmoothingMode(1);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 1.0f, 1.0f );
-  Vector2 position( -14.0f, 1.0f );
-  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2  startPosition(1.0f, 1.0f);
+  Vector2  position(-14.0f, 1.0f);
+  Vector2  direction(Vector2::XAXIS * -5.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 47; i++ )
+  for(int i = 0; i < 47; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
   // Take into account resampling done when prediction is off.
-  DALI_TEST_EQUALS( constraintData.screenPosition, startPosition + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  startPosition + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION );
+  DALI_TEST_EQUALS(constraintData.screenPosition, startPosition + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, startPosition + (direction * (PAN_GESTURE_UPDATE_COUNT - 0.25f)), 0.15f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2003,57 +2008,57 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
   Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 1.0f, 1.0f );
-  Vector2 position( -1.0f, 1.0f );
-  Vector2 direction(Vector2::XAXIS * -1.0f);
+  Vector2  startPosition(1.0f, 1.0f);
+  Vector2  position(-1.0f, 1.0f);
+  Vector2  direction(Vector2::XAXIS * -1.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 47; i++ )
+  for(int i = 0; i < 47; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2066,57 +2071,57 @@ int UtcDaliPanGesturePredictionSmoothing01(void)
   Integration::SetPanGestureSmoothingMode(1);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 1.0f, 1.0f );
-  Vector2 position( -1.0f, 1.0f );
-  Vector2 direction(Vector2::XAXIS * -1.0f);
+  Vector2  startPosition(1.0f, 1.0f);
+  Vector2  position(-1.0f, 1.0f);
+  Vector2  direction(Vector2::XAXIS * -1.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 47; i++ )
+  for(int i = 0; i < 47; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2125,98 +2130,98 @@ int UtcDaliPanGesturePredictionSmoothing01(void)
 int UtcDaliPanGesturePredictionSmoothing02(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode( 1 );
-  Integration::SetPanGestureMaximumPredictionAmount( 1 );
-  Integration::SetPanGesturePredictionAmountAdjustment( 2 );
-  Integration::SetPanGestureSmoothingMode( 1 );
-  Integration::SetPanGestureSmoothingAmount( 0.25f );
+  Integration::SetPanGesturePredictionMode(1);
+  Integration::SetPanGestureMaximumPredictionAmount(1);
+  Integration::SetPanGesturePredictionAmountAdjustment(2);
+  Integration::SetPanGestureSmoothingMode(1);
+  Integration::SetPanGestureSmoothingAmount(0.25f);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 2.0f, 2.0f );
-  Vector2 position( 4.0f, 2.0f );
-  Vector2 directionX(Vector2::XAXIS);
-  Vector2 directionY(Vector2::YAXIS);
+  Vector2  startPosition(2.0f, 2.0f);
+  Vector2  position(4.0f, 2.0f);
+  Vector2  directionX(Vector2::XAXIS);
+  Vector2  directionY(Vector2::YAXIS);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 7; i++ )
+  for(int i = 0; i < 7; i++)
   {
     position += directionX;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
   position += directionX * 10.0f;
-  TestMovePan( application, position, time );
+  TestMovePan(application, position, time);
   time += TestGetFrameInterval();
   application.SendNotification();
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  for(int i = 0; i < 2; i++ )
+  for(int i = 0; i < 2; i++)
   {
-    position += ( directionX * -1.0f );
-    TestMovePan( application, position, time );
+    position += (directionX * -1.0f);
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += directionX;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += directionY;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2226,70 +2231,70 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap01(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode( 2 );
-  Integration::SetPanGesturePredictionAmount( 57 );
-  Integration::SetPanGestureSmoothingMode( 2 );
-  Integration::SetPanGestureUseActualTimes( false );
-  Integration::SetPanGestureInterpolationTimeRange( 10 );
-  Integration::SetPanGestureScalarOnlyPredictionEnabled( false );
-  Integration::SetPanGestureTwoPointPredictionEnabled( true );
-  Integration::SetPanGestureTwoPointInterpolatePastTime( 42 );
-  Integration::SetPanGestureTwoPointVelocityBias( 0.35f );
-  Integration::SetPanGestureTwoPointAccelerationBias( 0.10f );
-  Integration::SetPanGestureMultitapSmoothingRange( 34 );
+  Integration::SetPanGesturePredictionMode(2);
+  Integration::SetPanGesturePredictionAmount(57);
+  Integration::SetPanGestureSmoothingMode(2);
+  Integration::SetPanGestureUseActualTimes(false);
+  Integration::SetPanGestureInterpolationTimeRange(10);
+  Integration::SetPanGestureScalarOnlyPredictionEnabled(false);
+  Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Integration::SetPanGestureMultitapSmoothingRange(34);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 2.0f, 2.0f );
-  Vector2 position( -1.0f, 2.0f );
-  Vector2 direction(Vector2::XAXIS * -1.0f);
+  Vector2  startPosition(2.0f, 2.0f);
+  Vector2  position(-1.0f, 2.0f);
+  Vector2  direction(Vector2::XAXIS * -1.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 27; i++ )
+  for(int i = 0; i < 27; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2299,103 +2304,103 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap02(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode( 2 );
-  Integration::SetPanGestureSmoothingMode( 2 );
-  Integration::SetPanGestureUseActualTimes( true );
-  Integration::SetPanGestureInterpolationTimeRange( 10 );
-  Integration::SetPanGestureScalarOnlyPredictionEnabled( true );
-  Integration::SetPanGestureTwoPointPredictionEnabled( true );
-  Integration::SetPanGestureTwoPointInterpolatePastTime( 42 );
-  Integration::SetPanGestureTwoPointVelocityBias( 0.35f );
-  Integration::SetPanGestureTwoPointAccelerationBias( 0.10f );
-  Integration::SetPanGestureMultitapSmoothingRange( 34 );
+  Integration::SetPanGesturePredictionMode(2);
+  Integration::SetPanGestureSmoothingMode(2);
+  Integration::SetPanGestureUseActualTimes(true);
+  Integration::SetPanGestureInterpolationTimeRange(10);
+  Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
+  Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Integration::SetPanGestureMultitapSmoothingRange(34);
 
-  Integration::EnableProfiling( Integration::PROFILING_TYPE_PAN_GESTURE );
+  Integration::EnableProfiling(Integration::PROFILING_TYPE_PAN_GESTURE);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 2.0f, 2.0f );
-  Vector2 position( 17.0f, 2.0f );
-  Vector2 direction(Vector2::XAXIS * -1.0f);
+  Vector2  startPosition(2.0f, 2.0f);
+  Vector2  position(17.0f, 2.0f);
+  Vector2  direction(Vector2::XAXIS * -1.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
 
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
 
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
 
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2405,101 +2410,100 @@ int UtcDaliPanGesturePrediction2Smoothing(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode( 2 );
-  Integration::SetPanGesturePredictionAmount( 57 );
-  Integration::SetPanGestureSmoothingMode( 1 );
-  Integration::SetPanGestureUseActualTimes( false );
-  Integration::SetPanGestureInterpolationTimeRange( 10 );
-  Integration::SetPanGestureScalarOnlyPredictionEnabled( true );
-  Integration::SetPanGestureTwoPointPredictionEnabled( true );
-  Integration::SetPanGestureTwoPointInterpolatePastTime( 42 );
-  Integration::SetPanGestureTwoPointVelocityBias( 0.35f );
-  Integration::SetPanGestureTwoPointAccelerationBias( 0.10f );
-  Integration::SetPanGestureMultitapSmoothingRange( 34 );
+  Integration::SetPanGesturePredictionMode(2);
+  Integration::SetPanGesturePredictionAmount(57);
+  Integration::SetPanGestureSmoothingMode(1);
+  Integration::SetPanGestureUseActualTimes(false);
+  Integration::SetPanGestureInterpolationTimeRange(10);
+  Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
+  Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Integration::SetPanGestureMultitapSmoothingRange(34);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 startPosition( 2.0f, 2.0f );
-  Vector2 position( 17.0f, 2.0f );
-  Vector2 direction(Vector2::XAXIS * -1.0f);
+  Vector2  startPosition(2.0f, 2.0f);
+  Vector2  position(17.0f, 2.0f);
+  Vector2  direction(Vector2::XAXIS * -1.0f);
   uint32_t time = 100;
 
-  TestStartPan( application, startPosition, position, time );
+  TestStartPan(application, startPosition, position, time);
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-
   position += direction;
-  TestMovePan( application, position, time );
+  TestMovePan(application, position, time);
   time += TestGetFrameInterval();
 
   position += direction;
-  TestMovePan( application, position, time );
+  TestMovePan(application, position, time);
   time += TestGetFrameInterval();
 
   position += direction;
-  TestMovePan( application, position, time );
+  TestMovePan(application, position, time);
   time += TestGetFrameInterval();
 
   application.SendNotification();
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  for(int i = 0; i < 5; i++ )
+  for(int i = 0; i < 5; i++)
   {
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  for(int i = 0; i < 10; i++ )
+  for(int i = 0; i < 10; i++)
   {
     position += direction;
-    TestMovePan( application, position, time );
+    TestMovePan(application, position, time);
     time += TestGetFrameInterval();
     application.SendNotification();
     application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
   }
 
-  TestEndPan( application, position, time );
+  TestEndPan(application, position, time);
   application.Render(TestApplication::DEFAULT_RENDER_INTERVAL);
 
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, Vector2(2.0f, 2.0f) + position, 10.0f, TEST_LOCATION);
 
   constraintData.Reset();
   END_TEST;
@@ -2507,36 +2511,36 @@ int UtcDaliPanGesturePrediction2Smoothing(void)
 
 int UtcDaliPanGestureSetProperties(void)
 {
-  TestApplication application;
-  TestRenderController& renderController( application.GetRenderController() );
+  TestApplication       application;
+  TestRenderController& renderController(application.GetRenderController());
   Integration::SetPanGesturePredictionMode(0);
   Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
-  Property::Index animatableGestureProperty = detector.RegisterProperty( "Dummy Property", Vector3::ZERO ); // For code coverage
+  Property::Index property                  = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
+  Property::Index animatableGestureProperty = detector.RegisterProperty("Dummy Property", Vector3::ZERO); // For code coverage
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
-  constraint.AddSource( Source( detector, animatableGestureProperty ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
+  constraint.AddSource(Source(detector, animatableGestureProperty));
   constraint.Apply();
 
   // Render and notify
@@ -2544,29 +2548,29 @@ int UtcDaliPanGestureSetProperties(void)
   application.Render();
 
   renderController.Initialize();
-  DALI_TEST_EQUALS( renderController.WasCalled( TestRenderController::RequestUpdateFunc ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS(renderController.WasCalled(TestRenderController::RequestUpdateFunc), false, TEST_LOCATION);
 
-  Vector2 screenPosition( 20.0f, 20.0f );
-  Vector2 screenDisplacement( 1.0f, 1.0f );
-  Vector2 screenVelocity( 1.3f, 4.0f );
-  Vector2 localPosition( 21.0f, 21.0f );
-  Vector2 localDisplacement( 0.5f, 0.5f );
-  Vector2 localVelocity( 1.5f, 2.5f );
+  Vector2 screenPosition(20.0f, 20.0f);
+  Vector2 screenDisplacement(1.0f, 1.0f);
+  Vector2 screenVelocity(1.3f, 4.0f);
+  Vector2 localPosition(21.0f, 21.0f);
+  Vector2 localDisplacement(0.5f, 0.5f);
+  Vector2 localVelocity(1.5f, 2.5f);
 
-  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, GestureState::STARTED, screenPosition, localPosition, screenDisplacement, localDisplacement, screenVelocity, localVelocity ) );
-  DALI_TEST_EQUALS( renderController.WasCalled( TestRenderController::RequestUpdateFunc ), true, TEST_LOCATION );
+  PanGestureDetector::SetPanGestureProperties(GeneratePan(1u, GestureState::STARTED, screenPosition, localPosition, screenDisplacement, localDisplacement, screenVelocity, localVelocity));
+  DALI_TEST_EQUALS(renderController.WasCalled(TestRenderController::RequestUpdateFunc), true, TEST_LOCATION);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition,     screenPosition,     TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,      localPosition,      TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenDisplacement, screenDisplacement, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localDisplacement,  localDisplacement,  TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenVelocity,     screenVelocity,     TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localVelocity,      localVelocity,      TEST_LOCATION );
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, screenPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, localPosition, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenDisplacement, screenDisplacement, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localDisplacement, localDisplacement, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenVelocity, screenVelocity, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localVelocity, localVelocity, TEST_LOCATION);
   constraintData.Reset();
   END_TEST;
 }
@@ -2577,64 +2581,64 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   Integration::SetPanGesturePredictionMode(0);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
-  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+  Property::Index property = actor.RegisterProperty("Dummy Property", Vector3::ZERO);
 
   ConstraintData constraintData;
-  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
-  constraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
+  Constraint     constraint = Constraint::New<Vector3>(actor, property, PanConstraint(constraintData));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::SCREEN_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_VELOCITY));
+  constraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
   constraint.Apply();
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector2 currentPosition( 20.0f, 4.0f );
+  Vector2  currentPosition(20.0f, 4.0f);
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 20.0f, 20.0f ),  currentPosition, time );
-  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
+  TestStartPan(application, Vector2(20.0f, 20.0f), currentPosition, time);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
-  Vector2 screenPosition( 100.0f, 20.0f );
-  Vector2 localPosition( 110.0f, 110.0f );
+  Vector2 screenPosition(100.0f, 20.0f);
+  Vector2 localPosition(110.0f, 110.0f);
 
-  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, GestureState::STARTED, screenPosition, localPosition ) );
+  PanGestureDetector::SetPanGestureProperties(GeneratePan(1u, GestureState::STARTED, screenPosition, localPosition));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.screenPosition, currentPosition, 0.1, TEST_LOCATION );
-  DALI_TEST_EQUALS( constraintData.localPosition,  currentPosition, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS(constraintData.called, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.screenPosition, currentPosition, 0.1, TEST_LOCATION);
+  DALI_TEST_EQUALS(constraintData.localPosition, currentPosition, 0.1f, TEST_LOCATION);
   constraintData.Reset();
   END_TEST;
 }
 
 int UtcDaliPanGesturePropertyIndices(void)
 {
-  TestApplication application;
+  TestApplication    application;
   PanGestureDetector detector = PanGestureDetector::New();
 
   Property::IndexContainer indices;
-  detector.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.Size() );
-  DALI_TEST_EQUALS( indices.Size(), detector.GetPropertyCount(), TEST_LOCATION );
+  detector.GetPropertyIndices(indices);
+  DALI_TEST_CHECK(indices.Size());
+  DALI_TEST_EQUALS(indices.Size(), detector.GetPropertyCount(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -2642,40 +2646,39 @@ namespace
 {
 struct PropertyStringIndex
 {
-  const char * const name;
+  const char* const     name;
   const Property::Index index;
-  const Property::Type type;
+  const Property::Type  type;
   const Property::Value value;
 };
 
 const PropertyStringIndex PROPERTY_TABLE[] =
-{
-  { "screenPosition",      PanGestureDetector::Property::SCREEN_POSITION,     Property::VECTOR2, Vector2::ZERO },
-  { "screenDisplacement",  PanGestureDetector::Property::SCREEN_DISPLACEMENT, Property::VECTOR2, Vector2::ZERO },
-  { "screenVelocity",      PanGestureDetector::Property::SCREEN_VELOCITY,     Property::VECTOR2, Vector2::ZERO },
-  { "localPosition",       PanGestureDetector::Property::LOCAL_POSITION,      Property::VECTOR2, Vector2::ZERO },
-  { "localDisplacement",   PanGestureDetector::Property::LOCAL_DISPLACEMENT,  Property::VECTOR2, Vector2::ZERO },
-  { "localVelocity",       PanGestureDetector::Property::LOCAL_VELOCITY,      Property::VECTOR2, Vector2::ZERO },
-  { "panning",             PanGestureDetector::Property::PANNING,             Property::BOOLEAN, false         },
+  {
+    {"screenPosition", PanGestureDetector::Property::SCREEN_POSITION, Property::VECTOR2, Vector2::ZERO},
+    {"screenDisplacement", PanGestureDetector::Property::SCREEN_DISPLACEMENT, Property::VECTOR2, Vector2::ZERO},
+    {"screenVelocity", PanGestureDetector::Property::SCREEN_VELOCITY, Property::VECTOR2, Vector2::ZERO},
+    {"localPosition", PanGestureDetector::Property::LOCAL_POSITION, Property::VECTOR2, Vector2::ZERO},
+    {"localDisplacement", PanGestureDetector::Property::LOCAL_DISPLACEMENT, Property::VECTOR2, Vector2::ZERO},
+    {"localVelocity", PanGestureDetector::Property::LOCAL_VELOCITY, Property::VECTOR2, Vector2::ZERO},
+    {"panning", PanGestureDetector::Property::PANNING, Property::BOOLEAN, false},
 };
-const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
+const unsigned int PROPERTY_TABLE_COUNT = sizeof(PROPERTY_TABLE) / sizeof(PROPERTY_TABLE[0]);
 } // unnamed namespace
-
 
 int UtcDaliPanGestureProperties(void)
 {
-  TestApplication application;
+  TestApplication    application;
   PanGestureDetector detector = PanGestureDetector::New();
 
-  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  for(unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i)
   {
-    DALI_TEST_EQUALS( detector.GetPropertyName( PROPERTY_TABLE[ i ].index ), std::string( PROPERTY_TABLE[ i ].name ), TEST_LOCATION );
-    DALI_TEST_EQUALS( detector.GetPropertyIndex( PROPERTY_TABLE[ i ].name ), PROPERTY_TABLE[ i ].index, TEST_LOCATION );
-    DALI_TEST_EQUALS( detector.GetPropertyType( PROPERTY_TABLE[ i ].index ), PROPERTY_TABLE[ i ].type, TEST_LOCATION );
-    DALI_TEST_EQUALS( detector.IsPropertyWritable( PROPERTY_TABLE[ i ].index ), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( detector.IsPropertyAnimatable( PROPERTY_TABLE[ i ].index ), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( detector.IsPropertyAConstraintInput( PROPERTY_TABLE[ i ].index ), true, TEST_LOCATION );
-    detector.SetProperty( PROPERTY_TABLE[ i ].index, Property::Value() ); // Just for Coverage
+    DALI_TEST_EQUALS(detector.GetPropertyName(PROPERTY_TABLE[i].index), std::string(PROPERTY_TABLE[i].name), TEST_LOCATION);
+    DALI_TEST_EQUALS(detector.GetPropertyIndex(PROPERTY_TABLE[i].name), PROPERTY_TABLE[i].index, TEST_LOCATION);
+    DALI_TEST_EQUALS(detector.GetPropertyType(PROPERTY_TABLE[i].index), PROPERTY_TABLE[i].type, TEST_LOCATION);
+    DALI_TEST_EQUALS(detector.IsPropertyWritable(PROPERTY_TABLE[i].index), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(detector.IsPropertyAnimatable(PROPERTY_TABLE[i].index), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(detector.IsPropertyAConstraintInput(PROPERTY_TABLE[i].index), true, TEST_LOCATION);
+    detector.SetProperty(PROPERTY_TABLE[i].index, Property::Value()); // Just for Coverage
   }
 
   END_TEST;
@@ -2683,20 +2686,20 @@ int UtcDaliPanGestureProperties(void)
 
 int UtcDaliPanGestureGetProperty(void)
 {
-  TestApplication application;
+  TestApplication    application;
   PanGestureDetector detector = PanGestureDetector::New();
 
-  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  for(unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i)
   {
-    if( PROPERTY_TABLE[ i ].type == Property::VECTOR2 )
+    if(PROPERTY_TABLE[i].type == Property::VECTOR2)
     {
-      bool value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< bool >();
-      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< bool >(), value, TEST_LOCATION );
+      bool value = detector.GetProperty(PROPERTY_TABLE[i].index).Get<bool>();
+      DALI_TEST_EQUALS(PROPERTY_TABLE[i].value.Get<bool>(), value, TEST_LOCATION);
     }
-    else if( PROPERTY_TABLE[ i ].type == Property::BOOLEAN )
+    else if(PROPERTY_TABLE[i].type == Property::BOOLEAN)
     {
-      Vector2 value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< Vector2 >();
-      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< Vector2 >(), value, TEST_LOCATION );
+      Vector2 value = detector.GetProperty(PROPERTY_TABLE[i].index).Get<Vector2>();
+      DALI_TEST_EQUALS(PROPERTY_TABLE[i].value.Get<Vector2>(), value, TEST_LOCATION);
     }
   }
 
@@ -2708,31 +2711,31 @@ int UtcDaliPanGestureGetPropertyWithSceneObject(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
+  detector.Attach(actor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  for( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  for(unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i)
   {
-    detector.SetProperty( PROPERTY_TABLE[ i ].index, Property::Value() ); // Just for Coverage
+    detector.SetProperty(PROPERTY_TABLE[i].index, Property::Value()); // Just for Coverage
 
-    if( PROPERTY_TABLE[ i ].type == Property::VECTOR2 )
+    if(PROPERTY_TABLE[i].type == Property::VECTOR2)
     {
-      bool value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< bool >();
-      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< bool >(), value, TEST_LOCATION );
+      bool value = detector.GetProperty(PROPERTY_TABLE[i].index).Get<bool>();
+      DALI_TEST_EQUALS(PROPERTY_TABLE[i].value.Get<bool>(), value, TEST_LOCATION);
     }
-    else if( PROPERTY_TABLE[ i ].type == Property::BOOLEAN )
+    else if(PROPERTY_TABLE[i].type == Property::BOOLEAN)
     {
-      Vector2 value = detector.GetProperty( PROPERTY_TABLE[ i ].index ).Get< Vector2 >();
-      DALI_TEST_EQUALS( PROPERTY_TABLE[ i ].value.Get< Vector2 >(), value, TEST_LOCATION );
+      Vector2 value = detector.GetProperty(PROPERTY_TABLE[i].index).Get<Vector2>();
+      DALI_TEST_EQUALS(PROPERTY_TABLE[i].value.Get<Vector2>(), value, TEST_LOCATION);
     }
   }
 
@@ -2744,22 +2747,22 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
-  layer.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  layer.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  application.GetScene().Add( layer );
+  layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(layer);
   layer.RaiseToTop();
 
   // Render and notify
@@ -2768,23 +2771,23 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
 
   // Emit signals, should receive
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestEndPan( application, Vector2(26.0f, 20.0f), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Set layer to consume all touch
-  layer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
+  layer.SetProperty(Layer::Property::CONSUMES_TOUCH, true);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Emit the same signals again, should not receive
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
-  TestEndPan( application, Vector2(26.0f, 20.0f), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestEndPan(application, Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
@@ -2797,16 +2800,16 @@ int UtcDaliPanGestureNoTimeDiff(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
   PanGestureDetector detector = PanGestureDetector::New();
-  detector.Attach( actor );
-  SignalData data;
-  GestureReceivedFunctor functor( data );
-  detector.DetectedSignal().Connect( &application, functor );
+  detector.Attach(actor);
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
 
   // Render and notify
   application.SendNotification();
@@ -2814,16 +2817,16 @@ int UtcDaliPanGestureNoTimeDiff(void)
 
   // As normal helper function adds intervals between presses we must generate the sequence
   // using other helper functions
-  TestStartLongPress( application, 10.0f, 20.0f, 100 );   // Used to send a down press event
-  TestMovePan( application, Vector2(26.0f, 20.0f), 100 );
-  TestMovePan( application, Vector2(26.0f, 20.0f), 100 ); // 2 motions required to trigger
-  TestEndPan( application, Vector2(26.0f, 20.0f), 100 );
+  TestStartLongPress(application, 10.0f, 20.0f, 100); // Used to send a down press event
+  TestMovePan(application, Vector2(26.0f, 20.0f), 100);
+  TestMovePan(application, Vector2(26.0f, 20.0f), 100); // 2 motions required to trigger
+  TestEndPan(application, Vector2(26.0f, 20.0f), 100);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetVelocity().x ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetVelocity().y ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetScreenVelocity().x ) );
-  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.GetScreenVelocity().y ) );
+  DALI_TEST_CHECK(!std::isinf(data.receivedGesture.GetVelocity().x));
+  DALI_TEST_CHECK(!std::isinf(data.receivedGesture.GetVelocity().y));
+  DALI_TEST_CHECK(!std::isinf(data.receivedGesture.GetScreenVelocity().x));
+  DALI_TEST_CHECK(!std::isinf(data.receivedGesture.GetScreenVelocity().y));
   data.Reset();
 
   data.Reset();
@@ -2836,19 +2839,19 @@ int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
-  bool consume = false;
+  bool                           consume = false;
   TouchEventFunctorConsumeSetter touchFunctor(consume);
-  actor.TouchedSignal().Connect(&application,touchFunctor);
+  actor.TouchedSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
 
   PanGestureDetector detector = PanGestureDetector::New();
@@ -2857,7 +2860,7 @@ int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
 
   // Start gesture within the actor's area, we should receive the pan as the touch is NOT being consumed
   uint32_t time = 100;
-  TestStartPan( application, Vector2( 10.0f, 20.0f ),  Vector2( 26.0f, 20.0f ), time );
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
@@ -2866,7 +2869,7 @@ int UtcDaliPanGestureInterruptedWhenTouchConsumed(void)
   // Continue the gesture within the actor's area, but now the touch consumes thus cancelling the gesture
   consume = true;
 
-  TestMovePan( application, Vector2(26.0f, 4.0f), time );
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
   time += TestGetFrameInterval();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -2882,24 +2885,23 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
-  PanGestureDetector detector = PanGestureDetector::New();
-  bool functorCalled = false;
-  detector.Attach( actor );
+  PanGestureDetector detector      = PanGestureDetector::New();
+  bool               functorCalled = false;
+  detector.Attach(actor);
   detector.DetectedSignal().Connect(
-      &application,
-      [&detector, &functorCalled](Actor actor, const PanGesture& pan)
+    &application,
+    [&detector, &functorCalled](Actor actor, const PanGesture& pan) {
+      if(pan.GetState() == GestureState::FINISHED)
       {
-        if( pan.GetState() == GestureState::FINISHED )
-        {
-          detector.Detach(actor);
-          functorCalled = true;
-        }
-      });
+        detector.Detach(actor);
+        functorCalled = true;
+      }
+    });
 
   // Render and notify
   application.SendNotification();
@@ -2909,15 +2911,15 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
   try
   {
     uint32_t time = 100;
-    TestStartPan( application, Vector2( 10.0f, 20.0f ), Vector2( 26.0f, 20.0f ), time );
-    TestEndPan( application, Vector2(26.0f, 20.0f) );
+    TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+    TestEndPan(application, Vector2(26.0f, 20.0f));
 
-    DALI_TEST_CHECK( true ); // No crash, test has passed
+    DALI_TEST_CHECK(true); // No crash, test has passed
     DALI_TEST_EQUALS(functorCalled, true, TEST_LOCATION);
   }
   catch(...)
   {
-    DALI_TEST_CHECK( false ); // If we crash, the test has failed
+    DALI_TEST_CHECK(false); // If we crash, the test has failed
   }
 
   END_TEST;

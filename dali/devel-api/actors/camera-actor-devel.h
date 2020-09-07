@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/camera-actor.h>
 
 namespace Dali
 {

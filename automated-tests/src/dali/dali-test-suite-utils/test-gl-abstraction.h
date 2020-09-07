@@ -19,29 +19,28 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdio>
+#include <cstring>
+#include <cstring> // for strcmp
+#include <map>
 #include <sstream>
 #include <string>
-#include <cstring>
-#include <map>
-#include <cstdio>
-#include <cstring> // for strcmp
 #include <typeinfo>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/dali-core.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>
-#include <test-trace-call-stack.h>
+#include <dali/public-api/dali-core.h>
 #include <test-compare-types.h>
+#include <test-trace-call-stack.h>
 
 namespace Dali
 {
-
 static const unsigned int MAX_ATTRIBUTE_CACHE_SIZE = 64;
-static const char *mStdAttribs[MAX_ATTRIBUTE_CACHE_SIZE] =
-{
+static const char*        mStdAttribs[MAX_ATTRIBUTE_CACHE_SIZE] =
+  {
     "aPosition",    // ATTRIB_POSITION
     "aNormal",      // ATTRIB_NORMAL
     "aTexCoord",    // ATTRIB_TEXCOORD
@@ -50,7 +49,7 @@ static const char *mStdAttribs[MAX_ATTRIBUTE_CACHE_SIZE] =
     "aBoneIndices"  // ATTRIB_BONE_INDICES
 };
 
-class DALI_CORE_API TestGlAbstraction: public Dali::Integration::GlAbstraction
+class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
 {
 public:
   TestGlAbstraction();
@@ -62,11 +61,11 @@ public:
 
   bool IsSurfacelessContextSupported() const override;
 
-  bool TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const override;
+  bool TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const override;
 
   /* OpenGL ES 2.0 */
 
-  inline void ActiveTexture( GLenum textureUnit ) override
+  inline void ActiveTexture(GLenum textureUnit) override
   {
     mActiveTextureUnit = textureUnit - GL_TEXTURE0;
   }
@@ -76,32 +75,32 @@ public:
     return mActiveTextureUnit + GL_TEXTURE0;
   }
 
-  inline void AttachShader( GLuint program, GLuint shader ) override
+  inline void AttachShader(GLuint program, GLuint shader) override
   {
     std::stringstream out;
     out << program << ", " << shader;
 
     TraceCallStack::NamedParams namedParams;
     namedParams["program"] = ToString(program);
-    namedParams["shader"] = ToString(shader);
+    namedParams["shader"]  = ToString(shader);
     mShaderTrace.PushCall("AttachShader", out.str(), namedParams);
   }
 
-  inline void BindAttribLocation( GLuint program, GLuint index, const char* name ) override
+  inline void BindAttribLocation(GLuint program, GLuint index, const char* name) override
   {
   }
 
-  inline void BindBuffer( GLenum target, GLuint buffer ) override
+  inline void BindBuffer(GLenum target, GLuint buffer) override
   {
   }
 
-  inline void BindFramebuffer( GLenum target, GLuint framebuffer ) override
+  inline void BindFramebuffer(GLenum target, GLuint framebuffer) override
   {
     //Add 010 bit;
     mFramebufferStatus |= 2;
   }
 
-  inline void BindRenderbuffer( GLenum target, GLuint renderbuffer ) override
+  inline void BindRenderbuffer(GLenum target, GLuint renderbuffer) override
   {
   }
 
@@ -119,9 +118,9 @@ public:
    * @param[in] activeTextureUnit The specific active texture unit.
    * @return A vector containing the IDs that were bound.
    */
-  inline const std::vector<GLuint>& GetBoundTextures( GLuint activeTextureUnit ) const
+  inline const std::vector<GLuint>& GetBoundTextures(GLuint activeTextureUnit) const
   {
-    return mActiveTextures[ activeTextureUnit - GL_TEXTURE0 ].mBoundTextures;
+    return mActiveTextures[activeTextureUnit - GL_TEXTURE0].mBoundTextures;
   }
 
   /**
@@ -131,22 +130,22 @@ public:
   {
     mBoundTextures.clear();
 
-    for( unsigned int i=0; i<MIN_TEXTURE_UNIT_LIMIT; ++i )
+    for(unsigned int i = 0; i < MIN_TEXTURE_UNIT_LIMIT; ++i)
     {
-      mActiveTextures[ i ].mBoundTextures.clear();
+      mActiveTextures[i].mBoundTextures.clear();
     }
   }
 
-  inline void BindTexture( GLenum target, GLuint texture ) override
+  inline void BindTexture(GLenum target, GLuint texture) override
   {
     // Record the bound textures for future checks
-    if( texture )
+    if(texture)
     {
-      mBoundTextures.push_back( texture );
+      mBoundTextures.push_back(texture);
 
-      if( mActiveTextureUnit < MIN_TEXTURE_UNIT_LIMIT )
+      if(mActiveTextureUnit < MIN_TEXTURE_UNIT_LIMIT)
       {
-        mActiveTextures[ mActiveTextureUnit ].mBoundTextures.push_back( texture );
+        mActiveTextures[mActiveTextureUnit].mBoundTextures.push_back(texture);
       }
     }
 
@@ -154,7 +153,7 @@ public:
     out << target << ", " << texture;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
+    namedParams["target"]  = ToString(target);
     namedParams["texture"] = ToString(texture);
 
     mTextureTrace.PushCall("BindTexture", out.str(), namedParams);
@@ -173,13 +172,13 @@ public:
     return mLastBlendColor;
   }
 
-  inline void BlendEquation( GLenum mode ) override
+  inline void BlendEquation(GLenum mode) override
   {
     mLastBlendEquationRgb   = mode;
     mLastBlendEquationAlpha = mode;
   }
 
-  inline void BlendEquationSeparate( GLenum modeRgb, GLenum modeAlpha ) override
+  inline void BlendEquationSeparate(GLenum modeRgb, GLenum modeAlpha) override
   {
     mLastBlendEquationRgb   = modeRgb;
     mLastBlendEquationAlpha = modeAlpha;
@@ -197,16 +196,16 @@ public:
 
   inline void BlendFunc(GLenum sfactor, GLenum dfactor) override
   {
-    mLastBlendFuncSrcRgb = sfactor;
-    mLastBlendFuncDstRgb = dfactor;
+    mLastBlendFuncSrcRgb   = sfactor;
+    mLastBlendFuncDstRgb   = dfactor;
     mLastBlendFuncSrcAlpha = sfactor;
     mLastBlendFuncDstAlpha = dfactor;
   }
 
   inline void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) override
   {
-    mLastBlendFuncSrcRgb = srcRGB;
-    mLastBlendFuncDstRgb = dstRGB;
+    mLastBlendFuncSrcRgb   = srcRGB;
+    mLastBlendFuncDstRgb   = dstRGB;
     mLastBlendFuncSrcAlpha = srcAlpha;
     mLastBlendFuncDstAlpha = dstAlpha;
   }
@@ -233,19 +232,19 @@ public:
 
   inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage) override
   {
-     mBufferDataCalls.push_back(size);
+    mBufferDataCalls.push_back(size);
   }
 
   inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data) override
   {
-     mBufferSubDataCalls.push_back(size);
+    mBufferSubDataCalls.push_back(size);
   }
 
   inline GLenum CheckFramebufferStatus(GLenum target) override
   {
     //If it has the three last bits set to 1 - 111, then the three minimum functions to create a
     //Framebuffer texture have been called
-    if( mFramebufferStatus == 7 )
+    if(mFramebufferStatus == 7)
     {
       return GL_FRAMEBUFFER_COMPLETE;
     }
@@ -297,16 +296,16 @@ public:
     out << s;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["s"] = ToString( s );
+    namedParams["s"] = ToString(s);
 
-    mStencilFunctionTrace.PushCall( "ClearStencil", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("ClearStencil", out.str(), namedParams);
   }
 
   inline void ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) override
   {
-    mColorMaskParams.red = red;
+    mColorMaskParams.red   = red;
     mColorMaskParams.green = green;
-    mColorMaskParams.blue = blue;
+    mColorMaskParams.blue  = blue;
     mColorMaskParams.alpha = alpha;
   }
 
@@ -323,16 +322,16 @@ public:
   inline void CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data) override
   {
     std::stringstream out;
-    out << target<<", "<<level<<", "<<width << ", " << height;
+    out << target << ", " << level << ", " << width << ", " << height;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["level"] = ToString(level);
+    namedParams["target"]         = ToString(target);
+    namedParams["level"]          = ToString(level);
     namedParams["internalformat"] = ToString(internalformat);
-    namedParams["width"] = ToString(width);
-    namedParams["height"] = ToString(height);
-    namedParams["border"] = ToString(border);
-    namedParams["size"] = ToString(imageSize);
+    namedParams["width"]          = ToString(width);
+    namedParams["height"]         = ToString(height);
+    namedParams["border"]         = ToString(border);
+    namedParams["size"]           = ToString(imageSize);
 
     mTextureTrace.PushCall("CompressedTexImage2D", out.str(), namedParams);
   }
@@ -340,15 +339,15 @@ public:
   inline void CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void* data) override
   {
     std::stringstream out;
-    out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
+    out << target << ", " << level << ", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["level"] = ToString(level);
+    namedParams["target"]  = ToString(target);
+    namedParams["level"]   = ToString(level);
     namedParams["xoffset"] = ToString(xoffset);
     namedParams["yoffset"] = ToString(yoffset);
-    namedParams["width"] = ToString(width);
-    namedParams["height"] = ToString(height);
+    namedParams["width"]   = ToString(width);
+    namedParams["height"]  = ToString(height);
     mTextureTrace.PushCall("CompressedTexSubImage2D", out.str(), namedParams);
   }
 
@@ -433,11 +432,11 @@ public:
 
     TraceCallStack::NamedParams namedParams;
 
-    for(GLsizei i=0; i<n; i++)
+    for(GLsizei i = 0; i < n; i++)
     {
       out << textures[i] << ", ";
       std::stringstream paramName;
-      paramName<<"texture["<<i<<"]";
+      paramName << "texture[" << i << "]";
       namedParams[paramName.str()] = ToString(textures[i]);
       mDeletedTextureIds.push_back(textures[i]);
       mNumGeneratedTextures--;
@@ -452,11 +451,11 @@ public:
     return mDeletedTextureIds.size() == 0;
   }
 
-  inline bool CheckTextureDeleted( GLuint textureId )
+  inline bool CheckTextureDeleted(GLuint textureId)
   {
     bool found = false;
 
-    for(std::vector<GLuint>::iterator iter=mDeletedTextureIds.begin(); iter != mDeletedTextureIds.end(); ++iter)
+    for(std::vector<GLuint>::iterator iter = mDeletedTextureIds.begin(); iter != mDeletedTextureIds.end(); ++iter)
     {
       if(*iter == textureId)
       {
@@ -503,7 +502,7 @@ public:
     out << program << ", " << shader;
     TraceCallStack::NamedParams namedParams;
     namedParams["program"] = ToString(program);
-    namedParams["shader"] = ToString(shader);
+    namedParams["shader"]  = ToString(shader);
     mShaderTrace.PushCall("DetachShader", out.str(), namedParams);
   }
 
@@ -518,7 +517,7 @@ public:
 
   inline void DisableVertexAttribArray(GLuint index) override
   {
-    SetVertexAttribArray( index, false );
+    SetVertexAttribArray(index, false);
   }
 
   inline void DrawArrays(GLenum mode, GLint first, GLsizei count) override
@@ -526,7 +525,7 @@ public:
     std::stringstream out;
     out << mode << ", " << first << ", " << count;
     TraceCallStack::NamedParams namedParams;
-    namedParams["mode"] = ToString(mode);
+    namedParams["mode"]  = ToString(mode);
     namedParams["first"] = ToString(first);
     namedParams["count"] = ToString(count);
     mDrawTrace.PushCall("DrawArrays", out.str(), namedParams);
@@ -538,9 +537,9 @@ public:
     out << mode << ", " << count << ", " << type << ", indices";
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["mode"] = ToString(mode);
+    namedParams["mode"]  = ToString(mode);
     namedParams["count"] = ToString(count);
-    namedParams["type"] = ToString(type);
+    namedParams["type"]  = ToString(type);
     // Skip void pointers - are they of any use?
     mDrawTrace.PushCall("DrawElements", out.str(), namedParams);
   }
@@ -556,7 +555,7 @@ public:
 
   inline void EnableVertexAttribArray(GLuint index) override
   {
-    SetVertexAttribArray( index, true);
+    SetVertexAttribArray(index, true);
   }
 
   inline void Finish(void) override
@@ -569,11 +568,11 @@ public:
 
   inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) override
   {
-    if (attachment == GL_DEPTH_ATTACHMENT)
+    if(attachment == GL_DEPTH_ATTACHMENT)
     {
       mFramebufferDepthAttached = true;
     }
-    else if (attachment == GL_STENCIL_ATTACHMENT)
+    else if(attachment == GL_STENCIL_ATTACHMENT)
     {
       mFramebufferStencilAttached = true;
     }
@@ -585,10 +584,10 @@ public:
     mFramebufferStatus |= 4;
 
     //We check 4 attachment colors
-    if ((attachment >= GL_COLOR_ATTACHMENT0) && (attachment < GL_COLOR_ATTACHMENT0 + Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS))
+    if((attachment >= GL_COLOR_ATTACHMENT0) && (attachment < GL_COLOR_ATTACHMENT0 + Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS))
     {
       uint8_t mask = 1 << (attachment - GL_COLOR_ATTACHMENT0);
-      if ((mFrameBufferColorStatus & mask) == 0)
+      if((mFrameBufferColorStatus & mask) == 0)
       {
         mFrameBufferColorStatus |= mask;
         ++mFramebufferColorAttachmentCount;
@@ -609,7 +608,7 @@ public:
   inline void GenerateMipmap(GLenum target) override
   {
     std::stringstream out;
-    out<<target;
+    out << target;
     TraceCallStack::NamedParams namedParams;
     namedParams["target"] = ToString(target);
 
@@ -618,7 +617,7 @@ public:
 
   inline void GenFramebuffers(GLsizei n, GLuint* framebuffers) override
   {
-    for( int i = 0; i < n; i++ )
+    for(int i = 0; i < n; i++)
     {
       framebuffers[i] = i + 1;
     }
@@ -629,7 +628,7 @@ public:
 
   inline void GenRenderbuffers(GLsizei n, GLuint* renderbuffers) override
   {
-    for( int i = 0; i < n; i++ )
+    for(int i = 0; i < n; i++)
     {
       renderbuffers[i] = i + 1;
     }
@@ -639,7 +638,7 @@ public:
    * This method can be used by test cases, to manipulate the texture IDs generated by GenTextures.
    * @param[in] ids A vector containing the next IDs to be generated
    */
-  inline void SetNextTextureIds( const std::vector<GLuint>& ids )
+  inline void SetNextTextureIds(const std::vector<GLuint>& ids)
   {
     mNextTextureIds = ids;
   }
@@ -651,16 +650,16 @@ public:
 
   inline void GenTextures(GLsizei count, GLuint* textures) override
   {
-    for( int i=0; i<count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( !mNextTextureIds.empty() )
+      if(!mNextTextureIds.empty())
       {
-        *(textures+i) = mNextTextureIds[0];
-        mNextTextureIds.erase( mNextTextureIds.begin() );
+        *(textures + i) = mNextTextureIds[0];
+        mNextTextureIds.erase(mNextTextureIds.begin());
       }
       else
       {
-        *(textures+i) = ++mLastAutoTextureIdUsed;
+        *(textures + i) = ++mLastAutoTextureIdUsed;
       }
       mNumGeneratedTextures++;
     }
@@ -669,15 +668,15 @@ public:
     namedParams["count"] = ToString(count);
 
     std::stringstream out;
-    for(int i=0; i<count; i++)
+    for(int i = 0; i < count; i++)
     {
       out << textures[i];
-      if(i<count-1)
+      if(i < count - 1)
       {
         out << ", ";
       }
       std::ostringstream oss;
-      oss<<"indices["<<i<<"]";
+      oss << "indices[" << i << "]";
       namedParams[oss.str()] = ToString(textures[i]);
     }
 
@@ -704,18 +703,18 @@ public:
     {
       case 0:
         *length = snprintf(name, bufsize, "sTexture");
-        *type = GL_SAMPLER_2D;
-        *size = 1;
+        *type   = GL_SAMPLER_2D;
+        *size   = 1;
         break;
       case 1:
         *length = snprintf(name, bufsize, "sEffect");
-        *type = GL_SAMPLER_2D;
-        *size = 1;
+        *type   = GL_SAMPLER_2D;
+        *size   = 1;
         break;
       case 2:
         *length = snprintf(name, bufsize, "sGloss");
-        *type = GL_SAMPLER_2D;
-        *size = 1;
+        *type   = GL_SAMPLER_2D;
+        *size   = 1;
         break;
       default:
         break;
@@ -726,13 +725,13 @@ public:
   {
   }
 
-  inline int  GetAttribLocation(GLuint program, const char* name) override
+  inline int GetAttribLocation(GLuint program, const char* name) override
   {
     std::string attribName(name);
 
-    for( unsigned int i = 0; i < ATTRIB_TYPE_LAST; ++i )
+    for(unsigned int i = 0; i < ATTRIB_TYPE_LAST; ++i)
     {
-      if( mStdAttribs[i] == attribName )
+      if(mStdAttribs[i] == attribName)
       {
         return i;
       }
@@ -765,7 +764,7 @@ public:
 
   inline void GetIntegerv(GLenum pname, GLint* params) override
   {
-    switch( pname )
+    switch(pname)
     {
       case GL_MAX_TEXTURE_SIZE:
         *params = 2048;
@@ -784,7 +783,7 @@ public:
 
   inline void GetProgramiv(GLuint program, GLenum pname, GLint* params) override
   {
-    switch( pname )
+    switch(pname)
     {
       case GL_LINK_STATUS:
         *params = mLinkStatus;
@@ -811,7 +810,8 @@ public:
 
   inline void GetShaderiv(GLuint shader, GLenum pname, GLint* params) override
   {
-    switch( pname ) {
+    switch(pname)
+    {
       case GL_COMPILE_STATUS:
         *params = mCompileStatus;
         break;
@@ -850,16 +850,16 @@ public:
   inline GLint GetUniformLocation(GLuint program, const char* name) override
   {
     ProgramUniformMap::iterator it = mUniforms.find(program);
-    if( it == mUniforms.end() )
+    if(it == mUniforms.end())
     {
       // Not a valid program ID
       mGetErrorResult = GL_INVALID_OPERATION;
       return -1;
     }
 
-    UniformIDMap& uniformIDs = it->second;
-    UniformIDMap::iterator it2 = uniformIDs.find( name );
-    if( it2 == uniformIDs.end() )
+    UniformIDMap&          uniformIDs = it->second;
+    UniformIDMap::iterator it2        = uniformIDs.find(name);
+    if(it2 == uniformIDs.end())
     {
       // Uniform not found, so add it...
       uniformIDs[name] = ++mLastUniformIdUsed;
@@ -933,7 +933,7 @@ public:
     namedParams["program"] = ToString(program);
     mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
 
-    mNumberOfActiveUniforms=3;
+    mNumberOfActiveUniforms = 3;
     GetUniformLocation(program, "sTexture");
     GetUniformLocation(program, "sEffect");
     GetUniformLocation(program, "sGloss");
@@ -965,19 +965,19 @@ public:
 
   inline void Scissor(GLint x, GLint y, GLsizei width, GLsizei height) override
   {
-    mScissorParams.x = x;
-    mScissorParams.y = y;
-    mScissorParams.width = width;
+    mScissorParams.x      = x;
+    mScissorParams.y      = y;
+    mScissorParams.width  = width;
     mScissorParams.height = height;
 
     std::stringstream out;
     out << x << ", " << y << ", " << width << ", " << height;
     TraceCallStack::NamedParams namedParams;
-    namedParams["x"] = ToString( x );
-    namedParams["y"] = ToString( y );
-    namedParams["width"] = ToString( width );
-    namedParams["height"] = ToString( height );
-    mScissorTrace.PushCall( "Scissor", out.str(), namedParams );
+    namedParams["x"]      = ToString(x);
+    namedParams["y"]      = ToString(y);
+    namedParams["width"]  = ToString(width);
+    namedParams["height"] = ToString(height);
+    mScissorTrace.PushCall("Scissor", out.str(), namedParams);
   }
 
   inline void ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length) override
@@ -992,21 +992,21 @@ public:
       stringBuilder += string[i];
     }
     mShaderSources[shader] = stringBuilder;
-    mLastShaderCompiled = shader;
+    mLastShaderCompiled    = shader;
   }
 
   inline void GetShaderSource(GLuint shader, GLsizei bufsize, GLsizei* length, char* source) override
   {
-    const std::string shaderSource = mShaderSources[shader];
-    const int shaderSourceLength = static_cast<int>(shaderSource.length());
-    if( shaderSourceLength < bufsize )
+    const std::string shaderSource       = mShaderSources[shader];
+    const int         shaderSourceLength = static_cast<int>(shaderSource.length());
+    if(shaderSourceLength < bufsize)
     {
-      strncpy( source, shaderSource.c_str(), shaderSourceLength );
+      strncpy(source, shaderSource.c_str(), shaderSourceLength);
       *length = shaderSourceLength;
     }
     else
     {
-      *length = bufsize -1;
+      *length = bufsize - 1;
       strncpy(source, shaderSource.c_str(), *length);
       source[*length] = 0x0;
     }
@@ -1023,11 +1023,11 @@ public:
     out << func << ", " << ref << ", " << mask;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["func"] = ToString( func );
-    namedParams["ref"] = ToString( ref );
-    namedParams["mask"] = ToString( mask );
+    namedParams["func"] = ToString(func);
+    namedParams["ref"]  = ToString(ref);
+    namedParams["mask"] = ToString(mask);
 
-    mStencilFunctionTrace.PushCall( "StencilFunc", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilFunc", out.str(), namedParams);
   }
 
   inline void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) override
@@ -1036,12 +1036,12 @@ public:
     out << face << ", " << func << ", " << ref << ", " << mask;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["face"] = ToString( face );
-    namedParams["func"] = ToString( func );
-    namedParams["ref"] = ToString( ref );
-    namedParams["mask"] = ToString( mask );
+    namedParams["face"] = ToString(face);
+    namedParams["func"] = ToString(func);
+    namedParams["ref"]  = ToString(ref);
+    namedParams["mask"] = ToString(mask);
 
-    mStencilFunctionTrace.PushCall( "StencilFuncSeparate", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilFuncSeparate", out.str(), namedParams);
   }
 
   inline void StencilMask(GLuint mask) override
@@ -1050,9 +1050,9 @@ public:
     out << mask;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["mask"] = ToString( mask );
+    namedParams["mask"] = ToString(mask);
 
-    mStencilFunctionTrace.PushCall( "StencilMask", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilMask", out.str(), namedParams);
   }
 
   inline void StencilMaskSeparate(GLenum face, GLuint mask) override
@@ -1061,10 +1061,10 @@ public:
     out << face << ", " << mask;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["face"] = ToString( face );
-    namedParams["mask"] = ToString( mask );
+    namedParams["face"] = ToString(face);
+    namedParams["mask"] = ToString(mask);
 
-    mStencilFunctionTrace.PushCall( "StencilMaskSeparate", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilMaskSeparate", out.str(), namedParams);
   }
 
   inline void StencilOp(GLenum fail, GLenum zfail, GLenum zpass) override
@@ -1073,11 +1073,11 @@ public:
     out << fail << ", " << zfail << ", " << zpass;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["fail"] = ToString( fail );
-    namedParams["zfail"] = ToString( zfail );
-    namedParams["zpass"] = ToString( zpass );
+    namedParams["fail"]  = ToString(fail);
+    namedParams["zfail"] = ToString(zfail);
+    namedParams["zpass"] = ToString(zpass);
 
-    mStencilFunctionTrace.PushCall( "StencilOp", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilOp", out.str(), namedParams);
   }
 
   inline void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass) override
@@ -1086,28 +1086,28 @@ public:
     out << face << ", " << fail << ", " << zfail << "," << zpass;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["face"] = ToString( face );
-    namedParams["fail"] = ToString( fail );
-    namedParams["zfail"] = ToString( zfail );
-    namedParams["zpass"] = ToString( zpass );
+    namedParams["face"]  = ToString(face);
+    namedParams["fail"]  = ToString(fail);
+    namedParams["zfail"] = ToString(zfail);
+    namedParams["zpass"] = ToString(zpass);
 
-    mStencilFunctionTrace.PushCall( "StencilOpSeparate", out.str(), namedParams );
+    mStencilFunctionTrace.PushCall("StencilOpSeparate", out.str(), namedParams);
   }
 
   inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels) override
   {
     std::stringstream out;
-    out << target<<", "<<level<<", "<<width << ", " << height;
+    out << target << ", " << level << ", " << width << ", " << height;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["level"] = ToString(level);
+    namedParams["target"]         = ToString(target);
+    namedParams["level"]          = ToString(level);
     namedParams["internalformat"] = ToString(internalformat);
-    namedParams["width"] = ToString(width);
-    namedParams["height"] = ToString(height);
-    namedParams["border"] = ToString(border);
-    namedParams["format"] = ToString(format);
-    namedParams["type"] = ToString(type);
+    namedParams["width"]          = ToString(width);
+    namedParams["height"]         = ToString(height);
+    namedParams["border"]         = ToString(border);
+    namedParams["format"]         = ToString(format);
+    namedParams["type"]           = ToString(type);
 
     mTextureTrace.PushCall("TexImage2D", out.str(), namedParams);
   }
@@ -1119,8 +1119,8 @@ public:
 
     TraceCallStack::NamedParams namedParams;
     namedParams["target"] = ToString(target);
-    namedParams["pname"] = ToString(pname);
-    namedParams["param"] = ToString(param);
+    namedParams["pname"]  = ToString(pname);
+    namedParams["param"]  = ToString(param);
 
     mTexParamaterTrace.PushCall("TexParameterf", out.str(), namedParams);
   }
@@ -1131,8 +1131,8 @@ public:
     out << target << ", " << pname << ", " << params[0];
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["pname"] = ToString(pname);
+    namedParams["target"]    = ToString(target);
+    namedParams["pname"]     = ToString(pname);
     namedParams["params[0]"] = ToString(params[0]);
 
     mTexParamaterTrace.PushCall("TexParameterfv", out.str(), namedParams);
@@ -1144,8 +1144,8 @@ public:
     out << target << ", " << pname << ", " << param;
     TraceCallStack::NamedParams namedParams;
     namedParams["target"] = ToString(target);
-    namedParams["pname"] = ToString(pname);
-    namedParams["param"] = ToString(param);
+    namedParams["pname"]  = ToString(pname);
+    namedParams["param"]  = ToString(param);
     mTexParamaterTrace.PushCall("TexParameteri", out.str(), namedParams);
   }
 
@@ -1154,8 +1154,8 @@ public:
     std::stringstream out;
     out << target << ", " << pname << ", " << params[0];
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["pname"] = ToString(pname);
+    namedParams["target"]    = ToString(target);
+    namedParams["pname"]     = ToString(pname);
     namedParams["params[0]"] = ToString(params[0]);
     mTexParamaterTrace.PushCall("TexParameteriv", out.str(), namedParams);
   }
@@ -1163,24 +1163,24 @@ public:
   inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) override
   {
     std::stringstream out;
-    out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
+    out << target << ", " << level << ", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
 
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] = ToString(target);
-    namedParams["level"] = ToString(level);
+    namedParams["target"]  = ToString(target);
+    namedParams["level"]   = ToString(level);
     namedParams["xoffset"] = ToString(xoffset);
     namedParams["yoffset"] = ToString(yoffset);
-    namedParams["width"] = ToString(width);
-    namedParams["height"] = ToString(height);
+    namedParams["width"]   = ToString(width);
+    namedParams["height"]  = ToString(height);
     mTextureTrace.PushCall("TexSubImage2D", out.str(), namedParams);
   }
 
-  inline void Uniform1f(GLint location, GLfloat value ) override
+  inline void Uniform1f(GLint location, GLfloat value) override
   {
-    std::string params = ToString( value );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(value);
+    AddUniformCallToTraceStack(location, params);
 
-    if( ! mProgramUniforms1f.SetUniformValue( mCurrentProgram, location, value ) )
+    if(!mProgramUniforms1f.SetUniformValue(mCurrentProgram, location, value))
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1189,16 +1189,16 @@ public:
   inline void Uniform1fv(GLint location, GLsizei count, const GLfloat* v) override
   {
     std::string params;
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      params = params + ToString( v[i] ) + ",";
+      params = params + ToString(v[i]) + ",";
     }
 
-    AddUniformCallToTraceStack( location, params );
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniforms1f.SetUniformValue( mCurrentProgram, location, v[i] ) )
+      if(!mProgramUniforms1f.SetUniformValue(mCurrentProgram, location, v[i]))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1208,11 +1208,11 @@ public:
 
   inline void Uniform1i(GLint location, GLint x) override
   {
-    std::string params = ToString( x );
+    std::string params = ToString(x);
 
-    AddUniformCallToTraceStack( location,  params );
+    AddUniformCallToTraceStack(location, params);
 
-    if( ! mProgramUniforms1i.SetUniformValue( mCurrentProgram, location, x ) )
+    if(!mProgramUniforms1i.SetUniformValue(mCurrentProgram, location, x))
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1220,14 +1220,14 @@ public:
 
   inline void Uniform1iv(GLint location, GLsizei count, const GLint* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniforms1i.SetUniformValue( mCurrentProgram,
-                                                 location,
-                                                 v[i] ) )
+      if(!mProgramUniforms1i.SetUniformValue(mCurrentProgram,
+                                             location,
+                                             v[i]))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1237,12 +1237,12 @@ public:
 
   inline void Uniform2f(GLint location, GLfloat x, GLfloat y) override
   {
-    std::string params = ToString( x ) + "," + ToString( y );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y);
+    AddUniformCallToTraceStack(location, params);
 
-    if( ! mProgramUniforms2f.SetUniformValue( mCurrentProgram,
-                                               location,
-                                               Vector2( x, y ) ) )
+    if(!mProgramUniforms2f.SetUniformValue(mCurrentProgram,
+                                           location,
+                                           Vector2(x, y)))
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1250,14 +1250,14 @@ public:
 
   inline void Uniform2fv(GLint location, GLsizei count, const GLfloat* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniforms2f.SetUniformValue( mCurrentProgram,
-                                                 location,
-                                                 Vector2( v[2*i], v[2*i+1] ) ) )
+      if(!mProgramUniforms2f.SetUniformValue(mCurrentProgram,
+                                             location,
+                                             Vector2(v[2 * i], v[2 * i + 1])))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1267,24 +1267,24 @@ public:
 
   inline void Uniform2i(GLint location, GLint x, GLint y) override
   {
-    std::string params = ToString( x ) + "," + ToString( y );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void Uniform2iv(GLint location, GLsizei count, const GLint* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z) override
   {
-    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y) + "," + ToString(z);
+    AddUniformCallToTraceStack(location, params);
 
-    if( ! mProgramUniforms3f.SetUniformValue( mCurrentProgram,
-                                               location,
-                                               Vector3( x, y, z ) ) )
+    if(!mProgramUniforms3f.SetUniformValue(mCurrentProgram,
+                                           location,
+                                           Vector3(x, y, z)))
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1292,15 +1292,15 @@ public:
 
   inline void Uniform3fv(GLint location, GLsizei count, const GLfloat* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniforms3f.SetUniformValue(
-          mCurrentProgram,
-          location,
-          Vector3( v[3*i], v[3*i+1], v[3*i+2] ) ) )
+      if(!mProgramUniforms3f.SetUniformValue(
+           mCurrentProgram,
+           location,
+           Vector3(v[3 * i], v[3 * i + 1], v[3 * i + 2])))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1310,24 +1310,24 @@ public:
 
   inline void Uniform3i(GLint location, GLint x, GLint y, GLint z) override
   {
-    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y) + "," + ToString(z);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void Uniform3iv(GLint location, GLsizei count, const GLint* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) override
   {
-    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y) + "," + ToString(z) + "," + ToString(w);
+    AddUniformCallToTraceStack(location, params);
 
-    if( ! mProgramUniforms4f.SetUniformValue( mCurrentProgram,
-                                              location,
-                                              Vector4( x, y, z, w ) ) )
+    if(!mProgramUniforms4f.SetUniformValue(mCurrentProgram,
+                                           location,
+                                           Vector4(x, y, z, w)))
     {
       mGetErrorResult = GL_INVALID_OPERATION;
     }
@@ -1335,15 +1335,15 @@ public:
 
   inline void Uniform4fv(GLint location, GLsizei count, const GLfloat* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniforms4f.SetUniformValue(
-          mCurrentProgram,
-          location,
-          Vector4( v[4*i], v[4*i+1], v[4*i+2], v[4*i+3] ) ) )
+      if(!mProgramUniforms4f.SetUniformValue(
+           mCurrentProgram,
+           location,
+           Vector4(v[4 * i], v[4 * i + 1], v[4 * i + 2], v[4 * i + 3])))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1353,33 +1353,33 @@ public:
 
   inline void Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w) override
   {
-    std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(x) + "," + ToString(y) + "," + ToString(z) + "," + ToString(w);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void Uniform4iv(GLint location, GLsizei count, const GLint* v) override
   {
-    std::string params = ToString( v );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(v);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
-    std::string params = ToString( value );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(value);
+    AddUniformCallToTraceStack(location, params);
   }
 
   inline void UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
-    std::string params = ToString( value );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(value);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniformsMat3.SetUniformValue(
-            mCurrentProgram,
-            location,
-            Matrix3( value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8] ) ) )
+      if(!mProgramUniformsMat3.SetUniformValue(
+           mCurrentProgram,
+           location,
+           Matrix3(value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8])))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1389,15 +1389,15 @@ public:
 
   inline void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
-    std::string params = ToString( value );
-    AddUniformCallToTraceStack( location, params );
+    std::string params = ToString(value);
+    AddUniformCallToTraceStack(location, params);
 
-    for( int i = 0; i < count; ++i )
+    for(int i = 0; i < count; ++i)
     {
-      if( ! mProgramUniformsMat4.SetUniformValue(
-          mCurrentProgram,
-          location,
-          Matrix( value ) ) )
+      if(!mProgramUniformsMat4.SetUniformValue(
+           mCurrentProgram,
+           location,
+           Matrix(value)))
       {
         mGetErrorResult = GL_INVALID_OPERATION;
         break;
@@ -1453,7 +1453,7 @@ public:
   inline void Viewport(GLint x, GLint y, GLsizei width, GLsizei height) override
   {
     std::string commaString(", ");
-    std::string params( std::to_string(x) + commaString + std::to_string(y) + commaString + std::to_string(width) + commaString + std::to_string(height) );
+    std::string params(std::to_string(x) + commaString + std::to_string(y) + commaString + std::to_string(width) + commaString + std::to_string(height));
 
     mViewportTrace.PushCall("Viewport", params);
   }
@@ -1652,7 +1652,7 @@ public:
   {
   }
 
-  inline GLint GetFragDataLocation(GLuint program, const GLchar *name) override
+  inline GLint GetFragDataLocation(GLuint program, const GLchar* name) override
   {
     return -1;
   }
@@ -1890,157 +1890,307 @@ public:
   }
 
 private:
-
-  inline void AddUniformCallToTraceStack( GLint location, std::string& value )
-    {
-    std::string name = "<not found>";
-    bool matched = false;
+  inline void AddUniformCallToTraceStack(GLint location, std::string& value)
+  {
+    std::string name    = "<not found>";
+    bool        matched = false;
 
     UniformIDMap& map = mUniforms[mCurrentProgram];
-    for (UniformIDMap::iterator it=map.begin(); it!=map.end(); ++it)
+    for(UniformIDMap::iterator it = map.begin(); it != map.end(); ++it)
     {
-      if( it->second == location )
+      if(it->second == location)
       {
-        name = it->first;
+        name    = it->first;
         matched = true;
         break;
       }
     }
 
-    if ( matched )
+    if(matched)
     {
-      mSetUniformTrace.PushCall( name, value );
+      mSetUniformTrace.PushCall(name, value);
     }
   }
 
-
 public: // TEST FUNCTIONS
-  inline void SetCompileStatus( GLuint value ) { mCompileStatus = value; }
-  inline void SetLinkStatus( GLuint value ) { mLinkStatus = value; }
-  inline void SetGetAttribLocationResult(  int result) { mGetAttribLocationResult = result; }
-  inline void SetGetErrorResult(  GLenum result) { mGetErrorResult = result; }
-  inline void SetGetStringResult(  GLubyte* result) { mGetStringResult = result; }
-  inline void SetIsBufferResult(  GLboolean result) { mIsBufferResult = result; }
-  inline void SetIsEnabledResult(  GLboolean result) { mIsEnabledResult = result; }
-  inline void SetIsFramebufferResult(  GLboolean result) { mIsFramebufferResult = result; }
-  inline void SetIsProgramResult(  GLboolean result) { mIsProgramResult = result; }
-  inline void SetIsRenderbufferResult(  GLboolean result) { mIsRenderbufferResult = result; }
-  inline void SetIsShaderResult(  GLboolean result) { mIsShaderResult = result; }
-  inline void SetIsTextureResult(  GLboolean result) { mIsTextureResult = result; }
-  inline void SetCheckFramebufferStatusResult(  GLenum result) { mCheckFramebufferStatusResult = result; }
-  inline void SetNumBinaryFormats( GLint numFormats ) { mNumBinaryFormats = numFormats; }
-  inline void SetBinaryFormats( GLint binaryFormats ) { mBinaryFormats = binaryFormats; }
-  inline void SetProgramBinaryLength( GLint length ) { mProgramBinaryLength = length; }
+  inline void SetCompileStatus(GLuint value)
+  {
+    mCompileStatus = value;
+  }
+  inline void SetLinkStatus(GLuint value)
+  {
+    mLinkStatus = value;
+  }
+  inline void SetGetAttribLocationResult(int result)
+  {
+    mGetAttribLocationResult = result;
+  }
+  inline void SetGetErrorResult(GLenum result)
+  {
+    mGetErrorResult = result;
+  }
+  inline void SetGetStringResult(GLubyte* result)
+  {
+    mGetStringResult = result;
+  }
+  inline void SetIsBufferResult(GLboolean result)
+  {
+    mIsBufferResult = result;
+  }
+  inline void SetIsEnabledResult(GLboolean result)
+  {
+    mIsEnabledResult = result;
+  }
+  inline void SetIsFramebufferResult(GLboolean result)
+  {
+    mIsFramebufferResult = result;
+  }
+  inline void SetIsProgramResult(GLboolean result)
+  {
+    mIsProgramResult = result;
+  }
+  inline void SetIsRenderbufferResult(GLboolean result)
+  {
+    mIsRenderbufferResult = result;
+  }
+  inline void SetIsShaderResult(GLboolean result)
+  {
+    mIsShaderResult = result;
+  }
+  inline void SetIsTextureResult(GLboolean result)
+  {
+    mIsTextureResult = result;
+  }
+  inline void SetCheckFramebufferStatusResult(GLenum result)
+  {
+    mCheckFramebufferStatusResult = result;
+  }
+  inline void SetNumBinaryFormats(GLint numFormats)
+  {
+    mNumBinaryFormats = numFormats;
+  }
+  inline void SetBinaryFormats(GLint binaryFormats)
+  {
+    mBinaryFormats = binaryFormats;
+  }
+  inline void SetProgramBinaryLength(GLint length)
+  {
+    mProgramBinaryLength = length;
+  }
 
   inline bool GetVertexAttribArrayState(GLuint index)
   {
-    if( index >= MAX_ATTRIBUTE_CACHE_SIZE )
+    if(index >= MAX_ATTRIBUTE_CACHE_SIZE)
     {
       // out of range
       return false;
     }
-    return mVertexAttribArrayState[ index ];
+    return mVertexAttribArrayState[index];
   }
-  inline void ClearVertexAttribArrayChanged() {  mVertexAttribArrayChanged = false; }
-  inline bool GetVertexAttribArrayChanged()  { return mVertexAttribArrayChanged; }
+  inline void ClearVertexAttribArrayChanged()
+  {
+    mVertexAttribArrayChanged = false;
+  }
+  inline bool GetVertexAttribArrayChanged()
+  {
+    return mVertexAttribArrayChanged;
+  }
 
   //Methods for CullFace verification
-  inline void EnableCullFaceCallTrace(bool enable) { mCullFaceTrace.Enable(enable); }
-  inline void ResetCullFaceCallStack() { mCullFaceTrace.Reset(); }
-  inline TraceCallStack& GetCullFaceTrace() { return mCullFaceTrace; }
+  inline void EnableCullFaceCallTrace(bool enable)
+  {
+    mCullFaceTrace.Enable(enable);
+  }
+  inline void ResetCullFaceCallStack()
+  {
+    mCullFaceTrace.Reset();
+  }
+  inline TraceCallStack& GetCullFaceTrace()
+  {
+    return mCullFaceTrace;
+  }
 
   //Methods for Enable/Disable call verification
-  inline void EnableEnableDisableCallTrace(bool enable) { mEnableDisableTrace.Enable(enable); }
-  inline void ResetEnableDisableCallStack() { mEnableDisableTrace.Reset(); }
-  inline TraceCallStack& GetEnableDisableTrace() { return mEnableDisableTrace; }
+  inline void EnableEnableDisableCallTrace(bool enable)
+  {
+    mEnableDisableTrace.Enable(enable);
+  }
+  inline void ResetEnableDisableCallStack()
+  {
+    mEnableDisableTrace.Reset();
+  }
+  inline TraceCallStack& GetEnableDisableTrace()
+  {
+    return mEnableDisableTrace;
+  }
 
   //Methods for Shader verification
-  inline void EnableShaderCallTrace(bool enable) { mShaderTrace.Enable(enable); }
-  inline void ResetShaderCallStack() { mShaderTrace.Reset(); }
-  inline TraceCallStack& GetShaderTrace() { return mShaderTrace; }
+  inline void EnableShaderCallTrace(bool enable)
+  {
+    mShaderTrace.Enable(enable);
+  }
+  inline void ResetShaderCallStack()
+  {
+    mShaderTrace.Reset();
+  }
+  inline TraceCallStack& GetShaderTrace()
+  {
+    return mShaderTrace;
+  }
 
   //Methods for Texture verification
-  inline void EnableTextureCallTrace(bool enable) { mTextureTrace.Enable(enable); }
-  inline void ResetTextureCallStack() { mTextureTrace.Reset(); }
-  inline TraceCallStack& GetTextureTrace() { return mTextureTrace; }
+  inline void EnableTextureCallTrace(bool enable)
+  {
+    mTextureTrace.Enable(enable);
+  }
+  inline void ResetTextureCallStack()
+  {
+    mTextureTrace.Reset();
+  }
+  inline TraceCallStack& GetTextureTrace()
+  {
+    return mTextureTrace;
+  }
 
   //Methods for Texture verification
-  inline void EnableTexParameterCallTrace(bool enable) { mTexParamaterTrace.Enable(enable); }
-  inline void ResetTexParameterCallStack() { mTexParamaterTrace.Reset(); }
-  inline TraceCallStack& GetTexParameterTrace() { return mTexParamaterTrace; }
+  inline void EnableTexParameterCallTrace(bool enable)
+  {
+    mTexParamaterTrace.Enable(enable);
+  }
+  inline void ResetTexParameterCallStack()
+  {
+    mTexParamaterTrace.Reset();
+  }
+  inline TraceCallStack& GetTexParameterTrace()
+  {
+    return mTexParamaterTrace;
+  }
 
   //Methods for Draw verification
-  inline void EnableDrawCallTrace(bool enable) { mDrawTrace.Enable(enable); }
-  inline void ResetDrawCallStack() { mDrawTrace.Reset(); }
-  inline TraceCallStack& GetDrawTrace() { return mDrawTrace; }
+  inline void EnableDrawCallTrace(bool enable)
+  {
+    mDrawTrace.Enable(enable);
+  }
+  inline void ResetDrawCallStack()
+  {
+    mDrawTrace.Reset();
+  }
+  inline TraceCallStack& GetDrawTrace()
+  {
+    return mDrawTrace;
+  }
 
   //Methods for Depth function verification
-  inline void EnableDepthFunctionCallTrace(bool enable) { mDepthFunctionTrace.Enable(enable); }
-  inline void ResetDepthFunctionCallStack() { mDepthFunctionTrace.Reset(); }
-  inline TraceCallStack& GetDepthFunctionTrace() { return mDepthFunctionTrace; }
+  inline void EnableDepthFunctionCallTrace(bool enable)
+  {
+    mDepthFunctionTrace.Enable(enable);
+  }
+  inline void ResetDepthFunctionCallStack()
+  {
+    mDepthFunctionTrace.Reset();
+  }
+  inline TraceCallStack& GetDepthFunctionTrace()
+  {
+    return mDepthFunctionTrace;
+  }
 
   //Methods for Stencil function verification
-  inline void EnableStencilFunctionCallTrace(bool enable) { mStencilFunctionTrace.Enable(enable); }
-  inline void ResetStencilFunctionCallStack() { mStencilFunctionTrace.Reset(); }
-  inline TraceCallStack& GetStencilFunctionTrace() { return mStencilFunctionTrace; }
+  inline void EnableStencilFunctionCallTrace(bool enable)
+  {
+    mStencilFunctionTrace.Enable(enable);
+  }
+  inline void ResetStencilFunctionCallStack()
+  {
+    mStencilFunctionTrace.Reset();
+  }
+  inline TraceCallStack& GetStencilFunctionTrace()
+  {
+    return mStencilFunctionTrace;
+  }
 
   //Methods for Scissor verification
-  inline void EnableScissorCallTrace(bool enable) { mScissorTrace.Enable(enable); }
-  inline void ResetScissorCallStack() { mScissorTrace.Reset(); }
-  inline TraceCallStack& GetScissorTrace() { return mScissorTrace; }
+  inline void EnableScissorCallTrace(bool enable)
+  {
+    mScissorTrace.Enable(enable);
+  }
+  inline void ResetScissorCallStack()
+  {
+    mScissorTrace.Reset();
+  }
+  inline TraceCallStack& GetScissorTrace()
+  {
+    return mScissorTrace;
+  }
 
   //Methods for Uniform function verification
-  inline void EnableSetUniformCallTrace(bool enable) { mSetUniformTrace.Enable(enable); }
-  inline void ResetSetUniformCallStack() { mSetUniformTrace.Reset(); }
-  inline TraceCallStack& GetSetUniformTrace() { return mSetUniformTrace; }
+  inline void EnableSetUniformCallTrace(bool enable)
+  {
+    mSetUniformTrace.Enable(enable);
+  }
+  inline void ResetSetUniformCallStack()
+  {
+    mSetUniformTrace.Reset();
+  }
+  inline TraceCallStack& GetSetUniformTrace()
+  {
+    return mSetUniformTrace;
+  }
 
   //Methods for Viewport verification
-  inline void EnableViewportCallTrace(bool enable) { mViewportTrace.Enable(enable); }
-  inline void ResetViewportCallStack() { mViewportTrace.Reset(); }
-  inline TraceCallStack& GetViewportTrace() { return mViewportTrace; }
-
-  template <typename T>
-  inline bool GetUniformValue( const char* name, T& value ) const
+  inline void EnableViewportCallTrace(bool enable)
   {
-    for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
-          program_it != mUniforms.end();
-          ++program_it )
-    {
-      const UniformIDMap &uniformIDs = program_it->second;
+    mViewportTrace.Enable(enable);
+  }
+  inline void ResetViewportCallStack()
+  {
+    mViewportTrace.Reset();
+  }
+  inline TraceCallStack& GetViewportTrace()
+  {
+    return mViewportTrace;
+  }
 
-      UniformIDMap::const_iterator uniform_it = uniformIDs.find( name );
-      if( uniform_it != uniformIDs.end() )
+  template<typename T>
+  inline bool GetUniformValue(const char* name, T& value) const
+  {
+    for(ProgramUniformMap::const_iterator program_it = mUniforms.begin();
+        program_it != mUniforms.end();
+        ++program_it)
+    {
+      const UniformIDMap& uniformIDs = program_it->second;
+
+      UniformIDMap::const_iterator uniform_it = uniformIDs.find(name);
+      if(uniform_it != uniformIDs.end())
       {
         // found one matching uniform name, lets check the value...
         GLuint programId = program_it->first;
-        GLint uniformId = uniform_it->second;
+        GLint  uniformId = uniform_it->second;
 
-        const ProgramUniformValue<T> &mProgramUniforms = GetProgramUniformsForType( value );
-        return mProgramUniforms.GetUniformValue( programId, uniformId, value );
+        const ProgramUniformValue<T>& mProgramUniforms = GetProgramUniformsForType(value);
+        return mProgramUniforms.GetUniformValue(programId, uniformId, value);
       }
     }
     return false;
   }
 
-
-  template <typename T>
-  inline bool CheckUniformValue( const char* name, const T& value ) const
+  template<typename T>
+  inline bool CheckUniformValue(const char* name, const T& value) const
   {
-    for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
-          program_it != mUniforms.end();
-          ++program_it )
+    for(ProgramUniformMap::const_iterator program_it = mUniforms.begin();
+        program_it != mUniforms.end();
+        ++program_it)
     {
-      const UniformIDMap &uniformIDs = program_it->second;
+      const UniformIDMap& uniformIDs = program_it->second;
 
-      UniformIDMap::const_iterator uniform_it = uniformIDs.find( name );
-      if( uniform_it != uniformIDs.end() )
+      UniformIDMap::const_iterator uniform_it = uniformIDs.find(name);
+      if(uniform_it != uniformIDs.end())
       {
         // found one matching uniform name, lets check the value...
         GLuint programId = program_it->first;
-        GLint uniformId = uniform_it->second;
+        GLint  uniformId = uniform_it->second;
 
-        const ProgramUniformValue<T> &mProgramUniforms = GetProgramUniformsForType( value );
-        if( mProgramUniforms.CheckUniformValue( programId, uniformId, value ) )
+        const ProgramUniformValue<T>& mProgramUniforms = GetProgramUniformsForType(value);
+        if(mProgramUniforms.CheckUniformValue(programId, uniformId, value))
         {
           // the value matches
           return true;
@@ -2048,50 +2198,50 @@ public: // TEST FUNCTIONS
       }
     }
 
-    fprintf(stderr, "Not found, printing possible values:\n" );
-    for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
-          program_it != mUniforms.end();
-          ++program_it )
+    fprintf(stderr, "Not found, printing possible values:\n");
+    for(ProgramUniformMap::const_iterator program_it = mUniforms.begin();
+        program_it != mUniforms.end();
+        ++program_it)
     {
-      const UniformIDMap &uniformIDs = program_it->second;
+      const UniformIDMap& uniformIDs = program_it->second;
 
-      UniformIDMap::const_iterator uniform_it = uniformIDs.find( name );
-      if( uniform_it != uniformIDs.end() )
+      UniformIDMap::const_iterator uniform_it = uniformIDs.find(name);
+      if(uniform_it != uniformIDs.end())
       {
         // found one matching uniform name, lets check the value...
         GLuint programId = program_it->first;
-        GLint uniformId = uniform_it->second;
+        GLint  uniformId = uniform_it->second;
 
-        const ProgramUniformValue<T> &mProgramUniforms = GetProgramUniformsForType( value );
-        T origValue;
-        if ( mProgramUniforms.GetUniformValue(programId, uniformId, origValue) )
+        const ProgramUniformValue<T>& mProgramUniforms = GetProgramUniformsForType(value);
+        T                             origValue;
+        if(mProgramUniforms.GetUniformValue(programId, uniformId, origValue))
         {
           std::stringstream out;
           out << uniform_it->first << ": " << origValue;
-          fprintf(stderr, "%s\n", out.str().c_str() );
+          fprintf(stderr, "%s\n", out.str().c_str());
         }
       }
     }
     return false;
   }
 
-  template <typename T>
-  inline bool GetUniformValue( GLuint programId, GLuint uniformId, T& outValue) const
+  template<typename T>
+  inline bool GetUniformValue(GLuint programId, GLuint uniformId, T& outValue) const
   {
-    const ProgramUniformValue<T> &mProgramUniforms = GetProgramUniformsForType( outValue );
-    return mProgramUniforms.GetUniformValue( programId, uniformId, outValue );
+    const ProgramUniformValue<T>& mProgramUniforms = GetProgramUniformsForType(outValue);
+    return mProgramUniforms.GetUniformValue(programId, uniformId, outValue);
   }
 
-  inline bool GetUniformIds( const char* name, GLuint& programId, GLuint& uniformId ) const
+  inline bool GetUniformIds(const char* name, GLuint& programId, GLuint& uniformId) const
   {
-    for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
-          program_it != mUniforms.end();
-          ++program_it )
+    for(ProgramUniformMap::const_iterator program_it = mUniforms.begin();
+        program_it != mUniforms.end();
+        ++program_it)
     {
-      const UniformIDMap &uniformIDs = program_it->second;
+      const UniformIDMap& uniformIDs = program_it->second;
 
-      UniformIDMap::const_iterator uniform_it = uniformIDs.find( name );
-      if( uniform_it != uniformIDs.end() )
+      UniformIDMap::const_iterator uniform_it = uniformIDs.find(name);
+      if(uniform_it != uniformIDs.end())
       {
         programId = program_it->first;
         uniformId = uniform_it->second;
@@ -2130,16 +2280,25 @@ public: // TEST FUNCTIONS
 
   struct ScissorParams
   {
-    GLint x;
-    GLint y;
+    GLint   x;
+    GLint   y;
     GLsizei width;
     GLsizei height;
 
-    ScissorParams() : x( 0 ), y( 0 ), width( 0 ), height( 0 ) { }
+    ScissorParams()
+    : x(0),
+      y(0),
+      width(0),
+      height(0)
+    {
+    }
   };
 
   // Methods to check scissor tests
-  inline const ScissorParams& GetScissorParams() const { return mScissorParams; }
+  inline const ScissorParams& GetScissorParams() const
+  {
+    return mScissorParams;
+  }
 
   struct ColorMaskParams
   {
@@ -2148,59 +2307,86 @@ public: // TEST FUNCTIONS
     GLboolean blue;
     GLboolean alpha;
 
-    ColorMaskParams() : red( true ), green( true ), blue( true ), alpha( true ) { }
+    ColorMaskParams()
+    : red(true),
+      green(true),
+      blue(true),
+      alpha(true)
+    {
+    }
   };
 
-  inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
+  inline bool GetProgramBinaryCalled() const
+  {
+    return mGetProgramBinaryCalled;
+  }
 
-  inline unsigned int GetClearCountCalled() const { return mClearCount; }
+  inline unsigned int GetClearCountCalled() const
+  {
+    return mClearCount;
+  }
 
-  inline const ColorMaskParams& GetColorMaskParams() const { return mColorMaskParams; }
+  inline const ColorMaskParams& GetColorMaskParams() const
+  {
+    return mColorMaskParams;
+  }
 
-  typedef std::vector<size_t> BufferDataCalls;
-  inline const BufferDataCalls& GetBufferDataCalls() const { return mBufferDataCalls; }
-  inline void ResetBufferDataCalls() { mBufferDataCalls.clear(); }
+  typedef std::vector<size_t>   BufferDataCalls;
+  inline const BufferDataCalls& GetBufferDataCalls() const
+  {
+    return mBufferDataCalls;
+  }
+  inline void ResetBufferDataCalls()
+  {
+    mBufferDataCalls.clear();
+  }
 
-  typedef std::vector<size_t> BufferSubDataCalls;
-  inline const BufferSubDataCalls& GetBufferSubDataCalls() const { return mBufferSubDataCalls; }
-  inline void ResetBufferSubDataCalls() { mBufferSubDataCalls.clear(); }
+  typedef std::vector<size_t>      BufferSubDataCalls;
+  inline const BufferSubDataCalls& GetBufferSubDataCalls() const
+  {
+    return mBufferSubDataCalls;
+  }
+  inline void ResetBufferSubDataCalls()
+  {
+    mBufferSubDataCalls.clear();
+  }
 
 private:
-  GLuint     mCurrentProgram;
-  GLuint     mCompileStatus;
-  BufferDataCalls mBufferDataCalls;
-  BufferSubDataCalls mBufferSubDataCalls;
-  GLuint     mLinkStatus;
-  GLint      mNumberOfActiveUniforms;
-  GLint      mGetAttribLocationResult;
-  GLenum     mGetErrorResult;
-  GLubyte*   mGetStringResult;
-  GLboolean  mIsBufferResult;
-  GLboolean  mIsEnabledResult;
-  GLboolean  mIsFramebufferResult;
-  GLboolean  mIsProgramResult;
-  GLboolean  mIsRenderbufferResult;
-  GLboolean  mIsShaderResult;
-  GLboolean  mIsTextureResult;
-  GLenum     mActiveTextureUnit;
-  GLenum     mCheckFramebufferStatusResult;
-  GLint      mFramebufferStatus;
-  GLenum     mFramebufferDepthAttached;
-  GLenum     mFramebufferStencilAttached;
-  GLuint     mFramebufferColorAttachmentCount;
-  GLuint     mFrameBufferColorStatus;
-  GLint      mNumBinaryFormats;
-  GLint      mBinaryFormats;
-  GLint      mProgramBinaryLength;
-  bool       mVertexAttribArrayState[MAX_ATTRIBUTE_CACHE_SIZE];
-  bool       mVertexAttribArrayChanged;                            // whether the vertex attrib array has been changed
-  bool       mGetProgramBinaryCalled;
-  typedef std::map< GLuint, std::string> ShaderSourceMap;
-  ShaderSourceMap mShaderSources;
-  GLuint     mLastShaderCompiled;
-  GLbitfield mLastClearBitMask;
-  Vector4 mLastClearColor;
-  unsigned int mClearCount;
+  GLuint                                mCurrentProgram;
+  GLuint                                mCompileStatus;
+  BufferDataCalls                       mBufferDataCalls;
+  BufferSubDataCalls                    mBufferSubDataCalls;
+  GLuint                                mLinkStatus;
+  GLint                                 mNumberOfActiveUniforms;
+  GLint                                 mGetAttribLocationResult;
+  GLenum                                mGetErrorResult;
+  GLubyte*                              mGetStringResult;
+  GLboolean                             mIsBufferResult;
+  GLboolean                             mIsEnabledResult;
+  GLboolean                             mIsFramebufferResult;
+  GLboolean                             mIsProgramResult;
+  GLboolean                             mIsRenderbufferResult;
+  GLboolean                             mIsShaderResult;
+  GLboolean                             mIsTextureResult;
+  GLenum                                mActiveTextureUnit;
+  GLenum                                mCheckFramebufferStatusResult;
+  GLint                                 mFramebufferStatus;
+  GLenum                                mFramebufferDepthAttached;
+  GLenum                                mFramebufferStencilAttached;
+  GLuint                                mFramebufferColorAttachmentCount;
+  GLuint                                mFrameBufferColorStatus;
+  GLint                                 mNumBinaryFormats;
+  GLint                                 mBinaryFormats;
+  GLint                                 mProgramBinaryLength;
+  bool                                  mVertexAttribArrayState[MAX_ATTRIBUTE_CACHE_SIZE];
+  bool                                  mVertexAttribArrayChanged; // whether the vertex attrib array has been changed
+  bool                                  mGetProgramBinaryCalled;
+  typedef std::map<GLuint, std::string> ShaderSourceMap;
+  ShaderSourceMap                       mShaderSources;
+  GLuint                                mLastShaderCompiled;
+  GLbitfield                            mLastClearBitMask;
+  Vector4                               mLastClearColor;
+  unsigned int                          mClearCount;
 
   Vector4 mLastBlendColor;
   GLenum  mLastBlendEquationRgb;
@@ -2213,8 +2399,8 @@ private:
   GLboolean mLastDepthMask;
 
   // Data for manipulating the IDs returned by GenTextures
-  GLuint mLastAutoTextureIdUsed;
-  GLuint mNumGeneratedTextures;
+  GLuint              mLastAutoTextureIdUsed;
+  GLuint              mNumGeneratedTextures;
   std::vector<GLuint> mNextTextureIds;
   std::vector<GLuint> mDeletedTextureIds;
   std::vector<GLuint> mBoundTextures;
@@ -2224,7 +2410,7 @@ private:
     std::vector<GLuint> mBoundTextures;
   };
 
-  ActiveTextureType mActiveTextures[ MIN_TEXTURE_UNIT_LIMIT ];
+  ActiveTextureType mActiveTextures[MIN_TEXTURE_UNIT_LIMIT];
 
   TraceCallStack mCullFaceTrace;
   TraceCallStack mEnableDisableTrace;
@@ -2239,46 +2425,46 @@ private:
   TraceCallStack mViewportTrace;
 
   // Shaders & Uniforms
-  GLuint mLastShaderIdUsed;
-  GLuint mLastProgramIdUsed;
-  GLuint mLastUniformIdUsed;
-  typedef std::map< std::string, GLint > UniformIDMap;
-  typedef std::map< GLuint, UniformIDMap > ProgramUniformMap;
-  ProgramUniformMap mUniforms;
+  GLuint                                 mLastShaderIdUsed;
+  GLuint                                 mLastProgramIdUsed;
+  GLuint                                 mLastUniformIdUsed;
+  typedef std::map<std::string, GLint>   UniformIDMap;
+  typedef std::map<GLuint, UniformIDMap> ProgramUniformMap;
+  ProgramUniformMap                      mUniforms;
 
-  template <typename T>
-  struct ProgramUniformValue : public std::map< GLuint, std::map< GLint, T > >
+  template<typename T>
+  struct ProgramUniformValue : public std::map<GLuint, std::map<GLint, T> >
   {
   public:
-    typedef std::map< GLint, T > UniformValueMap;
-    typedef std::map< GLuint, UniformValueMap > Map;
+    typedef std::map<GLint, T>                UniformValueMap;
+    typedef std::map<GLuint, UniformValueMap> Map;
 
-    bool SetUniformValue( GLuint program, GLuint uniform, const T& value )
+    bool SetUniformValue(GLuint program, GLuint uniform, const T& value)
     {
-      if( program == 0 )
+      if(program == 0)
       {
         return false;
       }
 
-      typename Map::iterator it = Map::find( program );
-      if( it == Map::end() )
+      typename Map::iterator it = Map::find(program);
+      if(it == Map::end())
       {
         // if its the first uniform for this program add it
-        std::pair< typename Map::iterator, bool > result =
-            Map::insert( typename Map::value_type( program, UniformValueMap() ) );
+        std::pair<typename Map::iterator, bool> result =
+          Map::insert(typename Map::value_type(program, UniformValueMap()));
         it = result.first;
       }
 
       UniformValueMap& uniforms = it->second;
-      uniforms[uniform] = value;
+      uniforms[uniform]         = value;
 
       return true;
     }
 
-    bool CheckUniformValue( GLuint program, GLuint uniform, const T& value ) const
+    bool CheckUniformValue(GLuint program, GLuint uniform, const T& value) const
     {
       T uniformValue;
-      if ( GetUniformValue( program, uniform, uniformValue ) )
+      if(GetUniformValue(program, uniform, uniformValue))
       {
         return CompareType<T>(value, uniformValue, Math::MACHINE_EPSILON_10);
       }
@@ -2286,24 +2472,24 @@ private:
       return false;
     }
 
-    bool GetUniformValue( GLuint program, GLuint uniform, T& value ) const
+    bool GetUniformValue(GLuint program, GLuint uniform, T& value) const
     {
-      if( program == 0 )
+      if(program == 0)
       {
         return false;
       }
 
-      typename Map::const_iterator it = Map::find( program );
-      if( it == Map::end() )
+      typename Map::const_iterator it = Map::find(program);
+      if(it == Map::end())
       {
         // Uniform values always initialised as 0
         value = GetZero();
         return true;
       }
 
-      const UniformValueMap& uniforms = it->second;
-      typename UniformValueMap::const_iterator it2 = uniforms.find( uniform );
-      if( it2 == uniforms.end() )
+      const UniformValueMap&                   uniforms = it->second;
+      typename UniformValueMap::const_iterator it2      = uniforms.find(uniform);
+      if(it2 == uniforms.end())
       {
         // Uniform values always initialised as 0
         value = GetZero();
@@ -2316,103 +2502,102 @@ private:
 
     T GetZero() const;
   };
-  ProgramUniformValue<int> mProgramUniforms1i;
-  ProgramUniformValue<float> mProgramUniforms1f;
+  ProgramUniformValue<int>     mProgramUniforms1i;
+  ProgramUniformValue<float>   mProgramUniforms1f;
   ProgramUniformValue<Vector2> mProgramUniforms2f;
   ProgramUniformValue<Vector3> mProgramUniforms3f;
   ProgramUniformValue<Vector4> mProgramUniforms4f;
-  ProgramUniformValue<Matrix> mProgramUniformsMat4;
+  ProgramUniformValue<Matrix>  mProgramUniformsMat4;
   ProgramUniformValue<Matrix3> mProgramUniformsMat3;
 
-  inline const ProgramUniformValue<int>& GetProgramUniformsForType( const int ) const
+  inline const ProgramUniformValue<int>& GetProgramUniformsForType(const int) const
   {
     return mProgramUniforms1i;
   }
-  inline const ProgramUniformValue<float>& GetProgramUniformsForType( const float ) const
+  inline const ProgramUniformValue<float>& GetProgramUniformsForType(const float) const
   {
     return mProgramUniforms1f;
   }
-  inline const ProgramUniformValue<Vector2>& GetProgramUniformsForType( const Vector2& ) const
+  inline const ProgramUniformValue<Vector2>& GetProgramUniformsForType(const Vector2&) const
   {
     return mProgramUniforms2f;
   }
-  inline const ProgramUniformValue<Vector3>& GetProgramUniformsForType( const Vector3& ) const
+  inline const ProgramUniformValue<Vector3>& GetProgramUniformsForType(const Vector3&) const
   {
     return mProgramUniforms3f;
   }
-  inline const ProgramUniformValue<Vector4>& GetProgramUniformsForType( const Vector4& ) const
+  inline const ProgramUniformValue<Vector4>& GetProgramUniformsForType(const Vector4&) const
   {
     return mProgramUniforms4f;
   }
-  inline const ProgramUniformValue<Matrix>& GetProgramUniformsForType( const Matrix& ) const
+  inline const ProgramUniformValue<Matrix>& GetProgramUniformsForType(const Matrix&) const
   {
     return mProgramUniformsMat4;
   }
-  inline const ProgramUniformValue<Matrix3>& GetProgramUniformsForType( const Matrix3& ) const
+  inline const ProgramUniformValue<Matrix3>& GetProgramUniformsForType(const Matrix3&) const
   {
     return mProgramUniformsMat3;
   }
   inline void SetVertexAttribArray(GLuint index, bool state)
   {
-    if( index >= MAX_ATTRIBUTE_CACHE_SIZE )
+    if(index >= MAX_ATTRIBUTE_CACHE_SIZE)
     {
       // out of range
       return;
     }
-    mVertexAttribArrayState[ index ] = state;
-    mVertexAttribArrayChanged = true;
+    mVertexAttribArrayState[index] = state;
+    mVertexAttribArrayChanged      = true;
   }
 
-  ScissorParams mScissorParams;
+  ScissorParams   mScissorParams;
   ColorMaskParams mColorMaskParams;
 };
 
-template <>
+template<>
 inline int TestGlAbstraction::ProgramUniformValue<int>::GetZero() const
 {
   return 0;
 }
 
-template <>
+template<>
 inline float TestGlAbstraction::ProgramUniformValue<float>::GetZero() const
 {
   return 0.0f;
 }
 
-template <>
+template<>
 inline Vector2 TestGlAbstraction::ProgramUniformValue<Vector2>::GetZero() const
 {
   return Vector2::ZERO;
 }
 
-template <>
+template<>
 inline Vector3 TestGlAbstraction::ProgramUniformValue<Vector3>::GetZero() const
 {
   return Vector3::ZERO;
 }
 
-template <>
+template<>
 inline Vector4 TestGlAbstraction::ProgramUniformValue<Vector4>::GetZero() const
 {
   return Vector4::ZERO;
 }
 
-template <>
+template<>
 inline Matrix TestGlAbstraction::ProgramUniformValue<Matrix>::GetZero() const
 {
   return Matrix();
 }
 
-template <>
+template<>
 inline Matrix3 TestGlAbstraction::ProgramUniformValue<Matrix3>::GetZero() const
 {
-  return Matrix3( Matrix() );
+  return Matrix3(Matrix());
 }
 
 } // namespace Dali
 
 bool BlendEnabled(const Dali::TraceCallStack& callStack);
 bool BlendDisabled(const Dali::TraceCallStack& callStack);
-
 
 #endif // TEST_GL_ABSTRACTION_H

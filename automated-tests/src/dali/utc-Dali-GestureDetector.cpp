@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <algorithm>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <algorithm>
+#include <iostream>
 
 using namespace Dali;
 
@@ -33,7 +33,6 @@ void utc_dali_gesture_detector_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
-
 
 int UtcDaliGestureDetectorConstructorN(void)
 {
@@ -48,9 +47,9 @@ int UtcDaliGestureDetectorConstructorN(void)
     detector.Attach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT( e, "detector", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "detector", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -69,9 +68,9 @@ int UtcDaliGestureDetectorConstructorP(void)
     detector.Attach(actor);
     tet_result(TET_PASS);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -94,9 +93,9 @@ int UtcDaliGestureDetectorAssignP(void)
     detector2.Attach(actor);
     tet_result(TET_PASS);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -114,14 +113,14 @@ int UtcDaliGestureDetectorDownCastP(void)
   GestureDetector detector2 = GestureDetector::DownCast(object);
   DALI_TEST_CHECK(detector2);
 
-  GestureDetector detector3 = DownCast< GestureDetector >(object);
+  GestureDetector detector3 = DownCast<GestureDetector>(object);
   DALI_TEST_CHECK(detector3);
 
-  BaseHandle unInitializedObject;
+  BaseHandle      unInitializedObject;
   GestureDetector detector4 = GestureDetector::DownCast(unInitializedObject);
   DALI_TEST_CHECK(!detector4);
 
-  GestureDetector detector5 = DownCast< GestureDetector >(unInitializedObject);
+  GestureDetector detector5 = DownCast<GestureDetector>(unInitializedObject);
   DALI_TEST_CHECK(!detector5);
   END_TEST;
 }
@@ -140,7 +139,7 @@ int UtcDaliGestureDetectorAttachP(void)
   bool found = false;
   for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    if( detector.GetAttachedActor(i) == actor )
+    if(detector.GetAttachedActor(i) == actor)
     {
       tet_result(TET_PASS);
       found = true;
@@ -178,9 +177,9 @@ int UtcDaliGestureDetectorAttachN(void)
     detector.Attach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT( e, "actor", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "actor", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -198,7 +197,7 @@ int UtcDaliGestureDetectorDetachP(void)
   bool found = false;
   for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    if( detector.GetAttachedActor(i) == actor )
+    if(detector.GetAttachedActor(i) == actor)
     {
       tet_result(TET_PASS);
       found = true;
@@ -216,7 +215,7 @@ int UtcDaliGestureDetectorDetachP(void)
   found = false;
   for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    if( detector.GetAttachedActor(i) == actor )
+    if(detector.GetAttachedActor(i) == actor)
     {
       found = true;
     }
@@ -249,9 +248,9 @@ int UtcDaliGestureDetectorDetachN01(void)
     detector.Detach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_ASSERT( e, "actor", TEST_LOCATION );
+    DALI_TEST_ASSERT(e, "actor", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -273,9 +272,9 @@ int UtcDaliGestureDetectorDetachN02(void)
     detector.Detach(actor2);
     tet_result(TET_PASS);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -299,9 +298,9 @@ int UtcDaliGestureDetectorDetachN03(void)
     detector.Detach(actor);
     detector.Detach(actor);
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
 
@@ -320,7 +319,7 @@ int UtcDaliGestureDetectorDetachAllP(void)
   const unsigned int actorsToAdd = 5;
   std::vector<Actor> myActors;
 
-  for (unsigned int i = 0; i < actorsToAdd; ++i)
+  for(unsigned int i = 0; i < actorsToAdd; ++i)
   {
     Actor actor = Actor::New();
     myActors.push_back(actor);
@@ -346,7 +345,7 @@ int UtcDaliGestureDetectorDetachAllN(void)
   const unsigned int actorsToAdd = 5;
   std::vector<Actor> myActors;
 
-  for (unsigned int i = 0; i < actorsToAdd; ++i)
+  for(unsigned int i = 0; i < actorsToAdd; ++i)
   {
     Actor actor = Actor::New();
     myActors.push_back(actor);
@@ -365,9 +364,9 @@ int UtcDaliGestureDetectorDetachAllN(void)
   {
     detector.DetachAll();
   }
-  catch (DaliException& e)
+  catch(DaliException& e)
   {
-    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_PRINT_ASSERT(e);
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -395,7 +394,7 @@ int UtcDaliGestureDetectorGetAttachedActors(void)
 
   // Attach another five actors
   std::vector<Actor> myActors;
-  for (unsigned int i = 0; i < 5; ++i)
+  for(unsigned int i = 0; i < 5; ++i)
   {
     Actor actor = Actor::New();
     myActors.push_back(actor);
@@ -441,25 +440,25 @@ int UtcDaliGestureDetectorProperties(void)
   // Use pinch gesture as that doen't currently have any properties. Will need to change it if default properties are added.
   GestureDetector detector = PinchGestureDetector::New();
 
-  DALI_TEST_EQUALS( detector.GetPropertyCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetPropertyCount(), 0u, TEST_LOCATION);
 
   Property::IndexContainer indices;
-  detector.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.Size(), 0u, TEST_LOCATION );
+  detector.GetPropertyIndices(indices);
+  DALI_TEST_EQUALS(indices.Size(), 0u, TEST_LOCATION);
 
-  DALI_TEST_EQUALS( detector.IsPropertyWritable( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.IsPropertyAnimatable( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.IsPropertyAConstraintInput( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetPropertyType( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ), Property::NONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetPropertyIndex( "InvalidIndex" ), Property::INVALID_INDEX, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.IsPropertyWritable(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.IsPropertyAnimatable(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.IsPropertyAConstraintInput(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetPropertyType(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX), Property::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetPropertyIndex("InvalidIndex"), Property::INVALID_INDEX, TEST_LOCATION);
 
-  Property::Value propValue = detector.GetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX );
-  DALI_TEST_EQUALS( propValue.GetType(), Property::NONE, TEST_LOCATION );
+  Property::Value propValue = detector.GetProperty(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX);
+  DALI_TEST_EQUALS(propValue.GetType(), Property::NONE, TEST_LOCATION);
 
-  DALI_TEST_CHECK( detector.GetPropertyName( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX ).empty() );
+  DALI_TEST_CHECK(detector.GetPropertyName(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX).empty());
 
   // For coverage only, not testable
-  detector.SetProperty( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, true );
+  detector.SetProperty(DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, true);
 
   END_TEST;
 }
@@ -470,24 +469,24 @@ int UtcDaliGestureDetectorRegisterProperty(void)
 
   GestureDetector detector = PinchGestureDetector::New();
 
-  Property::Index index = detector.RegisterProperty( "sceneProperty", 0 );
-  DALI_TEST_EQUALS( index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION );
-  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 0, TEST_LOCATION );
+  Property::Index index = detector.RegisterProperty("sceneProperty", 0);
+  DALI_TEST_EQUALS(index, (Property::Index)PROPERTY_CUSTOM_START_INDEX, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetProperty<int32_t>(index), 0, TEST_LOCATION);
 
-  detector.SetProperty( index, -123 );
-  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+  detector.SetProperty(index, -123);
+  DALI_TEST_EQUALS(detector.GetProperty<int32_t>(index), -123, TEST_LOCATION);
 
   using Dali::Animation;
-  Animation animation = Animation::New( 1.0f );
-  animation.AnimateTo( Property( detector, index ), 99 );
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(detector, index), 99);
 
-  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), -123, TEST_LOCATION );
+  DALI_TEST_EQUALS(detector.GetProperty<int32_t>(index), -123, TEST_LOCATION);
   // Start the animation
   animation.Play();
 
   application.SendNotification();
-  application.Render( 1000 /* 100% progress */);
-  DALI_TEST_EQUALS( detector.GetProperty< int32_t >( index ), 99, TEST_LOCATION );
+  application.Render(1000 /* 100% progress */);
+  DALI_TEST_EQUALS(detector.GetProperty<int32_t>(index), 99, TEST_LOCATION);
 
   END_TEST;
 }

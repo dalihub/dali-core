@@ -23,44 +23,42 @@
 
 namespace Dali
 {
-
 /**
  * Class to emulate the GL context helper
  */
-class DALI_CORE_API TestGlContextHelperAbstraction: public Integration::GlContextHelperAbstraction
+class DALI_CORE_API TestGlContextHelperAbstraction : public Integration::GlContextHelperAbstraction
 {
 public:
   /**
    * Constructor
    */
-  TestGlContextHelperAbstraction() {};
+  TestGlContextHelperAbstraction(){};
 
   /**
    * Destructor
    */
-  ~TestGlContextHelperAbstraction() override {};
+  ~TestGlContextHelperAbstraction() override{};
 
   /**
    * @brief Switch to the surfaceless GL context
    */
-  void MakeSurfacelessContextCurrent() override {};
+  void MakeSurfacelessContextCurrent() override{};
 
   /**
    * @brief Clear the GL context
    */
-  void MakeContextNull() override {};
+  void MakeContextNull() override{};
 
   /**
    * @brief Wait until all GL rendering calls for the current GL context are executed
    */
-  void WaitClient() override {};
+  void WaitClient() override{};
 
 private:
-
-  TestGlContextHelperAbstraction( const TestGlContextHelperAbstraction& ); ///< Undefined
-  TestGlContextHelperAbstraction& operator=( const TestGlContextHelperAbstraction& ); ///< Undefined
+  TestGlContextHelperAbstraction(const TestGlContextHelperAbstraction&);            ///< Undefined
+  TestGlContextHelperAbstraction& operator=(const TestGlContextHelperAbstraction&); ///< Undefined
 };
 
-} // Dali
+} // namespace Dali
 
 #endif // TEST_GL_CONTEXT_HELPER_ABSTRACTION_H

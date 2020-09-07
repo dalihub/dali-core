@@ -2,7 +2,7 @@
 #define TEST_HARNESS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,27 @@
 
 #include <stdio.h>
 #include <testcase.h>
+
 #include <cstdint>
 
 namespace TestHarness
 {
-
 enum ExitStatus
 {
-  EXIT_STATUS_TESTCASE_SUCCEEDED,   // 0
-  EXIT_STATUS_TESTCASE_FAILED,      // 1
-  EXIT_STATUS_TESTCASE_ABORTED,     // 2
-  EXIT_STATUS_FORK_FAILED,          // 3
-  EXIT_STATUS_WAITPID_FAILED,       // 4
-  EXIT_STATUS_BAD_ARGUMENT,         // 5
-  EXIT_STATUS_TESTCASE_NOT_FOUND    // 6
+  EXIT_STATUS_TESTCASE_SUCCEEDED, // 0
+  EXIT_STATUS_TESTCASE_FAILED,    // 1
+  EXIT_STATUS_TESTCASE_ABORTED,   // 2
+  EXIT_STATUS_FORK_FAILED,        // 3
+  EXIT_STATUS_WAITPID_FAILED,     // 4
+  EXIT_STATUS_BAD_ARGUMENT,       // 5
+  EXIT_STATUS_TESTCASE_NOT_FOUND  // 6
 };
 
 const int32_t MAX_NUM_CHILDREN(16);
 
 struct TestCase
 {
-  int32_t testCase;
+  int32_t     testCase;
   const char* testCaseName;
 
   TestCase()
@@ -60,10 +60,9 @@ struct TestCase
   }
   TestCase& operator=(const TestCase& rhs)
   {
-    testCase = rhs.testCase;
+    testCase     = rhs.testCase;
     testCaseName = rhs.testCaseName;
     return *this;
-
   }
 };
 
@@ -71,7 +70,7 @@ struct TestCase
  * Run a test case
  * @param[in] testCase The Testkit-lite test case to run
  */
-int32_t RunTestCase( struct testcase_s& testCase );
+int32_t RunTestCase(struct testcase_s& testCase);
 
 /**
  * Run all test cases in parallel
@@ -88,7 +87,7 @@ int32_t RunAllInParallel(const char* processName, testcase tc_array[], bool reRu
  * @param[in] tc_array The array of auto-generated testkit-lite test cases
  * @return 0 on success
  */
-int32_t RunAll( const char* processName, testcase tc_array[] );
+int32_t RunAll(const char* processName, testcase tc_array[]);
 
 /**
  * Find the named test case in the given array, and run it

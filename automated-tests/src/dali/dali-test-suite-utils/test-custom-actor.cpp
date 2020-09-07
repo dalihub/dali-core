@@ -2,8 +2,8 @@
 
 using namespace Dali;
 
-std::vector< std::string > MasterCallStack;
-bool gOnRelayout = false;
+std::vector<std::string> MasterCallStack;
+bool                     gOnRelayout = false;
 
 namespace Test
 {
@@ -12,11 +12,10 @@ namespace Impl
 struct TestCustomActor;
 }
 
-
 TestCustomActor TestCustomActor::New()
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActor;
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -25,19 +24,19 @@ TestCustomActor TestCustomActor::New()
 
 TestCustomActor TestCustomActor::NewNegoSize()
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActor( true );
-  TestCustomActor custom( *impl ); // takes ownership
-  custom.SetProperty( Dali::Actor::Property::NAME, "SizeNegotiationActor" );
+  Impl::TestCustomActor* impl = new Impl::TestCustomActor(true);
+  TestCustomActor        custom(*impl); // takes ownership
+  custom.SetProperty(Dali::Actor::Property::NAME, "SizeNegotiationActor");
 
   impl->Initialize();
 
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant1( Actor childToAdd )
+TestCustomActor TestCustomActor::NewVariant1(Actor childToAdd)
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant1( childToAdd );
-  TestCustomActor custom( *impl ); // takes ownership
+  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant1(childToAdd);
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -47,17 +46,17 @@ TestCustomActor TestCustomActor::NewVariant1( Actor childToAdd )
 TestCustomActor TestCustomActor::NewVariant2()
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant2();
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant3( Actor childToAdd )
+TestCustomActor TestCustomActor::NewVariant3(Actor childToAdd)
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant3( childToAdd );
-  TestCustomActor custom( *impl ); // takes ownership
+  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant3(childToAdd);
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -67,7 +66,7 @@ TestCustomActor TestCustomActor::NewVariant3( Actor childToAdd )
 TestCustomActor TestCustomActor::NewVariant4()
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant4();
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -77,7 +76,7 @@ TestCustomActor TestCustomActor::NewVariant4()
 TestCustomActor TestCustomActor::NewVariant5(Integration::Scene scene)
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant5(scene);
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -87,27 +86,27 @@ TestCustomActor TestCustomActor::NewVariant5(Integration::Scene scene)
 TestCustomActor TestCustomActor::NewVariant6(Integration::Scene scene)
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant6(scene);
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant7( const char* name )
+TestCustomActor TestCustomActor::NewVariant7(const char* name)
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant7();
-  TestCustomActor custom( *impl ); // takes ownership
+  TestCustomActor        custom(*impl); // takes ownership
 
-  impl->Initialize( name );
+  impl->Initialize(name);
 
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant8( Actor rival )
+TestCustomActor TestCustomActor::NewVariant8(Actor rival)
 {
-  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant8( rival );
-  TestCustomActor custom( *impl ); // takes ownership
+  Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant8(rival);
+  TestCustomActor        custom(*impl); // takes ownership
 
   impl->Initialize();
 
@@ -123,7 +122,7 @@ Impl::TestCustomActor& TestCustomActor::GetImpl()
   return static_cast<Impl::TestCustomActor&>(GetImplementation());
 }
 
-std::vector< std::string >& TestCustomActor::GetMethodsCalled()
+std::vector<std::string>& TestCustomActor::GetMethodsCalled()
 {
   return GetImpl().mMethodsCalled;
 }
@@ -150,28 +149,28 @@ Vector3 TestCustomActor::GetTargetSize()
 
 Vector3 TestCustomActor::GetNaturalSize()
 {
-  return Vector3( 0.0f, 0.0f, 0.0f );
+  return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-float TestCustomActor::GetHeightForWidth( float width )
+float TestCustomActor::GetHeightForWidth(float width)
 {
   return 0.0f;
 }
 
-float TestCustomActor::GetWidthForHeight( float height )
+float TestCustomActor::GetWidthForHeight(float height)
 {
   return 0.0f;
 }
 
-void TestCustomActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void TestCustomActor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
 }
 
-void TestCustomActor::OnLayoutNegotiated( float size, Dimension::Type dimension )
+void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
 {
 }
 
-void TestCustomActor::OnCalculateRelayoutSize( Dimension::Type dimension )
+void TestCustomActor::OnCalculateRelayoutSize(Dimension::Type dimension)
 {
 }
 
@@ -180,24 +179,24 @@ void TestCustomActor::TestRelayoutRequest()
   GetImpl().TestRelayoutRequest();
 }
 
-float TestCustomActor::TestGetHeightForWidthBase( float width )
+float TestCustomActor::TestGetHeightForWidthBase(float width)
 {
-  return GetImpl().TestGetHeightForWidthBase( width );
+  return GetImpl().TestGetHeightForWidthBase(width);
 }
 
-float TestCustomActor::TestGetWidthForHeightBase( float height )
+float TestCustomActor::TestGetWidthForHeightBase(float height)
 {
-  return GetImpl().TestGetWidthForHeightBase( height );
+  return GetImpl().TestGetWidthForHeightBase(height);
 }
 
-float TestCustomActor::TestCalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+float TestCustomActor::TestCalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return GetImpl().TestCalculateChildSizeBase( child, dimension );
+  return GetImpl().TestCalculateChildSizeBase(child, dimension);
 }
 
-bool TestCustomActor::TestRelayoutDependentOnChildrenBase( Dimension::Type dimension )
+bool TestCustomActor::TestRelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return GetImpl().TestRelayoutDependentOnChildrenBase( dimension );
+  return GetImpl().TestRelayoutDependentOnChildrenBase(dimension);
 }
 
 uint32_t TestCustomActor::GetDepth()
@@ -209,26 +208,26 @@ TestCustomActor::TestCustomActor()
 {
 }
 
-TestCustomActor::TestCustomActor( Impl::TestCustomActor& impl )
-: CustomActor( impl )
+TestCustomActor::TestCustomActor(Impl::TestCustomActor& impl)
+: CustomActor(impl)
 {
 }
 
-TestCustomActor::TestCustomActor( Dali::Internal::CustomActor* internal )
-: CustomActor( internal )
+TestCustomActor::TestCustomActor(Dali::Internal::CustomActor* internal)
+: CustomActor(internal)
 {
 }
 
-TestCustomActor TestCustomActor::DownCast( BaseHandle handle )
+TestCustomActor TestCustomActor::DownCast(BaseHandle handle)
 {
   TestCustomActor actor;
-  CustomActor custom = Dali::CustomActor::DownCast(handle);
+  CustomActor     custom = Dali::CustomActor::DownCast(handle);
   if(custom)
   {
     CustomActorImpl& customImpl = custom.GetImplementation();
 
     Test::Impl::TestCustomActor* impl = dynamic_cast<Test::Impl::TestCustomActor*>(&customImpl);
-    if( impl )
+    if(impl)
     {
       actor = TestCustomActor(customImpl.GetOwner());
     }
@@ -238,25 +237,24 @@ TestCustomActor TestCustomActor::DownCast( BaseHandle handle )
 
 namespace Impl
 {
-
 TestCustomActor::TestCustomActor()
-: CustomActorImpl( ActorFlags( DISABLE_SIZE_NEGOTIATION ) ),
-  mDaliProperty( Property::INVALID_INDEX ),
-  mSizeSet( Vector3::ZERO ),
-  mTargetSize( Vector3::ZERO ),
-  mNego( false ),
+: CustomActorImpl(ActorFlags(DISABLE_SIZE_NEGOTIATION)),
+  mDaliProperty(Property::INVALID_INDEX),
+  mSizeSet(Vector3::ZERO),
+  mTargetSize(Vector3::ZERO),
+  mNego(false),
   mDepth(0u),
-  develProp6( 10.0f )
+  develProp6(10.0f)
 {
 }
 
 TestCustomActor::TestCustomActor(bool nego)
-: CustomActorImpl( ActorFlags() ),
-  mDaliProperty( Property::INVALID_INDEX ),
-  mSizeSet( Vector3::ZERO ),
-  mTargetSize( Vector3::ZERO ),
-  mNego( nego ),
-  develProp6( 10.0f )
+: CustomActorImpl(ActorFlags()),
+  mDaliProperty(Property::INVALID_INDEX),
+  mSizeSet(Vector3::ZERO),
+  mTargetSize(Vector3::ZERO),
+  mNego(nego),
+  develProp6(10.0f)
 {
 }
 /**
@@ -266,32 +264,34 @@ TestCustomActor::~TestCustomActor()
 {
 }
 
-void TestCustomActor::Initialize( const char* name )
+void TestCustomActor::Initialize(const char* name)
 {
-  mDaliProperty = Self().RegisterProperty( "Dali", std::string("no"), Property::READ_WRITE);
+  mDaliProperty = Self().RegisterProperty("Dali", std::string("no"), Property::READ_WRITE);
 
-  OnInitialize( name );
+  OnInitialize(name);
 }
 
-void TestCustomActor::OnInitialize( const char* name ) {}
+void TestCustomActor::OnInitialize(const char* name)
+{
+}
 
 /**
  * Resets the call stack
  */
 void TestCustomActor::ResetCallStack()
 {
-  mSizeSet = Vector3();
+  mSizeSet    = Vector3();
   mTargetSize = Vector3();
   mMethodsCalled.clear();
 }
 
-void TestCustomActor::AddToCallStacks( const char* method )
+void TestCustomActor::AddToCallStacks(const char* method)
 {
-  mMethodsCalled.push_back( method );
+  mMethodsCalled.push_back(method);
 
   // Combine Actor name with method string
-  std::string nameAndMethod( Self().GetProperty< std::string >( Dali::Actor::Property::NAME ) );
-  if ( 0 == nameAndMethod.size() )
+  std::string nameAndMethod(Self().GetProperty<std::string>(Dali::Actor::Property::NAME));
+  if(0 == nameAndMethod.size())
   {
     nameAndMethod = "Unknown: ";
   }
@@ -301,11 +301,11 @@ void TestCustomActor::AddToCallStacks( const char* method )
   }
   nameAndMethod += method;
 
-  MasterCallStack.push_back( nameAndMethod );
+  MasterCallStack.push_back(nameAndMethod);
 }
 
 // From CustomActorImpl
-void TestCustomActor::OnSceneConnection( int depth )
+void TestCustomActor::OnSceneConnection(int depth)
 {
   AddToCallStacks("OnSceneConnection");
   mDepth = depth;
@@ -322,7 +322,7 @@ void TestCustomActor::OnChildRemove(Actor& child)
 {
   AddToCallStacks("OnChildRemove");
 }
-void TestCustomActor::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
+void TestCustomActor::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
 {
   AddToCallStacks("OnPropertySet");
 }
@@ -346,42 +346,42 @@ void TestCustomActor::OnKeyInputFocusLost()
 }
 Vector3 TestCustomActor::GetNaturalSize()
 {
-  return Vector3( 0.0f, 0.0f, 0.0f );
+  return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-float TestCustomActor::GetHeightForWidth( float width )
+float TestCustomActor::GetHeightForWidth(float width)
 {
   return 0.0f;
 }
 
-float TestCustomActor::GetWidthForHeight( float height )
+float TestCustomActor::GetWidthForHeight(float height)
 {
   return 0.0f;
 }
 
-void TestCustomActor::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void TestCustomActor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   gOnRelayout = true;
 }
 
-void TestCustomActor::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+void TestCustomActor::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
 }
 
-void TestCustomActor::OnCalculateRelayoutSize( Dimension::Type dimension )
+void TestCustomActor::OnCalculateRelayoutSize(Dimension::Type dimension)
 {
 }
 
-float TestCustomActor::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+float TestCustomActor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
   return 0.0f;
 }
 
-void TestCustomActor::OnLayoutNegotiated( float size, Dimension::Type dimension )
+void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
 {
 }
 
-bool TestCustomActor::RelayoutDependentOnChildren( Dimension::Type dimension )
+bool TestCustomActor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
   return false;
 }
@@ -395,31 +395,31 @@ void TestCustomActor::TestRelayoutRequest()
   RelayoutRequest();
 }
 
-float TestCustomActor::TestGetHeightForWidthBase( float width )
+float TestCustomActor::TestGetHeightForWidthBase(float width)
 {
-  return GetHeightForWidthBase( width );
+  return GetHeightForWidthBase(width);
 }
 
-float TestCustomActor::TestGetWidthForHeightBase( float height )
+float TestCustomActor::TestGetWidthForHeightBase(float height)
 {
-  return GetWidthForHeightBase( height );
+  return GetWidthForHeightBase(height);
 }
 
-float TestCustomActor::TestCalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+float TestCustomActor::TestCalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return CalculateChildSizeBase( child, dimension );
+  return CalculateChildSizeBase(child, dimension);
 }
 
-bool TestCustomActor::TestRelayoutDependentOnChildrenBase( Dimension::Type dimension )
+bool TestCustomActor::TestRelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return RelayoutDependentOnChildrenBase( dimension );
+  return RelayoutDependentOnChildrenBase(dimension);
 }
 
-void TestCustomActor::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+void TestCustomActor::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Test::TestCustomActor actor = Test::TestCustomActor::DownCast( Dali::BaseHandle( object ) );
+  Test::TestCustomActor actor = Test::TestCustomActor::DownCast(Dali::BaseHandle(object));
 
-  if ( actor )
+  if(actor)
   {
     TestCustomActor& actorImpl = GetImpl(actor);
     switch(index)
@@ -453,11 +453,11 @@ void TestCustomActor::SetProperty( BaseObject* object, Property::Index index, co
   }
 }
 
-Property::Value TestCustomActor::GetProperty( BaseObject* object, Property::Index index )
+Property::Value TestCustomActor::GetProperty(BaseObject* object, Property::Index index)
 {
-  Test::TestCustomActor actor = Test::TestCustomActor::DownCast( Dali::BaseHandle( object ) );
+  Test::TestCustomActor actor = Test::TestCustomActor::DownCast(Dali::BaseHandle(object));
 
-  if ( actor )
+  if(actor)
   {
     TestCustomActor& actorImpl = GetImpl(actor);
     switch(index)
@@ -491,22 +491,21 @@ Property::Value TestCustomActor::GetProperty( BaseObject* object, Property::Inde
   return Property::Value();
 }
 
-
 BaseHandle CreateActor()
 {
   return Test::TestCustomActor::New();
 }
 
-DALI_TYPE_REGISTRATION_BEGIN( Test::TestCustomActor, Dali::CustomActor, CreateActor );
+DALI_TYPE_REGISTRATION_BEGIN(Test::TestCustomActor, Dali::CustomActor, CreateActor);
 
-DALI_PROPERTY_REGISTRATION( Test, TestCustomActor, "testProperty1", FLOAT, TEST_PROPERTY1)
-DALI_PROPERTY_REGISTRATION( Test, TestCustomActor, "testProperty2", VECTOR4, TEST_PROPERTY2)
-DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty3", VECTOR4, DEVEL_TEST_PROPERTY3)
-DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty4", INTEGER, DEVEL_TEST_PROPERTY4)
-DALI_DEVEL_PROPERTY_REGISTRATION( Test, TestCustomActor, "develTestProperty5", FLOAT, DEVEL_TEST_PROPERTY5)
-DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Test, TestCustomActor, "develTestProperty6", FLOAT, DEVEL_TEST_PROPERTY6)
+DALI_PROPERTY_REGISTRATION(Test, TestCustomActor, "testProperty1", FLOAT, TEST_PROPERTY1)
+DALI_PROPERTY_REGISTRATION(Test, TestCustomActor, "testProperty2", VECTOR4, TEST_PROPERTY2)
+DALI_DEVEL_PROPERTY_REGISTRATION(Test, TestCustomActor, "develTestProperty3", VECTOR4, DEVEL_TEST_PROPERTY3)
+DALI_DEVEL_PROPERTY_REGISTRATION(Test, TestCustomActor, "develTestProperty4", INTEGER, DEVEL_TEST_PROPERTY4)
+DALI_DEVEL_PROPERTY_REGISTRATION(Test, TestCustomActor, "develTestProperty5", FLOAT, DEVEL_TEST_PROPERTY5)
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Test, TestCustomActor, "develTestProperty6", FLOAT, DEVEL_TEST_PROPERTY6)
 
 DALI_TYPE_REGISTRATION_END()
 
-} // Impl
-} // Test namespace
+} // namespace Impl
+} // namespace Test

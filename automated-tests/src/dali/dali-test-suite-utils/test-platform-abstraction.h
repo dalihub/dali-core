@@ -2,7 +2,7 @@
 #define DALI_TEST_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
+
 #include <cstring>
 #include <string>
 #include <vector>
@@ -32,15 +33,12 @@
 
 namespace Dali
 {
-
 /**
  * Concrete implementation of the platform abstraction class.
  */
 class DALI_CORE_API TestPlatformAbstraction : public Dali::Integration::PlatformAbstraction
 {
-
 public:
-
   /**
    * Constructor
    */
@@ -54,53 +52,55 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
    */
-  ImageDimensions GetClosestImageSize( const std::string& filename,
-                                                 ImageDimensions size,
-                                                 FittingMode::Type fittingMode,
-                                                 SamplingMode::Type samplingMode,
-                                                 bool orientationCorrection ) override;
+  ImageDimensions GetClosestImageSize(const std::string& filename,
+                                      ImageDimensions    size,
+                                      FittingMode::Type  fittingMode,
+                                      SamplingMode::Type samplingMode,
+                                      bool               orientationCorrection) override;
 
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
    */
-  ImageDimensions GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
-                                               ImageDimensions size,
-                                               FittingMode::Type fittingMode,
-                                               SamplingMode::Type samplingMode,
-                                               bool orientationCorrection ) override;
+  ImageDimensions GetClosestImageSize(Integration::ResourcePointer resourceBuffer,
+                                      ImageDimensions              size,
+                                      FittingMode::Type            fittingMode,
+                                      SamplingMode::Type           samplingMode,
+                                      bool                         orientationCorrection) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
    */
-  Integration::ResourcePointer LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath ) override;
+  Integration::ResourcePointer LoadImageSynchronously(const Integration::BitmapResourceType& resourceType, const std::string& resourcePath) override;
 
   /**
    * @copydoc PlatformAbstraction::DecodeBuffer()
    */
-  Integration::BitmapPtr DecodeBuffer( const Dali::Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size ) override;
+  Integration::BitmapPtr DecodeBuffer(const Dali::Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
    */
-  bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const override;
+  bool LoadShaderBinaryFile(const std::string& filename, Dali::Vector<unsigned char>& buffer) const override;
 
   /**
    * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
    */
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const override { return true; }
+  virtual bool SaveShaderBinaryFile(const std::string& filename, const unsigned char* buffer, unsigned int numBytes) const override
+  {
+    return true;
+  }
 
   /**
    * @copydoc PlatformAbstraction::StartTimer()
    */
-  uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback ) override;
+  uint32_t StartTimer(uint32_t milliseconds, CallbackBase* callback) override;
 
   /*
    * @copydoc PlatformAbstraction::CancelTimer()
    */
-  void CancelTimer ( uint32_t timerId ) override;
+  void CancelTimer(uint32_t timerId) override;
 
 public: // TEST FUNCTIONS
-
   // Enumeration of Platform Abstraction methods
   typedef enum
   {
@@ -112,9 +112,18 @@ public: // TEST FUNCTIONS
   /** Call this every test */
   void Initialize();
 
-  inline void EnableTrace(bool enable) { mTrace.Enable(enable); }
-  inline void ResetTrace() { mTrace.Reset(); }
-  inline TraceCallStack& GetTrace() { return mTrace; }
+  inline void EnableTrace(bool enable)
+  {
+    mTrace.Enable(enable);
+  }
+  inline void ResetTrace()
+  {
+    mTrace.Reset();
+  }
+  inline TraceCallStack& GetTrace()
+  {
+    return mTrace;
+  }
 
   /**
    * @brief Checks if a platform function was called
@@ -138,32 +147,32 @@ public: // TEST FUNCTIONS
    * @brief Sets the value returned by GetClosestImageSize.
    * @param[in] size The size that should be returned.
    */
-  void SetClosestImageSize( const Vector2& size );
+  void SetClosestImageSize(const Vector2& size);
 
   /**
    * @brief Sets the result return by LoadFile.
    * @param[in] result The value that LoadFile should return.
    * @param[in] buffer The buffer of the loaded file.
    */
-  void SetLoadFileResult( bool result, Dali::Vector< unsigned char >& buffer );
+  void SetLoadFileResult(bool result, Dali::Vector<unsigned char>& buffer);
 
   /**
    * @brief Sets the SaveFile result
    * @param[in] result The value that SaveFile should return
    */
-  void SetSaveFileResult( bool result );
+  void SetSaveFileResult(bool result);
 
   /**
    * @brief Sets the resource loaded by LoadResourceSynchronously
    * @param[in] resource The loaded resource
    */
-  void SetSynchronouslyLoadedResource( Integration::ResourcePointer resource );
+  void SetSynchronouslyLoadedResource(Integration::ResourcePointer resource);
 
   /**
    * @brief Sets the bitmap returned by DecodeBuffer()
    * @param[in] bitmap The decoded bitmap
    */
-  void SetDecodedBitmap( Integration::BitmapPtr bitmap );
+  void SetDecodedBitmap(Integration::BitmapPtr bitmap);
 
   /**
    * @brief Triggers the previously stored callback function
@@ -171,38 +180,35 @@ public: // TEST FUNCTIONS
   void TriggerTimer();
 
 private:
-
-  TestPlatformAbstraction( const TestPlatformAbstraction& ); ///< Undefined
-  TestPlatformAbstraction& operator=( const TestPlatformAbstraction& ); ///< Undefined
+  TestPlatformAbstraction(const TestPlatformAbstraction&);            ///< Undefined
+  TestPlatformAbstraction& operator=(const TestPlatformAbstraction&); ///< Undefined
 
 private:
-
   struct LoadFileResult
   {
     inline LoadFileResult()
     : loadResult(false)
     {
-
     }
 
-    bool loadResult;
-    Dali::Vector< unsigned char> buffer;
+    bool                        loadResult;
+    Dali::Vector<unsigned char> buffer;
   };
 
-  mutable TraceCallStack        mTrace;
-  bool                          mIsLoadingResult;
-  ImageDimensions               mClosestSize;
+  mutable TraceCallStack mTrace;
+  bool                   mIsLoadingResult;
+  ImageDimensions        mClosestSize;
 
-  LoadFileResult                mLoadFileResult;
-  bool                          mSaveFileResult;
+  LoadFileResult mLoadFileResult;
+  bool           mSaveFileResult;
 
-  Integration::ResourcePointer  mSynchronouslyLoadedResource;
-  Integration::BitmapPtr        mDecodedBitmap;
+  Integration::ResourcePointer mSynchronouslyLoadedResource;
+  Integration::BitmapPtr       mDecodedBitmap;
 
-  uint32_t                      mTimerId;
-  CallbackBase*                 mCallbackFunction;
+  uint32_t      mTimerId;
+  CallbackBase* mCallbackFunction;
 };
 
-} // Dali
+} // namespace Dali
 
 #endif /* DALI_TEST_PLATFORM_ABSTRACTION_H */

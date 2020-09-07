@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 class Actor;
 class Image;
 class Texture;
@@ -39,7 +38,7 @@ Actor CreateRenderableActor();
  * @param[in] texture Texture to set.
  * @return An actor with a renderer.
  */
-Actor CreateRenderableActor( Texture texture );
+Actor CreateRenderableActor(Texture texture);
 
 /**
  * @brief Creates a renderable-actor with a texture and custom shaders.
@@ -48,7 +47,7 @@ Actor CreateRenderableActor( Texture texture );
  * @param[in] fragmentShader The fragment-shader.
  * @return An actor with a renderer.
  */
-Actor CreateRenderableActor( Texture texture, const std::string& vertexShader, const std::string& fragmentShader );
+Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, const std::string& fragmentShader);
 
 } // namespace Dali
 

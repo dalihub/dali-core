@@ -2,7 +2,7 @@
 #define TEST_GL_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,32 @@
  */
 
 // EXTERNAL INCLUDES
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
+
 #include "test-trace-call-stack.h"
 
 namespace Dali
 {
-
 class DALI_CORE_API TestSyncObject : public Integration::GlSyncAbstraction::SyncObject
 {
 public:
   TestSyncObject(TraceCallStack& trace);
   ~TestSyncObject() override;
-  bool IsSynced() override;
-  bool synced;
+  bool            IsSynced() override;
+  bool            synced;
   TraceCallStack& mTrace;
 };
 
 /**
  * Class to emulate the GL sync functions with tracing
  */
-class DALI_CORE_API TestGlSyncAbstraction: public Integration::GlSyncAbstraction
+class DALI_CORE_API TestGlSyncAbstraction : public Integration::GlSyncAbstraction
 {
 public:
   /**
@@ -66,24 +66,23 @@ public:
    * Create a sync object
    * @return the sync object
    */
-  Integration::GlSyncAbstraction::SyncObject* CreateSyncObject( ) override;
+  Integration::GlSyncAbstraction::SyncObject* CreateSyncObject() override;
 
   /**
    * Destroy a sync object
    * @param[in] syncObject The object to destroy
    */
-  void DestroySyncObject( Integration::GlSyncAbstraction::SyncObject* syncObject ) override;
-
+  void DestroySyncObject(Integration::GlSyncAbstraction::SyncObject* syncObject) override;
 
 public: // TEST FUNCTIONS
-  Integration::GlSyncAbstraction::SyncObject* GetLastSyncObject( );
+  Integration::GlSyncAbstraction::SyncObject* GetLastSyncObject();
 
   /**
    * Test method to trigger the object sync behaviour.
    * @param[in]
    * @param[in] sync The sync value to set
    */
-  void SetObjectSynced( Integration::GlSyncAbstraction::SyncObject* syncObject, bool sync );
+  void SetObjectSynced(Integration::GlSyncAbstraction::SyncObject* syncObject, bool sync);
 
   /**
    * Turn trace on
@@ -108,16 +107,15 @@ public: // TEST FUNCTIONS
   int32_t GetNumberOfSyncObjects();
 
 private:
+  TestGlSyncAbstraction(const TestGlSyncAbstraction&);            ///< Undefined
+  TestGlSyncAbstraction& operator=(const TestGlSyncAbstraction&); ///< Undefined
 
-  TestGlSyncAbstraction( const TestGlSyncAbstraction& ); ///< Undefined
-  TestGlSyncAbstraction& operator=( const TestGlSyncAbstraction& ); ///< Undefined
-
-  typedef std::vector<TestSyncObject*>   SyncContainer;
-  typedef SyncContainer::iterator SyncIter;
-  SyncContainer mSyncObjects;  ///< The sync objects
-  TraceCallStack mTrace; ///< the trace call stack for testing
+  typedef std::vector<TestSyncObject*> SyncContainer;
+  typedef SyncContainer::iterator      SyncIter;
+  SyncContainer                        mSyncObjects; ///< The sync objects
+  TraceCallStack                       mTrace;       ///< the trace call stack for testing
 };
 
-} // Dali
+} // namespace Dali
 
 #endif // TEST_GL_SYNC_ABSTRACTION_H

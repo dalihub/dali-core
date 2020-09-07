@@ -15,10 +15,11 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 void utc_dali_angle_axis_startup(void)
 {
@@ -30,8 +31,6 @@ void utc_dali_angle_axis_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
-
 int UtcDaliAngleAxisNew01(void)
 {
   TestApplication application;
@@ -42,13 +41,11 @@ int UtcDaliAngleAxisNew01(void)
   END_TEST;
 }
 
-
-
 int UtcDaliAngleAxisNew02(void)
 {
   TestApplication application;
 
-  Degree d(75.0f);
+  Degree    d(75.0f);
   AngleAxis a(d, Vector3::XAXIS);
 
   DALI_TEST_EQUALS(a.angle, Radian(d), 0.001f, TEST_LOCATION);
@@ -56,12 +53,11 @@ int UtcDaliAngleAxisNew02(void)
   END_TEST;
 }
 
-
 int UtcDaliAngleAxisNew03(void)
 {
   TestApplication application;
 
-  Radian r(Math::PI_2);
+  Radian    r(Math::PI_2);
   AngleAxis a(r, Vector3::ZAXIS);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
@@ -74,7 +70,7 @@ int UtcDaliAngleAxisAssign(void)
 {
   TestApplication application;
 
-  Radian r(Math::PI_2);
+  Radian    r(Math::PI_2);
   AngleAxis a(r, Vector3::ZAXIS);
 
   AngleAxis b = a;
@@ -89,13 +85,13 @@ int UtcDaliAngleAxisCopyConstructor(void)
 {
   TestApplication application;
 
-  Radian r( Math::PI_2 );
-  AngleAxis a( r, Vector3::ZAXIS );
-  AngleAxis b( a );
+  Radian    r(Math::PI_2);
+  AngleAxis a(r, Vector3::ZAXIS);
+  AngleAxis b(a);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -103,13 +99,13 @@ int UtcDaliAngleAxisMoveConstructor(void)
 {
   TestApplication application;
 
-  Radian r( Math::PI_2 );
-  AngleAxis a( r, Vector3::ZAXIS );
-  AngleAxis b = std::move( a );
+  Radian    r(Math::PI_2);
+  AngleAxis a(r, Vector3::ZAXIS);
+  AngleAxis b = std::move(a);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -117,14 +113,14 @@ int UtcDaliAngleAxisCopyAssignmwent(void)
 {
   TestApplication application;
 
-  Radian r( Math::PI_2 );
-  AngleAxis a( r, Vector3::ZAXIS );
+  Radian    r(Math::PI_2);
+  AngleAxis a(r, Vector3::ZAXIS);
   AngleAxis b;
   b = a;
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -132,14 +128,14 @@ int UtcDaliAngleAxisMoveAssignmwent(void)
 {
   TestApplication application;
 
-  Radian r( Math::PI_2 );
-  AngleAxis a( r, Vector3::ZAXIS );
+  Radian    r(Math::PI_2);
+  AngleAxis a(r, Vector3::ZAXIS);
   AngleAxis b;
-  b = std::move( a );
+  b = std::move(a);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS( b.angle, Radian( Math::PI_2 ), 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -147,7 +143,7 @@ int UtcDaliAngleAxisEqual(void)
 {
   TestApplication application;
 
-  Radian r(Math::PI_2);
+  Radian    r(Math::PI_2);
   AngleAxis a(r, Vector3::ZAXIS);
   AngleAxis b(a);
 

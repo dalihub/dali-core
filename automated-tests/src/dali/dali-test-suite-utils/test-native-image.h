@@ -2,7 +2,7 @@
 #define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/native-image-interface.h>
+
 #include <dali/integration-api/gl-defines.h>
 
 namespace Dali
@@ -32,22 +33,63 @@ class DALI_CORE_API TestNativeImage : public Dali::NativeImageInterface
 public:
   static TestNativeImagePointer New(uint32_t width, uint32_t height);
 
-  inline void SetGlExtensionCreateResult(bool result){ createResult = result;}
-  inline virtual bool CreateResource() { ++mExtensionCreateCalls; return createResult;};
-  inline virtual void DestroyResource() { ++mExtensionDestroyCalls; };
-  inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return mTargetTextureError;};
-  inline virtual void PrepareTexture() {};
-  inline virtual uint32_t GetWidth() const {return mWidth;};
-  inline virtual uint32_t GetHeight() const {return mHeight;};
-  inline virtual bool RequiresBlending() const {return true;};
-  inline virtual int GetTextureTarget() const {return GL_TEXTURE_EXTERNAL_OES;};
-  inline virtual const char* GetCustomFragmentPrefix() const {return "#extension GL_OES_EGL_image_external:require\n";};
-  inline const char* GetCustomSamplerTypename() const override { return "samplerExternalOES"; };
+  inline void SetGlExtensionCreateResult(bool result)
+  {
+    createResult = result;
+  }
+  inline virtual bool CreateResource()
+  {
+    ++mExtensionCreateCalls;
+    return createResult;
+  };
+  inline virtual void DestroyResource()
+  {
+    ++mExtensionDestroyCalls;
+  };
+  inline virtual GLenum TargetTexture()
+  {
+    ++mTargetTextureCalls;
+    return mTargetTextureError;
+  };
+  inline virtual void     PrepareTexture(){};
+  inline virtual uint32_t GetWidth() const
+  {
+    return mWidth;
+  };
+  inline virtual uint32_t GetHeight() const
+  {
+    return mHeight;
+  };
+  inline virtual bool RequiresBlending() const
+  {
+    return true;
+  };
+  inline virtual int GetTextureTarget() const
+  {
+    return GL_TEXTURE_EXTERNAL_OES;
+  };
+  inline virtual const char* GetCustomFragmentPrefix() const
+  {
+    return "#extension GL_OES_EGL_image_external:require\n";
+  };
+  inline const char* GetCustomSamplerTypename() const override
+  {
+    return "samplerExternalOES";
+  };
 
-  inline Any GetNativeImageHandle() const override { return nullptr; };
-  inline bool SourceChanged() const override { return false; };
+  inline Any GetNativeImageHandle() const override
+  {
+    return nullptr;
+  };
+  inline bool SourceChanged() const override
+  {
+    return false;
+  };
 
-  inline virtual Dali::NativeImageInterface::Extension* GetExtension() {return nullptr;}
+  inline virtual Dali::NativeImageInterface::Extension* GetExtension()
+  {
+    return nullptr;
+  }
 
 private:
   TestNativeImage(uint32_t width, uint32_t height);
@@ -55,16 +97,15 @@ private:
 
   uint32_t mWidth;
   uint32_t mHeight;
+
 public:
-  int32_t mExtensionCreateCalls;
-  int32_t mExtensionDestroyCalls;
-  int32_t mTargetTextureCalls;
-  uint32_t mTargetTextureError=0u;
-  bool createResult;
+  int32_t  mExtensionCreateCalls;
+  int32_t  mExtensionDestroyCalls;
+  int32_t  mTargetTextureCalls;
+  uint32_t mTargetTextureError = 0u;
+  bool     createResult;
 };
 
-
-
-} // Dali
+} // namespace Dali
 
 #endif // TEST_NATIVE_IMAGE_H

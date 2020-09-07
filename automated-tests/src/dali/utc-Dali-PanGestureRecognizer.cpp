@@ -15,32 +15,32 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/public-api/dali-core.h>
-#include <dali/integration-api/input-options.h>
-#include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/render-task-list-integ.h>
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/input-options.h>
+#include <dali/integration-api/render-task-list-integ.h>
+#include <dali/public-api/dali-core.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 using namespace Dali;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-
 struct SignalData
 {
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
     receivedGesture()
-  {}
+  {
+  }
 
   void Reset()
   {
-    functorCalled = false;
+    functorCalled     = false;
     voidFunctorCalled = false;
 
     receivedGesture.Reset();
@@ -48,22 +48,25 @@ struct SignalData
     pannedActor.Reset();
   }
 
-  bool functorCalled;
-  bool voidFunctorCalled;
+  bool       functorCalled;
+  bool       voidFunctorCalled;
   PanGesture receivedGesture;
-  Actor pannedActor;
+  Actor      pannedActor;
 };
 
 // Functor that sets the data when called
 struct GestureReceivedFunctor
 {
-  GestureReceivedFunctor(SignalData& data) : signalData(data) { }
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
 
   void operator()(Actor actor, const PanGesture& pan)
   {
-    signalData.functorCalled = true;
+    signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
-    signalData.pannedActor = actor;
+    signalData.pannedActor     = actor;
   }
 
   void operator()()
@@ -74,41 +77,38 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-
-Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
-  point.SetScreenPosition( screenPosition );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch( PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time )
+Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( stateA );
-  point.SetScreenPosition( screenPositionA );
-  point.SetDeviceClass( Device::Class::TOUCH );
-  point.SetDeviceSubclass( Device::Subclass::NONE );
-  touchEvent.points.push_back( point );
-  point.SetScreenPosition( screenPositionB );
-  point.SetState( stateB);
-  touchEvent.points.push_back( point );
+  Integration::Point      point;
+  point.SetState(stateA);
+  point.SetScreenPosition(screenPositionA);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  point.SetScreenPosition(screenPositionB);
+  point.SetState(stateB);
+  touchEvent.points.push_back(point);
   touchEvent.time = time;
   return touchEvent;
 }
 
-
-} // anon namespace
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 int UtcDaliPanGestureRecognizerBasicNoAction(void)
 {
@@ -117,8 +117,8 @@ int UtcDaliPanGestureRecognizerBasicNoAction(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -127,13 +127,13 @@ int UtcDaliPanGestureRecognizerBasicNoAction(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 20.0f ), 200 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 20.0f), 200));
 
   application.SendNotification();
 
@@ -149,8 +149,8 @@ int UtcDaliPanGestureRecognizerBasic(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -159,13 +159,13 @@ int UtcDaliPanGestureRecognizerBasic(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 152 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 152));
 
   application.SendNotification();
 
@@ -181,8 +181,8 @@ int UtcDaliPanGestureRecognizerBasicInterrupted(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -191,13 +191,13 @@ int UtcDaliPanGestureRecognizerBasicInterrupted(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 25.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::INTERRUPTED, Vector2( 20.0f, 30.0f ), 152 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 25.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(20.0f, 30.0f), 152));
 
   application.SendNotification();
 
@@ -213,8 +213,8 @@ int UtcDaliPanGestureRecognizerBasicShortest(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -223,13 +223,13 @@ int UtcDaliPanGestureRecognizerBasicShortest(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 20.0f, 40.0f ), 155 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 40.0f), 155));
 
   application.SendNotification();
 
@@ -245,8 +245,8 @@ int UtcDaliPanGestureRecognizerBasicFailToStart(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -255,13 +255,13 @@ int UtcDaliPanGestureRecognizerBasicFailToStart(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 40.0f, 40.0f ), 153 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(40.0f, 40.0f), 153));
 
   application.SendNotification();
 
@@ -277,8 +277,8 @@ int UtcDaliPanGestureRecognizerBasicStationary(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -287,15 +287,15 @@ int UtcDaliPanGestureRecognizerBasicStationary(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 50.0f ), 152 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::STATIONARY, Vector2( 20.0f, 50.0f ), 153 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 55.0f ), 154 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 50.0f), 152));
+  application.ProcessEvent(GenerateSingleTouch(PointState::STATIONARY, Vector2(20.0f, 50.0f), 153));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 55.0f), 154));
 
   application.SendNotification();
 
@@ -314,8 +314,8 @@ int UtcDaliPanGestureRecognizerNewParametersFail(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -324,13 +324,13 @@ int UtcDaliPanGestureRecognizerNewParametersFail(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 152 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 152));
 
   application.SendNotification();
 
@@ -349,8 +349,8 @@ int UtcDaliPanGestureRecognizerNewParametersSuccess(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -359,13 +359,13 @@ int UtcDaliPanGestureRecognizerNewParametersSuccess(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 20.0f, 40.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 40.0f, 50.0f ), PointState::MOTION, Vector2( 40.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 50.0f, 50.0f ), PointState::MOTION, Vector2( 50.0f, 40.0f ), 152 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(20.0f, 40.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(40.0f, 50.0f), PointState::MOTION, Vector2(40.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(50.0f, 50.0f), PointState::MOTION, Vector2(50.0f, 40.0f), 152));
 
   application.SendNotification();
 
@@ -384,8 +384,8 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches01(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -394,14 +394,14 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches01(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 20.0f, 40.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 40.0f, 50.0f ), PointState::MOTION, Vector2( 40.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 50.0f, 50.0f ), PointState::MOTION, Vector2( 50.0f, 40.0f ), 152 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::STATIONARY, Vector2( 50.0f, 50.0f ), 153 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(20.0f, 40.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(40.0f, 50.0f), PointState::MOTION, Vector2(40.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(50.0f, 50.0f), PointState::MOTION, Vector2(50.0f, 40.0f), 152));
+  application.ProcessEvent(GenerateSingleTouch(PointState::STATIONARY, Vector2(50.0f, 50.0f), 153));
 
   application.SendNotification();
 
@@ -420,8 +420,8 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches02(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -430,14 +430,14 @@ int UtcDaliPanGestureRecognizerNewParametersEndFewerTouches02(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 20.0f, 40.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 40.0f, 50.0f ), PointState::MOTION, Vector2( 40.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 50.0f, 50.0f ), PointState::MOTION, Vector2( 50.0f, 40.0f ), 152 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::STATIONARY, Vector2( 50.0f, 50.0f ), PointState::UP, Vector2( 50.0f, 40.0f ), 153 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(20.0f, 40.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(40.0f, 50.0f), PointState::MOTION, Vector2(40.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(50.0f, 50.0f), PointState::MOTION, Vector2(50.0f, 40.0f), 152));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STATIONARY, Vector2(50.0f, 50.0f), PointState::UP, Vector2(50.0f, 40.0f), 153));
 
   application.SendNotification();
 
@@ -456,8 +456,8 @@ int UtcDaliPanGestureRecognizerNewParametersNoStart(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -466,13 +466,13 @@ int UtcDaliPanGestureRecognizerNewParametersNoStart(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 20.0f, 40.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 40.0f, 50.0f ), PointState::MOTION, Vector2( 40.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 50.0f, 50.0f ), 153 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(20.0f, 40.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(40.0f, 50.0f), PointState::MOTION, Vector2(40.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 153));
 
   application.SendNotification();
 
@@ -491,8 +491,8 @@ int UtcDaliPanGestureRecognizerNewParametersSlowRelease(void)
   detector.SetMinimumTouchesRequired(2);
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -501,16 +501,16 @@ int UtcDaliPanGestureRecognizerNewParametersSlowRelease(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateDoubleTouch( PointState::DOWN, Vector2( 20.0f, 50.0f ), PointState::DOWN, Vector2( 20.0f, 40.0f ), 150 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 40.0f, 50.0f ), PointState::MOTION, Vector2( 40.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 50.0f, 50.0f ), PointState::MOTION, Vector2( 50.0f, 40.0f ), 152 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 60.0f, 50.0f ), PointState::MOTION, Vector2( 60.0f, 40.0f ), 153 ) );
-  application.ProcessEvent( GenerateDoubleTouch( PointState::MOTION, Vector2( 70.0f, 50.0f ), PointState::MOTION, Vector2( 70.0f, 40.0f ), 154 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::UP, Vector2( 70.0f, 50.0f ), 155 ) );
+  application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 50.0f), PointState::DOWN, Vector2(20.0f, 40.0f), 150));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(40.0f, 50.0f), PointState::MOTION, Vector2(40.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(50.0f, 50.0f), PointState::MOTION, Vector2(50.0f, 40.0f), 152));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(60.0f, 50.0f), PointState::MOTION, Vector2(60.0f, 40.0f), 153));
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(70.0f, 50.0f), PointState::MOTION, Vector2(70.0f, 40.0f), 154));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(70.0f, 50.0f), 155));
 
   application.SendNotification();
 
@@ -526,8 +526,8 @@ int UtcDaliPanGestureRecognizerOtherEvent(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -536,15 +536,15 @@ int UtcDaliPanGestureRecognizerOtherEvent(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 151 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 152 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 60.0f ), 153 ) );      // Exercise default case in STARTED case. Not sure if realistic
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 65.0f ), 154 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 151));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 152));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 60.0f), 153)); // Exercise default case in STARTED case. Not sure if realistic
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 65.0f), 154));
 
   application.SendNotification();
 
@@ -560,8 +560,8 @@ int UtcDaliPanGestureRecognizerSlowMoving(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -570,16 +570,16 @@ int UtcDaliPanGestureRecognizerSlowMoving(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 251 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 352 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 70.0f ), 453 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 80.0f ), 554 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 90.0f ), 655 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
 
   application.SendNotification();
 
@@ -594,12 +594,11 @@ int UtcDaliPanGestureRecognizerNewParamsMinNum(void)
 
   Integration::SetPanGestureMinimumPanEvents(8);
 
-
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -608,16 +607,16 @@ int UtcDaliPanGestureRecognizerNewParamsMinNum(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 251 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 352 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 70.0f ), 453 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 80.0f ), 554 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 90.0f ), 655 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
 
   application.SendNotification();
 
@@ -635,8 +634,8 @@ int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
   PanGestureDetector detector = PanGestureDetector::New();
 
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -645,16 +644,16 @@ int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
 
   detector.Attach(actor);
 
-  SignalData data;
+  SignalData             data;
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  application.ProcessEvent( GenerateSingleTouch( PointState::DOWN, Vector2( 20.0f, 20.0f ), 150 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 40.0f ), 251 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 60.0f ), 352 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 70.0f ), 453 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 80.0f ), 554 ) );
-  application.ProcessEvent( GenerateSingleTouch( PointState::MOTION, Vector2( 20.0f, 90.0f ), 655 ) );
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
 
   application.SendNotification();
 

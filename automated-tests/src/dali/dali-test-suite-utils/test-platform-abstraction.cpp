@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
  */
 
 #include "test-platform-abstraction.h"
-#include "dali-test-suite-utils.h"
+
 #include <dali/integration-api/bitmap.h>
+
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
-
 TestPlatformAbstraction::TestPlatformAbstraction()
 : mTrace(),
-  mIsLoadingResult( false ),
+  mIsLoadingResult(false),
   mClosestSize(),
   mLoadFileResult(),
-  mSaveFileResult( false ),
+  mSaveFileResult(false),
   mSynchronouslyLoadedResource(),
   mTimerId(0),
   mCallbackFunction(nullptr)
@@ -39,44 +40,44 @@ TestPlatformAbstraction::~TestPlatformAbstraction()
 {
 }
 
-ImageDimensions TestPlatformAbstraction::GetClosestImageSize( const std::string& filename,
-                                                              ImageDimensions size,
-                                                              FittingMode::Type fittingMode,
-                                                              SamplingMode::Type samplingMode,
-                                                              bool orientationCorrection )
+ImageDimensions TestPlatformAbstraction::GetClosestImageSize(const std::string& filename,
+                                                             ImageDimensions    size,
+                                                             FittingMode::Type  fittingMode,
+                                                             SamplingMode::Type samplingMode,
+                                                             bool               orientationCorrection)
 {
-  ImageDimensions closestSize = ImageDimensions( mClosestSize );
+  ImageDimensions closestSize = ImageDimensions(mClosestSize);
   mTrace.PushCall("GetClosestImageSize", "");
   return closestSize;
 }
 
-ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
-                                                   ImageDimensions size,
-                                                   FittingMode::Type fittingMode,
-                                                   SamplingMode::Type samplingMode,
-                                                   bool orientationCorrection )
+ImageDimensions TestPlatformAbstraction::GetClosestImageSize(Integration::ResourcePointer resourceBuffer,
+                                                             ImageDimensions              size,
+                                                             FittingMode::Type            fittingMode,
+                                                             SamplingMode::Type           samplingMode,
+                                                             bool                         orientationCorrection)
 {
-  ImageDimensions closestSize = ImageDimensions( mClosestSize );
+  ImageDimensions closestSize = ImageDimensions(mClosestSize);
   mTrace.PushCall("GetClosestImageSize", "");
   return closestSize;
 }
 
-Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath )
+Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously(const Integration::BitmapResourceType& resourceType, const std::string& resourcePath)
 {
   mTrace.PushCall("LoadResourceSynchronously", "");
   return mSynchronouslyLoadedResource;
 }
 
-Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size )
+Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer(const Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size)
 {
   mTrace.PushCall("DecodeBuffer", "");
   return mDecodedBitmap;
 }
 
-bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
+bool TestPlatformAbstraction::LoadShaderBinaryFile(const std::string& filename, Dali::Vector<unsigned char>& buffer) const
 {
   mTrace.PushCall("LoadShaderBinaryFile", "");
-  if( mLoadFileResult.loadResult )
+  if(mLoadFileResult.loadResult)
   {
     buffer = mLoadFileResult.buffer;
   }
@@ -89,7 +90,7 @@ void TestPlatformAbstraction::Initialize()
 {
   mTrace.Reset();
   mTrace.Enable(true);
-  mIsLoadingResult=false;
+  mIsLoadingResult = false;
   mSynchronouslyLoadedResource.Reset();
   mDecodedBitmap.Reset();
 }
@@ -98,9 +99,12 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
 {
   switch(func)
   {
-    case LoadResourceSynchronouslyFunc:       return mTrace.FindMethod("LoadResourceSynchronously");
-    case LoadShaderBinaryFileFunc:            return mTrace.FindMethod("LoadShaderBinaryFile");
-    case SaveShaderBinaryFileFunc:            return mTrace.FindMethod("SaveShaderBinaryFile");
+    case LoadResourceSynchronouslyFunc:
+      return mTrace.FindMethod("LoadResourceSynchronously");
+    case LoadShaderBinaryFileFunc:
+      return mTrace.FindMethod("LoadShaderBinaryFile");
+    case SaveShaderBinaryFileFunc:
+      return mTrace.FindMethod("SaveShaderBinaryFile");
   }
   return false;
 }
@@ -116,36 +120,36 @@ void TestPlatformAbstraction::ClearReadyResources()
   mDecodedBitmap.Reset();
 }
 
-void TestPlatformAbstraction::SetClosestImageSize( const Vector2& size )
+void TestPlatformAbstraction::SetClosestImageSize(const Vector2& size)
 {
-  mClosestSize = ImageDimensions( static_cast<uint32_t>( size.x ), static_cast<uint32_t>( size.y ) );
+  mClosestSize = ImageDimensions(static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y));
 }
 
-void TestPlatformAbstraction::SetLoadFileResult( bool result, Dali::Vector< unsigned char >& buffer )
+void TestPlatformAbstraction::SetLoadFileResult(bool result, Dali::Vector<unsigned char>& buffer)
 {
   mLoadFileResult.loadResult = result;
-  if( result )
+  if(result)
   {
     mLoadFileResult.buffer = buffer;
   }
 }
 
-void TestPlatformAbstraction::SetSaveFileResult( bool result )
+void TestPlatformAbstraction::SetSaveFileResult(bool result)
 {
   mSaveFileResult = result;
 }
 
-void TestPlatformAbstraction::SetSynchronouslyLoadedResource( Integration::ResourcePointer resource )
+void TestPlatformAbstraction::SetSynchronouslyLoadedResource(Integration::ResourcePointer resource)
 {
   mSynchronouslyLoadedResource = resource;
 }
 
-void TestPlatformAbstraction::SetDecodedBitmap( Integration::BitmapPtr bitmap )
+void TestPlatformAbstraction::SetDecodedBitmap(Integration::BitmapPtr bitmap)
 {
   mDecodedBitmap = bitmap;
 }
 
-uint32_t TestPlatformAbstraction::StartTimer( uint32_t milliseconds, CallbackBase* callback )
+uint32_t TestPlatformAbstraction::StartTimer(uint32_t milliseconds, CallbackBase* callback)
 {
   mCallbackFunction = callback;
   mTimerId++;
@@ -154,13 +158,13 @@ uint32_t TestPlatformAbstraction::StartTimer( uint32_t milliseconds, CallbackBas
 
 void TestPlatformAbstraction::TriggerTimer()
 {
-  if (mCallbackFunction != nullptr)
+  if(mCallbackFunction != nullptr)
   {
-    CallbackBase::Execute( *mCallbackFunction );
+    CallbackBase::Execute(*mCallbackFunction);
   }
 }
 
-void TestPlatformAbstraction::CancelTimer ( uint32_t timerId )
+void TestPlatformAbstraction::CancelTimer(uint32_t timerId)
 {
   mCallbackFunction = nullptr;
 }

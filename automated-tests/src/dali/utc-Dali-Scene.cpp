@@ -15,24 +15,22 @@
  *
  */
 
-#include <iostream>
-
-#include <stdlib.h>
-#include <dali/integration-api/scene.h>
-#include <dali/integration-api/events/key-event-integ.h>
-#include <dali/public-api/events/key-event.h>
+#include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
-
-#include <dali-test-suite-utils.h>
+#include <dali/integration-api/scene.h>
+#include <dali/public-api/events/key-event.h>
 #include <mesh-builder.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 // Internal headers are allowed here
 
 namespace
 {
-
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
 // Functor for EventProcessingFinished signal
@@ -41,9 +39,10 @@ struct EventProcessingFinishedFunctor
   /**
    * @param[in] eventProcessingFinished reference to a boolean variable used to check if signal has been called.
    */
-  EventProcessingFinishedFunctor( bool& eventProcessingFinished )
-  : mEventProcessingFinished( eventProcessingFinished )
-  {}
+  EventProcessingFinishedFunctor(bool& eventProcessingFinished)
+  : mEventProcessingFinished(eventProcessingFinished)
+  {
+  }
 
   void operator()()
   {
@@ -58,7 +57,8 @@ struct KeyEventSignalData
 {
   KeyEventSignalData()
   : functorCalled(false)
-  {}
+  {
+  }
 
   void Reset()
   {
@@ -67,18 +67,21 @@ struct KeyEventSignalData
     receivedKeyEvent.Reset();
   }
 
-  bool functorCalled;
+  bool     functorCalled;
   KeyEvent receivedKeyEvent;
 };
 
 // Functor that sets the data when called
 struct KeyEventReceivedFunctor
 {
-  KeyEventReceivedFunctor( KeyEventSignalData& data ) : signalData( data ) { }
-
-  bool operator()( const KeyEvent& keyEvent )
+  KeyEventReceivedFunctor(KeyEventSignalData& data)
+  : signalData(data)
   {
-    signalData.functorCalled = true;
+  }
+
+  bool operator()(const KeyEvent& keyEvent)
+  {
+    signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
 
     return true;
@@ -94,36 +97,40 @@ struct TouchedSignalData
   : functorCalled(false),
     createNewScene(false),
     newSceneCreated(false)
-  {}
+  {
+  }
 
   void Reset()
   {
-    functorCalled = false;
-    createNewScene = false;
+    functorCalled   = false;
+    createNewScene  = false;
     newSceneCreated = false;
     receivedTouchEvent.Reset();
   }
 
-  bool functorCalled;
-  bool createNewScene;
-  bool newSceneCreated;
+  bool       functorCalled;
+  bool       createNewScene;
+  bool       newSceneCreated;
   TouchEvent receivedTouchEvent;
 };
 
 // Functor that sets the data when touched signal is received
 struct TouchFunctor
 {
-  TouchFunctor( TouchedSignalData& data ) : signalData( data ) { }
-
-  void operator()( const TouchEvent& touch )
+  TouchFunctor(TouchedSignalData& data)
+  : signalData(data)
   {
-    signalData.functorCalled = true;
+  }
+
+  void operator()(const TouchEvent& touch)
+  {
+    signalData.functorCalled      = true;
     signalData.receivedTouchEvent = touch;
 
-    if ( signalData.createNewScene )
+    if(signalData.createNewScene)
     {
-      Dali::Integration::Scene scene = Dali::Integration::Scene::New( Size( 480.0f, 800.0f  ) );
-      DALI_TEST_CHECK( scene );
+      Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+      DALI_TEST_CHECK(scene);
 
       signalData.newSceneCreated = true;
     }
@@ -142,25 +149,29 @@ struct WheelEventSignalData
 {
   WheelEventSignalData()
   : functorCalled(false)
-  {}
+  {
+  }
 
   void Reset()
   {
     functorCalled = false;
   }
 
-  bool functorCalled;
+  bool       functorCalled;
   WheelEvent receivedWheelEvent;
 };
 
 // Functor that sets the data when wheel-event signal is received
 struct WheelEventReceivedFunctor
 {
-  WheelEventReceivedFunctor( WheelEventSignalData& data ) : signalData( data ) { }
-
-  bool operator()( const WheelEvent& wheelEvent )
+  WheelEventReceivedFunctor(WheelEventSignalData& data)
+  : signalData(data)
   {
-    signalData.functorCalled = true;
+  }
+
+  bool operator()(const WheelEvent& wheelEvent)
+  {
+    signalData.functorCalled      = true;
     signalData.receivedWheelEvent = wheelEvent;
 
     return true;
@@ -174,7 +185,8 @@ struct KeyEventGeneratedSignalData
 {
   KeyEventGeneratedSignalData()
   : functorCalled(false)
-  {}
+  {
+  }
 
   void Reset()
   {
@@ -183,20 +195,21 @@ struct KeyEventGeneratedSignalData
     receivedKeyEvent.Reset();
   }
 
-  bool functorCalled;
+  bool     functorCalled;
   KeyEvent receivedKeyEvent;
 };
 
 // Functor that sets the data when called
 struct KeyEventGeneratedReceivedFunctor
 {
-  KeyEventGeneratedReceivedFunctor( KeyEventGeneratedSignalData& data )
-  : signalData( data )
-  {}
-
-  bool operator()( const KeyEvent& keyEvent )
+  KeyEventGeneratedReceivedFunctor(KeyEventGeneratedSignalData& data)
+  : signalData(data)
   {
-    signalData.functorCalled = true;
+  }
+
+  bool operator()(const KeyEvent& keyEvent)
+  {
+    signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
 
     return true;
@@ -211,22 +224,22 @@ struct KeyEventGeneratedReceivedFunctor
   KeyEventGeneratedSignalData& signalData;
 };
 
-void GenerateTouch( TestApplication& application, PointState::Type state, const Vector2& screenPosition )
+void GenerateTouch(TestApplication& application, PointState::Type state, const Vector2& screenPosition)
 {
   Integration::TouchEvent touchEvent;
-  Integration::Point point;
-  point.SetState( state );
-  point.SetScreenPosition( screenPosition );
-  touchEvent.points.push_back( point );
-  application.ProcessEvent( touchEvent );
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  touchEvent.points.push_back(point);
+  application.ProcessEvent(touchEvent);
 }
 
-bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
+bool DummyTouchCallback(Actor actor, const TouchEvent& touch)
 {
   return true;
 }
 
-void FrameCallback( int frameId )
+void FrameCallback(int frameId)
 {
 }
 
@@ -240,10 +253,10 @@ int UtcDaliSceneAdd(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
-  scene.Add( actor );
-  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  scene.Add(actor);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
   END_TEST;
 }
@@ -256,13 +269,13 @@ int UtcDaliSceneRemove(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
-  scene.Add( actor );
-  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  scene.Add(actor);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
   scene.Remove(actor);
-  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
 
   END_TEST;
 }
@@ -273,9 +286,9 @@ int UtcDaliSceneGetSize(void)
   tet_infoline("Testing Dali::Integration::Scene::GetSize");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Size size = scene.GetSize();
-  DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_WIDTH, size.width, TEST_LOCATION );
-  DALI_TEST_EQUALS( TestApplication::DEFAULT_SURFACE_HEIGHT, size.height, TEST_LOCATION );
+  Size                     size  = scene.GetSize();
+  DALI_TEST_EQUALS(TestApplication::DEFAULT_SURFACE_WIDTH, size.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(TestApplication::DEFAULT_SURFACE_HEIGHT, size.height, TEST_LOCATION);
 
   END_TEST;
 }
@@ -286,10 +299,10 @@ int UtcDaliSceneGetDpi(void)
 
   // Test that setting core DPI explicitly also sets up the scene's DPI.
   Dali::Integration::Scene scene = application.GetScene();
-  scene.SetDpi( Vector2(200.0f, 180.0f) );
+  scene.SetDpi(Vector2(200.0f, 180.0f));
   Vector2 dpi = scene.GetDpi();
-  DALI_TEST_EQUALS( dpi.x, 200.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( dpi.y, 180.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(dpi.x, 200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(dpi.y, 180.0f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -304,13 +317,13 @@ int UtcDaliSceneGetRenderTaskList(void)
   const RenderTaskList& tasks = scene.GetRenderTaskList();
 
   // There should be 1 task by default.
-  DALI_TEST_EQUALS( tasks.GetTaskCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS(tasks.GetTaskCount(), 1u, TEST_LOCATION);
 
   // RenderTaskList has it's own UTC tests.
   // But we can confirm that GetRenderTaskList in Stage retrieves the same RenderTaskList each time.
   RenderTask newTask = scene.GetRenderTaskList().CreateTask();
 
-  DALI_TEST_EQUALS( scene.GetRenderTaskList().GetTask( 1 ), newTask, TEST_LOCATION );
+  DALI_TEST_EQUALS(scene.GetRenderTaskList().GetTask(1), newTask, TEST_LOCATION);
 
   END_TEST;
 }
@@ -321,11 +334,11 @@ int UtcDaliSceneGetRootLayer(void)
   tet_infoline("Testing Dali::Integration::Scene::GetRootLayer");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Layer layer = scene.GetLayer( 0 );
-  DALI_TEST_CHECK( layer );
+  Layer                    layer = scene.GetLayer(0);
+  DALI_TEST_CHECK(layer);
 
   // Check that GetRootLayer() correctly retreived layer 0.
-  DALI_TEST_CHECK( scene.GetRootLayer() == layer );
+  DALI_TEST_CHECK(scene.GetRootLayer() == layer);
 
   END_TEST;
 }
@@ -337,12 +350,12 @@ int UtcDaliSceneGetLayerCount(void)
 
   Dali::Integration::Scene scene = application.GetScene();
   // Initially we have a default layer
-  DALI_TEST_EQUALS( scene.GetLayerCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS(scene.GetLayerCount(), 1u, TEST_LOCATION);
 
   Layer layer = Layer::New();
-  scene.Add( layer );
+  scene.Add(layer);
 
-  DALI_TEST_EQUALS( scene.GetLayerCount(), 2u, TEST_LOCATION );
+  DALI_TEST_EQUALS(scene.GetLayerCount(), 2u, TEST_LOCATION);
   END_TEST;
 }
 
@@ -353,14 +366,14 @@ int UtcDaliSceneGetLayer(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  Layer rootLayer = scene.GetLayer( 0 );
-  DALI_TEST_CHECK( rootLayer );
+  Layer rootLayer = scene.GetLayer(0);
+  DALI_TEST_CHECK(rootLayer);
 
   Layer layer = Layer::New();
-  scene.Add( layer );
+  scene.Add(layer);
 
-  Layer sameLayer = scene.GetLayer( 1 );
-  DALI_TEST_CHECK( layer == sameLayer );
+  Layer sameLayer = scene.GetLayer(1);
+  DALI_TEST_CHECK(layer == sameLayer);
 
   END_TEST;
 }
@@ -373,11 +386,11 @@ int UtcDaliSceneGet(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( Dali::Integration::Scene() == Dali::Integration::Scene::Get( actor ) );
+  DALI_TEST_CHECK(Dali::Integration::Scene() == Dali::Integration::Scene::Get(actor));
 
-  scene.Add( actor );
+  scene.Add(actor);
 
-  DALI_TEST_CHECK( scene == Dali::Integration::Scene::Get( actor ) );
+  DALI_TEST_CHECK(scene == Dali::Integration::Scene::Get(actor));
 
   END_TEST;
 }
@@ -388,11 +401,11 @@ int UtcDaliSceneDiscard(void)
   tet_infoline("Testing Dali::Scene::Discard");
 
   // Create a new Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Size( 480.0f, 800.0f ) );
-  DALI_TEST_CHECK( scene );
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
 
   // One reference of scene kept here and the other one kept in the Core
-  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 2 );
+  DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 2);
 
   // Render and notify.
   application.SendNotification();
@@ -400,12 +413,12 @@ int UtcDaliSceneDiscard(void)
 
   // Keep the reference of the root layer handle so it will still be alive after the scene is deleted
   Layer rootLayer = scene.GetRootLayer();
-  DALI_TEST_CHECK( rootLayer );
-  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 2 );
+  DALI_TEST_CHECK(rootLayer);
+  DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
   scene.Discard();
-  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 1 );
+  DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 
   // Reset the scene handle
   scene.Reset();
@@ -416,7 +429,7 @@ int UtcDaliSceneDiscard(void)
 
   // At this point, the scene should have been automatically deleted
   // To prove this, the ref count of the root layer handle should be decremented to 1
-  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
+  DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 1);
 
   // Delete the root layer handle
   rootLayer.Reset();
@@ -436,18 +449,18 @@ int UtcDaliSceneCreateNewSceneDuringCoreEventProcessing(void)
 
   TouchedSignalData data;
   data.createNewScene = true;
-  TouchFunctor functor( data );
-  scene.TouchedSignal().Connect( &application, functor );
+  TouchFunctor functor(data);
+  scene.TouchedSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
   application.Render();
 
-  GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+  GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_EQUALS( true, data.createNewScene, TEST_LOCATION );
-  DALI_TEST_EQUALS( true, data.newSceneCreated, TEST_LOCATION );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.createNewScene, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.newSceneCreated, TEST_LOCATION);
   data.Reset();
 
   END_TEST;
@@ -458,15 +471,15 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   TestApplication application;
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New( Size( 480.0f, 800.0f ) );
-  DALI_TEST_CHECK( scene );
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
 
   // One reference of scene kept here and the other one kept in the Core
-  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 2 );
+  DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 2);
 
   // Add a renderable actor to the scene
   auto actor = CreateRenderableActor();
-  scene.Add( actor );
+  scene.Add(actor);
 
   // Render and notify.
   application.SendNotification();
@@ -474,12 +487,12 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
 
   // Keep the reference of the root layer handle so it will still be alive after the scene is deleted
   Layer rootLayer = scene.GetRootLayer();
-  DALI_TEST_CHECK( rootLayer );
-  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 2 );
+  DALI_TEST_CHECK(rootLayer);
+  DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
   scene.Discard();
-  DALI_TEST_CHECK( scene.GetBaseObject().ReferenceCount() == 1 );
+  DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 
   // Reset the scene handle
   scene.Reset();
@@ -490,11 +503,11 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
 
   // At this point, the scene should have been automatically deleted
   // To prove this, the ref count of the root layer handle should be decremented to 1
-  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
+  DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 1);
 
   // Create a new Scene while the root layer of the deleted scene is still alive
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New( Size( 480.0f, 800.0f ) );
-  DALI_TEST_CHECK( newScene );
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(newScene);
 
   // Render and notify.
   application.SendNotification();
@@ -502,7 +515,7 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
 
   // At this point, we have only one scene but two root layers
   // The root layer of the deleted scene is still alive
-  DALI_TEST_CHECK( rootLayer.GetBaseObject().ReferenceCount() == 1 );
+  DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 1);
 
   // Delete the root layer of the deleted scene
   rootLayer.Reset();
@@ -516,118 +529,118 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
 
 int UtcDaliSceneEventProcessingFinishedP(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  bool eventProcessingFinished = false;
-  EventProcessingFinishedFunctor functor( eventProcessingFinished );
-  scene.EventProcessingFinishedSignal().Connect( &application, functor );
+  bool                           eventProcessingFinished = false;
+  EventProcessingFinishedFunctor functor(eventProcessingFinished);
+  scene.EventProcessingFinishedSignal().Connect(&application, functor);
 
-  Actor actor( Actor::New() );
-  scene.Add( actor );
+  Actor actor(Actor::New());
+  scene.Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( eventProcessingFinished );
+  DALI_TEST_CHECK(eventProcessingFinished);
 
   END_TEST;
 }
 
 int UtcDaliSceneEventProcessingFinishedN(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  bool eventProcessingFinished = false;
-  EventProcessingFinishedFunctor functor( eventProcessingFinished );
-  scene.EventProcessingFinishedSignal().Connect( &application, functor );
+  bool                           eventProcessingFinished = false;
+  EventProcessingFinishedFunctor functor(eventProcessingFinished);
+  scene.EventProcessingFinishedSignal().Connect(&application, functor);
 
-  Actor actor( Actor::New() );
-  scene.Add( actor );
+  Actor actor(Actor::New());
+  scene.Add(actor);
 
   // Do not complete event processing and confirm the signal has not been emitted.
-  DALI_TEST_CHECK( !eventProcessingFinished );
+  DALI_TEST_CHECK(!eventProcessingFinished);
 
   END_TEST;
 }
 
 int UtcDaliSceneSignalKeyEventP(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  KeyEventSignalData data;
-  KeyEventReceivedFunctor functor( data );
-  scene.KeyEventSignal().Connect( &application, functor );
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventSignal().Connect(&application, functor);
 
-  Integration::KeyEvent event( "i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event );
+  Integration::KeyEvent event("i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
-
-  data.Reset();
-
-  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event2 );
-
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event3 );
+  Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event2);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event2.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event2.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event2.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event4 );
+  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event3);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event3.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event3.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event3.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+
+  data.Reset();
+
+  Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event4);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event4.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event4.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event4.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event4.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
   END_TEST;
 }
 
 int UtcDaliSceneSignalKeyEventN(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  KeyEventSignalData data;
-  KeyEventReceivedFunctor functor( data );
-  scene.KeyEventSignal().Connect( &application, functor );
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventSignal().Connect(&application, functor);
 
   // Check that a non-pressed key events data is not modified.
-  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliSceneTouchedSignalP(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
   TouchedSignalData data;
-  TouchFunctor functor( data );
-  scene.TouchedSignal().Connect( &application, functor );
+  TouchFunctor      functor(data);
+  scene.TouchedSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
@@ -635,28 +648,28 @@ int UtcDaliSceneTouchedSignalP(void)
 
   // Basic test: No actors, single touch (down then up).
   {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
     data.Reset();
 
-    GenerateTouch( application, PointState::UP, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::UP, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
     data.Reset();
   }
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchedSignal().Connect( &DummyTouchCallback );
-  scene.Add( actor );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  scene.Add(actor);
 
   // Render and notify.
   application.SendNotification();
@@ -664,69 +677,69 @@ int UtcDaliSceneTouchedSignalP(void)
 
   // Actor on scene, single touch, down in actor, motion, then up outside actor.
   {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
     data.Reset();
 
-    GenerateTouch( application, PointState::MOTION, Vector2( 150.0f, 10.0f ) ); // Some motion
+    GenerateTouch(application, PointState::MOTION, Vector2(150.0f, 10.0f)); // Some motion
 
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
     data.Reset();
 
-    GenerateTouch( application, PointState::UP, Vector2( 150.0f, 10.0f ) ); // Some motion
+    GenerateTouch(application, PointState::UP, Vector2(150.0f, 10.0f)); // Some motion
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
     data.Reset();
   }
 
   // Multiple touch. Should only receive a touch on first down and last up.
   {
     Integration::TouchEvent touchEvent;
-    Integration::Point point;
+    Integration::Point      point;
 
     // 1st point
-    point.SetState( PointState::DOWN );
-    point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    touchEvent.points.push_back( point );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
+    point.SetState(PointState::DOWN);
+    point.SetScreenPosition(Vector2(10.0f, 10.0f));
+    touchEvent.points.push_back(point);
+    application.ProcessEvent(touchEvent);
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_EQUALS(data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION);
     data.Reset();
 
     // 2nd point
-    touchEvent.points[0].SetState( PointState::STATIONARY );
-    point.SetDeviceId( 1 );
-    point.SetScreenPosition( Vector2( 50.0f, 50.0f ) );
-    touchEvent.points.push_back( point );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+    touchEvent.points[0].SetState(PointState::STATIONARY);
+    point.SetDeviceId(1);
+    point.SetScreenPosition(Vector2(50.0f, 50.0f));
+    touchEvent.points.push_back(point);
+    application.ProcessEvent(touchEvent);
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
     data.Reset();
 
     // Primary point is up
-    touchEvent.points[0].SetState( PointState::UP );
-    touchEvent.points[1].SetState( PointState::STATIONARY );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+    touchEvent.points[0].SetState(PointState::UP);
+    touchEvent.points[1].SetState(PointState::STATIONARY);
+    application.ProcessEvent(touchEvent);
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
     data.Reset();
 
     // Remove 1st point now, 2nd point is now in motion
-    touchEvent.points.erase( touchEvent.points.begin() );
-    touchEvent.points[0].SetState( PointState::MOTION );
-    touchEvent.points[0].SetScreenPosition( Vector2( 150.0f, 50.0f ) );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+    touchEvent.points.erase(touchEvent.points.begin());
+    touchEvent.points[0].SetState(PointState::MOTION);
+    touchEvent.points[0].SetScreenPosition(Vector2(150.0f, 50.0f));
+    application.ProcessEvent(touchEvent);
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
     data.Reset();
 
     // Final point Up
-    touchEvent.points[0].SetState( PointState::UP );
-    application.ProcessEvent( touchEvent );
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
+    touchEvent.points[0].SetState(PointState::UP);
+    application.ProcessEvent(touchEvent);
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_EQUALS(data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION);
     data.Reset();
   }
   END_TEST;
@@ -734,52 +747,52 @@ int UtcDaliSceneTouchedSignalP(void)
 
 int UtcDaliSceneTouchedSignalN(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
   TouchedSignalData data;
-  TouchFunctor functor( data );
-  scene.TouchedSignal().Connect( &application, functor );
+  TouchFunctor      functor(data);
+  scene.TouchedSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
   application.Render();
 
   // Confirm functor not called before there has been any touch event.
-  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // No actors, single touch, down, motion then up.
   {
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
 
     data.Reset();
 
     // Confirm there is no signal when the touchpoint is only moved.
-    GenerateTouch( application, PointState::MOTION, Vector2( 1200.0f, 10.0f ) ); // Some motion
+    GenerateTouch(application, PointState::MOTION, Vector2(1200.0f, 10.0f)); // Some motion
 
-    DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+    DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
     data.Reset();
 
     // Confirm a following up event generates a signal.
-    GenerateTouch( application, PointState::UP, Vector2( 1200.0f, 10.0f ) );
+    GenerateTouch(application, PointState::UP, Vector2(1200.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0));
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
     data.Reset();
   }
 
   // Add an actor to the scene.
   Actor actor = Actor::New();
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  actor.TouchedSignal().Connect( &DummyTouchCallback );
-  scene.Add( actor );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  scene.Add(actor);
 
   // Render and notify.
   application.SendNotification();
@@ -787,34 +800,34 @@ int UtcDaliSceneTouchedSignalN(void)
 
   // Actor on scene. Interrupted before down and interrupted after down.
   {
-    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::INTERRUPTED, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED);
     data.Reset();
 
-    GenerateTouch( application, PointState::DOWN, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetHitActor(0) == actor );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::DOWN );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetHitActor(0) == actor);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetState(0) == PointState::DOWN);
     data.Reset();
 
-    GenerateTouch( application, PointState::INTERRUPTED, Vector2( 10.0f, 10.0f ) );
+    GenerateTouch(application, PointState::INTERRUPTED, Vector2(10.0f, 10.0f));
 
-    DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0u );
-    DALI_TEST_CHECK( !data.receivedTouchEvent.GetHitActor(0) );
-    DALI_TEST_CHECK( data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED );
+    DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetPointCount() != 0u);
+    DALI_TEST_CHECK(!data.receivedTouchEvent.GetHitActor(0));
+    DALI_TEST_CHECK(data.receivedTouchEvent.GetState(0) == PointState::INTERRUPTED);
 
-    DALI_TEST_EQUALS( data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS(data.receivedTouchEvent.GetPointCount(), 1u, TEST_LOCATION);
 
     // Check that getting info about a non-existent point returns an empty handle
-    Actor actor = data.receivedTouchEvent.GetHitActor( 1 );
-    DALI_TEST_CHECK( !actor );
+    Actor actor = data.receivedTouchEvent.GetHitActor(1);
+    DALI_TEST_CHECK(!actor);
 
     data.Reset();
   }
@@ -824,80 +837,80 @@ int UtcDaliSceneTouchedSignalN(void)
 
 int UtcDaliSceneSignalWheelEventP(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  WheelEventSignalData data;
-  WheelEventReceivedFunctor functor( data );
-  scene.WheelEventSignal().Connect( &application, functor );
+  WheelEventSignalData      data;
+  WheelEventReceivedFunctor functor(data);
+  scene.WheelEventSignal().Connect(&application, functor);
 
-  Integration::WheelEvent event( Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2( 0.0f, 0.0f ), 1, 1000u );
-  application.ProcessEvent( event );
+  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(event);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event.type) == data.receivedWheelEvent.GetType() );
-  DALI_TEST_CHECK( event.direction == data.receivedWheelEvent.GetDirection() );
-  DALI_TEST_CHECK( event.modifiers == data.receivedWheelEvent.GetModifiers() );
-  DALI_TEST_CHECK( event.point == data.receivedWheelEvent.GetPoint() );
-  DALI_TEST_CHECK( event.delta == data.receivedWheelEvent.GetDelta() );
-  DALI_TEST_CHECK( event.timeStamp == data.receivedWheelEvent.GetTime() );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(static_cast<WheelEvent::Type>(event.type) == data.receivedWheelEvent.GetType());
+  DALI_TEST_CHECK(event.direction == data.receivedWheelEvent.GetDirection());
+  DALI_TEST_CHECK(event.modifiers == data.receivedWheelEvent.GetModifiers());
+  DALI_TEST_CHECK(event.point == data.receivedWheelEvent.GetPoint());
+  DALI_TEST_CHECK(event.delta == data.receivedWheelEvent.GetDelta());
+  DALI_TEST_CHECK(event.timeStamp == data.receivedWheelEvent.GetTime());
 
   data.Reset();
 
-  Integration::WheelEvent event2( Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2( 0.0f, 0.0f ), -1, 1000u );
-  application.ProcessEvent( event2 );
+  Integration::WheelEvent event2(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
+  application.ProcessEvent(event2);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event2.type) == data.receivedWheelEvent.GetType() );
-  DALI_TEST_CHECK( event2.direction == data.receivedWheelEvent.GetDirection() );
-  DALI_TEST_CHECK( event2.modifiers == data.receivedWheelEvent.GetModifiers() );
-  DALI_TEST_CHECK( event2.point == data.receivedWheelEvent.GetPoint() );
-  DALI_TEST_CHECK( event2.delta == data.receivedWheelEvent.GetDelta() );
-  DALI_TEST_CHECK( event2.timeStamp == data.receivedWheelEvent.GetTime() );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(static_cast<WheelEvent::Type>(event2.type) == data.receivedWheelEvent.GetType());
+  DALI_TEST_CHECK(event2.direction == data.receivedWheelEvent.GetDirection());
+  DALI_TEST_CHECK(event2.modifiers == data.receivedWheelEvent.GetModifiers());
+  DALI_TEST_CHECK(event2.point == data.receivedWheelEvent.GetPoint());
+  DALI_TEST_CHECK(event2.delta == data.receivedWheelEvent.GetDelta());
+  DALI_TEST_CHECK(event2.timeStamp == data.receivedWheelEvent.GetTime());
   END_TEST;
 }
 
 int UtcDaliSceneSurfaceResizedDefaultScene(void)
 {
-  tet_infoline( "Ensure resizing of the surface is handled properly" );
+  tet_infoline("Ensure resizing of the surface is handled properly");
 
   TestApplication application;
 
   auto defaultScene = application.GetScene();
-  DALI_TEST_CHECK( defaultScene );
+  DALI_TEST_CHECK(defaultScene);
 
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS( stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
 
   // Resize the scene
-  Vector2 newSize( 1000.0f, 2000.0f );
-  DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+  Vector2 newSize(1000.0f, 2000.0f);
+  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
 {
-  tet_infoline( "Ensure resizing of the surface & viewport is handled properly" );
+  tet_infoline("Ensure resizing of the surface & viewport is handled properly");
 
-  TestApplication application;
+  TestApplication    application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  TraceCallStack& callStack = glAbstraction.GetViewportTrace();
-  glAbstraction.EnableViewportCallTrace( true );
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
 
   // Initial scene setup
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New( geometry, shader );
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
   // Render before resizing surface
@@ -906,65 +919,65 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   glAbstraction.ResetViewportCallStack();
 
   auto defaultScene = application.GetScene();
-  DALI_TEST_CHECK( defaultScene );
+  DALI_TEST_CHECK(defaultScene);
 
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS( stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
 
   // Resize the scene
-  Vector2 newSize( 1000.0f, 2000.0f );
-  std::string viewportParams( "0, 0, 1000, 2000" ); // to match newSize
-  DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+  Vector2     newSize(1000.0f, 2000.0f);
+  std::string viewportParams("0, 0, 1000, 2000"); // to match newSize
+  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   // Render after resizing surface
   application.SendNotification();
   application.Render(0);
 
   // Check that the viewport is handled properly
-  DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("Viewport", viewportParams ) );
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
 
   END_TEST;
 }
 
 int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
 {
-  tet_infoline( "Ensure resizing of the surface & viewport is handled properly" );
+  tet_infoline("Ensure resizing of the surface & viewport is handled properly");
 
-  TestApplication application;
+  TestApplication    application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  TraceCallStack& callStack = glAbstraction.GetViewportTrace();
-  glAbstraction.EnableViewportCallTrace( true );
+  TraceCallStack&    callStack     = glAbstraction.GetViewportTrace();
+  glAbstraction.EnableViewportCallTrace(true);
 
   // Initial scene setup
   auto scene = application.GetScene();
 
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New( geometry, shader );
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  int testWidth = 400;
+  int testWidth  = 400;
   int testHeight = 400;
-  actor.SetProperty( Actor::Property::SIZE, Vector2( testWidth, testHeight) );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(testWidth, testHeight));
   scene.Add(actor);
 
-  CameraActor offscreenCameraActor = CameraActor::New( Size( testWidth, testHeight ) );
-  application.GetScene().Add( offscreenCameraActor );
+  CameraActor offscreenCameraActor = CameraActor::New(Size(testWidth, testHeight));
+  application.GetScene().Add(offscreenCameraActor);
 
-  FrameBuffer newFrameBuffer = FrameBuffer::New( testWidth, testHeight, FrameBuffer::Attachment::NONE );
+  FrameBuffer newFrameBuffer = FrameBuffer::New(testWidth, testHeight, FrameBuffer::Attachment::NONE);
 
   RenderTask newTask = scene.GetRenderTaskList().CreateTask();
-  newTask.SetCameraActor( offscreenCameraActor );
-  newTask.SetSourceActor( actor );
-  newTask.SetFrameBuffer( newFrameBuffer );
-  newTask.SetViewportPosition( Vector2(0, 0) );
-  newTask.SetViewportSize( Vector2(testWidth, testHeight) );
+  newTask.SetCameraActor(offscreenCameraActor);
+  newTask.SetSourceActor(actor);
+  newTask.SetFrameBuffer(newFrameBuffer);
+  newTask.SetViewportPosition(Vector2(0, 0));
+  newTask.SetViewportSize(Vector2(testWidth, testHeight));
 
   // Render before resizing surface
   application.SendNotification();
@@ -972,179 +985,179 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   glAbstraction.ResetViewportCallStack();
 
   Rect<int32_t> initialViewport = newTask.GetViewport();
-  int initialWidth = initialViewport.width;
-  int initialHeight = initialViewport.height;
-  DALI_TEST_EQUALS( initialWidth, testWidth, TEST_LOCATION );
-  DALI_TEST_EQUALS( initialHeight, testHeight, TEST_LOCATION );
+  int           initialWidth    = initialViewport.width;
+  int           initialHeight   = initialViewport.height;
+  DALI_TEST_EQUALS(initialWidth, testWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(initialHeight, testHeight, TEST_LOCATION);
 
   auto defaultScene = application.GetScene();
-  DALI_TEST_CHECK( defaultScene );
+  DALI_TEST_CHECK(defaultScene);
 
   // Ensure stage size matches the scene size
   auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS( stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
 
   // Resize the scene
-  Vector2 newSize( 1000.0f, 2000.0f );
-  std::string viewportParams( "0, 0, 1000, 2000" ); // to match newSize
-  DALI_TEST_CHECK( stage.GetSize() != newSize );
-  defaultScene.SurfaceResized( newSize.width, newSize.height );
+  Vector2     newSize(1000.0f, 2000.0f);
+  std::string viewportParams("0, 0, 1000, 2000"); // to match newSize
+  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS( stage.GetSize(), newSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( defaultScene.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   // Render after resizing surface
   application.SendNotification();
   application.Render(0);
 
   // Check that the viewport is handled properly
-  DALI_TEST_CHECK( callStack.FindMethodAndGetParameters("Viewport", viewportParams ) );
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
 
   // Second render-task should not be affected
   Rect<int32_t> viewport = newTask.GetViewport();
-  int width = viewport.width;
-  int height = viewport.height;
-  DALI_TEST_EQUALS( width, testWidth, TEST_LOCATION );
-  DALI_TEST_EQUALS( height, testHeight, TEST_LOCATION );
+  int           width    = viewport.width;
+  int           height   = viewport.height;
+  DALI_TEST_EQUALS(width, testWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(height, testHeight, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliSceneSurfaceResizedAdditionalScene(void)
 {
-  tet_infoline( "Ensure resizing of the surface is handled properly on additional scenes" );
+  tet_infoline("Ensure resizing of the surface is handled properly on additional scenes");
 
   TestApplication application;
-  Vector2 originalSurfaceSize( 500.0f, 1000.0f );
+  Vector2         originalSurfaceSize(500.0f, 1000.0f);
 
-  auto scene = Integration::Scene::New( Size( originalSurfaceSize.width, originalSurfaceSize.height ) );
+  auto scene = Integration::Scene::New(Size(originalSurfaceSize.width, originalSurfaceSize.height));
 
   // Ensure stage size does NOT match the surface size
-  auto stage = Stage::GetCurrent();
+  auto       stage     = Stage::GetCurrent();
   const auto stageSize = stage.GetSize();
-  DALI_TEST_CHECK( stageSize != originalSurfaceSize );
-  DALI_TEST_EQUALS( originalSurfaceSize, scene.GetSize(), TEST_LOCATION );
+  DALI_TEST_CHECK(stageSize != originalSurfaceSize);
+  DALI_TEST_EQUALS(originalSurfaceSize, scene.GetSize(), TEST_LOCATION);
 
   // Resize the surface and inform the scene accordingly
-  Vector2 newSize( 1000.0f, 2000.0f );
-  DALI_TEST_CHECK( stage.GetSize() != newSize );
-  scene.SurfaceResized( newSize.width, newSize.height );
+  Vector2 newSize(1000.0f, 2000.0f);
+  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  scene.SurfaceResized(newSize.width, newSize.height);
 
   // Ensure the stage hasn't been resized
-  DALI_TEST_EQUALS( stage.GetSize(), stageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( scene.GetSize(), newSize, TEST_LOCATION );
+  DALI_TEST_EQUALS(stage.GetSize(), stageSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.GetSize(), newSize, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliSceneKeyEventGeneratedSignalP(void)
 {
-  TestApplication application;
+  TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  KeyEventGeneratedSignalData data;
-  KeyEventGeneratedReceivedFunctor functor( data );
-  scene.KeyEventGeneratedSignal().Connect( &application, functor );
+  KeyEventGeneratedSignalData      data;
+  KeyEventGeneratedReceivedFunctor functor(data);
+  scene.KeyEventGeneratedSignal().Connect(&application, functor);
 
-  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event );
+  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
-
-  data.Reset();
-
-  Integration::KeyEvent event2( "i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event2 );
-
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event2.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event2.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event2.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event3( "a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event3 );
+  Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event2);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event3.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event3.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event3.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event2.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event2.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event2.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event4( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-  application.ProcessEvent( event4 );
+  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event3);
 
-  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
-  DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.GetKeyModifier() );
-  DALI_TEST_CHECK( event4.keyName == data.receivedKeyEvent.GetKeyName() );
-  DALI_TEST_CHECK( event4.keyString == data.receivedKeyEvent.GetKeyString() );
-  DALI_TEST_CHECK( event4.state == static_cast<Integration::KeyEvent::State>( data.receivedKeyEvent.GetState() ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event3.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event3.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event3.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+
+  data.Reset();
+
+  Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event4);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event4.keyModifier == data.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event4.keyName == data.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event4.keyString == data.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event4.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
   END_TEST;
 }
 
 int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
 {
-  tet_infoline( "Ensure we keep background color when the scene surface is replaced " );
+  tet_infoline("Ensure we keep background color when the scene surface is replaced ");
 
   TestApplication application;
 
   // Create a new scene and set the background color of the main scene
   auto defaultScene = application.GetScene();
-  defaultScene.SetBackgroundColor( Color::BLUE );
+  defaultScene.SetBackgroundColor(Color::BLUE);
 
   // Need to create a renderable as we don't start rendering until we have at least one
   // We don't need to add this to any scene
   auto actor = CreateRenderableActor();
 
-  auto& glAbstraction = application.GetGlAbstraction();
-  auto clearCountBefore = glAbstraction.GetClearCountCalled();
+  auto& glAbstraction    = application.GetGlAbstraction();
+  auto  clearCountBefore = glAbstraction.GetClearCountCalled();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), clearCountBefore + 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION);
 
   defaultScene.SurfaceReplaced();
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 2, TEST_LOCATION );
-  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), clearCountBefore + 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION);
 
   // Check when the main render task viewport is set the clear color is clipped using scissors
-  TraceCallStack& scissorTrace = glAbstraction.GetScissorTrace();
+  TraceCallStack& scissorTrace        = glAbstraction.GetScissorTrace();
   TraceCallStack& enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
-  scissorTrace.Enable( true );
-  enabledDisableTrace.Enable( true );
+  scissorTrace.Enable(true);
+  enabledDisableTrace.Enable(true);
 
-  defaultScene.GetRenderTaskList().GetTask( 0 ).SetViewport( Viewport( 0.0f, 0.0f, 100.0f, 100.0f ) );
+  defaultScene.GetRenderTaskList().GetTask(0).SetViewport(Viewport(0.0f, 0.0f, 100.0f, 100.0f));
 
   application.SendNotification();
   application.Render();
 
   // Check scissor test was enabled.
-  DALI_TEST_CHECK( enabledDisableTrace.FindMethodAndParams( "Enable", "3089" ) ); // 3089 = 0xC11 (GL_SCISSOR_TEST)
+  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", "3089")); // 3089 = 0xC11 (GL_SCISSOR_TEST)
 
   // Check the scissor was set, and the coordinates are correct.
-  DALI_TEST_CHECK( scissorTrace.FindMethodAndParams( "Scissor", "0, 700, 100, 100" ) );
+  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", "0, 700, 100, 100"));
 
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), clearCountBefore + 3, TEST_LOCATION );
-  DALI_TEST_EQUALS( glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), clearCountBefore + 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(glAbstraction.GetLastClearColor(), Color::BLUE, TEST_LOCATION);
 
-  scissorTrace.Enable( false );
+  scissorTrace.Enable(false);
   scissorTrace.Reset();
 
-  enabledDisableTrace.Enable( false );
+  enabledDisableTrace.Enable(false);
   enabledDisableTrace.Reset();
 
   END_TEST;
@@ -1152,9 +1165,9 @@ int UtcDaliSceneEnsureReplacedSurfaceKeepsClearColor(void)
 
 int UtcDaliSceneEmptySceneRendering(void)
 {
-  tet_infoline( "Ensure not rendering before a Renderer is added" );
+  tet_infoline("Ensure not rendering before a Renderer is added");
 
-  TestApplication application;
+  TestApplication    application;
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
 
   // Render without any renderer
@@ -1162,30 +1175,30 @@ int UtcDaliSceneEmptySceneRendering(void)
   application.Render();
 
   // Check the clear count and the render status
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetRenderNeedsPostRender(), false, TEST_LOCATION);
 
   // Add a Renderer
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New( geometry, shader );
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
-  actor.AddRenderer( renderer );
+  actor.AddRenderer(renderer);
 
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 400, 400 ) );
-  application.GetScene().Add( actor );
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
+  application.GetScene().Add(actor);
 
   // Render
   application.SendNotification();
   application.Render();
 
   // Check the clear count and the render status
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetRenderNeedsPostRender(), true, TEST_LOCATION);
 
   // Remove the Renderer
-  application.GetScene().Remove( actor );
+  application.GetScene().Remove(actor);
   actor.Reset();
   renderer.Reset();
 
@@ -1194,49 +1207,49 @@ int UtcDaliSceneEmptySceneRendering(void)
   application.Render();
 
   // Check the clear count and the render status
-  DALI_TEST_EQUALS( glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION );  // Should be cleared
-  DALI_TEST_EQUALS( application.GetRenderNeedsPostRender(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS(glAbstraction.GetClearCountCalled(), 2, TEST_LOCATION); // Should be cleared
+  DALI_TEST_EQUALS(application.GetRenderNeedsPostRender(), true, TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliSceneFrameRenderedPresentedCallback(void)
 {
-  tet_infoline( "UtcDaliSceneFrameRenderedCallback" );
+  tet_infoline("UtcDaliSceneFrameRenderedCallback");
 
   TestApplication application;
 
   // Add a Renderer
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
-  Renderer renderer = Renderer::New( geometry, shader );
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
 
   Actor actor = Actor::New();
-  actor.AddRenderer( renderer );
-  application.GetScene().Add( actor );
+  actor.AddRenderer(renderer);
+  application.GetScene().Add(actor);
 
   Dali::Integration::Scene scene = application.GetScene();
 
   int frameId = 1;
-  scene.AddFrameRenderedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
-  scene.AddFramePresentedCallback( std::unique_ptr< CallbackBase >( MakeCallback( &FrameCallback ) ), frameId );
+  scene.AddFrameRenderedCallback(std::unique_ptr<CallbackBase>(MakeCallback(&FrameCallback)), frameId);
+  scene.AddFramePresentedCallback(std::unique_ptr<CallbackBase>(MakeCallback(&FrameCallback)), frameId);
 
   // Render
   application.SendNotification();
   application.Render();
 
   Dali::Integration::Scene::FrameCallbackContainer callbackContainer;
-  scene.GetFrameRenderedCallback( callbackContainer );
+  scene.GetFrameRenderedCallback(callbackContainer);
 
-  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
+  DALI_TEST_EQUALS(callbackContainer.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbackContainer[0].second, frameId, TEST_LOCATION);
 
   callbackContainer.clear();
 
-  scene.GetFramePresentedCallback( callbackContainer );
+  scene.GetFramePresentedCallback(callbackContainer);
 
-  DALI_TEST_EQUALS( callbackContainer.size(), 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( callbackContainer[0].second, frameId, TEST_LOCATION );
+  DALI_TEST_EQUALS(callbackContainer.size(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbackContainer[0].second, frameId, TEST_LOCATION);
 
   END_TEST;
 }

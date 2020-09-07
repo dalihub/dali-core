@@ -23,13 +23,12 @@
 
 namespace Dali
 {
-
-Shader CreateShader();
-TextureSet CreateTextureSet();
-TextureSet CreateTextureSet( Texture texture );
-Geometry CreateQuadGeometry();
+Shader       CreateShader();
+TextureSet   CreateTextureSet();
+TextureSet   CreateTextureSet(Texture texture);
+Geometry     CreateQuadGeometry();
 VertexBuffer CreateVertexBuffer();
 
-}
+} // namespace Dali
 
 #endif // MESH_BUILDER_H

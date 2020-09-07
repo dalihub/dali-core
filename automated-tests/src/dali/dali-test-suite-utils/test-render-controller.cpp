@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 namespace Dali
 {
-
 TestRenderController::TestRenderController()
 {
   Initialize();
@@ -29,12 +28,12 @@ TestRenderController::~TestRenderController()
 {
 }
 
-void TestRenderController::RequestUpdate( bool forceUpdate )
+void TestRenderController::RequestUpdate(bool forceUpdate)
 {
   mRequestUpdateCalled = true;
 }
 
-void TestRenderController::RequestProcessEventsOnIdle( bool forceProcess )
+void TestRenderController::RequestProcessEventsOnIdle(bool forceProcess)
 {
   mRequestProcessEventsOnIdleCalled = true;
 }
@@ -43,8 +42,10 @@ bool TestRenderController::WasCalled(TestRenderControllerFuncEnum func)
 {
   switch(func)
   {
-    case RequestUpdateFunc: return mRequestUpdateCalled;
-    case RequestProcessEventsOnIdleFunc: return mRequestProcessEventsOnIdleCalled;
+    case RequestUpdateFunc:
+      return mRequestUpdateCalled;
+    case RequestProcessEventsOnIdleFunc:
+      return mRequestProcessEventsOnIdleCalled;
   }
 
   return false;
@@ -52,9 +53,8 @@ bool TestRenderController::WasCalled(TestRenderControllerFuncEnum func)
 
 void TestRenderController::Initialize()
 {
-  mRequestUpdateCalled = false;
+  mRequestUpdateCalled              = false;
   mRequestProcessEventsOnIdleCalled = false;
 }
 
-
-} // namespace dali
+} // namespace Dali

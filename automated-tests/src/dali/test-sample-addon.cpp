@@ -15,33 +15,33 @@
  *
  */
 
-#include <cstring>
-#include <dali/devel-api/addons/addon-base.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/addons/addon-base.h>
+
+#include <cstring>
 
 static const std::string DUMMY_ADDON_NAME = "SampleAddOn";
 
-int StringLen( const char* str )
+int StringLen(const char* str)
 {
-  return strlen( str );
+  return strlen(str);
 }
 
-int DoSum( int a, int b )
+int DoSum(int a, int b)
 {
-  return a+b;
+  return a + b;
 }
 
 class TestDummyAddOn : public Dali::AddOns::AddOnBase
 {
 public:
-
-  void GetAddOnInfo( Dali::AddOnInfo& info ) override
+  void GetAddOnInfo(Dali::AddOnInfo& info) override
   {
-    info.type = Dali::AddOnType::GENERIC;
-    info.name = "SampleAddOn";
-    info.version = Dali::DALI_ADDON_VERSION( 1, 0, 0 );
-    info.next = nullptr;
-    tet_printf( "SampleAddOn: GetAddOnInfo() : name = %s\n", info.name.c_str());
+    info.type    = Dali::AddOnType::GENERIC;
+    info.name    = "SampleAddOn";
+    info.version = Dali::DALI_ADDON_VERSION(1, 0, 0);
+    info.next    = nullptr;
+    tet_printf("SampleAddOn: GetAddOnInfo() : name = %s\n", info.name.c_str());
   }
 
   /**
@@ -51,10 +51,10 @@ public:
   Dali::AddOns::DispatchTable* GetGlobalDispatchTable() override
   {
     static Dali::AddOns::DispatchTable dispatchTable{};
-    if( dispatchTable.Empty() )
+    if(dispatchTable.Empty())
     {
-      dispatchTable["DoSum"]            = DoSum;
-      dispatchTable["StringLen"]        = StringLen;
+      dispatchTable["DoSum"]     = DoSum;
+      dispatchTable["StringLen"] = StringLen;
     }
     return &dispatchTable;
   }
@@ -89,4 +89,4 @@ public:
   }
 };
 
-REGISTER_ADDON_CLASS( TestDummyAddOn );
+REGISTER_ADDON_CLASS(TestDummyAddOn);

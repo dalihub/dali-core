@@ -17,8 +17,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -39,17 +39,17 @@ void sampler_test_cleanup(void)
 int UtcDaliSamplerNew01(void)
 {
   TestApplication application;
-  Sampler sampler = Sampler::New();
+  Sampler         sampler = Sampler::New();
 
-  DALI_TEST_EQUALS( (bool)sampler, true, TEST_LOCATION );
+  DALI_TEST_EQUALS((bool)sampler, true, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliSamplerNew02(void)
 {
   TestApplication application;
-  Sampler sampler;
-  DALI_TEST_EQUALS( (bool)sampler, false, TEST_LOCATION );
+  Sampler         sampler;
+  DALI_TEST_EQUALS((bool)sampler, false, TEST_LOCATION);
   END_TEST;
 }
 
@@ -66,7 +66,7 @@ int UtcDaliSamplerCopyConstructor(void)
   // Copy the object, ref count == 2
   Sampler copy(sampler);
   DALI_TEST_CHECK(copy);
-  if (copy)
+  if(copy)
   {
     DALI_TEST_EQUALS(2, copy.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   }
@@ -79,13 +79,13 @@ int UtcDaliSamplerMoveConstructor(void)
   TestApplication application;
 
   Sampler sampler = Sampler::New();
-  DALI_TEST_CHECK( sampler );
-  DALI_TEST_EQUALS( 1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK(sampler);
+  DALI_TEST_EQUALS(1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
-  Sampler move = std::move( sampler );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( !sampler );
+  Sampler move = std::move(sampler);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sampler);
 
   END_TEST;
 }
@@ -95,14 +95,14 @@ int UtcDaliSamplerMoveAssignment(void)
   TestApplication application;
 
   Sampler sampler = Sampler::New();
-  DALI_TEST_CHECK( sampler );
-  DALI_TEST_EQUALS( 1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK(sampler);
+  DALI_TEST_EQUALS(1, sampler.GetBaseObject().ReferenceCount(), TEST_LOCATION);
 
   Sampler move;
-  move = std::move( sampler );
-  DALI_TEST_CHECK( move );
-  DALI_TEST_EQUALS( 1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION );
-  DALI_TEST_CHECK( !sampler );
+  move = std::move(sampler);
+  DALI_TEST_CHECK(move);
+  DALI_TEST_EQUALS(1, move.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sampler);
 
   END_TEST;
 }
@@ -110,11 +110,11 @@ int UtcDaliSamplerMoveAssignment(void)
 int UtcDaliSamplerDownCast01(void)
 {
   TestApplication application;
-  Sampler sampler = Sampler::New();
+  Sampler         sampler = Sampler::New();
 
   BaseHandle handle(sampler);
-  Sampler sampler2 = Sampler::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)sampler2, true, TEST_LOCATION );
+  Sampler    sampler2 = Sampler::DownCast(handle);
+  DALI_TEST_EQUALS((bool)sampler2, true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -123,15 +123,15 @@ int UtcDaliSamplerDownCast02(void)
   TestApplication application;
 
   BaseHandle handle;
-  Sampler sampler = Sampler::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)sampler, false, TEST_LOCATION );
+  Sampler    sampler = Sampler::DownCast(handle);
+  DALI_TEST_EQUALS((bool)sampler, false, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliSamplerAssignmentOperator(void)
 {
   TestApplication application;
-  Sampler sampler1 = Sampler::New();
+  Sampler         sampler1 = Sampler::New();
 
   Sampler sampler2;
 
@@ -152,23 +152,22 @@ int UtcSamplerSetFilterMode(void)
 {
   TestApplication application;
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture image   = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   Sampler sampler = Sampler::New();
 
   TextureSet textureSet = CreateTextureSet();
   textureSet.SetTexture(0u, image);
-  textureSet.SetSampler( 0u, sampler );
+  textureSet.SetSampler(0u, sampler);
 
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  application.GetScene().Add( actor );
-
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -176,105 +175,104 @@ int UtcSamplerSetFilterMode(void)
   // Default/Default
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+  sampler.SetFilterMode(FilterMode::DEFAULT, FilterMode::DEFAULT);
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify gl state
 
   // There are 4 calls to TexParameteri when the texture is first created
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 4, TEST_LOCATION);
 
   std::stringstream out;
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
   // Linear/Linear
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+  sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify gl state
 
   // Should not make any calls when settings are the same (DEFAULT = LINEAR )
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 0, TEST_LOCATION);
 
   /**************************************************************/
   // Nearest/Nearest
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  sampler.SetFilterMode(FilterMode::NEAREST, FilterMode::NEAREST);
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify actor gl state
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 2, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_NEAREST;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
-
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
   // Nearest/Linear
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::LINEAR );
+  sampler.SetFilterMode(FilterMode::NEAREST, FilterMode::LINEAR);
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify actor gl state
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
   // NONE/NONE
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetFilterMode( FilterMode::NONE, FilterMode::NONE );
+  sampler.SetFilterMode(FilterMode::NONE, FilterMode::NONE);
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify actor gl state
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 1, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -283,22 +281,22 @@ int UtcSamplerSetWrapMode1(void)
 {
   TestApplication application;
 
-  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+  Texture    image      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
   TextureSet textureSet = CreateTextureSet();
-  Sampler sampler = Sampler::New();
+  Sampler    sampler    = Sampler::New();
   textureSet.SetTexture(0u, image);
-  textureSet.SetSampler( 0u, sampler );
+  textureSet.SetSampler(0u, sampler);
 
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  application.GetScene().Add( actor );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -306,41 +304,41 @@ int UtcSamplerSetWrapMode1(void)
   // CLAMP_TO_EDGE / CLAMP_TO_EDGE
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify gl state
 
   // There are 4 calls to TexParameteri when the texture is first created
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 4, TEST_LOCATION);
 
   std::stringstream out;
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_CLAMP_TO_EDGE;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_CLAMP_TO_EDGE;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(3, "TexParameteri", out.str()), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.TestMethodAndParams(3, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
-  sampler.SetWrapMode( WrapMode::DEFAULT, WrapMode::DEFAULT );
+  sampler.SetWrapMode(WrapMode::DEFAULT, WrapMode::DEFAULT);
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify gl state
 
   // Should not make any calls when settings are the same
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 0, TEST_LOCATION);
 
   //Todo: Test the other wrap mode ( REPEAT, MIRRORED_REPEAT )  , currently not support!!
 
@@ -352,42 +350,42 @@ int UtcSamplerSetWrapMode2(void)
   TestApplication application;
 
   // Create a cube-map texture.
-  unsigned int width = 8u;
-  unsigned int height = 8u;
-  Texture texture = Texture::New( TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height );
+  unsigned int width   = 8u;
+  unsigned int height  = 8u;
+  Texture      texture = Texture::New(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
 
   // Create source image data.
-  unsigned int bufferSize( width * height * 4 );
-  unsigned char* buffer= new unsigned char[ bufferSize ];
-  memset( buffer, 0u, bufferSize );
+  unsigned int   bufferSize(width * height * 4);
+  unsigned char* buffer = new unsigned char[bufferSize];
+  memset(buffer, 0u, bufferSize);
 
-  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY );
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
 
   // Upload the source image data to all 6 sides of our cube-map.
-  texture.Upload( pixelData, CubeMapLayer::POSITIVE_X, 0u, 0u, 0u, width, height );
-  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_X, 0u, 0u, 0u, width, height );
-  texture.Upload( pixelData, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height );
-  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height );
-  texture.Upload( pixelData, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height );
-  texture.Upload( pixelData, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height );
+  texture.Upload(pixelData, CubeMapLayer::POSITIVE_X, 0u, 0u, 0u, width, height);
+  texture.Upload(pixelData, CubeMapLayer::NEGATIVE_X, 0u, 0u, 0u, width, height);
+  texture.Upload(pixelData, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height);
+  texture.Upload(pixelData, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height);
+  texture.Upload(pixelData, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height);
+  texture.Upload(pixelData, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height);
 
   // Finalize the cube-map setup.
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetTexture( 0u, texture );
+  textureSet.SetTexture(0u, texture);
 
   Sampler sampler = Sampler::New();
-  textureSet.SetSampler( 0u, sampler );
+  textureSet.SetSampler(0u, sampler);
 
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.0f ) );
-  application.GetScene().Add( actor );
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -396,39 +394,38 @@ int UtcSamplerSetWrapMode2(void)
 
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Reset();
-  texParameterTrace.Enable( true );
+  texParameterTrace.Enable(true);
 
   // Call the 3 dimensional wrap mode API.
-  sampler.SetWrapMode( WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE );
+  sampler.SetWrapMode(WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE, WrapMode::CLAMP_TO_EDGE);
 
   application.SendNotification();
   application.Render();
 
   // Verify that no TexParameteri calls occurred since wrap mode hasn't changed.
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 0u, TEST_LOCATION);
 
-
-  sampler.SetWrapMode( WrapMode::REPEAT, WrapMode::REPEAT, WrapMode::REPEAT );
+  sampler.SetWrapMode(WrapMode::REPEAT, WrapMode::REPEAT, WrapMode::REPEAT);
   texParameterTrace.Reset();
   application.SendNotification();
   application.Render();
 
-  texParameterTrace.Enable( false );
+  texParameterTrace.Enable(false);
 
   // Verify that 3 TexParameteri calls occurred.
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3u, TEST_LOCATION );
+  DALI_TEST_EQUALS(texParameterTrace.CountMethod("TexParameteri"), 3u, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliSamplerSetWrapModeNegative01(void)
 {
   TestApplication application;
-  Dali::Sampler instance;
+  Dali::Sampler   instance;
   try
   {
     Dali::WrapMode::Type arg1(static_cast<Dali::WrapMode::Type>(-1));
     Dali::WrapMode::Type arg2(static_cast<Dali::WrapMode::Type>(-1));
-    instance.SetWrapMode(arg1,arg2);
+    instance.SetWrapMode(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -441,13 +438,13 @@ int UtcDaliSamplerSetWrapModeNegative01(void)
 int UtcDaliSamplerSetWrapModeNegative02(void)
 {
   TestApplication application;
-  Dali::Sampler instance;
+  Dali::Sampler   instance;
   try
   {
     Dali::WrapMode::Type arg1(static_cast<Dali::WrapMode::Type>(-1));
     Dali::WrapMode::Type arg2(static_cast<Dali::WrapMode::Type>(-1));
     Dali::WrapMode::Type arg3(static_cast<Dali::WrapMode::Type>(-1));
-    instance.SetWrapMode(arg1,arg2,arg3);
+    instance.SetWrapMode(arg1, arg2, arg3);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -460,12 +457,12 @@ int UtcDaliSamplerSetWrapModeNegative02(void)
 int UtcDaliSamplerSetFilterModeNegative(void)
 {
   TestApplication application;
-  Dali::Sampler instance;
+  Dali::Sampler   instance;
   try
   {
     Dali::FilterMode::Type arg1(static_cast<Dali::FilterMode::Type>(-1));
     Dali::FilterMode::Type arg2(static_cast<Dali::FilterMode::Type>(-1));
-    instance.SetFilterMode(arg1,arg2);
+    instance.SetFilterMode(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
