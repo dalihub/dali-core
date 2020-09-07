@@ -22,7 +22,7 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/touch-point.h>
+#include <dali/devel-api/events/touch-point.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>

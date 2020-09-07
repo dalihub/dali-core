@@ -2,7 +2,7 @@
 #define DALI_TOUCH_POINT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/events/point-state.h>
 #include <dali/public-api/math/vector2.h>
 
 namespace Dali
@@ -40,44 +41,23 @@ namespace Dali
  */
 struct DALI_CORE_API TouchPoint
 {
-  // Enumerations
-
-  /**
-   * @brief Enumeration for Touch state.
-   * @SINCE_1_0.0
-   */
-  enum State
-  {
-    Started,        /**< Touch or hover started */
-    Finished,       /**< Touch or hover finished */
-    Down = Started, /**< Screen touched */
-    Up = Finished,  /**< Touch stopped */
-    Motion,         /**< Finger dragged or hovered */
-    Leave,          /**< Leave the boundary of an actor */
-    Stationary,     /**< No change from last event.  Useful when a multi-point event occurs where
-                         all points are sent but indicates that this particular point has not changed
-                         since the last time */
-    Interrupted,    /**< A system event has occurred which has interrupted the touch or hover event sequence. */
-    Last            /**< Number of states. */
-  };
-
   // Construction & Destruction
 
   /**
    * @brief Constructor.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] id      The touch device ID
    * @param[in] state   The state
    * @param[in] screenX The X co-ordinate relative to the screen's origin
    * @param[in] screenY The Y co-ordinate relative to the screen's origin
    */
-  TouchPoint(int32_t id, State state, float screenX, float screenY);
+  TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY);
 
   /**
    * @brief Constructor.
    *
-   * @SINCE_1_0.0
+   * @SINCE_1_9.28
    * @param[in] id      The touch device ID
    * @param[in] state   The state
    * @param[in] screenX The X co-ordinate relative to the screen's origin
@@ -85,7 +65,7 @@ struct DALI_CORE_API TouchPoint
    * @param[in] localX  The X co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
    * @param[in] localY  The Y co-ordinate relative to the top-left (0.0, 0.0, 0.5) of the actor
    */
-  TouchPoint(int32_t id, State state, float screenX, float screenY, float localX, float localY);
+  TouchPoint(int32_t id, PointState::Type state, float screenX, float screenY, float localX, float localY);
 
   /**
    * @brief Destructor.
@@ -103,9 +83,9 @@ struct DALI_CORE_API TouchPoint
   /**
    * @brief State of the point.
    *
-   * @see State
+   * @see Dali::PointState::Type
    */
-  State state;
+  PointState::Type state;
 
   /**
    * @brief The actor that was underneath the touch point.
