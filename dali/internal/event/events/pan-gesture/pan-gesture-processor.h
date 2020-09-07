@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PAN_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ public: // To be called by GestureEventProcessor
    * @return true if Core::Update required
    * @note If we are already processing a normal pan, then this call is ignored.
    */
-  bool SetPanGestureProperties( const PanGesture& pan );
+  bool SetPanGestureProperties( const Dali::PanGesture& pan );
 
   /**
    * Called to provide pan-gesture profiling information.
@@ -254,7 +254,7 @@ private:
                       const GestureDetectorContainer& gestureDetectors,
                       const PanGestureEvent& panEvent,
                       Vector2 localCurrent,
-                      Gesture::State state,
+                      GestureState state,
                       RenderTaskPtr renderTask );
 
   // GestureProcessor overrides

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ namespace Dali
 namespace Internal
 {
 
-PinchGestureEvent::PinchGestureEvent(Gesture::State state)
-: GestureEvent(Gesture::Pinch, state),
+PinchGestureEvent::PinchGestureEvent(GestureState state)
+: GestureEvent(GestureType::PINCH, state),
   scale(0.0f),
   speed(0.0f),
   centerPoint()

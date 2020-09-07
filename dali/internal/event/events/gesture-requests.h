@@ -38,7 +38,7 @@ struct GestureRequest
    * Default Constructor
    * @param[in]  typeRequired  The gesture type required
    */
-  GestureRequest( Gesture::Type typeRequired )
+  GestureRequest( GestureType::Value typeRequired )
   : type( typeRequired )
   {
   }
@@ -50,7 +50,7 @@ struct GestureRequest
 
   // Data Members
 
-  Gesture::Type type; ///< The type of gesture required.
+  GestureType::Value type; ///< The type of gesture required.
 };
 
 /**
@@ -64,7 +64,7 @@ struct PanGestureRequest : public GestureRequest
    * Default Constructor
    */
   PanGestureRequest()
-  : GestureRequest(Gesture::Pan),
+  : GestureRequest(GestureType::PAN),
     minTouches(1),
     maxTouches(1)
   {
@@ -94,7 +94,7 @@ struct TapGestureRequest : public GestureRequest
    * Default Constructor
    */
   TapGestureRequest()
-  : GestureRequest(Gesture::Tap),
+  : GestureRequest(GestureType::TAP),
     minTaps(1),
     maxTaps(1),
     minTouches(1),
@@ -128,7 +128,7 @@ struct LongPressGestureRequest : public GestureRequest
    * Default Constructor
    */
   LongPressGestureRequest()
-  : GestureRequest(Gesture::LongPress),
+  : GestureRequest(GestureType::LONG_PRESS),
     minTouches(1),
     maxTouches(1)
   {

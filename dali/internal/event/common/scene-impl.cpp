@@ -29,6 +29,7 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
@@ -41,13 +42,6 @@ namespace Dali
 
 namespace Internal
 {
-
-namespace
-{
-
-const Vector4 DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f); // Default background color
-
-} //Unnamed namespace
 
 ScenePtr Scene::New( Size size )
 {
@@ -319,9 +313,9 @@ void Scene::EmitEventProcessingFinishedSignal()
 void Scene::EmitTouchedSignal( const Dali::TouchEvent& touch )
 {
   Dali::Integration::Scene handle( this );
-  if ( !mTouchSignal.Empty() )
+  if ( !mTouchedSignal.Empty() )
   {
-    mTouchSignal.Emit( touch );
+    mTouchedSignal.Emit( touch );
   }
 }
 
@@ -371,9 +365,9 @@ Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFin
   return mEventProcessingFinishedSignal;
 }
 
-Integration::Scene::TouchSignalType& Scene::TouchSignal()
+Integration::Scene::TouchEventSignalType& Scene::TouchedSignal()
 {
-  return mTouchSignal;
+  return mTouchedSignal;
 }
 
 Integration::Scene::WheelEventSignalType& Scene::WheelEventSignal()

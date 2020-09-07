@@ -111,7 +111,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnPropertySet
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
   {
     mImpl->OnPropertySet(index, propertyValue);
   }
@@ -131,30 +131,6 @@ private:
   {
     Dali::Animation animationHandle(&animation);
     mImpl->OnSizeAnimation(animationHandle, targetSize);
-  }
-
-  /**
-   * @copydoc Internal::Actor::OnHoverEvent
-   */
-  virtual bool OnHoverEvent(const HoverEvent& event)
-  {
-    return mImpl->OnHoverEvent(event);
-  }
-
-  /**
-   * @copydoc Internal::Actor::OnKeyEvent
-   */
-  virtual bool OnKeyEvent(const KeyEvent& event)
-  {
-    return mImpl->OnKeyEvent(event);
-  }
-
-  /**
-   * @copydoc Internal::Actor::OnWheelEvent
-   */
-  virtual bool OnWheelEvent(const WheelEvent& event)
-  {
-    return mImpl->OnWheelEvent(event);
   }
 
   /**

@@ -30,7 +30,7 @@ namespace Internal DALI_INTERNAL
 class RotationGestureDetector;
 }
 
-struct RotationGesture;
+class RotationGesture;
 
 /**
  * @brief This class looks for a rotation gesture involving two touches.

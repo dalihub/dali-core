@@ -30,7 +30,7 @@ CustomActor CustomActorImpl::Self() const
   return CustomActor(mOwner);
 }
 
-void CustomActorImpl::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void CustomActorImpl::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
 }
 
@@ -54,21 +54,6 @@ void CustomActorImpl::Initialize(Internal::CustomActor& owner)
 Internal::CustomActor* CustomActorImpl::GetOwner() const
 {
   return mOwner;
-}
-
-bool CustomActorImpl::RequiresTouchEvents() const
-{
-  return ( mFlags & REQUIRES_TOUCH_EVENTS );
-}
-
-bool CustomActorImpl::RequiresHoverEvents() const
-{
-  return ( mFlags & REQUIRES_HOVER_EVENTS );
-}
-
-bool CustomActorImpl::RequiresWheelEvents() const
-{
-  return ( mFlags & REQUIRES_WHEEL_EVENTS );
 }
 
 bool CustomActorImpl::IsRelayoutEnabled() const

@@ -166,7 +166,7 @@ void PathConstrainer::Apply( Property target, Property source, const Vector2& ra
     constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
     constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
-    constraint.SetRemoveAction( Dali::Constraint::Discard );
+    constraint.SetRemoveAction( Dali::Constraint::DISCARD );
     constraint.Apply();
   }
   else if( propertyType == Dali::Property::ROTATION )
@@ -176,7 +176,7 @@ void PathConstrainer::Apply( Property target, Property source, const Vector2& ra
     constraint.AddSource( Dali::Source(source.object, source.propertyIndex ) );
 
     constraint.SetTag( static_cast<uint32_t>( reinterpret_cast<uintptr_t>( this ) ) ); // taking 32bits of this as tag
-    constraint.SetRemoveAction( Dali::Constraint::Discard );
+    constraint.SetRemoveAction( Dali::Constraint::DISCARD );
     constraint.Apply();
   }
 

@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/gesture.h>
 #include <dali/integration-api/events/event.h>
+#include <dali/internal/event/events/gesture-impl.h>
 
 namespace Dali
 {
@@ -46,12 +46,12 @@ struct GestureEvent
   /**
    * Gesture Type.
    */
-  Gesture::Type gestureType;
+  GestureType::Value gestureType;
 
   /**
    * The state of the gesture.
    */
-  Gesture::State state;
+  GestureState state;
 
   /**
    * The time the gesture took place.
@@ -65,7 +65,7 @@ protected:  // Constructors only to be used by derived structures.
    * @param[in] gesture       The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */
-  GestureEvent( Gesture::Type gesture, Gesture::State gestureState);
+  GestureEvent( GestureType::Value gesture, GestureState gestureState);
 };
 
 } // namespace Internal

@@ -65,7 +65,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  *
  * <h3>Multi-Touch Events:</h3>
  *
- * Touch or hover events are received via signals; see Actor::TouchSignal() and Actor::HoveredSignal() for more details.
+ * Touch or hover events are received via signals; see Actor::TouchedSignal() and Actor::HoveredSignal() for more details.
  *
  * <i>Hit Testing Rules Summary:</i>
  *
@@ -220,7 +220,7 @@ typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
  * Signals
  * | %Signal Name      | Method                       |
  * |-------------------|------------------------------|
- * | touch             | @ref TouchSignal()           |
+ * | touched           | @ref TouchedSignal()         |
  * | hovered           | @ref HoveredSignal()         |
  * | wheelEvent        | @ref WheelEventSignal()      |
  * | onScene           | @ref OnSceneSignal()         |
@@ -730,7 +730,7 @@ public:
 
   // Typedefs
 
-  typedef Signal< bool (Actor, const TouchEvent&) >  TouchEventSignalType;    ///< Touch signal type @SINCE_1_1.37
+  typedef Signal< bool (Actor, const TouchEvent&) > TouchEventSignalType;   ///< Touch signal type @SINCE_1_1.37
   typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
   typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
   typedef Signal< void (Actor) > OnSceneSignalType;                         ///< Scene connection signal type @SINCE_1_9.24
@@ -1170,11 +1170,11 @@ public: // Signals
    * The return value of True, indicates that the touch event has been consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    * A true return will also cancel any ongoing gestures.
-   * @SINCE_1_1.37
+   * @SINCE_1_9.28
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    */
-  TouchEventSignalType& TouchSignal();
+  TouchEventSignalType& TouchedSignal();
 
   /**
    * @brief This signal is emitted when hover input is received.

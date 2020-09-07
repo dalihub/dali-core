@@ -82,6 +82,14 @@ public:
   TouchEvent( const TouchEvent& other );
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.28
+   * @param[in] other The TouchEvent to move
+   */
+  TouchEvent( TouchEvent&& other );
+
+  /**
    * @brief Destructor.
    *
    * @SINCE_1_9.26
@@ -98,6 +106,15 @@ public:
    * @return A reference to this
    */
   TouchEvent& operator=( const TouchEvent& other );
+
+  /**
+   * @brief Move assignment Operator.
+   *
+   * @SINCE_1_9.28
+   * @param[in] other The TouchEvent to move
+   * @return A reference to this
+   */
+  TouchEvent& operator=( TouchEvent&& other );
 
   // Getters
 

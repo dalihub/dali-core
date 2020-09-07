@@ -2,7 +2,7 @@
 #define DALI_PINCH_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace Internal DALI_INTERNAL
 class PinchGestureDetector;
 }
 
-struct PinchGesture;
+class PinchGesture;
 
 /**
  * @brief This class looks for pinching gestures involving two touches.

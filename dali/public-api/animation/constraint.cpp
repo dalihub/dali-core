@@ -38,7 +38,7 @@ Internal::PropertyConstraint< P >* CreatePropertyConstraint( CallbackBase* func 
 
 } // unnamed namespace
 
-const Constraint::RemoveAction Constraint::DEFAULT_REMOVE_ACTION  = Constraint::Bake;
+const Constraint::RemoveAction Constraint::DEFAULT_REMOVE_ACTION = Constraint::BAKE;
 
 Constraint::Constraint()
 {

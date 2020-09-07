@@ -32,11 +32,11 @@ namespace Internal
 /**
  * When a rotation gesture is detected, this structure holds information regarding the gesture.
  *
- * A Rotation Gesture event should be in one of four states:
- * - Started:    If a rotation is detected.
- * - Continuing: If after a rotation is detected, it continues.
- * - Finished:   If after a rotation, the user lifts their finger(s).
- * - Cancelled:  If there is a system interruption.
+ * A ROTATION Gesture event should be in one of four states:
+ * - STARTED:    If a rotation is detected.
+ * - CONTINUING: If after a rotation is detected, it continues.
+ * - FINISHED:   If after a rotation, the user lifts their finger(s).
+ * - CANCELLED:  If there is a system interruption.
  */
 struct RotationGestureEvent : public GestureEvent
 {
@@ -46,8 +46,8 @@ struct RotationGestureEvent : public GestureEvent
    * Default Constructor
    * @param[in]  state  The state of the gesture
    */
-  RotationGestureEvent( Gesture::State state )
-  : GestureEvent( Gesture::Rotation, state )
+  RotationGestureEvent( GestureState state )
+  : GestureEvent( GestureType::ROTATION, state )
   {
   }
 

@@ -33,10 +33,10 @@ namespace Internal
  * send it to the Core.
  *
  * This gesture can be in four states:
- * - Possible:  When the user first puts their finger down - Core needs to hit test the down point.
- * - Started:   When the long-press gesture is actually detected.
- * - Finished:  When the user finally lifts all touches.
- * - Cancelled: If, after a down event, no long press is detected, or a system interruption.
+ * - POSSIBLE:  When the user first puts their finger down - Core needs to hit test the down point.
+ * - STARTED:   When the long-press gesture is actually detected.
+ * - FINISHED:  When the user finally lifts all touches.
+ * - CANCELLED: If, after a down event, no long press is detected, or a system interruption.
  */
 struct LongPressGestureEvent : public GestureEvent
 {
@@ -44,10 +44,10 @@ struct LongPressGestureEvent : public GestureEvent
 
   /**
    * Default Constructor
-   * @param[in]  state  Started, when we detect a long press.
-   *                    Finished, when all touches are finished.
+   * @param[in]  state  STARTED, when we detect a long press.
+   *                    FINISHED, when all touches are finished.
    */
-  LongPressGestureEvent( Gesture::State state );
+  LongPressGestureEvent( GestureState state );
 
   /**
    * Virtual destructor

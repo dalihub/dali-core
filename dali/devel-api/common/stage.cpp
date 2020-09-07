@@ -31,9 +31,6 @@ namespace Dali
 
 using Internal::Core;
 
-const Vector4 Stage::DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f);
-const Vector4 Stage::DEBUG_BACKGROUND_COLOR(0.2f, 0.5f, 0.2f, 1.0f);
-
 Stage::Stage()
 {
 }
@@ -144,9 +141,9 @@ Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
   return GetImplementation(*this).EventProcessingFinishedSignal();
 }
 
-Stage::TouchSignalType& Stage::TouchSignal()
+Stage::TouchEventSignalType& Stage::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchSignal();
+  return GetImplementation( *this ).TouchedSignal();
 }
 
 Stage::WheelEventSignalType& Stage::WheelEventSignal()

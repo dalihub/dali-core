@@ -40,6 +40,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/common/constants.h>
 
 using Dali::Internal::SceneGraph::Node;
 
@@ -64,7 +65,7 @@ namespace
 const char* const SIGNAL_KEY_EVENT =                 "keyEvent";
 const char* const SIGNAL_KEY_EVENT_GENERATED =       "keyEventGenerated";
 const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
-const char* const SIGNAL_TOUCH =                     "touch";
+const char* const SIGNAL_TOUCHED =                   "touched";
 const char* const SIGNAL_WHEEL_EVENT =               "wheelEvent";
 const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
 const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
@@ -79,7 +80,7 @@ SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &
 SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
 SignalConnectorType signalConnector7( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
 SignalConnectorType signalConnector8( mType, SIGNAL_KEY_EVENT_GENERATED,       &Stage::DoConnectSignal );
-SignalConnectorType signalConnector9( mType, SIGNAL_TOUCH,                     &Stage::DoConnectSignal );
+SignalConnectorType signalConnector9( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -91,10 +92,10 @@ StagePtr Stage::New( SceneGraph::UpdateManager& updateManager )
 void Stage::Initialize( Scene& scene )
 {
   mScene = &scene;
-  mScene->SetBackgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR );
+  mScene->SetBackgroundColor( Dali::DEFAULT_BACKGROUND_COLOR );
   mScene->EventProcessingFinishedSignal().Connect( this, &Stage::OnEventProcessingFinished );
   mScene->KeyEventSignal().Connect( this, &Stage::OnKeyEvent );
-  mScene->TouchSignal().Connect( this, &Stage::OnTouchEvent );
+  mScene->TouchedSignal().Connect( this, &Stage::OnTouchEvent );
   mScene->WheelEventSignal().Connect( this, &Stage::OnWheelEvent );
 }
 
@@ -230,9 +231,9 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     stage->EventProcessingFinishedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCH ) )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
   {
-    stage->TouchSignal().Connect( tracker, functor );
+    stage->TouchedSignal().Connect( tracker, functor );
   }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
   {
@@ -275,7 +276,7 @@ void Stage::OnKeyEvent( const Dali::KeyEvent& event )
 
 void Stage::OnTouchEvent( const Dali::TouchEvent& touch )
 {
-  mTouchSignal.Emit( touch );
+  EmitTouchedSignal( touch );
 }
 
 void Stage::OnWheelEvent( const Dali::WheelEvent& event )
@@ -299,12 +300,12 @@ bool Stage::EmitKeyEventGeneratedSignal(const KeyEvent& event)
 
 void Stage::EmitEventProcessingFinishedSignal()
 {
-   mEventProcessingFinishedSignal.Emit();
+  mEventProcessingFinishedSignal.Emit();
 }
 
 void Stage::EmitTouchedSignal( const Dali::TouchEvent& touch )
 {
-  mTouchSignal.Emit( touch );
+  mTouchedSignal.Emit( touch );
 }
 
 void Stage::EmitWheelEventSignal( const WheelEvent& event )
@@ -350,9 +351,9 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
   return mEventProcessingFinishedSignal;
 }
 
-Dali::Stage::TouchSignalType& Stage::TouchSignal()
+Dali::Stage::TouchEventSignalType& Stage::TouchedSignal()
 {
-  return mTouchSignal;
+  return mTouchedSignal;
 }
 
 Dali::Stage::WheelEventSignalType& Stage::WheelEventSignal()
@@ -390,7 +391,7 @@ Stage::Stage( SceneGraph::UpdateManager& updateManager )
   mKeyEventSignal(),
   mKeyEventGeneratedSignal(),
   mEventProcessingFinishedSignal(),
-  mTouchSignal(),
+  mTouchedSignal(),
   mWheelEventSignal(),
   mContextLostSignal(),
   mContextRegainedSignal(),

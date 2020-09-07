@@ -64,7 +64,7 @@ protected:
   /**
    * Protected constructor.  Cannot create an instance of GestureProcessor
    */
-  GestureProcessor( Gesture::Type type );
+  GestureProcessor( GestureType::Value type );
 
   /**
    * Virtual protected destructor.
@@ -190,7 +190,7 @@ protected:  //Data
 
 private: // Data
 
-  Gesture::Type mType;                 ///< Type of GestureProcessor
+  GestureType::Value mType;            ///< Type of GestureProcessor
   Actor* mCurrentGesturedActor;        ///< The current actor that has been gestured.
   bool   mGesturedActorDisconnected:1; ///< Indicates whether the gestured actor has been disconnected from the scene
 };

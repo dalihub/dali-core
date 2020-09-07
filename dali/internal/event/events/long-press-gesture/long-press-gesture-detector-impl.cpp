@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/long-press-gesture.h>
+
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 
@@ -72,14 +72,14 @@ LongPressGestureDetectorPtr LongPressGestureDetector::New(unsigned int minTouche
 }
 
 LongPressGestureDetector::LongPressGestureDetector()
-: GestureDetector(Gesture::LongPress),
+: GestureDetector(GestureType::LONG_PRESS),
   mMinimumTouchesRequired(DEFAULT_TOUCHES_REQUIRED),
   mMaximumTouchesRequired(DEFAULT_TOUCHES_REQUIRED)
 {
 }
 
 LongPressGestureDetector::LongPressGestureDetector(unsigned int minTouches, unsigned int maxTouches)
-: GestureDetector(Gesture::LongPress),
+: GestureDetector(GestureType::LONG_PRESS),
   mMinimumTouchesRequired(minTouches),
   mMaximumTouchesRequired(maxTouches)
 {
@@ -132,7 +132,7 @@ unsigned int LongPressGestureDetector::GetMaximumTouchesRequired() const
   return mMaximumTouchesRequired;
 }
 
-void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedActor, const LongPressGesture& longPress)
+void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedActor, const Dali::LongPressGesture& longPress)
 {
   // Guard against destruction during signal emission
   Dali::LongPressGestureDetector handle( this );

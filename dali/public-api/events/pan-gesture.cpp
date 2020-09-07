@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,73 +20,81 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 
 namespace Dali
 {
 
-PanGesture::PanGesture()
-: Gesture(Gesture::Pan, Gesture::Clear),
-  numberOfTouches(1)
+PanGesture::PanGesture( Internal::PanGesture* internal )
+: Gesture( internal )
 {
 }
 
-PanGesture::PanGesture(Gesture::State state)
-: Gesture(Gesture::Pan, state),
-  numberOfTouches(1)
+PanGesture::PanGesture() = default;
+
+PanGesture::PanGesture( const PanGesture& rhs ) = default;
+
+PanGesture::PanGesture( PanGesture&& rhs ) = default;
+
+PanGesture& PanGesture::operator=( const PanGesture& rhs ) = default;
+
+PanGesture& PanGesture::operator=( PanGesture&& rhs ) = default;
+
+PanGesture::~PanGesture() = default;
+
+const Vector2& PanGesture::GetVelocity() const
 {
+  return GetImplementation( *this ).GetVelocity();
 }
 
-PanGesture::PanGesture( const PanGesture& rhs )
-: Gesture( rhs ),
-  velocity( rhs.velocity ),
-  displacement( rhs.displacement ),
-  position( rhs.position ),
-  screenVelocity( rhs.screenVelocity ),
-  screenDisplacement( rhs.screenDisplacement ),
-  screenPosition( rhs.screenPosition ),
-  numberOfTouches( rhs.numberOfTouches )
+const Vector2& PanGesture::GetDisplacement() const
 {
+  return GetImplementation( *this ).GetDisplacement();
 }
 
-PanGesture& PanGesture::operator=( const PanGesture& rhs )
+const Vector2& PanGesture::GetPosition() const
 {
-  if( this != &rhs )
-  {
-    Gesture::operator=(rhs);
-    velocity = rhs.velocity;
-    displacement = rhs.displacement;
-    position = rhs.position;
-    screenVelocity = rhs.screenVelocity;
-    screenDisplacement = rhs.screenDisplacement;
-    screenPosition = rhs.screenPosition;
-    numberOfTouches = rhs.numberOfTouches;
-  }
-
-  return *this;
+  return GetImplementation( *this ).GetPosition();
 }
 
-PanGesture::~PanGesture()
+const Vector2& PanGesture::GetScreenVelocity() const
 {
+  return GetImplementation( *this ).GetScreenVelocity();
+}
+
+const Vector2& PanGesture::GetScreenDisplacement() const
+{
+  return GetImplementation( *this ).GetScreenDisplacement();
+}
+
+const Vector2& PanGesture::GetScreenPosition() const
+{
+  return GetImplementation( *this ).GetScreenPosition();
+}
+
+uint32_t PanGesture::GetNumberOfTouches() const
+{
+  return GetImplementation( *this ).GetNumberOfTouches();
 }
 
 float PanGesture::GetSpeed() const
 {
-  return velocity.Length();
+  return GetImplementation( *this ).GetSpeed();
 }
 
 float PanGesture::GetDistance() const
 {
-  return displacement.Length();
+  return GetImplementation( *this ).GetDistance();
 }
 
 float PanGesture::GetScreenSpeed() const
 {
-  return screenVelocity.Length();
+  return GetImplementation( *this ).GetScreenSpeed();
 }
 
 float PanGesture::GetScreenDistance() const
 {
-  return screenDisplacement.Length();
+  return GetImplementation( *this ).GetScreenDistance();
 }
 
 } // namespace Dali

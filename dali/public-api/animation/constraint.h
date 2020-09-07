@@ -276,11 +276,11 @@ public:
    */
   enum RemoveAction
   {
-    Bake,   ///< When the constraint is fully-applied, the constrained value is saved. @SINCE_1_0.0
-    Discard ///< When the constraint is removed, the constrained value is discarded. @SINCE_1_0.0
+    BAKE,   ///< When the constraint is fully-applied, the constrained value is saved. @SINCE_1_9.28
+    DISCARD ///< When the constraint is removed, the constrained value is discarded. @SINCE_1_9.28
   };
 
-  static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< Bake
+  static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< BAKE
 
   /**
    * @brief Creates an uninitialized Constraint; this can be initialized with Constraint::New().
@@ -489,10 +489,10 @@ public:
   Dali::Property::Index GetTargetProperty();
 
   /**
-   * @brief Sets the remove action. Constraint::Bake will "bake" a value when fully-applied.
+   * @brief Sets the remove action. Constraint::BAKE will "bake" a value when fully-applied.
    *
-   * In case of Constraint::Discard, the constrained value will be discarded, when the constraint is removed.
-   * The default value is Constraint::Bake.
+   * In case of Constraint::DISCARD, the constrained value will be discarded, when the constraint is removed.
+   * The default value is Constraint::BAKE.
    * @SINCE_1_0.0
    * @param[in] action The remove-action
    */

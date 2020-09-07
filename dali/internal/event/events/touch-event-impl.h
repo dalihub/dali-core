@@ -49,13 +49,16 @@ public:
   /**
    * @brief Default constructor
    */
-  TouchEvent();
+  TouchEvent() = default;
 
   /**
    * @brief Constructor
    * @param[in]  time  The time the event occurred
    */
-  TouchEvent( unsigned long time );
+  TouchEvent( unsigned long time )
+  : mTime( time )
+  {
+  }
 
   /**
    * @brief Clones the TouchEvent object.
@@ -66,22 +69,28 @@ public:
    */
   static TouchEventPtr Clone( const TouchEvent& other );
 
-  /**
-   * @brief Destructor
-   */
-  ~TouchEvent();
+  TouchEvent( const TouchEvent& other ) = delete; ///< Deleted copy constructor.
+  TouchEvent( TouchEvent&& other ) = delete; ///< Deleted move constructor.
+  TouchEvent& operator=( const TouchEvent& other ) = delete; ///< Deleted copy assignment operator.
+  TouchEvent& operator=( TouchEvent&& other ) = delete; ///< Deleted move assignment operator.
 
   // Getters
 
   /**
    * @copydoc Dali::TouchEvent::GetTime()
    */
-  unsigned long GetTime() const;
+  inline unsigned long GetTime() const
+  {
+    return mTime;
+  }
 
   /**
    * @copydoc Dali::TouchEvent::GetPointCount()
    */
-  std::size_t GetPointCount() const;
+  inline std::size_t GetPointCount() const
+  {
+    return mPoints.size();
+  }
 
   /**
    * @copydoc Dali::TouchEvent::GetDeviceId()
@@ -150,14 +159,6 @@ public:
    */
   Integration::Point& GetPoint( std::size_t point );
 
-  // Setters
-
-  /**
-   * @brief Adds a point to this touch event handler.
-   * @param[in]  point  The point to add to the touch event handler.
-   */
-  void AddPoint( const Integration::Point& point );
-
   /**
    * @brief Get the device class the mouse/touch event originated from
    *
@@ -179,19 +180,27 @@ public:
    */
   MouseButton::Type GetMouseButton( std::size_t point ) const;
 
+  // Setters
+
+  /**
+   * @brief Adds a point to this touch event handler.
+   * @param[in]  point  The point to add to the touch event handler.
+   */
+  void AddPoint( const Integration::Point& point );
 
 private:
 
-  /// Undefined Copy constructor
-  TouchEvent( const TouchEvent& other );
-
-  /// Undefined
-  TouchEvent& operator=( const TouchEvent& other );
+  /**
+   * @brief Virtual Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~TouchEvent() = default;
 
 private:
 
   std::vector< Integration::Point > mPoints; ///< Container of the points for this touch event.
-  unsigned long mTime; ///< The time (in ms) that the touch event occurred.
+  unsigned long mTime{0u}; ///< The time (in ms) that the touch event occurred.
 };
 
 } // namespace Internal

@@ -999,69 +999,6 @@ int UtcDaliCustomActorSizeComponentAnimation(void)
   END_TEST;
 }
 
-int UtcDaliCustomActorOnHoverEvent(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::CustomActor::OnHoverEvent()");
-
-  Test::TestCustomActor custom = Test::TestCustomActor::New();
-  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-
-  // set size for custom actor
-  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
-  // add the custom actor to stage
-  application.GetScene().Add( custom );
-  custom.ResetCallStack();
-
-  // Render and notify a couple of times
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-
-  // simulate a hover event
-  Dali::Integration::Point point;
-  point.SetState( PointState::MOTION );
-  point.SetScreenPosition( Vector2( 1, 1 ) );
-  Dali::Integration::HoverEvent event;
-  event.AddPoint( point );
-  application.ProcessEvent( event );
-
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnHoverEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliCustomActorOnWheelEvent(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::CustomActor::OnWheelEvent()");
-
-  Test::TestCustomActor custom = Test::TestCustomActor::New();
-  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-
-  // set size for custom actor
-  custom.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
-  // add the custom actor to stage
-  application.GetScene().Add( custom );
-  custom.ResetCallStack();
-
-  // Render and notify a couple of times
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-
-  // simulate a wheel event
-  Vector2 screenCoordinates( 10.0f, 10.0f );
-  Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
-  application.ProcessEvent( event );
-
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnWheelEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliCustomActorImplOnPropertySet(void)
 {
   TestApplication application;
@@ -1408,15 +1345,13 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   { }
   virtual void OnChildRemove(Actor& child)
   { }
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
   { }
   virtual void OnSizeSet(const Vector3& targetSize)
   { }
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   { }
   virtual bool OnHoverEvent(const HoverEvent& event)
-  { return false; }
-  virtual bool OnKeyEvent(const KeyEvent& event)
   { return false; }
   virtual bool OnWheelEvent(const WheelEvent& event)
   { return false; }

@@ -392,7 +392,7 @@ protected:
    * @param [in] index The index of the property.
    * @param [in] propertyValue The value of the property.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) {}
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) {}
 
   /**
    * Retrieves the TypeInfo for this object. Only retrieves it from the type-registry once and then stores a pointer

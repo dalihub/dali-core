@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ PanGesture::~PanGesture()
   delete mProfiling;
 }
 
-void PanGesture::AddGesture( const Dali::PanGesture& gesture )
+void PanGesture::AddGesture( const Internal::PanGesture& gesture )
 {
   Dali::Mutex::ScopedLock lock( mMutex );
   mGestures[ mWritePosition ] = gesture;
@@ -267,13 +267,13 @@ bool PanGesture::ReadGestures( FrameGestureInfo& info, unsigned int currentTimes
 
     // add event to history
     mPanHistory.push_back( currentGesture );
-    if( currentGesture.state == Gesture::Started )
+    if( currentGesture.state == GestureState::STARTED )
     {
       info.justStarted = true;
       // clear just finished as we have started new pan
       info.justFinished = false;
     }
-    info.justFinished |= ( currentGesture.state == Gesture::Finished || currentGesture.state == Gesture::Cancelled );
+    info.justFinished |= ( currentGesture.state == GestureState::FINISHED || currentGesture.state == GestureState::CANCELLED );
 
     // Update our read position.
     previousReadPosition = mReadPosition;
@@ -304,7 +304,7 @@ bool PanGesture::ReadAndResampleGestures( FrameGestureInfo& info, unsigned int c
     info.frameGesture.screen.velocity += lastReadGesture.screen.velocity;
     info.frameGesture.local.velocity += lastReadGesture.local.velocity;
 
-    if( lastReadGesture.state == Gesture::Started )
+    if( lastReadGesture.state == GestureState::STARTED )
     {
       // Clear just finished as we have started new pan.
       info.justFinished = false;
@@ -312,7 +312,7 @@ bool PanGesture::ReadAndResampleGestures( FrameGestureInfo& info, unsigned int c
     }
     else
     {
-      info.justFinished |= ( lastReadGesture.state == Gesture::Finished || lastReadGesture.state == Gesture::Cancelled );
+      info.justFinished |= ( lastReadGesture.state == GestureState::FINISHED || lastReadGesture.state == GestureState::CANCELLED );
     }
 
     // Add event to history
@@ -759,7 +759,7 @@ bool PanGesture::InputRateConversion( PanInfo& rateConvertedGesture, unsigned in
           readGesture.screen.displacement, readGesture.screen.velocity, readGesture.state ) );
     }
 
-    if( readGesture.state == Gesture::Started )
+    if( readGesture.state == GestureState::STARTED )
     {
       // Clear pan data.
       mPanHistory.clear();
@@ -792,7 +792,7 @@ bool PanGesture::InputRateConversion( PanInfo& rateConvertedGesture, unsigned in
     }
     else
     {
-      justFinished |= ( readGesture.state == Gesture::Finished || readGesture.state == Gesture::Cancelled );
+      justFinished |= ( readGesture.state == GestureState::FINISHED || readGesture.state == GestureState::CANCELLED );
     }
 
     rateConvertedGesture.screen.position += readGesture.screen.position;

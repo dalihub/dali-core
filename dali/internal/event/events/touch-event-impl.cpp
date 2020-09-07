@@ -27,38 +27,12 @@ namespace Dali
 namespace Internal
 {
 
-TouchEvent::TouchEvent()
-: mPoints(),
-  mTime( 0 )
-{
-}
-
-TouchEvent::TouchEvent( unsigned long time )
-: mPoints(),
-  mTime( time )
-{
-}
-
 TouchEventPtr TouchEvent::Clone( const TouchEvent& other )
 {
   TouchEventPtr touchEvent( new TouchEvent );
   touchEvent->mPoints = other.mPoints;
   touchEvent->mTime = other.mTime;
   return touchEvent;
-}
-
-TouchEvent::~TouchEvent()
-{
-}
-
-unsigned long TouchEvent::GetTime() const
-{
-  return mTime;
-}
-
-std::size_t TouchEvent::GetPointCount() const
-{
-  return mPoints.size();
 }
 
 int32_t TouchEvent::GetDeviceId( std::size_t point ) const
@@ -154,11 +128,6 @@ Integration::Point& TouchEvent::GetPoint( std::size_t point )
   return mPoints[ point ];
 }
 
-void TouchEvent::AddPoint( const Integration::Point& point )
-{
-  mPoints.push_back( point );
-}
-
 Device::Class::Type TouchEvent::GetDeviceClass( std::size_t point ) const
 {
   if( point < mPoints.size() )
@@ -184,6 +153,11 @@ MouseButton::Type TouchEvent::GetMouseButton( std::size_t point ) const
     return mPoints[ point ].GetMouseButton();
   }
   return MouseButton::INVALID;
+}
+
+void TouchEvent::AddPoint( const Integration::Point& point )
+{
+  mPoints.push_back( point );
 }
 
 } // namsespace Internal
