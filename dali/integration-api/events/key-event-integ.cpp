@@ -87,18 +87,6 @@ KeyEvent::~KeyEvent()
 {
 }
 
-Dali::KeyEvent KeyEvent::Convert( const Dali::Integration::KeyEvent& event )
-{
-  Dali::KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state));
-  GetImplementation( &keyEvent )->SetLogicalKey( event.logicalKey );
-  GetImplementation( &keyEvent )->SetCompose( event.compose );
-  GetImplementation( &keyEvent )->SetDeviceName( event.deviceName );
-  GetImplementation( &keyEvent )->SetDeviceClass( event.deviceClass );
-  GetImplementation( &keyEvent )->SetDeviceSubclass( event.deviceSubclass );
-
-  return keyEvent;
-}
-
 } // namespace Integration
 
 } // namespace Dali
