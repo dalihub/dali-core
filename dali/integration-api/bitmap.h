@@ -349,7 +349,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Bitmap();
+  ~Bitmap() override;
 
 protected:
 

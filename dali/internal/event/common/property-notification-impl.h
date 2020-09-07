@@ -167,7 +167,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PropertyNotification();
+  ~PropertyNotification() override;
 
 private:
 

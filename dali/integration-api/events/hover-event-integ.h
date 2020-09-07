@@ -52,7 +52,7 @@ struct DALI_CORE_API HoverEvent : public MultiPointEvent
   /**
    * Virtual destructor
    */
-  virtual ~HoverEvent();
+  ~HoverEvent() override;
 };
 
 } // namespace Integration

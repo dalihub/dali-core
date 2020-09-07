@@ -90,14 +90,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~Message()
+  ~Message() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)();
   }
@@ -143,14 +143,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue1()
+  ~MessageValue1() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1 );
   }
@@ -201,14 +201,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue2()
+  ~MessageValue2() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2 );
   }
@@ -262,14 +262,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue3()
+  ~MessageValue3() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3 );
   }
@@ -327,14 +327,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue4()
+  ~MessageValue4() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4 );
   }
@@ -396,14 +396,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue5()
+  ~MessageValue5() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4, param5 );
   }
@@ -469,14 +469,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageValue6()
+  ~MessageValue6() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     (object->*memberFunction)( param1, param2, param3, param4, param5, param6 );
   }
@@ -522,14 +522,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered0()
+  ~MessageDoubleBuffered0() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex );
   }
@@ -576,14 +576,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered1()
+  ~MessageDoubleBuffered1() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex,  param );
   }
@@ -633,14 +633,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered2()
+  ~MessageDoubleBuffered2() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3 );
   }
@@ -695,14 +695,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered3()
+  ~MessageDoubleBuffered3() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3, param4 );
   }
@@ -760,14 +760,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MessageDoubleBuffered4()
+  ~MessageDoubleBuffered4() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex bufferIndex )
+  void Process( BufferIndex bufferIndex ) override
   {
     (object->*memberFunction)( bufferIndex, param2, param3, param4, param5 );
   }

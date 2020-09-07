@@ -70,7 +70,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~RenderTask();
+  ~RenderTask() override;
 
   /**
    * Initialize the render task. Called in update thread
@@ -342,17 +342,17 @@ private: // from PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )
    */
-  void PropertyOwnerConnected( PropertyOwner& owner );
+  void PropertyOwnerConnected( PropertyOwner& owner ) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner );
+  void PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner ) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )
    */
-  void PropertyOwnerDestroyed( PropertyOwner& owner );
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override;
 
 private:
 

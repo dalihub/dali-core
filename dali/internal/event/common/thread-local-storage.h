@@ -196,7 +196,7 @@ private:
   /**
    * Virtual Destructor
    */
-  virtual ~ThreadLocalStorage();
+  ~ThreadLocalStorage() override;
 
   // Undefined
   ThreadLocalStorage( const ThreadLocalStorage& );

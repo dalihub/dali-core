@@ -52,7 +52,7 @@ public:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~ConnectionTracker();
+  ~ConnectionTracker() override;
 
   /**
    * @brief Disconnects all signals from this object.
@@ -63,12 +63,12 @@ public:
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback );
+  void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
+  void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @brief Returns the connection count.

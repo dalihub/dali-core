@@ -233,7 +233,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~AnimatablePropertyMetadata()
+  ~AnimatablePropertyMetadata() override
   {
   }
 
@@ -296,7 +296,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~CustomPropertyMetadata()
+  ~CustomPropertyMetadata() override
   {
   }
 

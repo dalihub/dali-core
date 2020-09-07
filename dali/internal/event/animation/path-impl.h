@@ -54,19 +54,19 @@ protected:
   /**
    * virtual destructor
    */
-  virtual ~Path();
+  ~Path() override;
 
 private:
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
    /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
 public:
 

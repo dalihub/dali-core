@@ -49,7 +49,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PropertyNotificationManager();
+  ~PropertyNotificationManager() override;
 
   /**
    * Called when a PropertyNotification is constructed.
@@ -66,7 +66,7 @@ private: // private virtual overrides
   /**
    * @copydoc PropertyNotifier::NotifyProperty
    */
-  virtual void NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity );
+  void NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity ) override;
 
 private:
 

@@ -88,7 +88,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PinchGestureDetector();
+  ~PinchGestureDetector() override;
 
 private:
 
@@ -101,17 +101,17 @@ private: // GestureDetector overrides
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
-  virtual void OnActorAttach(Actor& actor);
+  void OnActorAttach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
-  virtual void OnActorDetach(Actor& actor);
+  void OnActorDetach(Actor& actor) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
    */
-  virtual void OnActorDestroyed(Object& object);
+  void OnActorDestroyed(Object& object) override;
 
 private:
 

@@ -70,14 +70,14 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~CustomActor();
+  ~CustomActor() override;
 
 private:
 
   /**
    * @copydoc Internal::Actor::OnSceneConnectionExternal
    */
-  virtual void OnSceneConnectionExternal( int32_t depth )
+  void OnSceneConnectionExternal( int32_t depth ) override
   {
     mImpl->OnSceneConnection( depth );
   }
@@ -85,7 +85,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnSceneDisconnectionExternal
    */
-  virtual void OnSceneDisconnectionExternal()
+  void OnSceneDisconnectionExternal() override
   {
     mImpl->OnSceneDisconnection();
   }
@@ -93,7 +93,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnChildAdd
    */
-  virtual void OnChildAdd(Actor& child)
+  void OnChildAdd(Actor& child) override
   {
     Dali::Actor handle(&child);
     mImpl->OnChildAdd(handle);
@@ -102,7 +102,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnChildRemove
    */
-  virtual void OnChildRemove(Actor& child)
+  void OnChildRemove(Actor& child) override
   {
     Dali::Actor handle(&child);
     mImpl->OnChildRemove(handle);
@@ -111,7 +111,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnPropertySet
    */
-  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
+  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override
   {
     mImpl->OnPropertySet(index, propertyValue);
   }
@@ -119,7 +119,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnSizeSet
    */
-  virtual void OnSizeSet(const Vector3& targetSize)
+  void OnSizeSet(const Vector3& targetSize) override
   {
     mImpl->OnSizeSet(targetSize);
   }
@@ -127,7 +127,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnSizeAnimation
    */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
   {
     Dali::Animation animationHandle(&animation);
     mImpl->OnSizeAnimation(animationHandle, targetSize);
@@ -136,7 +136,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override
   {
     mImpl->OnRelayout( size, container );
   }
@@ -144,7 +144,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnSetResizePolicy
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override
   {
     mImpl->OnSetResizePolicy( policy, dimension );
   }
@@ -152,7 +152,7 @@ private:
   /**
    * @copydoc Internal::Actor::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize() const
+  Vector3 GetNaturalSize() const override
   {
     return mImpl->GetNaturalSize();
   }
@@ -160,7 +160,7 @@ private:
   /**
    * @copydoc Internal::Actor::CalculateChildSize
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+  float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override
   {
     return mImpl->CalculateChildSize( child, dimension );
   }
@@ -168,7 +168,7 @@ private:
   /**
    * @copydoc Internal::Actor::GetHeightForWidth
    */
-  virtual float GetHeightForWidth( float width )
+  float GetHeightForWidth( float width ) override
   {
     return mImpl->GetHeightForWidth( width );
   }
@@ -176,7 +176,7 @@ private:
   /**
    * @copydoc Internal::Actor::GetWidthForHeight
    */
-  virtual float GetWidthForHeight( float height )
+  float GetWidthForHeight( float height ) override
   {
     return mImpl->GetWidthForHeight( height );
   }
@@ -184,7 +184,7 @@ private:
   /**
    * @copydoc Internal::Actor::RelayoutDependentOnChildren
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
+  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override
   {
     return mImpl->RelayoutDependentOnChildren( dimension );
   }
@@ -192,7 +192,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnCalculateRelayoutSize
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
+  void OnCalculateRelayoutSize( Dimension::Type dimension ) override
   {
     return mImpl->OnCalculateRelayoutSize( dimension );
   }
@@ -200,7 +200,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnLayoutNegotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
+  void OnLayoutNegotiated( float size, Dimension::Type dimension ) override
   {
     return mImpl->OnLayoutNegotiated( size, dimension );
   }

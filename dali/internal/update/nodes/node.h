@@ -121,7 +121,7 @@ public:
    * @param[in] updated The updated flag
    * (used for partial rendering to mark an animating sub tree for example).
    */
-  virtual void SetUpdated(bool updated)
+  void SetUpdated(bool updated) override
   {
     mUpdated = updated;
 
@@ -798,12 +798,12 @@ public:
   /**
    * @copydoc UniformMap::Add
    */
-  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map );
+  void AddUniformMapping( OwnerPointer< UniformPropertyMapping >& map ) override;
 
   /**
    * @copydoc UniformMap::Remove
    */
-  void RemoveUniformMapping( const std::string& uniformName );
+  void RemoveUniformMapping( const std::string& uniformName ) override;
 
   /**
    * Prepare the node for rendering.
@@ -844,14 +844,14 @@ protected:
    * Protected virtual destructor; See also Node::Delete( Node* )
    * Kept protected to allow destructor chaining from layer
    */
-  virtual ~Node();
+  ~Node() override;
 
 private: // from NodeDataProvider
 
   /**
    * @copydoc NodeDataProvider::GetModelMatrix
    */
-  virtual const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetModelMatrix( BufferIndex bufferIndex ) const override
   {
     return GetWorldMatrix( bufferIndex );
   }
@@ -859,7 +859,7 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
-  virtual const Vector4& GetRenderColor( BufferIndex bufferIndex ) const
+  const Vector4& GetRenderColor( BufferIndex bufferIndex ) const override
   {
     return GetWorldColor( bufferIndex );
   }
@@ -868,7 +868,7 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMapChanged
    */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override
   {
     return mUniformMapChanged[bufferIndex];
   }
@@ -876,7 +876,7 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMap
    */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const
+  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override
   {
     return mCollectedUniformMap[bufferIndex];
   }

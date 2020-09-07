@@ -76,7 +76,7 @@ public:
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
    */
-  void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * Query the current depth of the layer
@@ -214,17 +214,17 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
 protected:
 
@@ -238,19 +238,19 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Layer();
+  ~Layer() override;
 
 private: // From Actor
 
   /**
    * From Actor.
    */
-  virtual void OnSceneConnectionInternal();
+  void OnSceneConnectionInternal() override;
 
   /**
    * From Actor.
    */
-  virtual void OnSceneDisconnectionInternal();
+  void OnSceneDisconnectionInternal() override;
 
 private:
 

@@ -124,7 +124,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~WheelEvent() = default;
+  ~WheelEvent() override = default;
 
   // Not copyable or movable
 

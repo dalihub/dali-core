@@ -68,7 +68,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~TypeInfo();
+  ~TypeInfo() override;
 
   /**
    * @copydoc Dali::TypeInfo::GetName

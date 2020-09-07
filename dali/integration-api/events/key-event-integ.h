@@ -80,7 +80,7 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * Virtual destructor
    */
-  virtual ~KeyEvent();
+  ~KeyEvent() override;
 
   // Data
 

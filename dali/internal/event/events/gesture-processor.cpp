@@ -46,19 +46,19 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
   {
   }
 
-  virtual bool IsActorHittable( Actor* actor )
+  bool IsActorHittable( Actor* actor ) override
   {
     return actor->IsGestureRequired( mType ) && // Does the Application or derived actor type require the gesture?
            actor->IsHittable();                 // Is actor sensitive, visible and on the scene?
   }
 
-  virtual bool DescendActorHierarchy( Actor* actor )
+  bool DescendActorHierarchy( Actor* actor ) override
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
   }
 
-  virtual bool DoesLayerConsumeHit( Layer* layer )
+  bool DoesLayerConsumeHit( Layer* layer ) override
   {
     return layer->IsTouchConsumed();
   }

@@ -82,7 +82,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Sampler();
+  ~Sampler() override;
 
 private: // data
   EventThreadServices& mEventThreadServices;    ///<Used to send messages to the render thread via the update thread

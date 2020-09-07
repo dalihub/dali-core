@@ -123,7 +123,7 @@ protected: // Creation & Destruction
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~GestureDetector();
+  ~GestureDetector() override;
 
 private:
 
@@ -135,17 +135,17 @@ private:
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(Object& object);
+  void SceneObjectAdded(Object& object) override;
 
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectRemoved(Object& object) {}
+  void SceneObjectRemoved(Object& object) override {}
 
   /**
    * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed(Object& object);
+  void ObjectDestroyed(Object& object) override;
 
   /**
    * For use in derived classes, called after an actor is attached.

@@ -77,7 +77,7 @@ protected:
    *
    * Release the pixel buffer if exists.
    */
-  ~PixelData();
+  ~PixelData() override;
 
 public:
 

@@ -47,7 +47,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyMessageBase();
+  ~NodePropertyMessageBase() override;
 
 private:
 
@@ -95,14 +95,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyMessage()
+  ~NodePropertyMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -175,14 +175,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodePropertyComponentMessage()
+  ~NodePropertyComponentMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -253,14 +253,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodeTransformPropertyMessage()
+  ~NodeTransformPropertyMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -331,14 +331,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~NodeTransformComponentMessage()
+  ~NodeTransformComponentMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }

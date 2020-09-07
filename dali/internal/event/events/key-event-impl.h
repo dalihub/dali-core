@@ -217,7 +217,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~KeyEvent() = default;
+  ~KeyEvent() override = default;
 
   // Not copyable or movable
 

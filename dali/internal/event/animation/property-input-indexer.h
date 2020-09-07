@@ -73,14 +73,14 @@ public:
   /**
    * Virtual Destructor
    */
-  virtual ~PropertyInputIndexer()
+  ~PropertyInputIndexer() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInput::GetType()
    */
-  virtual Property::Type GetType() const
+  Property::Type GetType() const override
   {
     return mInput->GetType();
   }
@@ -88,7 +88,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetBoolean()
    */
-  virtual const bool& GetBoolean() const
+  const bool& GetBoolean() const override
   {
     return mInput->GetConstraintInputBoolean( mBufferIndex );
   }
@@ -96,7 +96,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetInteger()
    */
-  virtual const int& GetInteger() const
+  const int& GetInteger() const override
   {
     return mInput->GetConstraintInputInteger( mBufferIndex );
   }
@@ -104,7 +104,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetFloat()
    */
-  virtual const float& GetFloat() const
+  const float& GetFloat() const override
   {
     return mInput->GetConstraintInputFloat( mBufferIndex );
   }
@@ -112,7 +112,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetVector2()
    */
-  virtual const Vector2& GetVector2() const
+  const Vector2& GetVector2() const override
   {
     return mInput->GetConstraintInputVector2( mBufferIndex );
   }
@@ -120,7 +120,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetVector3()
    */
-  virtual const Vector3& GetVector3() const
+  const Vector3& GetVector3() const override
   {
     return mInput->GetConstraintInputVector3( mBufferIndex );
   }
@@ -128,7 +128,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetVector4()
    */
-  virtual const Vector4& GetVector4() const
+  const Vector4& GetVector4() const override
   {
     return mInput->GetConstraintInputVector4( mBufferIndex );
   }
@@ -136,7 +136,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetMatrix3()
    */
-  virtual const Matrix3& GetMatrix3() const
+  const Matrix3& GetMatrix3() const override
   {
     return mInput->GetConstraintInputMatrix3( mBufferIndex );
   }
@@ -144,7 +144,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::GetMatrix()
    */
-  virtual const Matrix& GetMatrix() const
+  const Matrix& GetMatrix() const override
   {
     return mInput->GetConstraintInputMatrix( mBufferIndex );
   }
@@ -152,7 +152,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInput::Quaternion()
    */
-  virtual const Quaternion& GetQuaternion() const
+  const Quaternion& GetQuaternion() const override
   {
     return mInput->GetConstraintInputQuaternion( mBufferIndex );
   }

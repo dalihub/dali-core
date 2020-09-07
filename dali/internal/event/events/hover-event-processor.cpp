@@ -140,19 +140,19 @@ Dali::Actor EmitHoverSignals( Actor* actor, RenderTask& renderTask, const HoverE
  */
 struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
 {
-  bool IsActorHittable( Actor* actor )
+  bool IsActorHittable( Actor* actor ) override
   {
     return actor->GetHoverRequired() && // Does the Application or derived actor type require a hover event?
            actor->IsHittable();         // Is actor sensitive, visible and on the scene?
   }
 
-  bool DescendActorHierarchy( Actor* actor )
+  bool DescendActorHierarchy( Actor* actor ) override
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
   }
 
-  bool DoesLayerConsumeHit( Layer* layer )
+  bool DoesLayerConsumeHit( Layer* layer ) override
   {
     return layer->IsHoverConsumed();
   }

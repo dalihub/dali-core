@@ -56,7 +56,7 @@ public:
   /**
    * Non-virtual destructor; RotationGestureProcessor is not a base class
    */
-  ~RotationGestureProcessor() = default;
+  ~RotationGestureProcessor() override = default;
 
   RotationGestureProcessor( const RotationGestureProcessor& )                = delete; ///< Deleted copy constructor.
   RotationGestureProcessor& operator=( const RotationGestureProcessor& rhs ) = delete; ///< Deleted copy assignment operator.
@@ -68,7 +68,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the rotation gesture event occurs in.
    * @param[in] rotationEvent The event that has occurred.
    */
-  void Process( Scene& scene, const RotationGestureEvent& rotationEvent );
+  void Process( Scene& scene, const RotationGestureEvent& rotationEvent ) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -106,17 +106,17 @@ private:
   /**
    * @copydoc GestureProcessor::OnGesturedActorStageDisconnection()
    */
-  void OnGesturedActorStageDisconnection();
+  void OnGesturedActorStageDisconnection() override;
 
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
 
 private:
 

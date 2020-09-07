@@ -62,7 +62,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~PropertyCondition();
+  ~PropertyCondition() override;
 
 private:
 

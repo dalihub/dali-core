@@ -112,7 +112,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~LongPressGesture() = default;
+  ~LongPressGesture() override = default;
 
 private:
   Vector2 mScreenPoint;

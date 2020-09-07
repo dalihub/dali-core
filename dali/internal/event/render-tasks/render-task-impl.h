@@ -258,32 +258,32 @@ public: // Implementation of Object
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
-  virtual Property::Value GetDefaultProperty( Property::Index index ) const;
+  Property::Value GetDefaultProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCurrentValue()
    */
-  virtual Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const;
+  Property::Value GetDefaultPropertyCurrentValue( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
    */
-  virtual void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType );
+  void OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType ) override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
-  virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
+  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const override;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
-  virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
+  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const override;
 
 public: //signals
 
@@ -330,7 +330,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~RenderTask();
+  ~RenderTask() override;
 
 private: // not copyable
 

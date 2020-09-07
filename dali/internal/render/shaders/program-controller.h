@@ -99,7 +99,7 @@ public:
   /**
    * Destructor, non virtual as not a base class
    */
-  ~ProgramController();
+  ~ProgramController() override;
 
 public: // API
 
@@ -134,42 +134,42 @@ private: // From ProgramCache
   /**
    * @copydoc ProgramCache::GetGlAbstraction
    */
-  virtual Integration::GlAbstraction& GetGlAbstraction();
+  Integration::GlAbstraction& GetGlAbstraction() override;
 
   /**
    * @copydoc ProgramCache::GetProgram
    */
-  virtual Program* GetProgram( size_t shaderHash );
+  Program* GetProgram( size_t shaderHash ) override;
 
   /**
    * @copydoc ProgramCache::AddProgram
    */
-  virtual void AddProgram( size_t shaderHash, Program* program );
+  void AddProgram( size_t shaderHash, Program* program ) override;
 
   /**
    * @copydoc ProgramCache::GetCurrentProgram
    */
-  virtual Program* GetCurrentProgram();
+  Program* GetCurrentProgram() override;
 
   /**
    * @copydoc ProgramCache::SetCurrentProgram
    */
-  virtual void SetCurrentProgram( Program* program );
+  void SetCurrentProgram( Program* program ) override;
 
   /**
    * @copydoc ProgramCache::IsBinarySupported
    */
-  virtual bool IsBinarySupported();
+  bool IsBinarySupported() override;
 
   /**
    * @copydoc ProgramCache::ProgramBinaryFormat
    */
-  virtual GLenum ProgramBinaryFormat();
+  GLenum ProgramBinaryFormat() override;
 
   /**
    * @copydoc ProgramCache::StoreBinary
    */
-  virtual void StoreBinary( Internal::ShaderDataPtr programData );
+  void StoreBinary( Internal::ShaderDataPtr programData ) override;
 
 private: // not implemented as non-copyable
 

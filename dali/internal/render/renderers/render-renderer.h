@@ -94,12 +94,12 @@ public:
   /**
    * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
    */
-  void GlContextDestroyed();
+  void GlContextDestroyed() override;
 
   /**
    * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
    */
-  void GlCleanup();
+  void GlCleanup() override;
 
   /**
    * Create a new renderer instance
@@ -176,7 +176,7 @@ public:
   /**
    * Destructor
    */
-  ~Renderer();
+  ~Renderer() override;
 
   /**
    * Set the face-culling mode.

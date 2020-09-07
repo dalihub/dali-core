@@ -73,17 +73,17 @@ struct HitTestFunctionWrapper : public HitTestInterface
   {
   }
 
-  virtual bool IsActorHittable( Actor* actor )
+  bool IsActorHittable( Actor* actor ) override
   {
     return mFunc( Dali::Actor( actor ), Dali::HitTestAlgorithm::CHECK_ACTOR );
   }
 
-  virtual bool DescendActorHierarchy( Actor* actor )
+  bool DescendActorHierarchy( Actor* actor ) override
   {
     return mFunc( Dali::Actor( actor ), Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE );
   }
 
-  virtual bool DoesLayerConsumeHit( Layer* layer )
+  bool DoesLayerConsumeHit( Layer* layer ) override
   {
     // Layer::IsTouchConsumed() focuses on touch only. Here we are a wrapper for the public-api
     // where the caller may want to check for something completely different.
@@ -100,19 +100,19 @@ struct HitTestFunctionWrapper : public HitTestInterface
  */
 struct ActorTouchableCheck : public HitTestInterface
 {
-  virtual bool IsActorHittable( Actor* actor )
+  bool IsActorHittable( Actor* actor ) override
   {
     return actor->GetTouchRequired() && // Does the Application or derived actor type require a touch event?
            actor->IsHittable();         // Is actor sensitive, visible and on the scene?
   }
 
-  virtual bool DescendActorHierarchy( Actor* actor )
+  bool DescendActorHierarchy( Actor* actor ) override
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
   }
 
-  virtual bool DoesLayerConsumeHit( Layer* layer )
+  bool DoesLayerConsumeHit( Layer* layer ) override
   {
     return layer->IsTouchConsumed();
   }

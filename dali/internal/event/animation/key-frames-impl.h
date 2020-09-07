@@ -49,7 +49,7 @@ public:
   KeyFrames();
 
 protected:
-  virtual ~KeyFrames();
+  ~KeyFrames() override;
 
 private:
   /**
@@ -132,7 +132,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~KeyFrameSpec() {}
+  ~KeyFrameSpec() override {}
 };
 
 
@@ -196,7 +196,7 @@ protected:
   /**
    * Destructor. Ensure progress value pairs are cleared down
    */
-  virtual ~KeyFrameBaseSpec<V>()
+  ~KeyFrameBaseSpec<V>() override
   {
     delete mKeyFrames;
     mPVs.clear();
@@ -219,7 +219,7 @@ public:
    * Get the number of key frames
    * @return The size of the progress value vector
    */
-  virtual std::size_t GetNumberOfKeyFrames() const
+  std::size_t GetNumberOfKeyFrames() const override
   {
     return mPVs.size();
   }
@@ -240,7 +240,7 @@ public:
   /**
    * @copydoc KeyFrameSpec::GetKeyFrameAsValue()
    */
-  virtual void GetKeyFrameAsValue( std::size_t index, Property::Value& value )
+  void GetKeyFrameAsValue( std::size_t index, Property::Value& value ) override
   {
     value = mPVs[index].mValue;
   }

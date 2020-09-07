@@ -46,7 +46,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~MultiPointEvent();
+  ~MultiPointEvent() override;
 
 protected:
   /**

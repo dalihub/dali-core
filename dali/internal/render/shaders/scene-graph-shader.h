@@ -53,7 +53,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~Shader();
+  ~Shader() override;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are called during Update
@@ -131,7 +131,7 @@ public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
+  void UniformMappingsChanged( const UniformMap& mappings ) override;
 
 private: // Data
 

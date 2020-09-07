@@ -100,7 +100,7 @@ protected:
    * @brief A reference counted object may only be deleted by calling Unreference().
    * @SINCE_1_0.0
    */
-  virtual ~BaseObject();
+  ~BaseObject() override;
 
   /**
    * @brief Registers the object as created with the Object registry.

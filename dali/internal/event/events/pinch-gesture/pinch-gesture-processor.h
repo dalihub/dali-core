@@ -56,7 +56,7 @@ public:
   /**
    * Non-virtual destructor; PinchGestureProcessor is not a base class
    */
-  ~PinchGestureProcessor();
+  ~PinchGestureProcessor() override;
 
 public: // To be called by GestureEventProcessor
 
@@ -83,7 +83,7 @@ public: // To be called by GestureEventProcessor
    * @param[in] scene The scene the pinch gesture event occurs in.
    * @param[in] pinchEvent The event that has occurred.
    */
-  void Process( Scene& scene, const PinchGestureEvent& pinchEvent );
+  void Process( Scene& scene, const PinchGestureEvent& pinchEvent ) override;
 
   /**
    * Adds a gesture detector to this gesture processor.
@@ -120,17 +120,17 @@ private:
   /**
    * @copydoc GestureProcessor::OnGesturedActorStageDisconnection()
    */
-  void OnGesturedActorStageDisconnection();
+  void OnGesturedActorStageDisconnection() override;
 
   /**
    * @copydoc GestureProcessor::CheckGestureDetector()
    */
-  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) override;
 
   /**
    * @copydoc GestureProcessor::EmitGestureSignal()
    */
-  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) override;
 
 private:
 

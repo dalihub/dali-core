@@ -57,18 +57,18 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMapChanged()
    */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const = 0;
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override = 0;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::UniformMapDataProvider::GetUniformMap()
    */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const = 0;
+  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override = 0;
 
 protected:
   /**
    * Virtual destructor, this is an interface, no deletion through this interface
    */
-  virtual ~NodeDataProvider() { }
+  ~NodeDataProvider() override { }
 };
 
 } // SceneGraph

@@ -89,7 +89,7 @@ public:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~BaseSignal();
+  ~BaseSignal() override;
 
   /**
    * @brief Queries whether there are any connected slots.
@@ -474,7 +474,7 @@ private: // SlotObserver interface, to be told when a slot disconnects
   /**
    * @copydoc SlotObserver::SlotDisconnected
    */
-  virtual void SlotDisconnected( CallbackBase* callback );
+  void SlotDisconnected( CallbackBase* callback ) override;
 
 private:
 

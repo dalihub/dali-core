@@ -159,7 +159,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~RenderTaskList();
+  ~RenderTaskList() override;
 
   /**
    * 2nd-phase construction
@@ -171,7 +171,7 @@ private: // from CompleteNotificationInterface
   /**
    * @copydoc CompleteNotificationInterface::NotifyCompleted()
    */
-  virtual void NotifyCompleted();
+  void NotifyCompleted() override;
 
 private:
 

@@ -63,19 +63,19 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~LongPressGestureRecognizer();
+  ~LongPressGestureRecognizer() override;
 
 public:
 
   /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
-  virtual void SendEvent(const Integration::TouchEvent& event);
+  void SendEvent(const Integration::TouchEvent& event) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
-  virtual void Update(const GestureRequest& request);
+  void Update(const GestureRequest& request) override;
 
   /**
    * @brief This method sets the minimum holding time required to be recognized as a long press gesture

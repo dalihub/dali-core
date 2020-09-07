@@ -116,7 +116,7 @@ protected:
   /**
    * Virtual destructor.
    */
-  virtual ~GestureRecognizer() {}
+  ~GestureRecognizer() override {}
 
 protected:
   Vector2 mScreenSize;

@@ -146,7 +146,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~UpdateManager();
+  ~UpdateManager() override;
 
   // Node connection methods
 
@@ -337,7 +337,7 @@ public:
    * @brief Accept compiled shaders passed back on render thread for saving.
    * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
    */
-  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
+  void SaveBinary( Internal::ShaderDataPtr shaderData ) override;
 
   /**
    * @brief Set the destination for compiled shader binaries to be passed on to.
@@ -1328,14 +1328,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~IndexBufferMessage()
+  ~IndexBufferMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex /*bufferIndex*/ )
+  void Process( BufferIndex /*bufferIndex*/ ) override
   {
     DALI_ASSERT_DEBUG( mManager && "Message does not have an object" );
     mManager->SetIndexBuffer( mRenderGeometry, mIndices );

@@ -136,7 +136,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Texture();
+  ~Texture() override;
 
 private: // unimplemented methods
   Texture( const Texture& );
