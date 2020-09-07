@@ -36,8 +36,8 @@ namespace Dali
  * @{
  */
 
-typedef std::pair< Property::Key, Property::Value > KeyValuePair;
-typedef std::pair<std::string, Property::Value> StringValuePair;
+using KeyValuePair    = std::pair<Property::Key, Property::Value>;
+using StringValuePair = std::pair<std::string, Property::Value>;
 
 /**
  * @brief A Map of property values, the key type could be String or Property::Index.
@@ -46,8 +46,7 @@ typedef std::pair<std::string, Property::Value> StringValuePair;
 class DALI_CORE_API Property::Map
 {
 public:
-
-  typedef std::size_t SizeType;
+  using SizeType = std::size_t;
 
   /**
    * @brief Default constructor.

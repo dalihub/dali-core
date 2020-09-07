@@ -123,10 +123,9 @@ class Animation;
 class DALI_CORE_API Animation : public BaseHandle
 {
 public:
+  using AnimationSignalType = Signal<void( Animation& )>; ///< Animation finished signal type @SINCE_1_0.0
 
-  typedef Signal< void (Animation&) > AnimationSignalType; ///< Animation finished signal type @SINCE_1_0.0
-
-  typedef Any AnyFunction; ///< Interpolation function @SINCE_1_0.0
+  using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
 
   /**
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.

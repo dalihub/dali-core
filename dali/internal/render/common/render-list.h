@@ -28,8 +28,7 @@
 
 namespace Dali
 {
-
-typedef Rect<int> ClippingBox;
+using ClippingBox = Rect<int>;
 
 namespace Internal
 {
@@ -44,10 +43,10 @@ namespace SceneGraph
 
 class Layer;
 
-typedef OwnerContainer< RenderItem* > RenderItemContainer;
+using RenderItemContainer = OwnerContainer<RenderItem*>;
 
 struct RenderList;
-typedef OwnerContainer< RenderList* > RenderListContainer;
+using RenderListContainer = OwnerContainer<RenderList*>;
 
 /**
  * The RenderList structure provides the renderer with a list of renderers.

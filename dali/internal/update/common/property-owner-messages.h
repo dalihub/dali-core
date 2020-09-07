@@ -70,8 +70,7 @@ template< typename P >
 class AnimatablePropertyMessage : public PropertyOwnerMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, typename ParameterType< P >::PassingType );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, typename ParameterType<P>::PassingType );
 
   /**
    * Create a message.
@@ -149,8 +148,7 @@ template< typename P >
 class AnimatablePropertyComponentMessage : public PropertyOwnerMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, float );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, float );
 
   /**
    * Send a message.
@@ -225,7 +223,7 @@ private:
 
 inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<PropertyBase>& property )
 {
-  typedef MessageValue1< PropertyOwner, OwnerPointer<PropertyBase> > LocalType;
+  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<PropertyBase> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -236,7 +234,7 @@ inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServic
 
 inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer<ConstraintBase>& constraint )
 {
-  typedef MessageValue1< PropertyOwner, OwnerPointer<ConstraintBase> > LocalType;
+  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<ConstraintBase> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -250,7 +248,7 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
   // The update-thread can modify this object.
   ConstraintBase& constraint = const_cast< ConstraintBase& >( constConstraint );
 
-  typedef MessageValue1< PropertyOwner, ConstraintBase* > LocalType;
+  using LocalType = MessageValue1<PropertyOwner, ConstraintBase*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -261,7 +259,7 @@ inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, c
 
 inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, OwnerPointer< UniformPropertyMapping >& map )
 {
-  typedef MessageValue1< PropertyOwner, OwnerPointer< UniformPropertyMapping > > LocalType;
+  using LocalType = MessageValue1<PropertyOwner, OwnerPointer<UniformPropertyMapping> >;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -271,7 +269,7 @@ inline void AddUniformMapMessage( EventThreadServices& eventThreadServices, cons
 
 inline void RemoveUniformMapMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const std::string& uniformName )
 {
-  typedef MessageValue1< PropertyOwner, std::string > LocalType;
+  using LocalType = MessageValue1<PropertyOwner, std::string>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

@@ -35,8 +35,8 @@ namespace Internal
 {
 
 class PanGestureDetector;
-typedef IntrusivePtr<PanGestureDetector> PanGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<PanGestureDetector>::type PanGestureDetectorContainer;
+using PanGestureDetectorPtr       = IntrusivePtr<PanGestureDetector>;
+using PanGestureDetectorContainer = DerivedGestureDetectorContainer<PanGestureDetector>::type;
 
 namespace SceneGraph
 {
@@ -49,9 +49,8 @@ class PanGesture;
 class PanGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
-  typedef Dali::PanGestureDetector::AngleThresholdPair AngleThresholdPair;
-  typedef std::vector<AngleThresholdPair> AngleContainer;
+  using AngleThresholdPair = Dali::PanGestureDetector::AngleThresholdPair;
+  using AngleContainer     = std::vector<AngleThresholdPair>;
 
 public: // Creation
 

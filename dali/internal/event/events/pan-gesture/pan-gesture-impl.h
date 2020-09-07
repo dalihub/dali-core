@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class PanGesture;
-typedef IntrusivePtr< PanGesture > PanGesturePtr;
+using PanGesturePtr = IntrusivePtr<PanGesture>;
 
 /**
  * @copydoc Dali::PanGesture

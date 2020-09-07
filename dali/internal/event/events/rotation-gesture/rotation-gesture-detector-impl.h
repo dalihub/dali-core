@@ -31,8 +31,8 @@ namespace Internal
 
 class RotationGestureDetector;
 
-typedef IntrusivePtr<RotationGestureDetector> RotationGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<RotationGestureDetector>::type RotationGestureDetectorContainer;
+using RotationGestureDetectorPtr       = IntrusivePtr<RotationGestureDetector>;
+using RotationGestureDetectorContainer = DerivedGestureDetectorContainer<RotationGestureDetector>::type;
 
 /**
  * @copydoc Dali::RotationGestureDetector

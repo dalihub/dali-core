@@ -31,8 +31,8 @@ namespace
 {
 typedef std::vector< StringValuePair > StringValueContainer;
 
-typedef std::pair< Property::Index, Property::Value > IndexValuePair;
-typedef std::vector< IndexValuePair > IndexValueContainer;
+using IndexValuePair      = std::pair<Property::Index, Property::Value>;
+using IndexValueContainer = std::vector<IndexValuePair>;
 
 }; // unnamed namespace
 

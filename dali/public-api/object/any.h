@@ -241,8 +241,9 @@ public:
   }
 
   struct AnyContainerBase;    // Forward declaration for typedef
-  typedef AnyContainerBase* (*CloneFunc)( const AnyContainerBase& base );
-  typedef void (*DeleteFunc)( const AnyContainerBase* base );
+  using CloneFunc = AnyContainerBase* (*)( const AnyContainerBase& );
+
+  using DeleteFunc = void ( * )( const AnyContainerBase* );
 
   /**
    * @brief Base container to hold type for match verification and instance cloning function.

@@ -85,13 +85,12 @@ class KeyEvent;
 class DALI_CORE_API Stage : public BaseHandle
 {
 public:
-
-  typedef Signal< void (const KeyEvent&) > KeyEventSignalType;       ///< Key event signal type
-  typedef Signal< void () > EventProcessingFinishedSignalType;       ///< Event Processing finished signal type
-  typedef Signal< void (const TouchEvent&) > TouchEventSignalType;   ///< Touch signal type
-  typedef Signal< void (const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type
-  typedef Signal< void () > ContextStatusSignal;                     ///< Context status signal type
-  typedef Signal< void () > SceneCreatedSignalType;                  ///< Scene created signal type
+  using KeyEventSignalType                = Signal<void( const KeyEvent& )>;   ///< Key event signal type
+  using EventProcessingFinishedSignalType = Signal<void()>;                    ///< Event Processing finished signal type
+  using TouchEventSignalType              = Signal<void( const TouchEvent& )>; ///< Touch signal type
+  using WheelEventSignalType              = Signal<void( const WheelEvent& )>; ///< Wheel signal type
+  using ContextStatusSignal               = Signal<void()>;                    ///< Context status signal type
+  using SceneCreatedSignalType            = Signal<void()>;                    ///< Scene created signal type
 
   /**
    * @brief Allows the creation of an empty stage handle.

@@ -28,10 +28,9 @@ namespace Dali
 
 namespace Integration
 {
-
-typedef std::vector< Point > PointContainer; ///< Container of points
-typedef PointContainer::iterator PointContainerIterator; ///< Iterator for Dali::Integration::PointContainer
-typedef PointContainer::const_iterator PointContainerConstIterator; ///< Const iterator for Dali::Integration::PointContainer
+using PointContainer              = std::vector<Point>;             ///< Container of points
+using PointContainerIterator      = PointContainer::iterator;       ///< Iterator for Dali::Integration::PointContainer
+using PointContainerConstIterator = PointContainer::const_iterator; ///< Const iterator for Dali::Integration::PointContainer
 
 /**
  * An instance of this structure should be used by the adaptor to send a multi-point event to Dali core.

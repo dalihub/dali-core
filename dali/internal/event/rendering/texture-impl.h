@@ -38,7 +38,7 @@ class Texture;
 }
 
 class Texture;
-typedef IntrusivePtr<Texture> TexturePtr;
+using TexturePtr = IntrusivePtr<Texture>;
 
 class Texture : public BaseObject
 {

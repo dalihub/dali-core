@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
+using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 /**
  * @brief ShaderFactory loads and saves shader binaries synchronously.

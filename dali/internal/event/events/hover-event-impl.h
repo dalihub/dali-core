@@ -32,7 +32,7 @@ namespace Internal
 {
 
 class HoverEvent;
-typedef IntrusivePtr< HoverEvent > HoverEventPtr;
+using HoverEventPtr = IntrusivePtr<HoverEvent>;
 
 /**
  * @copydoc Dali::HoverEvent

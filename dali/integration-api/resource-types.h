@@ -27,8 +27,7 @@
 
 namespace Dali
 {
-
-typedef Uint16Pair ImageDimensions;
+using ImageDimensions = Uint16Pair;
 
 namespace Integration
 {

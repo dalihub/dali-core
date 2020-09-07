@@ -124,7 +124,7 @@ protected:
   Scene* mScene;
 };
 
-typedef IntrusivePtr<GestureRecognizer> GestureRecognizerPtr;
+using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;
 
 } // namespace Internal
 

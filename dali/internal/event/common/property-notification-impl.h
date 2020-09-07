@@ -43,7 +43,7 @@ class PropertyNotification;
 class Object;
 class PropertyNotificationManager;
 
-typedef IntrusivePtr<PropertyNotification> PropertyNotificationPtr;
+using PropertyNotificationPtr = IntrusivePtr<PropertyNotification>;
 
 /**
  * PropertyNotification is a proxy for a SceneGraph::PropertyNotification object.
@@ -53,14 +53,13 @@ typedef IntrusivePtr<PropertyNotification> PropertyNotificationPtr;
 class PropertyNotification : public BaseObject
 {
 public:
-
-  typedef Dali::PropertyNotification::NotifyMode NotifyMode;
-  typedef PropertyCondition::Type ConditionType;
+  using NotifyMode    = Dali::PropertyNotification::NotifyMode;
+  using ConditionType = PropertyCondition::Type;
 
   /**
    * RawArgumentContainer provides fast direct access to arguments for condition evaluation.
    */
-  typedef Dali::Vector<float> RawArgumentContainer;
+  using RawArgumentContainer = Dali::Vector<float>;
 
   /**
    * Create a new PropertyNotification object.

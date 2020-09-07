@@ -219,7 +219,7 @@ public:
    * @brief Pointer-to-member type.
    * Objects can be implicitly converted to this for validity checks.
    */
-  typedef void (BaseHandle::*BooleanType)() const;
+  using BooleanType = void ( BaseHandle::* )() const;
 
   /**
    * @brief Converts an handle to a BooleanType.

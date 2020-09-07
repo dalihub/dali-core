@@ -30,8 +30,8 @@ namespace Internal
 
 class LongPressGestureDetector;
 
-typedef IntrusivePtr<LongPressGestureDetector> LongPressGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<LongPressGestureDetector>::type LongPressGestureDetectorContainer;
+using LongPressGestureDetectorPtr       = IntrusivePtr<LongPressGestureDetector>;
+using LongPressGestureDetectorContainer = DerivedGestureDetectorContainer<LongPressGestureDetector>::type;
 
 /**
  * @copydoc Dali::LongPressGestureDetector

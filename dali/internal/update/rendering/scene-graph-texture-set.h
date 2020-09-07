@@ -144,7 +144,7 @@ private: // Data
 
 inline void SetTextureMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Texture* texture )
 {
-  typedef MessageValue2< TextureSet, uint32_t, Render::Texture* > LocalType;
+  using LocalType = MessageValue2<TextureSet, uint32_t, Render::Texture*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -155,7 +155,7 @@ inline void SetTextureMessage( EventThreadServices& eventThreadServices, const T
 
 inline void SetSamplerMessage( EventThreadServices& eventThreadServices, const TextureSet& textureSet, uint32_t index, Render::Sampler* sampler )
 {
-  typedef MessageValue2< TextureSet, uint32_t, Render::Sampler* > LocalType;
+  using LocalType = MessageValue2<TextureSet, uint32_t, Render::Sampler*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

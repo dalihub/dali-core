@@ -34,7 +34,7 @@ namespace Internal
 class MessageBuffer
 {
 public:
-  typedef std::ptrdiff_t WordType;
+  using WordType = std::ptrdiff_t;
 
   /**
    * Create a new MessageBuffer

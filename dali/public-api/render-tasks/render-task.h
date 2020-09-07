@@ -131,7 +131,7 @@ public:
    * @brief Typedef for signals sent by this class.
    * @SINCE_1_0.0
    */
-  typedef Signal< void (RenderTask& source) > RenderTaskSignalType;
+  using RenderTaskSignalType = Signal<void( RenderTask& )>;
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
@@ -139,7 +139,7 @@ public:
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen
    * @return True if the conversion was successful, otherwise coordinates should be unmodified
    */
-  typedef bool (* ScreenToFrameBufferFunction)( Vector2& coordinates );
+  using ScreenToFrameBufferFunction = bool ( * )( Vector2& );
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
@@ -147,7 +147,7 @@ public:
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen
    * @return True if the conversion was successful, otherwise coordinates should be unmodified
    */
-  typedef bool (* const ConstScreenToFrameBufferFunction)( Vector2& coordinates );
+  using ConstScreenToFrameBufferFunction = bool ( *const )( Vector2& );
 
   /**
    * @brief The default conversion function returns false for any screen coordinates.

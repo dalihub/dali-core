@@ -226,133 +226,133 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex )
 
     if( mResendFlag & RESEND_DRAW_COMMANDS )
     {
-      typedef MessageValue2< Render::Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t > DerivedType;
+      using DerivedType = MessageValue2<Render::Renderer, Dali::DevelRenderer::DrawCommand*, uint32_t>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDrawCommands, mDrawCommands.data(), mDrawCommands.size() );
     }
 
     if( mResendFlag & RESEND_FACE_CULLING_MODE )
     {
-      typedef MessageValue1< Render::Renderer, FaceCullingMode::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, FaceCullingMode::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode );
     }
 
     if( mResendFlag & RESEND_BLEND_BIT_MASK )
     {
-      typedef MessageValue1< Render::Renderer, uint32_t > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask );
     }
 
     if( mResendFlag & RESEND_BLEND_COLOR )
     {
-      typedef MessageValue1< Render::Renderer, Vector4 > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, Vector4>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetBlendColor, GetBlendColor() );
     }
 
     if( mResendFlag & RESEND_PREMULTIPLIED_ALPHA  )
     {
-      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, bool>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled );
     }
 
     if( mResendFlag & RESEND_INDEXED_DRAW_FIRST_ELEMENT )
     {
-      typedef MessageValue1< Render::Renderer, uint32_t > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement );
     }
 
     if( mResendFlag & RESEND_INDEXED_DRAW_ELEMENTS_COUNT )
     {
-      typedef MessageValue1< Render::Renderer, uint32_t > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, uint32_t>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount );
     }
 
     if( mResendFlag & RESEND_DEPTH_WRITE_MODE )
     {
-      typedef MessageValue1< Render::Renderer, DepthWriteMode::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, DepthWriteMode::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode );
     }
 
     if( mResendFlag & RESEND_DEPTH_TEST_MODE )
     {
-      typedef MessageValue1< Render::Renderer, DepthTestMode::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, DepthTestMode::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthTestMode, mDepthTestMode );
     }
 
     if( mResendFlag & RESEND_DEPTH_FUNCTION )
     {
-      typedef MessageValue1< Render::Renderer, DepthFunction::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, DepthFunction::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction );
     }
 
     if( mResendFlag & RESEND_RENDER_MODE )
     {
-      typedef MessageValue1< Render::Renderer, RenderMode::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, RenderMode::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode );
     }
 
     if( mResendFlag & RESEND_STENCIL_FUNCTION )
     {
-      typedef MessageValue1< Render::Renderer, StencilFunction::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, StencilFunction::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction );
     }
 
     if( mResendFlag & RESEND_STENCIL_FUNCTION_MASK )
     {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask );
     }
 
     if( mResendFlag & RESEND_STENCIL_FUNCTION_REFERENCE )
     {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference );
     }
 
     if( mResendFlag & RESEND_STENCIL_MASK )
     {
-      typedef MessageValue1< Render::Renderer, int > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, int>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask );
     }
 
     if( mResendFlag & RESEND_STENCIL_OPERATION_ON_FAIL )
     {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail );
     }
 
     if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_FAIL )
     {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail );
     }
 
     if( mResendFlag & RESEND_STENCIL_OPERATION_ON_Z_PASS )
     {
-      typedef MessageValue1< Render::Renderer, StencilOperation::Type > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, StencilOperation::Type>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass );
     }
 
     if( mResendFlag & RESEND_SHADER )
     {
-      typedef MessageValue1< Render::Renderer, bool > DerivedType;
+      using DerivedType = MessageValue1<Render::Renderer, bool>;
       uint32_t* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
       new (slot) DerivedType( mRenderer, &Render::Renderer::SetShaderChanged, true );
     }

@@ -37,7 +37,7 @@ struct Sampler;
 }
 
 class Sampler;
-typedef IntrusivePtr<Sampler> SamplerPtr;
+using SamplerPtr = IntrusivePtr<Sampler>;
 
 /**
  * Sampler is an object that contains an array of structures of values that

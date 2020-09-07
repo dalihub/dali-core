@@ -35,7 +35,7 @@ namespace Internal
 {
 
 class TouchEvent;
-typedef IntrusivePtr< TouchEvent > TouchEventPtr;
+using TouchEventPtr = IntrusivePtr<TouchEvent>;
 
 /**
  * @copydoc Dali::TouchEvent

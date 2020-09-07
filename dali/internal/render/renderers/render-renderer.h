@@ -459,7 +459,7 @@ private:
     const PropertyInputImpl*   propertyValue;
   };
 
-  typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
+  using UniformIndexMappings = Dali::Vector<UniformIndexMap>;
 
   UniformIndexMappings         mUniformIndexMap;
   Vector<GLint>                mAttributesLocation;

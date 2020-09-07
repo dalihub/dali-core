@@ -35,9 +35,9 @@ namespace SceneGraph
 
 class Node;
 
-typedef Dali::Vector< Node* > NodeContainer;
-typedef NodeContainer::Iterator NodeIter;
-typedef NodeContainer::ConstIterator NodeConstIter;
+using NodeContainer = Dali::Vector<Node *>;
+using NodeIter      = NodeContainer::Iterator;
+using NodeConstIter = NodeContainer::ConstIterator;
 
 /**
  * Flag whether property has changed, during the Update phase.

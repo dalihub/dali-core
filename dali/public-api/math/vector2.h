@@ -478,7 +478,7 @@ public: // Data
  * @brief Size is an alias of Dali::Vector2.
  * @SINCE_1_0.0
  */
-typedef Vector2 Size;
+using Size = Vector2;
 
 /**
  * @brief Print a Vector2.

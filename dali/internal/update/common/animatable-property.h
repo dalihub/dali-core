@@ -2134,7 +2134,7 @@ void BakeMessage( EventThreadServices& eventThreadServices,
                   const SceneGraph::AnimatableProperty<T>& property,
                   typename ParameterType< T >::PassingType newValue )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, T > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, T>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -2150,7 +2150,7 @@ void BakeRelativeMessage( EventThreadServices& eventThreadServices,
                           const SceneGraph::AnimatableProperty<T>& property,
                           const T& delta )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, const T& > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, const T&>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -2166,7 +2166,7 @@ void SetXComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -2182,7 +2182,7 @@ void SetYComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -2198,7 +2198,7 @@ void SetZComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -2214,7 +2214,7 @@ void SetWComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
-  typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
+  using LocalType = MessageDoubleBuffered1<SceneGraph::AnimatableProperty<T>, float>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

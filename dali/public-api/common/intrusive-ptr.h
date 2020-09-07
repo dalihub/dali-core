@@ -254,7 +254,7 @@ public:
    *
    * Objects can be implicitly converted to this for validity checks.
    */
-  typedef void (IntrusivePtr::*BooleanType)() const;
+  using BooleanType = void ( IntrusivePtr<T>::* )() const;
 
   /**
    * @brief Converts an object handle to a BooleanType.

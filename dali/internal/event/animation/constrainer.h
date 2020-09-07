@@ -29,7 +29,7 @@ namespace Internal
 {
 
 typedef Dali::Vector<Object*>         ObjectContainer;
-typedef ObjectContainer::Iterator     ObjectIter;
+using ObjectIter = ObjectContainer::Iterator;
 
 /**
  * An abstract base class for constrainers.

@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class PinchGesture;
-typedef IntrusivePtr< PinchGesture > PinchGesturePtr;
+using PinchGesturePtr = IntrusivePtr<PinchGesture>;
 
 /**
  * @copydoc Dali::PinchGesture

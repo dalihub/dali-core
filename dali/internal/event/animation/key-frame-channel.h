@@ -61,7 +61,7 @@ template <typename V>
 class KeyFrameChannel : public KeyFrameChannelBase
 {
 public:
-  typedef std::vector<ProgressValue<V> > ProgressValues;
+  using ProgressValues = std::vector<ProgressValue<V> >;
 
   KeyFrameChannel(KeyFrameChannelId channel_id, ProgressValues& values )
   : KeyFrameChannelBase(channel_id),
@@ -191,13 +191,12 @@ V KeyFrameChannel<V>::GetValue (float progress, Dali::Animation::Interpolation i
   return interpolatedV;
 }
 
-typedef KeyFrameChannel<float>      KeyFrameChannelNumber;
-typedef KeyFrameChannel<Vector2>    KeyFrameChannelVector2;
-typedef KeyFrameChannel<Vector3>    KeyFrameChannelVector3;
-typedef KeyFrameChannel<Vector4>    KeyFrameChannelVector4;
-typedef KeyFrameChannel<Quaternion> KeyFrameChannelQuaternion;
-typedef KeyFrameChannel<AngleAxis>  KeyFrameChannelAngleAxis;
-
+using KeyFrameChannelNumber     = KeyFrameChannel<float>;
+using KeyFrameChannelVector2    = KeyFrameChannel<Vector2>;
+using KeyFrameChannelVector3    = KeyFrameChannel<Vector3>;
+using KeyFrameChannelVector4    = KeyFrameChannel<Vector4>;
+using KeyFrameChannelQuaternion = KeyFrameChannel<Quaternion>;
+using KeyFrameChannelAngleAxis  = KeyFrameChannel<AngleAxis>;
 
 } // Internal
 } // namespace Dali

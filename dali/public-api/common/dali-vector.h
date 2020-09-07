@@ -62,8 +62,7 @@ namespace Dali
 class DALI_CORE_API VectorBase
 {
 public: // Typedefs
-
-  typedef std::size_t SizeType;
+  using SizeType = std::size_t;
 
 protected: // Construction
 
@@ -235,8 +234,7 @@ template< bool IsTrivial >
 class VectorAlgorithms : public VectorBase
 {
 protected: // API for deriving classes
-
-  typedef VectorBase::SizeType SizeType;
+  using SizeType = VectorBase::SizeType;
 
   /**
    * @brief Empty constructor.
@@ -420,10 +418,10 @@ public: // API
    * @brief Type definitions.
    * @SINCE_1_0.0
    */
-  typedef VectorBase::SizeType SizeType; ///< Size type @SINCE_1_0.0
-  typedef T* Iterator;  ///< Most simple Iterator is a pointer @SINCE_1_0.0
-  typedef const T* ConstIterator; ///< Const iterator @SINCE_1_0.0
-  typedef T  ItemType; ///< Item type @SINCE_1_0.0
+  using SizeType      = VectorBase::SizeType; ///< Size type @SINCE_1_0.0
+  using Iterator      = T*;                   ///< Most simple Iterator is a pointer @SINCE_1_0.0
+  using ConstIterator = const T*;             ///< Const iterator @SINCE_1_0.0
+  using ItemType      = T;                    ///< Item type @SINCE_1_0.0
 
   /**
    * @brief Enumeration for BaseType.

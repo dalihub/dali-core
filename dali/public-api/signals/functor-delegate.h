@@ -110,13 +110,13 @@ private:
    * @brief Used to call the correct function.
    * @SINCE_1_0.0
    */
-  typedef void (*Dispatcher)( void* objectPtr );
+  using Dispatcher = void ( * )( void* );
 
   /**
    * @brief Used to destroy mObjectPointer.
    * @SINCE_1_0.0
    */
-  typedef void(*Destructor)( void* objectPtr );
+  using Destructor = void ( * )( void* );
 
   /**
    * @brief Not defined.

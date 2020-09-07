@@ -56,7 +56,7 @@ struct Vector2;
 struct Vector3;
 struct Vector4;
 
-typedef Rect<float> Padding;      ///< Padding definition @SINCE_1_0.0
+using Padding = Rect<float>; ///< Padding definition @SINCE_1_0.0
 
 /**
  * @brief Actor is the primary object with which Dali applications interact.
@@ -730,13 +730,13 @@ public:
 
   // Typedefs
 
-  typedef Signal< bool (Actor, const TouchEvent&) > TouchEventSignalType;   ///< Touch signal type @SINCE_1_1.37
-  typedef Signal< bool (Actor, const HoverEvent&) > HoverSignalType;        ///< Hover signal type @SINCE_1_0.0
-  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;   ///< Wheel signal type @SINCE_1_0.0
-  typedef Signal< void (Actor) > OnSceneSignalType;                         ///< Scene connection signal type @SINCE_1_9.24
-  typedef Signal< void (Actor) > OffSceneSignalType;                        ///< Scene disconnection signal type @SINCE_1_9.24
-  typedef Signal< void (Actor) > OnRelayoutSignalType;                      ///< Called when the actor is relaid out @SINCE_1_0.0
-  typedef Signal< void ( Actor, LayoutDirection::Type ) > LayoutDirectionChangedSignalType; ///< Layout direction changes signal type. @SINCE_1_2.60
+  using TouchEventSignalType             = Signal<bool( Actor, const TouchEvent& )>;     ///< Touch signal type @SINCE_1_1.37
+  using HoverSignalType                  = Signal<bool( Actor, const HoverEvent& )>;     ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType             = Signal<bool( Actor, const WheelEvent& )>;     ///< Wheel signal type @SINCE_1_0.0
+  using OnSceneSignalType                = Signal<void( Actor )>;                        ///< Scene connection signal type @SINCE_1_9.24
+  using OffSceneSignalType               = Signal<void( Actor )>;                        ///< Scene disconnection signal type @SINCE_1_9.24
+  using OnRelayoutSignalType             = Signal<void( Actor )>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
+  using LayoutDirectionChangedSignalType = Signal<void( Actor, LayoutDirection::Type )>; ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
 

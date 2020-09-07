@@ -56,15 +56,15 @@ class RenderTask;
 class Renderer;
 class Scene;
 
-typedef std::vector< ActorPtr > ActorContainer;
-typedef ActorContainer::iterator ActorIter;
-typedef ActorContainer::const_iterator ActorConstIter;
+using ActorContainer = std::vector<ActorPtr>;
+using ActorIter      = ActorContainer::iterator;
+using ActorConstIter = ActorContainer::const_iterator;
 
-typedef std::vector< RendererPtr > RendererContainer;
-typedef RendererContainer::iterator RendererIter;
+using RendererContainer = std::vector<RendererPtr>;
+using RendererIter      = RendererContainer::iterator;
 
 class ActorDepthTreeNode;
-typedef Dali::Internal::MemoryPoolObjectAllocator< ActorDepthTreeNode > DepthNodeMemoryPool;
+using DepthNodeMemoryPool = Dali::Internal::MemoryPoolObjectAllocator<ActorDepthTreeNode>;
 
 /**
  * Actor is the primary object which Dali applications interact with.
@@ -112,7 +112,7 @@ public:
     Dimension::Type dimension;    ///< The dimension to hold
   };
 
-  typedef std::vector< ActorDimensionPair > ActorDimensionStack;
+  using ActorDimensionStack = std::vector<ActorDimensionPair>;
 
 public:
 

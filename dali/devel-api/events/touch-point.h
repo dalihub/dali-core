@@ -107,9 +107,9 @@ struct DALI_CORE_API TouchPoint
   Vector2 screen;
 };
 
-typedef std::vector<TouchPoint> TouchPointContainer; ///< Container of touch points. @SINCE_1_0.0
-typedef TouchPointContainer::iterator TouchPointContainerIterator; ///< Iterator for Dali::TouchPointContainer @SINCE_1_0.0
-typedef TouchPointContainer::const_iterator TouchPointContainerConstIterator; ///< Const iterator for Dali::TouchPointContainer @SINCE_1_0.0
+using TouchPointContainer              = std::vector<TouchPoint>;             ///< Container of touch points. @SINCE_1_0.0
+using TouchPointContainerIterator      = TouchPointContainer::iterator;       ///< Iterator for Dali::TouchPointContainer @SINCE_1_0.0
+using TouchPointContainerConstIterator = TouchPointContainer::const_iterator; ///< Const iterator for Dali::TouchPointContainer @SINCE_1_0.0
 
 /**
  * @}

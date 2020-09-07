@@ -32,8 +32,7 @@ namespace Internal
 {
 class KeyFrameSpec;
 class KeyFrames;
-typedef IntrusivePtr<KeyFrames> KeyFramesPtr;
-
+using KeyFramesPtr = IntrusivePtr<KeyFrames>;
 
 /**
  * KeyFrames class is responsible for creating and building a specialized KeyFrame class
@@ -146,8 +145,8 @@ template<typename V>
 class KeyFrameBaseSpec : public KeyFrameSpec
 {
 private:
-  typedef ProgressValue<V> PV;
-  typedef std::vector<PV> PVContainer;
+  using PV          = ProgressValue<V>;
+  using PVContainer = std::vector<PV>;
 
   PVContainer                    mPVs;       // The ProgressValue pairs
   KeyFrameChannel<V>*            mKeyFrames; // The key frame interpolator
@@ -268,22 +267,21 @@ public:
   }
 };
 
-typedef KeyFrameBaseSpec<float>          KeyFrameNumber;
-typedef KeyFrameBaseSpec<bool>           KeyFrameBoolean;
-typedef KeyFrameBaseSpec<int>            KeyFrameInteger;
-typedef KeyFrameBaseSpec<Vector2>        KeyFrameVector2;
-typedef KeyFrameBaseSpec<Vector3>        KeyFrameVector3;
-typedef KeyFrameBaseSpec<Vector4>        KeyFrameVector4;
-typedef KeyFrameBaseSpec<Quaternion>     KeyFrameQuaternion;
+using KeyFrameNumber     = KeyFrameBaseSpec<float>;
+using KeyFrameBoolean    = KeyFrameBaseSpec<bool>;
+using KeyFrameInteger    = KeyFrameBaseSpec<int>;
+using KeyFrameVector2    = KeyFrameBaseSpec<Vector2>;
+using KeyFrameVector3    = KeyFrameBaseSpec<Vector3>;
+using KeyFrameVector4    = KeyFrameBaseSpec<Vector4>;
+using KeyFrameQuaternion = KeyFrameBaseSpec<Quaternion>;
 
-typedef IntrusivePtr<KeyFrameBoolean>         KeyFrameBooleanPtr;
-typedef IntrusivePtr<KeyFrameNumber>          KeyFrameNumberPtr;
-typedef IntrusivePtr<KeyFrameInteger>         KeyFrameIntegerPtr;
-typedef IntrusivePtr<KeyFrameVector2>         KeyFrameVector2Ptr;
-typedef IntrusivePtr<KeyFrameVector3>         KeyFrameVector3Ptr;
-typedef IntrusivePtr<KeyFrameVector4>         KeyFrameVector4Ptr;
-typedef IntrusivePtr<KeyFrameQuaternion>      KeyFrameQuaternionPtr;
-
+using KeyFrameBooleanPtr    = IntrusivePtr<KeyFrameBoolean>;
+using KeyFrameNumberPtr     = IntrusivePtr<KeyFrameNumber>;
+using KeyFrameIntegerPtr    = IntrusivePtr<KeyFrameInteger>;
+using KeyFrameVector2Ptr    = IntrusivePtr<KeyFrameVector2>;
+using KeyFrameVector3Ptr    = IntrusivePtr<KeyFrameVector3>;
+using KeyFrameVector4Ptr    = IntrusivePtr<KeyFrameVector4>;
+using KeyFrameQuaternionPtr = IntrusivePtr<KeyFrameQuaternion>;
 
 inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameBoolean*& keyFrameSpec)
 {

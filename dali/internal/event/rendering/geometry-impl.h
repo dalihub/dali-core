@@ -41,7 +41,7 @@ class Geometry;
 }
 
 class Geometry;
-typedef IntrusivePtr<Geometry> GeometryPtr;
+using GeometryPtr = IntrusivePtr<Geometry>;
 
 /**
  * Geometry is an object that contains an array of structures of values that

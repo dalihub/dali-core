@@ -182,8 +182,8 @@ private: // Data
   Integration::GlAbstraction& mGlAbstraction;
   Program* mCurrentProgram;
 
-  typedef OwnerContainer< ProgramPair* > ProgramContainer;
-  typedef ProgramContainer::Iterator ProgramIterator;
+  using ProgramContainer = OwnerContainer<ProgramPair*>;
+  using ProgramIterator  = ProgramContainer::Iterator;
   ProgramContainer mProgramCache;
 
   GLint mProgramBinaryFormat;

@@ -54,7 +54,7 @@ struct Vector3;
  * @brief Pointer to Dali::CustomActorImpl object.
  * @SINCE_1_0.0
  */
-typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
+using CustomActorImplPtr = IntrusivePtr<CustomActorImpl>;
 
 /**
  * @brief CustomActorImpl is an abstract base class for custom control implementations.

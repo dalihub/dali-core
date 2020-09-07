@@ -29,7 +29,7 @@ namespace Internal
 {
 
 class BitmapPackedPixel;
-typedef IntrusivePtr<BitmapPackedPixel>        BitmapPackedPixelPtr;
+using BitmapPackedPixelPtr = IntrusivePtr<BitmapPackedPixel>;
 
 /**
  * BitmapPackedPixel class.

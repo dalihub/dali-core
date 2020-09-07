@@ -67,8 +67,7 @@ template< typename P >
 class NodePropertyMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, typename ParameterType< P >::PassingType );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, typename ParameterType<P>::PassingType );
 
   /**
    * Create a message.
@@ -148,8 +147,7 @@ template< typename P >
 class NodePropertyComponentMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(AnimatableProperty<P>::*MemberFunction)( BufferIndex, float );
+  using MemberFunction = void ( AnimatableProperty<P>::* )( BufferIndex, float );
 
   /**
    * Send a message.
@@ -227,8 +225,7 @@ template <typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, const P& );
+  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, const P& );
 
   /**
    * Create a message.
@@ -306,8 +303,7 @@ template <typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
 public:
-
-  typedef void(TransformManagerPropertyHandler<P>::*MemberFunction)( BufferIndex, float );
+  using MemberFunction = void ( TransformManagerPropertyHandler<P>::* )( BufferIndex, float );
 
   /**
    * Send a message.

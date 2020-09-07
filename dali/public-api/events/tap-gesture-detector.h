@@ -75,7 +75,7 @@ public: // Typedefs
    * @brief Signal type for detected signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( Actor, const TapGesture& ) > DetectedSignalType;
+  using DetectedSignalType = Signal<void( Actor, const TapGesture& )>;
 
 public: // Creation & Destruction
 

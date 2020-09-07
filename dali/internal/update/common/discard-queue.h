@@ -51,11 +51,10 @@ class Scene;
 class DiscardQueue
 {
 public:
-
-  typedef OwnerContainer< Shader* > ShaderQueue;
-  typedef OwnerContainer< Renderer* > RendererQueue;
-  typedef OwnerContainer< Camera* > CameraQueue;
-  typedef OwnerContainer< Scene* > SceneQueue;
+  using ShaderQueue   = OwnerContainer<Shader*>;
+  using RendererQueue = OwnerContainer<Renderer*>;
+  using CameraQueue   = OwnerContainer<Camera*>;
+  using SceneQueue    = OwnerContainer<Scene*>;
 
   /**
    * Create a new DiscardQueue.

@@ -136,7 +136,7 @@ enum Type
 
 } // namespace VisibilityChange
 
-typedef Signal< void ( Actor, bool, VisibilityChange::Type ) > VisibilityChangedSignalType; ///< Signal type of VisibilityChangedSignalType
+using VisibilityChangedSignalType = Signal<void( Actor, bool, VisibilityChange::Type )>; ///< Signal type of VisibilityChangedSignalType
 
 /**
  * @brief This signal is emitted when the visible property of this or a parent actor is changed.
@@ -161,9 +161,7 @@ DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor 
  */
 DALI_CORE_API Rect<> CalculateScreenExtents( Actor actor );
 
-
-
-typedef Signal< void (Actor) > ChildChangedSignalType; ///< Called when the actor has a child added or removed
+using ChildChangedSignalType = Signal<void( Actor )>; ///< Called when the actor has a child added or removed
 
 /**
  * @brief This signal is emitted when a child is added to this actor.
@@ -205,8 +203,7 @@ DALI_CORE_API ChildChangedSignalType& ChildAddedSignal( Actor actor );
  */
 DALI_CORE_API ChildChangedSignalType& ChildRemovedSignal( Actor actor );
 
-
-typedef Signal< void (Actor) > ChildOrderChangedSignalType; ///< Used when the actor's children have changed order
+using ChildOrderChangedSignalType = Signal<void( Actor )>; ///< Used when the actor's children have changed order
 
 /**
  * @brief This signal is emitted when an actor's children change their sibling order

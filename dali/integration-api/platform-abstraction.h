@@ -31,8 +31,8 @@ namespace Dali
 
 namespace Integration
 {
-typedef uint32_t ResourceId;
-typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
+using ResourceId      = uint32_t;
+using ResourcePointer = IntrusivePtr<Dali::RefObject>;
 
 /**
  * PlatformAbstraction is an abstract interface, used by Dali to access platform specific services.

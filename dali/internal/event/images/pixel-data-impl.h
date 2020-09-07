@@ -30,7 +30,7 @@ namespace Internal
 {
 
 class PixelData;
-typedef IntrusivePtr<PixelData> PixelDataPtr;
+using PixelDataPtr = IntrusivePtr<PixelData>;
 
 class PixelData : public BaseObject
 {

@@ -160,7 +160,7 @@ private:
 
   Layer* mRoot;        ///< The root layer that this ordered list of layers belong to
 
-  typedef std::vector<Layer*> LayerContainer;
+  using LayerContainer = std::vector<Layer*>;
 
   // Layers are not owned by the LayerList.
   // Each layer is responsible for registering & unregistering before the end of its life-time.

@@ -180,9 +180,9 @@ public:
     volatile bool read;
   };
 
-  typedef std::vector<PanInfo> PanInfoHistory;
-  typedef PanInfoHistory::iterator PanInfoHistoryIter;
-  typedef PanInfoHistory::const_iterator PanInfoHistoryConstIter;
+  using PanInfoHistory          = std::vector<PanInfo>;
+  using PanInfoHistoryIter      = PanInfoHistory::iterator;
+  using PanInfoHistoryConstIter = PanInfoHistory::const_iterator;
 
 private:
   static const unsigned int PAN_GESTURE_HISTORY = 30u;
@@ -410,11 +410,13 @@ private:
 
   // Struct to keep pairs of local and screen data together.
   // TODO: This can encapsulate some functionality also.
-  typedef struct
+  using RelativeVectors = struct
+
   {
     Vector2 local;
+
     Vector2 screen;
-  } RelativeVectors;
+  };
 
   /**
    * Houses new code to process input events and generate an output point.

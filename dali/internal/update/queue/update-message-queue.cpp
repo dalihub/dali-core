@@ -48,9 +48,9 @@ static const std::size_t MAX_FREE_BUFFER_COUNT = 3; // Allow this number of buff
 
 // A queue of message buffers
 typedef vector< MessageBuffer* > MessageBufferQueue;
-typedef MessageBufferQueue::iterator MessageBufferIter;
+using MessageBufferIter = MessageBufferQueue::iterator;
 
-typedef Dali::Mutex MessageQueueMutex;
+using MessageQueueMutex = Dali::Mutex;
 
 } // unnamed namespace
 

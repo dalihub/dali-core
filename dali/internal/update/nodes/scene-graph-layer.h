@@ -58,7 +58,7 @@ struct Renderable
   Renderer* mRenderer;
 };
 
-typedef Dali::Vector< Renderable > RenderableContainer;
+using RenderableContainer = Dali::Vector<Renderable>;
 
 /**
  * Layers have a "depth" relative to all other layers in the scene-graph.
@@ -70,8 +70,7 @@ typedef Dali::Vector< Renderable > RenderableContainer;
 class Layer : public Node
 {
 public:
-
-  typedef Dali::Layer::SortFunctionType SortFunctionType;
+  using SortFunctionType = Dali::Layer::SortFunctionType;
 
   // Creation methods
 
@@ -252,7 +251,7 @@ private:
  */
 inline void SetSortFunctionMessage( EventThreadServices& eventThreadServices, const Layer& layer, Dali::Layer::SortFunctionType function )
 {
-  typedef MessageValue1< Layer, Dali::Layer::SortFunctionType > LocalType;
+  using LocalType = MessageValue1<Layer, Dali::Layer::SortFunctionType>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -268,7 +267,7 @@ inline void SetSortFunctionMessage( EventThreadServices& eventThreadServices, co
  */
 inline void SetClippingMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool enabled )
 {
-  typedef MessageValue1< Layer, bool > LocalType;
+  using LocalType = MessageValue1<Layer, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -284,7 +283,7 @@ inline void SetClippingMessage( EventThreadServices& eventThreadServices, const 
  */
 inline void SetClippingBoxMessage( EventThreadServices& eventThreadServices, const Layer& layer, const Dali::ClippingBox& clippingbox )
 {
-  typedef MessageValue1< Layer, Dali::ClippingBox > LocalType;
+  using LocalType = MessageValue1<Layer, Dali::ClippingBox>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -302,7 +301,7 @@ inline void SetBehaviorMessage( EventThreadServices& eventThreadServices,
                                 const Layer& layer,
                                 Dali::Layer::Behavior behavior )
 {
-  typedef MessageValue1< Layer, Dali::Layer::Behavior > LocalType;
+  using LocalType = MessageValue1<Layer, Dali::Layer::Behavior>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -321,7 +320,7 @@ inline void SetBehaviorMessage( EventThreadServices& eventThreadServices,
  */
 inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool disable )
 {
-  typedef MessageValue1< Layer, bool > LocalType;
+  using LocalType = MessageValue1<Layer, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

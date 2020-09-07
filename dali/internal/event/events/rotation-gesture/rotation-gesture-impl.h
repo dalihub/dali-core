@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class RotationGesture;
-typedef IntrusivePtr< RotationGesture > RotationGesturePtr;
+using RotationGesturePtr = IntrusivePtr<RotationGesture>;
 
 /**
  * @copydoc Dali::RotationGesture

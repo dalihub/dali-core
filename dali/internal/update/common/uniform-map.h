@@ -40,7 +40,7 @@ namespace SceneGraph
 class UniformPropertyMapping
 {
 public:
-  typedef unsigned long Hash;
+  using Hash = unsigned long;
 
   /**
    * Constructor
@@ -151,10 +151,10 @@ private:
   void MappingChanged();
 
 private:
-  typedef OwnerContainer< UniformPropertyMapping* > UniformMapContainer;
-  typedef UniformMapContainer::Iterator UniformMapIter;
-  typedef Dali::Vector< Observer* > Observers;
-  typedef Observers::Iterator ObserversIter;
+  using UniformMapContainer = OwnerContainer<UniformPropertyMapping*>;
+  using UniformMapIter      = UniformMapContainer::Iterator;
+  using Observers           = Dali::Vector<Observer*>;
+  using ObserversIter       = Observers::Iterator;
 
   UniformMapContainer mUniformMaps; // Owner container of uniform maps
 

@@ -31,7 +31,7 @@ namespace Internal
 {
 
 class TapGesture;
-typedef IntrusivePtr< TapGesture > TapGesturePtr;
+using TapGesturePtr = IntrusivePtr<TapGesture>;
 
 /**
  * @copydoc Dali::TapGesture

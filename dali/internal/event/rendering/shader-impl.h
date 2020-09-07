@@ -36,7 +36,7 @@ class Shader;
 }
 
 class Shader;
-typedef IntrusivePtr<Shader> ShaderPtr;
+using ShaderPtr = IntrusivePtr<Shader>;
 
 /**
  * Shader is an object that contains an array of structures of values that

@@ -42,7 +42,7 @@ class TextureSet;
 
 
 class TextureSet;
-typedef IntrusivePtr<TextureSet> TextureSetPtr;
+using TextureSetPtr = IntrusivePtr<TextureSet>;
 
 /**
  * TextureSet is an object that holds all the textures used by a renderer

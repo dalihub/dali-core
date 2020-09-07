@@ -29,7 +29,7 @@ namespace Internal
 {
 
 class BitmapCompressed;
-typedef IntrusivePtr<BitmapCompressed>        BitmapCompressedPtr;
+using BitmapCompressedPtr = IntrusivePtr<BitmapCompressed>;
 
 /**
  * BitmapCompressed class.

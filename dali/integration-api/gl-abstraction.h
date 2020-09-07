@@ -60,30 +60,30 @@ namespace Dali
 
 /* OpenGL ES 2.0 */
 
-typedef void             GLvoid;
-typedef char             GLchar;
-typedef unsigned int     GLenum;
-typedef unsigned char    GLboolean;
-typedef unsigned int     GLbitfield;
-typedef int8_t           GLbyte;
-typedef short            GLshort;
-typedef int              GLint;
-typedef int              GLsizei;
-typedef uint8_t          GLubyte;
-typedef unsigned short   GLushort;
-typedef unsigned int     GLuint;
-typedef float            GLfloat;
-typedef float            GLclampf;
-typedef int              GLfixed;
-typedef signed long int  GLintptr;
-typedef signed long int  GLsizeiptr;
+using GLvoid     = void;
+using GLchar     = char;
+using GLenum     = unsigned int;
+using GLboolean  = unsigned char;
+using GLbitfield = unsigned int;
+using GLbyte     = int8_t;
+using GLshort    = short;
+using GLint      = int;
+using GLsizei    = int;
+using GLubyte    = uint8_t;
+using GLushort   = unsigned short;
+using GLuint     = unsigned int;
+using GLfloat    = float;
+using GLclampf   = float;
+using GLfixed    = int;
+using GLintptr   = long;
+using GLsizeiptr = long;
 
 /* OpenGL ES 3.0 */
 
-typedef unsigned short     GLhalf;
-typedef int64_t            GLint64;
-typedef uint64_t           GLuint64;
-typedef __GLsync* GLsync;
+using GLhalf   = unsigned short;
+using GLint64  = int64_t;
+using GLuint64 = uint64_t;
+using GLsync   = __GLsync*;
 
 namespace Integration
 {

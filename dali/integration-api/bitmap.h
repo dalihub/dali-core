@@ -42,8 +42,8 @@ namespace Integration
 DALI_CORE_API void ConvertToGlFormat(Pixel::Format pixelformat, unsigned& pixelDataType, unsigned& internalFormat);
 
 class Bitmap;
-typedef IntrusivePtr<Bitmap>    BitmapPtr;
-typedef uint8_t                 PixelBuffer;  ///< Pixel data buffers are composed of these
+using BitmapPtr   = IntrusivePtr<Bitmap>;
+using PixelBuffer = uint8_t; ///< Pixel data buffers are composed of these
 
 /**
  * Bitmap class.

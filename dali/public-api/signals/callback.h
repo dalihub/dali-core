@@ -106,13 +106,13 @@ public:
     // the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef R(*Dispatcher)(CallbackBase& base);
+      using Dispatcher      = R ( * )( CallbackBase& );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       returnVal = (*dispatcher)( callback );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
-      typedef R(*Function1)();
+      using Function1 = R ( * )();
       returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))();
     }
 
@@ -136,14 +136,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1);
+      using Dispatcher      = void ( * )( CallbackBase&, P1 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       (*dispatcher)( callback, param1 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(*Function1)(P1);
+      using Function1 = void ( * )( P1 );
       (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
     }
   }
@@ -167,14 +167,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1);
+      using Dispatcher      = R ( * )( CallbackBase&, P1 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       returnVal = (*dispatcher)( callback, param1 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(*Function1)(P1);
+      using Function1 = R ( * )( P1 );
       returnVal = (*(reinterpret_cast< Function1 >( callback.mFunction )))( param1 );
     }
 
@@ -199,14 +199,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1,P2);
+      using Dispatcher      = void ( * )( CallbackBase&, P1, P2 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       (*dispatcher)( callback, param1, param2 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(*Function2)(P1,P2);
+      using Function2 = void ( * )( P1, P2 );
       (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
     }
   }
@@ -231,14 +231,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1,P2);
+      using Dispatcher      = R ( * )( CallbackBase&, P1, P2 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       returnVal = (*dispatcher)( callback, param1, param2 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(*Function2)(P1,P2);
+      using Function2 = R ( * )( P1, P2 );
       returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2 );
     }
 
@@ -264,14 +264,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef void(*Dispatcher)(CallbackBase& base,P1,P2,P3);
+      using Dispatcher      = void ( * )( CallbackBase&, P1, P2, P3 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       (*dispatcher)( callback, param1, param2, param3 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef void(*Function2)(P1,P2,P3);
+      using Function2 = void ( * )( P1, P2, P3 );
       (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
     }
   }
@@ -297,14 +297,14 @@ public:
     // so the library containing the code has to be loaded, otherwise we crash boom bang
     if( callback.mImpl && callback.mImpl->mObjectPointer )
     {
-      typedef R(*Dispatcher)(CallbackBase& base,P1,P2,P3);
+      using Dispatcher      = R ( * )( CallbackBase&, P1, P2, P3 );
       Dispatcher dispatcher = reinterpret_cast< Dispatcher >( callback.mImpl->mMemberFunctionDispatcher );
       returnVal = (*dispatcher)( callback, param1, param2, param3 );
     }
     else if( !callback.mImpl && callback.mFunction )
     {
       // convert function type
-      typedef R(*Function2)(P1,P2,P3);
+      using Function2 = R ( * )( P1, P2, P3 );
       returnVal = (*(reinterpret_cast< Function2 >( callback.mFunction )))( param1, param2, param3 );
     }
 
@@ -317,25 +317,25 @@ protected: // Constructors for deriving classes
    * @brief Function with static linkage.
    * @SINCE_1_0.0
    */
-  typedef void(*Function)(void);
+  using Function = void ( * )();
 
   /**
    * @brief Member function.
    * @SINCE_1_0.0
    */
-  typedef void (CallbackBase::*MemberFunction)( void );
+  using MemberFunction = void ( CallbackBase::* )();
 
   /**
    * @brief Used to call the correct member function.
    * @SINCE_1_0.0
    */
-  typedef void (*Dispatcher)( CallbackBase& base );
+  using Dispatcher = void ( * )( CallbackBase& );
 
   /**
    * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned).
    * @SINCE_1_0.0
    */
-  typedef void(*Destructor)(void* object);
+  using Destructor = void ( * )( void* );
 
   /**
    * @brief Copy constructor operator not declared.
@@ -450,7 +450,7 @@ struct Dispatcher0
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)();
   }
@@ -474,7 +474,7 @@ struct Dispatcher1
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1);
+    using MemberFunction    = void ( T::* )( P1 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)( param1 );
   }
@@ -499,7 +499,7 @@ struct Dispatcher2
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1, P2);
+    using MemberFunction    = void ( T::* )( P1, P2 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)( param1, param2 );
   }
@@ -525,7 +525,7 @@ struct Dispatcher3
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(P1, P2, P3);
+    using MemberFunction    = void ( T::* )( P1, P2, P3 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)( param1, param2, param3 );
   }
@@ -549,7 +549,7 @@ struct DispatcherReturn0
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(void);
+    using MemberFunction    = R ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     return (object->*function)();
   }
@@ -574,7 +574,7 @@ struct DispatcherReturn1
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1);
+    using MemberFunction    = R ( T::* )( P1 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     return (object->*function)( param1 );
   }
@@ -600,7 +600,7 @@ struct DispatcherReturn2
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1, P2);
+    using MemberFunction    = R ( T::* )( P1, P2 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     return (object->*function)( param1, param2 );
   }
@@ -627,7 +627,7 @@ struct DispatcherReturn3
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef R(T::*MemberFunction)(P1, P2, P3);
+    using MemberFunction    = R ( T::* )( P1, P2, P3 );
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     return (object->*function)( param1, param2, param3 );
   }
@@ -836,7 +836,7 @@ struct VoidFunctorDispatcher0
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)();
   }
@@ -862,7 +862,7 @@ struct VoidFunctorDispatcher1
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
   }
@@ -889,7 +889,7 @@ struct VoidFunctorDispatcher2
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
   }
@@ -917,7 +917,7 @@ struct VoidFunctorDispatcher3
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
   }
@@ -943,7 +943,7 @@ struct VoidFunctorDispatcherReturn0
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
     return R();
@@ -971,7 +971,7 @@ struct VoidFunctorDispatcherReturn1
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
     return R();
@@ -1000,7 +1000,7 @@ struct VoidFunctorDispatcherReturn2
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
     return R();
@@ -1030,7 +1030,7 @@ struct VoidFunctorDispatcherReturn3
   {
     // "downcast" the object and function type back to the correct ones
     T* object = reinterpret_cast< T* >( callback.mImpl->mObjectPointer );
-    typedef void(T::*MemberFunction)(void);
+    using MemberFunction    = void ( T::* )();
     MemberFunction function = reinterpret_cast< MemberFunction >( callback.mMemberFunction );
     (object->*function)(/*ignore params*/);
     return R();

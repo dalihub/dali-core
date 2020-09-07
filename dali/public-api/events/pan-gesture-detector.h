@@ -92,10 +92,10 @@ public:
   };
 
   // Typedefs
-  typedef Signal< void ( Actor, const PanGesture& ) > DetectedSignalType; ///< Pan gesture detected signal type @SINCE_1_0.0
+  using DetectedSignalType = Signal<void( Actor, const PanGesture& )>; ///< Pan gesture detected signal type @SINCE_1_0.0
 
   // Directional Pan
-  typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction @SINCE_1_0.0
+  using AngleThresholdPair = std::pair<Radian, Radian>; ///< Range of angles for a direction @SINCE_1_0.0
 
   static const Radian DIRECTION_LEFT;       ///< For a left pan (-PI Radians).
   static const Radian DIRECTION_RIGHT;      ///< For a right pan (0 Radians).

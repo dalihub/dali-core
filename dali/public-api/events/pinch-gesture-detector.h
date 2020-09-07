@@ -66,7 +66,7 @@ public: // Typedefs
    * @brief Signal type.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( Actor, const PinchGesture& ) > DetectedSignalType;
+  using DetectedSignalType = Signal<void( Actor, const PinchGesture& )>;
 
 public: // Creation & Destruction
 

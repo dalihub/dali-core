@@ -30,7 +30,7 @@ namespace Internal
 {
 
 class Gesture;
-typedef IntrusivePtr<Gesture> GesturePtr;
+using GesturePtr = IntrusivePtr<Gesture>;
 
 /**
  * This is the abstract base structure for any gestures that the adaptor detects and wishes to send

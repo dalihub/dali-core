@@ -37,7 +37,7 @@ namespace Dali
  * This can only be used for images of up to 65535 x 65535 pixels.
  * @SINCE_1_0.0
  */
-typedef Dali::Uint16Pair ImageDimensions;
+using ImageDimensions = Dali::Uint16Pair;
 
 /**
  * @brief Fitting options, used when resizing images to fit desired dimensions.

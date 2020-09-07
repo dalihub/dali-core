@@ -49,9 +49,9 @@ class Quaternion;
 
 // Less opaque types for debugger
 typedef std::vector<Dali::Property::Value> DebugPropertyValueArray;
-typedef std::pair< Property::Index, Property::Value > DebugIndexValuePair;
-typedef std::vector<Dali::StringValuePair> DebugStringValueContainer;
-typedef std::vector< DebugIndexValuePair > DebugIndexValueContainer;
+using DebugIndexValuePair       = std::pair<Property::Index, Property::Value>;
+using DebugStringValueContainer = std::vector<Dali::StringValuePair>;
+using DebugIndexValueContainer  = std::vector<DebugIndexValuePair>;
 
 struct DebugPropertyValueMap
 {
@@ -87,7 +87,7 @@ DALI_CORE_API void LogMessage(enum DebugPriority level,const char *format, ...);
 /**
  * typedef for the logging function.
  */
-typedef void (*LogFunction)(DebugPriority priority, std::string& message);
+using LogFunction = void ( * )( DebugPriority, std::string & );
 
 /**
  * A log function has to be installed for every thread that wants to use logging.
@@ -183,8 +183,8 @@ enum LogLevel
 class DALI_CORE_API Filter
 {
 public:
-  typedef std::list<Filter*>           FilterList;
-  typedef std::list<Filter*>::iterator FilterIter;
+  using FilterList = std::list<Filter *>;
+  using FilterIter = std::list<Filter *>::iterator;
 
 public:
 

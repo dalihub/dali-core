@@ -46,13 +46,13 @@ struct DALI_CORE_API Property
    * @brief A valid property index is zero or greater.
    * @SINCE_1_0.0
    */
-  typedef int32_t Index;
+  using Index = int32_t;
 
   static constexpr int32_t INVALID_INDEX{-1}; ///< -1 is not a valid property index
   static constexpr int32_t INVALID_KEY{-1};   ///< -1 is not a valid property key
   static constexpr int32_t INVALID_COMPONENT_INDEX{-1}; ///< -1 is not a valid property index
 
-  typedef Dali::Vector< Index > IndexContainer; ///< A vector of property indices @SINCE_1_0.0
+  using IndexContainer = Dali::Vector<Index>; ///< A vector of property indices @SINCE_1_0.0
 
   /**
    * @brief A value-type representing a property value.

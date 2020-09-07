@@ -30,7 +30,7 @@ namespace Internal
 {
 
 class LongPressGesture;
-typedef IntrusivePtr< LongPressGesture > LongPressGesturePtr;
+using LongPressGesturePtr = IntrusivePtr<LongPressGesture>;
 
 /**
  * @copydoc Dali::LongPressGesture

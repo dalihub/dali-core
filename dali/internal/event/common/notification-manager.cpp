@@ -67,8 +67,8 @@ void MoveElements( InterfaceContainer& from, InterfaceContainer& to )
 }
 }
 
-typedef Dali::Mutex MessageQueueMutex;
-typedef OwnerContainer< MessageBase* > MessageContainer;
+using MessageQueueMutex = Dali::Mutex;
+using MessageContainer  = OwnerContainer<MessageBase*>;
 
 struct NotificationManager::Impl
 {

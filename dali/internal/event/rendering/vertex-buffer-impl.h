@@ -32,7 +32,7 @@ namespace Internal
 {
 
 class VertexBuffer;
-typedef IntrusivePtr<VertexBuffer> VertexBufferPtr;
+using VertexBufferPtr = IntrusivePtr<VertexBuffer>;
 
 /**
  * VertexBuffer is an object that contains an array of structures of values that
@@ -101,16 +101,56 @@ template<Property::Type type> struct PropertyImplementationType
 {
   // typedef ... Type; not defined, only support types declared below
 };
-template<> struct PropertyImplementationType< Property::BOOLEAN > { typedef bool Type; };
-template<> struct PropertyImplementationType< Property::FLOAT > { typedef float Type; };
-template<> struct PropertyImplementationType< Property::INTEGER > { typedef int Type; };
-template<> struct PropertyImplementationType< Property::VECTOR2 > { typedef Vector2 Type; };
-template<> struct PropertyImplementationType< Property::VECTOR3 > { typedef Vector3 Type; };
-template<> struct PropertyImplementationType< Property::VECTOR4 > { typedef Vector4 Type; };
-template<> struct PropertyImplementationType< Property::MATRIX3 > { typedef Matrix3 Type; };
-template<> struct PropertyImplementationType< Property::MATRIX > { typedef Matrix Type; };
-template<> struct PropertyImplementationType< Property::RECTANGLE > { typedef Rect<int> Type; };
-template<> struct PropertyImplementationType< Property::ROTATION > { typedef Quaternion Type; };
+template<>
+struct PropertyImplementationType<Property::BOOLEAN>
+{
+  using Type = bool;
+};
+template<>
+struct PropertyImplementationType<Property::FLOAT>
+{
+  using Type = float;
+};
+template<>
+struct PropertyImplementationType<Property::INTEGER>
+{
+  using Type = int;
+};
+template<>
+struct PropertyImplementationType<Property::VECTOR2>
+{
+  using Type = Vector2;
+};
+template<>
+struct PropertyImplementationType<Property::VECTOR3>
+{
+  using Type = Vector3;
+};
+template<>
+struct PropertyImplementationType<Property::VECTOR4>
+{
+  using Type = Vector4;
+};
+template<>
+struct PropertyImplementationType<Property::MATRIX3>
+{
+  using Type = Matrix3;
+};
+template<>
+struct PropertyImplementationType<Property::MATRIX>
+{
+  using Type = Matrix;
+};
+template<>
+struct PropertyImplementationType<Property::RECTANGLE>
+{
+  using Type = Rect<int>;
+};
+template<>
+struct PropertyImplementationType<Property::ROTATION>
+{
+  using Type = Quaternion;
+};
 
 uint32_t GetPropertyImplementationSize( Property::Type& propertyType );
 

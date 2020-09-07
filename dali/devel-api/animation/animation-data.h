@@ -70,8 +70,7 @@ public:
    * @brief AnimationData holds the required data required to define an
    * animation to be performed on an actor or actors.
    */
-  typedef Dali::Vector< AnimationDataElement* > AnimationDataList;
-
+  using AnimationDataList = Dali::Vector<AnimationDataElement*>;
 
   /**
    * @brief Adds one AnimationDataElement to the list to describe one animation.

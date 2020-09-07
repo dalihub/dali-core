@@ -29,7 +29,7 @@ namespace Internal
 {
 
 class WheelEvent;
-typedef IntrusivePtr< WheelEvent > WheelEventPtr;
+using WheelEventPtr = IntrusivePtr<WheelEvent>;
 
 /**
  * @copydoc Dali::WheelEvent

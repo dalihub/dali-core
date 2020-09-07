@@ -45,7 +45,7 @@ class Matrix3;
 class Matrix;
 struct Extents;
 
-typedef std::pair< Property::Key, Property::Value > KeyValuePair;
+using KeyValuePair = std::pair<Property::Key, Property::Value>;
 
 /**
  * @brief A value-type representing a property value.

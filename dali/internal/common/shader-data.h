@@ -33,7 +33,7 @@ namespace Internal
 {
 
 class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
+using ShaderDataPtr = IntrusivePtr<ShaderData>;
 
 /**
  * ShaderData class.

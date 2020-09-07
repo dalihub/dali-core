@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Internal
 {
-typedef IntrusivePtr<Path> PathPtr;
+using PathPtr = IntrusivePtr<Path>;
 
 /**
  * A 3D path

@@ -64,8 +64,7 @@ class LongPressGesture;
 class DALI_CORE_API LongPressGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
-  typedef Signal< void ( Actor, const LongPressGesture& ) > DetectedSignalType; ///< Gesture detected signal type @SINCE_1_0.0
+  using DetectedSignalType = Signal<void( Actor, const LongPressGesture& )>; ///< Gesture detected signal type @SINCE_1_0.0
 
 public: // Creation & Destruction
 

@@ -31,8 +31,8 @@ namespace Internal
 
 class TapGestureDetector;
 
-typedef IntrusivePtr<TapGestureDetector> TapGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<TapGestureDetector>::type TapGestureDetectorContainer;
+using TapGestureDetectorPtr       = IntrusivePtr<TapGestureDetector>;
+using TapGestureDetectorContainer = DerivedGestureDetectorContainer<TapGestureDetector>::type;
 
 /**
  * @copydoc Dali::TapGestureDetector

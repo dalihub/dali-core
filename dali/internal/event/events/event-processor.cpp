@@ -98,7 +98,7 @@ void EventProcessor::QueueEvent( const Event& event )
 
     case Event::Hover:
     {
-      typedef Integration::HoverEvent DerivedType;
+      using DerivedType = Integration::HoverEvent;
 
       // Reserve some memory inside the message queue
       uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
@@ -111,7 +111,7 @@ void EventProcessor::QueueEvent( const Event& event )
 
     case Event::Key:
     {
-      typedef Integration::KeyEvent DerivedType;
+      using DerivedType = Integration::KeyEvent;
 
       // Reserve some memory inside the message queue
       uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
@@ -124,7 +124,7 @@ void EventProcessor::QueueEvent( const Event& event )
 
     case Event::Wheel:
     {
-      typedef Integration::WheelEvent DerivedType;
+      using DerivedType = Integration::WheelEvent;
 
       // Reserve some memory inside the message queue
       uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );

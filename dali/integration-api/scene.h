@@ -56,11 +56,11 @@ struct Event;
 class DALI_CORE_API Scene : public BaseHandle
 {
 public:
-  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
-  typedef Signal< void (const Dali::KeyEvent&) > KeyEventSignalType; ///< Key event signal type
-  typedef Signal< bool (const Dali::KeyEvent&) > KeyEventGeneratedSignalType; ///< key event generated signal type
-  typedef Signal< void (const Dali::TouchEvent&) > TouchEventSignalType; ///< Touch signal type
-  typedef Signal< void (const Dali::WheelEvent&) > WheelEventSignalType; ///< WheelEvent signal type
+  using EventProcessingFinishedSignalType = Signal<void()>;                          ///< Event Processing finished signal type
+  using KeyEventSignalType                = Signal<void( const Dali::KeyEvent& )>;   ///< Key event signal type
+  using KeyEventGeneratedSignalType       = Signal<bool( const Dali::KeyEvent& )>;   ///< key event generated signal type
+  using TouchEventSignalType              = Signal<void( const Dali::TouchEvent& )>; ///< Touch signal type
+  using WheelEventSignalType              = Signal<void( const Dali::WheelEvent& )>; ///< WheelEvent signal type
 
   using FrameCallbackContainer = std::vector< std::pair< std::unique_ptr< CallbackBase >, int32_t > >;
 

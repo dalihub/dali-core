@@ -43,7 +43,7 @@ namespace Internal DALI_INTERNAL
 class ConstraintBase;
 }
 
-typedef Vector< PropertyInput* > PropertyInputContainer;
+using PropertyInputContainer = Vector<PropertyInput*>;
 
 /**
  * @brief An abstract base class for Constraints.
@@ -200,7 +200,7 @@ public:
      * @brief Used to call the function to copy the stored object.
      * @SINCE_1_0.0
      */
-    typedef UndefinedClass* (*CopyConstructorDispatcher) ( UndefinedClass* object );
+    using CopyConstructorDispatcher = UndefinedClass* (*)( UndefinedClass* );
 
     /**
      * @brief Copies the actual object in Constraint::Function.

@@ -61,7 +61,7 @@ public: // Typedefs
   /**
    * @brief Signal type.
    */
-  typedef Signal< void ( Actor, const RotationGesture& ) > DetectedSignalType;
+  using DetectedSignalType = Signal<void( Actor, const RotationGesture& )>;
 
 public: // Creation & Destruction
 

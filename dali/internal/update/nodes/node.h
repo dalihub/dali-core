@@ -960,7 +960,7 @@ protected:
 
 inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -971,7 +971,7 @@ inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServic
 
 inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {
-  typedef MessageValue1< Node, Vector3 > LocalType;
+  using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -982,7 +982,7 @@ inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor )
 {
-  typedef MessageValue1< Node, Vector3 > LocalType;
+  using LocalType = MessageValue1<Node, Vector3>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -993,7 +993,7 @@ inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1004,7 +1004,7 @@ inline void SetInheritPositionMessage( EventThreadServices& eventThreadServices,
 
 inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1015,7 +1015,7 @@ inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode )
 {
-  typedef MessageValue1< Node, ColorMode > LocalType;
+  using LocalType = MessageValue1<Node, ColorMode>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1026,7 +1026,7 @@ inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const
 
 inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode )
 {
-  typedef MessageValue1< Node, DrawMode::Type > LocalType;
+  using LocalType = MessageValue1<Node, DrawMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1037,7 +1037,7 @@ inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const 
 
 inline void AttachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
 {
-  typedef MessageValue1< Node, Renderer* > LocalType;
+  using LocalType = MessageValue1<Node, Renderer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1048,7 +1048,7 @@ inline void AttachRendererMessage( EventThreadServices& eventThreadServices, con
 
 inline void DetachRendererMessage( EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer )
 {
-  typedef MessageValue1< Node, const Renderer* > LocalType;
+  using LocalType = MessageValue1<Node, const Renderer*>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1059,7 +1059,7 @@ inline void DetachRendererMessage( EventThreadServices& eventThreadServices, con
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex )
 {
-  typedef MessageValue1< Node, uint32_t > LocalType;
+  using LocalType = MessageValue1<Node, uint32_t>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1070,7 +1070,7 @@ inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, cons
 
 inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, const Node& node, ClippingMode::Type clippingMode )
 {
-  typedef MessageValue1< Node, ClippingMode::Type > LocalType;
+  using LocalType = MessageValue1<Node, ClippingMode::Type>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -1081,7 +1081,7 @@ inline void SetClippingModeMessage( EventThreadServices& eventThreadServices, co
 
 inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint )
 {
-  typedef MessageValue1< Node, bool > LocalType;
+  using LocalType = MessageValue1<Node, bool>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

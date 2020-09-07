@@ -39,7 +39,7 @@ class FrameBuffer;
 }
 
 class FrameBuffer;
-typedef IntrusivePtr<FrameBuffer> FrameBufferPtr;
+using FrameBufferPtr = IntrusivePtr<FrameBuffer>;
 
 class FrameBuffer : public BaseObject
 {

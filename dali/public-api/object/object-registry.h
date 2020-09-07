@@ -66,13 +66,13 @@ public:
    * @brief Object created signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( BaseHandle ) > ObjectCreatedSignalType;
+  using ObjectCreatedSignalType = Signal<void( BaseHandle )>;
 
   /**
    * @brief Object destroyed signal.
    * @SINCE_1_0.0
    */
-  typedef Signal< void ( const Dali::RefObject* ) > ObjectDestroyedSignalType;
+  using ObjectDestroyedSignalType = Signal<void( const Dali::RefObject* )>;
 
   /**
    * @brief Allows the creation of an empty objectRegistry handle.

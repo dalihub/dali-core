@@ -129,8 +129,9 @@ private:
   inline void SortRenderItems( BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder );
 
   /// Sort comparitor function pointer type.
-  typedef bool ( *ComparitorPointer )( const SortAttributes& lhs, const SortAttributes& rhs );
-  typedef std::vector< SortAttributes > SortingHelper;
+  using ComparitorPointer = bool ( * )( const SortAttributes&, const SortAttributes& );
+
+  using SortingHelper = std::vector<SortAttributes>;
 
   Dali::Vector< ComparitorPointer > mSortComparitors;       ///< Contains all sort comparitors, used for quick look-up
   RenderInstructionProcessor::SortingHelper mSortingHelper; ///< Helper used to sort Renderers

@@ -43,7 +43,7 @@ DALI_CORE_API void LogContext( bool start, const char* tag );
 /**
  * typedef for the LogContextFunction function.
  */
-typedef void ( *LogContextFunction )( bool start, const char* tag );
+using LogContextFunction = void ( * )( bool, const char* );
 
 /**
  * A LogContextFunction function has to be installed for every thread that wants to use tracing.

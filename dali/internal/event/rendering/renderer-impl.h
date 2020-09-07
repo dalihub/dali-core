@@ -40,7 +40,7 @@ class Renderer;
 }
 
 class Renderer;
-typedef IntrusivePtr<Renderer> RendererPtr;
+using RendererPtr = IntrusivePtr<Renderer>;
 
 /**
  * Renderer is an object that can be used to show content by combining a Geometry with a shader and textures.

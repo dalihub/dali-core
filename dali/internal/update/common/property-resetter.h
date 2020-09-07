@@ -241,11 +241,8 @@ private:
   ModifierType* mModifier;
 };
 
-
-typedef Resetter<SceneGraph::AnimatorBase> AnimatorResetter;
-typedef Resetter<SceneGraph::ConstraintBase> ConstraintResetter;
-
-
+using AnimatorResetter   = Resetter<SceneGraph::AnimatorBase>;
+using ConstraintResetter = Resetter<SceneGraph::ConstraintBase>;
 
 } // namespace SceneGraph
 

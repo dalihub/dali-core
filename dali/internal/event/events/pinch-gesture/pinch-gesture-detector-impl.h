@@ -31,8 +31,8 @@ namespace Internal
 
 class PinchGestureDetector;
 
-typedef IntrusivePtr<PinchGestureDetector> PinchGestureDetectorPtr;
-typedef DerivedGestureDetectorContainer<PinchGestureDetector>::type PinchGestureDetectorContainer;
+using PinchGestureDetectorPtr       = IntrusivePtr<PinchGestureDetector>;
+using PinchGestureDetectorContainer = DerivedGestureDetectorContainer<PinchGestureDetector>::type;
 
 /**
  * @copydoc Dali::PinchGestureDetector

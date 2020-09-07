@@ -47,11 +47,11 @@ class AnimatorConnectorBase;
 class Object;
 class Path;
 
-typedef IntrusivePtr<Animation> AnimationPtr;
-typedef std::vector<AnimationPtr> AnimationContainer;
+using AnimationPtr       = IntrusivePtr<Animation>;
+using AnimationContainer = std::vector<AnimationPtr>;
 
-typedef AnimationContainer::iterator AnimationIter;
-typedef AnimationContainer::const_iterator AnimationConstIter;
+using AnimationIter      = AnimationContainer::iterator;
+using AnimationConstIter = AnimationContainer::const_iterator;
 
 /**
  * Animation is a proxy for a SceneGraph::Animation object.
@@ -69,8 +69,8 @@ public:
     BETWEEN  ///< Animating BETWEEN key-frames
   };
 
-  typedef Dali::Animation::EndAction EndAction;
-  typedef Dali::Animation::Interpolation Interpolation;
+  using EndAction     = Dali::Animation::EndAction;
+  using Interpolation = Dali::Animation::Interpolation;
 
   /**
    * Create a new Animation object.
@@ -529,10 +529,10 @@ private:
 
   Dali::Animation::AnimationSignalType mProgressReachedSignal;
 
-  typedef OwnerContainer< AnimatorConnectorBase* > AnimatorConnectorContainer;
+  using AnimatorConnectorContainer = OwnerContainer<AnimatorConnectorBase*>;
   AnimatorConnectorContainer mConnectors; ///< Owned by the Animation
 
-  typedef std::vector< ConnectorTargetValues > ConnectorTargetValuesContainer;
+  using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;
   ConnectorTargetValuesContainer mConnectorTargetValues; //< Used to store animating property target value information
 
   Vector2 mPlayRange;

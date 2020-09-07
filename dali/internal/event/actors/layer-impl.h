@@ -37,7 +37,7 @@ class UpdateManager;
 class Layer;
 }
 
-typedef Dali::ClippingBox ClippingBox;
+using ClippingBox = Dali::ClippingBox;
 
 class Layer : public Actor
 {

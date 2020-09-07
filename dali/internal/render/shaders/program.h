@@ -373,8 +373,8 @@ private:  // Data
   Internal::ShaderDataPtr mProgramData;       ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
-  typedef std::pair< std::string, GLint > NameLocationPair;
-  typedef std::vector< NameLocationPair > Locations;
+  using NameLocationPair = std::pair<std::string, GLint>;
+  using Locations        = std::vector<NameLocationPair>;
 
   Locations mAttributeLocations;      ///< attribute location cache
   Locations mUniformLocations;        ///< uniform location cache

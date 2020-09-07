@@ -91,7 +91,7 @@ public:
    * ScalingMode, but all other filter modes do if the desired dimensions are
    * `<=` the raw dimensions of the image file.
    */
-  typedef Dali::SamplingMode::Type FilterMode;
+  using FilterMode = Dali::SamplingMode::Type;
 
   static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
 

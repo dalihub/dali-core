@@ -45,7 +45,7 @@ class Layer;
  * @SINCE_1_0.0
  * @see Dali::Layer::SetClippingBox()
  */
-typedef Rect<int32_t> ClippingBox;
+using ClippingBox = Rect<int32_t>;
 
 /**
  * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.
@@ -218,7 +218,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] position This is the actor translation from camera
    */
-  typedef float (*SortFunctionType)( const Vector3& position );
+  using SortFunctionType = float ( * )( const Vector3& );
 
   /**
    * @brief Creates an empty Layer handle.

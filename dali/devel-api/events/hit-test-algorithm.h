@@ -126,7 +126,7 @@ struct Results
  *
  * @return true, if the actor is hittable, false otherwise.
  */
-typedef bool (*HitTestFunction)(Actor actor, TraverseType type);
+using HitTestFunction = bool ( * )( Actor, TraverseType );
 
 /**
  * @brief Given screen coordinates, this method returns the hit actor & the local coordinates relative to
