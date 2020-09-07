@@ -202,7 +202,7 @@ TouchEventProcessor::~TouchEventProcessor()
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
-void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
+bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
   DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty TouchEvent sent from Integration\n" );
@@ -264,7 +264,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     touchEventImpl->AddPoint( currentPoint );
 
     mScene.EmitTouchedSignal( touchEventHandle );
-    return; // No need for hit testing
+    return false; // No need for hit testing & already an interrupted event so just return false
   }
 
   // 2) Hit Testing.
@@ -309,11 +309,14 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 
   // 3) Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
 
+  bool consumed = false;
+
   // Emit the touch signal
   Dali::Actor consumedActor;
   if ( currentRenderTask )
   {
     consumedActor = EmitTouchSignals( touchEventImpl->GetPoint( 0 ).GetHitActor(), touchEventHandle );
+    consumed = consumedActor ? true : false;
   }
 
   Integration::Point& primaryPoint = touchEventImpl->GetPoint( 0 );
@@ -362,6 +365,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           leaveEventConsumer = EmitTouchSignals( mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, touchEventImpl, PointState::INTERRUPTED );
         }
       }
+
+      consumed |= leaveEventConsumer ? true : false;
 
       // Check if the motion event has been consumed by another actor's listener.  In this case, the previously
       // consumed actor's listeners may need to be informed (through a leave event).
@@ -474,6 +479,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
       }
     }
   }
+
+  return consumed;
 }
 
 void TouchEventProcessor::OnObservedActorDisconnected( Actor* actor )
