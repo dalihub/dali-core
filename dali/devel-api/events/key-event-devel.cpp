@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,51 @@ namespace Dali
 namespace DevelKeyEvent
 {
 
-std::string GetLogicalKey( KeyEvent keyEvent )
+KeyEvent New( const std::string& keyName,
+              const std::string& logicalKey,
+              const std::string& keyString,
+              int keyCode,
+              int keyModifier,
+              unsigned long timeStamp,
+              const Dali::KeyEvent::State& keyState,
+              const std::string& compose,
+              const std::string& deviceName,
+              const Device::Class::Type deviceClass,
+              const Device::Subclass::Type deviceSubclass )
 {
-  return GetImplementation( &keyEvent )->GetLogicalKey();
+  Internal::KeyEventPtr internal = Internal::KeyEvent::New( keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass );
+
+  return KeyEvent( internal.Get() );
+}
+
+void SetKeyName( KeyEvent keyEvent, const std::string& keyName )
+{
+  GetImplementation( keyEvent ).SetKeyName( keyName );
+}
+
+void SetKeyString( KeyEvent keyEvent, const std::string& keyString )
+{
+  GetImplementation( keyEvent ).SetKeyString( keyString );
+}
+
+void SetKeyCode( KeyEvent keyEvent, int32_t keyCode )
+{
+  GetImplementation( keyEvent ).SetKeyCode( keyCode );
+}
+
+void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier )
+{
+  GetImplementation( keyEvent ).SetKeyModifier( keyModifier );
+}
+
+void SetTime( KeyEvent keyEvent, unsigned long time )
+{
+  GetImplementation( keyEvent ).SetTime( time );
+}
+
+void SetState( KeyEvent keyEvent, const KeyEvent::State& state )
+{
+  GetImplementation( keyEvent ).SetState( state );
 }
 
 } // namespace DevelKeyEvent
