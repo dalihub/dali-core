@@ -42,10 +42,8 @@ struct DALI_CORE_API KeyEvent : public Event
   // Specifies the state of the key event.
   enum State
   {
-    Down,        /**< Key down */
-    Up,          /**< Key up */
-
-    Last
+    DOWN,        /**< Key down */
+    UP,          /**< Key up */
   };
 
   /**
