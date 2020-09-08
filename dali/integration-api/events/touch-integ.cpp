@@ -22,11 +22,16 @@ namespace Dali
 namespace Integration
 {
 
-Dali::TouchEvent NewTouchEvent(uint32_t timestamp, const TouchPoint& point)
+Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoint& point)
 {
-  Internal::TouchEventPtr touchEventImpl( new Internal::TouchEvent(timestamp) );
-  touchEventImpl->AddPoint(Integration::Point(point));
-  Dali::TouchEvent handle(touchEventImpl.Get());
+  return NewTouchEvent( timeStamp, Integration::Point( point ) );
+}
+
+Dali::TouchEvent NewTouchEvent( uint32_t timeStamp, const Dali::Integration::Point& point )
+{
+  Internal::TouchEventPtr touchEventImpl( new Internal::TouchEvent( timeStamp ) );
+  touchEventImpl->AddPoint( point );
+  Dali::TouchEvent handle( touchEventImpl.Get() );
   return handle;
 }
 
