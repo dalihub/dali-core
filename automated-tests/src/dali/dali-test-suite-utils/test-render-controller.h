@@ -31,8 +31,8 @@ public:
   TestRenderController();
   ~TestRenderController();
 
-  virtual void RequestUpdate( bool forceUpdate );
-  virtual void RequestProcessEventsOnIdle( bool forceProcess );
+  void RequestUpdate( bool forceUpdate ) override;
+  void RequestProcessEventsOnIdle( bool forceProcess ) override;
 
   typedef enum
   {

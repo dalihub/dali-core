@@ -43,17 +43,18 @@ public:
   /**
    * @brief Switch to the surfaceless GL context
    */
-  virtual void MakeSurfacelessContextCurrent() {};
+  void MakeSurfacelessContextCurrent() override {};
 
   /**
    * @brief Clear the GL context
    */
-  virtual void MakeContextNull() {};
+  void MakeContextNull() override {};
 
   /**
    * @brief Wait until all GL rendering calls for the current GL context are executed
    */
-  virtual void WaitClient() {};
+  void WaitClient() override {};
+
 private:
 
   TestGlContextHelperAbstraction( const TestGlContextHelperAbstraction& ); ///< Undefined
