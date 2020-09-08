@@ -42,7 +42,7 @@ Layer::Layer()
 : Node(),
   mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
-  mLastCamera( NULL ),
+  mLastCamera( nullptr ),
   mBehavior( Dali::Layer::LAYER_UI ),
   mIsClipping( false ),
   mDepthTestDisabled( true ),

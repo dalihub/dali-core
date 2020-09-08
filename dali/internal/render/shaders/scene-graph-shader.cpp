@@ -37,7 +37,7 @@ namespace SceneGraph
 
 Shader::Shader( Dali::Shader::Hint::Value& hints )
 : mHints( hints ),
-  mProgram( NULL ),
+  mProgram( nullptr ),
   mConnectionObservers()
 {
   AddUniformMapObserver( *this );

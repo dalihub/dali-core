@@ -46,7 +46,7 @@ namespace
 struct HitActor
 {
   HitActor()
-  : actor( NULL ),
+  : actor( nullptr ),
     distance( std::numeric_limits<float>::max() ),
     depth( std::numeric_limits<int>::min() )
   {

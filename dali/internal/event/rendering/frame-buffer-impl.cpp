@@ -41,7 +41,7 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
 
 FrameBuffer::FrameBuffer( uint32_t width, uint32_t height, Mask attachments )
 : mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( NULL ),
+  mRenderObject( nullptr ),
   mColor{ nullptr },
   mDepth( nullptr ),
   mStencil( nullptr ),

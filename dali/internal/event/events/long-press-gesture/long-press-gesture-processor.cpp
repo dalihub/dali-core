@@ -108,7 +108,7 @@ LongPressGestureProcessor::LongPressGestureProcessor()
   mCurrentRenderTask(),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
-  mCurrentLongPressEvent( NULL ),
+  mCurrentLongPressEvent( nullptr ),
   mMinimumHoldingTime( DEFAULT_MINIMUM_HOLDING_TIME )
 {
 }
@@ -150,7 +150,7 @@ void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEve
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
           ProcessAndEmit( hitTestResults );
-          mCurrentLongPressEvent = NULL;
+          mCurrentLongPressEvent = nullptr;
         }
         else
         {

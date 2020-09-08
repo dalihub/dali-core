@@ -277,7 +277,7 @@ public:
    */
   virtual Extension* GetExtension()
   {
-    return NULL;
+    return nullptr;
   }
 
 protected: // For derived classes

@@ -82,7 +82,7 @@ public:
     // Inlined for performance
     WordType* Get()
     {
-      return ( 0 != mMessageSize ) ? mCurrent : NULL;
+      return ( 0 != mMessageSize ) ? mCurrent : nullptr;
     }
 
     // Inlined for performance

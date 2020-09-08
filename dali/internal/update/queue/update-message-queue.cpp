@@ -69,7 +69,7 @@ struct MessageQueue::Impl
     queueWasEmpty(true),
     sceneUpdateFlag( false ),
     sceneUpdate( 0 ),
-    currentMessageBuffer(NULL)
+    currentMessageBuffer(nullptr)
   {
   }
 
@@ -137,7 +137,7 @@ struct MessageQueue::Impl
 };
 
 MessageQueue::MessageQueue( Integration::RenderController& controller, const SceneGraph::SceneGraphBuffers& buffers )
-: mImpl(NULL)
+: mImpl(nullptr)
 {
   mImpl = new Impl( controller, buffers );
 }
@@ -202,7 +202,7 @@ uint32_t* MessageQueue::ReserveMessageSlot( uint32_t requestedSize, bool updateS
 // Called from event thread
 bool MessageQueue::FlushQueue()
 {
-  const bool messagesToProcess = ( NULL != mImpl->currentMessageBuffer );
+  const bool messagesToProcess = ( nullptr != mImpl->currentMessageBuffer );
 
   // If there're messages to flush
   if ( messagesToProcess )
@@ -211,7 +211,7 @@ bool MessageQueue::FlushQueue()
     MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
     mImpl->processQueue.push_back( mImpl->currentMessageBuffer );
-    mImpl->currentMessageBuffer = NULL;
+    mImpl->currentMessageBuffer = nullptr;
 
     // Grab any recycled MessageBuffers
     while ( !mImpl->recycleQueue.empty() )

@@ -485,7 +485,7 @@ RenderTask::RenderTask()
   mSourceNode( nullptr ),
   mCameraNode( nullptr ),
   mCamera( nullptr ),
-  mFrameBuffer(0),
+  mFrameBuffer(nullptr),
   mRefreshRate( Dali::RenderTask::DEFAULT_REFRESH_RATE ),
   mFrameCounter( 0u ),
   mRenderedOnceCounter( 0u ),

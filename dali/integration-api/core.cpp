@@ -154,7 +154,7 @@ ObjectRegistry Core::GetObjectRegistry() const
 }
 
 Core::Core()
-: mImpl( NULL )
+: mImpl( nullptr )
 {
 }
 

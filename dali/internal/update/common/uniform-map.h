@@ -53,7 +53,7 @@ public:
   }
 
   UniformPropertyMapping()
-  : propertyPtr( NULL ),
+  : propertyPtr( nullptr ),
     uniformName( "" ),
     uniformNameHash( 0 )
   {

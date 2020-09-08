@@ -45,8 +45,8 @@ class Camera;
 struct Renderable
 {
   Renderable()
-  : mNode( 0 ),
-    mRenderer( 0 )
+  : mNode( nullptr ),
+    mRenderer( nullptr )
   {}
 
   Renderable( Node* node, Renderer* renderer )
@@ -335,10 +335,10 @@ inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadService
 template <>
 inline void OwnerPointer<Dali::Internal::SceneGraph::Layer>::Reset()
 {
-  if (mObject != NULL)
+  if (mObject != nullptr)
   {
     Dali::Internal::SceneGraph::Node::Delete(mObject);
-    mObject = NULL;
+    mObject = nullptr;
   }
 }
 } // namespace Internal

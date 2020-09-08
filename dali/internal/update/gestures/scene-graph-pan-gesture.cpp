@@ -699,7 +699,7 @@ PanGesture::PanGesture()
   mInGesture( false ),
   mPredictionAmountOverridden( false ),
   mSmoothingAmountOverridden( false ),
-  mProfiling( NULL ),
+  mProfiling( nullptr ),
 
   // Set environment variable defaults:
   mPredictionMode( DEFAULT_PREDICTION_MODE ),

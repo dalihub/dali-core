@@ -92,7 +92,7 @@ void BitmapPackedPixel::TestForTransparency()
   if(HasAlphaChannel())
   {
     uint8_t* pixelBuffer=GetBuffer();
-    if(pixelBuffer != NULL)
+    if(pixelBuffer != nullptr)
     {
       uint8_t* row = pixelBuffer;
 

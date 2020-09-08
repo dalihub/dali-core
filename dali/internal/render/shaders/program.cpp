@@ -107,7 +107,7 @@ Program* Program::New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, 
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = cache.GetProgram( shaderHash );
 
-  if( NULL == program )
+  if( nullptr == program )
   {
     // program not found so create it
     program = new Program( cache, shaderData, modifiesGeometry );
@@ -313,7 +313,7 @@ void Program::GetActiveSamplerUniforms()
   {
     char* outerToken = strtok_r( uniform + UNIFORM.mLength, ";", &uniform );
 
-    char* nextPtr = NULL;
+    char* nextPtr = nullptr;
     char* token = strtok_r( outerToken, DELIMITERS, &nextPtr );
     while ( token )
     {
@@ -323,7 +323,7 @@ void Program::GetActiveSamplerUniforms()
         if ( std::find(SAMPLER_TYPES, END_SAMPLER_TYPES, token) != END_SAMPLER_TYPES )
         {
           bool found( false );
-          token = strtok_r( NULL, DELIMITERS, &nextPtr );
+          token = strtok_r( nullptr, DELIMITERS, &nextPtr );
           for (uint32_t i=0; i < static_cast<uint32_t>( samplerUniformLocations.size() ); ++i)
           {
             if ( samplerUniformLocations[i].position == -1 &&
@@ -343,7 +343,7 @@ void Program::GetActiveSamplerUniforms()
         }
       }
 
-      token = strtok_r( NULL, DELIMITERS, &nextPtr );
+      token = strtok_r( nullptr, DELIMITERS, &nextPtr );
     }
 
     uniform = strstr( uniform, UNIFORM );
@@ -632,8 +632,8 @@ bool Program::ModifiesGeometry()
 Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 : mCache( cache ),
   mGlAbstraction( mCache.GetGlAbstraction() ),
-  mProjectionMatrix( NULL ),
-  mViewMatrix( NULL ),
+  mProjectionMatrix( nullptr ),
+  mViewMatrix( nullptr ),
   mLinked( false ),
   mVertexShaderId( 0 ),
   mFragmentShaderId( 0 ),
@@ -667,7 +667,7 @@ Program::~Program()
 
 void Program::Load()
 {
-  DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
+  DALI_ASSERT_ALWAYS( nullptr != mProgramData.Get() && "Program data is not initialized" );
   DALI_ASSERT_DEBUG( mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it." );
 
   LOG_GL( "CreateProgram()\n" );
@@ -737,7 +737,7 @@ void Program::Load()
             // Allocate space for the bytecode in ShaderData
             mProgramData->AllocateBuffer(binaryLength);
             // Copy the bytecode to ShaderData
-            CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, NULL, &binaryFormat, mProgramData->GetBufferData()) );
+            CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, nullptr, &binaryFormat, mProgramData->GetBufferData()) );
             mCache.StoreBinary( mProgramData );
             DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Saved binary.\n" );
           }
@@ -760,7 +760,7 @@ void Program::Unload()
   {
     CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(0) );
 
-    mCache.SetCurrentProgram( NULL );
+    mCache.SetCurrentProgram( nullptr );
   }
 
   if (mProgramId)
@@ -785,7 +785,7 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
   }
 
   LOG_GL( "ShaderSource(%d)\n", shaderId );
-  CHECK_GL( mGlAbstraction, mGlAbstraction.ShaderSource(shaderId, 1, &src, NULL ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.ShaderSource(shaderId, 1, &src, nullptr ) );
 
   LOG_GL( "CompileShader(%d)\n", shaderId );
   CHECK_GL( mGlAbstraction, mGlAbstraction.CompileShader( shaderId ) );

@@ -458,7 +458,7 @@ void RenderInstructionProcessor::Prepare( BufferIndex updateBufferIndex,
     Layer& layer = **iter;
     const bool tryReuseRenderList( viewMatrixHasNotChanged && layer.CanReuseRenderers( &renderTask.GetCamera() ) );
     const bool isLayer3D = layer.GetBehavior() == Dali::Layer::LAYER_3D;
-    RenderList* renderList = NULL;
+    RenderList* renderList = nullptr;
 
     if( layer.IsRoot() && ( layer.GetDirtyFlags() != NodePropertyFlags::NOTHING ) )
     {

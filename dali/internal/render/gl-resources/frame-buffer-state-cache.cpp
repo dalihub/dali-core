@@ -201,7 +201,7 @@ FrameBufferStateCache::FrameBufferState* FrameBufferStateCache::GetFrameBufferSt
       return &state;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 void FrameBufferStateCache::DeleteFrameBuffer( GLuint frameBufferId )

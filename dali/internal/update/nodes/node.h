@@ -113,7 +113,7 @@ public:
    */
   virtual Layer* GetLayer()
   {
-    return NULL;
+    return nullptr;
   }
 
   /**
@@ -1096,10 +1096,10 @@ inline void SetPositionUsesAnchorPointMessage( EventThreadServices& eventThreadS
 template <>
 inline void OwnerPointer<Dali::Internal::SceneGraph::Node>::Reset()
 {
-  if (mObject != NULL)
+  if (mObject != nullptr)
   {
     Dali::Internal::SceneGraph::Node::Delete(mObject);
-    mObject = NULL;
+    mObject = nullptr;
   }
 }
 } // namespace Internal

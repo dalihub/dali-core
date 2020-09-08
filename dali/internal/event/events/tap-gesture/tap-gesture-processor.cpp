@@ -81,7 +81,7 @@ TapGestureProcessor::TapGestureProcessor()
   mMaxTapsRequired( 1 ),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
-  mCurrentTapEvent( NULL ),
+  mCurrentTapEvent( nullptr ),
   mPossibleProcessed( false )
 {
 }
@@ -125,7 +125,7 @@ void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent
           mCurrentTapEvent = &tapEvent;
           ProcessAndEmit( hitTestResults );
         }
-        mCurrentTapEvent = NULL;
+        mCurrentTapEvent = nullptr;
         mPossibleProcessed = false;
       }
       break;

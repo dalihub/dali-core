@@ -35,7 +35,7 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
    * Constructor
    */
   TransformManagerPropertyHandler()
-  :mTxManager(0),
+  :mTxManager(nullptr),
    mId( INVALID_TRANSFORM_ID )
   {}
 
@@ -302,7 +302,7 @@ public:
    * Create an TransformManagerVector3Input
    */
   TransformManagerVector3Input( TransformManagerProperty property, const Vector3& initialValue )
-  :mTxManager(0),
+  :mTxManager(nullptr),
    mId(INVALID_TRANSFORM_ID),
    mProperty(property),
    mValue(initialValue)
@@ -464,7 +464,7 @@ public:
    * Constructor
    */
   TransformManagerQuaternionInput()
-  :mTxManager(0),
+  :mTxManager(nullptr),
    mId(INVALID_TRANSFORM_ID),
    mValue(1.0f,0.0f,0.0f,0.0f)
   {
@@ -616,7 +616,7 @@ public:
    * Constructor
    */
   TransformManagerMatrixInput()
-  :mTxManager(0),
+  :mTxManager(nullptr),
    mId(INVALID_TRANSFORM_ID)
   {
   }
@@ -692,7 +692,7 @@ public:
    */
   Matrix& Get( BufferIndex bufferIndex )
   {
-    DALI_ASSERT_ALWAYS( mTxManager != 0 );
+    DALI_ASSERT_ALWAYS( mTxManager != nullptr );
     return mTxManager->GetWorldMatrix(mId);
   }
 

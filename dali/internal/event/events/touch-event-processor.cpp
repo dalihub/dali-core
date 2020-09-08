@@ -420,7 +420,7 @@ bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
       }
       else
       {
-        mLastConsumedActor.SetActor( NULL );
+        mLastConsumedActor.SetActor( nullptr );
       }
 
       mLastRenderTask = currentRenderTask;
@@ -458,7 +458,7 @@ bool TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           AllocAndEmitTouchSignals( event.time, touchDownConsumedActorHandle, currentPoint );
         }
 
-        mTouchDownConsumedActor.SetActor( NULL );
+        mTouchDownConsumedActor.SetActor( nullptr );
 
         DALI_FALLTHROUGH;
       }
@@ -506,7 +506,7 @@ void TouchEventProcessor::OnObservedActorDisconnected( Actor* actor )
 
     // Do not set mLastPrimaryHitActor to NULL we may be iterating through its observers
 
-    mLastConsumedActor.SetActor( NULL );
+    mLastConsumedActor.SetActor( nullptr );
     mLastRenderTask.Reset();
   }
 }

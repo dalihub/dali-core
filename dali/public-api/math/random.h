@@ -54,7 +54,7 @@ inline float Range(float f0, float f1)
   static bool initialized( false );
   if( !initialized )
   {
-    uint32_t seed = static_cast<uint32_t>( time( NULL ) );
+    uint32_t seed = static_cast<uint32_t>( time( nullptr ) );
     srand( seed );
     initialized = true;
   }

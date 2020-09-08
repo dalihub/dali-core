@@ -45,7 +45,7 @@ const int32_t ARGINDEX_THIRD_VALUE = 5;
 
 ConditionFunction Step::GetFunction(Property::Type valueType)
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch(valueType)
   {
@@ -86,7 +86,7 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
 
 ConditionFunction Step::GetCompareFunction( Property::Type valueType )
 {
-    ConditionFunction function = NULL;
+    ConditionFunction function = nullptr;
     if( valueType == Property::VECTOR3 )
     {
       function = EvalAndCompareVector3;

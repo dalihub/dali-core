@@ -41,7 +41,7 @@ namespace
 const char* const SIGNAL_OBJECT_CREATED =   "objectCreated";
 const char* const SIGNAL_OBJECT_DESTROYED = "objectDestroyed";
 
-TypeRegistration mType( typeid( Dali::ObjectRegistry ), typeid( Dali::BaseHandle ), NULL );
+TypeRegistration mType( typeid( Dali::ObjectRegistry ), typeid( Dali::BaseHandle ), nullptr );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_OBJECT_CREATED,   &ObjectRegistry::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_OBJECT_DESTROYED, &ObjectRegistry::DoConnectSignal );

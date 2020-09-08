@@ -44,7 +44,7 @@ struct Source
   Source()
   : sourceType( OBJECT_PROPERTY ),
     propertyIndex( Property::INVALID_INDEX ),
-    object( NULL )
+    object( nullptr )
   {
   }
 
@@ -56,7 +56,7 @@ struct Source
   Source( Dali::ConstraintSource& source )
   : sourceType( source.sourceType ),
     propertyIndex( source.propertyIndex ),
-    object( NULL )
+    object( nullptr )
   {
     if ( source.object )
     {

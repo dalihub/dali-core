@@ -35,7 +35,7 @@ void CustomActorImpl::OnPropertySet( Property::Index index, const Property::Valu
 }
 
 CustomActorImpl::CustomActorImpl( ActorFlags flags )
-: mOwner(NULL),
+: mOwner(nullptr),
   mFlags( flags )
 {
 }

@@ -25,7 +25,7 @@ namespace Dali
 {
 
 VectorBase::VectorBase()
-  : mData( NULL )
+  : mData( nullptr )
 {
 }
 
@@ -53,7 +53,7 @@ void VectorBase::Release()
     SizeType* metadata = reinterpret_cast< SizeType* >( mData );
 
     delete [] ( metadata - 2u );
-    mData = 0u;
+    mData = nullptr;
   }
 }
 
@@ -131,7 +131,7 @@ void VectorBase::Erase( char* address, SizeType elementSize )
 
 char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
 {
-  char* next = NULL;
+  char* next = nullptr;
 
   if( mData )
   {

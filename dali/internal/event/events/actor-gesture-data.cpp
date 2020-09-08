@@ -48,7 +48,7 @@ void ActorGestureData::AddGestureDetector( GestureDetector& detector )
   const GestureType::Value type( detector.GetType() );
 
   GestureDetectorContainer*& containerPtr( GetContainerPtr( type ) );
-  if ( NULL == containerPtr )
+  if ( nullptr == containerPtr )
   {
     containerPtr = new GestureDetectorContainer;
   }
@@ -73,7 +73,7 @@ void ActorGestureData::RemoveGestureDetector( GestureDetector& detector )
   {
     gesturesRequired = GestureType::Value( gesturesRequired & ~type );
     delete containerPtr;
-    containerPtr = NULL;
+    containerPtr = nullptr;
   }
 }
 
@@ -113,7 +113,7 @@ GestureDetectorContainer*& ActorGestureData::GetContainerPtr( GestureType::Value
   }
 
   DALI_ASSERT_DEBUG( ! "Invalid Type" );
-  static GestureDetectorContainer* invalidType( NULL );
+  static GestureDetectorContainer* invalidType( nullptr );
   return invalidType;
 }
 

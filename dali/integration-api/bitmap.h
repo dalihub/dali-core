@@ -59,7 +59,7 @@ protected:
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    * @param[in] pixBuf External buffer of pixel data or null.
    */
-  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
+  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = nullptr );
 
   /**
    * Initializes internal class members
@@ -279,11 +279,11 @@ public:
   /**
    * Get interface to features that are active only if the Bitmap was created
    * with a BITMAP_2D_PACKED_PIXELS profile. */
-  virtual const PackedPixelsProfile* GetPackedPixelsProfile() const { return 0; }
+  virtual const PackedPixelsProfile* GetPackedPixelsProfile() const { return nullptr; }
   /**
    * Get interface to features that are active only if the Bitmap was created
    * with a BITMAP_2D_PACKED_PIXELS profile. */
-  virtual PackedPixelsProfile* GetPackedPixelsProfile() { return 0; }
+  virtual PackedPixelsProfile* GetPackedPixelsProfile() { return nullptr; }
 
   /**@}*/ ///< End of packed pixel features.
 
@@ -319,8 +319,8 @@ public:
     virtual ~CompressedProfile() {}
   };
 
-  virtual const CompressedProfile* GetCompressedProfile() const { return 0; }
-  virtual CompressedProfile* GetCompressedProfile() { return 0; }
+  virtual const CompressedProfile* GetCompressedProfile() const { return nullptr; }
+  virtual CompressedProfile* GetCompressedProfile() { return nullptr; }
   /**@}*/
 
 

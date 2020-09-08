@@ -185,7 +185,7 @@ VertexBuffer::~VertexBuffer()
 
 VertexBuffer::VertexBuffer()
 : mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( NULL ),
+  mRenderObject( nullptr ),
   mBufferFormatSize( 0 ),
   mSize( 0 )
 {

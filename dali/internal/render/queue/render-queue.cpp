@@ -39,8 +39,8 @@ namespace SceneGraph
 {
 
 RenderQueue::RenderQueue()
-: container0( NULL ),
-  container1( NULL )
+: container0( nullptr ),
+  container1( nullptr )
 {
   container0 = new MessageBuffer( INITIAL_BUFFER_SIZE );
   container1 = new MessageBuffer( INITIAL_BUFFER_SIZE );
@@ -103,7 +103,7 @@ void RenderQueue::ProcessMessages( BufferIndex bufferIndex )
 
 MessageBuffer* RenderQueue::GetCurrentContainer( BufferIndex bufferIndex )
 {
-  MessageBuffer* container( NULL );
+  MessageBuffer* container( nullptr );
 
   /**
    * The update-thread queues messages with one container,
@@ -128,7 +128,7 @@ void RenderQueue::LimitBufferCapacity( BufferIndex bufferIndex )
     if( MAX_BUFFER_SIZE < container0->GetCapacity() )
     {
       delete container0;
-      container0 = NULL;
+      container0 = nullptr;
       container0 = new MessageBuffer( INITIAL_BUFFER_SIZE );
     }
   }
@@ -137,7 +137,7 @@ void RenderQueue::LimitBufferCapacity( BufferIndex bufferIndex )
     if( MAX_BUFFER_SIZE < container1->GetCapacity() )
     {
       delete container1;
-      container1 = NULL;
+      container1 = nullptr;
       container1 = new MessageBuffer( INITIAL_BUFFER_SIZE );
     }
   }

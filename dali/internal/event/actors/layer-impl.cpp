@@ -126,7 +126,7 @@ LayerPtr Layer::NewRoot( LayerList& layerList )
 
 Layer::Layer( Actor::DerivedType type, const SceneGraph::Layer& layer )
 : Actor( type, layer ),
-  mLayerList( NULL ),
+  mLayerList( nullptr ),
   mClippingBox( 0, 0, 0, 0 ),
   mSortFunction( Layer::ZValue ),
   mBehavior( Dali::Layer::LAYER_UI ),
@@ -337,7 +337,7 @@ void Layer::OnSceneConnectionInternal()
     DALI_ASSERT_DEBUG( NULL == mLayerList );
 
     // Find the ordered layer-list
-    for ( Actor* parent = mParent; parent != NULL; parent = parent->GetParent() )
+    for ( Actor* parent = mParent; parent != nullptr; parent = parent->GetParent() )
     {
       if( parent->IsLayer() )
       {
@@ -356,7 +356,7 @@ void Layer::OnSceneDisconnectionInternal()
   mLayerList->UnregisterLayer(*this);
 
   // mLayerList is only valid when on-stage
-  mLayerList = NULL;
+  mLayerList = nullptr;
 }
 
 const SceneGraph::Layer& Layer::GetSceneGraphLayer() const

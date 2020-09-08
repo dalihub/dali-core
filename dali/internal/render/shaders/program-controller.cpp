@@ -31,9 +31,9 @@ namespace Internal
 {
 
 ProgramController::ProgramController( Integration::GlAbstraction& glAbstraction )
-: mShaderSaver( 0 ),
+: mShaderSaver( nullptr ),
   mGlAbstraction( glAbstraction ),
-  mCurrentProgram( NULL ),
+  mCurrentProgram( nullptr ),
   mProgramBinaryFormat( 0 ),
   mNumberOfProgramBinaryFormats( 0 )
 {
@@ -51,8 +51,8 @@ void ProgramController::ResetProgramMatrices()
   for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
   {
     Program* program = (*iter)->GetProgram();
-    program->SetProjectionMatrix( NULL );
-    program->SetViewMatrix( NULL );
+    program->SetProjectionMatrix( nullptr );
+    program->SetViewMatrix( nullptr );
   }
 }
 
@@ -82,7 +82,7 @@ void ProgramController::GlContextDestroyed()
   mNumberOfProgramBinaryFormats = 0;
   mProgramBinaryFormat = 0;
 
-  SetCurrentProgram( NULL );
+  SetCurrentProgram( nullptr );
   // Inform programs they are no longer valid
   const ProgramIterator end = mProgramCache.End();
   for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
@@ -98,7 +98,7 @@ Integration::GlAbstraction& ProgramController::GetGlAbstraction()
 
 Program* ProgramController::GetProgram( size_t shaderHash )
 {
-  Program* program = NULL;
+  Program* program = nullptr;
   const ProgramIterator end = mProgramCache.End();
   for ( ProgramIterator iter = mProgramCache.Begin(); iter != end; ++iter )
   {
@@ -144,7 +144,7 @@ void ProgramController::StoreBinary( Internal::ShaderDataPtr programData )
   DALI_ASSERT_DEBUG( programData->GetBufferSize() > 0 );
   DALI_ASSERT_DEBUG( mShaderSaver && "SetShaderSaver() should have been called during startup." );
 
-  if( mShaderSaver != NULL )
+  if( mShaderSaver != nullptr )
   {
     mShaderSaver->SaveBinary( programData );
   }

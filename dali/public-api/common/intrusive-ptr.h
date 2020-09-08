@@ -45,7 +45,7 @@ public:
    * @brief Standard constructor to unassigned object.
    * @SINCE_1_0.0
    */
-  IntrusivePtr() : mPtr( 0 ) {}
+  IntrusivePtr() : mPtr( nullptr ) {}
 
   /**
    * @brief Constructor to attach existing object.
@@ -264,7 +264,7 @@ public:
    */
   operator BooleanType() const
   {
-    return mPtr ? &IntrusivePtr::ThisIsSaferThanReturningVoidStar : 0;
+    return mPtr ? &IntrusivePtr::ThisIsSaferThanReturningVoidStar : nullptr;
   }
 
   /**
@@ -277,7 +277,7 @@ public:
   T* Detach()
   {
     T* ptr = mPtr;
-    mPtr = 0;
+    mPtr = nullptr;
     return ptr;
   }
 

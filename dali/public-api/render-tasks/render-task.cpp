@@ -73,7 +73,7 @@ RenderTask& RenderTask::operator=( RenderTask&& rhs ) =  default;
 void RenderTask::SetSourceActor( Actor actor )
 {
   // NULL handle is allowed
-  Internal::Actor* actorImpl( NULL );
+  Internal::Actor* actorImpl( nullptr );
   if ( actor )
   {
     actorImpl = &GetImplementation( actor );
@@ -100,7 +100,7 @@ bool RenderTask::IsExclusive() const
 void RenderTask::SetCameraActor( CameraActor cameraActor )
 {
   // NULL handle is allowed
-  Internal::CameraActor* actorImpl( NULL );
+  Internal::CameraActor* actorImpl( nullptr );
   if ( cameraActor )
   {
     actorImpl = &GetImplementation( cameraActor );
@@ -116,7 +116,7 @@ CameraActor RenderTask::GetCameraActor() const
 
 void RenderTask::SetFrameBuffer( FrameBuffer frameBuffer )
 {
-  Internal::FrameBuffer* frameBufferPtr( NULL );
+  Internal::FrameBuffer* frameBufferPtr( nullptr );
   if( frameBuffer )
   {
     frameBufferPtr = &GetImplementation( frameBuffer );

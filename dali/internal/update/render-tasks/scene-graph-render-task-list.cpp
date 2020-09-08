@@ -44,8 +44,8 @@ RenderTaskList* RenderTaskList::New()
 }
 
 RenderTaskList::RenderTaskList()
-: mNotificationObject( NULL ),
-  mRenderMessageDispatcher( NULL )
+: mNotificationObject( nullptr ),
+  mRenderMessageDispatcher( nullptr )
 {
 }
 

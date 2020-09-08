@@ -57,7 +57,7 @@ inline void AddUnique( SceneGraph::PropertyOwnerContainer& propertyOwners, Scene
 ConstraintBase::ConstraintBase( Object& object, Property::Index targetPropertyIndex, SourceContainer& sources )
 : mEventThreadServices( EventThreadServices::Get() ),
   mTargetObject( &object ),
-  mSceneGraphConstraint( NULL ),
+  mSceneGraphConstraint( nullptr ),
   mSources( sources ),
   mObservedObjects(),
   mTargetPropertyIndex( targetPropertyIndex ),
@@ -94,7 +94,7 @@ void ConstraintBase::AddSource( Source source )
   // Observe the object providing this property
   if ( OBJECT_PROPERTY == source.sourceType )
   {
-    if ( source.object != NULL )
+    if ( source.object != nullptr )
     {
       ObserveObject( *source.object );
     }
@@ -141,7 +141,7 @@ void ConstraintBase::RemoveInternal()
         // Remove from scene-graph
         RemoveConstraintMessage( GetEventThreadServices(), propertyOwner, *(mSceneGraphConstraint) );
         // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
-        mSceneGraphConstraint = NULL;
+        mSceneGraphConstraint = nullptr;
       }
     }
   }
@@ -185,7 +185,7 @@ uint32_t ConstraintBase::GetTag() const
 void ConstraintBase::SceneObjectAdded( Object& object )
 {
   if ( mApplied &&
-       ( NULL == mSceneGraphConstraint ) &&
+       ( nullptr == mSceneGraphConstraint ) &&
        mTargetObject )
   {
     ConnectConstraint();
@@ -208,7 +208,7 @@ void ConstraintBase::SceneObjectRemoved( Object& object )
     }
 
     // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
-    mSceneGraphConstraint = NULL;
+    mSceneGraphConstraint = nullptr;
   }
 }
 
@@ -229,8 +229,8 @@ void ConstraintBase::ObjectDestroyed( Object& object )
   mSources.clear();
 
   // Discard all object & scene-graph pointers
-  mSceneGraphConstraint = NULL;
-  mTargetObject = NULL;
+  mSceneGraphConstraint = nullptr;
+  mTargetObject = nullptr;
 }
 
 void ConstraintBase::ObserveObject( Object& object )

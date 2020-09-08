@@ -78,7 +78,7 @@ std::size_t BaseSignal::GetConnectionCount() const
   for( std::size_t i = 0; i < size; ++i )
   {
     // Note that values are set to NULL in DeleteConnection
-    if ( NULL != mSignalConnections[i] )
+    if ( nullptr != mSignalConnections[i] )
     {
       ++count;
     }
@@ -118,7 +118,7 @@ void BaseSignal::Emit()
 
 void BaseSignal::OnConnect( CallbackBase* callback )
 {
-  DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Connect()" );
+  DALI_ASSERT_ALWAYS( nullptr != callback && "Invalid member function pointer passed to Connect()" );
 
   int32_t index = FindCallback( callback );
 
@@ -139,7 +139,7 @@ void BaseSignal::OnConnect( CallbackBase* callback )
 
 void BaseSignal::OnDisconnect( CallbackBase* callback )
 {
-  DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Disconnect()" );
+  DALI_ASSERT_ALWAYS( nullptr != callback && "Invalid member function pointer passed to Disconnect()" );
 
   int32_t index = FindCallback( callback );
 
@@ -154,8 +154,8 @@ void BaseSignal::OnDisconnect( CallbackBase* callback )
 
 void BaseSignal::OnConnect( ConnectionTrackerInterface* tracker, CallbackBase* callback )
 {
-  DALI_ASSERT_ALWAYS( NULL != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Connect()" );
-  DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Connect()" );
+  DALI_ASSERT_ALWAYS( nullptr != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Connect()" );
+  DALI_ASSERT_ALWAYS( nullptr != callback && "Invalid member function pointer passed to Connect()" );
 
   int32_t index = FindCallback( callback );
 
@@ -179,8 +179,8 @@ void BaseSignal::OnConnect( ConnectionTrackerInterface* tracker, CallbackBase* c
 
 void BaseSignal::OnDisconnect( ConnectionTrackerInterface* tracker, CallbackBase* callback )
 {
-  DALI_ASSERT_ALWAYS( NULL != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()" );
-  DALI_ASSERT_ALWAYS( NULL != callback && "Invalid member function pointer passed to Disconnect()" );
+  DALI_ASSERT_ALWAYS( nullptr != tracker  && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()" );
+  DALI_ASSERT_ALWAYS( nullptr != callback && "Invalid member function pointer passed to Disconnect()" );
 
   int32_t index = FindCallback( callback );
 
@@ -226,7 +226,7 @@ CallbackBase* BaseSignal::GetCallback( std::size_t connectionIndex ) const
 {
   DALI_ASSERT_ALWAYS( connectionIndex < mSignalConnections.Count() && "GetCallback called with invalid index" );
 
-  CallbackBase* callback( NULL );
+  CallbackBase* callback( nullptr );
 
   SignalConnection* connection( mSignalConnections[ connectionIndex ] );
 
@@ -275,7 +275,7 @@ void BaseSignal::DeleteConnection( std::size_t connectionIndex )
     // IMPORTANT - do not remove from items from mSignalConnections, set to NULL instead.
     // Signal Emit() methods require that connection count is not reduced while iterating
     // i.e. DeleteConnection can be called from within callbacks, while iterating through mSignalConnections.
-    mSignalConnections[ connectionIndex ] = NULL;
+    mSignalConnections[ connectionIndex ] = nullptr;
   }
   else
   {
@@ -295,7 +295,7 @@ void BaseSignal::CleanupConnections()
     // process the whole vector
     for( std::size_t i = 0; i < total; ++i )
     {
-      if( mSignalConnections[ index ] == NULL )
+      if( mSignalConnections[ index ] == nullptr )
       {
         // items will be moved so don't increase index (erase will decrease the count of vector)
         mSignalConnections.Erase( mSignalConnections.Begin() + index );
@@ -312,7 +312,7 @@ void BaseSignal::CleanupConnections()
 // BaseSignal::EmitGuard
 
 BaseSignal::EmitGuard::EmitGuard( bool& flag )
-: mFlag( NULL )
+: mFlag( nullptr )
 {
   if( !flag )
   {
@@ -337,7 +337,7 @@ BaseSignal::EmitGuard::~EmitGuard()
 bool BaseSignal::EmitGuard::ErrorOccurred()
 {
   // mFlag is NULL when Emit() is called during Emit()
-  return (NULL == mFlag);
+  return (nullptr == mFlag);
 }
 
 } // namespace Dali

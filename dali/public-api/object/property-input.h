@@ -148,7 +148,7 @@ public:
    */
   virtual Extension* GetExtension()
   {
-    return NULL;
+    return nullptr;
   }
 };
 
