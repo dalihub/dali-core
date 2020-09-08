@@ -42,7 +42,7 @@ const int32_t ARGINDEX_LIST_START = 2;
 
 ConditionFunction VariableStep::GetFunction( Property::Type valueType )
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch( valueType )
   {

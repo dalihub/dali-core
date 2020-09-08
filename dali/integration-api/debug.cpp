@@ -236,9 +236,9 @@ TraceObj::~TraceObj()
 std::string ArgListToString(const char *format, va_list args)
 {
   std::string str; // empty string
-  if(format != NULL)
+  if(format != nullptr)
   {
-    char* buffer = NULL;
+    char* buffer = nullptr;
     int err = vasprintf(&buffer, format, args);
     if(err >= 0) // No error
     {

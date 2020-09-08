@@ -212,7 +212,7 @@ Property::Value* Property::Map::Find( const char* key ) const
       return &iter.second;
     }
   }
-  return NULL; // Not found
+  return nullptr; // Not found
 }
 
 Property::Value* Property::Map::Find( const std::string& key ) const
@@ -231,7 +231,7 @@ Property::Value* Property::Map::Find( Property::Index key ) const
       return &iter.second;
     }
   }
-  return NULL; // Not found
+  return nullptr; // Not found
 }
 
 Property::Value* Property::Map::Find( Property::Index indexKey, const std::string& stringKey ) const
@@ -255,7 +255,7 @@ Property::Value* Property::Map::Find( const std::string& key, Property::Type typ
       return &iter.second;
     }
   }
-  return NULL; // Not found
+  return nullptr; // Not found
 }
 
 Property::Value* Property::Map::Find( Property::Index key, Property::Type type ) const
@@ -269,7 +269,7 @@ Property::Value* Property::Map::Find( Property::Index key, Property::Type type )
       return &iter.second;
     }
   }
-  return NULL; // Not found
+  return nullptr; // Not found
 }
 
 void Property::Map::Clear()

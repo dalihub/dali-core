@@ -222,9 +222,9 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
       AllocAndEmitHoverSignals( event.time, hoverStartConsumedActorHandle, currentPoint );
     }
 
-    mLastPrimaryHitActor.SetActor( NULL );
-    mLastConsumedActor.SetActor( NULL );
-    mHoverStartConsumedActor.SetActor( NULL );
+    mLastPrimaryHitActor.SetActor( nullptr );
+    mLastConsumedActor.SetActor( nullptr );
+    mHoverStartConsumedActor.SetActor( nullptr );
     mLastRenderTask.Reset();
 
     return; // No need for hit testing
@@ -355,8 +355,8 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
 
   if ( primaryPointState == PointState::FINISHED )
   {
-    mLastPrimaryHitActor.SetActor( NULL );
-    mLastConsumedActor.SetActor( NULL );
+    mLastPrimaryHitActor.SetActor( nullptr );
+    mLastConsumedActor.SetActor( nullptr );
     mLastRenderTask.Reset();
   }
   else
@@ -373,15 +373,15 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
       }
       else
       {
-        mLastConsumedActor.SetActor( NULL );
+        mLastConsumedActor.SetActor( nullptr );
       }
 
       mLastRenderTask = currentRenderTask;
     }
     else
     {
-      mLastPrimaryHitActor.SetActor( NULL );
-      mLastConsumedActor.SetActor( NULL );
+      mLastPrimaryHitActor.SetActor( nullptr );
+      mLastConsumedActor.SetActor( nullptr );
       mLastRenderTask.Reset();
     }
   }
@@ -411,7 +411,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
           primaryPoint.SetState( primaryPointState );
         }
 
-        mHoverStartConsumedActor.SetActor( NULL );
+        mHoverStartConsumedActor.SetActor( nullptr );
       }
       // No break, Fallthrough
 

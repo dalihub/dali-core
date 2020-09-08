@@ -34,14 +34,14 @@ constexpr uint32_t BitMaskOfN( uint32_t bits )
 
 AlphaFunction::AlphaFunction()
 :mBezierControlPoints(Vector4::ZERO),
- mCustom(0),
+ mCustom(nullptr),
  mBuiltin(DEFAULT),
  mMode(BUILTIN_FUNCTION)
 {}
 
 AlphaFunction::AlphaFunction( BuiltinFunction function)
 :mBezierControlPoints(Vector4::ZERO),
- mCustom(0),
+ mCustom(nullptr),
  mBuiltin(function),
  mMode(BUILTIN_FUNCTION)
 {}
@@ -56,7 +56,7 @@ AlphaFunction::AlphaFunction( AlphaFunctionPrototype function)
 AlphaFunction::AlphaFunction( const Vector2& controlPoint0, const Vector2& controlPoint1 )
 :mBezierControlPoints(Vector4(Clamp(controlPoint0.x,0.0f,1.0f),controlPoint0.y,
                               Clamp(controlPoint1.x,0.0f,1.0f),controlPoint1.y)),
- mCustom(0),
+ mCustom(nullptr),
  mBuiltin(DEFAULT),
  mMode(BEZIER)
 {

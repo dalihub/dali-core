@@ -226,7 +226,7 @@ const char* GetEnumerationName( T value, const StringEnum* table, uint32_t table
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -248,7 +248,7 @@ const char * GetLinearEnumerationName( T value, const StringEnum* table, uint32_
   {
     return table[value].string;
   }
-  return NULL;
+  return nullptr;
 }
 
 /**

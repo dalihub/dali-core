@@ -89,14 +89,14 @@ public:
   Any( const Any& any )
   {
     // If container isn't empty then copy the container?
-    if ( NULL != any.mContainer )
+    if ( nullptr != any.mContainer )
     {
       mContainer = any.mContainer->mCloneFunc( *any.mContainer );
     }
     else
     {
       // Otherwise mark new container as empty
-      mContainer = NULL;
+      mContainer = nullptr;
     }
   }
 
@@ -113,7 +113,7 @@ public:
   Any& operator=( const Type& value )
   {
     // If the container is empty then assign the new value
-    if ( NULL == mContainer )
+    if ( nullptr == mContainer )
     {
       mContainer = new AnyContainerImpl< Type >( value );
     }
@@ -176,7 +176,7 @@ public:
   template<typename Type>
   const Type& Get() const
   {
-    if ( NULL == mContainer )
+    if ( nullptr == mContainer )
     {
       AssertAlways( "Any::Get(). mContainer is NULL" );
     }
@@ -196,7 +196,7 @@ public:
   template<typename Type>
   Type* GetPointer()
   {
-    if( NULL == mContainer )
+    if( nullptr == mContainer )
     {
       return NULL;
     }
@@ -217,7 +217,7 @@ public:
   template<typename Type>
   const Type* GetPointer() const
   {
-    if( NULL == mContainer )
+    if( nullptr == mContainer )
     {
       return NULL;
     }
@@ -237,7 +237,7 @@ public:
    */
   bool Empty() const
   {
-    return ( NULL == mContainer ) ? true : false;
+    return ( nullptr == mContainer ) ? true : false;
   }
 
   struct AnyContainerBase;    // Forward declaration for typedef

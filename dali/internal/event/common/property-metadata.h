@@ -71,7 +71,7 @@ public:
    */
   bool IsAnimatable( void ) const
   {
-    return NULL != mSceneGraphProperty;
+    return nullptr != mSceneGraphProperty;
   }
 
   /**
@@ -285,7 +285,7 @@ public:
   CustomPropertyMetadata( const std::string& propertyName,
                           const Property::Value& propertyValue,
                           Property::AccessMode accessMode )
-  : PropertyMetadata( propertyValue, NULL, ( accessMode != Property::READ_ONLY ) ),
+  : PropertyMetadata( propertyValue, nullptr, ( accessMode != Property::READ_ONLY ) ),
     name( propertyName ),
     key( Property::INVALID_KEY ),
     childPropertyIndex( Property::INVALID_INDEX )

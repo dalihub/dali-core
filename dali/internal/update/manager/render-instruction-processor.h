@@ -69,10 +69,10 @@ public:
   struct SortAttributes
   {
     SortAttributes()
-    : renderItem( NULL ),
-      shader( NULL ),
-      textureSet( NULL ),
-      geometry( NULL ),
+    : renderItem( nullptr ),
+      shader( nullptr ),
+      textureSet( nullptr ),
+      geometry( nullptr ),
       zValue( 0.0f )
     {
     }

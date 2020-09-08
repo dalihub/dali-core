@@ -62,7 +62,7 @@ void TextureSet::SetTexture( size_t index, Texture texture )
   }
   else
   {
-    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 textures
+    GetImplementation(*this).SetTexture( static_cast<uint32_t>( index ), nullptr ); // only support 4,294,967,295 textures
   }
 }
 
@@ -81,7 +81,7 @@ void TextureSet::SetSampler( size_t index, Sampler sampler )
   }
   else
   {
-    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), NULL ); // only support 4,294,967,295 samplers
+    GetImplementation(*this).SetSampler( static_cast<uint32_t>( index ), nullptr ); // only support 4,294,967,295 samplers
   }
 }
 

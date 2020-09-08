@@ -443,7 +443,7 @@ std::string TypeInfo::GetPropertyName( Property::Index index ) const
 
 void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
 {
-  if( NULL == function)
+  if( nullptr == function)
   {
     DALI_LOG_WARNING("Action function is empty\n");
   }
@@ -465,7 +465,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
 
 void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunction function )
 {
-  if( NULL == function)
+  if( nullptr == function)
   {
     DALI_LOG_WARNING("Connector function is empty\n");
   }
@@ -489,7 +489,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 {
   // The setter can be empty as a property can be read-only.
 
-  if ( NULL == getFunc )
+  if ( nullptr == getFunc )
   {
     DALI_ASSERT_ALWAYS( ! "GetProperty Function is empty" );
   }
@@ -514,7 +514,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 
   // The setter can be empty as a property can be read-only.
 
-  if ( NULL == getFunc )
+  if ( nullptr == getFunc )
   {
     DALI_ASSERT_ALWAYS( ! "GetProperty Function is empty" );
   }

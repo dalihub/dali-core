@@ -25,7 +25,7 @@ namespace Dali
 {
 
 Any::Any()
-: mContainer( NULL )
+: mContainer( nullptr )
 {
 }
 
@@ -33,10 +33,10 @@ Any::~Any()
 {
   // Call the implementation deletion function, which will invalidate mContainer
 
-  if ( NULL != mContainer )
+  if ( nullptr != mContainer )
   {
     mContainer->mDeleteFunc( mContainer );
-    mContainer = NULL;
+    mContainer = nullptr;
   }
 }
 
@@ -44,16 +44,16 @@ Any& Any::operator=( const Any& any )
 {
   if( &any != this )
   {
-    if( NULL == any.mContainer )
+    if( nullptr == any.mContainer )
     {
       delete mContainer;
-      mContainer = NULL;
+      mContainer = nullptr;
     }
     else
     {
       AnyContainerBase* tmp = mContainer;
 
-      if( NULL != mContainer )
+      if( nullptr != mContainer )
       {
         // Check if two Any types have the same type. Avoids assignments of values with different types.
         if( mContainer->GetType() != any.GetType() )

@@ -51,18 +51,18 @@ void TextureSet::SetTexture( uint32_t index, TexturePtr texture )
 
     for( uint32_t i(textureCount); i<=index; ++i )
     {
-      mTextures[i] = NULL;
+      mTextures[i] = nullptr;
 
       if( !samplerExist )
       {
-        mSamplers[i] = NULL;
+        mSamplers[i] = nullptr;
       }
     }
   }
 
   mTextures[index]= texture;
 
-  Render::Texture* renderTexture(0);
+  Render::Texture* renderTexture(nullptr);
   if( texture )
   {
     renderTexture = texture->GetRenderObject();
@@ -73,7 +73,7 @@ void TextureSet::SetTexture( uint32_t index, TexturePtr texture )
 
 Texture* TextureSet::GetTexture( uint32_t index ) const
 {
-  Texture* result(0);
+  Texture* result(nullptr);
   if( index < mTextures.size() )
   {
     result = mTextures[index].Get();
@@ -94,13 +94,13 @@ void TextureSet::SetSampler( uint32_t index, SamplerPtr sampler )
     mSamplers.resize( index + 1 );
     for( uint32_t i = samplerCount; i<=index; ++i )
     {
-      mSamplers[i] = NULL;
+      mSamplers[i] = nullptr;
     }
   }
 
   mSamplers[index] = sampler;
 
-  Render::Sampler* renderSampler(0);
+  Render::Sampler* renderSampler(nullptr);
   if( sampler )
   {
     renderSampler = sampler->GetSamplerRenderObject();
@@ -111,7 +111,7 @@ void TextureSet::SetSampler( uint32_t index, SamplerPtr sampler )
 
 Sampler* TextureSet::GetSampler( uint32_t index ) const
 {
-  Sampler* result(0);
+  Sampler* result(nullptr);
   if( index < mSamplers.size() )
   {
     result = mSamplers[index].Get();
@@ -136,7 +136,7 @@ const SceneGraph::TextureSet* TextureSet::GetTextureSetSceneObject() const
 
 TextureSet::TextureSet()
 :mEventThreadServices( EventThreadServices::Get() ),
- mSceneObject( NULL )
+ mSceneObject( nullptr )
 {
 }
 

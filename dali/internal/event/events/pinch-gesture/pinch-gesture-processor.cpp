@@ -108,7 +108,7 @@ PinchGestureProcessor::PinchGestureProcessor()
 : GestureProcessor( GestureType::PINCH ),
   mPinchGestureDetectors(),
   mCurrentPinchEmitters(),
-  mCurrentPinchEvent(NULL),
+  mCurrentPinchEvent(nullptr),
   mMinimumPinchDistance(-1.0f),
   mMinimumTouchEvents( MINIMUM_TOUCH_EVENTS_REQUIRED ),
   mMinimumTouchEventsAfterStart( MINIMUM_TOUCH_EVENTS_REQUIRED_AFTER_START )
@@ -188,7 +188,7 @@ void PinchGestureProcessor::Process( Scene& scene, const PinchGestureEvent& pinc
         // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentPinchEvent = &pinchEvent;
         ProcessAndEmit( hitTestResults );
-        mCurrentPinchEvent = NULL;
+        mCurrentPinchEvent = nullptr;
       }
       break;
     }

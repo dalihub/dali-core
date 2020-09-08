@@ -687,7 +687,7 @@ void Renderer::OnNotifyDefaultPropertyAnimation( Animation& animation, Property:
 
 const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  const SceneGraph::PropertyBase* property = NULL;
+  const SceneGraph::PropertyBase* property = nullptr;
 
   if( index == DevelRenderer::Property::OPACITY )
   {

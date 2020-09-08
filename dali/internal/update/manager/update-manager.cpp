@@ -167,10 +167,10 @@ struct UpdateManager::Impl
     transformManager(),
     animationPlaylist( animationPlaylist ),
     propertyNotifier( propertyNotifier ),
-    shaderSaver( NULL ),
+    shaderSaver( nullptr ),
     discardQueue( discardQueue ),
     renderController( renderController ),
-    sceneController( NULL ),
+    sceneController( nullptr ),
     renderManager( renderManager ),
     renderQueue( renderQueue ),
     renderTaskProcessor( renderTaskProcessor ),
@@ -178,9 +178,9 @@ struct UpdateManager::Impl
     renderers(),
     textureSets(),
     shaders(),
-    panGestureProcessor( NULL ),
+    panGestureProcessor( nullptr ),
     messageQueue( renderController, sceneGraphBuffers ),
-    frameCallbackProcessor( NULL ),
+    frameCallbackProcessor( nullptr ),
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( NodePropertyFlags::TRANSFORM ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
@@ -194,7 +194,7 @@ struct UpdateManager::Impl
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue );
 
     // create first 'dummy' node
-    nodes.PushBack(0u);
+    nodes.PushBack(nullptr);
   }
 
   ~Impl()
@@ -207,7 +207,7 @@ struct UpdateManager::Impl
         RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
         for ( auto&& task : tasks )
         {
-          task->SetSourceNode( NULL );
+          task->SetSourceNode( nullptr );
         }
       }
     }
@@ -313,7 +313,7 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               RenderManager& renderManager,
                               RenderQueue& renderQueue,
                               RenderTaskProcessor& renderTaskProcessor )
-  : mImpl(NULL)
+  : mImpl(nullptr)
 {
   mImpl = new Impl( notificationManager,
                     animationFinishedNotifier,
@@ -374,7 +374,7 @@ void UpdateManager::UninstallRoot( Layer* layer )
 
 void UpdateManager::AddNode( OwnerPointer<Node>& node )
 {
-  DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
+  DALI_ASSERT_ALWAYS( nullptr == node->GetParent() ); // Should not have a parent yet
 
   // Nodes must be sorted by pointer
   Node* rawNode = node.Release();
@@ -394,9 +394,9 @@ void UpdateManager::AddNode( OwnerPointer<Node>& node )
 
 void UpdateManager::ConnectNode( Node* parent, Node* node )
 {
-  DALI_ASSERT_ALWAYS( NULL != parent );
-  DALI_ASSERT_ALWAYS( NULL != node );
-  DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should not have a parent yet
+  DALI_ASSERT_ALWAYS( nullptr != parent );
+  DALI_ASSERT_ALWAYS( nullptr != node );
+  DALI_ASSERT_ALWAYS( nullptr == node->GetParent() ); // Should not have a parent yet
 
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] ConnectNode\n", node );
 
@@ -414,7 +414,7 @@ void UpdateManager::DisconnectNode( Node* node )
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] DisconnectNode\n", node );
 
   Node* parent = node->GetParent();
-  DALI_ASSERT_ALWAYS( NULL != parent );
+  DALI_ASSERT_ALWAYS( nullptr != parent );
   parent->SetDirtyFlag( NodePropertyFlags::CHILD_DELETED ); // make parent dirty so that render items dont get reused
 
   parent->DisconnectChild( mSceneGraphBuffers.GetUpdateBufferIndex(), *node );
@@ -428,8 +428,8 @@ void UpdateManager::DisconnectNode( Node* node )
 
 void UpdateManager::DestroyNode( Node* node )
 {
-  DALI_ASSERT_ALWAYS( NULL != node );
-  DALI_ASSERT_ALWAYS( NULL == node->GetParent() ); // Should have been disconnected
+  DALI_ASSERT_ALWAYS( nullptr != node );
+  DALI_ASSERT_ALWAYS( nullptr == node->GetParent() ); // Should have been disconnected
 
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%x] DestroyNode\n", node );
 

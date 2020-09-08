@@ -131,7 +131,7 @@ public:
     template< class T >
     Function( const T& object )
     : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                    NULL, // uses operator() instead of member function
+                    nullptr, // uses operator() instead of member function
                     reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher2< T, P&, const PropertyInputContainer& >::Dispatch ),
                     reinterpret_cast< CallbackBase::Destructor >( &Destroyer< T >::Delete ) ),
       mCopyConstructorDispatcher( reinterpret_cast< CopyConstructorDispatcher >( &ObjectCopyConstructorDispatcher< T >::Copy ) )
@@ -171,7 +171,7 @@ public:
      */
     CallbackBase* Clone()
     {
-      CallbackBase* callback = NULL;
+      CallbackBase* callback = nullptr;
       if ( mImpl && mImpl->mObjectPointer && mCopyConstructorDispatcher )
       {
         callback = new Function( mCopyConstructorDispatcher( reinterpret_cast< UndefinedClass* >( mImpl->mObjectPointer ) ) /* Copy the object */,
@@ -258,7 +258,7 @@ public:
      */
     Function( CallbackBase::Function function )
     : CallbackBase( function ),
-      mCopyConstructorDispatcher( NULL )
+      mCopyConstructorDispatcher( nullptr )
     {
     }
 

@@ -476,7 +476,7 @@ Bitmap* Bitmap::New( const Profile profile = BITMAP_2D_PACKED_PIXELS,
       return new Dali::Internal::BitmapCompressed( discardable );
     }
   }
-  return 0;
+  return nullptr;
 }
 
 
@@ -494,7 +494,7 @@ Bitmap::Bitmap( ResourcePolicy::Discardable discardable, Dali::Integration::Pixe
 PixelBuffer* Bitmap::GetBufferOwnership()
 {
   PixelBuffer* buffer = mData;
-  mData = NULL;
+  mData = nullptr;
   return buffer;
 }
 
@@ -521,7 +521,7 @@ void Bitmap::DeletePixelBuffer()
     return;
   }
   free ( mData );
-  mData = NULL;
+  mData = nullptr;
 }
 
 

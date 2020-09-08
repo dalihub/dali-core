@@ -68,10 +68,10 @@ bool CheckExclusivity( const Node& node, const RenderTask& task )
 Layer* FindLayer( Node& node )
 {
   Node* currentNode( &node );
-  Layer* layer( NULL );
+  Layer* layer( nullptr );
   while( currentNode )
   {
-    if( ( layer = currentNode->GetLayer() ) != NULL )
+    if( ( layer = currentNode->GetLayer() ) != nullptr )
     {
       return layer;
     }
@@ -79,7 +79,7 @@ Layer* FindLayer( Node& node )
     currentNode = currentNode->GetParent();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -233,7 +233,7 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
   {
     RenderTask& renderTask = **iter;
 
-    const bool hasFrameBuffer = NULL != renderTask.GetFrameBuffer();
+    const bool hasFrameBuffer = nullptr != renderTask.GetFrameBuffer();
     const bool isDefaultRenderTask = isFirstRenderTask;
     isFirstRenderTask = false;
 

@@ -153,7 +153,7 @@ CameraActorPtr CameraActor::New( const Size& size )
 
 CameraActor::CameraActor( const SceneGraph::Node& node )
 : Actor( Actor::BASIC, node ),
-  mSceneObject( NULL ),
+  mSceneObject( nullptr ),
   mTarget( SceneGraph::Camera::DEFAULT_TARGET_POSITION ),
   mType( SceneGraph::Camera::DEFAULT_TYPE ),
   mProjectionMode( SceneGraph::Camera::DEFAULT_MODE ),
@@ -754,7 +754,7 @@ Property::Value CameraActor::GetDefaultPropertyCurrentValue( Property::Index ind
 
 const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  const PropertyInputImpl* property( NULL );
+  const PropertyInputImpl* property( nullptr );
 
   switch( index )
   {

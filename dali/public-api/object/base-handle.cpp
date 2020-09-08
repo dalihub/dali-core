@@ -77,12 +77,12 @@ const BaseObject& BaseHandle::GetBaseObject() const
 
 void BaseHandle::Reset()
 {
-  mObjectHandle = NULL;
+  mObjectHandle = nullptr;
 }
 
 BaseHandle::operator BaseHandle::BooleanType() const
 {
-  return mObjectHandle ? &BaseHandle::ThisIsSaferThanReturningVoidStar : NULL;
+  return mObjectHandle ? &BaseHandle::ThisIsSaferThanReturningVoidStar : nullptr;
 }
 
 bool BaseHandle::operator==(const BaseHandle& rhs) const

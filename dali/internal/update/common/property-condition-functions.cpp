@@ -35,7 +35,7 @@ namespace SceneGraph
 
 ConditionFunction LessThan::GetFunction(Property::Type valueType)
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch(valueType)
   {
@@ -124,7 +124,7 @@ bool LessThan::EvalDefault( const Dali::PropertyInput& value, PropertyNotificati
 
 ConditionFunction GreaterThan::GetFunction(Property::Type valueType)
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch(valueType)
   {
@@ -213,7 +213,7 @@ bool GreaterThan::EvalDefault( const Dali::PropertyInput& value, PropertyNotific
 
 ConditionFunction Inside::GetFunction(Property::Type valueType)
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch(valueType)
   {
@@ -302,7 +302,7 @@ bool Inside::EvalDefault( const Dali::PropertyInput& value, PropertyNotification
 
 ConditionFunction Outside::GetFunction(Property::Type valueType)
 {
-  ConditionFunction function = NULL;
+  ConditionFunction function = nullptr;
 
   switch(valueType)
   {

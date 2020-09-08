@@ -125,13 +125,13 @@ Renderer* Renderer::New()
 }
 
 Renderer::Renderer()
-: mSceneController( 0 ),
-  mRenderer( NULL ),
-  mTextureSet( NULL ),
-  mGeometry( NULL ),
-  mShader( NULL ),
-  mRenderDataProvider( NULL ),
-  mBlendColor( NULL ),
+: mSceneController( nullptr ),
+  mRenderer( nullptr ),
+  mTextureSet( nullptr ),
+  mGeometry( nullptr ),
+  mShader( nullptr ),
+  mRenderDataProvider( nullptr ),
+  mBlendColor( nullptr ),
   mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
@@ -160,12 +160,12 @@ Renderer::~Renderer()
   if( mTextureSet )
   {
     mTextureSet->RemoveObserver( this );
-    mTextureSet = NULL;
+    mTextureSet = nullptr;
   }
   if( mShader )
   {
     mShader->RemoveConnectionObserver( *this );
-    mShader = NULL;
+    mShader = nullptr;
   }
 }
 
@@ -452,7 +452,7 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
 {
   if( blendColor == Color::TRANSPARENT )
   {
-    mBlendColor = NULL;
+    mBlendColor = nullptr;
   }
   else
   {
@@ -640,10 +640,10 @@ void Renderer::DisconnectFromSceneGraph( SceneController& sceneController, Buffe
   if( mRenderer )
   {
     mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
-    mRenderer = NULL;
+    mRenderer = nullptr;
   }
-  mSceneController = NULL;
-  mRenderDataProvider = NULL;
+  mSceneController = nullptr;
+  mRenderDataProvider = nullptr;
 }
 
 void Renderer::UpdateTextureSet()
@@ -738,7 +738,7 @@ void Renderer::TextureSetChanged()
 
 void Renderer::TextureSetDeleted()
 {
-  mTextureSet = NULL;
+  mTextureSet = nullptr;
 
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
@@ -767,7 +767,7 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 {
   if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
   {
-    mShader = NULL;
+    mShader = nullptr;
   }
 }
 

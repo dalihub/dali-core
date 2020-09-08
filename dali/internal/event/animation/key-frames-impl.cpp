@@ -30,7 +30,7 @@ KeyFrames* KeyFrames::New()
 
 KeyFrames::KeyFrames()
   : mType(Property::NONE),
-    mKeyFrames(NULL)
+    mKeyFrames(nullptr)
 {
 }
 

@@ -89,7 +89,7 @@ const Render::Geometry* Geometry::GetRenderObject() const
 
 Geometry::Geometry()
 : mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( NULL ),
+  mRenderObject( nullptr ),
   mType(Dali::Geometry::TRIANGLES)
 {
 }

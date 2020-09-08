@@ -70,7 +70,7 @@ void TextureSet::SetSampler( uint32_t index, Render::Sampler* sampler )
     mSamplers.Resize( index + 1 );
     for( uint32_t i(samplerCount); i<=index; ++i )
     {
-      mSamplers[i] = NULL;
+      mSamplers[i] = nullptr;
     }
   }
 
@@ -94,11 +94,11 @@ void TextureSet::SetTexture( uint32_t index, Render::Texture* texture )
 
     for( uint32_t i(textureCount); i<=index; ++i )
     {
-      mTextures[i] = 0;
+      mTextures[i] = nullptr;
 
       if( !samplerExist )
       {
-        mSamplers[i] = 0;
+        mSamplers[i] = nullptr;
       }
     }
   }

@@ -236,7 +236,7 @@ void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
 
 LayerList::LayerList( SceneGraph::UpdateManager& updateManager )
 : mUpdateManager( updateManager ),
-  mRoot( NULL )
+  mRoot( nullptr )
 {
 }
 

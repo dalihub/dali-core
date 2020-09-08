@@ -92,7 +92,7 @@ uint32_t PixelData::GetBufferSize() const
 DevelPixelData::PixelDataBuffer PixelData::ReleaseBuffer()
 {
   DevelPixelData::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mReleaseFunction);
-  mBuffer = NULL;
+  mBuffer = nullptr;
   return pixelDataBuffer;
 }
 

@@ -33,13 +33,13 @@ namespace SceneGraph
 {
 
 RenderInstruction::RenderInstruction()
-: mRenderTracker( NULL ),
+: mRenderTracker( nullptr ),
   mClearColor(),
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
   mIgnoreRenderToFbo( false ),
-  mFrameBuffer( 0 ),
-  mCamera( 0 ),
+  mFrameBuffer( nullptr ),
+  mCamera( nullptr ),
   mNextFreeRenderList( 0 )
 {
   // reserve 6 lists, which is enough for three layers with opaque and transparent things on
@@ -99,7 +99,7 @@ const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeTyp
   // Return null if the caller has passed an invalid index:
   if( index >= std::min( mNextFreeRenderList, mRenderLists.Size() ) )
   {
-    return 0;
+    return nullptr;
   }
 
   return mRenderLists[ index ];
@@ -112,10 +112,10 @@ void RenderInstruction::Reset( Camera*         camera,
 {
   mCamera = camera;
   mViewport = viewport ? *viewport : Viewport();
-  mIsViewportSet = NULL != viewport;
+  mIsViewportSet = nullptr != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;
-  mIsClearColorSet = NULL != clearColor;
-  mRenderTracker = NULL;
+  mIsClearColorSet = nullptr != clearColor;
+  mRenderTracker = nullptr;
   mNextFreeRenderList = 0;
   mFrameBuffer = frameBuffer;
 

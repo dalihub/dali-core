@@ -71,7 +71,7 @@ const char* const SIGNAL_CONTEXT_LOST =              "contextLost";
 const char* const SIGNAL_CONTEXT_REGAINED =          "contextRegained";
 const char* const SIGNAL_SCENE_CREATED =             "sceneCreated";
 
-TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
+TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), nullptr );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
@@ -101,7 +101,7 @@ void Stage::Initialize( Scene& scene )
 
 StagePtr Stage::GetCurrent()
 {
-  StagePtr stage( NULL );
+  StagePtr stage( nullptr );
   // no checking in this version
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
   if( tls )
