@@ -703,8 +703,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  std::vector<Render::Texture*> textures = mRenderDataProvider->GetTextures();
-  for (Render::Texture* texture : textures)
+  for( const auto& texture : mRenderDataProvider->GetTextures() )
   {
     if (texture && texture->IsNativeImage())
     {
