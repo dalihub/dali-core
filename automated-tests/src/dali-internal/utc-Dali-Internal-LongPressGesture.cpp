@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/long-press-gesture-devel.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
 
 using namespace Dali;
@@ -38,7 +39,7 @@ int UtcDaliLongPressGestureConstructorP(void)
 {
   TestApplication application;
 
-  LongPressGesture gesture(new Internal::LongPressGesture( GestureState::STARTED ));
+  LongPressGesture gesture = DevelLongPressGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::LONG_PRESS, gesture.GetType(), TEST_LOCATION);
 
@@ -63,13 +64,13 @@ int UtcDaliLongPressGestureConstructorP(void)
 int UtcDaliLongPressGestureAssignmentP(void)
 {
   // Test Assignment operator
-  LongPressGesture gesture(new Internal::LongPressGesture( GestureState::STARTED ));
+  LongPressGesture gesture = DevelLongPressGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(1u, gesture.GetNumberOfTouches(), TEST_LOCATION);
   DALI_TEST_EQUALS(GestureType::LONG_PRESS, gesture.GetType(), TEST_LOCATION);
 
   GetImplementation( gesture ).SetNumberOfTouches( 5u );
 
-  LongPressGesture gesture2(new Internal::LongPressGesture( GestureState::FINISHED ));
+  LongPressGesture gesture2 = DevelLongPressGesture::New( GestureState::FINISHED );
   DALI_TEST_EQUALS(GestureState::FINISHED, gesture2.GetState(), TEST_LOCATION);
   gesture2 = gesture;
   DALI_TEST_EQUALS(5u, gesture2.GetNumberOfTouches(), TEST_LOCATION);
@@ -92,7 +93,7 @@ int UtcDaliLongPressGestureGetNumberOfTouchesP(void)
 {
   TestApplication application;
 
-  LongPressGesture gesture(new Internal::LongPressGesture(GestureState::STARTED));
+  LongPressGesture gesture = DevelLongPressGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(gesture.GetNumberOfTouches(), 1, TEST_LOCATION);
 
   GetImplementation(gesture).SetNumberOfTouches(4);
@@ -105,7 +106,7 @@ int UtcDaliLongPressGestureGetScreenPointP(void)
 {
   TestApplication application;
 
-  LongPressGesture gesture(new Internal::LongPressGesture(GestureState::STARTED));
+  LongPressGesture gesture = DevelLongPressGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(gesture.GetScreenPoint(), Vector2::ZERO , TEST_LOCATION);
   DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2::ZERO , TEST_LOCATION);
 
@@ -120,7 +121,7 @@ int UtcDaliLongPressGestureGetLocalPointP(void)
 {
   TestApplication application;
 
-  LongPressGesture gesture(new Internal::LongPressGesture(GestureState::STARTED));
+  LongPressGesture gesture = DevelLongPressGesture::New( GestureState::STARTED );
   DALI_TEST_EQUALS(gesture.GetLocalPoint(), Vector2::ZERO , TEST_LOCATION);
   DALI_TEST_EQUALS(gesture.GetScreenPoint(), Vector2::ZERO , TEST_LOCATION);
 
