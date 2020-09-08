@@ -28,7 +28,7 @@ namespace DevelKeyEvent
 {
 
 /**
- * @brief Creates an initialized WheelEvent.
+ * @brief Creates an initialized KeyEvent.
  *
  * @SINCE_1_9.27
  * @param[in]  keyName         The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
