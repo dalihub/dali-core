@@ -65,7 +65,7 @@ public:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~ConnectionTrackerInterface();
+  ~ConnectionTrackerInterface() override;
 
   /**
    * @brief Called when a signal is connected.

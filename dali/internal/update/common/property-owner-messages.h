@@ -54,7 +54,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~PropertyOwnerMessageBase();
+  ~PropertyOwnerMessageBase() override;
 
 private:
 
@@ -98,14 +98,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~AnimatablePropertyMessage()
+  ~AnimatablePropertyMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }
@@ -176,14 +176,14 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~AnimatablePropertyComponentMessage()
+  ~AnimatablePropertyComponentMessage() override
   {
   }
 
   /**
    * @copydoc MessageBase::Process
    */
-  virtual void Process( BufferIndex updateBufferIndex )
+  void Process( BufferIndex updateBufferIndex ) override
   {
     (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
   }

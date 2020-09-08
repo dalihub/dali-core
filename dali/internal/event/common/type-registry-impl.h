@@ -252,7 +252,7 @@ private:
 
 private:
   TypeRegistry();
-  ~TypeRegistry();
+  ~TypeRegistry() override;
 
   /**
    * @brief Undefined Copy Constructor

@@ -111,7 +111,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~RotationGesture() = default;
+  ~RotationGesture() override = default;
 
 private:
   Radian mRotation;

@@ -197,7 +197,7 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~PanGesture();
+  ~PanGesture() override;
 
   /**
    * Adds a PanGesture to the internal circular-buffer waiting to be handled by UpdateProperties.

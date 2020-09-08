@@ -81,7 +81,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~ConstraintBase();
+  ~ConstraintBase() override;
 
   /**
    * Property resetter observes the lifecycle of this object
@@ -175,14 +175,14 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
    */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner )
+  void PropertyOwnerConnected( PropertyOwner& owner ) override
   {
   }
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
   {
     if ( !mDisconnected )
     {
@@ -199,7 +199,7 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed()
    */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner )
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override
   {
     if ( !mDisconnected )
     {

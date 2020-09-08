@@ -365,7 +365,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Object();
+  ~Object() override;
 
   /**
    * Called immediately by derived classes, after the scene-object has been created & passed to the scene-graph.

@@ -69,7 +69,7 @@ protected:
   /**
    * Virtual protected destructor.
    */
-  virtual ~GestureProcessor();
+  ~GestureProcessor() override;
 
   // Methods to be used by deriving classes
 
@@ -165,7 +165,7 @@ private:
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(Object& object) { }
+  void SceneObjectAdded(Object& object) override { }
 
   /**
    * This will be called when the actor is removed from the stage, we should clear and stop
@@ -173,14 +173,14 @@ private:
    * @param[in] object The object object.
    * @see Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved(Object& object);
+  void SceneObjectRemoved(Object& object) override;
 
   /**
    * This will be called when the actor is destroyed. We should clear the actor.
    * No need to stop observing as the object is being destroyed anyway.
    * @see Object::Observer::ObjectDestroyed()
    */
-  virtual void ObjectDestroyed(Object& object);
+  void ObjectDestroyed(Object& object) override;
 
 
 protected:  //Data

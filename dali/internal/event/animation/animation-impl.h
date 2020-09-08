@@ -456,7 +456,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Animation();
+  ~Animation() override;
 
 private:
 

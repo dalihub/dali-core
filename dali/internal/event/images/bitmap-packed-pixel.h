@@ -49,8 +49,8 @@ public:
   BitmapPackedPixel( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
 
 public:
-  virtual const Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() const { return this; }
-  virtual Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() { return this; }
+  const Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() const override { return this; }
+  Bitmap::PackedPixelsProfile* GetPackedPixelsProfile() override { return this; }
 
   /**
    * (Re-)Allocate pixel buffer for the Bitmap. Any previously allocated pixel buffer is deleted.
@@ -64,11 +64,11 @@ public:
    * @param[in] bufferHeight  Buffer height in pixels
    * @return pixel buffer pointer
    */
-  virtual Dali::Integration::PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
+  Dali::Integration::PixelBuffer* ReserveBuffer(Pixel::Format pixelFormat,
                                      uint32_t width,
                                      uint32_t height,
                                      uint32_t bufferWidth = 0,
-                                     uint32_t bufferHeight = 0);
+                                     uint32_t bufferHeight = 0) override;
 
   /**
    * Assign a pixel buffer. Any previously allocated pixel buffer is deleted.
@@ -83,19 +83,19 @@ public:
    * @param[in] bufferWidth   Buffer width (stride) in pixels
    * @param[in] bufferHeight  Buffer height in pixels
    */
-  virtual void AssignBuffer(Pixel::Format pixelFormat,
+  void AssignBuffer(Pixel::Format pixelFormat,
                             Dali::Integration::PixelBuffer* buffer,
                             uint32_t bufferSize,
                             uint32_t width,
                             uint32_t height,
                             uint32_t bufferWidth = 0,
-                            uint32_t bufferHeight = 0);
+                            uint32_t bufferHeight = 0) override;
 
   /**
    * Get the width of the buffer (stride)
    * @return The width of the buffer in pixels
    */
-  virtual unsigned GetBufferWidth() const
+  unsigned GetBufferWidth() const override
   {
     return mBufferWidth;
   }
@@ -104,7 +104,7 @@ public:
    * Get the height of the buffer
    * @return The height of the buffer in pixels
    */
-  virtual unsigned GetBufferHeight() const
+  unsigned GetBufferHeight() const override
   {
     return mBufferHeight;
   }
@@ -113,7 +113,7 @@ public:
    * Get the pixel buffer size in bytes
    * @return The buffer size in bytes.
    */
-  virtual uint32_t GetBufferSize() const
+  uint32_t GetBufferSize() const override
   {
     return mBufferWidth * mBytesPerPixel * mBufferHeight;
   }
@@ -121,13 +121,13 @@ public:
   /**
    * See Dali::Integration::Bitmap::GetReleaseFunction()
    */
-  ReleaseFunction GetReleaseFunction(){ return FREE; }
+  ReleaseFunction GetReleaseFunction() override{ return FREE; }
 
   /**
    * Get the pixel buffer stride.
    * @return The buffer stride (in bytes).
    */
-  virtual uint32_t GetBufferStride() const;
+  uint32_t GetBufferStride() const override;
 
   /**
    * Get the pixel format
@@ -142,14 +142,14 @@ public:
    * Check the bitmap data and test whether it has any transparent pixels.
    * This property can then be tested for with IsFullyOpaque().
    */
-  virtual void TestForTransparency();
+  void TestForTransparency() override;
 
 protected:
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~BitmapPackedPixel();
+  ~BitmapPackedPixel() override;
 
 protected:
 

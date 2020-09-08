@@ -132,13 +132,13 @@ public:
    * From RenderTaskDefaults; retrieve the default root actor.
    * @return The default root actor.
    */
-  virtual Actor& GetDefaultRootActor();
+  Actor& GetDefaultRootActor() override;
 
   /**
    * From RenderTaskDefaults; retrieve the default camera actor.
    * @return The default camera actor.
    */
-  virtual CameraActor& GetDefaultCameraActor();
+  CameraActor& GetDefaultCameraActor() override;
 
   // Layers
 
@@ -318,12 +318,12 @@ private: // Implementation of ContextNotificationInterface:
   /**
    * @copydoc Dali::Integration::NotifyContextLost();
    */
-  virtual void NotifyContextLost();
+  void NotifyContextLost() override;
 
   /**
    * @copydoc Dali::Integration::NotifyContextRegained();
    */
-  virtual void NotifyContextRegained();
+  void NotifyContextRegained() override;
 
 private:
 
@@ -335,7 +335,7 @@ private:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Stage();
+  ~Stage() override;
 
 private:
 

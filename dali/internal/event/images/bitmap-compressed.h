@@ -46,8 +46,8 @@ public:
    */
   BitmapCompressed( ResourcePolicy::Discardable discardable = ResourcePolicy::OWNED_RETAIN );
 
-  virtual const Bitmap::CompressedProfile* GetCompressedProfile() const { return this; }
-  virtual Bitmap::CompressedProfile* GetCompressedProfile() { return this; }
+  const Bitmap::CompressedProfile* GetCompressedProfile() const override { return this; }
+  Bitmap::CompressedProfile* GetCompressedProfile() override { return this; }
 
 private:
   /**
@@ -74,16 +74,16 @@ public:
    * @param[in] bufferSize    Buffer size in bytes
    * @return pixel buffer pointer
    */
-  virtual Dali::Integration::PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
+  Dali::Integration::PixelBuffer* ReserveBufferOfSize( Pixel::Format pixelFormat,
                                      const uint32_t width,
                                      const uint32_t height,
-                                     const uint32_t numBytes );
+                                     const uint32_t numBytes ) override;
 
   /**
    * Get the pixel buffer size in bytes
    * @return The buffer size in bytes.
    */
-  virtual uint32_t GetBufferSize() const
+  uint32_t GetBufferSize() const override
   {
     return mBufferSize;
   }
@@ -91,14 +91,14 @@ public:
   /**
    * See Dali::Integration::Bitmap::GetReleaseFunction()
    */
-  ReleaseFunction GetReleaseFunction(){ return FREE; }
+  ReleaseFunction GetReleaseFunction() override{ return FREE; }
 
 protected:
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~BitmapCompressed();
+  ~BitmapCompressed() override;
 
 private:
 

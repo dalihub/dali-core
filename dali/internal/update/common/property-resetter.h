@@ -45,7 +45,7 @@ public:
   /**
    * Virtual Destructor
    */
-  virtual ~PropertyResetterBase()
+  ~PropertyResetterBase() override
   {
     if( mPropertyOwner != nullptr )
     {
@@ -91,7 +91,7 @@ public:
    *
    * @param[in] owner The property owner
    */
-  virtual void PropertyOwnerConnected( PropertyOwner& owner ) override
+  void PropertyOwnerConnected( PropertyOwner& owner ) override
   {
     mDisconnected = false;
     mActive = ACTIVE;
@@ -102,7 +102,7 @@ public:
    * @param[in] bufferIndex the current buffer index
    * @param[in] owner The property owner
    */
-  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
+  void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner ) override
   {
     mDisconnected = true;
   }
@@ -111,7 +111,7 @@ public:
    * Called shortly before the propertyOwner is destroyed
    * @param[in] owner The property owner
    */
-  virtual void PropertyOwnerDestroyed( PropertyOwner& owner ) override
+  void PropertyOwnerDestroyed( PropertyOwner& owner ) override
   {
     mDisconnected = true;
     mPropertyOwner = nullptr;
@@ -200,7 +200,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Resetter()
+  ~Resetter() override
   {
     // Disconnect from modifier object. Although this resetter should match the lifecycle of the modifier object,
     // there are situations where it is deleted first (e.g. if the property owner is destroyed)
@@ -230,7 +230,7 @@ private:
   /**
    * The Animator or Constraint is destroyed
    */
-  virtual void ObjectDestroyed() override
+  void ObjectDestroyed() override
   {
     // When the modifier is destroyed, reduce the running value to ensure we stay alive for
     // another frame to reset the other buffer.

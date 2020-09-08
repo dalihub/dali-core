@@ -74,7 +74,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatorConnector()
+  ~AnimatorConnector() override
   {
   }
 
@@ -101,7 +101,7 @@ private:
   /**
    * @copydoc AnimatorConnectorBase::DoCreateAnimator()
    */
-  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) override final
+  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) final
   {
     bool resetterRequired = false;
     // components only supported for float property type
@@ -173,7 +173,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatorConnector()
+  ~AnimatorConnector() override
   {
   }
 
@@ -200,7 +200,7 @@ private:
   /**
    * @copydoc AnimatorConnectorBase::DoCreateAnimator()
    */
-  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) override final
+  bool DoCreateAnimator( const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty ) final
   {
     bool resetterRequired = false;
     if( mComponentIndex == Property::INVALID_COMPONENT_INDEX )

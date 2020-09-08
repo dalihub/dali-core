@@ -72,14 +72,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Constraint()
+  ~Constraint() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::Apply()
    */
-  virtual void Apply( BufferIndex updateBufferIndex )
+  void Apply( BufferIndex updateBufferIndex ) override
   {
     if ( !mDisconnected )
     {
@@ -130,7 +130,7 @@ private:
   /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::OnDisconnect()
    */
-  virtual void OnDisconnect()
+  void OnDisconnect() override
   {
     // Discard target object/property pointers
     mTargetProperty.Reset();

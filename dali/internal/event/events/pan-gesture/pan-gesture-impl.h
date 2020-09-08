@@ -213,7 +213,7 @@ private:
    *
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~PanGesture() = default;
+  ~PanGesture() override = default;
 
 private:
   Vector2 mVelocity;

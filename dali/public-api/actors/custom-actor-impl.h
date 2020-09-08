@@ -74,7 +74,7 @@ protected:
    * @brief Virtual destructor
    * @SINCE_1_0.0
    */
-  virtual ~CustomActorImpl();
+  ~CustomActorImpl() override;
 
 public:
   /**

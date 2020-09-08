@@ -51,7 +51,7 @@ struct PinchGestureEvent : public GestureEvent
   /**
    * Virtual destructor
    */
-  virtual ~PinchGestureEvent();
+  ~PinchGestureEvent() override;
 
   // Data
 

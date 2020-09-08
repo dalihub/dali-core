@@ -68,7 +68,7 @@ struct DALI_CORE_API WheelEvent : public Event
   /**
    * Virtual destructor
    */
-  virtual ~WheelEvent();
+  ~WheelEvent() override;
 
   // Data
 

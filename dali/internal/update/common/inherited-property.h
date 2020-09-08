@@ -68,14 +68,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedVector3()
+  ~InheritedVector3() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector3>();
   }
@@ -105,7 +105,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -115,7 +115,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -123,7 +123,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  virtual const Vector3& GetVector3( BufferIndex bufferIndex ) const
+  const Vector3& GetVector3( BufferIndex bufferIndex ) const override
   {
     return mValue[ bufferIndex ];
   }
@@ -131,7 +131,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector3()
    */
-  virtual const Vector3& GetConstraintInputVector3( BufferIndex bufferIndex ) const
+  const Vector3& GetConstraintInputVector3( BufferIndex bufferIndex ) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
@@ -219,14 +219,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedColor()
+  ~InheritedColor() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector4>();
   }
@@ -256,7 +256,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -266,7 +266,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -274,7 +274,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector4()
    */
-  virtual const Vector4& GetVector4( BufferIndex bufferIndex ) const
+  const Vector4& GetVector4( BufferIndex bufferIndex ) const override
   {
     return mValue[ bufferIndex ];
   }
@@ -282,7 +282,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector4()
    */
-  virtual const Vector4& GetConstraintInputVector4( BufferIndex bufferIndex ) const
+  const Vector4& GetConstraintInputVector4( BufferIndex bufferIndex ) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
@@ -388,14 +388,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedQuaternion()
+  ~InheritedQuaternion() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Quaternion>();
   }
@@ -425,7 +425,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -435,7 +435,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -443,7 +443,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
+  const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const override
   {
     return mValue[ bufferIndex ];
   }
@@ -451,7 +451,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputQuaternion()
    */
-  virtual const Quaternion& GetConstraintInputQuaternion( BufferIndex bufferIndex ) const
+  const Quaternion& GetConstraintInputQuaternion( BufferIndex bufferIndex ) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
@@ -538,14 +538,14 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedMatrix()
+  ~InheritedMatrix() override
   {
   }
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Matrix>();
   }
@@ -575,7 +575,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -585,7 +585,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -593,7 +593,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  virtual const Matrix& GetMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetMatrix( BufferIndex bufferIndex ) const override
   {
     return mValue[ bufferIndex ];
   }
@@ -601,7 +601,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputMatrix()
    */
-  virtual const Matrix& GetConstraintInputMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetConstraintInputMatrix( BufferIndex bufferIndex ) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.

@@ -92,7 +92,7 @@ public:
   /**
    * Destructor
    */
-  ~Core();
+  ~Core() override;
 
   /**
    * @copydoc Dali::Integration::Core::Initialize()

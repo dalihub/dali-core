@@ -47,7 +47,7 @@ struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
   }
 
   // Destruction
-  ~Impl()
+  ~Impl() override
   {
     Reset();
   }
@@ -64,7 +64,7 @@ struct WeakHandleBase::Impl : public BaseObject::Impl::Observer
   /**
    * From BaseObject::Impl::Observer
    */
-  virtual void ObjectDestroyed( BaseObject& object )
+  void ObjectDestroyed( BaseObject& object ) override
   {
     mObject = nullptr;
   }

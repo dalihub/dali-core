@@ -70,7 +70,7 @@ protected:
   /**
    * @brief Destructor
    */
-  ~VertexBuffer();
+  ~VertexBuffer() override;
 
 private: // implementation
   /**

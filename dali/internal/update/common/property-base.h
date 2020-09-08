@@ -51,7 +51,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PropertyBase();
+  ~PropertyBase() override;
 
   /**
    * Reset the property to a base value; only required if the property is animated.
@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }

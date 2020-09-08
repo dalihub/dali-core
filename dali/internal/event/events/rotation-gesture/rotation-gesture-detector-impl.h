@@ -93,24 +93,24 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~RotationGestureDetector() = default;
+  ~RotationGestureDetector() override = default;
 
 private: // GestureDetector overrides
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
    */
-  virtual void OnActorAttach( Actor& actor ) { /* Nothing to do */ }
+  void OnActorAttach( Actor& actor ) override { /* Nothing to do */ }
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDetach(Actor&)
    */
-  virtual void OnActorDetach( Actor& actor ) { /* Nothing to do */ }
+  void OnActorDetach( Actor& actor ) override { /* Nothing to do */ }
 
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
    */
-  virtual void OnActorDestroyed( Object& object ) { /* Nothing to do */ }
+  void OnActorDestroyed( Object& object ) override { /* Nothing to do */ }
 
 private:
 

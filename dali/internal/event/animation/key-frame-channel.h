@@ -70,11 +70,11 @@ public:
   }
 
 
-  virtual ~KeyFrameChannel()
+  ~KeyFrameChannel() override
   {
   }
 
-  bool IsActive (float progress);
+  bool IsActive (float progress) override;
 
   V GetValue(float progress, Dali::Animation::Interpolation interpolation) const;
 

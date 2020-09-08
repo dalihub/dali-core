@@ -76,7 +76,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~Renderer();
+  ~Renderer() override;
 
   /**
    * Overriden delete operator
@@ -395,24 +395,24 @@ public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
+  void UniformMappingsChanged( const UniformMap& mappings ) override;
 
 public: // ConnectionChangePropagator::Observer
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectionsChanged
    */
-  virtual void ConnectionsChanged( PropertyOwner& owner );
+  void ConnectionsChanged( PropertyOwner& owner ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ConnectedUniformMapChanged( );
+  void ConnectedUniformMapChanged( ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ObservedObjectDestroyed(PropertyOwner& owner);
+  void ObservedObjectDestroyed(PropertyOwner& owner) override;
 
 public: // PropertyOwner implementation
   /**
@@ -425,12 +425,12 @@ public: // From UniformMapDataProvider
   /**
    * @copydoc UniformMapDataProvider::GetUniformMapChanged
    */
-  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const{ return mUniformMapChanged[bufferIndex];}
+  bool GetUniformMapChanged( BufferIndex bufferIndex ) const override{ return mUniformMapChanged[bufferIndex];}
 
   /**
    * @copydoc UniformMapDataProvider::GetUniformMap
    */
-  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
+  const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const override;
 
   void SetDrawCommands( Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size );
 

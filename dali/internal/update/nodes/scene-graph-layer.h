@@ -83,13 +83,13 @@ public:
   /**
    * Virtual destructor
    */
-  virtual ~Layer();
+  ~Layer() override;
 
   /**
    * From Node, to convert a node to a layer.
    * @return The layer.
    */
-  virtual Layer* GetLayer()
+  Layer* GetLayer() override
   {
     return this;
   }
