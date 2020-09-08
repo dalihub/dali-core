@@ -891,6 +891,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||    // ..nodes were dirty in previous frame OR
       IsAnimationRunning()                            ||    // ..at least one animation is running OR
       mImpl->messageQueue.IsSceneUpdateRequired()     ||    // ..a message that modifies the scene graph node tree is queued OR
+      mImpl->frameCallbackProcessor                   ||    // ..a frame callback processor is existed OR
       gestureUpdated;                                       // ..a gesture property was updated
 
   bool keepRendererRendering = false;
