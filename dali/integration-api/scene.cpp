@@ -35,6 +35,12 @@ Scene Scene::New( Size size )
   return Scene( internal.Get() );
 }
 
+Scene Scene::New( Size size, int orientation )
+{
+  Internal::ScenePtr internal = Internal::Scene::New( size, orientation );
+  return Scene( internal.Get() );
+}
+
 Scene Scene::DownCast( BaseHandle handle )
 {
   return Scene( dynamic_cast<Dali::Internal::Scene*>( handle.GetObjectPtr()) );
