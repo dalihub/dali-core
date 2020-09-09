@@ -25,6 +25,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
+#include <dali/internal/event/events/ray-test.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
@@ -130,6 +131,7 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
   {
     Actor* hitTestActor( &GetImplementation( hitTestResults.actor ) );
     Actor* actor( hitTestActor );
+    RayTest rayTest;
 
     while ( actor )
     {
@@ -156,11 +158,11 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
             if ( ( size.x > 0.0f ) && ( size.y > 0.0f ) )
             {
               // Ensure tap is within the actor's area
-              if ( actor->RaySphereTest( hitTestResults.rayOrigin, hitTestResults.rayDirection ) ) // Quick check
+              if ( rayTest.SphereTest( *actor, hitTestResults.rayOrigin, hitTestResults.rayDirection ) ) // Quick check
               {
                 Vector2 hitPointLocal;
                 float distance( 0.0f );
-                if( actor->RayActorTest( hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
+                if( rayTest.ActorTest( *actor, hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
                 {
                   // One of the parents was the gestured actor so we can emit the signal for that actor.
                   EmitGestureSignal( actor, gestureDetectors, hitPointLocal );

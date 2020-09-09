@@ -27,14 +27,13 @@
 #include <dali/devel-api/actors/layer-devel.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/scripting/scripting.h>
-#include <dali/internal/common/internal-constants.h>
+#include <dali/internal/event/actors/actor-property-handler.h>
+#include <dali/internal/event/actors/actor-relayouter.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
@@ -44,15 +43,10 @@
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
-#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/nodes/node-messages.h>
-#include <dali/internal/update/nodes/node-declarations.h>
-#include <dali/internal/update/animation/scene-graph-constraint.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
-#include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
 using Dali::Internal::SceneGraph::Node;
@@ -69,78 +63,6 @@ namespace Dali
 
 namespace Internal
 {
-
-namespace
-{
-/// Using a function because of library initialisation order. Vector3::ONE may not have been initialised yet.
-inline const Vector3& GetDefaultSizeModeFactor()
-{
-  return Vector3::ONE;
-}
-
-/// Using a function because of library initialisation order. Vector2::ZERO may not have been initialised yet.
-inline const Vector2& GetDefaultPreferredSize()
-{
-  return Vector2::ZERO;
-}
-
-/// Using a function because of library initialisation order. Vector2::ZERO may not have been initialised yet.
-inline const Vector2& GetDefaultDimensionPadding()
-{
-  return Vector2::ZERO;
-}
-
-const SizeScalePolicy::Type DEFAULT_SIZE_SCALE_POLICY = SizeScalePolicy::USE_SIZE_SET;
-
-} // unnamed namespace
-
-/**
- * Struct to collect relayout variables
- */
-struct Actor::RelayoutData
-{
-  RelayoutData()
-    : sizeModeFactor( GetDefaultSizeModeFactor() ), preferredSize( GetDefaultPreferredSize() ), sizeSetPolicy( DEFAULT_SIZE_SCALE_POLICY ), relayoutEnabled( false ), insideRelayout( false )
-  {
-    // Set size negotiation defaults
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      resizePolicies[ i ] = ResizePolicy::DEFAULT;
-      useAssignedSize[ i ] = false;
-      negotiatedDimensions[ i ] = 0.0f;
-      dimensionNegotiated[ i ] = false;
-      dimensionDirty[ i ] = false;
-      dimensionDependencies[ i ] = Dimension::ALL_DIMENSIONS;
-      dimensionPadding[ i ] = GetDefaultDimensionPadding();
-      minimumSize[ i ] = 0.0f;
-      maximumSize[ i ] = FLT_MAX;
-    }
-  }
-
-  ResizePolicy::Type resizePolicies[ Dimension::DIMENSION_COUNT ];      ///< Resize policies
-  bool useAssignedSize[ Dimension::DIMENSION_COUNT ];                   ///< The flag to specify whether the size should be assigned to the actor
-
-  Dimension::Type dimensionDependencies[ Dimension::DIMENSION_COUNT ];  ///< A list of dimension dependencies
-
-  Vector2 dimensionPadding[ Dimension::DIMENSION_COUNT ];         ///< Padding for each dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
-
-  float negotiatedDimensions[ Dimension::DIMENSION_COUNT ];       ///< Storage for when a dimension is negotiated but before set on actor
-
-  float minimumSize[ Dimension::DIMENSION_COUNT ];                ///< The minimum size an actor can be
-  float maximumSize[ Dimension::DIMENSION_COUNT ];                ///< The maximum size an actor can be
-
-  bool dimensionNegotiated[ Dimension::DIMENSION_COUNT ];         ///< Has the dimension been negotiated
-  bool dimensionDirty[ Dimension::DIMENSION_COUNT ];              ///< Flags indicating whether the layout dimension is dirty or not
-
-  Vector3 sizeModeFactor;                              ///< Factor of size used for certain SizeModes
-
-  Vector2 preferredSize;                               ///< The preferred size of the actor
-
-  SizeScalePolicy::Type sizeSetPolicy :3;            ///< Policy to apply when setting size. Enough room for the enum
-
-  bool relayoutEnabled :1;                   ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
-  bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
-};
 
 namespace // unnamed namespace
 {
@@ -262,83 +184,6 @@ SignalConnectorType signalConnector11( mType, SIGNAL_CHILD_REMOVED, &Actor::DoCo
 TypeAction a1( mType, ACTION_SHOW, &Actor::DoAction );
 TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
 
-struct AnchorValue
-{
-  const char* name;
-  const Vector3& value;
-};
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( AnchorValue, ANCHOR_CONSTANT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_LEFT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_CENTER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, TOP_RIGHT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER_LEFT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, CENTER_RIGHT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_LEFT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_CENTER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( AnchorPoint, BOTTOM_RIGHT )
-DALI_ENUM_TO_STRING_TABLE_END( ANCHOR_CONSTANT )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( COLOR_MODE )
-DALI_ENUM_TO_STRING( USE_OWN_COLOR )
-DALI_ENUM_TO_STRING( USE_PARENT_COLOR )
-DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_COLOR )
-DALI_ENUM_TO_STRING( USE_OWN_MULTIPLY_PARENT_ALPHA )
-DALI_ENUM_TO_STRING_TABLE_END( COLOR_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( DRAW_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, NORMAL )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DrawMode, OVERLAY_2D )
-DALI_ENUM_TO_STRING_TABLE_END( DRAW_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( RESIZE_POLICY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FIXED )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, USE_NATURAL_SIZE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FILL_TO_PARENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, SIZE_RELATIVE_TO_PARENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, SIZE_FIXED_OFFSET_FROM_PARENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, FIT_TO_CHILDREN )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, DIMENSION_DEPENDENCY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ResizePolicy, USE_ASSIGNED_SIZE )
-DALI_ENUM_TO_STRING_TABLE_END( RESIZE_POLICY )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( SIZE_SCALE_POLICY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, USE_SIZE_SET )
-DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, FIT_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING_WITH_SCOPE( SizeScalePolicy, FILL_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING_TABLE_END( SIZE_SCALE_POLICY )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( CLIPPING_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, DISABLED )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, CLIP_CHILDREN )
-DALI_ENUM_TO_STRING_TABLE_END( CLIPPING_MODE )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( LAYOUT_DIRECTION )
-DALI_ENUM_TO_STRING_WITH_SCOPE( LayoutDirection, LEFT_TO_RIGHT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( LayoutDirection, RIGHT_TO_LEFT )
-DALI_ENUM_TO_STRING_TABLE_END( LAYOUT_DIRECTION )
-
-bool GetAnchorPointConstant( const std::string& value, Vector3& anchor )
-{
-  for( uint32_t i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
-  {
-    uint32_t sizeIgnored = 0;
-    if( CompareTokens( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name, sizeIgnored ) )
-    {
-      anchor = ANCHOR_CONSTANT_TABLE[ i ].value;
-      return true;
-    }
-  }
-  return false;
-}
-
-inline bool GetParentOriginConstant( const std::string& value, Vector3& parentOrigin )
-{
-  // Values are the same so just use the same table as anchor-point
-  return GetAnchorPointConstant( value, parentOrigin );
-}
-
 /**
  * @brief Extract a given dimension from a Vector2
  *
@@ -346,7 +191,7 @@ inline bool GetParentOriginConstant( const std::string& value, Vector3& parentOr
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
+constexpr float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
 {
   switch( dimension )
   {
@@ -392,13 +237,92 @@ void EmitVisibilityChangedSignalRecursively( ActorPtr actor, bool visible, Devel
 
     if( actor->GetChildCount() > 0 )
     {
-      ActorContainer& children = actor->GetChildrenInternal();
-      for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
+      for( ActorPtr& child : actor->GetChildrenInternal() )
       {
-        EmitVisibilityChangedSignalRecursively( *iter, visible, DevelActor::VisibilityChange::PARENT );
+        EmitVisibilityChangedSignalRecursively( child, visible, DevelActor::VisibilityChange::PARENT );
       }
     }
   }
+}
+
+/// Helper for emitting a signal
+template<typename Signal, typename Event>
+bool EmitConsumingSignal( Actor& actor, Signal& signal, const Event& event )
+{
+  bool consumed = false;
+
+  if( !signal.Empty() )
+  {
+    Dali::Actor handle( &actor );
+    consumed = signal.Emit( handle, event );
+  }
+
+  return consumed;
+}
+
+/// Helper for emitting signals with multiple parameters
+template<typename Signal, typename... Param>
+void EmitSignal( Actor& actor, Signal& signal, Param... params)
+{
+  if( !signal.Empty() )
+  {
+    Dali::Actor handle( &actor );
+    signal.Emit( handle, params... );
+  }
+}
+
+bool ScreenToLocalInternal(
+    const Matrix& viewMatrix,
+    const Matrix& projectionMatrix,
+    const Matrix& worldMatrix,
+    const Viewport& viewport,
+    const Vector3& currentSize,
+    float& localX,
+    float& localY,
+    float screenX,
+    float screenY )
+{
+  // Get the ModelView matrix
+  Matrix modelView;
+  Matrix::Multiply( modelView, worldMatrix, viewMatrix );
+
+  // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
+  Matrix invertedMvp( false/*don't init*/);
+  Matrix::Multiply( invertedMvp, modelView, projectionMatrix );
+  bool success = invertedMvp.Invert();
+
+  // Convert to GL coordinates
+  Vector4 screenPos( screenX - static_cast<float>( viewport.x ), static_cast<float>( viewport.height ) - screenY - static_cast<float>( viewport.y ), 0.f, 1.f );
+
+  Vector4 nearPos;
+  if( success )
+  {
+    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), nearPos );
+  }
+
+  Vector4 farPos;
+  if( success )
+  {
+    screenPos.z = 1.0f;
+    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), farPos );
+  }
+
+  if( success )
+  {
+    Vector4 local;
+    if( XyPlaneIntersect( nearPos, farPos, local ) )
+    {
+      Vector3 size = currentSize;
+      localX = local.x + size.x * 0.5f;
+      localY = local.y + size.y * 0.5f;
+    }
+    else
+    {
+      success = false;
+    }
+  }
+
+  return success;
 }
 
 } // unnamed namespace
@@ -428,11 +352,6 @@ const SceneGraph::Node* Actor::CreateNode()
   return node;
 }
 
-const std::string& Actor::GetName() const
-{
-  return mName;
-}
-
 void Actor::SetName( const std::string& name )
 {
   mName = name;
@@ -444,11 +363,6 @@ void Actor::SetName( const std::string& name )
 uint32_t Actor::GetId() const
 {
   return GetNode().GetId();
-}
-
-bool Actor::OnScene() const
-{
-  return mIsOnScene;
 }
 
 Dali::Layer Actor::GetLayer()
@@ -659,27 +573,6 @@ void Actor::SetParentOrigin( const Vector3& origin )
   }
 }
 
-void Actor::SetParentOriginX( float x )
-{
-  const Vector3& current = GetCurrentParentOrigin();
-
-  SetParentOrigin( Vector3( x, current.y, current.z ) );
-}
-
-void Actor::SetParentOriginY( float y )
-{
-  const Vector3& current = GetCurrentParentOrigin();
-
-  SetParentOrigin( Vector3( current.x, y, current.z ) );
-}
-
-void Actor::SetParentOriginZ( float z )
-{
-  const Vector3& current = GetCurrentParentOrigin();
-
-  SetParentOrigin( Vector3( current.x, current.y, z ) );
-}
-
 const Vector3& Actor::GetCurrentParentOrigin() const
 {
   // Cached for event-thread access
@@ -705,27 +598,6 @@ void Actor::SetAnchorPoint( const Vector3& anchor )
     // check if different from current costs more than just set
     *mAnchorPoint = anchor;
   }
-}
-
-void Actor::SetAnchorPointX( float x )
-{
-  const Vector3& current = GetCurrentAnchorPoint();
-
-  SetAnchorPoint( Vector3( x, current.y, current.z ) );
-}
-
-void Actor::SetAnchorPointY( float y )
-{
-  const Vector3& current = GetCurrentAnchorPoint();
-
-  SetAnchorPoint( Vector3( current.x, y, current.z ) );
-}
-
-void Actor::SetAnchorPointZ( float z )
-{
-  const Vector3& current = GetCurrentAnchorPoint();
-
-  SetAnchorPoint( Vector3( current.x, current.y, z ) );
 }
 
 const Vector3& Actor::GetCurrentAnchorPoint() const
@@ -790,11 +662,6 @@ const Vector3& Actor::GetCurrentPosition() const
   return GetNode().GetPosition(GetEventThreadServices().GetEventBufferIndex());
 }
 
-const Vector3& Actor::GetTargetPosition() const
-{
-  return mTargetPosition;
-}
-
 const Vector3& Actor::GetCurrentWorldPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
@@ -829,11 +696,6 @@ void Actor::SetInheritPosition( bool inherit )
     mInheritPosition = inherit;
     SetInheritPositionMessage( GetEventThreadServices(), GetNode(), inherit );
   }
-}
-
-bool Actor::IsPositionInherited() const
-{
-  return mInheritPosition;
 }
 
 void Actor::SetOrientation( const Radian& angle, const Vector3& axis )
@@ -952,11 +814,6 @@ void Actor::SetInheritScale( bool inherit )
   }
 }
 
-bool Actor::IsScaleInherited() const
-{
-  return mInheritScale;
-}
-
 Matrix Actor::GetCurrentWorldMatrix() const
 {
   return GetNode().GetWorldMatrix(0);
@@ -985,16 +842,6 @@ float Actor::GetCurrentOpacity() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetOpacity(GetEventThreadServices().GetEventBufferIndex());
-}
-
-ClippingMode::Type Actor::GetClippingMode() const
-{
-  return mClippingMode;
-}
-
-uint32_t Actor::GetSortingDepth()
-{
-  return mSortedDepth;
 }
 
 const Vector4& Actor::GetCurrentWorldColor() const
@@ -1051,14 +898,9 @@ void Actor::SetInheritOrientation( bool inherit )
   }
 }
 
-bool Actor::IsOrientationInherited() const
-{
-  return mInheritOrientation;
-}
-
 void Actor::SetSizeModeFactor( const Vector3& factor )
 {
-  EnsureRelayoutData();
+  EnsureRelayouter();
 
   mRelayoutData->sizeModeFactor = factor;
 }
@@ -1070,7 +912,7 @@ const Vector3& Actor::GetSizeModeFactor() const
     return mRelayoutData->sizeModeFactor;
   }
 
-  return GetDefaultSizeModeFactor();
+  return Relayouter::DEFAULT_SIZE_MODE_FACTOR;
 }
 
 void Actor::SetColorMode( ColorMode colorMode )
@@ -1079,12 +921,6 @@ void Actor::SetColorMode( ColorMode colorMode )
   mColorMode = colorMode;
   // node is being used in a separate thread; queue a message to set the value
   SetColorModeMessage( GetEventThreadServices(), GetNode(), colorMode );
-}
-
-ColorMode Actor::GetColorMode() const
-{
-  // we have cached copy
-  return mColorMode;
 }
 
 void Actor::SetSize( float width, float height )
@@ -1249,70 +1085,7 @@ Vector3 Actor::GetNaturalSize() const
 
 void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  ResizePolicy::Type originalWidthPolicy = GetResizePolicy(Dimension::WIDTH);
-  ResizePolicy::Type originalHeightPolicy = GetResizePolicy(Dimension::HEIGHT);
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      if ( policy == ResizePolicy::USE_ASSIGNED_SIZE )
-      {
-        mRelayoutData->useAssignedSize[ i ] = true;
-      }
-      else
-      {
-        mRelayoutData->resizePolicies[ i ] = policy;
-        mRelayoutData->useAssignedSize[ i ] = false;
-      }
-    }
-  }
-
-  if( policy == ResizePolicy::DIMENSION_DEPENDENCY )
-  {
-    if( dimension & Dimension::WIDTH )
-    {
-      SetDimensionDependency( Dimension::WIDTH, Dimension::HEIGHT );
-    }
-
-    if( dimension & Dimension::HEIGHT )
-    {
-      SetDimensionDependency( Dimension::HEIGHT, Dimension::WIDTH );
-    }
-  }
-
-  // If calling SetResizePolicy, assume we want relayout enabled
-  SetRelayoutEnabled( true );
-
-  // If the resize policy is set to be FIXED, the preferred size
-  // should be overrided by the target size. Otherwise the target
-  // size should be overrided by the preferred size.
-
-  if( dimension & Dimension::WIDTH )
-  {
-    if( originalWidthPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
-    {
-      mRelayoutData->preferredSize.width = mTargetSize.width;
-    }
-    else if( originalWidthPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
-    {
-      mTargetSize.width = mRelayoutData->preferredSize.width;
-    }
-  }
-
-  if( dimension & Dimension::HEIGHT )
-  {
-    if( originalHeightPolicy != ResizePolicy::FIXED && policy == ResizePolicy::FIXED )
-    {
-      mRelayoutData->preferredSize.height = mTargetSize.height;
-    }
-    else if( originalHeightPolicy == ResizePolicy::FIXED && policy != ResizePolicy::FIXED )
-    {
-      mTargetSize.height = mRelayoutData->preferredSize.height;
-    }
-  }
+  EnsureRelayouter().SetResizePolicy(policy, dimension, mTargetSize);
 
   OnSetResizePolicy( policy, dimension );
 
@@ -1324,21 +1097,7 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    // If more than one dimension is requested, just return the first one found
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( ( dimension & ( 1 << i ) ) )
-      {
-        if( mRelayoutData->useAssignedSize[ i ] )
-        {
-          return ResizePolicy::USE_ASSIGNED_SIZE;
-        }
-        else
-        {
-          return mRelayoutData->resizePolicies[ i ];
-        }
-      }
-    }
+    return mRelayoutData->GetResizePolicy(dimension);
   }
 
   return ResizePolicy::DEFAULT;
@@ -1346,7 +1105,7 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 
 void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 {
-  EnsureRelayoutData();
+  EnsureRelayouter();
 
   mRelayoutData->sizeSetPolicy = policy;
 
@@ -1361,34 +1120,19 @@ SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
     return mRelayoutData->sizeSetPolicy;
   }
 
-  return DEFAULT_SIZE_SCALE_POLICY;
+  return Relayouter::DEFAULT_SIZE_SCALE_POLICY;
 }
 
 void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type dependency )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->dimensionDependencies[ i ] = dependency;
-    }
-  }
+  EnsureRelayouter().SetDimensionDependency(dimension, dependency);
 }
 
 Dimension::Type Actor::GetDimensionDependency( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    // If more than one dimension is requested, just return the first one found
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( ( dimension & ( 1 << i ) ) )
-      {
-        return mRelayoutData->dimensionDependencies[ i ];
-      }
-    }
+    return mRelayoutData->GetDimensionDependency(dimension);
   }
 
   return Dimension::ALL_DIMENSIONS;   // Default
@@ -1400,7 +1144,7 @@ void Actor::SetRelayoutEnabled( bool relayoutEnabled )
   // to disable it, do nothing
   if( mRelayoutData || relayoutEnabled )
   {
-    EnsureRelayoutData();
+    EnsureRelayouter();
 
     DALI_ASSERT_DEBUG( mRelayoutData && "mRelayoutData not created" );
 
@@ -1417,31 +1161,12 @@ bool Actor::IsRelayoutEnabled() const
 
 void Actor::SetLayoutDirty( bool dirty, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->dimensionDirty[ i ] = dirty;
-    }
-  }
+  EnsureRelayouter().SetLayoutDirty(dirty, dimension);
 }
 
 bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
 {
-  if ( mRelayoutData )
-  {
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionDirty[ i ] )
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->IsLayoutDirty(dimension);
 }
 
 bool Actor::RelayoutPossible( Dimension::Type dimension ) const
@@ -1517,11 +1242,6 @@ void Actor::RemoveRenderer( uint32_t index )
   }
 }
 
-bool Actor::IsOverlay() const
-{
-  return ( DrawMode::OVERLAY_2D == mDrawMode );
-}
-
 void Actor::SetDrawMode( DrawMode::Type drawMode )
 {
   // this flag is not animatable so keep the value
@@ -1529,11 +1249,6 @@ void Actor::SetDrawMode( DrawMode::Type drawMode )
 
   // node is being used in a separate thread; queue a message to set the value
   SetDrawModeMessage( GetEventThreadServices(), GetNode(), drawMode );
-}
-
-DrawMode::Type Actor::GetDrawMode() const
-{
-  return mDrawMode;
 }
 
 bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
@@ -1585,225 +1300,7 @@ bool Actor::ScreenToLocal( const RenderTask& renderTask, float& localX, float& l
 
 bool Actor::ScreenToLocal( const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY ) const
 {
-  // Early-out if not on stage
-  if( !OnScene() )
-  {
-    return false;
-  }
-
-  // Get the ModelView matrix
-  Matrix modelView;
-  Matrix::Multiply( modelView, GetNode().GetWorldMatrix(0), viewMatrix );
-
-  // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
-  Matrix invertedMvp( false/*don't init*/);
-  Matrix::Multiply( invertedMvp, modelView, projectionMatrix );
-  bool success = invertedMvp.Invert();
-
-  // Convert to GL coordinates
-  Vector4 screenPos( screenX - static_cast<float>( viewport.x ), static_cast<float>( viewport.height ) - screenY - static_cast<float>( viewport.y ), 0.f, 1.f );
-
-  Vector4 nearPos;
-  if( success )
-  {
-    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), nearPos );
-  }
-
-  Vector4 farPos;
-  if( success )
-  {
-    screenPos.z = 1.0f;
-    success = Unproject( screenPos, invertedMvp, static_cast<float>( viewport.width ), static_cast<float>( viewport.height ), farPos );
-  }
-
-  if( success )
-  {
-    Vector4 local;
-    if( XyPlaneIntersect( nearPos, farPos, local ) )
-    {
-      Vector3 size = GetCurrentSize();
-      localX = local.x + size.x * 0.5f;
-      localY = local.y + size.y * 0.5f;
-    }
-    else
-    {
-      success = false;
-    }
-  }
-
-  return success;
-}
-
-bool Actor::RaySphereTest( const Vector4& rayOrigin, const Vector4& rayDir ) const
-{
-  /*
-   http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
-
-   Mathematical Formulation
-
-   Given the above mentioned sphere, a point 'p' lies on the surface of the sphere if
-
-   ( p - c ) dot ( p - c ) = r^2
-
-   Given a ray with a point of origin 'o', and a direction vector 'd':
-
-   ray(t) = o + td, t >= 0
-
-   we can find the t at which the ray intersects the sphere by setting ray(t) equal to 'p'
-
-   (o + td - c ) dot ( o + td - c ) = r^2
-
-   To solve for t we first expand the above into a more recognisable quadratic equation form
-
-   ( d dot d )t^2 + 2( o - c ) dot dt + ( o - c ) dot ( o - c ) - r^2 = 0
-
-   or
-
-   At2 + Bt + C = 0
-
-   where
-
-   A = d dot d
-   B = 2( o - c ) dot d
-   C = ( o - c ) dot ( o - c ) - r^2
-
-   which can be solved using a standard quadratic formula.
-
-   Note that in the absence of positive, real, roots, the ray does not intersect the sphere.
-
-   Practical Simplification
-
-   In a renderer, we often differentiate between world space and object space. In the object space
-   of a sphere it is centred at origin, meaning that if we first transform the ray from world space
-   into object space, the mathematical solution presented above can be simplified significantly.
-
-   If a sphere is centred at origin, a point 'p' lies on a sphere of radius r2 if
-
-   p dot p = r^2
-
-   and we can find the t at which the (transformed) ray intersects the sphere by
-
-   ( o + td ) dot ( o + td ) = r^2
-
-   According to the reasoning above, we expand the above quadratic equation into the general form
-
-   At2 + Bt + C = 0
-
-   which now has coefficients:
-
-   A = d dot d
-   B = 2( d dot o )
-   C = o dot o - r^2
-   */
-
-  // Early-out if not on stage
-  if( !OnScene() )
-  {
-    return false;
-  }
-
-  BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
-
-  // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
-  const Vector3& translation( GetNode().GetWorldPosition( bufferIndex ) );
-  Vector3 rayOriginLocal( rayOrigin.x - translation.x, rayOrigin.y - translation.y, rayOrigin.z - translation.z );
-
-  // Compute the radius is not needed, square radius it's enough.
-  const Vector3& size( GetNode().GetSize( bufferIndex ) );
-
-  // Scale the sphere.
-  const Vector3& scale( GetNode().GetWorldScale( bufferIndex ) );
-
-  const float width = size.width * scale.width;
-  const float height = size.height * scale.height;
-
-  float squareSphereRadius = 0.5f * ( width * width + height * height );
-
-  float a = rayDir.Dot( rayDir );                                       // a
-  float b2 = rayDir.Dot( rayOriginLocal );                              // b/2
-  float c = rayOriginLocal.Dot( rayOriginLocal ) - squareSphereRadius;  // c
-
-  return ( b2 * b2 - a * c ) >= 0.f;
-}
-
-bool Actor::RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance ) const
-{
-  bool hit = false;
-
-  if( OnScene() )
-  {
-    // Transforms the ray to the local reference system.
-    // Calculate the inverse of Model matrix
-    Matrix invModelMatrix( false/*don't init*/);
-
-    BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
-    invModelMatrix = GetNode().GetWorldMatrix(0);
-    invModelMatrix.Invert();
-
-    Vector4 rayOriginLocal( invModelMatrix * rayOrigin );
-    Vector4 rayDirLocal( invModelMatrix * rayDir - invModelMatrix.GetTranslation() );
-
-    // Test with the actor's XY plane (Normal = 0 0 1 1).
-
-    float a = -rayOriginLocal.z;
-    float b = rayDirLocal.z;
-
-    if( fabsf( b ) > Math::MACHINE_EPSILON_1 )
-    {
-      // Ray travels distance * rayDirLocal to intersect with plane.
-      distance = a / b;
-
-      const Vector3& size = GetNode().GetSize( bufferIndex );
-
-      hitPointLocal.x = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
-      hitPointLocal.y = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
-
-      // Test with the actor's geometry.
-      hit = ( hitPointLocal.x >= 0.f ) && ( hitPointLocal.x <= size.x ) && ( hitPointLocal.y >= 0.f ) && ( hitPointLocal.y <= size.y );
-    }
-  }
-
-  return hit;
-}
-
-void Actor::SetLeaveRequired( bool required )
-{
-  mLeaveRequired = required;
-}
-
-bool Actor::GetLeaveRequired() const
-{
-  return mLeaveRequired;
-}
-
-void Actor::SetKeyboardFocusable( bool focusable )
-{
-  mKeyboardFocusable = focusable;
-}
-
-bool Actor::IsKeyboardFocusable() const
-{
-  return mKeyboardFocusable;
-}
-
-bool Actor::GetTouchRequired() const
-{
-  return !mTouchedSignal.Empty();
-}
-
-bool Actor::GetHoverRequired() const
-{
-  return !mHoveredSignal.Empty();
-}
-
-bool Actor::GetWheelEventRequired() const
-{
-  return !mWheelEventSignal.Empty();
-}
-
-bool Actor::IsHittable() const
-{
-  return IsSensitive() && IsVisible() && ( GetCurrentWorldColor().a > FULLY_TRANSPARENT ) && IsNodeConnected();
+  return OnScene() && ScreenToLocalInternal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(0), viewport, GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
 ActorGestureData& Actor::GetGestureData()
@@ -1824,132 +1321,37 @@ bool Actor::IsGestureRequired( GestureType::Value type ) const
 
 bool Actor::EmitTouchEventSignal( const Dali::TouchEvent& touch )
 {
-  bool consumed = false;
-
-  if( !mTouchedSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    consumed = mTouchedSignal.Emit( handle, touch );
-  }
-
-  return consumed;
+  return EmitConsumingSignal( *this, mTouchedSignal, touch );
 }
 
 bool Actor::EmitHoverEventSignal( const Dali::HoverEvent& event )
 {
-  bool consumed = false;
-
-  if( !mHoveredSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    consumed = mHoveredSignal.Emit( handle, event );
-  }
-
-  return consumed;
+  return EmitConsumingSignal( *this, mHoveredSignal, event );
 }
 
 bool Actor::EmitWheelEventSignal( const Dali::WheelEvent& event )
 {
-  bool consumed = false;
-
-  if( !mWheelEventSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    consumed = mWheelEventSignal.Emit( handle, event );
-  }
-
-  return consumed;
+  return EmitConsumingSignal( *this, mWheelEventSignal, event );
 }
 
 void Actor::EmitVisibilityChangedSignal( bool visible, DevelActor::VisibilityChange::Type type )
 {
-  if( ! mVisibilityChangedSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    mVisibilityChangedSignal.Emit( handle, visible, type );
-  }
+  EmitSignal( *this, mVisibilityChangedSignal, visible, type );
 }
 
 void Actor::EmitLayoutDirectionChangedSignal( LayoutDirection::Type type )
 {
-  if( ! mLayoutDirectionChangedSignal.Empty() )
-  {
-    Dali::Actor handle( this );
-    mLayoutDirectionChangedSignal.Emit( handle, type );
-  }
+  EmitSignal( *this, mLayoutDirectionChangedSignal, type );
 }
 
 void Actor::EmitChildAddedSignal( Actor& child )
 {
-  if( ! mChildAddedSignal.Empty() )
-  {
-    Dali::Actor handle( &child );
-    mChildAddedSignal.Emit( handle );
-  }
+  EmitSignal( child, mChildAddedSignal );
 }
 
 void Actor::EmitChildRemovedSignal( Actor& child )
 {
-  if( ! mChildRemovedSignal.Empty() )
-  {
-    Dali::Actor handle( &child );
-    mChildRemovedSignal.Emit( handle );
-  }
-}
-
-Dali::Actor::TouchEventSignalType& Actor::TouchedSignal()
-{
-  return mTouchedSignal;
-}
-
-Dali::Actor::HoverSignalType& Actor::HoveredSignal()
-{
-  return mHoveredSignal;
-}
-
-Dali::Actor::WheelEventSignalType& Actor::WheelEventSignal()
-{
-  return mWheelEventSignal;
-}
-
-Dali::Actor::OnSceneSignalType& Actor::OnSceneSignal()
-{
-  return mOnSceneSignal;
-}
-
-Dali::Actor::OffSceneSignalType& Actor::OffSceneSignal()
-{
-  return mOffSceneSignal;
-}
-
-Dali::Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
-{
-  return mOnRelayoutSignal;
-}
-
-DevelActor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
-{
-  return mVisibilityChangedSignal;
-}
-
-Dali::Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
-{
-  return mLayoutDirectionChangedSignal;
-}
-
-DevelActor::ChildChangedSignalType& Actor::ChildAddedSignal()
-{
-  return mChildAddedSignal;
-}
-
-DevelActor::ChildChangedSignalType& Actor::ChildRemovedSignal()
-{
-  return mChildRemovedSignal;
-}
-
-DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
-{
-  return mChildOrderChangedSignal;
+  EmitSignal( child, mChildRemovedSignal );
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2333,615 +1735,13 @@ void Actor::DepthTraverseActorTree( OwnerPointer<SceneGraph::NodeDepths>& sceneG
 
 void Actor::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
-  switch( index )
-  {
-    case Dali::Actor::Property::PARENT_ORIGIN:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::VECTOR3 )
-      {
-        SetParentOrigin( property.Get< Vector3 >() );
-      }
-      else if ( type == Property::STRING )
-      {
-        std::string parentOriginString;
-        property.Get( parentOriginString );
-        Vector3 parentOrigin;
-        if( GetParentOriginConstant( parentOriginString, parentOrigin ) )
-        {
-          SetParentOrigin( parentOrigin );
-        }
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_X:
-    {
-      SetParentOriginX( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    {
-      SetParentOriginY( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    {
-      SetParentOriginZ( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::VECTOR3 )
-      {
-        SetAnchorPoint( property.Get< Vector3 >() );
-      }
-      else if ( type == Property::STRING )
-      {
-        std::string anchorPointString;
-        property.Get( anchorPointString );
-        Vector3 anchor;
-        if( GetAnchorPointConstant( anchorPointString, anchor ) )
-        {
-          SetAnchorPoint( anchor );
-        }
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_X:
-    {
-      SetAnchorPointX( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
-    {
-      SetAnchorPointY( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    {
-      SetAnchorPointZ( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::VECTOR2 )
-      {
-        SetSize( property.Get< Vector2 >() );
-      }
-      else if ( type == Property::VECTOR3 )
-      {
-        SetSize( property.Get< Vector3 >() );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_WIDTH:
-    {
-      SetWidth( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    {
-      SetHeight( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_DEPTH:
-    {
-      SetDepth( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::VECTOR2 )
-      {
-        Vector2 position = property.Get< Vector2 >();
-        SetPosition( Vector3( position.x, position.y, 0.0f ) );
-      }
-      else if ( type == Property::VECTOR3 )
-      {
-        SetPosition( property.Get< Vector3 >() );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_X:
-    {
-      SetX( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Y:
-    {
-      SetY( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Z:
-    {
-      SetZ( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::ORIENTATION:
-    {
-      SetOrientation( property.Get< Quaternion >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::FLOAT )
-      {
-        float scale = property.Get< float >();
-        SetScale( scale, scale, scale );
-      }
-      else if ( type == Property::VECTOR3 )
-      {
-        SetScale( property.Get< Vector3 >() );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_X:
-    {
-      SetScaleX( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Y:
-    {
-      SetScaleY( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Z:
-    {
-      SetScaleZ( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::VISIBLE:
-    {
-      SetVisible( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR:
-    {
-      Property::Type type = property.GetType();
-      if( type == Property::VECTOR3 )
-      {
-        Vector3 color = property.Get< Vector3 >();
-        SetColor( Vector4( color.r, color.g, color.b, 1.0f ) );
-      }
-      else if( type == Property::VECTOR4 )
-      {
-        SetColor( property.Get< Vector4 >() );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_RED:
-    {
-      SetColorRed( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_GREEN:
-    {
-      SetColorGreen( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      SetColorBlue( property.Get< float >() );
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::Actor::Property::OPACITY:
-    {
-      float value;
-      if( property.Get( value ) )
-      {
-        SetOpacity( value );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::NAME:
-    {
-      SetName( property.Get< std::string >() );
-      break;
-    }
-
-    case Dali::Actor::Property::SENSITIVE:
-    {
-      SetSensitive( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::LEAVE_REQUIRED:
-    {
-      SetLeaveRequired( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_POSITION:
-    {
-      SetInheritPosition( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_ORIENTATION:
-    {
-      SetInheritOrientation( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_SCALE:
-    {
-      SetInheritScale( property.Get< bool >() );
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_MODE:
-    {
-      ColorMode mode = mColorMode;
-      if ( Scripting::GetEnumerationProperty< ColorMode >( property, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode ) )
-      {
-        SetColorMode( mode );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::DRAW_MODE:
-    {
-      DrawMode::Type mode = mDrawMode;
-      if( Scripting::GetEnumerationProperty< DrawMode::Type >( property, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode ) )
-      {
-        SetDrawMode( mode );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_MODE_FACTOR:
-    {
-      SetSizeModeFactor( property.Get< Vector3 >() );
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
-    {
-      ResizePolicy::Type type = GetResizePolicy( Dimension::WIDTH );
-      if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
-      {
-        SetResizePolicy( type, Dimension::WIDTH );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
-    {
-      ResizePolicy::Type type = GetResizePolicy( Dimension::HEIGHT );
-      if( Scripting::GetEnumerationProperty< ResizePolicy::Type >( property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type ) )
-      {
-        SetResizePolicy( type, Dimension::HEIGHT );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_SCALE_POLICY:
-    {
-      SizeScalePolicy::Type type = GetSizeScalePolicy();
-      if( Scripting::GetEnumerationProperty< SizeScalePolicy::Type >( property, SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type ) )
-      {
-        SetSizeScalePolicy( type );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
-    {
-      if( property.Get< bool >() )
-      {
-        SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
-    {
-      if( property.Get< bool >() )
-      {
-        SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::PADDING:
-    {
-      Vector4 padding = property.Get< Vector4 >();
-      SetPadding( Vector2( padding.x, padding.y ), Dimension::WIDTH );
-      SetPadding( Vector2( padding.z, padding.w ), Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::Actor::Property::MINIMUM_SIZE:
-    {
-      Vector2 size = property.Get< Vector2 >();
-      SetMinimumSize( size.x, Dimension::WIDTH );
-      SetMinimumSize( size.y, Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::Actor::Property::MAXIMUM_SIZE:
-    {
-      Vector2 size = property.Get< Vector2 >();
-      SetMaximumSize( size.x, Dimension::WIDTH );
-      SetMaximumSize( size.y, Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::DevelActor::Property::SIBLING_ORDER:
-    {
-      int value;
-
-      if( property.Get( value ) )
-      {
-        SetSiblingOrder( value );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::CLIPPING_MODE:
-    {
-      ClippingMode::Type convertedValue = mClippingMode;
-      if( Scripting::GetEnumerationProperty< ClippingMode::Type >( property, CLIPPING_MODE_TABLE, CLIPPING_MODE_TABLE_COUNT, convertedValue ) )
-      {
-        mClippingMode = convertedValue;
-        SetClippingModeMessage( GetEventThreadServices(), GetNode(), mClippingMode );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
-    {
-      bool value = false;
-      if( property.Get( value ) && value != mPositionUsesAnchorPoint )
-      {
-        mPositionUsesAnchorPoint = value;
-        SetPositionUsesAnchorPointMessage( GetEventThreadServices(), GetNode(), mPositionUsesAnchorPoint );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::LAYOUT_DIRECTION:
-    {
-      Dali::LayoutDirection::Type direction = mLayoutDirection;
-      mInheritLayoutDirection = false;
-
-      if( Scripting::GetEnumerationProperty< LayoutDirection::Type >( property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction ) )
-      {
-        InheritLayoutDirectionRecursively( this, direction, true );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
-    {
-      bool value = false;
-      if( property.Get( value ) )
-      {
-        SetInheritLayoutDirection( value );
-      }
-      break;
-    }
-
-    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
-    {
-      bool value = false;
-      if( property.Get( value ) )
-      {
-        SetKeyboardFocusable( value );
-      }
-      break;
-    }
-
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
-    {
-      SetUpdateSizeHint( property.Get< Vector2 >() );
-      break;
-    }
-
-    case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
-    {
-      bool boolValue = false;
-      if ( property.Get( boolValue ) )
-      {
-        mCaptureAllTouchAfterStart = boolValue;
-      }
-      break;
-    }
-
-    default:
-    {
-      // this can happen in the case of a non-animatable default property so just do nothing
-      break;
-    }
-  }
+  PropertyHandler::SetDefaultProperty(*this, index, property);
 }
 
 // TODO: This method needs to be removed
 void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value )
 {
-  switch( entry.GetType() )
-  {
-    case Property::BOOLEAN:
-    {
-      const AnimatableProperty< bool >* property = dynamic_cast< const AnimatableProperty< bool >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<bool>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<bool>::Bake, value.Get<bool>() );
-
-      break;
-    }
-
-    case Property::INTEGER:
-    {
-      const AnimatableProperty< int >* property = dynamic_cast< const AnimatableProperty< int >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<int>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<int>::Bake, value.Get<int>() );
-
-      break;
-    }
-
-    case Property::FLOAT:
-    {
-      const AnimatableProperty< float >* property = dynamic_cast< const AnimatableProperty< float >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<float>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<float>::Bake, value.Get<float>() );
-
-      break;
-    }
-
-    case Property::VECTOR2:
-    {
-      const AnimatableProperty< Vector2 >* property = dynamic_cast< const AnimatableProperty< Vector2 >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      if(entry.componentIndex == 0)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector2>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector2>::BakeX, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 1)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector2>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector2>::BakeY, value.Get<float>() );
-      }
-      else
-      {
-        SceneGraph::NodePropertyMessage<Vector2>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
-      }
-
-      break;
-    }
-
-    case Property::VECTOR3:
-    {
-      const AnimatableProperty< Vector3 >* property = dynamic_cast< const AnimatableProperty< Vector3 >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      if(entry.componentIndex == 0)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector3>::BakeX, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 1)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector3>::BakeY, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 2)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector3>::BakeZ, value.Get<float>() );
-      }
-      else
-      {
-        SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
-      }
-
-      break;
-    }
-
-    case Property::VECTOR4:
-    {
-      const AnimatableProperty< Vector4 >* property = dynamic_cast< const AnimatableProperty< Vector4 >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      if(entry.componentIndex == 0)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector4>::BakeX, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 1)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector4>::BakeY, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 2)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector4>::BakeZ, value.Get<float>() );
-      }
-      else if(entry.componentIndex == 3)
-      {
-        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector4>::BakeW, value.Get<float>() );
-      }
-      else
-      {
-        SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), &GetNode(), property, &AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
-      }
-
-      break;
-    }
-
-    case Property::ROTATION:
-    {
-      const AnimatableProperty< Quaternion >* property = dynamic_cast< const AnimatableProperty< Quaternion >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Quaternion>::Send( GetEventThreadServices(), &GetNode(), property,&AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
-
-      break;
-    }
-
-    case Property::MATRIX:
-    {
-      const AnimatableProperty< Matrix >* property = dynamic_cast< const AnimatableProperty< Matrix >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Matrix>::Send( GetEventThreadServices(), &GetNode(), property,&AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
-
-      break;
-    }
-
-    case Property::MATRIX3:
-    {
-      const AnimatableProperty< Matrix3 >* property = dynamic_cast< const AnimatableProperty< Matrix3 >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Matrix3>::Send( GetEventThreadServices(), &GetNode(), property,&AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
-
-      break;
-    }
-
-    default:
-    {
-      // nothing to do for other types
-    }
-  } // entry.GetType
+  PropertyHandler::SetSceneGraphProperty(index, entry, value, GetEventThreadServices(), GetNode());
 }
 
 Property::Value Actor::GetDefaultProperty( Property::Index index ) const
@@ -2972,387 +1772,12 @@ Property::Value Actor::GetDefaultPropertyCurrentValue( Property::Index index ) c
 
 void Actor::OnNotifyDefaultPropertyAnimation( Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType )
 {
-  switch( animationType )
-  {
-    case Animation::TO:
-    case Animation::BETWEEN:
-    {
-      switch( index )
-      {
-        case Dali::Actor::Property::SIZE:
-        {
-          if( value.Get( mTargetSize ) )
-          {
-            mAnimatedSize = mTargetSize;
-            mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_WIDTH:
-        {
-          if( value.Get( mTargetSize.width ) )
-          {
-            mAnimatedSize.width = mTargetSize.width;
-            mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_HEIGHT:
-        {
-          if( value.Get( mTargetSize.height ) )
-          {
-            mAnimatedSize.height = mTargetSize.height;
-            mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_DEPTH:
-        {
-          if( value.Get( mTargetSize.depth ) )
-          {
-            mAnimatedSize.depth = mTargetSize.depth;
-            mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION:
-        {
-          value.Get( mTargetPosition );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_X:
-        {
-          value.Get( mTargetPosition.x );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_Y:
-        {
-          value.Get( mTargetPosition.y );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_Z:
-        {
-          value.Get( mTargetPosition.z );
-          break;
-        }
-
-        case Dali::Actor::Property::ORIENTATION:
-        {
-          value.Get( mTargetOrientation );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE:
-        {
-          value.Get( mTargetScale );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_X:
-        {
-          value.Get( mTargetScale.x );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_Y:
-        {
-          value.Get( mTargetScale.y );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_Z:
-        {
-          value.Get( mTargetScale.z );
-          break;
-        }
-
-        case Dali::Actor::Property::VISIBLE:
-        {
-          SetVisibleInternal( value.Get< bool >(), SendMessage::FALSE );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR:
-        {
-          value.Get( mTargetColor );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_RED:
-        {
-          value.Get( mTargetColor.r );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_GREEN:
-        {
-          value.Get( mTargetColor.g );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_BLUE:
-        {
-          value.Get( mTargetColor.b );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_ALPHA:
-        case Dali::Actor::Property::OPACITY:
-        {
-          value.Get( mTargetColor.a );
-          break;
-        }
-
-        default:
-        {
-          // Not an animatable property. Do nothing.
-          break;
-        }
-      }
-      break;
-    }
-
-    case Animation::BY:
-    {
-      switch( index )
-      {
-        case Dali::Actor::Property::SIZE:
-        {
-          if( AdjustValue< Vector3 >( mTargetSize, value ) )
-          {
-            mAnimatedSize = mTargetSize;
-            mUseAnimatedSize = AnimatedSizeFlag::WIDTH | AnimatedSizeFlag::HEIGHT | AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_WIDTH:
-        {
-          if( AdjustValue< float >( mTargetSize.width, value ) )
-          {
-            mAnimatedSize.width = mTargetSize.width;
-            mUseAnimatedSize |= AnimatedSizeFlag::WIDTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_HEIGHT:
-        {
-          if( AdjustValue< float >( mTargetSize.height, value ) )
-          {
-            mAnimatedSize.height = mTargetSize.height;
-            mUseAnimatedSize |= AnimatedSizeFlag::HEIGHT;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SIZE_DEPTH:
-        {
-          if( AdjustValue< float >( mTargetSize.depth, value ) )
-          {
-            mAnimatedSize.depth = mTargetSize.depth;
-            mUseAnimatedSize |= AnimatedSizeFlag::DEPTH;
-
-            // Notify deriving classes
-            OnSizeAnimation( animation, mTargetSize );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION:
-        {
-          AdjustValue< Vector3 >( mTargetPosition, value );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_X:
-        {
-          AdjustValue< float >( mTargetPosition.x, value );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_Y:
-        {
-          AdjustValue< float >( mTargetPosition.y, value );
-          break;
-        }
-
-        case Dali::Actor::Property::POSITION_Z:
-        {
-          AdjustValue< float >( mTargetPosition.z, value );
-          break;
-        }
-
-        case Dali::Actor::Property::ORIENTATION:
-        {
-          Quaternion relativeValue;
-          if( value.Get( relativeValue ) )
-          {
-            mTargetOrientation *= relativeValue;
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE:
-        {
-          AdjustValue< Vector3 >( mTargetScale, value );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_X:
-        {
-          AdjustValue< float >( mTargetScale.x, value );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_Y:
-        {
-          AdjustValue< float >( mTargetScale.y, value );
-          break;
-        }
-
-        case Dali::Actor::Property::SCALE_Z:
-        {
-          AdjustValue< float >( mTargetScale.z, value );
-          break;
-        }
-
-        case Dali::Actor::Property::VISIBLE:
-        {
-          bool relativeValue = false;
-          if( value.Get( relativeValue ) )
-          {
-            bool visible = mVisible || relativeValue;
-            SetVisibleInternal( visible, SendMessage::FALSE );
-          }
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR:
-        {
-          AdjustValue< Vector4 >( mTargetColor, value );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_RED:
-        {
-          AdjustValue< float >( mTargetColor.r, value );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_GREEN:
-        {
-          AdjustValue< float >( mTargetColor.g, value );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_BLUE:
-        {
-          AdjustValue< float >( mTargetColor.b, value );
-          break;
-        }
-
-        case Dali::Actor::Property::COLOR_ALPHA:
-        case Dali::Actor::Property::OPACITY:
-        {
-          AdjustValue< float >( mTargetColor.a, value );
-          break;
-        }
-
-        default:
-        {
-          // Not an animatable property. Do nothing.
-          break;
-        }
-      }
-      break;
-    }
-  }
+  PropertyHandler::OnNotifyDefaultPropertyAnimation(*this, animation, index, value, animationType);
 }
 
 const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  const PropertyBase* property( nullptr );
-
-  switch( index )
-  {
-    case Dali::Actor::Property::SIZE:        // FALLTHROUGH
-    case Dali::Actor::Property::SIZE_WIDTH:  // FALLTHROUGH
-    case Dali::Actor::Property::SIZE_HEIGHT: // FALLTHROUGH
-    case Dali::Actor::Property::SIZE_DEPTH:
-    {
-      property = &GetNode().mSize;
-      break;
-    }
-    case Dali::Actor::Property::POSITION:   // FALLTHROUGH
-    case Dali::Actor::Property::POSITION_X: // FALLTHROUGH
-    case Dali::Actor::Property::POSITION_Y: // FALLTHROUGH
-    case Dali::Actor::Property::POSITION_Z:
-    {
-      property = &GetNode().mPosition;
-      break;
-    }
-    case Dali::Actor::Property::ORIENTATION:
-    {
-      property = &GetNode().mOrientation;
-      break;
-    }
-    case Dali::Actor::Property::SCALE:   // FALLTHROUGH
-    case Dali::Actor::Property::SCALE_X: // FALLTHROUGH
-    case Dali::Actor::Property::SCALE_Y: // FALLTHROUGH
-    case Dali::Actor::Property::SCALE_Z:
-    {
-      property = &GetNode().mScale;
-      break;
-    }
-    case Dali::Actor::Property::VISIBLE:
-    {
-      property = &GetNode().mVisible;
-      break;
-    }
-    case Dali::Actor::Property::COLOR:       // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_RED:   // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_GREEN: // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_BLUE:  // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_ALPHA: // FALLTHROUGH
-    case Dali::Actor::Property::OPACITY:
-    {
-      property = &GetNode().mColor;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
+  const PropertyBase* property = PropertyHandler::GetSceneObjectAnimatableProperty(index, GetNode());
   if( !property )
   {
     // not our property, ask base
@@ -3364,64 +1789,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
 
 const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  const PropertyInputImpl* property( nullptr );
-
-  switch( index )
-  {
-    case Dali::Actor::Property::PARENT_ORIGIN:   // FALLTHROUGH
-    case Dali::Actor::Property::PARENT_ORIGIN_X: // FALLTHROUGH
-    case Dali::Actor::Property::PARENT_ORIGIN_Y: // FALLTHROUGH
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    {
-      property = &GetNode().mParentOrigin;
-      break;
-    }
-    case Dali::Actor::Property::ANCHOR_POINT:   // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_X: // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_Y: // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    {
-      property = &GetNode().mAnchorPoint;
-      break;
-    }
-    case Dali::Actor::Property::WORLD_POSITION:   // FALLTHROUGH
-    case Dali::Actor::Property::WORLD_POSITION_X: // FALLTHROUGH
-    case Dali::Actor::Property::WORLD_POSITION_Y: // FALLTHROUGH
-    case Dali::Actor::Property::WORLD_POSITION_Z:
-    {
-      property = &GetNode().mWorldPosition;
-      break;
-    }
-    case Dali::Actor::Property::WORLD_ORIENTATION:
-    {
-      property = &GetNode().mWorldOrientation;
-      break;
-    }
-    case Dali::Actor::Property::WORLD_SCALE:
-    {
-      property = &GetNode().mWorldScale;
-      break;
-    }
-    case Dali::Actor::Property::WORLD_COLOR:
-    {
-      property = &GetNode().mWorldColor;
-      break;
-    }
-    case Dali::Actor::Property::WORLD_MATRIX:
-    {
-      property = &GetNode().mWorldMatrix;
-      break;
-    }
-    case Dali::Actor::Property::CULLED:
-    {
-      property = &GetNode().mCulled;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
+  const PropertyInputImpl* property = PropertyHandler::GetSceneObjectInputProperty(index, GetNode());
   if( !property )
   {
     // reuse animatable property getter as animatable properties are inputs as well
@@ -3434,59 +1802,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
 
 int32_t Actor::GetPropertyComponentIndex( Property::Index index ) const
 {
-  int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
-
-  switch( index )
-  {
-    case Dali::Actor::Property::PARENT_ORIGIN_X:
-    case Dali::Actor::Property::ANCHOR_POINT_X:
-    case Dali::Actor::Property::SIZE_WIDTH:
-    case Dali::Actor::Property::POSITION_X:
-    case Dali::Actor::Property::WORLD_POSITION_X:
-    case Dali::Actor::Property::SCALE_X:
-    case Dali::Actor::Property::COLOR_RED:
-    {
-      componentIndex = 0;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    case Dali::Actor::Property::POSITION_Y:
-    case Dali::Actor::Property::WORLD_POSITION_Y:
-    case Dali::Actor::Property::SCALE_Y:
-    case Dali::Actor::Property::COLOR_GREEN:
-    {
-      componentIndex = 1;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    case Dali::Actor::Property::SIZE_DEPTH:
-    case Dali::Actor::Property::POSITION_Z:
-    case Dali::Actor::Property::WORLD_POSITION_Z:
-    case Dali::Actor::Property::SCALE_Z:
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      componentIndex = 2;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::Actor::Property::OPACITY:
-    {
-      componentIndex = 3;
-      break;
-    }
-
-    default:
-    {
-      // Do nothing
-      break;
-    }
-  }
+  int32_t componentIndex = PropertyHandler::GetPropertyComponentIndex(index);
   if( Property::INVALID_COMPONENT_INDEX == componentIndex )
   {
     // ask base
@@ -3494,11 +1810,6 @@ int32_t Actor::GetPropertyComponentIndex( Property::Index index ) const
   }
 
   return componentIndex;
-}
-
-bool Actor::IsAnimationPossible() const
-{
-  return OnScene();
 }
 
 void Actor::SetParent( Actor* parent )
@@ -3574,565 +1885,23 @@ Rect<> Actor::CalculateScreenExtents( ) const
 
 bool Actor::GetCachedPropertyValue( Property::Index index, Property::Value& value ) const
 {
-  bool valueSet = true;
-
-  switch( index )
-  {
-    case Dali::Actor::Property::PARENT_ORIGIN:
-    {
-      value = GetCurrentParentOrigin();
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_X:
-    {
-      value = GetCurrentParentOrigin().x;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    {
-      value = GetCurrentParentOrigin().y;
-      break;
-    }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    {
-      value = GetCurrentParentOrigin().z;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT:
-    {
-      value = GetCurrentAnchorPoint();
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_X:
-    {
-      value = GetCurrentAnchorPoint().x;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
-    {
-      value = GetCurrentAnchorPoint().y;
-      break;
-    }
-
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    {
-      value = GetCurrentAnchorPoint().z;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE:
-    {
-      value = GetTargetSize();
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_WIDTH:
-    {
-      value = GetTargetSize().width;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    {
-      value = GetTargetSize().height;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_DEPTH:
-    {
-      value = GetTargetSize().depth;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION:
-    {
-      value = GetTargetPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_X:
-    {
-      value = GetTargetPosition().x;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Y:
-    {
-      value = GetTargetPosition().y;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Z:
-    {
-      value = GetTargetPosition().z;
-      break;
-    }
-
-    case Dali::Actor::Property::ORIENTATION:
-    {
-      value = mTargetOrientation;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE:
-    {
-      value = mTargetScale;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_X:
-    {
-      value = mTargetScale.x;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Y:
-    {
-      value = mTargetScale.y;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Z:
-    {
-      value = mTargetScale.z;
-      break;
-    }
-
-    case Dali::Actor::Property::VISIBLE:
-    {
-      value = mVisible;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR:
-    {
-      value = mTargetColor;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_RED:
-    {
-      value = mTargetColor.r;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_GREEN:
-    {
-      value = mTargetColor.g;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      value = mTargetColor.b;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::Actor::Property::OPACITY:
-    {
-      value = mTargetColor.a;
-      break;
-    }
-
-    case Dali::Actor::Property::NAME:
-    {
-      value = GetName();
-      break;
-    }
-
-    case Dali::Actor::Property::SENSITIVE:
-    {
-      value = IsSensitive();
-      break;
-    }
-
-    case Dali::Actor::Property::LEAVE_REQUIRED:
-    {
-      value = GetLeaveRequired();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_POSITION:
-    {
-      value = IsPositionInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_ORIENTATION:
-    {
-      value = IsOrientationInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_SCALE:
-    {
-      value = IsScaleInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_MODE:
-    {
-      value = GetColorMode();
-      break;
-    }
-
-    case Dali::Actor::Property::DRAW_MODE:
-    {
-      value = GetDrawMode();
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_MODE_FACTOR:
-    {
-      value = GetSizeModeFactor();
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
-    {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
-    {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT );
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_SCALE_POLICY:
-    {
-      value = GetSizeScalePolicy();
-      break;
-    }
-
-    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
-    {
-      value = ( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::WIDTH ) == Dimension::HEIGHT );
-      break;
-    }
-
-    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
-    {
-      value = ( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::HEIGHT ) == Dimension::WIDTH );
-      break;
-    }
-
-    case Dali::Actor::Property::PADDING:
-    {
-      Vector2 widthPadding = GetPadding( Dimension::WIDTH );
-      Vector2 heightPadding = GetPadding( Dimension::HEIGHT );
-      value = Vector4( widthPadding.x, widthPadding.y, heightPadding.x, heightPadding.y );
-      break;
-    }
-
-    case Dali::Actor::Property::MINIMUM_SIZE:
-    {
-      value = Vector2( GetMinimumSize( Dimension::WIDTH ), GetMinimumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::Actor::Property::MAXIMUM_SIZE:
-    {
-      value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
-      break;
-    }
-
-    case Dali::Actor::Property::CLIPPING_MODE:
-    {
-      value = mClippingMode;
-      break;
-    }
-
-    case Dali::DevelActor::Property::SIBLING_ORDER:
-    {
-      value = static_cast<int>( GetSiblingOrder() );
-      break;
-    }
-
-    case Dali::Actor::Property::SCREEN_POSITION:
-    {
-      value = GetCurrentScreenPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
-    {
-      value = mPositionUsesAnchorPoint;
-      break;
-    }
-
-    case Dali::Actor::Property::LAYOUT_DIRECTION:
-    {
-      value = mLayoutDirection;
-      break;
-    }
-
-    case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
-    {
-      value = IsLayoutDirectionInherited();
-      break;
-    }
-
-    case Dali::Actor::Property::ID:
-    {
-      value = static_cast<int>( GetId() );
-      break;
-    }
-
-    case Dali::Actor::Property::HIERARCHY_DEPTH:
-    {
-      value = GetHierarchyDepth();
-      break;
-    }
-
-    case Dali::Actor::Property::IS_ROOT:
-    {
-      value = IsRoot();
-      break;
-    }
-
-    case Dali::Actor::Property::IS_LAYER:
-    {
-      value = IsLayer();
-      break;
-    }
-
-    case Dali::Actor::Property::CONNECTED_TO_SCENE:
-    {
-      value = OnScene();
-      break;
-    }
-
-    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
-    {
-      value = IsKeyboardFocusable();
-      break;
-    }
-
-    case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
-    {
-      value = mCaptureAllTouchAfterStart;
-      break;
-    }
-
-    default:
-    {
-      // Must be a scene-graph only property
-      valueSet = false;
-      break;
-    }
-  }
-
-  return valueSet;
+  return PropertyHandler::GetCachedPropertyValue(*this, index, value);
 }
 
 bool Actor::GetCurrentPropertyValue( Property::Index index, Property::Value& value  ) const
 {
-  bool valueSet = true;
-
-  switch( index )
-  {
-    case Dali::Actor::Property::SIZE:
-    {
-      value = GetCurrentSize();
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_WIDTH:
-    {
-      value = GetCurrentSize().width;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    {
-      value = GetCurrentSize().height;
-      break;
-    }
-
-    case Dali::Actor::Property::SIZE_DEPTH:
-    {
-      value = GetCurrentSize().depth;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION:
-    {
-      value = GetCurrentPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_X:
-    {
-      value = GetCurrentPosition().x;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Y:
-    {
-      value = GetCurrentPosition().y;
-      break;
-    }
-
-    case Dali::Actor::Property::POSITION_Z:
-    {
-      value = GetCurrentPosition().z;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION:
-    {
-      value = GetCurrentWorldPosition();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_X:
-    {
-      value = GetCurrentWorldPosition().x;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_Y:
-    {
-      value = GetCurrentWorldPosition().y;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_POSITION_Z:
-    {
-      value = GetCurrentWorldPosition().z;
-      break;
-    }
-
-    case Dali::Actor::Property::ORIENTATION:
-    {
-      value = GetCurrentOrientation();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_ORIENTATION:
-    {
-      value = GetCurrentWorldOrientation();
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE:
-    {
-      value = GetCurrentScale();
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_X:
-    {
-      value = GetCurrentScale().x;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Y:
-    {
-      value = GetCurrentScale().y;
-      break;
-    }
-
-    case Dali::Actor::Property::SCALE_Z:
-    {
-      value = GetCurrentScale().z;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_SCALE:
-    {
-      value = GetCurrentWorldScale();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR:
-    {
-      value = GetCurrentColor();
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_RED:
-    {
-      value = GetCurrentColor().r;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_GREEN:
-    {
-      value = GetCurrentColor().g;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      value = GetCurrentColor().b;
-      break;
-    }
-
-    case Dali::Actor::Property::COLOR_ALPHA:
-    case Dali::Actor::Property::OPACITY:
-    {
-      value = GetCurrentColor().a;
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_COLOR:
-    {
-      value = GetCurrentWorldColor();
-      break;
-    }
-
-    case Dali::Actor::Property::WORLD_MATRIX:
-    {
-      value = GetCurrentWorldMatrix();
-      break;
-    }
-
-    case Dali::Actor::Property::VISIBLE:
-    {
-      value = IsVisible();
-      break;
-    }
-
-    case Dali::Actor::Property::CULLED:
-    {
-      value = GetNode().IsCulled( GetEventThreadServices().GetEventBufferIndex() );
-      break;
-    }
-
-    case Dali::DevelActor::Property::UPDATE_SIZE_HINT:
-    {
-      value = GetUpdateSizeHint();
-      break;
-    }
-
-    default:
-    {
-      // Must be an event-side only property
-      valueSet = false;
-      break;
-    }
-  }
-
-  return valueSet;
+  return PropertyHandler::GetCurrentPropertyValue(*this, index, value);
 }
 
-void Actor::EnsureRelayoutData()
+Actor::Relayouter& Actor::EnsureRelayouter()
 {
-  // Assign relayout data.
+  // Assign relayouter
   if( !mRelayoutData )
   {
-    mRelayoutData = new RelayoutData();
+    mRelayoutData = new Relayouter();
   }
+
+  return *mRelayoutData;
 }
 
 bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
@@ -4226,15 +1995,7 @@ float Actor::GetNegotiatedDimension( Dimension::Type dimension ) const
 
 void Actor::SetPadding( const Vector2& padding, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->dimensionPadding[ i ] = padding;
-    }
-  }
+  EnsureRelayouter().SetPadding( padding, dimension );
 }
 
 Vector2 Actor::GetPadding( Dimension::Type dimension ) const
@@ -4251,36 +2012,17 @@ Vector2 Actor::GetPadding( Dimension::Type dimension ) const
     }
   }
 
-  return GetDefaultDimensionPadding();
+  return Relayouter::DEFAULT_DIMENSION_PADDING;
 }
 
 void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->dimensionNegotiated[ i ] = negotiated;
-    }
-  }
+  EnsureRelayouter().SetLayoutNegotiated(negotiated, dimension);
 }
 
 bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
 {
-  if ( mRelayoutData )
-  {
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionNegotiated[ i ] )
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->IsLayoutNegotiated(dimension);
 }
 
 float Actor::GetHeightForWidthBase( float width )
@@ -4475,14 +2217,6 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
   return 0.0f;  // Default
 }
 
-float Actor::ClampDimension( float size, Dimension::Type dimension )
-{
-  const float minSize = GetMinimumSize( dimension );
-  const float maxSize = GetMaximumSize( dimension );
-
-  return std::max( minSize, std::min( size, maxSize ) );
-}
-
 void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
 {
   // Check if it needs to be negotiated
@@ -4542,7 +2276,7 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       OnCalculateRelayoutSize( dimension );
 
       // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = ClampDimension( CalculateSize( dimension, allocatedSize ), dimension );
+      const float newSize = Relayouter::ClampDimension( *this, CalculateSize( dimension, allocatedSize ), dimension );
 
       SetNegotiatedDimension( newSize, dimension );
       SetLayoutNegotiated( true, dimension );
@@ -4577,71 +2311,7 @@ void Actor::NegotiateDimensions( const Vector2& allocatedSize )
 
 Vector2 Actor::ApplySizeSetPolicy( const Vector2& size )
 {
-  switch( mRelayoutData->sizeSetPolicy )
-  {
-    case SizeScalePolicy::USE_SIZE_SET:
-    {
-      return size;
-    }
-
-    case SizeScalePolicy::FIT_WITH_ASPECT_RATIO:
-    {
-      // Scale size to fit within the original size bounds, keeping the natural size aspect ratio
-      const Vector3 naturalSize = GetNaturalSize();
-      if( naturalSize.width > 0.0f && naturalSize.height > 0.0f && size.width > 0.0f && size.height > 0.0f )
-      {
-        const float sizeRatio = size.width / size.height;
-        const float naturalSizeRatio = naturalSize.width / naturalSize.height;
-
-        if( naturalSizeRatio < sizeRatio )
-        {
-          return Vector2( naturalSizeRatio * size.height, size.height );
-        }
-        else if( naturalSizeRatio > sizeRatio )
-        {
-          return Vector2( size.width, size.width / naturalSizeRatio );
-        }
-        else
-        {
-          return size;
-        }
-      }
-
-      break;
-    }
-
-    case SizeScalePolicy::FILL_WITH_ASPECT_RATIO:
-    {
-      // Scale size to fill the original size bounds, keeping the natural size aspect ratio. Potentially exceeding the original bounds.
-      const Vector3 naturalSize = GetNaturalSize();
-      if( naturalSize.width > 0.0f && naturalSize.height > 0.0f && size.width > 0.0f && size.height > 0.0f )
-      {
-        const float sizeRatio = size.width / size.height;
-        const float naturalSizeRatio = naturalSize.width / naturalSize.height;
-
-        if( naturalSizeRatio < sizeRatio )
-        {
-          return Vector2( size.width, size.width / naturalSizeRatio );
-        }
-        else if( naturalSizeRatio > sizeRatio )
-        {
-          return Vector2( naturalSizeRatio * size.height, size.height );
-        }
-        else
-        {
-          return size;
-        }
-      }
-      break;
-    }
-
-    default:
-    {
-      break;
-    }
-  }
-
-  return size;
+  return mRelayoutData->ApplySizeSetPolicy(*this, size);
 }
 
 void Actor::SetNegotiatedSize( RelayoutContainer& container )
@@ -4728,31 +2398,13 @@ void Actor::SetUseAssignedSize( bool use, Dimension::Type dimension )
 {
   if( mRelayoutData )
   {
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( dimension & ( 1 << i ) )
-      {
-        mRelayoutData->useAssignedSize[ i ] = use;
-      }
-    }
+    mRelayoutData->SetUseAssignedSize(use, dimension);
   }
 }
 
 bool Actor::GetUseAssignedSize( Dimension::Type dimension ) const
 {
-  if ( mRelayoutData )
-  {
-    // If more than one dimension is requested, just return the first one found
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( dimension & ( 1 << i ) )
-      {
-        return mRelayoutData->useAssignedSize[ i ];
-      }
-    }
-  }
-
-  return false;
+  return mRelayoutData && mRelayoutData->GetUseAssignedSize(dimension);
 }
 
 void Actor::RelayoutRequest( Dimension::Type dimension )
@@ -4765,17 +2417,9 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
   }
 }
 
-void Actor::OnCalculateRelayoutSize( Dimension::Type dimension )
-{
-}
-
-void Actor::OnLayoutNegotiated( float size, Dimension::Type dimension )
-{
-}
-
 void Actor::SetPreferredSize( const Vector2& size )
 {
-  EnsureRelayoutData();
+  EnsureRelayouter();
 
   // If valid width or height, then set the resize policy to FIXED
   // A 0 width or height may also be required so if the resize policy has not been changed, i.e. is still set to DEFAULT,
@@ -4805,21 +2449,12 @@ Vector2 Actor::GetPreferredSize() const
     return Vector2( mRelayoutData->preferredSize );
   }
 
-  return GetDefaultPreferredSize();
+  return Relayouter::DEFAULT_PREFERRED_SIZE;
 }
 
 void Actor::SetMinimumSize( float size, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->minimumSize[ i ] = size;
-    }
-  }
-
+  EnsureRelayouter().SetMinimumSize(size, dimension);
   RelayoutRequest();
 }
 
@@ -4827,13 +2462,7 @@ float Actor::GetMinimumSize( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( dimension & ( 1 << i ) )
-      {
-        return mRelayoutData->minimumSize[ i ];
-      }
-    }
+    return mRelayoutData->GetMinimumSize(dimension);
   }
 
   return 0.0f;  // Default
@@ -4841,16 +2470,7 @@ float Actor::GetMinimumSize( Dimension::Type dimension ) const
 
 void Actor::SetMaximumSize( float size, Dimension::Type dimension )
 {
-  EnsureRelayoutData();
-
-  for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-  {
-    if( dimension & ( 1 << i ) )
-    {
-      mRelayoutData->maximumSize[ i ] = size;
-    }
-  }
-
+  EnsureRelayouter().SetMaximumSize(size, dimension);
   RelayoutRequest();
 }
 
@@ -4858,21 +2478,10 @@ float Actor::GetMaximumSize( Dimension::Type dimension ) const
 {
   if ( mRelayoutData )
   {
-    for( uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i )
-    {
-      if( dimension & ( 1 << i ) )
-      {
-        return mRelayoutData->maximumSize[ i ];
-      }
-    }
+    return mRelayoutData->GetMaximumSize(dimension);
   }
 
   return FLT_MAX;  // Default
-}
-
-Object* Actor::GetParentObject() const
-{
-  return mParent;
 }
 
 void Actor::SetVisibleInternal( bool visible, SendMessage::Type sendMessage )
@@ -5134,16 +2743,6 @@ void Actor::LowerBelow( Internal::Actor& target )
   }
 }
 
-void Actor::SetScene( Scene& scene )
-{
-  mScene = &scene;
-}
-
-Scene& Actor::GetScene() const
-{
-  return *mScene;
-}
-
 void Actor::SetInheritLayoutDirection( bool inherit )
 {
   if( mInheritLayoutDirection != inherit )
@@ -5155,11 +2754,6 @@ void Actor::SetInheritLayoutDirection( bool inherit )
       InheritLayoutDirectionRecursively( this, mParent->mLayoutDirection );
     }
   }
-}
-
-bool Actor::IsLayoutDirectionInherited() const
-{
-  return mInheritLayoutDirection;
 }
 
 void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirection::Type direction, bool set )
@@ -5175,10 +2769,9 @@ void Actor::InheritLayoutDirectionRecursively( ActorPtr actor, Dali::LayoutDirec
 
     if( actor->GetChildCount() > 0 )
     {
-      ActorContainer& children = actor->GetChildrenInternal();
-      for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
+      for( ActorPtr& child : actor->GetChildrenInternal() )
       {
-        InheritLayoutDirectionRecursively( *iter, direction );
+        InheritLayoutDirectionRecursively( child, direction );
       }
     }
   }
@@ -5188,13 +2781,6 @@ void Actor::SetUpdateSizeHint( const Vector2& updateSizeHint )
 {
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), &GetNode(), &GetNode().mUpdateSizeHint, &AnimatableProperty<Vector3>::Bake, Vector3(updateSizeHint.width, updateSizeHint.height, 0.f ) );
-}
-
-Vector2 Actor::GetUpdateSizeHint() const
-{
-  // node is being used in a separate thread, the value from the previous update is the same, set by user
-  Vector3 updateSizeHint = GetNode().GetUpdateSizeHint();
-  return Vector2( updateSizeHint.width, updateSizeHint.height );
 }
 
 } // namespace Internal
