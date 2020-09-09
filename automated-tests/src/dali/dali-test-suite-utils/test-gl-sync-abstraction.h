@@ -35,8 +35,8 @@ class DALI_CORE_API TestSyncObject : public Integration::GlSyncAbstraction::Sync
 {
 public:
   TestSyncObject(TraceCallStack& trace);
-  ~TestSyncObject();
-  bool IsSynced();
+  ~TestSyncObject() override;
+  bool IsSynced() override;
   bool synced;
   TraceCallStack& mTrace;
 };
@@ -55,7 +55,7 @@ public:
   /**
    * Destructor
    */
-  ~TestGlSyncAbstraction();
+  ~TestGlSyncAbstraction() override;
 
   /**
    * Initialize the sync objects - clear down the map

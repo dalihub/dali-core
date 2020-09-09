@@ -38,7 +38,7 @@ public:
   /**
    * Destructor
    */
-  ~TestGlContextHelperAbstraction() {};
+  ~TestGlContextHelperAbstraction() override {};
 
   /**
    * @brief Switch to the surfaceless GL context

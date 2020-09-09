@@ -54,19 +54,19 @@ class DALI_CORE_API TestGlAbstraction: public Dali::Integration::GlAbstraction
 {
 public:
   TestGlAbstraction();
-  ~TestGlAbstraction();
+  ~TestGlAbstraction() override;
   void Initialize();
 
-  void PreRender();
-  void PostRender();
+  void PreRender() override;
+  void PostRender() override;
 
-  bool IsSurfacelessContextSupported() const;
+  bool IsSurfacelessContextSupported() const override;
 
-  bool TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const;
+  bool TextureRequiresConverting( const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage ) const override;
 
   /* OpenGL ES 2.0 */
 
-  inline void ActiveTexture( GLenum textureUnit )
+  inline void ActiveTexture( GLenum textureUnit ) override
   {
     mActiveTextureUnit = textureUnit - GL_TEXTURE0;
   }
@@ -76,7 +76,7 @@ public:
     return mActiveTextureUnit + GL_TEXTURE0;
   }
 
-  inline void AttachShader( GLuint program, GLuint shader )
+  inline void AttachShader( GLuint program, GLuint shader ) override
   {
     std::stringstream out;
     out << program << ", " << shader;
@@ -87,21 +87,21 @@ public:
     mShaderTrace.PushCall("AttachShader", out.str(), namedParams);
   }
 
-  inline void BindAttribLocation( GLuint program, GLuint index, const char* name )
+  inline void BindAttribLocation( GLuint program, GLuint index, const char* name ) override
   {
   }
 
-  inline void BindBuffer( GLenum target, GLuint buffer )
+  inline void BindBuffer( GLenum target, GLuint buffer ) override
   {
   }
 
-  inline void BindFramebuffer( GLenum target, GLuint framebuffer )
+  inline void BindFramebuffer( GLenum target, GLuint framebuffer ) override
   {
     //Add 010 bit;
     mFramebufferStatus |= 2;
   }
 
-  inline void BindRenderbuffer( GLenum target, GLuint renderbuffer )
+  inline void BindRenderbuffer( GLenum target, GLuint renderbuffer ) override
   {
   }
 
@@ -137,7 +137,7 @@ public:
     }
   }
 
-  inline void BindTexture( GLenum target, GLuint texture )
+  inline void BindTexture( GLenum target, GLuint texture ) override
   {
     // Record the bound textures for future checks
     if( texture )
@@ -160,7 +160,7 @@ public:
     mTextureTrace.PushCall("BindTexture", out.str(), namedParams);
   }
 
-  inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+  inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) override
   {
     mLastBlendColor.r = red;
     mLastBlendColor.g = green;
@@ -173,13 +173,13 @@ public:
     return mLastBlendColor;
   }
 
-  inline void BlendEquation( GLenum mode )
+  inline void BlendEquation( GLenum mode ) override
   {
     mLastBlendEquationRgb   = mode;
     mLastBlendEquationAlpha = mode;
   }
 
-  inline void BlendEquationSeparate( GLenum modeRgb, GLenum modeAlpha )
+  inline void BlendEquationSeparate( GLenum modeRgb, GLenum modeAlpha ) override
   {
     mLastBlendEquationRgb   = modeRgb;
     mLastBlendEquationAlpha = modeAlpha;
@@ -195,7 +195,7 @@ public:
     return mLastBlendEquationAlpha;
   }
 
-  inline void BlendFunc(GLenum sfactor, GLenum dfactor)
+  inline void BlendFunc(GLenum sfactor, GLenum dfactor) override
   {
     mLastBlendFuncSrcRgb = sfactor;
     mLastBlendFuncDstRgb = dfactor;
@@ -203,7 +203,7 @@ public:
     mLastBlendFuncDstAlpha = dfactor;
   }
 
-  inline void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
+  inline void BlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) override
   {
     mLastBlendFuncSrcRgb = srcRGB;
     mLastBlendFuncDstRgb = dstRGB;
@@ -231,17 +231,17 @@ public:
     return mLastBlendFuncDstAlpha;
   }
 
-  inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
+  inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage) override
   {
      mBufferDataCalls.push_back(size);
   }
 
-  inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
+  inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data) override
   {
      mBufferSubDataCalls.push_back(size);
   }
 
-  inline GLenum CheckFramebufferStatus(GLenum target)
+  inline GLenum CheckFramebufferStatus(GLenum target) override
   {
     //If it has the three last bits set to 1 - 111, then the three minimum functions to create a
     //Framebuffer texture have been called
@@ -268,13 +268,13 @@ public:
     return mFramebufferStencilAttached;
   }
 
-  inline void Clear(GLbitfield mask)
+  inline void Clear(GLbitfield mask) override
   {
     mClearCount++;
     mLastClearBitMask = mask;
   }
 
-  inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+  inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) override
   {
     mLastClearColor.r = red;
     mLastClearColor.g = green;
@@ -287,11 +287,11 @@ public:
     return mLastClearColor;
   }
 
-  inline void ClearDepthf(GLclampf depth)
+  inline void ClearDepthf(GLclampf depth) override
   {
   }
 
-  inline void ClearStencil(GLint s)
+  inline void ClearStencil(GLint s) override
   {
     std::stringstream out;
     out << s;
@@ -302,7 +302,7 @@ public:
     mStencilFunctionTrace.PushCall( "ClearStencil", out.str(), namedParams );
   }
 
-  inline void ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+  inline void ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) override
   {
     mColorMaskParams.red = red;
     mColorMaskParams.green = green;
@@ -310,7 +310,7 @@ public:
     mColorMaskParams.alpha = alpha;
   }
 
-  inline void CompileShader(GLuint shader)
+  inline void CompileShader(GLuint shader) override
   {
     std::stringstream out;
     out << shader;
@@ -320,7 +320,7 @@ public:
     mShaderTrace.PushCall("CompileShader", out.str(), namedParams);
   }
 
-  inline void CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data)
+  inline void CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data) override
   {
     std::stringstream out;
     out << target<<", "<<level<<", "<<width << ", " << height;
@@ -337,7 +337,7 @@ public:
     mTextureTrace.PushCall("CompressedTexImage2D", out.str(), namedParams);
   }
 
-  inline void CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void* data)
+  inline void CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void* data) override
   {
     std::stringstream out;
     out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
@@ -352,15 +352,15 @@ public:
     mTextureTrace.PushCall("CompressedTexSubImage2D", out.str(), namedParams);
   }
 
-  inline void CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
+  inline void CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border) override
   {
   }
 
-  inline void CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+  inline void CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height) override
   {
   }
 
-  inline GLuint CreateProgram(void)
+  inline GLuint CreateProgram(void) override
   {
     mShaderTrace.PushCall("CreateProgram", "");
 
@@ -369,7 +369,7 @@ public:
     return mLastProgramIdUsed;
   }
 
-  inline GLuint CreateShader(GLenum type)
+  inline GLuint CreateShader(GLenum type) override
   {
     std::stringstream out;
     out << type;
@@ -381,7 +381,7 @@ public:
     return ++mLastShaderIdUsed;
   }
 
-  inline void CullFace(GLenum mode)
+  inline void CullFace(GLenum mode) override
   {
     std::stringstream out;
     out << mode;
@@ -392,15 +392,15 @@ public:
     mCullFaceTrace.PushCall("CullFace", out.str(), namedParams);
   }
 
-  inline void DeleteBuffers(GLsizei n, const GLuint* buffers)
+  inline void DeleteBuffers(GLsizei n, const GLuint* buffers) override
   {
   }
 
-  inline void DeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
+  inline void DeleteFramebuffers(GLsizei n, const GLuint* framebuffers) override
   {
   }
 
-  inline void DeleteProgram(GLuint program)
+  inline void DeleteProgram(GLuint program) override
   {
     std::stringstream out;
     out << program;
@@ -411,11 +411,11 @@ public:
     mShaderTrace.PushCall("DeleteProgram", out.str(), namedParams);
   }
 
-  inline void DeleteRenderbuffers(GLsizei n, const GLuint* renderbuffers)
+  inline void DeleteRenderbuffers(GLsizei n, const GLuint* renderbuffers) override
   {
   }
 
-  inline void DeleteShader(GLuint shader)
+  inline void DeleteShader(GLuint shader) override
   {
     std::stringstream out;
     out << shader;
@@ -426,7 +426,7 @@ public:
     mShaderTrace.PushCall("DeleteShader", out.str(), namedParams);
   }
 
-  inline void DeleteTextures(GLsizei n, const GLuint* textures)
+  inline void DeleteTextures(GLsizei n, const GLuint* textures) override
   {
     std::stringstream out;
     out << n << ", " << textures << " = [";
@@ -472,7 +472,7 @@ public:
     mDeletedTextureIds.clear();
   }
 
-  inline void DepthFunc(GLenum func)
+  inline void DepthFunc(GLenum func) override
   {
     std::stringstream out;
     out << func;
@@ -483,7 +483,7 @@ public:
     mDepthFunctionTrace.PushCall("DepthFunc", out.str(), namedParams);
   }
 
-  inline void DepthMask(GLboolean flag)
+  inline void DepthMask(GLboolean flag) override
   {
     mLastDepthMask = flag;
   }
@@ -493,11 +493,11 @@ public:
     return mLastDepthMask;
   }
 
-  inline void DepthRangef(GLclampf zNear, GLclampf zFar)
+  inline void DepthRangef(GLclampf zNear, GLclampf zFar) override
   {
   }
 
-  inline void DetachShader(GLuint program, GLuint shader)
+  inline void DetachShader(GLuint program, GLuint shader) override
   {
     std::stringstream out;
     out << program << ", " << shader;
@@ -507,7 +507,7 @@ public:
     mShaderTrace.PushCall("DetachShader", out.str(), namedParams);
   }
 
-  inline void Disable(GLenum cap)
+  inline void Disable(GLenum cap) override
   {
     std::stringstream out;
     out << cap;
@@ -516,12 +516,12 @@ public:
     mEnableDisableTrace.PushCall("Disable", out.str(), namedParams);
   }
 
-  inline void DisableVertexAttribArray(GLuint index)
+  inline void DisableVertexAttribArray(GLuint index) override
   {
     SetVertexAttribArray( index, false );
   }
 
-  inline void DrawArrays(GLenum mode, GLint first, GLsizei count)
+  inline void DrawArrays(GLenum mode, GLint first, GLsizei count) override
   {
     std::stringstream out;
     out << mode << ", " << first << ", " << count;
@@ -532,7 +532,7 @@ public:
     mDrawTrace.PushCall("DrawArrays", out.str(), namedParams);
   }
 
-  inline void DrawElements(GLenum mode, GLsizei count, GLenum type, const void* indices)
+  inline void DrawElements(GLenum mode, GLsizei count, GLenum type, const void* indices) override
   {
     std::stringstream out;
     out << mode << ", " << count << ", " << type << ", indices";
@@ -545,7 +545,7 @@ public:
     mDrawTrace.PushCall("DrawElements", out.str(), namedParams);
   }
 
-  inline void Enable(GLenum cap)
+  inline void Enable(GLenum cap) override
   {
     std::stringstream out;
     out << cap;
@@ -554,20 +554,20 @@ public:
     mEnableDisableTrace.PushCall("Enable", out.str(), namedParams);
   }
 
-  inline void EnableVertexAttribArray(GLuint index)
+  inline void EnableVertexAttribArray(GLuint index) override
   {
     SetVertexAttribArray( index, true);
   }
 
-  inline void Finish(void)
+  inline void Finish(void) override
   {
   }
 
-  inline void Flush(void)
+  inline void Flush(void) override
   {
   }
 
-  inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
+  inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) override
   {
     if (attachment == GL_DEPTH_ATTACHMENT)
     {
@@ -579,7 +579,7 @@ public:
     }
   }
 
-  inline void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+  inline void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) override
   {
     //Add 100 bit;
     mFramebufferStatus |= 4;
@@ -596,17 +596,17 @@ public:
     }
   }
 
-  inline void FrontFace(GLenum mode)
+  inline void FrontFace(GLenum mode) override
   {
   }
 
-  inline void GenBuffers(GLsizei n, GLuint* buffers)
+  inline void GenBuffers(GLsizei n, GLuint* buffers) override
   {
     // avoids an assert in GpuBuffers
     *buffers = 1u;
   }
 
-  inline void GenerateMipmap(GLenum target)
+  inline void GenerateMipmap(GLenum target) override
   {
     std::stringstream out;
     out<<target;
@@ -616,7 +616,7 @@ public:
     mTextureTrace.PushCall("GenerateMipmap", out.str(), namedParams);
   }
 
-  inline void GenFramebuffers(GLsizei n, GLuint* framebuffers)
+  inline void GenFramebuffers(GLsizei n, GLuint* framebuffers) override
   {
     for( int i = 0; i < n; i++ )
     {
@@ -627,7 +627,7 @@ public:
     mFramebufferStatus = 1;
   }
 
-  inline void GenRenderbuffers(GLsizei n, GLuint* renderbuffers)
+  inline void GenRenderbuffers(GLsizei n, GLuint* renderbuffers) override
   {
     for( int i = 0; i < n; i++ )
     {
@@ -649,7 +649,7 @@ public:
     return mNextTextureIds;
   }
 
-  inline void GenTextures(GLsizei count, GLuint* textures)
+  inline void GenTextures(GLsizei count, GLuint* textures) override
   {
     for( int i=0; i<count; ++i )
     {
@@ -688,16 +688,17 @@ public:
   {
     return mLastAutoTextureIdUsed;
   }
+
   inline GLuint GetNumGeneratedTextures()
   {
     return mNumGeneratedTextures;
   }
 
-  inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
+  inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
   }
 
-  inline void GetActiveUniform(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
+  inline void GetActiveUniform(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
     switch(index)
     {
@@ -721,11 +722,11 @@ public:
     }
   }
 
-  inline void GetAttachedShaders(GLuint program, GLsizei maxcount, GLsizei* count, GLuint* shaders)
+  inline void GetAttachedShaders(GLuint program, GLsizei maxcount, GLsizei* count, GLuint* shaders) override
   {
   }
 
-  inline int  GetAttribLocation(GLuint program, const char* name)
+  inline int  GetAttribLocation(GLuint program, const char* name) override
   {
     std::string attribName(name);
 
@@ -741,28 +742,28 @@ public:
     return 0;
   }
 
-  inline void GetBooleanv(GLenum pname, GLboolean* params)
+  inline void GetBooleanv(GLenum pname, GLboolean* params) override
   {
   }
 
-  inline void GetBufferParameteriv(GLenum target, GLenum pname, GLint* params)
+  inline void GetBufferParameteriv(GLenum target, GLenum pname, GLint* params) override
   {
   }
 
-  inline GLenum GetError(void)
+  inline GLenum GetError(void) override
   {
     return mGetErrorResult;
   }
 
-  inline void GetFloatv(GLenum pname, GLfloat* params)
+  inline void GetFloatv(GLenum pname, GLfloat* params) override
   {
   }
 
-  inline void GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params)
+  inline void GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetIntegerv(GLenum pname, GLint* params)
+  inline void GetIntegerv(GLenum pname, GLint* params) override
   {
     switch( pname )
     {
@@ -781,7 +782,7 @@ public:
     }
   }
 
-  inline void GetProgramiv(GLuint program, GLenum pname, GLint* params)
+  inline void GetProgramiv(GLuint program, GLenum pname, GLint* params) override
   {
     switch( pname )
     {
@@ -800,15 +801,15 @@ public:
     }
   }
 
-  inline void GetProgramInfoLog(GLuint program, GLsizei bufsize, GLsizei* length, char* infolog)
+  inline void GetProgramInfoLog(GLuint program, GLsizei bufsize, GLsizei* length, char* infolog) override
   {
   }
 
-  inline void GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint* params)
+  inline void GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetShaderiv(GLuint shader, GLenum pname, GLint* params)
+  inline void GetShaderiv(GLuint shader, GLenum pname, GLint* params) override
   {
     switch( pname ) {
       case GL_COMPILE_STATUS:
@@ -817,36 +818,36 @@ public:
     }
   }
 
-  inline void GetShaderInfoLog(GLuint shader, GLsizei bufsize, GLsizei* length, char* infolog)
+  inline void GetShaderInfoLog(GLuint shader, GLsizei bufsize, GLsizei* length, char* infolog) override
   {
   }
 
-  inline void GetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, GLint* range, GLint* precision)
+  inline void GetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, GLint* range, GLint* precision) override
   {
   }
 
-  inline const GLubyte* GetString(GLenum name)
+  inline const GLubyte* GetString(GLenum name) override
   {
     return mGetStringResult;
   }
 
-  inline void GetTexParameterfv(GLenum target, GLenum pname, GLfloat* params)
+  inline void GetTexParameterfv(GLenum target, GLenum pname, GLfloat* params) override
   {
   }
 
-  inline void GetTexParameteriv(GLenum target, GLenum pname, GLint* params)
+  inline void GetTexParameteriv(GLenum target, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetUniformfv(GLuint program, GLint location, GLfloat* params)
+  inline void GetUniformfv(GLuint program, GLint location, GLfloat* params) override
   {
   }
 
-  inline void GetUniformiv(GLuint program, GLint location, GLint* params)
+  inline void GetUniformiv(GLuint program, GLint location, GLint* params) override
   {
   }
 
-  inline GLint GetUniformLocation(GLuint program, const char* name)
+  inline GLint GetUniformLocation(GLuint program, const char* name) override
   {
     ProgramUniformMap::iterator it = mUniforms.find(program);
     if( it == mUniforms.end() )
@@ -868,62 +869,62 @@ public:
     return it2->second;
   }
 
-  inline void GetVertexAttribfv(GLuint index, GLenum pname, GLfloat* params)
+  inline void GetVertexAttribfv(GLuint index, GLenum pname, GLfloat* params) override
   {
   }
 
-  inline void GetVertexAttribiv(GLuint index, GLenum pname, GLint* params)
+  inline void GetVertexAttribiv(GLuint index, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetVertexAttribPointerv(GLuint index, GLenum pname, void** pointer)
+  inline void GetVertexAttribPointerv(GLuint index, GLenum pname, void** pointer) override
   {
   }
 
-  inline void Hint(GLenum target, GLenum mode)
+  inline void Hint(GLenum target, GLenum mode) override
   {
   }
 
-  inline GLboolean IsBuffer(GLuint buffer)
+  inline GLboolean IsBuffer(GLuint buffer) override
   {
     return mIsBufferResult;
   }
 
-  inline GLboolean IsEnabled(GLenum cap)
+  inline GLboolean IsEnabled(GLenum cap) override
   {
     return mIsEnabledResult;
   }
 
-  inline GLboolean IsFramebuffer(GLuint framebuffer)
+  inline GLboolean IsFramebuffer(GLuint framebuffer) override
   {
     return mIsFramebufferResult;
   }
 
-  inline GLboolean IsProgram(GLuint program)
+  inline GLboolean IsProgram(GLuint program) override
   {
     return mIsProgramResult;
   }
 
-  inline GLboolean IsRenderbuffer(GLuint renderbuffer)
+  inline GLboolean IsRenderbuffer(GLuint renderbuffer) override
   {
     return mIsRenderbufferResult;
   }
 
-  inline GLboolean IsShader(GLuint shader)
+  inline GLboolean IsShader(GLuint shader) override
   {
     return mIsShaderResult;
   }
 
-  inline GLboolean IsTexture(GLuint texture)
+  inline GLboolean IsTexture(GLuint texture) override
   {
     return mIsTextureResult;
   }
 
-  inline void LineWidth(GLfloat width)
+  inline void LineWidth(GLfloat width) override
   {
   }
 
-  inline void LinkProgram(GLuint program)
+  inline void LinkProgram(GLuint program) override
   {
     std::stringstream out;
     out << program;
@@ -938,31 +939,31 @@ public:
     GetUniformLocation(program, "sGloss");
   }
 
-  inline void PixelStorei(GLenum pname, GLint param)
+  inline void PixelStorei(GLenum pname, GLint param) override
   {
   }
 
-  inline void PolygonOffset(GLfloat factor, GLfloat units)
+  inline void PolygonOffset(GLfloat factor, GLfloat units) override
   {
   }
 
-  inline void ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* pixels)
+  inline void ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* pixels) override
   {
   }
 
-  inline void ReleaseShaderCompiler(void)
+  inline void ReleaseShaderCompiler(void) override
   {
   }
 
-  inline void RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)
+  inline void RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) override
   {
   }
 
-  inline void SampleCoverage(GLclampf value, GLboolean invert)
+  inline void SampleCoverage(GLclampf value, GLboolean invert) override
   {
   }
 
-  inline void Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
+  inline void Scissor(GLint x, GLint y, GLsizei width, GLsizei height) override
   {
     mScissorParams.x = x;
     mScissorParams.y = y;
@@ -979,11 +980,11 @@ public:
     mScissorTrace.PushCall( "Scissor", out.str(), namedParams );
   }
 
-  inline void ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length)
+  inline void ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const void* binary, GLsizei length) override
   {
   }
 
-  inline void ShaderSource(GLuint shader, GLsizei count, const char** string, const GLint* length)
+  inline void ShaderSource(GLuint shader, GLsizei count, const char** string, const GLint* length) override
   {
     std::string stringBuilder;
     for(int i = 0; i < count; ++i)
@@ -994,7 +995,7 @@ public:
     mLastShaderCompiled = shader;
   }
 
-  inline void GetShaderSource(GLuint shader, GLsizei bufsize, GLsizei* length, char* source)
+  inline void GetShaderSource(GLuint shader, GLsizei bufsize, GLsizei* length, char* source) override
   {
     const std::string shaderSource = mShaderSources[shader];
     const int shaderSourceLength = static_cast<int>(shaderSource.length());
@@ -1016,7 +1017,7 @@ public:
     return mShaderSources[shader];
   }
 
-  inline void StencilFunc(GLenum func, GLint ref, GLuint mask)
+  inline void StencilFunc(GLenum func, GLint ref, GLuint mask) override
   {
     std::stringstream out;
     out << func << ", " << ref << ", " << mask;
@@ -1029,7 +1030,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilFunc", out.str(), namedParams );
   }
 
-  inline void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
+  inline void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask) override
   {
     std::stringstream out;
     out << face << ", " << func << ", " << ref << ", " << mask;
@@ -1043,7 +1044,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilFuncSeparate", out.str(), namedParams );
   }
 
-  inline void StencilMask(GLuint mask)
+  inline void StencilMask(GLuint mask) override
   {
     std::stringstream out;
     out << mask;
@@ -1054,7 +1055,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilMask", out.str(), namedParams );
   }
 
-  inline void StencilMaskSeparate(GLenum face, GLuint mask)
+  inline void StencilMaskSeparate(GLenum face, GLuint mask) override
   {
     std::stringstream out;
     out << face << ", " << mask;
@@ -1066,7 +1067,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilMaskSeparate", out.str(), namedParams );
   }
 
-  inline void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
+  inline void StencilOp(GLenum fail, GLenum zfail, GLenum zpass) override
   {
     std::stringstream out;
     out << fail << ", " << zfail << ", " << zpass;
@@ -1079,7 +1080,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilOp", out.str(), namedParams );
   }
 
-  inline void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)
+  inline void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass) override
   {
     std::stringstream out;
     out << face << ", " << fail << ", " << zfail << "," << zpass;
@@ -1093,7 +1094,7 @@ public:
     mStencilFunctionTrace.PushCall( "StencilOpSeparate", out.str(), namedParams );
   }
 
-  inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels)
+  inline void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels) override
   {
     std::stringstream out;
     out << target<<", "<<level<<", "<<width << ", " << height;
@@ -1111,7 +1112,7 @@ public:
     mTextureTrace.PushCall("TexImage2D", out.str(), namedParams);
   }
 
-  inline void TexParameterf(GLenum target, GLenum pname, GLfloat param)
+  inline void TexParameterf(GLenum target, GLenum pname, GLfloat param) override
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << param;
@@ -1124,7 +1125,7 @@ public:
     mTexParamaterTrace.PushCall("TexParameterf", out.str(), namedParams);
   }
 
-  inline void TexParameterfv(GLenum target, GLenum pname, const GLfloat* params)
+  inline void TexParameterfv(GLenum target, GLenum pname, const GLfloat* params) override
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << params[0];
@@ -1137,7 +1138,7 @@ public:
     mTexParamaterTrace.PushCall("TexParameterfv", out.str(), namedParams);
   }
 
-  inline void TexParameteri(GLenum target, GLenum pname, GLint param)
+  inline void TexParameteri(GLenum target, GLenum pname, GLint param) override
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << param;
@@ -1148,7 +1149,7 @@ public:
     mTexParamaterTrace.PushCall("TexParameteri", out.str(), namedParams);
   }
 
-  inline void TexParameteriv(GLenum target, GLenum pname, const GLint* params)
+  inline void TexParameteriv(GLenum target, GLenum pname, const GLint* params) override
   {
     std::stringstream out;
     out << target << ", " << pname << ", " << params[0];
@@ -1159,7 +1160,7 @@ public:
     mTexParamaterTrace.PushCall("TexParameteriv", out.str(), namedParams);
   }
 
-  inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
+  inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) override
   {
     std::stringstream out;
     out << target << ", "<<level <<", " << xoffset << ", " << yoffset << ", " << width << ", " << height;
@@ -1174,7 +1175,7 @@ public:
     mTextureTrace.PushCall("TexSubImage2D", out.str(), namedParams);
   }
 
-  inline void Uniform1f(GLint location, GLfloat value )
+  inline void Uniform1f(GLint location, GLfloat value ) override
   {
     std::string params = ToString( value );
     AddUniformCallToTraceStack( location, params );
@@ -1185,7 +1186,7 @@ public:
     }
   }
 
-  inline void Uniform1fv(GLint location, GLsizei count, const GLfloat* v)
+  inline void Uniform1fv(GLint location, GLsizei count, const GLfloat* v) override
   {
     std::string params;
     for( int i = 0; i < count; ++i )
@@ -1205,7 +1206,7 @@ public:
     }
   }
 
-  inline void Uniform1i(GLint location, GLint x)
+  inline void Uniform1i(GLint location, GLint x) override
   {
     std::string params = ToString( x );
 
@@ -1217,7 +1218,7 @@ public:
     }
   }
 
-  inline void Uniform1iv(GLint location, GLsizei count, const GLint* v)
+  inline void Uniform1iv(GLint location, GLsizei count, const GLint* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
@@ -1234,7 +1235,7 @@ public:
     }
   }
 
-  inline void Uniform2f(GLint location, GLfloat x, GLfloat y)
+  inline void Uniform2f(GLint location, GLfloat x, GLfloat y) override
   {
     std::string params = ToString( x ) + "," + ToString( y );
     AddUniformCallToTraceStack( location, params );
@@ -1247,7 +1248,7 @@ public:
     }
   }
 
-  inline void Uniform2fv(GLint location, GLsizei count, const GLfloat* v)
+  inline void Uniform2fv(GLint location, GLsizei count, const GLfloat* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
@@ -1264,19 +1265,19 @@ public:
     }
   }
 
-  inline void Uniform2i(GLint location, GLint x, GLint y)
+  inline void Uniform2i(GLint location, GLint x, GLint y) override
   {
     std::string params = ToString( x ) + "," + ToString( y );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void Uniform2iv(GLint location, GLsizei count, const GLint* v)
+  inline void Uniform2iv(GLint location, GLsizei count, const GLint* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)
+  inline void Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z) override
   {
     std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
     AddUniformCallToTraceStack( location, params );
@@ -1289,7 +1290,7 @@ public:
     }
   }
 
-  inline void Uniform3fv(GLint location, GLsizei count, const GLfloat* v)
+  inline void Uniform3fv(GLint location, GLsizei count, const GLfloat* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
@@ -1307,19 +1308,19 @@ public:
     }
   }
 
-  inline void Uniform3i(GLint location, GLint x, GLint y, GLint z)
+  inline void Uniform3i(GLint location, GLint x, GLint y, GLint z) override
   {
     std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void Uniform3iv(GLint location, GLsizei count, const GLint* v)
+  inline void Uniform3iv(GLint location, GLsizei count, const GLint* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
+  inline void Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) override
   {
     std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
     AddUniformCallToTraceStack( location, params );
@@ -1332,7 +1333,7 @@ public:
     }
   }
 
-  inline void Uniform4fv(GLint location, GLsizei count, const GLfloat* v)
+  inline void Uniform4fv(GLint location, GLsizei count, const GLfloat* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
@@ -1350,25 +1351,25 @@ public:
     }
   }
 
-  inline void Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w)
+  inline void Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w) override
   {
     std::string params = ToString( x ) + "," + ToString( y ) + "," + ToString( z ) + "," + ToString( w );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void Uniform4iv(GLint location, GLsizei count, const GLint* v)
+  inline void Uniform4iv(GLint location, GLsizei count, const GLint* v) override
   {
     std::string params = ToString( v );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
     std::string params = ToString( value );
     AddUniformCallToTraceStack( location, params );
   }
 
-  inline void UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
     std::string params = ToString( value );
     AddUniformCallToTraceStack( location, params );
@@ -1386,7 +1387,7 @@ public:
     }
   }
 
-  inline void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
     std::string params = ToString( value );
     AddUniformCallToTraceStack( location, params );
@@ -1404,52 +1405,52 @@ public:
     }
   }
 
-  inline void UseProgram(GLuint program)
+  inline void UseProgram(GLuint program) override
   {
     mCurrentProgram = program;
   }
 
-  inline void ValidateProgram(GLuint program)
+  inline void ValidateProgram(GLuint program) override
   {
   }
 
-  inline void VertexAttrib1f(GLuint indx, GLfloat x)
+  inline void VertexAttrib1f(GLuint indx, GLfloat x) override
   {
   }
 
-  inline void VertexAttrib1fv(GLuint indx, const GLfloat* values)
+  inline void VertexAttrib1fv(GLuint indx, const GLfloat* values) override
   {
   }
 
-  inline void VertexAttrib2f(GLuint indx, GLfloat x, GLfloat y)
+  inline void VertexAttrib2f(GLuint indx, GLfloat x, GLfloat y) override
   {
   }
 
-  inline void VertexAttrib2fv(GLuint indx, const GLfloat* values)
+  inline void VertexAttrib2fv(GLuint indx, const GLfloat* values) override
   {
   }
 
-  inline void VertexAttrib3f(GLuint indx, GLfloat x, GLfloat y, GLfloat z)
+  inline void VertexAttrib3f(GLuint indx, GLfloat x, GLfloat y, GLfloat z) override
   {
   }
 
-  inline void VertexAttrib3fv(GLuint indx, const GLfloat* values)
+  inline void VertexAttrib3fv(GLuint indx, const GLfloat* values) override
   {
   }
 
-  inline void VertexAttrib4f(GLuint indx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
+  inline void VertexAttrib4f(GLuint indx, GLfloat x, GLfloat y, GLfloat z, GLfloat w) override
   {
   }
 
-  inline void VertexAttrib4fv(GLuint indx, const GLfloat* values)
+  inline void VertexAttrib4fv(GLuint indx, const GLfloat* values) override
   {
   }
 
-  inline void VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* ptr)
+  inline void VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* ptr) override
   {
   }
 
-  inline void Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
+  inline void Viewport(GLint x, GLint y, GLsizei width, GLsizei height) override
   {
     std::string commaString(", ");
     std::string params( std::to_string(x) + commaString + std::to_string(y) + commaString + std::to_string(width) + commaString + std::to_string(height) );
@@ -1459,432 +1460,432 @@ public:
 
   /* OpenGL ES 3.0 */
 
-  inline void ReadBuffer(GLenum mode)
+  inline void ReadBuffer(GLenum mode) override
   {
   }
 
-  inline void DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices)
+  inline void DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices) override
   {
   }
 
-  inline void TexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
+  inline void TexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels) override
   {
   }
 
-  inline void TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels)
+  inline void TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels) override
   {
   }
 
-  inline void CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+  inline void CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height) override
   {
   }
 
-  inline void CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data)
+  inline void CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data) override
   {
   }
 
-  inline void CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data)
+  inline void CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data) override
   {
   }
 
-  inline void GenQueries(GLsizei n, GLuint* ids)
+  inline void GenQueries(GLsizei n, GLuint* ids) override
   {
   }
 
-  inline void DeleteQueries(GLsizei n, const GLuint* ids)
+  inline void DeleteQueries(GLsizei n, const GLuint* ids) override
   {
   }
 
-  inline GLboolean IsQuery(GLuint id)
-  {
-    return false;
-  }
-
-  inline void BeginQuery(GLenum target, GLuint id)
-  {
-  }
-
-  inline void EndQuery(GLenum target)
-  {
-  }
-
-  inline void GetQueryiv(GLenum target, GLenum pname, GLint* params)
-  {
-  }
-
-  inline void GetQueryObjectuiv(GLuint id, GLenum pname, GLuint* params)
-  {
-  }
-
-  inline GLboolean UnmapBuffer(GLenum target)
+  inline GLboolean IsQuery(GLuint id) override
   {
     return false;
   }
 
-  inline void GetBufferPointerv(GLenum target, GLenum pname, GLvoid** params)
+  inline void BeginQuery(GLenum target, GLuint id) override
   {
   }
 
-  inline void DrawBuffers(GLsizei n, const GLenum* bufs)
+  inline void EndQuery(GLenum target) override
   {
   }
 
-  inline void UniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void GetQueryiv(GLenum target, GLenum pname, GLint* params) override
   {
   }
 
-  inline void UniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void GetQueryObjectuiv(GLuint id, GLenum pname, GLuint* params) override
   {
   }
 
-  inline void UniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline GLboolean UnmapBuffer(GLenum target) override
+  {
+    return false;
+  }
+
+  inline void GetBufferPointerv(GLenum target, GLenum pname, GLvoid** params) override
   {
   }
 
-  inline void UniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void DrawBuffers(GLsizei n, const GLenum* bufs) override
   {
   }
 
-  inline void UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void UniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
   }
 
-  inline void UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+  inline void UniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
   }
 
-  inline void BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
+  inline void UniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
   }
 
-  inline void RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height)
+  inline void UniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
   }
 
-  inline void FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
+  inline void UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
   {
   }
 
-  inline GLvoid* MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
+  inline void UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) override
+  {
+  }
+
+  inline void BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) override
+  {
+  }
+
+  inline void RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) override
+  {
+  }
+
+  inline void FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer) override
+  {
+  }
+
+  inline GLvoid* MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access) override
   {
     return NULL;
   }
 
-  inline void FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
+  inline void FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length) override
   {
   }
 
-  inline void BindVertexArray(GLuint array)
+  inline void BindVertexArray(GLuint array) override
   {
   }
 
-  inline void DeleteVertexArrays(GLsizei n, const GLuint* arrays)
+  inline void DeleteVertexArrays(GLsizei n, const GLuint* arrays) override
   {
   }
 
-  inline void GenVertexArrays(GLsizei n, GLuint* arrays)
+  inline void GenVertexArrays(GLsizei n, GLuint* arrays) override
   {
   }
 
-  inline GLboolean IsVertexArray(GLuint array)
+  inline GLboolean IsVertexArray(GLuint array) override
   {
     return false;
   }
 
-  inline void GetIntegeri_v(GLenum target, GLuint index, GLint* data)
+  inline void GetIntegeri_v(GLenum target, GLuint index, GLint* data) override
   {
   }
 
-  inline void BeginTransformFeedback(GLenum primitiveMode)
+  inline void BeginTransformFeedback(GLenum primitiveMode) override
   {
   }
 
-  inline void EndTransformFeedback(void)
+  inline void EndTransformFeedback(void) override
   {
   }
 
-  inline void BindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size)
+  inline void BindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size) override
   {
   }
 
-  inline void BindBufferBase(GLenum target, GLuint index, GLuint buffer)
+  inline void BindBufferBase(GLenum target, GLuint index, GLuint buffer) override
   {
   }
 
-  inline void TransformFeedbackVaryings(GLuint program, GLsizei count, const GLchar* const* varyings, GLenum bufferMode)
+  inline void TransformFeedbackVaryings(GLuint program, GLsizei count, const GLchar* const* varyings, GLenum bufferMode) override
   {
   }
 
-  inline void GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLsizei* size, GLenum* type, GLchar* name)
+  inline void GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLsizei* size, GLenum* type, GLchar* name) override
   {
   }
 
-  inline void VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid* pointer)
+  inline void VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid* pointer) override
   {
   }
 
-  inline void GetVertexAttribIiv(GLuint index, GLenum pname, GLint* params)
+  inline void GetVertexAttribIiv(GLuint index, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint* params)
+  inline void GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint* params) override
   {
   }
 
-  inline void VertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w)
+  inline void VertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w) override
   {
   }
 
-  inline void VertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w)
+  inline void VertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w) override
   {
   }
 
-  inline void VertexAttribI4iv(GLuint index, const GLint* v)
+  inline void VertexAttribI4iv(GLuint index, const GLint* v) override
   {
   }
 
-  inline void VertexAttribI4uiv(GLuint index, const GLuint* v)
+  inline void VertexAttribI4uiv(GLuint index, const GLuint* v) override
   {
   }
 
-  inline void GetUniformuiv(GLuint program, GLint location, GLuint* params)
+  inline void GetUniformuiv(GLuint program, GLint location, GLuint* params) override
   {
   }
 
-  inline GLint GetFragDataLocation(GLuint program, const GLchar *name)
+  inline GLint GetFragDataLocation(GLuint program, const GLchar *name) override
   {
     return -1;
   }
 
-  inline void Uniform1ui(GLint location, GLuint v0)
+  inline void Uniform1ui(GLint location, GLuint v0) override
   {
   }
 
-  inline void Uniform2ui(GLint location, GLuint v0, GLuint v1)
+  inline void Uniform2ui(GLint location, GLuint v0, GLuint v1) override
   {
   }
 
-  inline void Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
+  inline void Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2) override
   {
   }
 
-  inline void Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+  inline void Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3) override
   {
   }
 
-  inline void Uniform1uiv(GLint location, GLsizei count, const GLuint* value)
+  inline void Uniform1uiv(GLint location, GLsizei count, const GLuint* value) override
   {
   }
 
-  inline void Uniform2uiv(GLint location, GLsizei count, const GLuint* value)
+  inline void Uniform2uiv(GLint location, GLsizei count, const GLuint* value) override
   {
   }
 
-  inline void Uniform3uiv(GLint location, GLsizei count, const GLuint* value)
+  inline void Uniform3uiv(GLint location, GLsizei count, const GLuint* value) override
   {
   }
 
-  inline void Uniform4uiv(GLint location, GLsizei count, const GLuint* value)
+  inline void Uniform4uiv(GLint location, GLsizei count, const GLuint* value) override
   {
   }
 
-  inline void ClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint* value)
+  inline void ClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint* value) override
   {
   }
 
-  inline void ClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint* value)
+  inline void ClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint* value) override
   {
   }
 
-  inline void ClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value)
+  inline void ClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value) override
   {
   }
 
-  inline void ClearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil)
+  inline void ClearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil) override
   {
   }
 
-  inline const GLubyte* GetStringi(GLenum name, GLuint index)
+  inline const GLubyte* GetStringi(GLenum name, GLuint index) override
   {
     return NULL;
   }
 
-  inline void CopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)
+  inline void CopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size) override
   {
   }
 
-  inline void GetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar* const* uniformNames, GLuint* uniformIndices)
+  inline void GetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar* const* uniformNames, GLuint* uniformIndices) override
   {
   }
 
-  inline void GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint* uniformIndices, GLenum pname, GLint* params)
+  inline void GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint* uniformIndices, GLenum pname, GLint* params) override
   {
   }
 
-  inline GLuint GetUniformBlockIndex(GLuint program, const GLchar* uniformBlockName)
+  inline GLuint GetUniformBlockIndex(GLuint program, const GLchar* uniformBlockName) override
   {
     return GL_INVALID_INDEX;
   }
 
-  inline void GetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint* params)
+  inline void GetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint* params) override
   {
   }
 
-  inline void GetActiveUniformBlockName(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformBlockName)
+  inline void GetActiveUniformBlockName(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei* length, GLchar* uniformBlockName) override
   {
   }
 
-  inline void UniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding)
+  inline void UniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding) override
   {
   }
 
-  inline void DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount)
+  inline void DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount) override
   {
   }
 
-  inline void DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei instanceCount)
+  inline void DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei instanceCount) override
   {
   }
 
-  inline GLsync FenceSync(GLenum condition, GLbitfield flags)
+  inline GLsync FenceSync(GLenum condition, GLbitfield flags) override
   {
     return NULL;
   }
 
-  inline GLboolean IsSync(GLsync sync)
+  inline GLboolean IsSync(GLsync sync) override
   {
     return false;
   }
 
-  inline void DeleteSync(GLsync sync)
+  inline void DeleteSync(GLsync sync) override
   {
   }
 
-  inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+  inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
   {
     return 0;
   }
 
-  inline void WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+  inline void WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
   {
   }
 
-  inline void GetInteger64v(GLenum pname, GLint64* params)
+  inline void GetInteger64v(GLenum pname, GLint64* params) override
   {
   }
 
-  inline void GetSynciv(GLsync sync, GLenum pname, GLsizei bufSize, GLsizei* length, GLint* values)
+  inline void GetSynciv(GLsync sync, GLenum pname, GLsizei bufSize, GLsizei* length, GLint* values) override
   {
   }
 
-  inline void GetInteger64i_v(GLenum target, GLuint index, GLint64* data)
+  inline void GetInteger64i_v(GLenum target, GLuint index, GLint64* data) override
   {
   }
 
-  inline void GetBufferParameteri64v(GLenum target, GLenum pname, GLint64* params)
+  inline void GetBufferParameteri64v(GLenum target, GLenum pname, GLint64* params) override
   {
   }
 
-  inline void GenSamplers(GLsizei count, GLuint* samplers)
+  inline void GenSamplers(GLsizei count, GLuint* samplers) override
   {
   }
 
-  inline void DeleteSamplers(GLsizei count, const GLuint* samplers)
+  inline void DeleteSamplers(GLsizei count, const GLuint* samplers) override
   {
   }
 
-  inline GLboolean IsSampler(GLuint sampler)
-  {
-    return false;
-  }
-
-  inline void BindSampler(GLuint unit, GLuint sampler)
-  {
-  }
-
-  inline void SamplerParameteri(GLuint sampler, GLenum pname, GLint param)
-  {
-  }
-
-  inline void SamplerParameteriv(GLuint sampler, GLenum pname, const GLint* param)
-  {
-  }
-
-  inline void SamplerParameterf(GLuint sampler, GLenum pname, GLfloat param)
-  {
-  }
-
-  inline void SamplerParameterfv(GLuint sampler, GLenum pname, const GLfloat* param)
-  {
-  }
-
-  inline void GetSamplerParameteriv(GLuint sampler, GLenum pname, GLint* params)
-  {
-  }
-
-  inline void GetSamplerParameterfv(GLuint sampler, GLenum pname, GLfloat* params)
-  {
-  }
-
-  inline void VertexAttribDivisor(GLuint index, GLuint divisor)
-  {
-  }
-
-  inline void BindTransformFeedback(GLenum target, GLuint id)
-  {
-  }
-
-  inline void DeleteTransformFeedbacks(GLsizei n, const GLuint* ids)
-  {
-  }
-
-  inline void GenTransformFeedbacks(GLsizei n, GLuint* ids)
-  {
-  }
-
-  inline GLboolean IsTransformFeedback(GLuint id)
+  inline GLboolean IsSampler(GLuint sampler) override
   {
     return false;
   }
 
-  inline void PauseTransformFeedback(void)
+  inline void BindSampler(GLuint unit, GLuint sampler) override
   {
   }
 
-  inline void ResumeTransformFeedback(void)
+  inline void SamplerParameteri(GLuint sampler, GLenum pname, GLint param) override
   {
   }
 
-  inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary)
+  inline void SamplerParameteriv(GLuint sampler, GLenum pname, const GLint* param) override
+  {
+  }
+
+  inline void SamplerParameterf(GLuint sampler, GLenum pname, GLfloat param) override
+  {
+  }
+
+  inline void SamplerParameterfv(GLuint sampler, GLenum pname, const GLfloat* param) override
+  {
+  }
+
+  inline void GetSamplerParameteriv(GLuint sampler, GLenum pname, GLint* params) override
+  {
+  }
+
+  inline void GetSamplerParameterfv(GLuint sampler, GLenum pname, GLfloat* params) override
+  {
+  }
+
+  inline void VertexAttribDivisor(GLuint index, GLuint divisor) override
+  {
+  }
+
+  inline void BindTransformFeedback(GLenum target, GLuint id) override
+  {
+  }
+
+  inline void DeleteTransformFeedbacks(GLsizei n, const GLuint* ids) override
+  {
+  }
+
+  inline void GenTransformFeedbacks(GLsizei n, GLuint* ids) override
+  {
+  }
+
+  inline GLboolean IsTransformFeedback(GLuint id) override
+  {
+    return false;
+  }
+
+  inline void PauseTransformFeedback(void) override
+  {
+  }
+
+  inline void ResumeTransformFeedback(void) override
+  {
+  }
+
+  inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary) override
   {
     mGetProgramBinaryCalled = true;
   }
 
-  inline void ProgramBinary(GLuint program, GLenum binaryFormat, const GLvoid* binary, GLsizei length)
+  inline void ProgramBinary(GLuint program, GLenum binaryFormat, const GLvoid* binary, GLsizei length) override
   {
   }
 
-  inline void ProgramParameteri(GLuint program, GLenum pname, GLint value)
+  inline void ProgramParameteri(GLuint program, GLenum pname, GLint value) override
   {
   }
 
-  inline void InvalidateFramebuffer(GLenum target, GLsizei numAttachments, const GLenum* attachments)
+  inline void InvalidateFramebuffer(GLenum target, GLsizei numAttachments, const GLenum* attachments) override
   {
   }
 
-  inline void InvalidateSubFramebuffer(GLenum target, GLsizei numAttachments, const GLenum* attachments, GLint x, GLint y, GLsizei width, GLsizei height)
+  inline void InvalidateSubFramebuffer(GLenum target, GLsizei numAttachments, const GLenum* attachments, GLint x, GLint y, GLsizei width, GLsizei height) override
   {
   }
 
-  inline void TexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height)
+  inline void TexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) override
   {
   }
 
-  inline void TexStorage3D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth)
+  inline void TexStorage3D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth) override
   {
   }
 
-  inline void GetInternalformativ(GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params)
+  inline void GetInternalformativ(GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params) override
   {
   }
 

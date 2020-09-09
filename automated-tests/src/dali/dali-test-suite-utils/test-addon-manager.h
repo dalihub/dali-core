@@ -38,7 +38,7 @@ public:
   /**
    * @brief Destructor
    */
-  virtual ~AddOnManager() = default;
+  ~AddOnManager() override = default;
 
   std::vector<std::string> EnumerateAddOns() override;
 

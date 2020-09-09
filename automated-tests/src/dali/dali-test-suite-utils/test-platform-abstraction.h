@@ -49,25 +49,25 @@ public:
   /**
    * Destructor
    */
-  virtual ~TestPlatformAbstraction();
+  ~TestPlatformAbstraction() override;
 
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
    */
-  virtual ImageDimensions GetClosestImageSize( const std::string& filename,
+  ImageDimensions GetClosestImageSize( const std::string& filename,
                                                  ImageDimensions size,
                                                  FittingMode::Type fittingMode,
                                                  SamplingMode::Type samplingMode,
-                                                 bool orientationCorrection );
+                                                 bool orientationCorrection ) override;
 
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
    */
-  virtual ImageDimensions GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
+  ImageDimensions GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
                                                ImageDimensions size,
                                                FittingMode::Type fittingMode,
                                                SamplingMode::Type samplingMode,
-                                               bool orientationCorrection );
+                                               bool orientationCorrection ) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
@@ -87,7 +87,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
    */
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
+  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const override { return true; }
 
   /**
    * @copydoc PlatformAbstraction::StartTimer()

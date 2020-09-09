@@ -29,7 +29,7 @@ class DALI_CORE_API TestRenderController : public Dali::Integration::RenderContr
 {
 public:
   TestRenderController();
-  ~TestRenderController();
+  ~TestRenderController() override;
 
   void RequestUpdate( bool forceUpdate ) override;
   void RequestProcessEventsOnIdle( bool forceProcess ) override;

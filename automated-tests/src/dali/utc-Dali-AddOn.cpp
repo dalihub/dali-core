@@ -24,7 +24,7 @@ struct DummyAddOn : public Dali::AddOn::AddOnBinder
   DummyAddOn() : Dali::AddOn::AddOnBinder( "SampleAddOn" )
   {}
 
-  ~DummyAddOn() = default;
+  ~DummyAddOn() override = default;
 
   ADDON_BIND_FUNCTION( DoSum, int(int, int) );
 

@@ -58,7 +58,7 @@ public:
   void CreateCore();
   void CreateScene();
   void InitializeCore();
-  virtual ~TestApplication();
+  ~TestApplication() override;
   static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
   static void LogContext( bool start, const char* tag );
   Dali::Integration::Core& GetCore();
