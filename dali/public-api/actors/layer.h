@@ -22,10 +22,10 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
@@ -85,7 +85,6 @@ using ClippingBox = Rect<int32_t>;
 class DALI_CORE_API Layer : public Actor
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the Layer class.
    *
@@ -218,7 +217,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] position This is the actor translation from camera
    */
-  using SortFunctionType = float ( * )( const Vector3& );
+  using SortFunctionType = float (*)(const Vector3&);
 
   /**
    * @brief Creates an empty Layer handle.
@@ -245,7 +244,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a Layer or an uninitialized handle
    */
-  static Layer DownCast( BaseHandle handle );
+  static Layer DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -278,7 +277,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs The layer to move
    */
-  Layer( Layer&& rhs );
+  Layer(Layer&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -287,7 +286,7 @@ public:
    * @param[in] rhs The layer to move
    * @return A reference to this
    */
-  Layer& operator=( Layer&& rhs );
+  Layer& operator=(Layer&& rhs);
 
   /**
    * @brief Increments the depth of the layer.
@@ -316,7 +315,7 @@ public:
    * @pre Target layer is on the stage.
    * @note All layers between this layer and target get new depth values.
    */
-  void RaiseAbove( Layer target );
+  void RaiseAbove(Layer target);
 
   /**
    * @brief Ensures the layers depth is less than the target layer.
@@ -329,7 +328,7 @@ public:
    * @pre Target layer is on the stage.
    * @note All layers between this layer and target get new depth values.
    */
-  void LowerBelow( Layer target );
+  void LowerBelow(Layer target);
 
   /**
    * @brief Raises the layer to the top.
@@ -355,7 +354,7 @@ public:
    * @pre Target layer is on the stage.
    * @note All layers between this layer and target get new depth values.
    */
-  void MoveAbove( Layer target );
+  void MoveAbove(Layer target);
 
   /**
    * @brief Moves the layer directly below the given layer.
@@ -367,7 +366,7 @@ public:
    * @pre Target layer is on the stage.
    * @note All layers between this layer and target get new depth values.
    */
-  void MoveBelow( Layer target );
+  void MoveBelow(Layer target);
 
   // Sorting
 
@@ -391,7 +390,7 @@ public:
    * layer, then the sort function used by the child layer will also be the same.
    *
   */
-  void SetSortFunction( SortFunctionType function );
+  void SetSortFunction(SortFunctionType function);
 
   /**
    * @brief Retrieves whether the layer consumes hover.
@@ -402,7 +401,6 @@ public:
   bool IsHoverConsumed() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Layer::New() methods.

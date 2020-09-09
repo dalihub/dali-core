@@ -54,7 +54,6 @@ namespace Dali
 class DALI_CORE_API ConnectionTrackerInterface : public SignalObserver
 {
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -74,14 +73,13 @@ public:
    * @param[in] slotObserver The slot observer i.e. a signal. Ownership is not passed
    * @param[in] callback The call back. Ownership is not passed
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
+  virtual void SignalConnected(SlotObserver* slotObserver, CallbackBase* callback) = 0;
 
 private:
-
-  ConnectionTrackerInterface( const ConnectionTrackerInterface& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  ConnectionTrackerInterface( ConnectionTrackerInterface&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  ConnectionTrackerInterface& operator=( const ConnectionTrackerInterface& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  ConnectionTrackerInterface& operator=( ConnectionTrackerInterface&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+  ConnectionTrackerInterface(const ConnectionTrackerInterface&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  ConnectionTrackerInterface(ConnectionTrackerInterface&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  ConnectionTrackerInterface& operator=(const ConnectionTrackerInterface&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  ConnectionTrackerInterface& operator=(ConnectionTrackerInterface&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 };
 
 /**

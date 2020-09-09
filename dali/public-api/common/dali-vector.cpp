@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@
 
 namespace Dali
 {
-
 VectorBase::VectorBase()
-  : mData( nullptr )
+: mData(nullptr)
 {
 }
 
@@ -36,58 +35,57 @@ VectorBase::~VectorBase()
 VectorBase::SizeType VectorBase::Capacity() const
 {
   SizeType capacity = 0u;
-  if( mData )
+  if(mData)
   {
-    SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-    capacity = *(metadata - 2u);
+    SizeType* metadata = reinterpret_cast<SizeType*>(mData);
+    capacity           = *(metadata - 2u);
   }
   return capacity;
 }
 
-
 void VectorBase::Release()
 {
-  if( mData )
+  if(mData)
   {
     // adjust pointer to real beginning
-    SizeType* metadata = reinterpret_cast< SizeType* >( mData );
+    SizeType* metadata = reinterpret_cast<SizeType*>(mData);
 
-    delete [] ( metadata - 2u );
+    delete[](metadata - 2u);
     mData = nullptr;
   }
 }
 
-void VectorBase::SetCount( SizeType count )
+void VectorBase::SetCount(SizeType count)
 {
   // someone can call Resize( 0u ) before ever populating the vector
-  if( mData )
+  if(mData)
   {
-    SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-    *(metadata - 1u) = count;
+    SizeType* metadata = reinterpret_cast<SizeType*>(mData);
+    *(metadata - 1u)   = count;
   }
 }
 
-void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
+void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
 {
   SizeType oldCapacity = Capacity();
-  SizeType oldCount = Count();
-  if( capacity > oldCapacity )
+  SizeType oldCount    = Count();
+  if(capacity > oldCapacity)
   {
     const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-    void* wholeData = reinterpret_cast< void* >( new uint8_t[ wholeAllocation ] );
-    DALI_ASSERT_ALWAYS( wholeData && "VectorBase::Reserve - Memory allocation failed" );
+    void*          wholeData       = reinterpret_cast<void*>(new uint8_t[wholeAllocation]);
+    DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Reserve - Memory allocation failed");
 
-#if defined( DEBUG_ENABLED )
+#if defined(DEBUG_ENABLED)
     // in debug build this will help identify a vector of uninitialized data
-    memset( wholeData, 0xaa, wholeAllocation );
+    memset(wholeData, 0xaa, wholeAllocation);
 #endif
-    SizeType* metaData = reinterpret_cast< SizeType* >( wholeData );
-    *metaData++ = capacity;
-    *metaData++ = oldCount;
-    if( mData )
+    SizeType* metaData = reinterpret_cast<SizeType*>(wholeData);
+    *metaData++        = capacity;
+    *metaData++        = oldCount;
+    if(mData)
     {
       // copy over the old data
-      memcpy( metaData, mData, oldCount * elementSize );
+      memcpy(metaData, mData, oldCount * elementSize);
       // release old buffer
       Release();
     }
@@ -95,52 +93,52 @@ void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
   }
 }
 
-void VectorBase::Copy( const VectorBase& vector, SizeType elementSize )
+void VectorBase::Copy(const VectorBase& vector, SizeType elementSize)
 {
   // release old data
   Release();
   // reserve space based on source capacity
   const SizeType capacity = vector.Capacity();
-  Reserve( capacity, elementSize );
+  Reserve(capacity, elementSize);
   // copy over whole data
   const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-  SizeType* srcData = reinterpret_cast< SizeType* >( vector.mData );
-  SizeType* dstData = reinterpret_cast< SizeType* >( mData );
-  memcpy( dstData - 2u, srcData - 2u, wholeAllocation );
+  SizeType*      srcData         = reinterpret_cast<SizeType*>(vector.mData);
+  SizeType*      dstData         = reinterpret_cast<SizeType*>(mData);
+  memcpy(dstData - 2u, srcData - 2u, wholeAllocation);
 }
 
-void VectorBase::Swap( VectorBase& vector )
+void VectorBase::Swap(VectorBase& vector)
 {
   // just swap the data pointers, metadata will swap as side effect
-  std::swap( mData, vector.mData );
+  std::swap(mData, vector.mData);
 }
 
-void VectorBase::Erase( char* address, SizeType elementSize )
+void VectorBase::Erase(char* address, SizeType elementSize)
 {
   // erase can be called on an unallocated vector
-  if( mData )
+  if(mData)
   {
-    uint8_t* startAddress = reinterpret_cast< uint8_t* >( address ) + elementSize;
-    const uint8_t* endAddress = reinterpret_cast< uint8_t* >( mData ) + Count() * elementSize;
-    SizeType numberOfBytes = endAddress - startAddress;
+    uint8_t*       startAddress  = reinterpret_cast<uint8_t*>(address) + elementSize;
+    const uint8_t* endAddress    = reinterpret_cast<uint8_t*>(mData) + Count() * elementSize;
+    SizeType       numberOfBytes = endAddress - startAddress;
     // addresses overlap so use memmove
-    memmove( address, startAddress, numberOfBytes );
-    SetCount( Count() - 1u );
+    memmove(address, startAddress, numberOfBytes);
+    SetCount(Count() - 1u);
   }
 }
 
-char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
+char* VectorBase::Erase(char* first, char* last, SizeType elementSize)
 {
   char* next = nullptr;
 
-  if( mData )
+  if(mData)
   {
-    uint8_t* startAddress = reinterpret_cast< uint8_t* >( last );
-    const uint8_t* endAddress = reinterpret_cast< uint8_t* >( mData ) + Count() * elementSize;
-    SizeType numberOfBytes = endAddress - startAddress;
+    uint8_t*       startAddress  = reinterpret_cast<uint8_t*>(last);
+    const uint8_t* endAddress    = reinterpret_cast<uint8_t*>(mData) + Count() * elementSize;
+    SizeType       numberOfBytes = endAddress - startAddress;
     // addresses overlap so use memmove
-    memmove( first, startAddress, numberOfBytes );
-    SetCount( Count() - ( last - first ) / elementSize );
+    memmove(first, startAddress, numberOfBytes);
+    SetCount(Count() - (last - first) / elementSize);
 
     next = first;
   }
@@ -148,20 +146,19 @@ char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
   return next;
 }
 
-void VectorBase::CopyMemory( char* destination, const char* source, size_t numberOfBytes )
+void VectorBase::CopyMemory(char* destination, const char* source, size_t numberOfBytes)
 {
-  if( ( ( source < destination ) && ( source + numberOfBytes > destination ) ) ||
-      ( ( destination < source ) && ( destination + numberOfBytes > source ) ) )
+  if(((source < destination) && (source + numberOfBytes > destination)) ||
+     ((destination < source) && (destination + numberOfBytes > source)))
   {
     // If there is overlap, use memmove.
-    memmove( destination, source, numberOfBytes );
+    memmove(destination, source, numberOfBytes);
   }
   else
   {
     // It's safe to use memcpy if there isn't overlap.
-    memcpy( destination, source, numberOfBytes );
+    memcpy(destination, source, numberOfBytes);
   }
 }
 
 } // namespace Dali
-

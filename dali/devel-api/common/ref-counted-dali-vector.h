@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 /**
  * @brief A reference counting wrapper for a vector class that allows
  * a set of referencing smart pointers to collaborate in managing its
@@ -34,7 +33,7 @@ namespace Dali
  * stack.
  * @tparam T type of the data that the vector holds
  */
-template< typename T >
+template<typename T>
 class RefCountedVector : public RefObject
 {
 public:
@@ -50,16 +49,16 @@ public:
    *
    * @return A reference to the vector that this object wraps.
    */
-  Vector< T >& GetVector()
+  Vector<T>& GetVector()
   {
     return mVector;
   }
 
   // Not copyable or movable
-  RefCountedVector( const RefCountedVector& ) = delete; ///< Deleted copy constructor
-  RefCountedVector( RefCountedVector&& ) = delete; ///< Deleted move constructor
-  RefCountedVector& operator=( const RefCountedVector& ) = delete; ///< Deleted copy assignment operator
-  RefCountedVector& operator=( RefCountedVector&& ) = delete; ///< Deleted move assignment operator
+  RefCountedVector(const RefCountedVector&) = delete;            ///< Deleted copy constructor
+  RefCountedVector(RefCountedVector&&)      = delete;            ///< Deleted move constructor
+  RefCountedVector& operator=(const RefCountedVector&) = delete; ///< Deleted copy assignment operator
+  RefCountedVector& operator=(RefCountedVector&&) = delete;      ///< Deleted move assignment operator
 
 protected:
   virtual ~RefCountedVector()
@@ -67,8 +66,7 @@ protected:
   }
 
 private:
-
-  Vector< T > mVector; ///< The vector of data
+  Vector<T> mVector; ///< The vector of data
 };
 
 } // namespace Dali

@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace DevelWheelEvent
 {
-
 /**
  * @brief Creates an initialized WheelEvent.
  *
@@ -39,8 +37,7 @@ namespace DevelWheelEvent
  * @param[in] timeStamp The time the wheel is being rolled
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API WheelEvent New( WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp );
-
+DALI_CORE_API WheelEvent New(WheelEvent::Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
 
 } // namespace DevelWheelEvent
 

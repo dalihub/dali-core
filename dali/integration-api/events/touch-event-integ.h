@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * An instance of this structure should be used by the adaptor to send a touch event to Dali core.
  *

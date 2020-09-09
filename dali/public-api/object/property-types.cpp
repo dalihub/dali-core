@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,9 @@
 
 namespace Dali
 {
-
 namespace
 {
-const char* const PROPERTY_TYPE_NAMES[] =
-{
+const char* const PROPERTY_TYPE_NAMES[] = {
   "NONE",
   "BOOLEAN",
   "FLOAT",
@@ -41,15 +39,14 @@ const char* const PROPERTY_TYPE_NAMES[] =
   "MAP",
   "EXTENTS",
 };
-const uint32_t PROPERTY_TYPE_NAMES_COUNT = static_cast<uint32_t>( sizeof( PROPERTY_TYPE_NAMES ) / sizeof( const char* ) );
-}
+const uint32_t PROPERTY_TYPE_NAMES_COUNT = static_cast<uint32_t>(sizeof(PROPERTY_TYPE_NAMES) / sizeof(const char*));
+} // namespace
 
 namespace PropertyTypes
 {
-
 DALI_CORE_API const char* GetName(Property::Type type)
 {
-  if (type < PROPERTY_TYPE_NAMES_COUNT )
+  if(type < PROPERTY_TYPE_NAMES_COUNT)
   {
     return PROPERTY_TYPE_NAMES[type];
   }

@@ -75,7 +75,6 @@ class Shader;
 class DALI_CORE_API Shader : public Handle
 {
 public:
-
   /**
    * @brief Hints for rendering.
    * @SINCE_1_1.45
@@ -88,9 +87,9 @@ public:
      */
     enum Value
     {
-      NONE                     = 0x00, ///< No hints                                                                          @SINCE_1_1.45
-      OUTPUT_IS_TRANSPARENT    = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.45
-      MODIFIES_GEOMETRY        = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.45
+      NONE                  = 0x00, ///< No hints                                                                          @SINCE_1_1.45
+      OUTPUT_IS_TRANSPARENT = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.45
+      MODIFIES_GEOMETRY     = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.45
     };
   };
 
@@ -125,9 +124,9 @@ public:
    * @param[in] hints Hints to define the geometry of the rendered object
    * @return A handle to a shader effect
    */
-  static Shader New( const std::string& vertexShader,
-                     const std::string& fragmentShader,
-                     Hint::Value hints = Hint::NONE );
+  static Shader New(const std::string& vertexShader,
+                    const std::string& fragmentShader,
+                    Hint::Value        hints = Hint::NONE);
 
   /**
    * @brief Default constructor, creates an empty handle.
@@ -150,7 +149,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle A handle to a Shader object
    */
-  Shader( const Shader& handle );
+  Shader(const Shader& handle);
 
   /**
    * @brief Downcasts to a shader handle.
@@ -160,7 +159,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Shader handle or an uninitialized handle
    */
-  static Shader DownCast( BaseHandle handle );
+  static Shader DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -169,7 +168,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  Shader& operator=( const Shader& handle );
+  Shader& operator=(const Shader& handle);
 
   /**
    * @brief Move constructor.
@@ -177,7 +176,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Shader( Shader&& rhs );
+  Shader(Shader&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -186,17 +185,16 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Shader& operator=( Shader&& rhs );
+  Shader& operator=(Shader&& rhs);
 
 public:
-
   /**
    * @brief This constructor is used by Dali New() methods.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] effect A pointer to a newly allocated Dali resource.
    */
-  explicit DALI_INTERNAL Shader( Internal::Shader* effect );
+  explicit DALI_INTERNAL Shader(Internal::Shader* effect);
 };
 
 /**

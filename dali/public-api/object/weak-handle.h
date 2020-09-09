@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/actors/custom-actor.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -39,9 +39,7 @@ namespace Dali
  */
 class DALI_CORE_API WeakHandleBase
 {
-
 public:
-
   /**
    * @brief Default constructor which provides an uninitialized Dali::WeakHandleBase.
    * @SINCE_1_2.60
@@ -54,7 +52,7 @@ public:
    * @SINCE_1_2.60
    * @param [in] handle A reference to the handle of the DALi object
    */
-  WeakHandleBase( BaseHandle& handle );
+  WeakHandleBase(BaseHandle& handle);
 
   /**
    * @brief Destructor to free resources.
@@ -78,7 +76,7 @@ public:
    * @param [in] rhs  A reference to the copied WeakHandleBase
    * @return A reference to this WeakHandleBase
    */
-  WeakHandleBase& operator=( const WeakHandleBase& rhs );
+  WeakHandleBase& operator=(const WeakHandleBase& rhs);
 
   /**
    * @brief Move constructor.
@@ -86,7 +84,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  WeakHandleBase( WeakHandleBase&& rhs );
+  WeakHandleBase(WeakHandleBase&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -95,7 +93,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  WeakHandleBase& operator=( WeakHandleBase&& rhs );
+  WeakHandleBase& operator=(WeakHandleBase&& rhs);
 
   /**
    * @brief Equality operator overload.
@@ -129,26 +127,22 @@ public:
    */
   void Reset();
 
-
 protected:
-
   /// @cond internal
   struct Impl;
   Impl* mImpl;
   /// @endcond
 };
 
-
 /**
  * @brief Weak handle for the given type of DALi object.
  * @SINCE_1_2.60
  * @see WeakHandleBase
  */
-template < class T >
+template<class T>
 class WeakHandle : public WeakHandleBase
 {
 public:
-
   /**
    * @copydoc Dali::WeakHandleBase::WeakHandleBase()
    */
@@ -160,28 +154,30 @@ public:
   /**
    * @copydoc Dali::WeakHandleBase::WeakHandleBase( BaseHandle& )
    */
-  WeakHandle( T& handle )
-  : WeakHandleBase( handle )
+  WeakHandle(T& handle)
+  : WeakHandleBase(handle)
   {
   }
 
   /**
    * @copydoc Dali::WeakHandleBase::~WeakHandleBase()
    */
-  ~WeakHandle() {}
+  ~WeakHandle()
+  {
+  }
 
   /**
    * @copydoc Dali::WeakHandleBase::WeakHandleBase(const WeakHandleBase&)
    */
   WeakHandle(const WeakHandle& handle)
-  : WeakHandleBase( handle )
+  : WeakHandleBase(handle)
   {
   }
 
   /**
    * @copydoc Dali::WeakHandleBase::operator=(const WeakHandleBase& rhs)
    */
-  WeakHandle& operator=( const WeakHandle& rhs )
+  WeakHandle& operator=(const WeakHandle& rhs)
   {
     WeakHandleBase::operator=(rhs);
     return *this;
@@ -190,12 +186,12 @@ public:
   /**
    * @copydoc Dali::WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs)
    */
-  WeakHandle( WeakHandle&& rhs ) = default;
+  WeakHandle(WeakHandle&& rhs) = default;
 
   /**
    * @copydoc Dali::WeakHandleBase::operator=(WeakHandleBase&& rhs)
    */
-  WeakHandle& operator=( WeakHandle&& rhs ) = default;
+  WeakHandle& operator=(WeakHandle&& rhs) = default;
 
   /**
    * @copydoc Dali::WeakHandleBase::operator==()
@@ -218,10 +214,10 @@ public:
    */
   T GetHandle() const
   {
-    BaseHandle handle( WeakHandleBase::GetBaseHandle() );
-    if( handle )
+    BaseHandle handle(WeakHandleBase::GetBaseHandle());
+    if(handle)
     {
-      return DownCast< T >( handle );
+      return DownCast<T>(handle);
     }
     else
     {

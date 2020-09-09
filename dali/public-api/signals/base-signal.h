@@ -78,7 +78,6 @@ namespace Dali
 class DALI_CORE_API BaseSignal : public SlotObserver
 {
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -121,7 +120,7 @@ public:
      * @SINCE_1_0.0
      * @param[in,out] flag This flag will be set to true during Emit() calls
      */
-    EmitGuard( bool& flag );
+    EmitGuard(bool& flag);
 
     /**
      * @brief Non-virtual destructor.
@@ -156,31 +155,31 @@ public:
    * @return The value returned by the last callback
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Ret >
+  template<typename Ret>
   Ret EmitReturn()
   {
     Ret returnVal = Ret();
 
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag );
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag);
+    if(guard.ErrorOccurred())
     {
       return returnVal;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        returnVal = CallbackBase::ExecuteReturn<Ret>( *callback );
+        returnVal = CallbackBase::ExecuteReturn<Ret>(*callback);
       }
     }
 
@@ -197,29 +196,29 @@ public:
    * @param[in] arg0 The first parameter
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Arg0 >
-  void Emit( Arg0 arg0 )
+  template<typename Arg0>
+  void Emit(Arg0 arg0)
   {
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        CallbackBase::Execute<Arg0 >( *callback, arg0 );
+        CallbackBase::Execute<Arg0>(*callback, arg0);
       }
     }
 
@@ -235,31 +234,31 @@ public:
    * @return The value returned by the last callback
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Ret, typename Arg0 >
-  Ret EmitReturn( Arg0 arg0 )
+  template<typename Ret, typename Arg0>
+  Ret EmitReturn(Arg0 arg0)
   {
     Ret returnVal = Ret();
 
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return returnVal;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        returnVal = CallbackBase::ExecuteReturn<Ret,Arg0>( *callback, arg0 );
+        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0>(*callback, arg0);
       }
     }
 
@@ -277,29 +276,29 @@ public:
    * @param[in] arg1 The second parameter
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Arg0, typename Arg1 >
-  void Emit( Arg0 arg0, Arg1 arg1 )
+  template<typename Arg0, typename Arg1>
+  void Emit(Arg0 arg0, Arg1 arg1)
   {
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        CallbackBase::Execute<Arg0,Arg1>( *callback, arg0, arg1 );
+        CallbackBase::Execute<Arg0, Arg1>(*callback, arg0, arg1);
       }
     }
 
@@ -316,31 +315,31 @@ public:
    * @return The value returned by the last callback
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Ret, typename Arg0, typename Arg1 >
-  Ret EmitReturn( Arg0 arg0, Arg1 arg1 )
+  template<typename Ret, typename Arg0, typename Arg1>
+  Ret EmitReturn(Arg0 arg0, Arg1 arg1)
   {
     Ret returnVal = Ret();
 
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return returnVal;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        returnVal = CallbackBase::ExecuteReturn<Ret,Arg0,Arg1>( *callback, arg0, arg1 );
+        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0, Arg1>(*callback, arg0, arg1);
       }
     }
 
@@ -359,29 +358,29 @@ public:
    * @param[in] arg2 The third parameter
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Arg0, typename Arg1, typename Arg2 >
-  void Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
+  template<typename Arg0, typename Arg1, typename Arg2>
+  void Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        CallbackBase::Execute<Arg0,Arg1,Arg2>( *callback, arg0, arg1, arg2 );
+        CallbackBase::Execute<Arg0, Arg1, Arg2>(*callback, arg0, arg1, arg2);
       }
     }
 
@@ -399,31 +398,31 @@ public:
    * @return The value returned by the last callback
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
-  template< typename Ret, typename Arg0, typename Arg1, typename Arg2 >
-  Ret EmitReturn( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
+  template<typename Ret, typename Arg0, typename Arg1, typename Arg2>
+  Ret EmitReturn(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
     Ret returnVal = Ret();
 
     // Guards against nested Emit() calls
-    EmitGuard guard( mEmittingFlag ); // Guards against nested Emit() calls
-    if( guard.ErrorOccurred() )
+    EmitGuard guard(mEmittingFlag); // Guards against nested Emit() calls
+    if(guard.ErrorOccurred())
     {
       return returnVal;
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
     // Note that count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.Count() );
+    const std::size_t initialCount(mSignalConnections.Count());
 
-    for( std::size_t i = 0; i < initialCount; ++i )
+    for(std::size_t i = 0; i < initialCount; ++i)
     {
-      CallbackBase* callback( GetCallback(i) );
+      CallbackBase* callback(GetCallback(i));
 
       // Note that connections will be set to NULL when disconnected
       // This is preferable to reducing the connection count while iterating
-      if( callback )
+      if(callback)
       {
-        returnVal = CallbackBase::ExecuteReturn<Ret,Arg0,Arg1,Arg2>( *callback, arg0, arg1, arg2 );
+        returnVal = CallbackBase::ExecuteReturn<Ret, Arg0, Arg1, Arg2>(*callback, arg0, arg1, arg2);
       }
     }
 
@@ -441,7 +440,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] callback A newly allocated callback object (takes ownership)
    */
-  void OnConnect( CallbackBase* callback );
+  void OnConnect(CallbackBase* callback);
 
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... ).
@@ -449,7 +448,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] callback A newly allocated callback object (takes ownership)
    */
-  void OnDisconnect( CallbackBase* callback );
+  void OnDisconnect(CallbackBase* callback);
 
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Connect( ... ).
@@ -458,7 +457,7 @@ public:
    * @param[in] tracker The connection tracker
    * @param[in] callback A newly allocated callback object (takes ownership)
    */
-  void OnConnect( ConnectionTrackerInterface* tracker, CallbackBase* callback );
+  void OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* callback);
 
   /**
    * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... ).
@@ -467,17 +466,15 @@ public:
    * @param[in] tracker The connection tracker
    * @param[in] callback A newly allocated callback object (takes ownership)
    */
-  void OnDisconnect( ConnectionTrackerInterface* tracker, CallbackBase* callback );
+  void OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase* callback);
 
 private: // SlotObserver interface, to be told when a slot disconnects
-
   /**
    * @copydoc SlotObserver::SlotDisconnected
    */
-  void SlotDisconnected( CallbackBase* callback ) override;
+  void SlotDisconnected(CallbackBase* callback) override;
 
 private:
-
   /**
    * @brief Returns a callback given an index in to the connection array.
    *
@@ -485,7 +482,7 @@ private:
    * @param[in] connectionIndex The index of the callback
    * @return The callback, or NULL if the connection has been deleted
    */
-  CallbackBase* GetCallback( std::size_t connectionIndex ) const;
+  CallbackBase* GetCallback(std::size_t connectionIndex) const;
 
   /**
    * @brief Helper to find whether a callback is connected.
@@ -494,7 +491,7 @@ private:
    * @param[in] callback The call back object
    * @return A valid index if the callback is connected
    */
-  int32_t FindCallback( CallbackBase* callback );
+  int32_t FindCallback(CallbackBase* callback);
 
   /**
    * @brief Deletes a connection object from the list of connections.
@@ -502,7 +499,7 @@ private:
    * @SINCE_1_0.0
    * @param[in] connectionIndex The index of the callback
    */
-  void DeleteConnection( std::size_t connectionIndex );
+  void DeleteConnection(std::size_t connectionIndex);
 
   /**
    * @brief Helper to remove NULL items from mSignalConnections, which is only safe at the end of Emit()
@@ -511,14 +508,13 @@ private:
    */
   void CleanupConnections();
 
-  BaseSignal( const BaseSignal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  BaseSignal( BaseSignal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  BaseSignal& operator=( const BaseSignal& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  BaseSignal& operator=( BaseSignal&& ) = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
+  BaseSignal(const BaseSignal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  BaseSignal(BaseSignal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  BaseSignal& operator=(const BaseSignal&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-
-  Dali::Vector< SignalConnection* > mSignalConnections;   ///< Array of connections
+  Dali::Vector<SignalConnection*> mSignalConnections; ///< Array of connections
 
   bool mEmittingFlag; ///< Used to guard against nested Emit() calls
 };

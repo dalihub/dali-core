@@ -27,10 +27,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * An instance of this class should be used by the adaptor to send a key event to
  * the Dali core.
@@ -42,8 +40,8 @@ struct DALI_CORE_API KeyEvent : public Event
   // Specifies the state of the key event.
   enum State
   {
-    DOWN,        /**< Key down */
-    UP,          /**< Key up */
+    DOWN, /**< Key down */
+    UP,   /**< Key up */
   };
 
   /**
@@ -65,17 +63,17 @@ struct DALI_CORE_API KeyEvent : public Event
    * @param[in]  deviceClass     The class of device KeyEvent originated from
    * @param[in]  deviceSubclass  The subclass of device KeyEvent originated from
    */
-  KeyEvent(const std::string& keyName,
-           const std::string& logicalKey,
-           const std::string& keyString,
-           int keyCode,
-           int keyModifier,
-           unsigned long timeStamp,
-           const State& keyState,
-           const std::string& compose,
-           const std::string& deviceName,
-           const Device::Class::Type deviceClass,
-           const Device::Subclass::Type deviceSubclass );
+  KeyEvent(const std::string&           keyName,
+           const std::string&           logicalKey,
+           const std::string&           keyString,
+           int                          keyCode,
+           int                          keyModifier,
+           unsigned long                timeStamp,
+           const State&                 keyState,
+           const std::string&           compose,
+           const std::string&           deviceName,
+           const Device::Class::Type    deviceClass,
+           const Device::Subclass::Type deviceSubclass);
 
   /**
    * Virtual destructor
@@ -102,12 +100,12 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * The unique key code for the key pressed.
    */
-  int  keyCode;
+  int keyCode;
 
   /**
    * The key modifier for special keys like shift and alt
    */
-  int  keyModifier;
+  int keyModifier;
 
   /**
    * The time (in ms) that the key event occurred.

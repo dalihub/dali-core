@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 #include <dali/public-api/signals/callback.h>
-#include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
+#include <dali/public-api/signals/signal-slot-observers.h>
 
 namespace Dali
 {
-
 ConnectionTracker::ConnectionTracker()
 {
 }
@@ -38,12 +37,12 @@ void ConnectionTracker::DisconnectAll()
 {
   std::size_t size = mConnections.Size();
 
-  for( std::size_t i = 0; i< size; ++i )
+  for(std::size_t i = 0; i < size; ++i)
   {
     SlotConnection* connection = mConnections[i];
 
     // Tell the signal that the slot is disconnected
-    connection->GetSlotObserver()->SlotDisconnected( connection->GetCallback() );
+    connection->GetSlotObserver()->SlotDisconnected(connection->GetCallback());
 
     delete connection;
   }
@@ -51,25 +50,25 @@ void ConnectionTracker::DisconnectAll()
   mConnections.Clear();
 }
 
-void ConnectionTracker::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
+void ConnectionTracker::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
-  SlotConnection* connection = new SlotConnection( slotObserver, callback );
-  mConnections.PushBack( connection );
+  SlotConnection* connection = new SlotConnection(slotObserver, callback);
+  mConnections.PushBack(connection);
 }
 
-void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* callback )
+void ConnectionTracker::SignalDisconnected(SlotObserver* signal, CallbackBase* callback)
 {
   std::size_t size = mConnections.Size();
 
-  for( std::size_t i = 0; i< size; ++i )
+  for(std::size_t i = 0; i < size; ++i)
   {
     SlotConnection* connection = mConnections[i];
 
     // Pointer comparison i.e. SignalConnection contains pointer to same callback instance
-    if( connection->GetCallback() == callback )
+    if(connection->GetCallback() == callback)
     {
       // Remove from connection list
-      mConnections.Erase( mConnections.Begin() + i );
+      mConnections.Erase(mConnections.Begin() + i);
 
       // Delete connection
       delete connection;
@@ -79,7 +78,7 @@ void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* 
     }
   }
 
-  DALI_ABORT( "Callback lost in SignalDisconnected()" );
+  DALI_ABORT("Callback lost in SignalDisconnected()");
 }
 
 std::size_t ConnectionTracker::GetConnectionCount() const

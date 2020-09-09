@@ -23,17 +23,15 @@
 
 namespace Dali
 {
-
 namespace DevelTapGesture
 {
-
 /**
  * @brief Creates an initialized TapGesture.
  *
  * @param[in] state The state of the TapGesture
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API TapGesture New( GestureState state );
+DALI_CORE_API TapGesture New(GestureState state);
 
 } // namespace DevelTapGesture
 

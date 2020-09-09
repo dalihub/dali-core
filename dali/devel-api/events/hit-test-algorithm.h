@@ -1,5 +1,5 @@
-#ifndef  __DALI_HIT_TEST_ALGORITHM_H__
-#define  __DALI_HIT_TEST_ALGORITHM_H__
+#ifndef __DALI_HIT_TEST_ALGORITHM_H__
+#define __DALI_HIT_TEST_ALGORITHM_H__
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -18,14 +18,12 @@
  *
  */
 
-#include <dali/public-api/actors/actor.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/scene.h>
-
+#include <dali/public-api/actors/actor.h>
 
 namespace Dali
 {
-
 class RenderTask;
 
 /**
@@ -102,14 +100,13 @@ class RenderTask;
  */
 namespace HitTestAlgorithm
 {
-
 /**
  * @brief How the actor tree should be traversed.
  */
 enum TraverseType
 {
-  CHECK_ACTOR,            ///< Hit test the given actor.
-  DESCEND_ACTOR_TREE      ///< Check whether the actor tree should be descended to hit-test its children.
+  CHECK_ACTOR,       ///< Hit test the given actor.
+  DESCEND_ACTOR_TREE ///< Check whether the actor tree should be descended to hit-test its children.
 };
 
 /**
@@ -117,8 +114,8 @@ enum TraverseType
  */
 struct Results
 {
-  Actor      actor;            ///< The hit actor.
-  Vector2    actorCoordinates; ///< The actor coordinates.
+  Actor   actor;            ///< The hit actor.
+  Vector2 actorCoordinates; ///< The actor coordinates.
 };
 
 /**
@@ -126,7 +123,7 @@ struct Results
  *
  * @return true, if the actor is hittable, false otherwise.
  */
-using HitTestFunction = bool ( * )( Actor, TraverseType );
+using HitTestFunction = bool (*)(Actor, TraverseType);
 
 /**
  * @brief Given screen coordinates, this method returns the hit actor & the local coordinates relative to
@@ -144,7 +141,7 @@ using HitTestFunction = bool ( * )( Actor, TraverseType );
  * @param[in] func The function to use in the hit-test algorithm.
  * @return true if something was hit
  */
-DALI_CORE_API bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_CORE_API bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func);
 
 } // namespace HitTestAlgorithm
 

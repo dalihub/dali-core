@@ -22,11 +22,11 @@
 #include <dali/public-api/object/base-handle.h>
 
 // EXTERNAL EXCLUDES
-#include <string>
-#include <memory>
-#include <vector>
-#include <functional>
 #include <cstdio>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Dali
 {
@@ -46,9 +46,9 @@ enum class AddOnType
  * @param[in] rev Revision version number
  * @return returns 32-bit version number
  */
-constexpr uint32_t DALI_ADDON_VERSION( uint32_t maj, uint32_t min, uint32_t rev )
+constexpr uint32_t DALI_ADDON_VERSION(uint32_t maj, uint32_t min, uint32_t rev)
 {
-  return ((maj&0xff) << 24) | ((min & 0xfff) << 16);
+  return ((maj & 0xff) << 24) | ((min & 0xfff) << 16);
 }
 
 /**
@@ -56,10 +56,10 @@ constexpr uint32_t DALI_ADDON_VERSION( uint32_t maj, uint32_t min, uint32_t rev 
  */
 struct AddOnInfo
 {
-  AddOnType type;        /// may be use in order to classify extension
-  void* next;           /// holds pointer to additional data-structures
+  AddOnType type; /// may be use in order to classify extension
+  void*     next; /// holds pointer to additional data-structures
 
-  std::string name;     /// Name of the extension
+  std::string name; /// Name of the extension
   uint32_t    version;
 
   /**
@@ -80,15 +80,15 @@ struct AddOnInfo
 struct AddOnDispatchTable
 {
   std::string name;
-  void (*GetAddOnInfo)( Dali::AddOnInfo&) = nullptr;
-  void*(*GetGlobalProc)(const char*) = nullptr;
-  void*(*GetInstanceProc)(const char*) = nullptr;
+  void (*GetAddOnInfo)(Dali::AddOnInfo&) = nullptr;
+  void* (*GetGlobalProc)(const char*)    = nullptr;
+  void* (*GetInstanceProc)(const char*)  = nullptr;
 
   // Lifecycle callbacks
-  void(*OnStart)() = nullptr;
-  void(*OnResume)() = nullptr;
-  void(*OnPause)() = nullptr;
-  void(*OnStop)() = nullptr;
+  void (*OnStart)()  = nullptr;
+  void (*OnResume)() = nullptr;
+  void (*OnPause)()  = nullptr;
+  void (*OnStop)()   = nullptr;
 };
 
 /**
@@ -121,7 +121,6 @@ protected:
   AddOnManager();
 
 public:
-
   /**
    * @brief Destructor
    */
@@ -141,23 +140,23 @@ public:
    * @param[out]] info Output reference
    * @return True on success, False if extension info cannot be retrieved
    */
-  virtual bool GetAddOnInfo(const std::string& name, AddOnInfo& info ) = 0;
+  virtual bool GetAddOnInfo(const std::string& name, AddOnInfo& info) = 0;
 
   /**
    * @brief Loads and initialises specified extensions
    * @param[in] extensionNames Array of extension names
    * @return vector of initialised extension handles
    */
-  virtual std::vector<AddOnLibrary> LoadAddOns( const std::vector<std::string>& addonNames ) = 0;
+  virtual std::vector<AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) = 0;
 
   /**
    * @brief Loads AddOn with specified name
    * @param[in] addOnName Name of AddOn to be acquired
    * @return Returns a valid handle or nullptr
    */
-  inline AddOnLibrary GetAddOn( const std::string& addonName )
+  inline AddOnLibrary GetAddOn(const std::string& addonName)
   {
-    return LoadAddOns( { addonName } )[0];
+    return LoadAddOns({addonName})[0];
   }
 
   /**
@@ -166,7 +165,7 @@ public:
    * @param[in] procName Name of the function to retrieve
    * @return Pointer to the function or null if function doesn't exist
    */
-  virtual void* GetGlobalProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName ) = 0;
+  virtual void* GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) = 0;
 
   /**
    * @brief Returns addon instance function pointer
@@ -174,7 +173,7 @@ public:
    * @param[in] procName Name of the function to retrieve
    * @return Pointer to the function or null if function doesn't exist
    */
-  virtual void* GetInstanceProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName ) = 0;
+  virtual void* GetInstanceProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) = 0;
 
   /**
    * @brief Returns addon global function of specified type
@@ -183,12 +182,12 @@ public:
    * @return std::function object or null if function doesn't exist
    */
   template<class T>
-  DALI_INTERNAL std::function<T> GetGlobalProc( const Dali::AddOnLibrary& addonlibrary, const char* procName )
+  DALI_INTERNAL std::function<T> GetGlobalProc(const Dali::AddOnLibrary& addonlibrary, const char* procName)
   {
-    auto ptr = GetGlobalProc( addonlibrary, procName );
-    if( ptr )
+    auto ptr = GetGlobalProc(addonlibrary, procName);
+    if(ptr)
     {
-      return std::function<T>( *reinterpret_cast<T**>(&ptr) );
+      return std::function<T>(*reinterpret_cast<T**>(&ptr));
     }
     return {};
   };
@@ -200,12 +199,12 @@ public:
    * @return std::function object or null if function doesn't exist
    */
   template<class T>
-  DALI_INTERNAL std::function<T> GetInstanceProc( const Dali::AddOnLibrary& addOnLibrary, const char* procName )
+  DALI_INTERNAL std::function<T> GetInstanceProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName)
   {
-    auto ptr = GetInstanceProc( addOnLibrary, procName );
-    if( ptr )
+    auto ptr = GetInstanceProc(addOnLibrary, procName);
+    if(ptr)
     {
-      return std::function<T>( *reinterpret_cast<T**>(&ptr) );
+      return std::function<T>(*reinterpret_cast<T**>(&ptr));
     }
     return {};
   };
@@ -218,14 +217,13 @@ public:
    * @return Result of called function
    */
   template<class R, class... Args>
-  DALI_INTERNAL R InvokeGlobalProc( AddOnLibrary addOnLibrary, const char* functionName, Args&&... args)
+  DALI_INTERNAL R InvokeGlobalProc(AddOnLibrary addOnLibrary, const char* functionName, Args&&... args)
   {
-    return std::move(GetGlobalProc<R(Args...)>( addOnLibrary, functionName )( args... ));
+    return std::move(GetGlobalProc<R(Args...)>(addOnLibrary, functionName)(args...));
   }
 
   // Lifecycle events, functions are called by the Adaptor
 public:
-
   /**
    * @brief Lifecycle pause function
    */
@@ -248,7 +246,6 @@ public:
 
   // Functions called by the AddOn
 public:
-
   /**
    * @brief Registers the dispatch table with AddOnManager.
    *
@@ -259,7 +256,7 @@ public:
    *
    * @param[in] dispatchTable Pointer to the valid dispatch table
    */
-  virtual void RegisterAddOnDispatchTable( const AddOnDispatchTable* dispatchTable ) = 0;
+  virtual void RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatchTable) = 0;
 
   /**
    * @brief Retrieves AddOnManager singleton
@@ -268,7 +265,6 @@ public:
   static AddOnManager* Get();
 
 protected:
-
   static AddOnManager* mSingleton; ///< Singleton storing an instance of AddOnManager
 };
 } // namespace Integration

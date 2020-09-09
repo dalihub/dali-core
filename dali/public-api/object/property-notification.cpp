@@ -19,17 +19,16 @@
 #include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/quaternion.h>
+#include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/handle.h>
-#include <dali/internal/event/common/property-notification-impl.h>
 #include <stdio.h>
 
 namespace Dali
 {
-
 PropertyNotification::PropertyNotification()
 {
 }
@@ -39,9 +38,9 @@ PropertyNotification::PropertyNotification(Internal::PropertyNotification* prope
 {
 }
 
-PropertyNotification PropertyNotification::DownCast( BaseHandle handle )
+PropertyNotification PropertyNotification::DownCast(BaseHandle handle)
 {
-  return PropertyNotification( dynamic_cast<Dali::Internal::PropertyNotification*>(handle.GetObjectPtr()) );
+  return PropertyNotification(dynamic_cast<Dali::Internal::PropertyNotification*>(handle.GetObjectPtr()));
 }
 
 PropertyNotification::~PropertyNotification()
@@ -52,9 +51,9 @@ PropertyNotification::PropertyNotification(const PropertyNotification& copy) = d
 
 PropertyNotification& PropertyNotification::operator=(const PropertyNotification& rhs) = default;
 
-PropertyNotification::PropertyNotification( PropertyNotification&& rhs ) = default;
+PropertyNotification::PropertyNotification(PropertyNotification&& rhs) = default;
 
-PropertyNotification& PropertyNotification::operator=( PropertyNotification&& rhs ) = default;
+PropertyNotification& PropertyNotification::operator=(PropertyNotification&& rhs) = default;
 
 PropertyCondition PropertyNotification::GetCondition()
 {
@@ -76,9 +75,9 @@ Property::Index PropertyNotification::GetTargetProperty() const
   return GetImplementation(*this).GetTargetProperty();
 }
 
-void PropertyNotification::SetNotifyMode( NotifyMode mode )
+void PropertyNotification::SetNotifyMode(NotifyMode mode)
 {
-  GetImplementation(*this).SetNotifyMode( mode );
+  GetImplementation(*this).SetNotifyMode(mode);
 }
 
 PropertyNotification::NotifyMode PropertyNotification::GetNotifyMode()

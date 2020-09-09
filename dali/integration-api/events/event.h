@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_EVENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * Base structure for events passed to Dali::Integration::Core::QueueEvent()
  * An instance of this class cannot be created.
@@ -44,10 +42,10 @@ struct DALI_CORE_API Event
 
   enum Type
   {
-    Touch,         ///< A touch event, when the user interacts with the screen.
-    Key,           ///< A key pressed event, from the virtual or external keyboard.
-    Wheel,         ///< A wheel event, when the wheel is being rolled from an external mouse.
-    Hover          ///< A hover event, when the user hovers above the screen.
+    Touch, ///< A touch event, when the user interacts with the screen.
+    Key,   ///< A key pressed event, from the virtual or external keyboard.
+    Wheel, ///< A wheel event, when the wheel is being rolled from an external mouse.
+    Hover  ///< A hover event, when the user hovers above the screen.
   };
 
   // Data
@@ -58,7 +56,6 @@ struct DALI_CORE_API Event
   Type type;
 
 protected: // Constructors only to be used by derived structures.
-
   /**
    * This constructor is only used by derived classes.
    * @param[in] eventType The type of event.

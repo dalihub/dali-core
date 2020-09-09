@@ -41,7 +41,6 @@ class SlotConnection;
 class DALI_CORE_API ConnectionTracker : public ConnectionTrackerInterface
 {
 public:
-
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
@@ -63,12 +62,12 @@ public:
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalConnected(SlotObserver* slotObserver, CallbackBase* callback) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback) override;
 
   /**
    * @brief Returns the connection count.
@@ -78,15 +77,13 @@ public:
   std::size_t GetConnectionCount() const;
 
 private:
-
-  ConnectionTracker( const ConnectionTracker& ) = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  ConnectionTracker( ConnectionTracker&& ) = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  ConnectionTracker& operator=( const ConnectionTracker& ) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  ConnectionTracker& operator=( ConnectionTracker&& ) = delete;///< Deleted move assignment operator. @SINCE_1_9.25
+  ConnectionTracker(const ConnectionTracker&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  ConnectionTracker(ConnectionTracker&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  ConnectionTracker& operator=(const ConnectionTracker&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
+  ConnectionTracker& operator=(ConnectionTracker&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
-
-  Dali::Vector< SlotConnection* > mConnections; ///< Vector of connection pointers
+  Dali::Vector<SlotConnection*> mConnections; ///< Vector of connection pointers
 };
 
 /**

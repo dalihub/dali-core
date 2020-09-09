@@ -23,17 +23,15 @@
 
 namespace Dali
 {
-
 namespace DevelLongPressGesture
 {
-
 /**
  * @brief Creates an initialized LongPressGesture.
  *
  * @param[in] state The state of the LongPressGesture
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API LongPressGesture New( GestureState state );
+DALI_CORE_API LongPressGesture New(GestureState state);
 
 } // namespace DevelLongPressGesture
 

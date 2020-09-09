@@ -2,7 +2,7 @@
 #define DALI_MAP_WRAPPER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@
 #include <map>
 
 #undef _LIBCPP_INLINE_VISIBILITY
-#define _LIBCPP_INLINE_VISIBILITY __attribute__ ((__visibility__("hidden"), __always_inline__))
+#define _LIBCPP_INLINE_VISIBILITY __attribute__((__visibility__("hidden"), __always_inline__))
 #undef _LIBCPP_EXTERN_TEMPLATE
 #define _LIBCPP_EXTERN_TEMPLATE(...) extern template __VA_ARGS__;
 
@@ -49,13 +49,13 @@
 #include <bits/stl_tree.h>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #undef _GLIBCXX_VISIBILITY
-#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ ("hidden")))
-#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ ("hidden")))
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__((__visibility__("hidden")))
+#define _GLIBCXX_VISIBILITY(V) __attribute__((__visibility__("hidden")))
 #include <map>
 #undef _GLIBCXX_VISIBILITY_ATTR
 #undef _GLIBCXX_VISIBILITY
-#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
-#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V))) // restore `_GLIBCXX_VISIBILITY`
+#define _GLIBCXX_VISIBILITY_ATTR(V) __attribute__((__visibility__(#V))) // restore `_GLIBCXX_VISIBILITY_ATTR`
+#define _GLIBCXX_VISIBILITY(V) __attribute__((__visibility__(#V)))      // restore `_GLIBCXX_VISIBILITY`
 
 #endif // #ifdef __clang__
 

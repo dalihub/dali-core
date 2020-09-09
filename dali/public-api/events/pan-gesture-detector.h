@@ -29,7 +29,6 @@
 
 namespace Dali
 {
-
 struct Radian;
 
 namespace Internal DALI_INTERNAL
@@ -68,7 +67,6 @@ class PanGestureDetector;
 class DALI_CORE_API PanGestureDetector : public GestureDetector
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the PanGestureDetector class.
    * @SINCE_1_0.0
@@ -92,7 +90,7 @@ public:
   };
 
   // Typedefs
-  using DetectedSignalType = Signal<void( Actor, const PanGesture& )>; ///< Pan gesture detected signal type @SINCE_1_0.0
+  using DetectedSignalType = Signal<void(Actor, const PanGesture&)>; ///< Pan gesture detected signal type @SINCE_1_0.0
 
   // Directional Pan
   using AngleThresholdPair = std::pair<Radian, Radian>; ///< Range of angles for a direction @SINCE_1_0.0
@@ -104,10 +102,9 @@ public:
   static const Radian DIRECTION_HORIZONTAL; ///< For a left and right pan (PI Radians). Useful for AddDirection().
   static const Radian DIRECTION_VERTICAL;   ///< For an up and down pan (-0.5 * PI Radians). Useful for AddDirection().
 
-  static const Radian DEFAULT_THRESHOLD;    ///< The default threshold is PI * 0.25 radians (or 45 degrees).
+  static const Radian DEFAULT_THRESHOLD; ///< The default threshold is PI * 0.25 radians (or 45 degrees).
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized PanGestureDetector; this can be initialized with PanGestureDetector::New().
    *
@@ -133,7 +130,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a PanGestureDetector object or an uninitialized handle
    */
-  static PanGestureDetector DownCast( BaseHandle handle );
+  static PanGestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -161,7 +158,6 @@ public: // Creation & Destruction
   PanGestureDetector& operator=(const PanGestureDetector& rhs);
 
 public: // Setters
-
   /**
    * @brief This is the minimum number of touches required for the pan gesture to be detected.
    *
@@ -183,7 +179,6 @@ public: // Setters
   void SetMaximumTouchesRequired(uint32_t maximum);
 
 public: // Getters
-
   /**
    * @brief Retrieves the minimum number of touches required for the pan gesture to be detected.
    *
@@ -203,7 +198,6 @@ public: // Getters
   uint32_t GetMaximumTouchesRequired() const;
 
 public: // Directional Panning
-
   /**
    * @brief The pan gesture is only emitted if the pan occurs in the direction specified by this method with a +/- threshold allowance.
    *
@@ -237,7 +231,7 @@ public: // Directional Panning
    * @note If the threshold is greater than PI, then PI will be used as the threshold.
    *
    */
-  void AddAngle( Radian angle, Radian threshold = DEFAULT_THRESHOLD );
+  void AddAngle(Radian angle, Radian threshold = DEFAULT_THRESHOLD);
 
   /**
    * @brief A helper method for adding bi-directional angles where the pan should take place.
@@ -259,7 +253,7 @@ public: // Directional Panning
    *
    * @see AddAngle
    */
-  void AddDirection( Radian direction, Radian threshold = DEFAULT_THRESHOLD );
+  void AddDirection(Radian direction, Radian threshold = DEFAULT_THRESHOLD);
 
   /**
    * @brief Returns the count of angles that this pan gesture detector emits a signal.
@@ -301,7 +295,7 @@ public: // Directional Panning
    * @note If an angle outside the range in AddAngle() is given, then the value is wrapped within
    *       the range and that is removed.
    */
-  void RemoveAngle( Radian angle );
+  void RemoveAngle(Radian angle);
 
   /**
    * @brief Removes the two angles that make up the direction from the container.
@@ -312,10 +306,9 @@ public: // Directional Panning
    * @note If a direction outside the range in AddAngle() is given, then the value is wrapped within
    *       the range and that is removed.
    */
-  void RemoveDirection( Radian direction );
+  void RemoveDirection(Radian direction);
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when the pan gesture is detected on the attached actor.
    *
@@ -330,7 +323,6 @@ public: // Signals
   DetectedSignalType& DetectedSignal();
 
 public: // Pan Properties Setters
-
   /**
    * @brief Allows setting of the pan properties that are returned in constraints.
    *
@@ -338,10 +330,9 @@ public: // Pan Properties Setters
    * @param[in] pan The pan gesture to set
    * @note If a normal pan is taking place, then any value set is ignored.
    */
-  static void SetPanGestureProperties( const PanGesture& pan );
+  static void SetPanGestureProperties(const PanGesture& pan);
 
 public: // Not intended for Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by PanGestureDetector::New() methods.
@@ -351,7 +342,6 @@ public: // Not intended for Application developers
    */
   explicit DALI_INTERNAL PanGestureDetector(Internal::PanGestureDetector* internal);
   /// @endcond
-
 };
 
 /**

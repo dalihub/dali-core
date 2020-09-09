@@ -2,7 +2,7 @@
 #define DALI_CAMERA_ACTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,8 @@ enum Type
  */
 enum ProjectionMode
 {
-  PERSPECTIVE_PROJECTION,    ///< Distance causes foreshortening; objects further from the camera appear smaller @SINCE_1_0.0
-  ORTHOGRAPHIC_PROJECTION,    ///< Relative distance from the camera does not affect the size of objects @SINCE_1_0.0
+  PERSPECTIVE_PROJECTION,  ///< Distance causes foreshortening; objects further from the camera appear smaller @SINCE_1_0.0
+  ORTHOGRAPHIC_PROJECTION, ///< Relative distance from the camera does not affect the size of objects @SINCE_1_0.0
 };
 
 } // namespace Camera
@@ -89,7 +89,6 @@ enum ProjectionMode
 class DALI_CORE_API CameraActor : public Actor
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the CameraActor class.
    *
@@ -152,7 +151,7 @@ public:
    * @param[in] size The canvas size
    * @return The newly created camera actor
    */
-  static CameraActor New( const Size& size );
+  static CameraActor New(const Size& size);
 
   /**
    * @brief Downcasts a handle to CameraActor handle.
@@ -163,7 +162,7 @@ public:
    * @param[in] handle to An object
    * @return Handle to a CameraActor or an uninitialized handle
    */
-  static CameraActor DownCast( BaseHandle handle );
+  static CameraActor DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -196,7 +195,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] type The camera type
    */
-  void SetType( Dali::Camera::Type type );
+  void SetType(Dali::Camera::Type type);
 
   /**
    * @brief Gets the type of the camera.
@@ -212,7 +211,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] mode One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
    */
-  void SetProjectionMode( Dali::Camera::ProjectionMode mode );
+  void SetProjectionMode(Dali::Camera::ProjectionMode mode);
 
   /**
    * @brief Gets the projection mode.
@@ -228,7 +227,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] fieldOfView The field of view in radians
    */
-  void SetFieldOfView( float fieldOfView );
+  void SetFieldOfView(float fieldOfView);
 
   /**
    * @brief Gets the field of view in Radians.
@@ -237,7 +236,7 @@ public:
    * @SINCE_1_0.0
    * @return The field of view in radians
    */
-  float GetFieldOfView( );
+  float GetFieldOfView();
 
   /**
    * @brief Sets the aspect ratio.
@@ -245,7 +244,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] aspectRatio The aspect ratio
    */
-  void SetAspectRatio( float aspectRatio );
+  void SetAspectRatio(float aspectRatio);
 
   /**
    * @brief Gets the aspect ratio of the camera.
@@ -254,7 +253,7 @@ public:
    * @SINCE_1_0.0
    * @return The aspect ratio
    */
-  float GetAspectRatio( );
+  float GetAspectRatio();
 
   /**
    * @brief Sets the near clipping plane distance.
@@ -262,7 +261,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] nearClippingPlane Distance of the near clipping plane
    */
-  void SetNearClippingPlane( float nearClippingPlane );
+  void SetNearClippingPlane(float nearClippingPlane);
 
   /**
    * @brief Gets the near clipping plane distance.
@@ -272,7 +271,7 @@ public:
    * @SINCE_1_0.0
    * @return The near clipping plane value
    */
-  float GetNearClippingPlane( );
+  float GetNearClippingPlane();
 
   /**
    * @brief Sets the far clipping plane distance.
@@ -280,7 +279,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] farClippingPlane Distance of the far clipping plane
    */
-  void SetFarClippingPlane( float farClippingPlane );
+  void SetFarClippingPlane(float farClippingPlane);
 
   /**
    * @brief Gets the far clipping plane distance.
@@ -289,7 +288,7 @@ public:
    * @SINCE_1_0.0
    * @return The far clipping plane value
    */
-  float GetFarClippingPlane( );
+  float GetFarClippingPlane();
 
   /**
    * @brief Sets the target position of the camera.
@@ -298,7 +297,7 @@ public:
    * @param[in] targetPosition The position of the target to look at
    * @pre Camera type is LOOK_AT_TARGET.
    */
-  void SetTargetPosition( const Vector3& targetPosition );
+  void SetTargetPosition(const Vector3& targetPosition);
 
   /**
    * @brief Gets the Camera Target position.
@@ -340,7 +339,7 @@ public:
    * @note If either of the values of size is 0.0f, then we use the default perspective projection for the size of the scene this actor is added to.
    * @note This modifies the Z position property of this actor as well.
    */
-  void SetPerspectiveProjection( const Size& size );
+  void SetPerspectiveProjection(const Size& size);
 
   /**
    * @brief Sets the camera projection to use orthographic projection.
@@ -356,7 +355,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] size Size of XY plane (normal to camera axis)
    */
-  void SetOrthographicProjection( const Size& size );
+  void SetOrthographicProjection(const Size& size);
 
   /**
    * @brief Sets the camera projection to use orthographic projection with the given clip planes.
@@ -371,7 +370,7 @@ public:
    * @param[in] near Distance to the near clip plane (along camera axis)
    * @param[in] far Distance to the far clip plane (along camera axis)
    */
-  void SetOrthographicProjection( float left, float right, float top, float bottom, float near, float far );
+  void SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far);
 
 public: // Not intended for use by Application developers
   /// @cond internal

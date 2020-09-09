@@ -2,7 +2,7 @@
 #define DALI_MUTEX_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,12 @@
  */
 namespace Dali
 {
-
 /**
  * Class to synchronize access to critical resources from multiple threads
  */
 class DALI_CORE_API Mutex
 {
 public:
-
   /**
    * @brief Constructor, acquires the mutex from the underlying OS
    */
@@ -51,7 +49,6 @@ public:
   bool IsLocked();
 
 public:
-
   /**
    * Helper class to do a scoped lock on a mutex implementing the RAII idiom.
    * Note! this class *does not* prevent a deadlock in the case when same thread is
@@ -60,12 +57,11 @@ public:
   class DALI_CORE_API ScopedLock
   {
   public:
-
     /**
      * Constructor
      * @param mutex to lock
      */
-    ScopedLock( Mutex& mutex );
+    ScopedLock(Mutex& mutex);
 
     /**
      * Destructor, releases the lock
@@ -77,14 +73,12 @@ public:
   };
 
 private:
-
   /// Not implemented as Mutex is not copyable
-  Mutex( const Mutex& );
-  const Mutex& operator= ( const Mutex& );
+  Mutex(const Mutex&);
+  const Mutex& operator=(const Mutex&);
 
   struct MutexImpl;
   MutexImpl* mImpl;
-
 };
 
 } // namespace Dali

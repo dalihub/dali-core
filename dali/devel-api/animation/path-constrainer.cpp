@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,15 @@
 
 namespace Dali
 {
-
 PathConstrainer PathConstrainer::New()
 {
   Internal::PathConstrainer* internal = Internal::PathConstrainer::New();
   return PathConstrainer(internal);
 }
 
-PathConstrainer PathConstrainer::DownCast( BaseHandle handle )
+PathConstrainer PathConstrainer::DownCast(BaseHandle handle)
 {
-  return PathConstrainer( dynamic_cast<Dali::Internal::PathConstrainer*>(handle.GetObjectPtr()) );
+  return PathConstrainer(dynamic_cast<Dali::Internal::PathConstrainer*>(handle.GetObjectPtr()));
 }
 
 PathConstrainer::PathConstrainer()
@@ -45,7 +44,7 @@ PathConstrainer::~PathConstrainer()
 }
 
 PathConstrainer::PathConstrainer(const PathConstrainer& handle)
-:Handle(handle)
+: Handle(handle)
 {
 }
 
@@ -60,15 +59,14 @@ PathConstrainer& PathConstrainer::operator=(const PathConstrainer& rhs)
   return *this;
 }
 
-void PathConstrainer::Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap )
+void PathConstrainer::Apply(Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap)
 {
-  GetImplementation(*this).Apply( target, source, range, wrap );
+  GetImplementation(*this).Apply(target, source, range, wrap);
 }
 
-void PathConstrainer::Remove( Dali::Handle& target )
+void PathConstrainer::Remove(Dali::Handle& target)
 {
-  GetImplementation(*this).Remove( target );
+  GetImplementation(*this).Remove(target);
 }
 
-
-} // Dali
+} // namespace Dali

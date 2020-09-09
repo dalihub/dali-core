@@ -2,7 +2,7 @@
 #define DALI_ALPHA_FUNCTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector2.h>
@@ -33,7 +33,7 @@ namespace Dali
  * @{
  */
 
-using AlphaFunctionPrototype = float ( * )( float ); ///< Prototype of an alpha function @SINCE_1_0.0
+using AlphaFunctionPrototype = float (*)(float); ///< Prototype of an alpha function @SINCE_1_0.0
 
 /**
    * @brief Alpha functions are used in animations to specify the rate of change of the animation parameter over time.
@@ -45,32 +45,26 @@ using AlphaFunctionPrototype = float ( * )( float ); ///< Prototype of an alpha 
 class DALI_CORE_API AlphaFunction
 {
 public:
-
   /**
    * @brief Enumeration for built-in alpha functions.
    * @SINCE_1_0.0
    */
   enum BuiltinFunction
   {
-    DEFAULT,            ///< Linear @SINCE_1_0.0
-    LINEAR,             ///< No transformation @SINCE_1_0.0
-    REVERSE,            ///< Reverse linear @SINCE_1_0.0
-
-    EASE_IN_SQUARE,     ///< Speeds up and comes to a sudden stop (Square) @SINCE_1_0.0
-    EASE_OUT_SQUARE,    ///< Sudden start and slows to a gradual stop (Square) @SINCE_1_0.0
-
-    EASE_IN,            ///< Speeds up and comes to a sudden stop (Cubic) @SINCE_1_0.0
-    EASE_OUT,           ///< Sudden start and slows to a gradual stop (Cubic) @SINCE_1_0.0
-    EASE_IN_OUT,        ///< Speeds up and slows to a gradual stop (Cubic) @SINCE_1_0.0
-
-    EASE_IN_SINE,       ///< Speeds up and comes to a sudden stop (sinusoidal) @SINCE_1_0.0
-    EASE_OUT_SINE,      ///< Sudden start and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
-    EASE_IN_OUT_SINE,   ///< Speeds up and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
-
-    BOUNCE,             ///< Sudden start, loses momentum and returns to start position @SINCE_1_0.0
-    SIN,                ///< Single revolution @SINCE_1_0.0
-    EASE_OUT_BACK,      ///< Sudden start, exceed end position and return to a gradual stop @SINCE_1_0.0
-
+    DEFAULT,          ///< Linear @SINCE_1_0.0
+    LINEAR,           ///< No transformation @SINCE_1_0.0
+    REVERSE,          ///< Reverse linear @SINCE_1_0.0
+    EASE_IN_SQUARE,   ///< Speeds up and comes to a sudden stop (Square) @SINCE_1_0.0
+    EASE_OUT_SQUARE,  ///< Sudden start and slows to a gradual stop (Square) @SINCE_1_0.0
+    EASE_IN,          ///< Speeds up and comes to a sudden stop (Cubic) @SINCE_1_0.0
+    EASE_OUT,         ///< Sudden start and slows to a gradual stop (Cubic) @SINCE_1_0.0
+    EASE_IN_OUT,      ///< Speeds up and slows to a gradual stop (Cubic) @SINCE_1_0.0
+    EASE_IN_SINE,     ///< Speeds up and comes to a sudden stop (sinusoidal) @SINCE_1_0.0
+    EASE_OUT_SINE,    ///< Sudden start and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
+    EASE_IN_OUT_SINE, ///< Speeds up and slows to a gradual stop (sinusoidal) @SINCE_1_0.0
+    BOUNCE,           ///< Sudden start, loses momentum and returns to start position @SINCE_1_0.0
+    SIN,              ///< Single revolution @SINCE_1_0.0
+    EASE_OUT_BACK,    ///< Sudden start, exceed end position and return to a gradual stop @SINCE_1_0.0
     COUNT
   };
 
@@ -80,9 +74,9 @@ public:
    */
   enum Mode
   {
-    BUILTIN_FUNCTION,  ///< The user has specified a built-in function @SINCE_1_0.0
-    CUSTOM_FUNCTION,   ///< The user has provided a custom function @SINCE_1_0.0
-    BEZIER             ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
+    BUILTIN_FUNCTION, ///< The user has specified a built-in function @SINCE_1_0.0
+    CUSTOM_FUNCTION,  ///< The user has provided a custom function @SINCE_1_0.0
+    BEZIER            ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
   };
 
   /**
@@ -101,7 +95,7 @@ public:
    * @param[in] function One of the built-in alpha functions
    * @return The alpha function
    */
-  AlphaFunction( BuiltinFunction function);
+  AlphaFunction(BuiltinFunction function);
 
   /**
    * @brief Constructor.
@@ -111,7 +105,7 @@ public:
    * @param[in] function A pointer to an alpha function
    * @return The alpha function
    */
-  AlphaFunction( AlphaFunctionPrototype function);
+  AlphaFunction(AlphaFunctionPrototype function);
 
   /**
    * @brief Constructor.
@@ -125,7 +119,7 @@ public:
    * @note The x components of the control points will be clamped to the range [0,1] to prevent
    * non monotonic curves.
    */
-  AlphaFunction( const Dali::Vector2& controlPoint0, const Dali::Vector2& controlPoint1 );
+  AlphaFunction(const Dali::Vector2& controlPoint0, const Dali::Vector2& controlPoint1);
 
   /**
    * @brief Returns the control points of the alpha function.
@@ -158,11 +152,10 @@ public:
   Mode GetMode() const;
 
 private:
-
-  Vector4                 mBezierControlPoints;   //< Control points for the bezier alpha function
-  AlphaFunctionPrototype  mCustom;                //< Pointer to an alpha function
-  BuiltinFunction         mBuiltin : Log<COUNT>::value+1; //< Enum indicating the built-in alpha function
-  Mode                    mMode    : 2;                   //< Enum indicating the functioning mode of the AlphaFunction
+  Vector4                mBezierControlPoints;             //< Control points for the bezier alpha function
+  AlphaFunctionPrototype mCustom;                          //< Pointer to an alpha function
+  BuiltinFunction        mBuiltin : Log<COUNT>::value + 1; //< Enum indicating the built-in alpha function
+  Mode                   mMode : 2;                        //< Enum indicating the functioning mode of the AlphaFunction
 };
 
 /**

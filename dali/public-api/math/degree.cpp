@@ -23,9 +23,8 @@
 
 namespace Dali
 {
-
-Degree::Degree( Radian radian )
-: degree( radian * Math::ONE80_OVER_PI )
+Degree::Degree(Radian radian)
+: degree(radian * Math::ONE80_OVER_PI)
 {
 }
 

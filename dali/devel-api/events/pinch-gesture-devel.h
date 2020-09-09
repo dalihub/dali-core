@@ -23,17 +23,15 @@
 
 namespace Dali
 {
-
 namespace DevelPinchGesture
 {
-
 /**
  * @brief Creates an initialized PinchGesture.
  *
  * @param[in] state The state of the PinchGesture
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API PinchGesture New( GestureState state );
+DALI_CORE_API PinchGesture New(GestureState state);
 
 } // namespace DevelPinchGesture
 

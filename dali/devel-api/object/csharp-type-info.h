@@ -24,17 +24,15 @@
 
 namespace Dali
 {
-
 namespace CSharpTypeInfo
 {
-
 /**
  * @brief Call back used to create an instance of the associated object type
  *
  * @param[in] typeName The type name of the object to be created.
  * @return Pointer to a BaseHandle
  */
-using CreateFunction = BaseHandle *(*)( const char *const );
+using CreateFunction = BaseHandle* (*)(const char* const);
 
 /**
  * @brief Callback to set an event-thread only property.
@@ -44,7 +42,7 @@ using CreateFunction = BaseHandle *(*)( const char *const );
  * @param[in] value The new value of the property for the object specified.
  * @see PropertyRegistration.
  */
-using SetPropertyFunction = void ( * )( BaseObject *, const char *const, Property::Value * );
+using SetPropertyFunction = void (*)(BaseObject*, const char* const, Property::Value*);
 
 /**
  * @brief Callback to get the value of an event-thread only property.
@@ -54,8 +52,8 @@ using SetPropertyFunction = void ( * )( BaseObject *, const char *const, Propert
  * @return The current value of the property for the object specified.
  * @see PropertyRegistration.
  */
-using GetPropertyFunction = Property::Value *(*)( BaseObject *, const char *const );
-}
+using GetPropertyFunction = Property::Value* (*)(BaseObject*, const char* const);
+} // namespace CSharpTypeInfo
 
 } // namespace Dali
 

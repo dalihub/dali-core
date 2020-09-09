@@ -23,17 +23,15 @@
 
 namespace Dali
 {
-
 namespace DevelRotationGesture
 {
-
 /**
  * @brief Creates an initialized RotationGesture.
  *
  * @param[in] state The state of the RotationGesture
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API RotationGesture New( GestureState state );
+DALI_CORE_API RotationGesture New(GestureState state);
 
 } // namespace DevelRotationGesture
 

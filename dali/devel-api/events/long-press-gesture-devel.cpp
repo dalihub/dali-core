@@ -21,16 +21,13 @@
 
 namespace Dali
 {
-
 namespace DevelLongPressGesture
 {
-
-LongPressGesture New( GestureState state )
+LongPressGesture New(GestureState state)
 {
-  return LongPressGesture( new Internal::LongPressGesture( state ) );
+  return LongPressGesture(new Internal::LongPressGesture(state));
 }
 
 } // namespace DevelLongPressGesture
 
 } // namespace Dali
-

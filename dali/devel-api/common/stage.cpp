@@ -19,16 +19,15 @@
 #include <dali/devel-api/common/stage.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/common/core-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/object-registry.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 namespace Dali
 {
-
 using Internal::Core;
 
 Stage::Stage()
@@ -58,8 +57,8 @@ Stage::Stage(Internal::Stage* internal)
 Stage Stage::GetCurrent()
 {
   Internal::Stage* stage = Internal::Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
-  return Stage( stage );
+  DALI_ASSERT_ALWAYS(stage && "Stage doesn't exist");
+  return Stage(stage);
 }
 
 bool Stage::IsInstalled()
@@ -79,7 +78,7 @@ void Stage::Remove(Actor& actor)
 
 RenderTaskList Stage::GetRenderTaskList() const
 {
-  return RenderTaskList( &GetImplementation(*this).GetRenderTaskList() );
+  return RenderTaskList(&GetImplementation(*this).GetRenderTaskList());
 }
 
 Vector2 Stage::GetSize() const
@@ -120,15 +119,15 @@ Vector2 Stage::GetDpi() const
 ObjectRegistry Stage::GetObjectRegistry() const
 {
   Internal::Stage* stage = Internal::Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "GetObjectRegistry() : Stage is null" );
+  DALI_ASSERT_ALWAYS(stage && "GetObjectRegistry() : Stage is null");
 
   Internal::ObjectRegistry& internal = stage->GetObjectRegistry();
   return ObjectRegistry(&internal);
 }
 
-void Stage::KeepRendering( float durationSeconds )
+void Stage::KeepRendering(float durationSeconds)
 {
-  GetImplementation(*this).KeepRendering( durationSeconds );
+  GetImplementation(*this).KeepRendering(durationSeconds);
 }
 
 Stage::KeyEventSignalType& Stage::KeyEventSignal()
@@ -143,7 +142,7 @@ Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
 
 Stage::TouchEventSignalType& Stage::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchedSignal();
+  return GetImplementation(*this).TouchedSignal();
 }
 
 Stage::WheelEventSignalType& Stage::WheelEventSignal()

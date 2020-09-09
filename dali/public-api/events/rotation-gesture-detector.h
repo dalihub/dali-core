@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class RotationGestureDetector;
@@ -57,14 +56,12 @@ class RotationGesture;
 class DALI_CORE_API RotationGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
   /**
    * @brief Signal type.
    */
-  using DetectedSignalType = Signal<void( Actor, const RotationGesture& )>;
+  using DetectedSignalType = Signal<void(Actor, const RotationGesture&)>;
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized RotationGestureDetector; this can be initialized with RotationGestureDetector::New().
    *
@@ -90,7 +87,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a RotationGestureDetector object or an uninitialized handle
    */
-  static RotationGestureDetector DownCast( BaseHandle handle );
+  static RotationGestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -118,7 +115,6 @@ public: // Creation & Destruction
   RotationGestureDetector& operator=(const RotationGestureDetector& rhs);
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when the rotation gesture is detected on the attached actor.
    *
@@ -133,7 +129,6 @@ public: // Signals
   DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by RotationGestureDetector::New() methods.
@@ -143,7 +138,6 @@ public: // Not intended for Application developers
    */
   explicit DALI_INTERNAL RotationGestureDetector(Internal::RotationGestureDetector* internal);
   /// @endcond
-
 };
 
 } // namespace Dali

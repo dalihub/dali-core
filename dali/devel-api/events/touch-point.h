@@ -22,8 +22,8 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/math/vector2.h>
 

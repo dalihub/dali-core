@@ -23,14 +23,13 @@
 
 namespace Dali
 {
-
 RenderTaskList::RenderTaskList()
 {
 }
 
-RenderTaskList RenderTaskList::DownCast( BaseHandle handle )
+RenderTaskList RenderTaskList::DownCast(BaseHandle handle)
 {
-  return RenderTaskList( dynamic_cast<Dali::Internal::RenderTaskList*>( handle.GetObjectPtr() ) );
+  return RenderTaskList(dynamic_cast<Dali::Internal::RenderTaskList*>(handle.GetObjectPtr()));
 }
 
 RenderTaskList::~RenderTaskList()
@@ -41,20 +40,20 @@ RenderTaskList::RenderTaskList(const RenderTaskList& handle) = default;
 
 RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs) = default;
 
-RenderTaskList::RenderTaskList( RenderTaskList&& rhs ) =  default;
+RenderTaskList::RenderTaskList(RenderTaskList&& rhs) = default;
 
-RenderTaskList& RenderTaskList::operator=( RenderTaskList&& rhs ) =  default;
+RenderTaskList& RenderTaskList::operator=(RenderTaskList&& rhs) = default;
 
 RenderTask RenderTaskList::CreateTask()
 {
-  return RenderTask( GetImplementation(*this).CreateTask().Get() );
+  return RenderTask(GetImplementation(*this).CreateTask().Get());
 }
 
-void RenderTaskList::RemoveTask( RenderTask task )
+void RenderTaskList::RemoveTask(RenderTask task)
 {
-  if( task ) // don't crash if called with empty task handle
+  if(task) // don't crash if called with empty task handle
   {
-    GetImplementation(*this).RemoveTask( GetImplementation( task ) );
+    GetImplementation(*this).RemoveTask(GetImplementation(task));
   }
 }
 
@@ -63,15 +62,14 @@ uint32_t RenderTaskList::GetTaskCount() const
   return GetImplementation(*this).GetTaskCount();
 }
 
-RenderTask RenderTaskList::GetTask( uint32_t index ) const
+RenderTask RenderTaskList::GetTask(uint32_t index) const
 {
-  return RenderTask( GetImplementation(*this).GetTask( index ).Get() );
+  return RenderTask(GetImplementation(*this).GetTask(index).Get());
 }
 
-RenderTaskList::RenderTaskList( Internal::RenderTaskList* internal )
-: BaseHandle( internal )
+RenderTaskList::RenderTaskList(Internal::RenderTaskList* internal)
+: BaseHandle(internal)
 {
 }
 
 } // namespace Dali
-

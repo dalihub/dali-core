@@ -23,54 +23,52 @@
 
 namespace Dali
 {
-
 namespace DevelFrameBuffer
 {
-
-void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture )
+void AttachDepthTexture(FrameBuffer frameBuffer, Texture& texture)
 {
-  AttachDepthTexture( frameBuffer, texture, 0u );
+  AttachDepthTexture(frameBuffer, texture, 0u);
 }
 
-void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel )
+void AttachDepthTexture(FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel)
 {
-  if( texture )
+  if(texture)
   {
-    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
-    GetImplementation( frameBuffer ).AttachDepthTexture( texturePtr, mipmapLevel );
+    Internal::TexturePtr texturePtr(&GetImplementation(texture));
+    GetImplementation(frameBuffer).AttachDepthTexture(texturePtr, mipmapLevel);
   }
 }
 
-void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture )
+void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture)
 {
-  AttachDepthStencilTexture( frameBuffer, texture, 0u );
+  AttachDepthStencilTexture(frameBuffer, texture, 0u);
 }
 
-void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel )
+void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel)
 {
-  if( texture )
+  if(texture)
   {
-    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
-    GetImplementation( frameBuffer ).AttachDepthStencilTexture( texturePtr, mipmapLevel );
+    Internal::TexturePtr texturePtr(&GetImplementation(texture));
+    GetImplementation(frameBuffer).AttachDepthStencilTexture(texturePtr, mipmapLevel);
   }
 }
 
-Texture GetColorTexture( const FrameBuffer frameBuffer, uint8_t index )
+Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index)
 {
-  Internal::Texture* texturePtr = GetImplementation( frameBuffer ).GetColorTexture(index);
-  return Dali::Texture( texturePtr );
+  Internal::Texture* texturePtr = GetImplementation(frameBuffer).GetColorTexture(index);
+  return Dali::Texture(texturePtr);
 }
 
-Texture GetDepthTexture( FrameBuffer frameBuffer )
+Texture GetDepthTexture(FrameBuffer frameBuffer)
 {
   Internal::Texture* texturePtr = GetImplementation(frameBuffer).GetDepthTexture();
-  return Dali::Texture( texturePtr );
+  return Dali::Texture(texturePtr);
 }
 
-Texture GetDepthStencilTexture( FrameBuffer frameBuffer )
+Texture GetDepthStencilTexture(FrameBuffer frameBuffer)
 {
   Internal::Texture* texturePtr = GetImplementation(frameBuffer).GetDepthStencilTexture();
-  return Dali::Texture( texturePtr );
+  return Dali::Texture(texturePtr);
 }
 
 } // namespace DevelFrameBuffer

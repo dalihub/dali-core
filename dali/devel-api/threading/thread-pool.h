@@ -2,7 +2,7 @@
 #define DALI_THREAD_POOL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,15 @@
 #include <dali/public-api/common/dali-common.h>
 
 // EXTERNAL INCLUDES
-#include <thread>
-#include <functional>
-#include <mutex>
-#include <queue>
-#include <condition_variable>
-#include <future>
 #include <algorithm>
+#include <condition_variable>
+#include <functional>
+#include <future>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 namespace Dali
 {
@@ -49,7 +49,6 @@ class DALI_INTERNAL Future final
   friend class ThreadPool;
 
 public:
-
   /**
    * @brief Constructor of Future
    */
@@ -81,7 +80,7 @@ public:
    */
   void Wait() const
   {
-    if( IsValid() )
+    if(IsValid())
     {
       mFuture.wait();
     }
@@ -107,7 +106,6 @@ public:
   }
 
 private:
-
   std::promise<T> mPromise{};
   std::future<T>  mFuture{};
 };
@@ -123,26 +121,22 @@ class FutureGroup final
   friend class ThreadPool;
 
 public:
-
   /**
    * Waits for all the Futures to complete.
    */
   void Wait()
   {
-    for (auto &future : mFutures)
+    for(auto& future : mFutures)
     {
       future->Wait();
     }
   }
 
 private:
-
-  std::vector<std::shared_ptr<Future<T> > > mFutures;
+  std::vector<std::shared_ptr<Future<T>>> mFutures;
 };
 
 using UniqueFutureGroup = std::unique_ptr<FutureGroup<void>>;
-
-
 
 /**
  * ThreadPool creates and manages worker threads and tasks submitted for execution.
@@ -150,7 +144,6 @@ using UniqueFutureGroup = std::unique_ptr<FutureGroup<void>>;
 class DALI_CORE_API ThreadPool final
 {
 public:
-
   /**
    * @brief Constructor of thread pool.
    */
@@ -166,7 +159,7 @@ public:
    * @param threadCount Number of worker threads to use. If 0 then thread count equals hardware thread count.
    * @return True if success
    */
-  bool Initialize( uint32_t threadCount = 0u );
+  bool Initialize(uint32_t threadCount = 0u);
 
   /**
    * @brief Waits until all threads finish execution and go back to the idle state.
@@ -179,7 +172,7 @@ public:
    * @param task Task submitted for execution
    * @return Shared pointer to the Future object
    */
-  SharedFuture SubmitTask(uint32_t workerIndex, const Task &task);
+  SharedFuture SubmitTask(uint32_t workerIndex, const Task& task);
 
   /**
    * @brief Submits vector of tasks to the pool
@@ -203,7 +196,6 @@ public:
   size_t GetWorkerCount() const;
 
 private:
-
   struct Impl;
   std::unique_ptr<Impl> mImpl;
 };

@@ -22,15 +22,14 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/core-enumerations.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/integration-api/context-notifier.h>
-#include <dali/integration-api/core-enumerations.h>
 
 namespace Dali
 {
-
 class Layer;
 class ObjectRegistry;
 class RenderTaskList;
@@ -53,7 +52,6 @@ class Scene;
 struct Event;
 struct TouchEvent;
 
-
 /**
  * The reasons why further updates are required.
  */
@@ -61,11 +59,11 @@ namespace KeepUpdating
 {
 enum Reasons
 {
-  NOT_REQUESTED           = 0,    ///< Zero means that no further updates are required
-  STAGE_KEEP_RENDERING    = 1<<1, ///<  - Stage::KeepRendering() is being used
-  ANIMATIONS_RUNNING      = 1<<2, ///< - Animations are ongoing
-  MONITORING_PERFORMANCE  = 1<<3, ///< - The --enable-performance-monitor option is being used
-  RENDER_TASK_SYNC        = 1<<4  ///< - A render task is waiting for render sync
+  NOT_REQUESTED          = 0,      ///< Zero means that no further updates are required
+  STAGE_KEEP_RENDERING   = 1 << 1, ///<  - Stage::KeepRendering() is being used
+  ANIMATIONS_RUNNING     = 1 << 2, ///< - Animations are ongoing
+  MONITORING_PERFORMANCE = 1 << 3, ///< - The --enable-performance-monitor option is being used
+  RENDER_TASK_SYNC       = 1 << 4  ///< - A render task is waiting for render sync
 };
 }
 
@@ -75,7 +73,6 @@ enum Reasons
 class UpdateStatus
 {
 public:
-
   /**
    * Constructor
    */
@@ -83,44 +80,54 @@ public:
   : keepUpdating(false),
     needsNotification(false),
     surfaceRectChanged(false),
-    secondsFromLastFrame( 0.0f )
+    secondsFromLastFrame(0.0f)
   {
   }
 
 public:
-
   /**
    * Query whether the Core has further frames to update & render e.g. when animations are ongoing.
    * @return A bitmask of KeepUpdating values
    */
-  uint32_t KeepUpdating() { return keepUpdating; }
+  uint32_t KeepUpdating()
+  {
+    return keepUpdating;
+  }
 
   /**
    * Query whether the Core requires an Notification event.
    * This should be sent through the same mechanism (e.g. event loop) as input events.
    * @return True if an Notification event should be sent.
    */
-  bool NeedsNotification() { return needsNotification; }
+  bool NeedsNotification()
+  {
+    return needsNotification;
+  }
 
   /**
    * Query wheter the default surface rect is changed or not.
    * @return true if the default surface rect is changed.
    */
-  bool SurfaceRectChanged() { return surfaceRectChanged; }
+  bool SurfaceRectChanged()
+  {
+    return surfaceRectChanged;
+  }
 
   /**
    * This method is provided so that FPS can be easily calculated with a release version
    * of Core.
    * @return the seconds from last frame as float
    */
-  float SecondsFromLastFrame() { return secondsFromLastFrame; }
+  float SecondsFromLastFrame()
+  {
+    return secondsFromLastFrame;
+  }
 
 public:
-
   uint32_t keepUpdating; ///< A bitmask of KeepUpdating values
-  bool needsNotification;
-  bool surfaceRectChanged;
-  float secondsFromLastFrame;
+  bool     needsNotification;
+  bool     surfaceRectChanged;
+  float    secondsFromLastFrame;
 };
 
 /**
@@ -129,13 +136,12 @@ public:
 class RenderStatus
 {
 public:
-
   /**
    * Constructor
    */
   RenderStatus()
-  : needsUpdate( false ),
-    needsPostRender( false )
+  : needsUpdate(false),
+    needsPostRender(false)
   {
   }
 
@@ -143,7 +149,7 @@ public:
    * Set whether update needs to run following a render.
    * @param[in] updateRequired Set to true if an update is required to be run
    */
-  void SetNeedsUpdate( bool updateRequired )
+  void SetNeedsUpdate(bool updateRequired)
   {
     needsUpdate = updateRequired;
   }
@@ -162,7 +168,7 @@ public:
    * If nothing is rendered this frame, we can skip post-render.
    * @param[in] postRenderRequired Set to True if post-render is required to be run
    */
-  void SetNeedsPostRender( bool postRenderRequired )
+  void SetNeedsPostRender(bool postRenderRequired)
   {
     needsPostRender = postRenderRequired;
   }
@@ -177,11 +183,9 @@ public:
   }
 
 private:
-
-  bool needsUpdate      :1;  ///< True if update is required to be run
-  bool needsPostRender  :1;  ///< True if post-render is required to be run.
+  bool needsUpdate : 1;     ///< True if update is required to be run
+  bool needsPostRender : 1; ///< True if post-render is required to be run.
 };
-
 
 /**
  * Integration::Core is used for integration with the native windowing system.
@@ -219,7 +223,6 @@ private:
 class DALI_CORE_API Core
 {
 public:
-
   /**
    * Create a new Core.
    * This object is used for integration with the native windowing system.
@@ -234,15 +237,15 @@ public:
    * @param[in] partialUpdateAvailable Whether the partial update is available
    * @return A newly allocated Core.
    */
-  static Core* New( RenderController& renderController,
-                    PlatformAbstraction& platformAbstraction,
-                    GlAbstraction& glAbstraction,
-                    GlSyncAbstraction& glSyncAbstraction,
-                    GlContextHelperAbstraction& glContextHelperAbstraction,
-                    RenderToFrameBuffer renderToFboEnabled,
-                    DepthBufferAvailable depthBufferAvailable,
-                    StencilBufferAvailable stencilBufferAvailable,
-                    PartialUpdateAvailable partialUpdateAvailable);
+  static Core* New(RenderController&           renderController,
+                   PlatformAbstraction&        platformAbstraction,
+                   GlAbstraction&              glAbstraction,
+                   GlSyncAbstraction&          glSyncAbstraction,
+                   GlContextHelperAbstraction& glContextHelperAbstraction,
+                   RenderToFrameBuffer         renderToFboEnabled,
+                   DepthBufferAvailable        depthBufferAvailable,
+                   StencilBufferAvailable      stencilBufferAvailable,
+                   PartialUpdateAvailable      partialUpdateAvailable);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -335,12 +338,12 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo Whether this frame is being rendered into the Frame Buffer Object.
    */
-  void Update( float elapsedSeconds,
-               uint32_t lastVSyncTimeMilliseconds,
-               uint32_t nextVSyncTimeMilliseconds,
-               UpdateStatus& status,
-               bool renderToFboEnabled,
-               bool isRenderingToFbo );
+  void Update(float         elapsedSeconds,
+              uint32_t      lastVSyncTimeMilliseconds,
+              uint32_t      nextVSyncTimeMilliseconds,
+              UpdateStatus& status,
+              bool          renderToFboEnabled,
+              bool          isRenderingToFbo);
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded
@@ -351,7 +354,7 @@ public:
    * @param[in] forceClear force the Clear on the framebuffer even if nothing is rendered.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PreRender( RenderStatus& status, bool forceClear, bool uploadOnly );
+  void PreRender(RenderStatus& status, bool forceClear, bool uploadOnly);
 
   /**
    * This is called before rendering any scene in the next frame. This method should be preceded
@@ -361,7 +364,7 @@ public:
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects containing damaged render items rects for this pass.
    */
-  void PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects );
+  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.
@@ -373,7 +376,7 @@ public:
    * @param[in] scene The scene to be rendered.
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    */
-  void RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo );
+  void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.
@@ -386,7 +389,7 @@ public:
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    * @param[in] clippingRect The rect to clip rendered scene.
    */
-  void RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect );
+  void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
    * This is called after rendering all the scenes in the next frame. This method should be
@@ -395,7 +398,7 @@ public:
    * @pre The GL context must have been created, and made current.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
    */
-  void PostRender( bool uploadOnly );
+  void PostRender(bool uploadOnly);
 
   /**
    * @brief Register a processor
@@ -403,13 +406,13 @@ public:
    * Note, Core does not take ownership of this processor.
    * @param[in] processor The process to register
    */
-  void RegisterProcessor( Processor& processor );
+  void RegisterProcessor(Processor& processor);
 
   /**
    * @brief Unregister a processor
    * @param[in] processor The process to unregister
    */
-  void UnregisterProcessor( Processor& processor );
+  void UnregisterProcessor(Processor& processor);
 
   /**
    * @brief Gets the Object registry.
@@ -418,7 +421,6 @@ public:
   ObjectRegistry GetObjectRegistry() const;
 
 private:
-
   /**
    * Private constructor; see also Core::New()
    */
@@ -439,9 +441,7 @@ private:
   Core& operator=(const Core& rhs);
 
 private:
-
   Internal::Core* mImpl;
-
 };
 
 } // namespace Integration

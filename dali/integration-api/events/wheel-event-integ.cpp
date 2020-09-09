@@ -20,29 +20,27 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 WheelEvent::WheelEvent()
-: Event( Wheel ),
-  type( MOUSE_WHEEL ),
-  direction( 0 ),
-  modifiers( 0 ),
-  point( Vector2::ZERO ),
-  delta( 0 ),
-  timeStamp( 0 )
+: Event(Wheel),
+  type(MOUSE_WHEEL),
+  direction(0),
+  modifiers(0),
+  point(Vector2::ZERO),
+  delta(0),
+  timeStamp(0)
 {
 }
 
-WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp )
-: Event( Wheel ),
-  type( type ),
-  direction( direction ),
-  modifiers( modifiers ),
-  point( point ),
-  delta( delta ),
-  timeStamp( timeStamp )
+WheelEvent::WheelEvent(Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp)
+: Event(Wheel),
+  type(type),
+  direction(direction),
+  modifiers(modifiers),
+  point(point),
+  delta(delta),
+  timeStamp(timeStamp)
 {
 }
 

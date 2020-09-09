@@ -36,10 +36,10 @@ namespace Dali
  * @brief Template class to create and operate on rectangles.
  * @SINCE_1_0.0
  */
-template< typename T = float >
+template<typename T = float>
 struct Rect
 {
-// Methods
+  // Methods
 
   /**
    * @brief Constructor.
@@ -76,7 +76,7 @@ struct Rect
    * @SINCE_1_9.14
    * @param[in] vec4 Vector4 to convert from
    */
-  Rect( const Vector4& vec4 )
+  Rect(const Vector4& vec4)
   : x(vec4.x),
     y(vec4.y),
     width(vec4.z),
@@ -90,7 +90,7 @@ struct Rect
    * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect( const Rect<T>& rhs ) = default;
+  Rect(const Rect<T>& rhs) = default;
 
   /**
    * @brief Default copy assignment operator.
@@ -99,7 +99,7 @@ struct Rect
    * @param[in] rhs The original object
    * @return Reference to this
    */
-  Rect<T>& operator=( const Rect<T>& rhs ) = default;
+  Rect<T>& operator=(const Rect<T>& rhs) = default;
 
   /**
    * @brief Default move constructor.
@@ -107,7 +107,7 @@ struct Rect
    * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect<T>( Rect<T>&& rhs ) = default;
+  Rect<T>(Rect<T>&& rhs) = default;
 
   /**
    * @brief Default move assignment operator.
@@ -116,7 +116,7 @@ struct Rect
    * @param[in] rhs The original object
    * @return Reference to this
    */
-  Rect<T>& operator=( Rect<T>&& rhs ) = default;
+  Rect<T>& operator=(Rect<T>&& rhs) = default;
 
   /**
    * @brief Assignment operator.
@@ -127,9 +127,9 @@ struct Rect
    */
   Rect<T>& operator=(const Vector4& vec4)
   {
-    x = vec4.x;
-    y = vec4.y;
-    width = vec4.z;
+    x      = vec4.x;
+    y      = vec4.y;
+    width  = vec4.z;
     height = vec4.w;
 
     return *this;
@@ -146,9 +146,9 @@ struct Rect
    */
   void Set(T newX, T newY, T newWidth, T newHeight)
   {
-    x = newX;
-    y = newY;
-    width = newWidth;
+    x      = newX;
+    y      = newY;
+    width  = newWidth;
     height = newHeight;
   }
 
@@ -160,8 +160,8 @@ struct Rect
    */
   bool IsEmpty() const
   {
-    return width  == 0 ||
-      height == 0;
+    return width == 0 ||
+           height == 0;
   }
 
   /**
@@ -239,7 +239,7 @@ struct Rect
   bool Intersects(const Rect<T>& other) const
   {
     return (other.x + other.width) > x && other.x < (x + width) &&
-      (other.y + other.height) > y && other.y < (y + height);
+           (other.y + other.height) > y && other.y < (y + height);
   }
 
   /**
@@ -252,18 +252,18 @@ struct Rect
    */
   bool Intersect(const Rect<T>& rect)
   {
-    const int left = std::max(rect.x, x);
-    const int top = std::max(rect.y, y);
-    const int right = std::min(rect.x + rect.width, x + width);
+    const int left   = std::max(rect.x, x);
+    const int top    = std::max(rect.y, y);
+    const int right  = std::min(rect.x + rect.width, x + width);
     const int bottom = std::min(rect.y + rect.height, y + height);
 
-    const int width = right - left;
+    const int width  = right - left;
     const int height = bottom - top;
-    if (!(width < 0 || height < 0))
+    if(!(width < 0 || height < 0))
     {
-      x = left;
-      y = top;
-      this->width = width;
+      x            = left;
+      y            = top;
+      this->width  = width;
       this->height = height;
       return true;
     }
@@ -280,14 +280,14 @@ struct Rect
    */
   void Merge(const Rect<T>& rect)
   {
-    const int left = std::min(rect.x, x);
-    const int top = std::min(rect.y, y);
-    const int right = std::max(rect.x + rect.width, x + width);
+    const int left   = std::min(rect.x, x);
+    const int top    = std::min(rect.y, y);
+    const int right  = std::max(rect.x + rect.width, x + width);
     const int bottom = std::max(rect.y + rect.height, y + height);
-    x = left;
-    y = top;
-    width = right - left;
-    height = bottom - top;
+    x                = left;
+    y                = top;
+    width            = right - left;
+    height           = bottom - top;
   }
 
   /**
@@ -298,14 +298,14 @@ struct Rect
    */
   void Inset(T dx, T dy)
   {
-    const int left = x - dx;
-    const int top = y - dy;
-    const int right = x + width + dx;
+    const int left   = x - dx;
+    const int top    = y - dy;
+    const int right  = x + width + dx;
     const int bottom = y + height + dy;
-    x = left;
-    y = top;
-    width = right - left;
-    height = bottom - top;
+    x                = left;
+    y                = top;
+    width            = right - left;
+    height           = bottom - top;
   }
 
   /**
@@ -317,22 +317,21 @@ struct Rect
    */
   bool Contains(const Rect<T>& other) const
   {
-    return other.x >= x && (other.x + other.width)  <= (x + width) &&
-      other.y >= y && (other.y + other.height) <= (y + height);
+    return other.x >= x && (other.x + other.width) <= (x + width) &&
+           other.y >= y && (other.y + other.height) <= (y + height);
   }
 
-public:   // Data
-
+public: // Data
   union
   {
-    T x;      ///< X position of the rectangle
-    T left;   ///< The left value
+    T x;    ///< X position of the rectangle
+    T left; ///< The left value
   };
 
   union
   {
-    T y;      ///< Y position of the rectangle
-    T right;  ///< The right value
+    T y;     ///< Y position of the rectangle
+    T right; ///< The right value
   };
 
   union
@@ -356,13 +355,13 @@ public:   // Data
  * @param[in] rhs Second operand
  * @return True if boxes are exactly same
  */
-template< typename T >
-inline bool operator==( const Rect<T>& lhs, const Rect<T>& rhs )
+template<typename T>
+inline bool operator==(const Rect<T>& lhs, const Rect<T>& rhs)
 {
-  return ( lhs.x == rhs.x )&&
-    ( lhs.y == rhs.y )&&
-    ( lhs.width == rhs.width )&&
-    ( lhs.height == rhs.height );
+  return (lhs.x == rhs.x) &&
+         (lhs.y == rhs.y) &&
+         (lhs.width == rhs.width) &&
+         (lhs.height == rhs.height);
 }
 
 /**
@@ -373,8 +372,8 @@ inline bool operator==( const Rect<T>& lhs, const Rect<T>& rhs )
  * @param[in] rhs The second rectangle
  * @return True if rectangles are not identical
  */
-template< typename T >
-inline bool operator!=( const Rect<T>& lhs, const Rect<T>& rhs )
+template<typename T>
+inline bool operator!=(const Rect<T>& lhs, const Rect<T>& rhs)
 {
   return !(lhs == rhs);
 }
@@ -388,12 +387,12 @@ inline bool operator!=( const Rect<T>& lhs, const Rect<T>& rhs )
  * @return True if rectangles are exactly same
  */
 template<>
-inline bool operator==( const Rect<float>& lhs, const Rect<float>& rhs )
+inline bool operator==(const Rect<float>& lhs, const Rect<float>& rhs)
 {
-  return ( fabsf( lhs.x - rhs.x ) < GetRangedEpsilon(lhs.x, rhs.x) )&&
-    ( fabsf( lhs.y - rhs.y ) < GetRangedEpsilon(lhs.y, rhs.y) )&&
-    ( fabsf( lhs.width - rhs.width ) < GetRangedEpsilon(lhs.width, rhs.width) )&&
-    ( fabsf( lhs.height - rhs.height ) < GetRangedEpsilon(lhs.height, rhs.height) );
+  return (fabsf(lhs.x - rhs.x) < GetRangedEpsilon(lhs.x, rhs.x)) &&
+         (fabsf(lhs.y - rhs.y) < GetRangedEpsilon(lhs.y, rhs.y)) &&
+         (fabsf(lhs.width - rhs.width) < GetRangedEpsilon(lhs.width, rhs.width)) &&
+         (fabsf(lhs.height - rhs.height) < GetRangedEpsilon(lhs.height, rhs.height));
 }
 
 /**
@@ -405,8 +404,7 @@ inline bool operator==( const Rect<float>& lhs, const Rect<float>& rhs )
 template<>
 inline bool Rect<float>::IsEmpty() const
 {
-  return (fabsf(width)  <= GetRangedEpsilon(width, width)
-          ||
+  return (fabsf(width) <= GetRangedEpsilon(width, width) ||
           fabsf(height) <= GetRangedEpsilon(height, height));
 }
 
@@ -418,8 +416,8 @@ inline bool Rect<float>::IsEmpty() const
  * @param[in] rectangle the rectangle to output
  * @return The output stream operator
  */
-template< typename T >
-inline std::ostream& operator<< (std::ostream& stream, const Rect<T>& rectangle)
+template<typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Rect<T>& rectangle)
 {
   return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }

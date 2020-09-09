@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,36 +21,32 @@
 
 namespace Dali
 {
-
 namespace DevelActor
 {
-
-Rect<> CalculateScreenExtents( Actor actor )
+Rect<> CalculateScreenExtents(Actor actor)
 {
-  return GetImplementation( actor ).CalculateScreenExtents();
+  return GetImplementation(actor).CalculateScreenExtents();
 }
 
-VisibilityChangedSignalType& VisibilityChangedSignal( Actor actor )
+VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor)
 {
-  return GetImplementation( actor ).VisibilityChangedSignal();
+  return GetImplementation(actor).VisibilityChangedSignal();
 }
 
-ChildChangedSignalType& ChildAddedSignal( Actor actor )
+ChildChangedSignalType& ChildAddedSignal(Actor actor)
 {
-  return GetImplementation( actor ).ChildAddedSignal();
+  return GetImplementation(actor).ChildAddedSignal();
 }
 
-ChildChangedSignalType& ChildRemovedSignal( Actor actor )
+ChildChangedSignalType& ChildRemovedSignal(Actor actor)
 {
-  return GetImplementation( actor ).ChildRemovedSignal();
+  return GetImplementation(actor).ChildRemovedSignal();
 }
 
-ChildOrderChangedSignalType& ChildOrderChangedSignal( Actor actor )
+ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor)
 {
-  return GetImplementation( actor ).ChildOrderChangedSignal();
+  return GetImplementation(actor).ChildOrderChangedSignal();
 }
-
-
 
 } // namespace DevelActor
 

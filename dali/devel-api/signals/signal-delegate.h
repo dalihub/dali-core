@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_DELEGATE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 /**
  * @brief The SignalDelegate object allows direct connection to a signal that has been pre-configured internally.
  *
@@ -34,14 +33,13 @@ namespace Dali
 class DALI_CORE_API SignalDelegate
 {
 public:
-
   /**
    * @brief Create and set up a signal delegate.
    *
    * @param[in] connectActor The actor whose signal should be connected to.
    * @param[in] signalName The name of the signal within the actor to connect to.
    */
-  SignalDelegate( Dali::Actor connectActor, const std::string& signalName );
+  SignalDelegate(Dali::Actor connectActor, const std::string& signalName);
 
   /**
    * @brief Destructor.
@@ -51,7 +49,6 @@ public:
   }
 
 public:
-
   /**
    * @brief Connect to a FunctorDelegate as received from a type-registry signal connection call.
    *
@@ -63,15 +60,15 @@ public:
    * @param[in] functorDelegate A functor delegate object that must be executed when the signal is emitted.
    * @return    True of the connection was made, false otherwise.
    */
-  bool Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* functorDelegate )
+  bool Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* functorDelegate)
   {
-    if( !mIsConnected )
+    if(!mIsConnected)
     {
       // Note: We have to new the CallbackBaseFunctor rather than have it as a concrete object, as it
       // is converted to a FunctorDelegate again within ConnectSignal. FunctorDelegates gain ownership
       // of any functor they are created from and therefore always attempt to delete them.
-      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor( new CallbackFunctorDelegate0( functorDelegate ) );
-      mConnectActor.ConnectSignal( connectionTracker, mSignalName, *callbackFunctor );
+      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor(new CallbackFunctorDelegate0(functorDelegate));
+      mConnectActor.ConnectSignal(connectionTracker, mSignalName, *callbackFunctor);
       mIsConnected = true;
 
       return true;
@@ -89,13 +86,13 @@ public:
    * @param[in] memberFunction The member-function to call when the signal is emitted.
    * @return    True of the connection was made, false otherwise.
    */
-  template< class T >
-  bool Connect( T* object, void ( T::*memberFunction )( void ) )
+  template<class T>
+  bool Connect(T* object, void (T::*memberFunction)(void))
   {
-    if( !mIsConnected )
+    if(!mIsConnected)
     {
-      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor( MakeCallback( object, memberFunction ) );
-      mConnectActor.ConnectSignal( object, mSignalName, *callbackFunctor );
+      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor(MakeCallback(object, memberFunction));
+      mConnectActor.ConnectSignal(object, mSignalName, *callbackFunctor);
       mIsConnected = true;
 
       return true;
@@ -112,9 +109,7 @@ public:
    */
   bool IsConnected();
 
-
 private:
-
   /**
    * This functor is used by SignalDelegate in order to callback to a non-static member function
    * (after it has been converted to a CallbackBase).
@@ -128,7 +123,7 @@ private:
      *
      * @param[in] callback A CallbackBase which can be created from a member function, or a FunctorDelegate.
      */
-    CallbackBaseFunctor( CallbackBase* callback );
+    CallbackBaseFunctor(CallbackBase* callback);
 
     /**
      * @brief Executes the functor.
@@ -143,25 +138,23 @@ private:
      */
     ~CallbackBaseFunctor();
 
-    private:
-
-      CallbackBase* mCallback;    ///< Stores (and owns) the callback to be called on execution.
+  private:
+    CallbackBase* mCallback; ///< Stores (and owns) the callback to be called on execution.
   };
 
 private:
+  /**
+   * @brief Not defined.
+   */
+  SignalDelegate(const SignalDelegate& rhs);
 
   /**
    * @brief Not defined.
    */
-  SignalDelegate( const SignalDelegate& rhs );
-
-  /**
-   * @brief Not defined.
-   */
-  const SignalDelegate& operator=( const SignalDelegate& rhs );
+  const SignalDelegate& operator=(const SignalDelegate& rhs);
 
 private:
-  bool mIsConnected;         ///< Boolean to know if it is connected already.
+  bool        mIsConnected;  ///< Boolean to know if it is connected already.
   Dali::Actor mConnectActor; ///< The actor owning the signal to connect to.
   std::string mSignalName;   ///< The name of the signal to connect to.
 };

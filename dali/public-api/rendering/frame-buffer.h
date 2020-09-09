@@ -44,7 +44,6 @@ class FrameBuffer;
 class DALI_CORE_API FrameBuffer : public BaseHandle
 {
 public:
-
   /**
    * @brief The initial attachments to create the FrameBuffer with.
    * @note The color attachment can also be created on calling AttachColorTexture().
@@ -60,13 +59,13 @@ public:
      */
     enum Mask
     {
-      NONE          = 0,                          ///< No attachments are created initially.         @SINCE_1_1.45
-      DEPTH         = 1 << 0,                     ///< Depth buffer is created.                      @SINCE_1_1.45
-      STENCIL       = 1 << 1,                     ///< Stencil buffer is created.                    @SINCE_1_1.45
-      DEPTH_STENCIL = DEPTH | STENCIL,            ///< Depth and stencil buffer are created.         @SINCE_1_1.45
-      COLOR         = 1 << 2,                     ///< Color texture is created.                     @SINCE_1_4.0
-      COLOR_DEPTH   = COLOR | DEPTH,              ///< Color texture and depth buffer are created.   @SINCE_1_4.0
-      COLOR_STENCIL = COLOR | STENCIL,            ///< Color texture and stencil buffer are created. @SINCE_1_4.0
+      NONE                = 0,                    ///< No attachments are created initially.         @SINCE_1_1.45
+      DEPTH               = 1 << 0,               ///< Depth buffer is created.                      @SINCE_1_1.45
+      STENCIL             = 1 << 1,               ///< Stencil buffer is created.                    @SINCE_1_1.45
+      DEPTH_STENCIL       = DEPTH | STENCIL,      ///< Depth and stencil buffer are created.         @SINCE_1_1.45
+      COLOR               = 1 << 2,               ///< Color texture is created.                     @SINCE_1_4.0
+      COLOR_DEPTH         = COLOR | DEPTH,        ///< Color texture and depth buffer are created.   @SINCE_1_4.0
+      COLOR_STENCIL       = COLOR | STENCIL,      ///< Color texture and stencil buffer are created. @SINCE_1_4.0
       COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer are created.  @SINCE_1_4.0
     };
   };
@@ -82,7 +81,7 @@ public:
    * @param[in] height The height of the FrameBuffer and the color texture
    * @return A handle to a newly allocated FrameBuffer
    */
-  static FrameBuffer New( uint32_t width, uint32_t height );
+  static FrameBuffer New(uint32_t width, uint32_t height);
 
   /**
    * @brief Creates a new FrameBuffer with specific attachments.
@@ -94,7 +93,7 @@ public:
    * @param[in] attachments Enumeration of the attachments to create
    * @return A handle to a newly allocated FrameBuffer
    */
-  static FrameBuffer New( uint32_t width, uint32_t height, Attachment::Mask attachments );
+  static FrameBuffer New(uint32_t width, uint32_t height, Attachment::Mask attachments);
 
   /**
    * @brief Default constructor, creates an empty handle.
@@ -113,7 +112,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  FrameBuffer( const FrameBuffer& handle );
+  FrameBuffer(const FrameBuffer& handle);
 
   /**
    * @brief Downcasts to a FrameBuffer.
@@ -122,7 +121,7 @@ public:
    * @param[in] handle Handle to an object
    * @return FrameBuffer handle or an uninitialized handle
    */
-  static FrameBuffer DownCast( BaseHandle handle );
+  static FrameBuffer DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -131,7 +130,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  FrameBuffer& operator=( const FrameBuffer& handle );
+  FrameBuffer& operator=(const FrameBuffer& handle);
 
   /**
    * @brief Move constructor.
@@ -139,7 +138,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  FrameBuffer( FrameBuffer&& rhs );
+  FrameBuffer(FrameBuffer&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -148,7 +147,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  FrameBuffer& operator=( FrameBuffer&& rhs );
+  FrameBuffer& operator=(FrameBuffer&& rhs);
 
   /**
    * @brief Attach the base LOD of a 2D texture to the framebuffer for color rendering.
@@ -161,7 +160,7 @@ public:
    * @note The texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
-  void AttachColorTexture( Texture& texture );
+  void AttachColorTexture(Texture& texture);
 
   /**
    * @brief Attach a texture to the framebuffer for color rendering.
@@ -176,7 +175,7 @@ public:
    * @note The mipmapped texture has to have same size as that of FrameBuffer
    * otherwise it won't be attached.
    */
-  void AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer );
+  void AttachColorTexture(Texture& texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @brief Gets the first color texture used as output in the FrameBuffer.
@@ -187,14 +186,13 @@ public:
   Texture GetColorTexture();
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated FrameBuffer
    */
-  explicit DALI_INTERNAL FrameBuffer( Internal::FrameBuffer* pointer );
+  explicit DALI_INTERNAL FrameBuffer(Internal::FrameBuffer* pointer);
 };
 
 /**

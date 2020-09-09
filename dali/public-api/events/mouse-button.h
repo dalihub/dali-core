@@ -2,7 +2,7 @@
 #define DALI_MOUSE_BUTTON_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,18 @@ namespace Dali
  */
 namespace MouseButton
 {
-
 /**
  * @brief Enumeration for mouse button type.
  * @SINCE_1_3_31
  */
 enum Type
 {
-  INVALID = -1, /**< No mouse button event or invalid data */
-  PRIMARY = 1, /**< Primary(Left) mouse button */
-  SECONDARY = 3, /**< Secondary(Right) mouse button */
-  TERTIARY = 2, /**< Center(Wheel) mouse button */
+  INVALID   = -1, /**< No mouse button event or invalid data */
+  PRIMARY   = 1,  /**< Primary(Left) mouse button */
+  SECONDARY = 3,  /**< Secondary(Right) mouse button */
+  TERTIARY  = 2,  /**< Center(Wheel) mouse button */
 };
-}
+} // namespace MouseButton
 
 /**
  * @}

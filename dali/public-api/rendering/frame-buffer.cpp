@@ -22,39 +22,38 @@
 #include <type_traits>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/debug.h> // DALI_LOG_WARNING_NOFN
+#include <dali/integration-api/debug.h>                      // DALI_LOG_WARNING_NOFN
 #include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
-#include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
+#include <dali/internal/event/rendering/texture-impl.h>      // Dali::Internal::Texture
 
 namespace Dali
 {
-
 namespace
 {
 /// Bool operator for FrameBuffer::Attachment::Mask.
 /// in cpp as only used in this file
-bool operator&( FrameBuffer::Attachment::Mask lhs, FrameBuffer::Attachment::Mask rhs )
+bool operator&(FrameBuffer::Attachment::Mask lhs, FrameBuffer::Attachment::Mask rhs)
 {
-  using UnderlyingType = typename std::underlying_type< FrameBuffer::Attachment::Mask >::type;
-  return static_cast<bool>( static_cast<UnderlyingType>( lhs ) & static_cast<UnderlyingType>( rhs ) );
+  using UnderlyingType = typename std::underlying_type<FrameBuffer::Attachment::Mask>::type;
+  return static_cast<bool>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
 }
 
 } // unnamed namespace
 
-FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height )
+FrameBuffer FrameBuffer::New(uint32_t width, uint32_t height)
 {
-  return New( width, height, FrameBuffer::Attachment::COLOR );
+  return New(width, height, FrameBuffer::Attachment::COLOR);
 }
 
-FrameBuffer FrameBuffer::New( uint32_t width, uint32_t height, Attachment::Mask attachments )
+FrameBuffer FrameBuffer::New(uint32_t width, uint32_t height, Attachment::Mask attachments)
 {
-  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New( width, height, attachments );
-  if( attachments & FrameBuffer::Attachment::COLOR )
+  Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New(width, height, attachments);
+  if(attachments & FrameBuffer::Attachment::COLOR)
   {
-    Internal::TexturePtr texture = Internal::Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGB888, width, height );
-    frameBuffer->AttachColorTexture( texture, 0u, 0u );
+    Internal::TexturePtr texture = Internal::Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGB888, width, height);
+    frameBuffer->AttachColorTexture(texture, 0u, 0u);
   }
-  return FrameBuffer( frameBuffer.Get() );
+  return FrameBuffer(frameBuffer.Get());
 }
 
 FrameBuffer::FrameBuffer()
@@ -65,42 +64,42 @@ FrameBuffer::~FrameBuffer()
 {
 }
 
-FrameBuffer::FrameBuffer( const FrameBuffer& handle ) = default;
+FrameBuffer::FrameBuffer(const FrameBuffer& handle) = default;
 
-FrameBuffer FrameBuffer::DownCast( BaseHandle handle )
+FrameBuffer FrameBuffer::DownCast(BaseHandle handle)
 {
-  return FrameBuffer( dynamic_cast<Dali::Internal::FrameBuffer*>(handle.GetObjectPtr()));
+  return FrameBuffer(dynamic_cast<Dali::Internal::FrameBuffer*>(handle.GetObjectPtr()));
 }
 
-FrameBuffer& FrameBuffer::operator=( const FrameBuffer& handle ) = default;
+FrameBuffer& FrameBuffer::operator=(const FrameBuffer& handle) = default;
 
-FrameBuffer::FrameBuffer( Internal::FrameBuffer* pointer )
-: BaseHandle( pointer )
+FrameBuffer::FrameBuffer(Internal::FrameBuffer* pointer)
+: BaseHandle(pointer)
 {
 }
 
-FrameBuffer::FrameBuffer( FrameBuffer&& rhs ) =  default;
+FrameBuffer::FrameBuffer(FrameBuffer&& rhs) = default;
 
-FrameBuffer& FrameBuffer::operator=( FrameBuffer&& rhs ) =  default;
+FrameBuffer& FrameBuffer::operator=(FrameBuffer&& rhs) = default;
 
-void FrameBuffer::AttachColorTexture( Texture& texture )
+void FrameBuffer::AttachColorTexture(Texture& texture)
 {
-  AttachColorTexture( texture, 0u, 0u );
+  AttachColorTexture(texture, 0u, 0u);
 }
 
-void FrameBuffer::AttachColorTexture( Texture& texture, uint32_t mipmapLevel, uint32_t layer )
+void FrameBuffer::AttachColorTexture(Texture& texture, uint32_t mipmapLevel, uint32_t layer)
 {
-  if( texture )
+  if(texture)
   {
-    Internal::TexturePtr texturePtr( &GetImplementation( texture ) );
-    GetImplementation(*this).AttachColorTexture( texturePtr, mipmapLevel, layer );
+    Internal::TexturePtr texturePtr(&GetImplementation(texture));
+    GetImplementation(*this).AttachColorTexture(texturePtr, mipmapLevel, layer);
   }
 }
 
 Texture FrameBuffer::GetColorTexture()
 {
   Internal::Texture* texturePtr = GetImplementation(*this).GetColorTexture(0);
-  return Dali::Texture( texturePtr );
+  return Dali::Texture(texturePtr);
 }
 
 } //namespace Dali

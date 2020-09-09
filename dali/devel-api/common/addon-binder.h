@@ -23,7 +23,6 @@ namespace Dali
 {
 namespace AddOn
 {
-
 /**
  * Class automates binding an AddOn interface.
  *
@@ -65,19 +64,18 @@ namespace AddOn
 class AddOnBinder
 {
 public:
-
   /**
    * @brief Constructor. Opens an AddOn and creates interface
    * @param[in] addonName Name of AddOn
    * @param[in] version Version of AddOn
    */
-  explicit AddOnBinder( const char* addonName, uint32_t version = 0u )
+  explicit AddOnBinder(const char* addonName, uint32_t version = 0u)
   {
     mAddOnManager = Dali::Integration::AddOnManager::Get();
-    if (mAddOnManager)
+    if(mAddOnManager)
     {
       mAddOnHandle = mAddOnManager->GetAddOn(addonName);
-      if (mAddOnHandle)
+      if(mAddOnHandle)
       {
         mAddOnManager->GetAddOnInfo(addonName, mAddOnInfo);
       }
@@ -95,7 +93,7 @@ public:
    * @return Returns a new pointer
    */
   template<class T>
-  T* ConvertFunction( const std::string& funcName )
+  T* ConvertFunction(const std::string& funcName)
   {
     if(mAddOnHandle)
     {
@@ -119,9 +117,9 @@ public:
    * @param[in] name Name of the function
    * @return Valid pointer or nullptr
    */
-  void* GetGlobalProc( const char* name )
+  void* GetGlobalProc(const char* name)
   {
-    return mAddOnManager ? mAddOnManager->GetGlobalProc( mAddOnHandle, name ) : nullptr;
+    return mAddOnManager ? mAddOnManager->GetGlobalProc(mAddOnHandle, name) : nullptr;
   }
 
   /**
@@ -129,9 +127,9 @@ public:
    * @param[in] name Name of the function
    * @return Valid pointer or nullptr
    */
-  void* GetInstanceProc( const char* name )
+  void* GetInstanceProc(const char* name)
   {
-    return mAddOnManager ? mAddOnManager->GetInstanceProc( mAddOnHandle, name ) : nullptr;
+    return mAddOnManager ? mAddOnManager->GetInstanceProc(mAddOnHandle, name) : nullptr;
   }
 
   /**
@@ -153,13 +151,11 @@ public:
   }
 
 protected:
-
   static DALI_CORE_API Dali::Integration::AddOnManager* mAddOnManager; ///< Pointer to the AddOn manager
 
-  Dali::AddOnLibrary mAddOnHandle { nullptr }; ///< Handle to the AddOn library
-  Dali::AddOnInfo mAddOnInfo {}; ///< Stored AddOnInfo structure
+  Dali::AddOnLibrary mAddOnHandle{nullptr}; ///< Handle to the AddOn library
+  Dali::AddOnInfo    mAddOnInfo{};          ///< Stored AddOnInfo structure
 };
-
 
 /**
  * Macro binds function as a member function of the class, for example, the call:
@@ -168,8 +164,8 @@ protected:
  *
  * will create a std::function object named SomeAddOnFunction and bound to the AddOn library.
  */
-#define ADDON_BIND_FUNCTION( FUNCNAME, FUNCTYPE ) \
-std::function<FUNCTYPE> FUNCNAME{ConvertFunction<FUNCTYPE>( std::string(#FUNCNAME) )};
+#define ADDON_BIND_FUNCTION(FUNCNAME, FUNCTYPE) \
+  std::function<FUNCTYPE> FUNCNAME{ConvertFunction<FUNCTYPE>(std::string(#FUNCNAME))};
 
 } // namespace AddOn
 } // namespace Dali

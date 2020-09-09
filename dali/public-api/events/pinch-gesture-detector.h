@@ -61,15 +61,13 @@ class PinchGesture;
 class DALI_CORE_API PinchGestureDetector : public GestureDetector
 {
 public: // Typedefs
-
   /**
    * @brief Signal type.
    * @SINCE_1_0.0
    */
-  using DetectedSignalType = Signal<void( Actor, const PinchGesture& )>;
+  using DetectedSignalType = Signal<void(Actor, const PinchGesture&)>;
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
    *
@@ -95,7 +93,7 @@ public: // Creation & Destruction
    * @param[in] handle Handle to an object
    * @return Handle to a PinchGestureDetector object or an uninitialized handle
    */
-  static PinchGestureDetector DownCast( BaseHandle handle );
+  static PinchGestureDetector DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -123,7 +121,6 @@ public: // Creation & Destruction
   PinchGestureDetector& operator=(const PinchGestureDetector& rhs);
 
 public: // Signals
-
   /**
    * @brief This signal is emitted when the pinch gesture is detected on the attached actor.
    *
@@ -138,7 +135,6 @@ public: // Signals
   DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by PinchGestureDetector::New() methods.
@@ -148,7 +144,6 @@ public: // Not intended for Application developers
    */
   explicit DALI_INTERNAL PinchGestureDetector(Internal::PinchGestureDetector* internal);
   /// @endcond
-
 };
 
 /**

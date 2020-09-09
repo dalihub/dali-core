@@ -54,10 +54,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/slot-delegate.h>
-#include <dali/public-api/signals/base-signal.h>
 
 namespace Dali
 {
@@ -132,7 +132,7 @@ namespace Dali
  * @endcode
  * @SINCE_1_0.0
  */
-template< typename _Signature >
+template<typename _Signature>
 class Signal
 {
 };
@@ -141,11 +141,10 @@ class Signal
  * @brief A template for Signals with no parameters or return value.
  * @SINCE_1_0.0
  */
-template <>
-class Signal< void () >
+template<>
+class Signal<void()>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -190,9 +189,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( void (*func)() )
+  void Connect(void (*func)())
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -201,9 +200,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( void (*func)() )
+  void Disconnect(void (*func)())
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -214,9 +213,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, void (X::*func)() )
+  void Connect(X* obj, void (X::*func)())
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -227,9 +226,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, void (X::*func)() )
+  void Disconnect(X* obj, void (X::*func)())
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -240,9 +239,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, void (X::*func)() )
+  void Connect(SlotDelegate<X>& delegate, void (X::*func)())
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -253,9 +252,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, void (X::*func)() )
+  void Disconnect(SlotDelegate<X>& delegate, void (X::*func)())
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -266,9 +265,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctor0< X >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctor0<X>(func));
   }
 
   /**
@@ -278,9 +277,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegate0( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegate0(delegate));
   }
 
   /**
@@ -293,14 +292,12 @@ public:
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< The base signal implementation
 };
@@ -309,11 +306,10 @@ private:
  * @brief A template for Signals with no parameters and a return value.
  * @SINCE_1_0.0
  */
-template < typename Ret >
-class Signal< Ret() >
+template<typename Ret>
+class Signal<Ret()>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -357,9 +353,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( Ret (*func)() )
+  void Connect(Ret (*func)())
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -368,9 +364,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( Ret (*func)() )
+  void Disconnect(Ret (*func)())
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -381,9 +377,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, Ret (X::*func)() )
+  void Connect(X* obj, Ret (X::*func)())
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -394,9 +390,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, Ret (X::*func)() )
+  void Disconnect(X* obj, Ret (X::*func)())
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -407,9 +403,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, Ret (X::*func)() )
+  void Connect(SlotDelegate<X>& delegate, Ret (X::*func)())
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -420,9 +416,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)() )
+  void Disconnect(SlotDelegate<X>& delegate, Ret (X::*func)())
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -433,9 +429,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorReturn0< X, Ret >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorReturn0<X, Ret>(func));
   }
 
   /**
@@ -445,9 +441,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegateReturn0< Ret >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegateReturn0<Ret>(delegate));
   }
 
   /**
@@ -458,18 +454,16 @@ public:
    */
   Ret Emit()
   {
-    return mImpl.EmitReturn< Ret >();
+    return mImpl.EmitReturn<Ret>();
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -478,11 +472,10 @@ private:
  * @brief A template for Signals with 1 parameter.
  * @SINCE_1_0.0
  */
-template < typename Arg0 >
-class Signal< void ( Arg0 ) >
+template<typename Arg0>
+class Signal<void(Arg0)>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -526,9 +519,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( void (*func)( Arg0 arg0 ) )
+  void Connect(void (*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -537,9 +530,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( void (*func)( Arg0 arg0 ) )
+  void Disconnect(void (*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -550,9 +543,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, void (X::*func)( Arg0 arg0 ) )
+  void Connect(X* obj, void (X::*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -563,9 +556,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, void (X::*func)( Arg0 arg0 ) )
+  void Disconnect(X* obj, void (X::*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -576,9 +569,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
+  void Connect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -589,9 +582,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
+  void Disconnect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -602,9 +595,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctor1< X, Arg0 >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctor1<X, Arg0>(func));
   }
 
   /**
@@ -614,9 +607,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegate1< Arg0 >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegate1<Arg0>(delegate));
   }
 
   /**
@@ -625,20 +618,18 @@ public:
    * @SINCE_1_0.0
    * @param[in] arg0 The first value to pass to callbacks
    */
-  void Emit( Arg0 arg0 )
+  void Emit(Arg0 arg0)
   {
-    mImpl.Emit< Arg0 >( arg0 );
+    mImpl.Emit<Arg0>(arg0);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -647,11 +638,10 @@ private:
  * @brief A template for Signals with 1 parameter and a return value.
  * @SINCE_1_0.0
  */
-template < typename Ret, typename Arg0 >
-class Signal< Ret( Arg0 ) >
+template<typename Ret, typename Arg0>
+class Signal<Ret(Arg0)>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -695,9 +685,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( Ret (*func)( Arg0 arg0 ) )
+  void Connect(Ret (*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -706,9 +696,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( Ret (*func)( Arg0 arg0 ) )
+  void Disconnect(Ret (*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -719,9 +709,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, Ret (X::*func)( Arg0 arg0 ) )
+  void Connect(X* obj, Ret (X::*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -732,9 +722,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0 ) )
+  void Disconnect(X* obj, Ret (X::*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -745,9 +735,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0 ) )
+  void Connect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -758,9 +748,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0 ) )
+  void Disconnect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -771,9 +761,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorReturn1< X, Arg0, Ret >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorReturn1<X, Arg0, Ret>(func));
   }
 
   /**
@@ -783,9 +773,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegateReturn1< Arg0, Ret >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegateReturn1<Arg0, Ret>(delegate));
   }
 
   /**
@@ -795,20 +785,18 @@ public:
    * @param[in] arg0 The first value to pass to callbacks
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
-  Ret Emit( Arg0 arg0 )
+  Ret Emit(Arg0 arg0)
   {
-    return mImpl.EmitReturn< Ret,Arg0 >(arg0);
+    return mImpl.EmitReturn<Ret, Arg0>(arg0);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -818,11 +806,10 @@ private:
  *
  * @SINCE_1_0.0
  */
-template < typename Arg0, typename Arg1 >
-class Signal< void ( Arg0, Arg1 ) >
+template<typename Arg0, typename Arg1>
+class Signal<void(Arg0, Arg1)>
 {
 public:
-
   /**
    * @brief Default constructor.
    *
@@ -868,9 +855,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(void (*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -879,9 +866,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(void (*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -892,9 +879,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(X* obj, void (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -905,9 +892,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(X* obj, void (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -918,9 +905,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -931,9 +918,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -944,9 +931,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctor2< X, Arg0, Arg1 >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctor2<X, Arg0, Arg1>(func));
   }
 
   /**
@@ -956,9 +943,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegate2< Arg0, Arg1 >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegate2<Arg0, Arg1>(delegate));
   }
 
   /**
@@ -968,20 +955,18 @@ public:
    * @param[in] arg0 The first value to pass to callbacks
    * @param[in] arg1 The second value to pass to callbacks
    */
-  void Emit( Arg0 arg0, Arg1 arg1 )
+  void Emit(Arg0 arg0, Arg1 arg1)
   {
-    mImpl.Emit< Arg0,Arg1 >( arg0, arg1 );
+    mImpl.Emit<Arg0, Arg1>(arg0, arg1);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -990,11 +975,10 @@ private:
  * @brief A template for Signals with 2 parameters and a return value.
  * @SINCE_1_0.0
  */
-template < typename Ret, typename Arg0, typename Arg1 >
-class Signal< Ret( Arg0, Arg1 ) >
+template<typename Ret, typename Arg0, typename Arg1>
+class Signal<Ret(Arg0, Arg1)>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -1037,9 +1021,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(Ret (*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -1048,9 +1032,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(Ret (*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -1061,9 +1045,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(X* obj, Ret (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1074,9 +1058,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(X* obj, Ret (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1087,9 +1071,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Connect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1100,9 +1084,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1 ) )
+  void Disconnect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0, Arg1 arg1))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1113,9 +1097,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorReturn2< X, Arg0, Arg1, Ret >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorReturn2<X, Arg0, Arg1, Ret>(func));
   }
 
   /**
@@ -1125,9 +1109,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegateReturn2< Arg0, Arg1, Ret >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegateReturn2<Arg0, Arg1, Ret>(delegate));
   }
 
   /**
@@ -1138,20 +1122,18 @@ public:
    * @param[in] arg1 The second value to pass to callbacks
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
-  Ret Emit( Arg0 arg0, Arg1 arg1 )
+  Ret Emit(Arg0 arg0, Arg1 arg1)
   {
-    return mImpl.EmitReturn< Ret,Arg0,Arg1 >( arg0, arg1 );
+    return mImpl.EmitReturn<Ret, Arg0, Arg1>(arg0, arg1);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -1160,11 +1142,10 @@ private:
  * @brief A template for Signals with 3 parameters.
  * @SINCE_1_0.0
  */
-template < typename Arg0, typename Arg1, typename Arg2 >
-class Signal< void ( Arg0, Arg1, Arg2 ) >
+template<typename Arg0, typename Arg1, typename Arg2>
+class Signal<void(Arg0, Arg1, Arg2)>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -1208,9 +1189,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(void (*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -1219,9 +1200,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(void (*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -1232,9 +1213,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(X* obj, void (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1245,9 +1226,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(X* obj, void (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1258,9 +1239,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1271,9 +1252,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(SlotDelegate<X>& delegate, void (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1284,9 +1265,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctor3< X, Arg0, Arg1, Arg2 >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctor3<X, Arg0, Arg1, Arg2>(func));
   }
 
   /**
@@ -1296,9 +1277,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegate3< Arg0, Arg1, Arg2 >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegate3<Arg0, Arg1, Arg2>(delegate));
   }
 
   /**
@@ -1309,20 +1290,18 @@ public:
    * @param[in] arg1 The second value to pass to callbacks
    * @param[in] arg2 The third value to pass to callbacks
    */
-  void Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
+  void Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
-    mImpl.Emit< Arg0,Arg1,Arg2 >( arg0, arg1, arg2 );
+    mImpl.Emit<Arg0, Arg1, Arg2>(arg0, arg1, arg2);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };
@@ -1331,11 +1310,10 @@ private:
  * @brief A template for Signals with 2 parameters and a return value.
  * @SINCE_1_0.0
  */
-template < typename Ret, typename Arg0, typename Arg1, typename Arg2 >
-class Signal< Ret( Arg0, Arg1, Arg2 ) >
+template<typename Ret, typename Arg0, typename Arg1, typename Arg2>
+class Signal<Ret(Arg0, Arg1, Arg2)>
 {
 public:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -1380,9 +1358,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to connect
    */
-  void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(Ret (*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( MakeCallback( func ) );
+    mImpl.OnConnect(MakeCallback(func));
   }
 
   /**
@@ -1391,9 +1369,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] func The function to disconnect
    */
-  void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(Ret (*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( MakeCallback( func ) );
+    mImpl.OnDisconnect(MakeCallback(func));
   }
 
   /**
@@ -1404,9 +1382,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(X* obj, Ret (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnConnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1417,9 +1395,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( X* obj, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(X* obj, Ret (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( obj, MakeCallback( obj, func ) );
+    mImpl.OnDisconnect(obj, MakeCallback(obj, func));
   }
 
   /**
@@ -1430,9 +1408,9 @@ public:
    * @param[in] func The member function to connect
    */
   template<class X>
-  void Connect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Connect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnConnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnConnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1443,9 +1421,9 @@ public:
    * @param[in] func The member function to disconnect
    */
   template<class X>
-  void Disconnect( SlotDelegate<X>& delegate, Ret (X::*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
+  void Disconnect(SlotDelegate<X>& delegate, Ret (X::*func)(Arg0 arg0, Arg1 arg1, Arg2 arg2))
   {
-    mImpl.OnDisconnect( delegate.GetConnectionTracker(), MakeCallback( delegate.GetSlot(), func ) );
+    mImpl.OnDisconnect(delegate.GetConnectionTracker(), MakeCallback(delegate.GetSlot(), func));
   }
 
   /**
@@ -1456,9 +1434,9 @@ public:
    * @param[in] func The function object to copy
    */
   template<class X>
-  void Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  void Connect(ConnectionTrackerInterface* connectionTracker, const X& func)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorReturn3< X, Arg0, Arg1, Arg2, Ret >( func ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorReturn3<X, Arg0, Arg1, Arg2, Ret>(func));
   }
 
   /**
@@ -1468,9 +1446,9 @@ public:
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken)
    */
-  void Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  void Connect(ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate)
   {
-    mImpl.OnConnect( connectionTracker, new CallbackFunctorDelegateReturn3< Arg0, Arg1, Arg2, Ret >( delegate ) );
+    mImpl.OnConnect(connectionTracker, new CallbackFunctorDelegateReturn3<Arg0, Arg1, Arg2, Ret>(delegate));
   }
 
   /**
@@ -1482,20 +1460,18 @@ public:
    * @param[in] arg2 The third value to pass to callbacks
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected
    */
-  Ret Emit( Arg0 arg0, Arg1 arg1, Arg2 arg2 )
+  Ret Emit(Arg0 arg0, Arg1 arg1, Arg2 arg2)
   {
-    return mImpl.EmitReturn< Ret,Arg0,Arg1,Arg2 >( arg0, arg1, arg2 );
+    return mImpl.EmitReturn<Ret, Arg0, Arg1, Arg2>(arg0, arg1, arg2);
   }
 
 private:
-
-  Signal( const Signal& ) = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  Signal( Signal&& ) = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
-  Signal& operator=( const Signal& ) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
-  Signal& operator=( Signal&& ) = delete; ///< Deleted move assignment operator @SINCE_1_9.25
+  Signal(const Signal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  Signal(Signal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  Signal& operator=(const Signal&) = delete; ///< Deleted copy assignment operator @SINCE_1_0.0
+  Signal& operator=(Signal&&) = delete;      ///< Deleted move assignment operator @SINCE_1_9.25
 
 private:
-
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
   BaseSignal mImpl; ///< Implementation
 };

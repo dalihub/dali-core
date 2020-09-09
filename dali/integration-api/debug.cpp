@@ -19,26 +19,25 @@
 #include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
-#include <cstdio>
 #include <cstdarg>
-#include <cstring>
+#include <cstdio>
 #include <cstdlib>
-#include <sstream>
-#include <iomanip>
+#include <cstring>
 #include <ctime>
+#include <iomanip>
+#include <sstream>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
 {
-
 #ifdef DEBUG_ENABLED
 
 // Fake globals for gdb typedefs
@@ -47,29 +46,25 @@ Dali::DebugPropertyValueMap   gValueMap;
 
 #endif
 
-
 namespace // unnamed namespace
 {
-
 const uint64_t NANOSECONDS_PER_SECOND = 1e+9;
 
 }
 
 namespace Integration
 {
-
 namespace Log
 {
-
 thread_local LogFunction gthreadLocalLogFunction = nullptr;
 
 /* Forward declarations */
-std::string FormatToString(const char *format, ...);
-std::string ArgListToString(const char *format, va_list args);
+std::string FormatToString(const char* format, ...);
+std::string ArgListToString(const char* format, va_list args);
 
 void LogMessage(DebugPriority priority, const char* format, ...)
 {
-  if ( !gthreadLocalLogFunction )
+  if(!gthreadLocalLogFunction)
   {
     return;
   }
@@ -79,7 +74,7 @@ void LogMessage(DebugPriority priority, const char* format, ...)
   std::string message = ArgListToString(format, arg);
   va_end(arg);
 
-  gthreadLocalLogFunction(priority,message);
+  gthreadLocalLogFunction(priority, message);
 }
 
 void InstallLogFunction(const LogFunction& logFunction)
@@ -115,27 +110,27 @@ Filter::FilterList* Filter::GetActiveFilters()
   return activeFilters;
 }
 
-Filter* Filter::New( LogLevel level, bool trace, const char * environmentVariableName )
+Filter* Filter::New(LogLevel level, bool trace, const char* environmentVariableName)
 {
-  char * environmentVariableValue = getenv( environmentVariableName );
-  if ( environmentVariableValue )
+  char* environmentVariableValue = getenv(environmentVariableName);
+  if(environmentVariableValue)
   {
     unsigned int envLevel(0);
-    char envTraceString(0);
-    sscanf( environmentVariableValue, "%u,%c", &envLevel, &envTraceString );
+    char         envTraceString(0);
+    sscanf(environmentVariableValue, "%u,%c", &envLevel, &envTraceString);
 
-    if ( envLevel > Verbose )
+    if(envLevel > Verbose)
     {
       envLevel = Verbose;
     }
-    level = LogLevel( envLevel );
+    level = LogLevel(envLevel);
 
     // Just use 'f' and 't' as it's faster than doing full string comparisons
-    if ( envTraceString == 't' )
+    if(envTraceString == 't')
     {
       trace = true;
     }
-    else if ( envTraceString == 'f' )
+    else if(envTraceString == 'f')
     {
       trace = false;
     }
@@ -169,11 +164,11 @@ void Filter::DisableGlobalTrace()
   }
 }
 
-void Filter::SetGlobalLogLevel( LogLevel level )
+void Filter::SetGlobalLogLevel(LogLevel level)
 {
   for(FilterIter iter = GetActiveFilters()->begin(); iter != GetActiveFilters()->end(); iter++)
   {
-    (*iter)->SetLogLevel( level );
+    (*iter)->SetLogLevel(level);
   }
 }
 
@@ -184,28 +179,28 @@ void Filter::Log(LogLevel level, const char* format, ...)
     va_list arg;
     va_start(arg, format);
 
-    if( mTraceEnabled )
+    if(mTraceEnabled)
     {
-      char *buffer = nullptr;
-      int numChars = asprintf( &buffer, "    %-*c %s", mNesting, ':', format );
-      if( numChars >= 0 ) // No error
+      char* buffer   = nullptr;
+      int   numChars = asprintf(&buffer, "    %-*c %s", mNesting, ':', format);
+      if(numChars >= 0) // No error
       {
-        std::string message = ArgListToString( buffer, arg );
-        LogMessage( DebugInfo, message.c_str() );
-        free( buffer );
+        std::string message = ArgListToString(buffer, arg);
+        LogMessage(DebugInfo, message.c_str());
+        free(buffer);
       }
     }
     else
     {
-      std::string message = ArgListToString( format, arg );
-      LogMessage( DebugInfo, message.c_str() );
+      std::string message = ArgListToString(format, arg);
+      LogMessage(DebugInfo, message.c_str());
     }
     va_end(arg);
   }
 }
 
-
-TraceObj::TraceObj(Filter* filter, const char*format, ...) : mFilter(filter)
+TraceObj::TraceObj(Filter* filter, const char* format, ...)
+: mFilter(filter)
 {
   if(mFilter && mFilter->IsTraceEnabled())
   {
@@ -223,7 +218,7 @@ TraceObj::~TraceObj()
 {
   if(mFilter && mFilter->IsTraceEnabled())
   {
-    if (mFilter->mNesting)
+    if(mFilter->mNesting)
     {
       --mFilter->mNesting;
     }
@@ -233,13 +228,13 @@ TraceObj::~TraceObj()
 
 #endif // DEBUG_ENABLED
 
-std::string ArgListToString(const char *format, va_list args)
+std::string ArgListToString(const char* format, va_list args)
 {
   std::string str; // empty string
   if(format != nullptr)
   {
     char* buffer = nullptr;
-    int err = vasprintf(&buffer, format, args);
+    int   err    = vasprintf(&buffer, format, args);
     if(err >= 0) // No error
     {
       str = buffer;
@@ -249,7 +244,7 @@ std::string ArgListToString(const char *format, va_list args)
   return str;
 }
 
-std::string FormatToString(const char *format, ...)
+std::string FormatToString(const char* format, ...)
 {
   va_list arg;
   va_start(arg, format);
@@ -258,13 +253,13 @@ std::string FormatToString(const char *format, ...)
   return s;
 }
 
-void GetNanoseconds( uint64_t& timeInNanoseconds )
+void GetNanoseconds(uint64_t& timeInNanoseconds)
 {
   timespec timeSpec;
-  clock_gettime( CLOCK_MONOTONIC, &timeSpec );
+  clock_gettime(CLOCK_MONOTONIC, &timeSpec);
 
   // Convert all values to uint64_t to match our return type
-  timeInNanoseconds = ( static_cast< uint64_t >( timeSpec.tv_sec ) * NANOSECONDS_PER_SECOND ) + static_cast< uint64_t >( timeSpec.tv_nsec );
+  timeInNanoseconds = (static_cast<uint64_t>(timeSpec.tv_sec) * NANOSECONDS_PER_SECOND) + static_cast<uint64_t>(timeSpec.tv_nsec);
 }
 
 } // namespace Log

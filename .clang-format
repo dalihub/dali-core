@@ -34,7 +34,6 @@ BraceWrapping:
   IndentBraces:    false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
-SpacesInConditionalStatement : true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: true
@@ -46,7 +45,7 @@ ColumnLimit:     0
 CommentPragmas:  '^ IWYU pragma:'
 ContinuationIndentWidth: 2
 Cpp11BracedListStyle: true
-DerivePointerAlignment: true
+DerivePointerAlignment: false
 DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
 ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
@@ -63,8 +62,8 @@ IndentCaseLabels: true
 IndentWidth:     2
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
-MacroBlockBegin: ''
-MacroBlockEnd:   ''
+MacroBlockBegin: '^DALI_ENUM_TO_STRING_TABLE_BEGIN'
+MacroBlockEnd:   'DALI_ENUM_TO_STRING_TABLE_END'
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCBlockIndentWidth: 2
@@ -76,13 +75,14 @@ PenaltyBreakFirstLessLess: 120
 PenaltyBreakString: 1000
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 200
-PointerAlignment: Right
+PointerAlignment: Left
 ReflowComments:  true
 SortIncludes:    true
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: Never
 SpaceInEmptyParentheses: false
+SpacesInConditionalStatement : false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles:  false
 SpacesInContainerLiterals: true

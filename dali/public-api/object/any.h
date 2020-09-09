@@ -2,7 +2,7 @@
 #define DALI_ANY_TYPE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <typeinfo>   // operator typeid
-#include <cstddef>    // NULL
+#include <cstddef>  // NULL
+#include <typeinfo> // operator typeid
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -67,7 +67,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] assertMessage Assert message to report
    */
-  DALI_CORE_API static void AssertAlways( const char* assertMessage );
+  DALI_CORE_API static void AssertAlways(const char* assertMessage);
 
   /**
    * @brief Constructs a Any type with the given value.
@@ -76,8 +76,8 @@ public:
    * @param[in] value The given value
    */
   template<typename Type>
-  Any( const Type& value )
-  : mContainer( new AnyContainerImpl<Type>( value ) )
+  Any(const Type& value)
+  : mContainer(new AnyContainerImpl<Type>(value))
   {
   }
 
@@ -86,12 +86,12 @@ public:
    * @SINCE_1_0.0
    * @param[in] any Any to be copied
    */
-  Any( const Any& any )
+  Any(const Any& any)
   {
     // If container isn't empty then copy the container?
-    if ( nullptr != any.mContainer )
+    if(nullptr != any.mContainer)
     {
-      mContainer = any.mContainer->mCloneFunc( *any.mContainer );
+      mContainer = any.mContainer->mCloneFunc(*any.mContainer);
     }
     else
     {
@@ -110,26 +110,26 @@ public:
    *
    */
   template<typename Type>
-  Any& operator=( const Type& value )
+  Any& operator=(const Type& value)
   {
     // If the container is empty then assign the new value
-    if ( nullptr == mContainer )
+    if(nullptr == mContainer)
     {
-      mContainer = new AnyContainerImpl< Type >( value );
+      mContainer = new AnyContainerImpl<Type>(value);
     }
     else
     {
       // Check to see if this type is compatible with current container?
-      if ( mContainer->GetType() == typeid( Type ) )
+      if(mContainer->GetType() == typeid(Type))
       {
         // Same type so just set the new value
-        static_cast< AnyContainerImpl< Type >* >( mContainer )->SetValue( value );
+        static_cast<AnyContainerImpl<Type>*>(mContainer)->SetValue(value);
       }
       else
       {
         // Incompatible types, so delete old container and assign a new one with this type and value
-        mContainer->mDeleteFunc( mContainer );
-        mContainer = new AnyContainerImpl< Type >( value );
+        mContainer->mDeleteFunc(mContainer);
+        mContainer = new AnyContainerImpl<Type>(value);
       }
     }
     return *this;
@@ -144,7 +144,7 @@ public:
    * @exception DaliException If parameter any is of a different type.
    *
    */
-  DALI_CORE_API Any& operator=( const Any& any );
+  DALI_CORE_API Any& operator=(const Any& any);
 
   /**
    * @brief Gets a value of type Type from container.
@@ -153,7 +153,7 @@ public:
    * @param[in] type destination of type Type to write to
    */
   template<typename Type>
-  void Get( Type& type ) const
+  void Get(Type& type) const
   {
     type = Get<Type>();
   }
@@ -176,15 +176,15 @@ public:
   template<typename Type>
   const Type& Get() const
   {
-    if ( nullptr == mContainer )
+    if(nullptr == mContainer)
     {
-      AssertAlways( "Any::Get(). mContainer is NULL" );
+      AssertAlways("Any::Get(). mContainer is NULL");
     }
-    else if( mContainer->GetType() != typeid( Type ) ) // Check if the value has the same value than the Any type.
+    else if(mContainer->GetType() != typeid(Type)) // Check if the value has the same value than the Any type.
     {
-      AssertAlways( "Any::Get(). Trying to retrieve a value of a different type than the template one." );
+      AssertAlways("Any::Get(). Trying to retrieve a value of a different type than the template one.");
     }
-    return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetValue();
+    return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetValue();
   }
 
   /**
@@ -196,16 +196,16 @@ public:
   template<typename Type>
   Type* GetPointer()
   {
-    if( nullptr == mContainer )
+    if(nullptr == mContainer)
     {
       return NULL;
     }
-     // Check if the value has the same value than the Any type.
-    if( mContainer->GetType() != typeid( Type ) )
+    // Check if the value has the same value than the Any type.
+    if(mContainer->GetType() != typeid(Type))
     {
-      AssertAlways( "Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one." );
+      AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
-    return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetPointerToValue();
+    return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetPointerToValue();
   }
 
   /**
@@ -217,16 +217,16 @@ public:
   template<typename Type>
   const Type* GetPointer() const
   {
-    if( nullptr == mContainer )
+    if(nullptr == mContainer)
     {
       return NULL;
     }
-     // Check if the value has the same value than the Any type.
-    if( mContainer->GetType() != typeid( Type ) )
+    // Check if the value has the same value than the Any type.
+    if(mContainer->GetType() != typeid(Type))
     {
-      AssertAlways( "Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one." );
+      AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
-    return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetPointerToValue();
+    return static_cast<AnyContainerImpl<Type>*>(mContainer)->GetPointerToValue();
   }
 
   /**
@@ -237,13 +237,13 @@ public:
    */
   bool Empty() const
   {
-    return ( nullptr == mContainer ) ? true : false;
+    return (nullptr == mContainer) ? true : false;
   }
 
-  struct AnyContainerBase;    // Forward declaration for typedef
-  using CloneFunc = AnyContainerBase* (*)( const AnyContainerBase& );
+  struct AnyContainerBase; // Forward declaration for typedef
+  using CloneFunc = AnyContainerBase* (*)(const AnyContainerBase&);
 
-  using DeleteFunc = void ( * )( const AnyContainerBase* );
+  using DeleteFunc = void (*)(const AnyContainerBase*);
 
   /**
    * @brief Base container to hold type for match verification and instance cloning function.
@@ -260,11 +260,12 @@ public:
      * @param[in] cloneFunc Cloning function to replicate this container type
      * @param[in] deleteFunc Deleting function to destroy this container type
      */
-    AnyContainerBase( const std::type_info& type, CloneFunc cloneFunc, DeleteFunc deleteFunc )
-    : mType( type ),
-      mCloneFunc( cloneFunc ),
-      mDeleteFunc( deleteFunc )
-    {}
+    AnyContainerBase(const std::type_info& type, CloneFunc cloneFunc, DeleteFunc deleteFunc)
+    : mType(type),
+      mCloneFunc(cloneFunc),
+      mDeleteFunc(deleteFunc)
+    {
+    }
 
     /**
      * @brief Gets the typeid of this container.
@@ -277,11 +278,10 @@ public:
       return mType;
     }
 
-    const::std::type_info& mType;       // typeID
-    CloneFunc mCloneFunc;               // cloning function for this container
-    DeleteFunc mDeleteFunc;             // deleting function for this container
+    const ::std::type_info& mType;       // typeID
+    CloneFunc               mCloneFunc;  // cloning function for this container
+    DeleteFunc              mDeleteFunc; // deleting function for this container
   };
-
 
   /**
    * @brief Templated Clone function from container base.
@@ -292,9 +292,9 @@ public:
   template<typename Type>
   struct AnyContainerImplCloner
   {
-    static AnyContainerBase* Clone( const AnyContainerBase& base )
+    static AnyContainerBase* Clone(const AnyContainerBase& base)
     {
-      return new AnyContainerImpl< Type >( static_cast< AnyContainerImpl< Type > >( base ) );
+      return new AnyContainerImpl<Type>(static_cast<AnyContainerImpl<Type> >(base));
     }
   };
 
@@ -307,9 +307,9 @@ public:
   template<typename Type>
   struct AnyContainerImplDelete
   {
-    static void Delete( const AnyContainerBase* base )
+    static void Delete(const AnyContainerBase* base)
     {
-      delete ( static_cast< const AnyContainerImpl< Type >* > ( base ) );
+      delete(static_cast<const AnyContainerImpl<Type>*>(base));
     }
   };
 
@@ -322,19 +322,19 @@ public:
   class AnyContainerImpl : public AnyContainerBase
   {
   public:
-
     /**
      * @brief Constructor to create container holding value of type Type.
      *
      * @SINCE_1_0.0
      * @param[in] value Value of Type
      */
-    AnyContainerImpl( const Type& value )
-    : AnyContainerBase( typeid( Type ),
-                        static_cast< CloneFunc >( &AnyContainerImplCloner< Type >::Clone ),
-                        static_cast< DeleteFunc >( &AnyContainerImplDelete< Type >::Delete ) ),
-                        mValue( value )
-    {}
+    AnyContainerImpl(const Type& value)
+    : AnyContainerBase(typeid(Type),
+                       static_cast<CloneFunc>(&AnyContainerImplCloner<Type>::Clone),
+                       static_cast<DeleteFunc>(&AnyContainerImplDelete<Type>::Delete)),
+      mValue(value)
+    {
+    }
 
     /**
      * @brief Constructor to create new container of type from and existing container (cloning).
@@ -342,12 +342,12 @@ public:
      * @SINCE_1_0.0
      * @param[in] base The reference to base container to copy from
      */
-    AnyContainerImpl( const AnyContainerBase& base )
-    : AnyContainerBase( typeid( Type ),
-                        static_cast< CloneFunc >( &AnyContainerImplCloner< Type >::Clone ),
-                        static_cast< DeleteFunc >( &AnyContainerImplDelete< Type >::Delete ) )
+    AnyContainerImpl(const AnyContainerBase& base)
+    : AnyContainerBase(typeid(Type),
+                       static_cast<CloneFunc>(&AnyContainerImplCloner<Type>::Clone),
+                       static_cast<DeleteFunc>(&AnyContainerImplDelete<Type>::Delete))
     {
-      mValue = static_cast< const AnyContainerImpl& >( base ).GetValue();
+      mValue = static_cast<const AnyContainerImpl&>(base).GetValue();
     }
 
     /**
@@ -367,7 +367,7 @@ public:
      * @SINCE_1_0.0
      * @param[in] value Value of type Type
      */
-    void SetValue( const Type& value )
+    void SetValue(const Type& value)
     {
       mValue = value;
     }
@@ -380,7 +380,7 @@ public:
      */
     Type* GetPointerToValue()
     {
-      return static_cast< Type* >( &mValue );
+      return static_cast<Type*>(&mValue);
     }
 
     /**
@@ -391,15 +391,14 @@ public:
      */
     const Type* GetPointerToValue() const
     {
-      return static_cast< const Type* >( &mValue );
+      return static_cast<const Type*>(&mValue);
     }
 
-    private:
-      Type mValue;
+  private:
+    Type mValue;
   };
 
   AnyContainerBase* mContainer;
-
 };
 
 /**
@@ -415,7 +414,7 @@ public:
  * @return Pointer to the Type held
  */
 template<typename Type>
-inline Type* AnyCast( Any* any )
+inline Type* AnyCast(Any* any)
 {
   return any->GetPointer<Type>();
 }
@@ -429,7 +428,7 @@ inline Type* AnyCast( Any* any )
  * @return const Pointer to the Type held
  */
 template<typename Type>
-inline const Type* AnyCast( const Any* any )
+inline const Type* AnyCast(const Any* any)
 {
   return any->GetPointer<Type>();
 }
@@ -443,7 +442,7 @@ inline const Type* AnyCast( const Any* any )
  * @return Type value of type Type
  */
 template<typename Type>
-inline Type AnyCast( Any& any )
+inline Type AnyCast(Any& any)
 {
   return any.Get<Type>();
 }
@@ -457,7 +456,7 @@ inline Type AnyCast( Any& any )
  * @return Type value of type Type
  */
 template<typename Type>
-inline Type AnyCast( const Any& any )
+inline Type AnyCast(const Any& any)
 {
   return any.Get<Type>();
 }
@@ -471,7 +470,7 @@ inline Type AnyCast( const Any& any )
  * @return A reference to the Type value of type Type
  */
 template<typename Type>
-inline Type& AnyCastReference( Any& any )
+inline Type& AnyCastReference(Any& any)
 {
   return any.Get<Type>();
 }
@@ -485,7 +484,7 @@ inline Type& AnyCastReference( Any& any )
  * @return A const reference to the Type value of type Type
  */
 template<typename Type>
-inline const Type& AnyCastReference( const Any& any )
+inline const Type& AnyCastReference(const Any& any)
 {
   return any.Get<Type>();
 }

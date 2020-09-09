@@ -21,16 +21,13 @@
 
 namespace Dali
 {
-
 namespace DevelPinchGesture
 {
-
-PinchGesture New( GestureState state )
+PinchGesture New(GestureState state)
 {
-  return PinchGesture( new Internal::PinchGesture( state ) );
+  return PinchGesture(new Internal::PinchGesture(state));
 }
 
 } // namespace DevelPinchGesture
 
 } // namespace Dali
-

@@ -27,13 +27,12 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
-#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 namespace Dali
 {
-
 Actor::Actor()
 {
 }
@@ -45,9 +44,9 @@ Actor Actor::New()
   return Actor(internal.Get());
 }
 
-Actor Actor::DownCast( BaseHandle handle )
+Actor Actor::DownCast(BaseHandle handle)
 {
-  return Actor( dynamic_cast<Dali::Internal::Actor*>(handle.GetObjectPtr()) );
+  return Actor(dynamic_cast<Dali::Internal::Actor*>(handle.GetObjectPtr()));
 }
 
 Actor::~Actor()
@@ -58,9 +57,9 @@ Actor::Actor(const Actor& copy) = default;
 
 Actor& Actor::operator=(const Actor& rhs) = default;
 
-Actor::Actor( Actor&& rhs ) = default;
+Actor::Actor(Actor&& rhs) = default;
 
-Actor& Actor::operator=( Actor&& rhs ) = default;
+Actor& Actor::operator=(Actor&& rhs) = default;
 
 Layer Actor::GetLayer()
 {
@@ -87,22 +86,22 @@ uint32_t Actor::GetChildCount() const
   return GetImplementation(*this).GetChildCount();
 }
 
-Actor Actor::GetChildAt( uint32_t index ) const
+Actor Actor::GetChildAt(uint32_t index) const
 {
-  Internal::ActorPtr child = GetImplementation(*this).GetChildAt( index );
-  return Actor( child.Get() );
+  Internal::ActorPtr child = GetImplementation(*this).GetChildAt(index);
+  return Actor(child.Get());
 }
 
 Actor Actor::FindChildByName(const std::string& actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName( actorName );
-  return Actor( child.Get() );
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
+  return Actor(child.Get());
 }
 
-Actor Actor::FindChildById( const uint32_t id )
+Actor Actor::FindChildById(const uint32_t id)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildById( id );
-  return Actor( child.Get() );
+  Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
+  return Actor(child.Get());
 }
 
 Actor Actor::GetParent() const
@@ -149,62 +148,62 @@ bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float scr
 
 void Actor::Raise()
 {
-  GetImplementation( *this ).Raise();
+  GetImplementation(*this).Raise();
 }
 
 void Actor::Lower()
 {
-  GetImplementation( *this ).Lower();
+  GetImplementation(*this).Lower();
 }
 
 void Actor::RaiseToTop()
 {
-  GetImplementation( *this ).RaiseToTop();
+  GetImplementation(*this).RaiseToTop();
 }
 
 void Actor::LowerToBottom()
 {
-  GetImplementation( *this ).LowerToBottom();
+  GetImplementation(*this).LowerToBottom();
 }
 
-void Actor::RaiseAbove( Actor target )
+void Actor::RaiseAbove(Actor target)
 {
-  GetImplementation( *this ).RaiseAbove( GetImplementation( target ) );
+  GetImplementation(*this).RaiseAbove(GetImplementation(target));
 }
 
-void Actor::LowerBelow( Actor target )
+void Actor::LowerBelow(Actor target)
 {
-  GetImplementation( *this ).LowerBelow( GetImplementation( target ) );
+  GetImplementation(*this).LowerBelow(GetImplementation(target));
 }
 
-void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+void Actor::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
-  GetImplementation(*this).SetResizePolicy( policy, dimension );
+  GetImplementation(*this).SetResizePolicy(policy, dimension);
 }
 
-ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
+ResizePolicy::Type Actor::GetResizePolicy(Dimension::Type dimension) const
 {
-  return GetImplementation(*this).GetResizePolicy( dimension );
+  return GetImplementation(*this).GetResizePolicy(dimension);
 }
 
-float Actor::GetHeightForWidth( float width )
+float Actor::GetHeightForWidth(float width)
 {
-  return GetImplementation(*this).GetHeightForWidth( width );
+  return GetImplementation(*this).GetHeightForWidth(width);
 }
 
-float Actor::GetWidthForHeight( float height )
+float Actor::GetWidthForHeight(float height)
 {
-  return GetImplementation(*this).GetWidthForHeight( height );
+  return GetImplementation(*this).GetWidthForHeight(height);
 }
 
-float Actor::GetRelayoutSize( Dimension::Type dimension ) const
+float Actor::GetRelayoutSize(Dimension::Type dimension) const
 {
-  return GetImplementation(*this).GetRelayoutSize( dimension );
+  return GetImplementation(*this).GetRelayoutSize(dimension);
 }
 
 Actor::TouchEventSignalType& Actor::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchedSignal();
+  return GetImplementation(*this).TouchedSignal();
 }
 
 Actor::HoverSignalType& Actor::HoveredSignal()
@@ -227,9 +226,9 @@ Actor::OffSceneSignalType& Actor::OffSceneSignal()
   return GetImplementation(*this).OffSceneSignal();
 }
 
-uint32_t Actor::AddRenderer( Renderer& renderer )
+uint32_t Actor::AddRenderer(Renderer& renderer)
 {
-  return GetImplementation(*this).AddRenderer( GetImplementation( renderer ) );
+  return GetImplementation(*this).AddRenderer(GetImplementation(renderer));
 }
 
 uint32_t Actor::GetRendererCount() const
@@ -237,20 +236,20 @@ uint32_t Actor::GetRendererCount() const
   return GetImplementation(*this).GetRendererCount();
 }
 
-Renderer Actor::GetRendererAt( uint32_t index )
+Renderer Actor::GetRendererAt(uint32_t index)
 {
-  Internal::RendererPtr renderer = GetImplementation(*this).GetRendererAt( index );
-  return Renderer( renderer.Get() );
+  Internal::RendererPtr renderer = GetImplementation(*this).GetRendererAt(index);
+  return Renderer(renderer.Get());
 }
 
-void Actor::RemoveRenderer( Renderer& renderer )
+void Actor::RemoveRenderer(Renderer& renderer)
 {
-  GetImplementation(*this).RemoveRenderer( GetImplementation( renderer ) );
+  GetImplementation(*this).RemoveRenderer(GetImplementation(renderer));
 }
 
-void Actor::RemoveRenderer( uint32_t index )
+void Actor::RemoveRenderer(uint32_t index)
 {
-  GetImplementation(*this).RemoveRenderer( index );
+  GetImplementation(*this).RemoveRenderer(index);
 }
 
 Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
@@ -260,7 +259,7 @@ Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 
 Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
 {
-  return GetImplementation( *this ).LayoutDirectionChangedSignal();
+  return GetImplementation(*this).LayoutDirectionChangedSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

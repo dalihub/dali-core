@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector3.h>
 
 // EXTERNAL INCLUDES
 #include <math.h>
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/math-utils.h>
-#include <dali/internal/render/common/performance-monitor.h>
 
 namespace Dali
 {
@@ -43,14 +43,14 @@ const Vector3 Vector3::NEGATIVE_YAXIS(0.0f, -1.0f, 0.0f);
 const Vector3 Vector3::NEGATIVE_ZAXIS(0.0f, 0.0f, -1.0f);
 const Vector3 Vector3::ZERO(0.0f, 0.0f, 0.0f);
 
-Vector3::Vector3( const Vector2& vec2 )
+Vector3::Vector3(const Vector2& vec2)
 : x(vec2.x),
   y(vec2.y),
   z(0.0f)
 {
 }
 
-Vector3::Vector3( const Vector4& vec4 )
+Vector3::Vector3(const Vector4& vec4)
 : x(vec4.x),
   y(vec4.y),
   z(vec4.z)
@@ -80,13 +80,13 @@ Vector3& Vector3::operator*=(const Quaternion& rhs)
   // nVidia SDK implementation
   Vector3 qvec(rhs.mVector.x, rhs.mVector.y, rhs.mVector.z);
 
-  Vector3 uv( (qvec.y * z) - (qvec.z * y),
-              (qvec.z * x) - (qvec.x * z),
-              (qvec.x * y) - (qvec.y * x) );
+  Vector3 uv((qvec.y * z) - (qvec.z * y),
+             (qvec.z * x) - (qvec.x * z),
+             (qvec.x * y) - (qvec.y * x));
 
-  Vector3 uuv( (qvec.y * uv.z) - (qvec.z * uv.y),
-               (qvec.z * uv.x) - (qvec.x * uv.z),
-               (qvec.x * uv.y) - (qvec.y * uv.x) );
+  Vector3 uuv((qvec.y * uv.z) - (qvec.z * uv.y),
+              (qvec.z * uv.x) - (qvec.x * uv.z),
+              (qvec.x * uv.y) - (qvec.y * uv.x));
 
   uv *= rhs.mVector.w;
 
@@ -99,15 +99,15 @@ Vector3& Vector3::operator*=(const Quaternion& rhs)
 
 bool Vector3::operator==(const Vector3& rhs) const
 {
-  if (fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x) )
+  if(fabsf(x - rhs.x) > GetRangedEpsilon(x, rhs.x))
   {
     return false;
   }
-  if (fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y) )
+  if(fabsf(y - rhs.y) > GetRangedEpsilon(y, rhs.y))
   {
     return false;
   }
-  if (fabsf(z - rhs.z) > GetRangedEpsilon(z, rhs.z) )
+  if(fabsf(z - rhs.z) > GetRangedEpsilon(z, rhs.z))
   {
     return false;
   }
@@ -115,42 +115,42 @@ bool Vector3::operator==(const Vector3& rhs) const
   return true;
 }
 
-float Vector3::Dot(const Vector3 &other) const
+float Vector3::Dot(const Vector3& other) const
 {
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,3);
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
   return x * other.x + y * other.y + z * other.z;
 }
 
-Vector3 Vector3::Cross(const Vector3 &other) const
+Vector3 Vector3::Cross(const Vector3& other) const
 {
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,6);
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 6);
 
-  return Vector3( (y * other.z) - (z * other.y),
-                  (z * other.x) - (x * other.z),
-                  (x * other.y) - (y * other.x));
+  return Vector3((y * other.z) - (z * other.y),
+                 (z * other.x) - (x * other.z),
+                 (x * other.y) - (y * other.x));
 }
 
 float Vector3::Length() const
 {
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,3);
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
-  return sqrtf(x*x + y*y + z*z);
+  return sqrtf(x * x + y * y + z * z);
 }
 
 float Vector3::LengthSquared() const
 {
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,3);
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
-  return x*x + y*y + z*z;
+  return x * x + y * y + z * z;
 }
 
 void Vector3::Normalize()
 {
   float length = Length();
-  if( ! EqualsZero(length) )
+  if(!EqualsZero(length))
   {
-    MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY,3);
+    MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
     const float inverseLength = 1.0f / length;
     x *= inverseLength;
@@ -159,22 +159,22 @@ void Vector3::Normalize()
   }
 }
 
-void Vector3::Clamp( const Vector3& min, const Vector3& max )
+void Vector3::Clamp(const Vector3& min, const Vector3& max)
 {
-  Dali::ClampInPlace<float>( x, min.x, max.x );
-  Dali::ClampInPlace<float>( y, min.y, max.y );
-  Dali::ClampInPlace<float>( z, min.z, max.z );
+  Dali::ClampInPlace<float>(x, min.x, max.x);
+  Dali::ClampInPlace<float>(y, min.y, max.y);
+  Dali::ClampInPlace<float>(z, min.z, max.z);
 }
 
-std::ostream& operator<< (std::ostream& o, const Vector3& vector)
+std::ostream& operator<<(std::ostream& o, const Vector3& vector)
 {
   return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << "]";
 }
 
-Vector3 Clamp( const Vector3& v, const float& min, const float& max )
+Vector3 Clamp(const Vector3& v, const float& min, const float& max)
 {
-  Vector3 result( v );
-  result.Clamp( Vector3( min, min, min ) , Vector3( max, max, max ) );
+  Vector3 result(v);
+  result.Clamp(Vector3(min, min, min), Vector3(max, max, max));
 
   return result;
 }

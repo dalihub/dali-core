@@ -59,8 +59,7 @@ class Quaternion;
 class DALI_CORE_API Matrix
 {
 public:
-
-  friend DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
+  friend DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix& matrix);
 
   /**
    * @brief Constructor.
@@ -76,7 +75,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] initialize True for initialization by zero or otherwise
    */
-  explicit Matrix( bool initialize );
+  explicit Matrix(bool initialize);
 
   /**
    * @brief Constructor.
@@ -99,7 +98,7 @@ public:
    * @SINCE_1_0.0
    * @param rotation Rotation as quaternion
    */
-  explicit Matrix( const Quaternion& rotation );
+  explicit Matrix(const Quaternion& rotation);
 
   /**
    * @brief Copy constructor.
@@ -107,7 +106,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] matrix A reference to the copied matrix
    */
-  Matrix( const Matrix& matrix );
+  Matrix(const Matrix& matrix);
 
   /**
    * @brief Assignment operator.
@@ -116,7 +115,7 @@ public:
    * @param[in] matrix A reference to the copied matrix
    * @return A reference to this
    */
-  Matrix& operator=( const Matrix& matrix );
+  Matrix& operator=(const Matrix& matrix);
 
   /**
    * @brief Move constructor.
@@ -124,7 +123,7 @@ public:
    * @SINCE_1_9.21
    * @param[in] matrix A reference to the moved matrix
    */
-  Matrix( Matrix&& matrix );
+  Matrix(Matrix&& matrix);
 
   /**
    * @brief Move assignment operator.
@@ -133,7 +132,7 @@ public:
    * @param[in] matrix A reference to the moved matrix
    * @return A reference to this
    */
-  Matrix& operator=( Matrix&& matrix );
+  Matrix& operator=(Matrix&& matrix);
 
   /**
    * @brief The identity matrix.
@@ -152,7 +151,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] scale Scale to set on top of identity matrix
    */
-  void SetIdentityAndScale( const Vector3& scale );
+  void SetIdentityAndScale(const Vector3& scale);
 
   /**
    * @brief Inverts a transform Matrix.
@@ -239,7 +238,10 @@ public:
    * @return The translation
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const Vector4& GetTranslation() const { return reinterpret_cast<const Vector4&>(mMatrix[12]); }
+  const Vector4& GetTranslation() const
+  {
+    return reinterpret_cast<const Vector4&>(mMatrix[12]);
+  }
 
   /**
    * @brief Gets the x,y and z components of the translation as a Vector3.
@@ -249,7 +251,10 @@ public:
    * @return The translation
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const Vector3& GetTranslation3() const { return reinterpret_cast<const Vector3&>(mMatrix[12]); }
+  const Vector3& GetTranslation3() const
+  {
+    return reinterpret_cast<const Vector3&>(mMatrix[12]);
+  }
 
   /**
    * @brief Sets the translation.
@@ -292,7 +297,10 @@ public:
    * @return The matrix contents as an array of 16 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  const float* AsFloat() const {return mMatrix;}
+  const float* AsFloat() const
+  {
+    return mMatrix;
+  }
 
   /**
    * @brief Returns the contents of the matrix as an array of 16 floats.
@@ -307,7 +315,10 @@ public:
    * @return The matrix contents as an array of 16 floats
    * @note inlined for performance reasons (generates less code than a function call)
    */
-  float* AsFloat() {return mMatrix;}
+  float* AsFloat()
+  {
+    return mMatrix;
+  }
 
   /**
    * @brief Function to multiply two matrices and store the result onto third.
@@ -321,7 +332,7 @@ public:
    * @param[in] lhs Matrix, this can be same matrix as result
    * @param[in] rhs Matrix, this cannot be same matrix as result
    */
-  static void Multiply( Matrix& result, const Matrix& lhs, const Matrix& rhs );
+  static void Multiply(Matrix& result, const Matrix& lhs, const Matrix& rhs);
 
   /**
    * @brief Function to multiply a matrix and quaternion and store the result onto third.
@@ -332,7 +343,7 @@ public:
    * @param[in] lhs Matrix, this can be same matrix as result
    * @param[in] rhs Quaternion
    */
-  static void Multiply( Matrix& result, const Matrix& lhs, const Quaternion& rhs );
+  static void Multiply(Matrix& result, const Matrix& lhs, const Quaternion& rhs);
 
   /**
    * @brief The multiplication operator.
@@ -354,7 +365,7 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are equal
    */
-  bool operator==(const Matrix & rhs) const;
+  bool operator==(const Matrix& rhs) const;
 
   /**
    * @brief The inequality operator.
@@ -364,7 +375,7 @@ public:
    * @param[in] rhs The Matrix to compare this to
    * @return true if the matrices are not equal.
    */
-  bool operator!=(const Matrix & rhs) const;
+  bool operator!=(const Matrix& rhs) const;
 
   /**
    * @brief Sets this matrix to contain the position, scale and rotation components.
@@ -375,9 +386,9 @@ public:
    * @param[in] rotation Rotation to apply
    * @param[in] translation Translation to apply
    */
-  void SetTransformComponents(const Vector3& scale,
+  void SetTransformComponents(const Vector3&    scale,
                               const Quaternion& rotation,
-                              const Vector3& translation );
+                              const Vector3&    translation);
 
   /**
    * @brief Sets this matrix to contain the inverse of the position, scale and rotation components.
@@ -390,8 +401,7 @@ public:
    */
   void SetInverseTransformComponents(const Vector3&    scale,
                                      const Quaternion& rotation,
-                                     const Vector3&    translation );
-
+                                     const Vector3&    translation);
 
   /**
    * @brief Sets this matrix to contain the inverse of the orthonormal basis and position components.
@@ -403,10 +413,10 @@ public:
    * @param[in] zAxis The Z axis of the basis
    * @param[in] translation Translation to apply
    */
-  void SetInverseTransformComponents(const Vector3&    xAxis,
-                                     const Vector3&    yAxis,
-                                     const Vector3&    zAxis,
-                                     const Vector3&    translation );
+  void SetInverseTransformComponents(const Vector3& xAxis,
+                                     const Vector3& yAxis,
+                                     const Vector3& zAxis,
+                                     const Vector3& translation);
 
   /**
    * @brief Gets the position, scale and rotation components from the given transform matrix.
@@ -417,12 +427,11 @@ public:
    * @param[out] scale Scale to set - only valid if the transform matrix has not been skewed or sheared
    * @pre This matrix must not contain skews or shears.
    */
-  void GetTransformComponents(Vector3& position,
+  void GetTransformComponents(Vector3&    position,
                               Quaternion& rotation,
-                              Vector3& scale) const;
+                              Vector3&    scale) const;
 
 private:
-
   float mMatrix[16]; ///< The elements of the matrix
 };
 
@@ -435,10 +444,17 @@ private:
  * @param[in] matrix The matrix to print
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix& matrix);
 
 // Allow Matrix to be treated as a POD type
-template <> struct TypeTraits< Matrix > : public BasicTypes< Matrix > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Matrix> : public BasicTypes<Matrix>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

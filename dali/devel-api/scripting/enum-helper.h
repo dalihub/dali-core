@@ -2,7 +2,7 @@
 #define DALI_ENUM_HELPER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 /**
  * Macros for creating value, typically enumerations, to string tables.
  * Example:
@@ -42,16 +41,19 @@ namespace Dali
  * By default, Dali::Scripting::StringEnum is used as the type for the table, however, a different type can be specified by using
  * DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE.
  */
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( type, t ) const type t##_TABLE[] = {
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE( Dali::Scripting::StringEnum, t )
-#define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const uint32_t t##_TABLE_COUNT = static_cast<uint32_t>( sizeof( t##_TABLE ) / sizeof( t##_TABLE[0] ) );
-#define DALI_ENUM_TO_STRING( s ) { #s, s },
+#define DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE(type, t) const type t##_TABLE[] = {
+#define DALI_ENUM_TO_STRING_TABLE_BEGIN(t) DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE(Dali::Scripting::StringEnum, t)
+#define DALI_ENUM_TO_STRING_TABLE_END(t) \
+  }                                      \
+  ;                                      \
+  const uint32_t t##_TABLE_COUNT = static_cast<uint32_t>(sizeof(t##_TABLE) / sizeof(t##_TABLE[0]));
+#define DALI_ENUM_TO_STRING(s) {#s, s},
 
 /**
  * Adds a value, typically an enum, to the table within a scope but without the scope name
  * Example converts ( Layer, LAYER_UI ) to ( "LAYER_UI", Layer::LayerUI )
  */
-#define DALI_ENUM_TO_STRING_WITH_SCOPE( className, enumName ) { #enumName, className::enumName },
+#define DALI_ENUM_TO_STRING_WITH_SCOPE(className, enumName) {#enumName, className::enumName},
 
 } // namespace Dali
 

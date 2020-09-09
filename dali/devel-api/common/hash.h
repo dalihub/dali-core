@@ -2,7 +2,7 @@
 #define DALI_HASH
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 enum
 {
   INITIAL_HASH_VALUE = 5381
@@ -37,7 +36,7 @@ enum
  * @param toHash string to hash
  * @return hash code
  */
-DALI_CORE_API std::size_t CalculateHash( const std::string& toHash );
+DALI_CORE_API std::size_t CalculateHash(const std::string& toHash);
 
 /**
  * @brief Create a hash code for 2 strings combined.
@@ -46,7 +45,7 @@ DALI_CORE_API std::size_t CalculateHash( const std::string& toHash );
  * @param string2 second string
  * @return hash code
  */
-DALI_CORE_API std::size_t CalculateHash( const std::string& string1, const std::string& string2 );
+DALI_CORE_API std::size_t CalculateHash(const std::string& string1, const std::string& string2);
 
 } // namespace Dali
 

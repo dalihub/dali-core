@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 using Dali::Layer;
 
 Layer::Layer()
@@ -37,9 +36,9 @@ Layer Layer::New()
   return Layer(internal.Get());
 }
 
-Layer Layer::DownCast( BaseHandle handle )
+Layer Layer::DownCast(BaseHandle handle)
 {
-  return Layer( dynamic_cast<Dali::Internal::Layer*>(handle.GetObjectPtr()) );
+  return Layer(dynamic_cast<Dali::Internal::Layer*>(handle.GetObjectPtr()));
 }
 
 Layer::~Layer()
@@ -50,9 +49,9 @@ Layer::Layer(const Layer& copy) = default;
 
 Layer& Layer::operator=(const Layer& rhs) = default;
 
-Layer::Layer( Layer&& rhs ) = default;
+Layer::Layer(Layer&& rhs) = default;
 
-Layer& Layer::operator=( Layer&& rhs ) = default;
+Layer& Layer::operator=(Layer&& rhs) = default;
 
 void Layer::Raise()
 {
@@ -64,14 +63,14 @@ void Layer::Lower()
   GetImplementation(*this).Lower();
 }
 
-void Layer::RaiseAbove( Layer target )
+void Layer::RaiseAbove(Layer target)
 {
-  GetImplementation(*this).RaiseAbove( GetImplementation( target ) );
+  GetImplementation(*this).RaiseAbove(GetImplementation(target));
 }
 
-void Layer::LowerBelow( Layer target )
+void Layer::LowerBelow(Layer target)
 {
-  GetImplementation(*this).LowerBelow( GetImplementation( target ) );
+  GetImplementation(*this).LowerBelow(GetImplementation(target));
 }
 
 void Layer::RaiseToTop()
@@ -84,14 +83,14 @@ void Layer::LowerToBottom()
   GetImplementation(*this).LowerToBottom();
 }
 
-void Layer::MoveAbove( Layer target )
+void Layer::MoveAbove(Layer target)
 {
-  GetImplementation(*this).MoveAbove( GetImplementation( target ) );
+  GetImplementation(*this).MoveAbove(GetImplementation(target));
 }
 
-void Layer::MoveBelow( Layer target )
+void Layer::MoveBelow(Layer target)
 {
-  GetImplementation(*this).MoveBelow( GetImplementation( target ) );
+  GetImplementation(*this).MoveBelow(GetImplementation(target));
 }
 
 void Layer::SetSortFunction(SortFunctionType function)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 
 namespace Dali
 {
-
-
 AnimationData::AnimationData()
 {
 }
@@ -31,44 +29,42 @@ AnimationData::~AnimationData()
   Clear();
 }
 
-
-void AnimationData::Add( AnimationDataElement* animationDataElement )
+void AnimationData::Add(AnimationDataElement* animationDataElement)
 {
-  mAnimationDataList.PushBack( animationDataElement );
+  mAnimationDataList.PushBack(animationDataElement);
 }
 
-
-Dali::Animation AnimationData::CreateAnimation( Dali::Actor targetActor, float duration )
+Dali::Animation AnimationData::CreateAnimation(Dali::Actor targetActor, float duration)
 {
   Dali::Animation animation;
 
-  if( mAnimationDataList.Size() > 0 )
+  if(mAnimationDataList.Size() > 0)
   {
-    animation = Dali::Animation::New( duration );
+    animation = Dali::Animation::New(duration);
 
     // Setup an Animation from AnimationData.
     AnimationData::AnimationDataList::Iterator end = mAnimationDataList.End();
-    for( AnimationData::AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter )
+    for(AnimationData::AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter)
     {
       // Override the actor in the animation.
-      animation.AnimateTo( Property( targetActor, ( *iter )->property ), ( *iter )->value,
-          ( *iter )->alphaFunction, TimePeriod( ( *iter )->timePeriodDelay, ( *iter )->timePeriodDuration ) );
+      animation.AnimateTo(Property(targetActor, (*iter)->property),
+                          (*iter)->value,
+                          (*iter)->alphaFunction,
+                          TimePeriod((*iter)->timePeriodDelay, (*iter)->timePeriodDuration));
     }
   }
 
   return animation;
 }
 
-
 void AnimationData::Clear()
 {
   AnimationData::AnimationDataList::Iterator end = mAnimationDataList.End();
-  for( AnimationData::AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter )
+  for(AnimationData::AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter)
   {
-    delete ( *iter );
+    delete(*iter);
   }
   mAnimationDataList.Clear();
 }
-
 
 } // namespace Dali

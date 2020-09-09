@@ -21,31 +21,29 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 Point::Point()
-: mTouchPoint( 0, PointState::STARTED, 0.0f, 0.0f ),
+: mTouchPoint(0, PointState::STARTED, 0.0f, 0.0f),
   mEllipseRadius(),
-  mAngle( 0.0f ),
-  mDeviceClass( Device::Class::NONE ),
-  mDeviceSubclass( Device::Subclass::NONE ),
-  mPressure( 1.0f ),
-  mRadius( 0.0f ),
-  mMouseButton( MouseButton::INVALID )
+  mAngle(0.0f),
+  mDeviceClass(Device::Class::NONE),
+  mDeviceSubclass(Device::Subclass::NONE),
+  mPressure(1.0f),
+  mRadius(0.0f),
+  mMouseButton(MouseButton::INVALID)
 {
 }
 
-Point::Point( const TouchPoint& touchPoint )
-: mTouchPoint( touchPoint ),
+Point::Point(const TouchPoint& touchPoint)
+: mTouchPoint(touchPoint),
   mEllipseRadius(),
-  mAngle( 0.0f ),
-  mDeviceClass( Device::Class::NONE ),
-  mDeviceSubclass( Device::Subclass::NONE ),
-  mPressure( 1.0f ),
-  mRadius( 0.0f ),
-  mMouseButton( MouseButton::INVALID )
+  mAngle(0.0f),
+  mDeviceClass(Device::Class::NONE),
+  mDeviceSubclass(Device::Subclass::NONE),
+  mPressure(1.0f),
+  mRadius(0.0f),
+  mMouseButton(MouseButton::INVALID)
 {
 }
 
@@ -53,38 +51,38 @@ Point::~Point()
 {
 }
 
-void Point::SetDeviceId( int32_t deviceId )
+void Point::SetDeviceId(int32_t deviceId)
 {
   mTouchPoint.deviceId = deviceId;
 }
 
-void Point::SetState( PointState::Type state )
+void Point::SetState(PointState::Type state)
 {
-  mTouchPoint.state = static_cast< PointState::Type >( state );
+  mTouchPoint.state = static_cast<PointState::Type>(state);
 }
 
-void Point::SetScreenPosition( const Vector2& screenPosition )
+void Point::SetScreenPosition(const Vector2& screenPosition)
 {
   mTouchPoint.screen = screenPosition;
 }
 
-void Point::SetRadius( float radius )
+void Point::SetRadius(float radius)
 {
   mRadius = mEllipseRadius.x = mEllipseRadius.y = radius;
 }
 
-void Point::SetRadius( float radius, Vector2 ellipseRadius )
+void Point::SetRadius(float radius, Vector2 ellipseRadius)
 {
-  mRadius = radius;
+  mRadius        = radius;
   mEllipseRadius = ellipseRadius;
 }
 
-void Point::SetPressure( float pressure )
+void Point::SetPressure(float pressure)
 {
   mPressure = pressure;
 }
 
-void Point::SetAngle( Degree angle )
+void Point::SetAngle(Degree angle)
 {
   mAngle = angle;
 }
@@ -96,7 +94,7 @@ int Point::GetDeviceId() const
 
 PointState::Type Point::GetState() const
 {
-  return static_cast< PointState::Type >( mTouchPoint.state );
+  return static_cast<PointState::Type>(mTouchPoint.state);
 }
 
 const Vector2& Point::GetScreenPosition() const
@@ -124,12 +122,12 @@ Degree Point::GetAngle() const
   return mAngle;
 }
 
-void Point::SetHitActor( Actor hitActor )
+void Point::SetHitActor(Actor hitActor)
 {
   mTouchPoint.hitActor = hitActor;
 }
 
-void Point::SetLocalPosition( const Vector2& localPosition )
+void Point::SetLocalPosition(const Vector2& localPosition)
 {
   mTouchPoint.local = localPosition;
 }
@@ -149,12 +147,12 @@ const TouchPoint& Point::GetTouchPoint() const
   return mTouchPoint;
 }
 
-void Point::SetDeviceClass( Device::Class::Type deviceClass )
+void Point::SetDeviceClass(Device::Class::Type deviceClass)
 {
   mDeviceClass = deviceClass;
 }
 
-void Point::SetDeviceSubclass( Device::Subclass::Type deviceSubclass )
+void Point::SetDeviceSubclass(Device::Subclass::Type deviceSubclass)
 {
   mDeviceSubclass = deviceSubclass;
 }
@@ -178,7 +176,6 @@ void Point::SetMouseButton(MouseButton::Type button)
 {
   mMouseButton = button;
 }
-
 
 } // namespace Integration
 

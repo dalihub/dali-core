@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property-types.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -65,7 +65,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a KeyFrames object or an uninitialized handle
    */
-  static KeyFrames DownCast( BaseHandle handle );
+  static KeyFrames DownCast(BaseHandle handle);
 
   /**
    * @brief Creates an uninitialized KeyFrame handle.
@@ -107,7 +107,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  KeyFrames( KeyFrames&& rhs );
+  KeyFrames(KeyFrames&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -116,7 +116,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  KeyFrames& operator=( KeyFrames&& rhs );
+  KeyFrames& operator=(KeyFrames&& rhs);
 
   /**
    * @brief Gets the type of the key frame.
@@ -147,7 +147,6 @@ public:
    * @param[in] alpha The alpha function used to blend to the next keyframe
    */
   void Add(float progress, Property::Value value, AlphaFunction alpha);
-
 
 public: // Not intended for application developers
   /// @cond internal

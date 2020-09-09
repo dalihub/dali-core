@@ -87,7 +87,6 @@ class RenderTask;
 class DALI_CORE_API RenderTask : public Handle
 {
 public:
-
   /**
    * @brief Enumeration for instances of properties belonging to the RenderTask class.
    * @SINCE_1_0.0
@@ -131,7 +130,7 @@ public:
    * @brief Typedef for signals sent by this class.
    * @SINCE_1_0.0
    */
-  using RenderTaskSignalType = Signal<void( RenderTask& )>;
+  using RenderTaskSignalType = Signal<void(RenderTask&)>;
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
@@ -139,7 +138,7 @@ public:
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen
    * @return True if the conversion was successful, otherwise coordinates should be unmodified
    */
-  using ScreenToFrameBufferFunction = bool ( * )( Vector2& );
+  using ScreenToFrameBufferFunction = bool (*)(Vector2&);
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
@@ -147,7 +146,7 @@ public:
    * @param[in,out] coordinates The screen coordinates to convert where (0,0) is the top-left of the screen
    * @return True if the conversion was successful, otherwise coordinates should be unmodified
    */
-  using ConstScreenToFrameBufferFunction = bool ( *const )( Vector2& );
+  using ConstScreenToFrameBufferFunction = bool (*const)(Vector2&);
 
   /**
    * @brief The default conversion function returns false for any screen coordinates.
@@ -198,7 +197,7 @@ public:
    * @param[in] handle A handle to an object
    * @return A handle to a RenderTask or an uninitialized handle
    */
-  static RenderTask DownCast( BaseHandle handle );
+  static RenderTask DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -231,7 +230,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  RenderTask( RenderTask&& rhs );
+  RenderTask(RenderTask&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -240,7 +239,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  RenderTask& operator=( RenderTask&& rhs );
+  RenderTask& operator=(RenderTask&& rhs);
 
   /**
    * @brief Sets the actors to be rendered.
@@ -248,7 +247,7 @@ public:
    * @param[in] actor This actor and its children will be rendered.
    * If actor is an empty handle, then nothing will be rendered
    */
-  void SetSourceActor( Actor actor );
+  void SetSourceActor(Actor actor);
 
   /**
    * @brief Retrieves the actors to be rendered.
@@ -262,7 +261,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] exclusive True if the source actors will only be rendered by this render-task
    */
-  void SetExclusive( bool exclusive );
+  void SetExclusive(bool exclusive);
 
   /**
    * @brief Queries whether the RenderTask has exclusive access to the source actors.
@@ -281,7 +280,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] enabled True if the render-task should be considered for input handling
    */
-  void SetInputEnabled( bool enabled );
+  void SetInputEnabled(bool enabled);
 
   /**
    * @brief Queries whether the render-task should be considered for input handling.
@@ -295,7 +294,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] cameraActor The scene is viewed from the perspective of this actor
    */
-  void SetCameraActor( CameraActor cameraActor );
+  void SetCameraActor(CameraActor cameraActor);
 
   /**
    * @brief Retrieves the actor from which the scene is viewed.
@@ -309,7 +308,7 @@ public:
    * @SINCE_1_1.38
    * @param[in] frameBuffer A valid FrameBuffer handle to enable off-screen rendering, or an uninitialized handle to disable it
    */
-  void SetFrameBuffer( FrameBuffer frameBuffer );
+  void SetFrameBuffer(FrameBuffer frameBuffer);
 
   /**
    * @brief Retrieves the frame-buffer used as a render target.
@@ -325,7 +324,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] conversionFunction The conversion function
    */
-  void SetScreenToFrameBufferFunction( ScreenToFrameBufferFunction conversionFunction );
+  void SetScreenToFrameBufferFunction(ScreenToFrameBufferFunction conversionFunction);
 
   /**
    * @brief Retrieves the function used to convert screen coordinates to frame-buffer coordinates.
@@ -343,7 +342,7 @@ public:
    * @param[in] mappingActor The actor used for conversion
    * @note The mapping actor needs to be rendered by the default render task to make the mapping work properly.
    */
-  void SetScreenToFrameBufferMappingActor( Actor mappingActor );
+  void SetScreenToFrameBufferMappingActor(Actor mappingActor);
 
   /**
    * @brief Retrieves the actor used to convert screen coordinates to frame-buffer coordinates.
@@ -361,7 +360,7 @@ public:
    * @param[in] position The viewports position (x,y)
    * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
-  void SetViewportPosition( Vector2 position );
+  void SetViewportPosition(Vector2 position);
 
   /**
    * @brief Retrieves the GL viewport position used when rendering.
@@ -378,7 +377,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] size The viewports size (width,height)
    */
-  void SetViewportSize( Vector2 size );
+  void SetViewportSize(Vector2 size);
 
   /**
    * @brief Retrieves the GL viewport size used when rendering.
@@ -396,7 +395,7 @@ public:
    * @param[in] viewport The new viewport
    * @note Unlike the glViewport method, the x & y coordinates refer to the top-left of the viewport rectangle.
    */
-  void SetViewport( Viewport viewport );
+  void SetViewport(Viewport viewport);
 
   /**
    * @brief Retrieves the GL viewport used when rendering.
@@ -410,7 +409,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] color The new clear color
    */
-  void SetClearColor( const Vector4& color );
+  void SetClearColor(const Vector4& color);
 
   /**
    * @brief Retrieves the clear color used when SetClearEnabled(true) is used.
@@ -433,7 +432,7 @@ public:
    * be (partially) cleared before rendering the second.
    *
    */
-  void SetClearEnabled( bool enabled );
+  void SetClearEnabled(bool enabled);
 
   /**
    * @brief Queries whether the render-task will clear the results of previous render-tasks.
@@ -451,7 +450,7 @@ public:
    * @note If the shader uses @ref Shader::Hint::MODIFIES_GEOMETRY then culling optimizations are disabled.
    * @see Shader::Hint
    */
-  void SetCullMode( bool cullMode );
+  void SetCullMode(bool cullMode);
 
   /**
    * @brief Gets the cull mode.
@@ -479,7 +478,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] refreshRate The new refresh rate
    */
-  void SetRefreshRate( uint32_t refreshRate );
+  void SetRefreshRate(uint32_t refreshRate);
 
   /**
    * @brief Queries the refresh-rate of the RenderTask.
@@ -497,7 +496,7 @@ public:
    * @param[out] viewportY The viewport y position
    * @return true if the position has a screen coordinate
    */
-  bool WorldToViewport(const Vector3 &position, float& viewportX, float& viewportY) const;
+  bool WorldToViewport(const Vector3& position, float& viewportX, float& viewportY) const;
 
   /**
    * @brief Gets actor local coordinates for given viewport coordinates.
@@ -510,10 +509,9 @@ public:
    * @param[out] localY The local y position
    * @return true if the screen position has a local coordinate
    */
-  bool ViewportToLocal(Actor actor, float viewportX, float viewportY, float &localX, float &localY) const;
+  bool ViewportToLocal(Actor actor, float viewportX, float viewportY, float& localX, float& localY) const;
 
 public: // Signals
-
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.
    * @SINCE_1_0.0
@@ -522,14 +520,13 @@ public: // Signals
   RenderTaskSignalType& FinishedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param[in] renderTask A pointer to a newly allocated render-task
    */
-  explicit DALI_INTERNAL RenderTask( Internal::RenderTask* renderTask );
+  explicit DALI_INTERNAL RenderTask(Internal::RenderTask* renderTask);
   /// @endcond
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,16 @@
 
 namespace Dali
 {
-
 CameraActor CameraActor::New()
 {
-  Internal::CameraActorPtr internal = Internal::CameraActor::New( Size::ZERO );
+  Internal::CameraActorPtr internal = Internal::CameraActor::New(Size::ZERO);
 
   return CameraActor(internal.Get());
 }
 
-
-CameraActor CameraActor::New( const Size& size )
+CameraActor CameraActor::New(const Size& size)
 {
-  Internal::CameraActorPtr internal = Internal::CameraActor::New( size );
+  Internal::CameraActorPtr internal = Internal::CameraActor::New(size);
 
   return CameraActor(internal.Get());
 }
@@ -44,9 +42,9 @@ CameraActor::CameraActor(Internal::CameraActor* internal)
 {
 }
 
-CameraActor CameraActor::DownCast( BaseHandle handle )
+CameraActor CameraActor::DownCast(BaseHandle handle)
 {
-  return CameraActor( dynamic_cast<Dali::Internal::CameraActor*>(handle.GetObjectPtr()) );
+  return CameraActor(dynamic_cast<Dali::Internal::CameraActor*>(handle.GetObjectPtr()));
 }
 
 CameraActor::CameraActor()
@@ -68,7 +66,7 @@ CameraActor& CameraActor::operator=(const CameraActor& rhs)
   return *this;
 }
 
-void CameraActor::SetType( Dali::Camera::Type type )
+void CameraActor::SetType(Dali::Camera::Type type)
 {
   GetImplementation(*this).SetType(type);
 }
@@ -78,9 +76,9 @@ Dali::Camera::Type CameraActor::GetType() const
   return GetImplementation(*this).GetType();
 }
 
-void CameraActor::SetProjectionMode( Dali::Camera::ProjectionMode mode )
+void CameraActor::SetProjectionMode(Dali::Camera::ProjectionMode mode)
 {
-  GetImplementation(*this).SetProjectionMode( mode );
+  GetImplementation(*this).SetProjectionMode(mode);
 }
 
 Dali::Camera::ProjectionMode CameraActor::GetProjectionMode() const
@@ -88,47 +86,47 @@ Dali::Camera::ProjectionMode CameraActor::GetProjectionMode() const
   return GetImplementation(*this).GetProjectionMode();
 }
 
-void CameraActor::SetFieldOfView( float fieldOfView )
+void CameraActor::SetFieldOfView(float fieldOfView)
 {
   GetImplementation(*this).SetFieldOfView(fieldOfView);
 }
 
-float CameraActor::GetFieldOfView( )
+float CameraActor::GetFieldOfView()
 {
   return GetImplementation(*this).GetFieldOfView();
 }
 
-void CameraActor::SetAspectRatio( float aspectRatio )
+void CameraActor::SetAspectRatio(float aspectRatio)
 {
   GetImplementation(*this).SetAspectRatio(aspectRatio);
 }
 
-float CameraActor::GetAspectRatio( )
+float CameraActor::GetAspectRatio()
 {
   return GetImplementation(*this).GetAspectRatio();
 }
 
-void CameraActor::SetNearClippingPlane( float nearClippingPlane )
+void CameraActor::SetNearClippingPlane(float nearClippingPlane)
 {
   GetImplementation(*this).SetNearClippingPlane(nearClippingPlane);
 }
 
-float CameraActor::GetNearClippingPlane( )
+float CameraActor::GetNearClippingPlane()
 {
   return GetImplementation(*this).GetNearClippingPlane();
 }
 
-void CameraActor::SetFarClippingPlane( float farClippingPlane )
+void CameraActor::SetFarClippingPlane(float farClippingPlane)
 {
   GetImplementation(*this).SetFarClippingPlane(farClippingPlane);
 }
 
-float CameraActor::GetFarClippingPlane( )
+float CameraActor::GetFarClippingPlane()
 {
   return GetImplementation(*this).GetFarClippingPlane();
 }
 
-void CameraActor::SetTargetPosition( const Vector3& targetPosition )
+void CameraActor::SetTargetPosition(const Vector3& targetPosition)
 {
   GetImplementation(*this).SetTarget(targetPosition);
 }
@@ -148,19 +146,19 @@ bool CameraActor::GetInvertYAxis()
   return GetImplementation(*this).GetInvertYAxis();
 }
 
-void CameraActor::SetPerspectiveProjection( const Size& size )
+void CameraActor::SetPerspectiveProjection(const Size& size)
 {
-  GetImplementation(*this).SetPerspectiveProjection( size );
+  GetImplementation(*this).SetPerspectiveProjection(size);
 }
 
-void CameraActor::SetOrthographicProjection( const Vector2& size )
+void CameraActor::SetOrthographicProjection(const Vector2& size)
 {
-  GetImplementation(*this).SetOrthographicProjection( size );
+  GetImplementation(*this).SetOrthographicProjection(size);
 }
 
-void CameraActor::SetOrthographicProjection( float left, float right, float top, float bottom, float near, float far )
+void CameraActor::SetOrthographicProjection(float left, float right, float top, float bottom, float near, float far)
 {
-  GetImplementation(*this).SetOrthographicProjection( left, right, top, bottom, near, far );
+  GetImplementation(*this).SetOrthographicProjection(left, right, top, bottom, near, far);
 }
 
 } // namespace Dali

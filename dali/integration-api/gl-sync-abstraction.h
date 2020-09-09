@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ namespace Dali
 {
 namespace Integration
 {
-
 /**
  * This abstraction defines an API for syncing CPU with GPU.
  * A typical use case is to determine when GL draw calls have finished drawing
@@ -36,10 +35,11 @@ protected:
   /**
    * Virtual protected destructor, no deletion through this interface
    */
-  virtual ~GlSyncAbstraction() {}
+  virtual ~GlSyncAbstraction()
+  {
+  }
 
 public:
-
   class SyncObject
   {
   protected:
@@ -48,10 +48,11 @@ public:
      * Core from deleting SyncObjects - only Adaptor implementation is able to delete
      * them.
      */
-    virtual ~SyncObject() {}
+    virtual ~SyncObject()
+    {
+    }
 
   public:
-
     /**
      * Determine if the synchronisation object has been signalled.
      * @return false if the sync object has not been signalled, true if it has been signalled (and

@@ -2,7 +2,7 @@
 #define DALI_CONSTRAINTS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
 
 namespace Dali
@@ -48,7 +48,8 @@ struct EqualToConstraint
    * @SINCE_1_0.0
    */
   EqualToConstraint()
-  { }
+  {
+  }
 
   /**
    * @brief Overrides functor for float properties.
@@ -57,7 +58,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( float& current, const PropertyInputContainer& inputs )
+  void operator()(float& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetFloat();
   }
@@ -69,7 +70,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Vector2& current, const PropertyInputContainer& inputs )
+  void operator()(Vector2& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector2();
   }
@@ -81,7 +82,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  void operator()(Vector3& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector3();
   }
@@ -93,7 +94,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Vector4& current, const PropertyInputContainer& inputs )
+  void operator()(Vector4& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector4();
   }
@@ -105,7 +106,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Quaternion& current, const PropertyInputContainer& inputs )
+  void operator()(Quaternion& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetQuaternion();
   }
@@ -117,7 +118,7 @@ struct EqualToConstraint
    * @param[in,out] current The current property value
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Matrix3& current, const PropertyInputContainer& inputs )
+  void operator()(Matrix3& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetMatrix3();
   }
@@ -129,11 +130,10 @@ struct EqualToConstraint
    * @param[in,out] current The current property value, the constrained value is set
    * @param[in] inputs Contains the property to copy
    */
-  void operator()( Matrix& current, const PropertyInputContainer& inputs )
+  void operator()(Matrix& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetMatrix();
   }
-
 };
 
 /**
@@ -152,16 +152,20 @@ struct RelativeToConstraint
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraint( float scale )
-  : mScale( scale, scale, scale ) { }
+  RelativeToConstraint(float scale)
+  : mScale(scale, scale, scale)
+  {
+  }
 
   /**
    * @brief Constructor.
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraint( const Vector3& scale )
-  : mScale( scale ) { }
+  RelativeToConstraint(const Vector3& scale)
+  : mScale(scale)
+  {
+  }
 
   /**
    * @brief Functor.
@@ -169,7 +173,7 @@ struct RelativeToConstraint
    * @param[in,out] current The current property value (vector3 property * scale factor)
    * @param[in] inputs Property container for current property calculation
    */
-  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  void operator()(Vector3& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector3() * mScale;
   }
@@ -192,8 +196,10 @@ struct RelativeToConstraintFloat
    * @SINCE_1_0.0
    * @param[in] scale Scale factor
    */
-  RelativeToConstraintFloat( float scale )
-  : mScale( scale ) { }
+  RelativeToConstraintFloat(float scale)
+  : mScale(scale)
+  {
+  }
 
   /**
    * @brief Functor.
@@ -201,7 +207,7 @@ struct RelativeToConstraintFloat
    * @param[in,out] current The current property value (float property * scale factor)
    * @param[in] inputs Property container for current property calculation
    */
-  void operator()( float& current, const PropertyInputContainer& inputs )
+  void operator()(float& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetFloat() * mScale;
   }
@@ -221,11 +227,11 @@ struct RelativeToConstraintFloat
  * @param[in,out] current The current orientation property value, the constrained value is set
  * @param[in] inputs Contains the world position of the target, the world position of the camera, and the world orientation of the target
  */
-inline void LookAt( Dali::Quaternion& current, const Dali::PropertyInputContainer& inputs )
+inline void LookAt(Dali::Quaternion& current, const Dali::PropertyInputContainer& inputs)
 {
-  const PropertyInput& targetPosition( *inputs[0] );
-  const PropertyInput& cameraPosition( *inputs[1] );
-  const PropertyInput& targetOrientation( *inputs[2] );
+  const PropertyInput& targetPosition(*inputs[0]);
+  const PropertyInput& cameraPosition(*inputs[1]);
+  const PropertyInput& targetOrientation(*inputs[2]);
 
   Vector3 vForward = targetPosition.GetVector3() - cameraPosition.GetVector3();
   vForward.Normalize();
@@ -243,7 +249,7 @@ inline void LookAt( Dali::Quaternion& current, const Dali::PropertyInputContaine
   Vector3 vY = vForward.Cross(vX);
   vY.Normalize();
 
-  current = Quaternion( vX, vY, vForward );
+  current = Quaternion(vX, vY, vForward);
 }
 
 /**

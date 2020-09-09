@@ -27,10 +27,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 /**
  * An instance of this class should be used by the adaptor to send a wheel event to
  * the Dali core.
@@ -45,8 +43,8 @@ struct DALI_CORE_API WheelEvent : public Event
    */
   enum Type
   {
-    MOUSE_WHEEL,      ///< Mouse wheel event
-    CUSTOM_WHEEL      ///< Custom wheel event
+    MOUSE_WHEEL, ///< Mouse wheel event
+    CUSTOM_WHEEL ///< Custom wheel event
   };
 
   /**
@@ -63,7 +61,7 @@ struct DALI_CORE_API WheelEvent : public Event
    * @param[in]  delta      The offset of rolling (positive value means roll down, and negative value means roll up)
    * @param[in]  timeStamp  The time the wheel is being rolled.
    */
-  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp );
+  WheelEvent(Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp);
 
   /**
    * Virtual destructor
@@ -101,7 +99,6 @@ struct DALI_CORE_API WheelEvent : public Event
    *@copydoc Dali::WheelEvent::GetTime
    */
   unsigned int timeStamp;
-
 };
 
 } // namespace Integration

@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <typeinfo>
 #include <cstdint> // uint32_t
+#include <typeinfo>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
@@ -140,7 +140,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  TypeRegistry( TypeRegistry&& rhs );
+  TypeRegistry(TypeRegistry&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -149,7 +149,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  TypeRegistry& operator=( TypeRegistry&& rhs );
+  TypeRegistry& operator=(TypeRegistry&& rhs);
 
   /**
    * @brief Gets TypeInfo for a registered type.
@@ -158,7 +158,7 @@ public:
    * @param[in] uniqueTypeName A unique type name
    * @return TypeInfo if the type exists, otherwise an empty handle
    */
-  TypeInfo GetTypeInfo( const std::string &uniqueTypeName );
+  TypeInfo GetTypeInfo(const std::string& uniqueTypeName);
 
   /**
    * @brief Gets TypeInfo for a registered type.
@@ -167,7 +167,7 @@ public:
    * @param[in] registerType The registered type info
    * @return TypeInfo if the type exists, otherwise an empty handle
    */
-  TypeInfo GetTypeInfo( const std::type_info& registerType );
+  TypeInfo GetTypeInfo(const std::type_info& registerType);
 
   /**
    * @brief Gets type name count.
@@ -187,7 +187,6 @@ public:
   std::string GetTypeName(size_t index) const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali Get() method.
@@ -195,7 +194,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] typeRegistry A pointer to a Dali resource
    */
-  explicit DALI_INTERNAL TypeRegistry(Internal::TypeRegistry*typeRegistry);
+  explicit DALI_INTERNAL TypeRegistry(Internal::TypeRegistry* typeRegistry);
   /// @endcond
 };
 
@@ -214,8 +213,7 @@ public:
    * @param[in] baseType The base type info of registerType
    * @param[in] f registerType Instance creation function
    */
-  TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
-                    TypeInfo::CreateFunction f );
+  TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
    * @brief Constructor registers the type creation function.
@@ -226,8 +224,7 @@ public:
    * @param[in] f registerType instance creation function
    * @param[in] callCreateOnInit If true the creation function is called as part of Dali initialization
    */
-  TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
-                    TypeInfo::CreateFunction f, bool callCreateOnInit );
+  TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, bool callCreateOnInit);
 
   /**
    * @brief Constructor registers the type creation function.
@@ -238,8 +235,7 @@ public:
    * @param[in] f registerType instance creation function
    * @param[in] defaultProperties the default property meta-data
    */
-  TypeRegistration( const std::type_info& registerType, const std::type_info& baseType,
-                    TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties );
+  TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties);
 
   /**
    * @brief Constructor registers the type creation function for a named class or type.
@@ -251,8 +247,7 @@ public:
    * @param[in] baseType the base type info of registerType
    * @param[in] f registerType instance creation function
    */
-  TypeRegistration( const std::string& name, const std::type_info& baseType,
-                    TypeInfo::CreateFunction f );
+  TypeRegistration(const std::string& name, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
    * @brief The name the type is registered under (derived from type_info).
@@ -264,7 +259,7 @@ public:
 
 private:
   TypeRegistry mReference; ///< Reference to the type registry
-  std::string mName;       ///< Name of the type
+  std::string  mName;      ///< Name of the type
 };
 
 /**
@@ -282,7 +277,7 @@ public:
    * @param[in] name The signal name
    * @param[in] func The signal connector function
    */
-  SignalConnectorType( TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func );
+  SignalConnectorType(TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func);
 };
 
 /**
@@ -300,7 +295,7 @@ public:
    * @param[in] name The action name
    * @param[in] f The action function
    */
-  TypeAction( TypeRegistration &registered, const std::string &name, TypeInfo::ActionFunction f);
+  TypeAction(TypeRegistration& registered, const std::string& name, TypeInfo::ActionFunction f);
 };
 
 /**
@@ -310,7 +305,6 @@ public:
 class DALI_CORE_API PropertyRegistration
 {
 public:
-
   /**
    * @brief This constructor registers the property with the registered type.
    *
@@ -337,9 +331,12 @@ public:
    * @note "getFunc" MUST be provided.
    *
    */
-  PropertyRegistration( TypeRegistration& registered,
-                        const std::string& name, Property::Index index, Property::Type type,
-                        TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc );
+  PropertyRegistration(TypeRegistration&             registered,
+                       const std::string&            name,
+                       Property::Index               index,
+                       Property::Type                type,
+                       TypeInfo::SetPropertyFunction setFunc,
+                       TypeInfo::GetPropertyFunction getFunc);
 };
 
 /**
@@ -349,7 +346,6 @@ public:
 class DALI_CORE_API AnimatablePropertyRegistration
 {
 public:
-
   /**
    * @brief This constructor registers the animatable property with the registered type.
    *
@@ -364,7 +360,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+  AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type);
 
   /**
    * @brief This constructor registers the animatable property with the registered default value.
@@ -380,7 +376,7 @@ public:
    * @param[in] value The property default value
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value );
+  AnimatablePropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, const Property::Value& value);
 };
 
 /**
@@ -390,7 +386,6 @@ public:
 class DALI_CORE_API AnimatablePropertyComponentRegistration
 {
 public:
-
   /**
    * @brief This constructor registers a component of an animatable property where
    * the base animatable property must be a property that supports property component
@@ -408,7 +403,7 @@ public:
    * @param[in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property)
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex );
+  AnimatablePropertyComponentRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
 };
 
 /**
@@ -418,7 +413,6 @@ public:
 class DALI_CORE_API ChildPropertyRegistration
 {
 public:
-
   /**
    * @brief This constructor registers an event-thread only child property (i.e. a property
    * that the parent supports in its children) with the registered type.
@@ -430,7 +424,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+  ChildPropertyRegistration(TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type);
 
   /**
    * @brief This constructor registers an event-thread only child property (i.e. a property
@@ -443,9 +437,8 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration( const std::string& registered, const std::string& name, Property::Index index, Property::Type type );
+  ChildPropertyRegistration(const std::string& registered, const std::string& name, Property::Index index, Property::Type type);
 };
-
 
 /**
  * @}

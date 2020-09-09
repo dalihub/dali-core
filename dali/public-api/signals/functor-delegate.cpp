@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,30 +31,30 @@ namespace
  * functions and regular functions.
  * If this assert fails, please implement the template specialisation for C functions.
  */
-static_assert( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ), "Need to implement template specialisation for C functions" );
-}
+static_assert(sizeof(void*) == sizeof(&FunctorDispatcher<void>::Dispatch), "Need to implement template specialisation for C functions");
+} // namespace
 
 FunctorDelegate::~FunctorDelegate()
 {
-  if( mFunctorPointer )
+  if(mFunctorPointer)
   {
-    (*mDestructorDispatcher)( mFunctorPointer );
+    (*mDestructorDispatcher)(mFunctorPointer);
   }
 }
 
 void FunctorDelegate::Execute()
 {
-  if( mFunctorPointer )
+  if(mFunctorPointer)
   {
     Dispatcher dispatcher = mMemberFunctionDispatcher;
-    (*dispatcher)( mFunctorPointer );
+    (*dispatcher)(mFunctorPointer);
   }
 }
 
-FunctorDelegate::FunctorDelegate( void* objectPtr, Dispatcher dispatcher, Destructor destructor )
-: mFunctorPointer( objectPtr ),
-  mMemberFunctionDispatcher( dispatcher ),
-  mDestructorDispatcher( destructor )
+FunctorDelegate::FunctorDelegate(void* objectPtr, Dispatcher dispatcher, Destructor destructor)
+: mFunctorPointer(objectPtr),
+  mMemberFunctionDispatcher(dispatcher),
+  mDestructorDispatcher(destructor)
 {
 }
 

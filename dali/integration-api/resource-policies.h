@@ -21,7 +21,6 @@ namespace Dali
 {
 namespace ResourcePolicy
 {
-
 /**
  * The discardable policy determines if a resource can be discarded.
  * Discarded means that it can be released after uploading to GPU.

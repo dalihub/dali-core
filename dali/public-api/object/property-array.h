@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_ARRAY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public:
    * @SINCE_1_4.17
    * @param[in] values An initializer_list of values
    */
-  Array( const std::initializer_list< Value >& values );
+  Array(const std::initializer_list<Value>& values);
 
   /**
    * @brief Copy constructor.
@@ -63,7 +63,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] other The Array to copy from
    */
-  Array( const Array& other );
+  Array(const Array& other);
 
   /**
    * @brief Move constructor.
@@ -73,7 +73,7 @@ public:
    * @param[in] other The Array to move from
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Array( Array&& other );
+  Array(Array&& other);
 
   /**
    * @brief Non-virtual destructor.
@@ -122,14 +122,14 @@ public:
    * @SINCE_1_0.0
    * @param[in] size The size to reserve
    */
-  void Reserve( SizeType size );
+  void Reserve(SizeType size);
 
   /**
    * @brief Resizes to size.
    * @SINCE_1_0.0
    * @param[in] size The size to resize
    */
-  void Resize( SizeType size );
+  void Resize(SizeType size);
 
   /**
    * @brief Retrieves the capacity of the array.
@@ -145,7 +145,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] value The value to add to the end of the array
    */
-  void PushBack( const Value& value );
+  void PushBack(const Value& value);
 
   /**
    * @brief Add an element to the array.
@@ -154,9 +154,9 @@ public:
    * @param[in] value The value to add to the end of the array
    * @return A reference to this object
    */
-  inline Property::Array& Add( const Value& value )
+  inline Property::Array& Add(const Value& value)
   {
-    PushBack( value );
+    PushBack(value);
     return *this;
   }
 
@@ -167,9 +167,9 @@ public:
    * @param[in] index The element index to access. No bounds checking is performed
    * @return The a reference to the element
    */
-  const Value& GetElementAt( SizeType index ) const
+  const Value& GetElementAt(SizeType index) const
   {
-    return operator[]( index );
+    return operator[](index);
   }
 
   /**
@@ -179,9 +179,9 @@ public:
    * @param[in] index The element index to access. No bounds checking is performed
    * @return The a reference to the element
    */
-  Value& GetElementAt( SizeType index )
+  Value& GetElementAt(SizeType index)
   {
-    return operator[]( index );
+    return operator[](index);
   }
 
   /**
@@ -192,7 +192,7 @@ public:
    * @return The a reference to the element
    *
    */
-  const Value& operator[]( SizeType index ) const;
+  const Value& operator[](SizeType index) const;
 
   /**
    * @brief Operator to access an element.
@@ -202,7 +202,7 @@ public:
    * @return The a reference to the element
    *
    */
-  Value& operator[]( SizeType index );
+  Value& operator[](SizeType index);
 
   /**
    * @brief Assignment operator.
@@ -212,7 +212,7 @@ public:
    *
    * @return The copied array.
    */
-  Array& operator=( const Array& other );
+  Array& operator=(const Array& other);
 
   /**
    * @brief Move assignment operator.
@@ -224,17 +224,17 @@ public:
    *
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Array& operator=( Array&& other );
+  Array& operator=(Array&& other);
 
   /**
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
-  friend DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
+  friend DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Array& array);
 
 private:
-  struct DALI_INTERNAL Impl; ///< Private data
-  Impl* mImpl; ///< Pointer to private data
+  struct DALI_INTERNAL Impl;  ///< Private data
+  Impl*                mImpl; ///< Pointer to private data
 };
 
 /**
@@ -245,7 +245,7 @@ private:
  * @param[in] array The array to insert
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Array& array );
+DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Array& array);
 
 /**
  * @}

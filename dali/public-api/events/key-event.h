@@ -19,17 +19,16 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <cstdint> // int32_t
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/events/device.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class KeyEvent;
@@ -57,9 +56,7 @@ class KeyEvent;
  */
 class DALI_CORE_API KeyEvent : public BaseHandle
 {
-
 public:
-
   // Enumerations
 
   /**
@@ -68,8 +65,8 @@ public:
    */
   enum State
   {
-    DOWN,        ///< Key down @SINCE_1_9.27
-    UP,          ///< Key up @SINCE_1_9.27
+    DOWN, ///< Key down @SINCE_1_9.27
+    UP,   ///< Key up @SINCE_1_9.27
   };
 
   /**
@@ -85,7 +82,7 @@ public:
    * @SINCE_1_2.36
    * @param[in] rhs A reference to the copied handle
    */
-  KeyEvent( const KeyEvent& rhs );
+  KeyEvent(const KeyEvent& rhs);
 
   /**
    * @brief Move constructor.
@@ -93,7 +90,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    */
-  KeyEvent( KeyEvent&& rhs );
+  KeyEvent(KeyEvent&& rhs);
 
   /**
    * @brief Copy assignment operator.
@@ -101,7 +98,7 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  KeyEvent& operator=( const KeyEvent& rhs );
+  KeyEvent& operator=(const KeyEvent& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -110,7 +107,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  KeyEvent& operator=( KeyEvent&& rhs );
+  KeyEvent& operator=(KeyEvent&& rhs);
 
   /**
    * @brief Destructor.
@@ -243,7 +240,6 @@ public:
   State GetState() const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized KeyEvent handle.
@@ -251,7 +247,7 @@ public: // Not intended for application developers
    * @SINCE_1_9.27
    * @param[in] keyEvent A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL KeyEvent( Internal::KeyEvent* keyEvent );
+  explicit DALI_INTERNAL KeyEvent(Internal::KeyEvent* keyEvent);
   /// @endcond
 };
 

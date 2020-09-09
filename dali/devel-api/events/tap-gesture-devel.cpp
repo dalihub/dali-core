@@ -21,16 +21,13 @@
 
 namespace Dali
 {
-
 namespace DevelTapGesture
 {
-
-TapGesture New( GestureState state )
+TapGesture New(GestureState state)
 {
-  return TapGesture( new Internal::TapGesture( state ) );
+  return TapGesture(new Internal::TapGesture(state));
 }
 
 } // namespace DevelTapGesture
 
 } // namespace Dali
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ TapGestureDetector TapGestureDetector::New()
   return TapGestureDetector(internal.Get());
 }
 
-TapGestureDetector TapGestureDetector::New(uint32_t tapsRequired )
+TapGestureDetector TapGestureDetector::New(uint32_t tapsRequired)
 {
-  Internal::TapGestureDetectorPtr internal = Internal::TapGestureDetector::New( tapsRequired );
+  Internal::TapGestureDetectorPtr internal = Internal::TapGestureDetector::New(tapsRequired);
 
   return TapGestureDetector(internal.Get());
 }
 
-TapGestureDetector TapGestureDetector::DownCast( BaseHandle handle )
+TapGestureDetector TapGestureDetector::DownCast(BaseHandle handle)
 {
-  return TapGestureDetector( dynamic_cast<Dali::Internal::TapGestureDetector*>(handle.GetObjectPtr()) );
+  return TapGestureDetector(dynamic_cast<Dali::Internal::TapGestureDetector*>(handle.GetObjectPtr()));
 }
 
 TapGestureDetector::~TapGestureDetector()

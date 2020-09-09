@@ -59,7 +59,6 @@ class TypeInfo;
 class DALI_CORE_API BaseHandle
 {
 public:
-
   /**
    * @brief This constructor is used by Dali New() methods.
    *
@@ -116,7 +115,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  BaseHandle( BaseHandle&& rhs );
+  BaseHandle(BaseHandle&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -125,7 +124,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  BaseHandle& operator=( BaseHandle&& rhs );
+  BaseHandle& operator=(BaseHandle&& rhs);
 
   /**
    * @brief Connects a void() functor to a specified signal.
@@ -137,10 +136,10 @@ public:
    * @return True if the signal was available
    * @pre The signal must be available in this object.
    */
-  template <class T>
-  bool ConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor )
+  template<class T>
+  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor)
   {
-    return DoConnectSignal( connectionTracker, signalName, FunctorDelegate::New( functor ) );
+    return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(functor));
   }
 
   /**
@@ -181,7 +180,6 @@ public:
   bool GetTypeInfo(Dali::TypeInfo& info) const;
 
 public:
-
   // BaseHandle accessors
 
   /**
@@ -219,7 +217,7 @@ public:
    * @brief Pointer-to-member type.
    * Objects can be implicitly converted to this for validity checks.
    */
-  using BooleanType = void ( BaseHandle::* )() const;
+  using BooleanType = void (BaseHandle::*)() const;
 
   /**
    * @brief Converts an handle to a BooleanType.
@@ -256,7 +254,6 @@ public:
   Dali::RefObject* GetObjectPtr() const;
 
 private:
-
   /**
    * @brief Not intended for application developers.
    *
@@ -266,10 +263,9 @@ private:
    * @param[in] functorDelegate A newly allocated functor delegate (takes ownership)
    * @return True if the signal was available
    */
-  bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
+  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate);
 
 protected:
-
   /**
    * @brief Used by the safe bool idiom.
    *
@@ -277,12 +273,12 @@ protected:
    * in a boolean context without the usual harmful side effects.
    * @SINCE_1_0.0
    */
-  void ThisIsSaferThanReturningVoidStar() const {}
+  void ThisIsSaferThanReturningVoidStar() const
+  {
+  }
 
 private:
-
   IntrusivePtr<Dali::RefObject> mObjectHandle; ///< Object this handle points at.
-
 };
 
 /**
@@ -293,10 +289,10 @@ private:
  * @return Handle pointer to either a valid deriving handle or an uninitialized handle
  * @pre The BaseHandle has been initialized.
  */
-template< class T >
-inline T DownCast( BaseHandle handle )
+template<class T>
+inline T DownCast(BaseHandle handle)
 {
-  return T::DownCast( handle );
+  return T::DownCast(handle);
 }
 
 // See also BaseHandle::BooleanType() conversion
@@ -308,7 +304,7 @@ inline T DownCast( BaseHandle handle )
  * @param[in] rhs A reference to compare to
  * @return True if the handle handles point to the same Dali resource, or if both are NULL
  */
-template <typename T>
+template<typename T>
 inline bool operator==(const BaseHandle& lhs, const T& rhs)
 {
   // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared
@@ -322,7 +318,7 @@ inline bool operator==(const BaseHandle& lhs, const T& rhs)
  * @param[in] rhs A reference to compare to
  * @return True if the handle handles point to the different Dali resources
  */
-template <typename T>
+template<typename T>
 inline bool operator!=(const BaseHandle& lhs, const T& rhs)
 {
   // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared

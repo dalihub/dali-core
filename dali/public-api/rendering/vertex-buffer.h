@@ -72,7 +72,6 @@ class VertexBuffer;
 class DALI_CORE_API VertexBuffer : public BaseHandle
 {
 public:
-
   /**
    * @brief Creates a VertexBuffer.
    *
@@ -80,7 +79,7 @@ public:
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
    * @return Handle to a newly allocated VertexBuffer
    */
-  static VertexBuffer New( Dali::Property::Map& bufferFormat );
+  static VertexBuffer New(Dali::Property::Map& bufferFormat);
 
   /**
    * @brief Default constructor, creates an empty handle.
@@ -102,7 +101,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] handle Handle to an object
    */
-  VertexBuffer( const VertexBuffer& handle );
+  VertexBuffer(const VertexBuffer& handle);
 
   /**
    * @brief Downcasts to a property buffer handle.
@@ -112,7 +111,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Property buffer handle or an uninitialized handle
    */
-  static VertexBuffer DownCast( BaseHandle handle );
+  static VertexBuffer DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -121,7 +120,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  VertexBuffer& operator=( const VertexBuffer& handle );
+  VertexBuffer& operator=(const VertexBuffer& handle);
 
   /**
    * @brief Move constructor.
@@ -129,7 +128,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] rhs A reference to the moved handle
    */
-  VertexBuffer( VertexBuffer&& rhs );
+  VertexBuffer(VertexBuffer&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -138,7 +137,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  VertexBuffer& operator=( VertexBuffer&& rhs );
+  VertexBuffer& operator=(VertexBuffer&& rhs);
 
   /**
    * @brief Updates the whole buffer information.
@@ -162,7 +161,7 @@ public:
    * @param[in] data A pointer to the data that will be copied to the buffer
    * @param[in] size Number of elements to expand or contract the buffer
    */
-  void SetData( const void* data, std::size_t size );
+  void SetData(const void* data, std::size_t size);
 
   /**
    * @brief Gets the number of elements in the buffer.
@@ -173,14 +172,13 @@ public:
   std::size_t GetSize() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_9.27
    * @param[in] pointer A pointer to a newly allocated VertexBuffer
    */
-  explicit DALI_INTERNAL VertexBuffer( Internal::VertexBuffer* pointer );
+  explicit DALI_INTERNAL VertexBuffer(Internal::VertexBuffer* pointer);
 };
 
 /**

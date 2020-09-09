@@ -2,7 +2,7 @@
 #define DALI_RANDOM_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ namespace Dali
  */
 namespace Random
 {
-
 /**
  * @brief Returns a random number between f0 and f1.
  *
@@ -51,16 +50,16 @@ inline float Range(float f0, float f1)
 
   // Ensure we initialize only once. As it's inlined, this static variable will exist in the code-block using it, thus,
   // will be created and then initialized again when another code-block uses this.
-  static bool initialized( false );
-  if( !initialized )
+  static bool initialized(false);
+  if(!initialized)
   {
-    uint32_t seed = static_cast<uint32_t>( time( nullptr ) );
-    srand( seed );
+    uint32_t seed = static_cast<uint32_t>(time(nullptr));
+    srand(seed);
     initialized = true;
   }
 
   int32_t randValue = rand();
-  return static_cast<float>(randValue & 0xfff) * (1.0f/4095.0f) * (max-min) + min;
+  return static_cast<float>(randValue & 0xfff) * (1.0f / 4095.0f) * (max - min) + min;
 }
 
 /**
@@ -77,10 +76,10 @@ inline Vector4 Axis()
   do
   {
     axis.x = Range(-1.0f, 1.0f);
-    axis.y = Range( 0.0f, 1.0f);
-    axis.z = Range( 0.0f, 1.0f);
+    axis.y = Range(0.0f, 1.0f);
+    axis.z = Range(0.0f, 1.0f);
     axis.w = 0.0f;
-  } while (axis == Vector4::ZERO);
+  } while(axis == Vector4::ZERO);
   axis.Normalize();
   return axis;
 }

@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_MAP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <sstream>
 #include <initializer_list>
+#include <sstream>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-key.h>
 #include <dali/public-api/object/property-value.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
@@ -60,7 +60,7 @@ public:
    * @SINCE_1_4.17
    * @param[in] values An initializer_list of pairs of index and value.
    */
-  Map( const std::initializer_list< KeyValuePair >& values );
+  Map(const std::initializer_list<KeyValuePair>& values);
 
   /**
    * @brief Copy constructor.
@@ -68,7 +68,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] other The Map to copy from
    */
-  Map( const Map& other );
+  Map(const Map& other);
 
   /**
    * @brief Move constructor.
@@ -77,7 +77,7 @@ public:
    * @param[in] other The Map to move from
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
-  Map( Map&& other );
+  Map(Map&& other);
 
   /**
    * @brief Non-virtual destructor.
@@ -109,7 +109,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert( const char* key, const Value& value );
+  void Insert(const char* key, const Value& value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as string.
@@ -119,7 +119,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert( const std::string& key, const Value& value );
+  void Insert(const std::string& key, const Value& value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as index.
@@ -129,8 +129,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert( Property::Index key, const Value& value );
-
+  void Insert(Property::Index key, const Value& value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as string.
@@ -141,7 +140,7 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  inline Property::Map& Add( const char* key, const Value& value )
+  inline Property::Map& Add(const char* key, const Value& value)
   {
     Insert(key, value);
     return *this;
@@ -156,12 +155,11 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  inline Property::Map& Add( const std::string& key, const Value& value )
+  inline Property::Map& Add(const std::string& key, const Value& value)
   {
     Insert(key, value);
     return *this;
   }
-
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as index.
@@ -172,7 +170,7 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  inline Property::Map& Add( Property::Index key, const Value& value )
+  inline Property::Map& Add(Property::Index key, const Value& value)
   {
     Insert(key, value);
     return *this;
@@ -187,7 +185,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  Value& GetValue( SizeType position ) const;
+  Value& GetValue(SizeType position) const;
 
   /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
@@ -200,7 +198,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  const std::string& GetKey( SizeType position ) const DALI_DEPRECATED_API;
+  const std::string& GetKey(SizeType position) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key at the specified position.
@@ -211,7 +209,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  Key GetKeyAt( SizeType position ) const;
+  Key GetKeyAt(SizeType position) const;
 
   /**
    * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
@@ -224,7 +222,7 @@ public:
    *
    * @note Will assert if position >= Count() or key at position is an index key.
    */
-  StringValuePair& GetPair( SizeType position ) const DALI_DEPRECATED_API;
+  StringValuePair& GetPair(SizeType position) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key & the value at the specified position.
@@ -235,7 +233,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  KeyValuePair GetKeyValue( SizeType position ) const;
+  KeyValuePair GetKeyValue(SizeType position) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -245,7 +243,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( const char* key ) const;
+  Value* Find(const char* key) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -255,7 +253,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( const std::string& key ) const;
+  Value* Find(const std::string& key) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -265,7 +263,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( Property::Index key ) const;
+  Value* Find(Property::Index key) const;
 
   /**
    * @brief Finds the value for the specified keys if either exist.
@@ -278,7 +276,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( Property::Index indexKey, const std::string& stringKey ) const;
+  Value* Find(Property::Index indexKey, const std::string& stringKey) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -289,7 +287,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( const std::string& key, Property::Type type ) const;
+  Value* Find(const std::string& key, Property::Type type) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -300,7 +298,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find( Property::Index key, Property::Type type ) const;
+  Value* Find(Property::Index key, Property::Type type) const;
 
   /**
    * @brief Clears the map.
@@ -316,7 +314,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] from The map to merge from
    */
-  void Merge( const Map& from );
+  void Merge(const Map& from);
 
   /**
    * @brief Const operator to access element with the specified string key.
@@ -328,7 +326,7 @@ public:
    *
    * @note Will assert if invalid-key is given.
    */
-  const Value& operator[]( const std::string& key ) const;
+  const Value& operator[](const std::string& key) const;
 
   /**
    * @brief Operator to access the element with the specified string key.
@@ -340,7 +338,7 @@ public:
    *
    * @note If an element with the key does not exist, then it is created.
    */
-  Value& operator[]( const std::string& key );
+  Value& operator[](const std::string& key);
 
   /**
    * @brief Const operator to access element with the specified index key.
@@ -352,7 +350,7 @@ public:
    *
    * @note Will assert if invalid-key is given.
    */
-  const Value& operator[]( Property::Index key ) const;
+  const Value& operator[](Property::Index key) const;
 
   /**
    * @brief Operator to access the element with the specified index key.
@@ -364,7 +362,7 @@ public:
    *
    * @note If an element with the key does not exist, then it is created.
    */
-  Value& operator[]( Property::Index key );
+  Value& operator[](Property::Index key);
 
   /**
    * @brief Assignment operator.
@@ -374,7 +372,7 @@ public:
    *
    * @return The copied map
    */
-  Map& operator=( const Map& other );
+  Map& operator=(const Map& other);
 
   /**
    * @brief Move assignment operator.
@@ -386,17 +384,17 @@ public:
    *
    * @note The other array is an r-value so becomes invalid and is no longer usable.
    */
-  Map& operator=( Map&& other );
+  Map& operator=(Map&& other);
 
   /**
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
-  friend DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
+  friend DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Map& map);
 
 private:
-  struct DALI_INTERNAL Impl; ///< Private data
-  Impl* mImpl; ///< Pointer to private data
+  struct DALI_INTERNAL Impl;  ///< Private data
+  Impl*                mImpl; ///< Pointer to private data
 };
 
 /**
@@ -407,7 +405,7 @@ private:
  * @param[in] map The map to insert
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<( std::ostream& stream, const Property::Map& map );
+DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Map& map);
 
 /**
  * @}

@@ -19,41 +19,39 @@
 #include <dali/integration-api/core.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/events/event.h>
-#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/gl-context-helper-abstraction.h>
+#include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
-Core* Core::New( RenderController& renderController,
-                 PlatformAbstraction& platformAbstraction,
-                 GlAbstraction& glAbstraction,
-                 GlSyncAbstraction& glSyncAbstraction,
-                 GlContextHelperAbstraction& glContextHelperAbstraction,
-                 RenderToFrameBuffer renderToFboEnabled,
-                 DepthBufferAvailable depthBufferAvailable,
-                 StencilBufferAvailable stencilBufferAvailable,
-                 PartialUpdateAvailable partialUpdateAvailable )
+Core* Core::New(RenderController&           renderController,
+                PlatformAbstraction&        platformAbstraction,
+                GlAbstraction&              glAbstraction,
+                GlSyncAbstraction&          glSyncAbstraction,
+                GlContextHelperAbstraction& glContextHelperAbstraction,
+                RenderToFrameBuffer         renderToFboEnabled,
+                DepthBufferAvailable        depthBufferAvailable,
+                StencilBufferAvailable      stencilBufferAvailable,
+                PartialUpdateAvailable      partialUpdateAvailable)
 {
-  Core* instance = new Core;
-  instance->mImpl = new Internal::Core( renderController,
-                                        platformAbstraction,
-                                        glAbstraction,
-                                        glSyncAbstraction,
-                                        glContextHelperAbstraction,
-                                        renderToFboEnabled,
-                                        depthBufferAvailable,
-                                        stencilBufferAvailable,
-                                        partialUpdateAvailable );
+  Core* instance  = new Core;
+  instance->mImpl = new Internal::Core(renderController,
+                                       platformAbstraction,
+                                       glAbstraction,
+                                       glSyncAbstraction,
+                                       glContextHelperAbstraction,
+                                       renderToFboEnabled,
+                                       depthBufferAvailable,
+                                       stencilBufferAvailable,
+                                       partialUpdateAvailable);
 
   return instance;
 }
@@ -108,53 +106,53 @@ uint32_t Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update( float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo )
+void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds, UpdateStatus& status, bool renderToFboEnabled, bool isRenderingToFbo)
 {
-  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo );
+  mImpl->Update(elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status, renderToFboEnabled, isRenderingToFbo);
 }
 
-void Core::PreRender( RenderStatus& status, bool forceClear, bool uploadOnly )
+void Core::PreRender(RenderStatus& status, bool forceClear, bool uploadOnly)
 {
-  mImpl->PreRender( status, forceClear, uploadOnly );
+  mImpl->PreRender(status, forceClear, uploadOnly);
 }
 
-void Core::PreRender( Integration::Scene& scene, std::vector<Rect<int>>& damagedRects )
+void Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  mImpl->PreRender( scene, damagedRects );
+  mImpl->PreRender(scene, damagedRects);
 }
 
-void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo )
+void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
 {
-  mImpl->RenderScene( status, scene, renderToFbo );
+  mImpl->RenderScene(status, scene, renderToFbo);
 }
 
-void Core::RenderScene( RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect )
+void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
-  mImpl->RenderScene( status, scene, renderToFbo, clippingRect );
+  mImpl->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
-void Core::PostRender( bool uploadOnly )
+void Core::PostRender(bool uploadOnly)
 {
-  mImpl->PostRender( uploadOnly );
+  mImpl->PostRender(uploadOnly);
 }
 
-void Core::RegisterProcessor( Processor& processor )
+void Core::RegisterProcessor(Processor& processor)
 {
-  mImpl->RegisterProcessor( processor );
+  mImpl->RegisterProcessor(processor);
 }
 
-void Core::UnregisterProcessor( Processor& processor )
+void Core::UnregisterProcessor(Processor& processor)
 {
-  mImpl->UnregisterProcessor( processor );
+  mImpl->UnregisterProcessor(processor);
 }
 
 ObjectRegistry Core::GetObjectRegistry() const
 {
-  return ObjectRegistry( &mImpl->GetObjectRegistry() );
+  return ObjectRegistry(&mImpl->GetObjectRegistry());
 }
 
 Core::Core()
-: mImpl( nullptr )
+: mImpl(nullptr)
 {
 }
 

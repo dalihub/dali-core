@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace DevelFrameBuffer
 {
-
 /**
  * @brief Maximum number of color attachments supported.
  */
@@ -41,7 +39,7 @@ constexpr uint8_t MAX_COLOR_ATTACHMENTS = 8;
  * @note The size of the texture has to be same as that of the frame buffer.
  * Otherwise, it won't be attached.
  */
-DALI_CORE_API void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture );
+DALI_CORE_API void AttachDepthTexture(FrameBuffer frameBuffer, Texture& texture);
 
 /**
  * @brief Attaches a depth texture to the frame buffer.
@@ -53,7 +51,7 @@ DALI_CORE_API void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture
  * @note The size of the mipmapped texture has to be same as that of the frame buffer.
  * Otherwise, it won't be attached.
  */
-DALI_CORE_API void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel );
+DALI_CORE_API void AttachDepthTexture(FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel);
 
 /**
  * @brief Attaches the base LOD of a stencil texture to the frame buffer.
@@ -64,7 +62,7 @@ DALI_CORE_API void AttachDepthTexture( FrameBuffer frameBuffer, Texture& texture
  * @note The size of the texture has to be same as that of the frame buffer.
  * Otherwise, it won't be attached.
  */
-DALI_CORE_API void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture );
+DALI_CORE_API void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture);
 
 /**
  * @brief Attaches a depth/stencil texture to the frame buffer.
@@ -76,7 +74,7 @@ DALI_CORE_API void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& 
  * @note The size of the mipmapped texture has to be same as that of the frame buffer.
  * Otherwise, it won't be attached.
  */
-DALI_CORE_API void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel );
+DALI_CORE_API void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& texture, uint32_t mipmapLevel);
 
 /**
  * @brief Gets the color texture at the given @a index used as output in the frame buffer.
@@ -89,7 +87,7 @@ DALI_CORE_API void AttachDepthStencilTexture( FrameBuffer frameBuffer, Texture& 
  * @note A maximum of 8 color attachments are supported. Passing an invalid index will return
  * an uninitialized handle.
  */
-DALI_CORE_API Texture GetColorTexture( const FrameBuffer frameBuffer, uint8_t index );
+DALI_CORE_API Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index);
 
 /**
  * @brief Gets the depth texture used as output in the frame buffer.
@@ -98,7 +96,7 @@ DALI_CORE_API Texture GetColorTexture( const FrameBuffer frameBuffer, uint8_t in
  *
  * @return A handle of the texture used as depth output, or an uninitialized handle
  */
-DALI_CORE_API Texture GetDepthTexture( FrameBuffer frameBuffer );
+DALI_CORE_API Texture GetDepthTexture(FrameBuffer frameBuffer);
 
 /**
  * @brief Gets the depth/stencil texture used as output in the frame buffer.
@@ -107,7 +105,7 @@ DALI_CORE_API Texture GetDepthTexture( FrameBuffer frameBuffer );
  *
  * @return A handle of the texture used as depth/stencil output, or an uninitialized handle
  */
-DALI_CORE_API Texture GetDepthStencilTexture( FrameBuffer frameBuffer );
+DALI_CORE_API Texture GetDepthStencilTexture(FrameBuffer frameBuffer);
 
 } // namespace DevelFrameBuffer
 

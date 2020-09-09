@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,31 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-key.h>
 
-
 namespace Dali
 {
-
-Property::Key::Key( const std::string& key )
-: type( Key::STRING ),
-  indexKey( Property::INVALID_INDEX ),
-  stringKey( key )
+Property::Key::Key(const std::string& key)
+: type(Key::STRING),
+  indexKey(Property::INVALID_INDEX),
+  stringKey(key)
 {
 }
 
-Property::Key::Key( Property::Index key )
-: type( Key::INDEX ),
-  indexKey( key )
+Property::Key::Key(Property::Index key)
+: type(Key::INDEX),
+  indexKey(key)
 {
 }
 
-Property::Key::Key( const char * key )
-: type( Key::STRING ),
-  indexKey( Property::INVALID_INDEX ),
-  stringKey( key )
+Property::Key::Key(const char* key)
+: type(Key::STRING),
+  indexKey(Property::INVALID_INDEX),
+  stringKey(key)
 {
 }
 
-bool Property::Key::operator== (const std::string& rhs)
+bool Property::Key::operator==(const std::string& rhs)
 {
-  bool result=false;
+  bool result = false;
   if(type == Key::STRING)
   {
     result = (stringKey == rhs);
@@ -52,14 +50,14 @@ bool Property::Key::operator== (const std::string& rhs)
   return result;
 }
 
-bool Property::Key::operator== ( const char* rhs )
+bool Property::Key::operator==(const char* rhs)
 {
-  return operator==( std::string( rhs ) );
+  return operator==(std::string(rhs));
 }
 
-bool Property::Key::operator== (Property::Index rhs)
+bool Property::Key::operator==(Property::Index rhs)
 {
-  bool result=false;
+  bool result = false;
   if(type == Key::INDEX)
   {
     result = (indexKey == rhs);
@@ -67,43 +65,43 @@ bool Property::Key::operator== (Property::Index rhs)
   return result;
 }
 
-bool Property::Key::operator== (const Key& rhs)
+bool Property::Key::operator==(const Key& rhs)
 {
-  bool result=false;
-  if(type == Key::STRING && rhs.type == Key::STRING )
+  bool result = false;
+  if(type == Key::STRING && rhs.type == Key::STRING)
   {
     result = (stringKey == rhs.stringKey);
   }
-  else if( type == Key::INDEX && rhs.type == Key::INDEX )
+  else if(type == Key::INDEX && rhs.type == Key::INDEX)
   {
     result = (indexKey == rhs.indexKey);
   }
   return result;
 }
 
-bool Property::Key::operator!= (const std::string& rhs)
+bool Property::Key::operator!=(const std::string& rhs)
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!= ( const char* rhs )
+bool Property::Key::operator!=(const char* rhs)
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!= (Property::Index rhs)
+bool Property::Key::operator!=(Property::Index rhs)
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!= (const Key& rhs)
+bool Property::Key::operator!=(const Key& rhs)
 {
   return !operator==(rhs);
 }
 
-std::ostream& operator<<( std::ostream& stream, const Property::Key& key )
+std::ostream& operator<<(std::ostream& stream, const Property::Key& key)
 {
-  if( key.type == Property::Key::INDEX )
+  if(key.type == Property::Key::INDEX)
   {
     stream << key.indexKey;
   }

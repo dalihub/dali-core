@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RESOURCE_TYPES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ using ImageDimensions = Uint16Pair;
 
 namespace Integration
 {
-
 /**
  * BitmapResourceType describes a bitmap resource.
  */
@@ -47,38 +46,38 @@ struct BitmapResourceType
    * @param[in] orientationCorrection Whether to use bitmap metadata to rotate or
    * flip the bitmap, e.g., from portrait to landscape.
    */
-  BitmapResourceType( ImageDimensions size = ImageDimensions( 0, 0 ),
-                      FittingMode::Type scalingMode = FittingMode::DEFAULT,
-                      SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
-                      bool orientationCorrection = true )
-  : size( size ),
-    scalingMode( scalingMode ),
-    samplingMode( samplingMode ),
-    orientationCorrection( orientationCorrection )
-  {}
+  BitmapResourceType(ImageDimensions    size                  = ImageDimensions(0, 0),
+                     FittingMode::Type  scalingMode           = FittingMode::DEFAULT,
+                     SamplingMode::Type samplingMode          = SamplingMode::DEFAULT,
+                     bool               orientationCorrection = true)
+  : size(size),
+    scalingMode(scalingMode),
+    samplingMode(samplingMode),
+    orientationCorrection(orientationCorrection)
+  {
+  }
 
   /**
    * Destructor.
    */
   ~BitmapResourceType()
-  {}
+  {
+  }
 
   /**
    * Attributes are copied from the request.
    */
-  ImageDimensions size;
-  FittingMode::Type scalingMode;
+  ImageDimensions    size;
+  FittingMode::Type  scalingMode;
   SamplingMode::Type samplingMode;
-  bool orientationCorrection;
+  bool               orientationCorrection;
 
 private:
-
   // Undefined copy constructor.
   BitmapResourceType(const BitmapResourceType& typePath);
 
   // Undefined assignment operator.
   BitmapResourceType& operator=(const BitmapResourceType& rhs);
-
 };
 
 } // namespace Integration

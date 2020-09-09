@@ -19,11 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <sstream>
+#include <stdint.h>
 #include <iostream>
 #include <list>
-#include <stdint.h>
+#include <sstream>
+#include <string>
 
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-map.h>
@@ -32,12 +32,19 @@
 #include <dali/public-api/common/dali-common.h>
 
 // Using Debug namespace alias shortens the log usage significantly
-namespace Dali{namespace Integration{namespace Log{}}}
+namespace Dali
+{
+namespace Integration
+{
+namespace Log
+{
+}
+} // namespace Integration
+} // namespace Dali
 namespace Debug = Dali::Integration::Log;
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector3;
 struct Vector4;
@@ -69,7 +76,6 @@ namespace Integration
 {
 namespace Log
 {
-
 enum DebugPriority
 {
   DebugInfo,
@@ -82,12 +88,12 @@ enum DebugPriority
  * @param level debug level
  * @param format string format
  */
-DALI_CORE_API void LogMessage(enum DebugPriority level,const char *format, ...);
+DALI_CORE_API void LogMessage(enum DebugPriority level, const char* format, ...);
 
 /**
  * typedef for the logging function.
  */
-using LogFunction = void ( * )( DebugPriority, std::string & );
+using LogFunction = void (*)(DebugPriority, std::string&);
 
 /**
  * A log function has to be installed for every thread that wants to use logging.
@@ -111,39 +117,38 @@ DALI_CORE_API void UninstallLogFunction();
 /**
  * Provides unfiltered logging for global error level messages
  */
-#define DALI_LOG_ERROR(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError,   "%s " format, __FUNCTION__, ## __VA_ARGS__)
+#define DALI_LOG_ERROR(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%s " format, __FUNCTION__, ##__VA_ARGS__)
 
-#define DALI_LOG_ERROR_NOFN(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ## __VA_ARGS__)
+#define DALI_LOG_ERROR_NOFN(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ##__VA_ARGS__)
 
-#define DALI_LOG_WARNING_NOFN(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, format, ## __VA_ARGS__)
+#define DALI_LOG_WARNING_NOFN(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, format, ##__VA_ARGS__)
 
 /**
  * Provides unfiltered logging for fps monitor
  */
-#define DALI_LOG_FPS(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_FPS(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
 
 /**
  * Provides unfiltered logging for update status
  */
-#define DALI_LOG_UPDATE_STATUS(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_UPDATE_STATUS(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
 
 /**
  * Provides unfiltered logging for render information
  */
-#define DALI_LOG_RENDER_INFO(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_RENDER_INFO(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
 
 /**
  * Provides unfiltered logging for release
  */
-#define DALI_LOG_RELEASE_INFO(format, ...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ## __VA_ARGS__)
+#define DALI_LOG_RELEASE_INFO(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, format, ##__VA_ARGS__)
 
 #ifdef DEBUG_ENABLED
 
 /**
  * Provides unfiltered logging for global warning level messages
  */
-#define DALI_LOG_WARNING(format, ...)   Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, ASSERT_LOCATION, ## __VA_ARGS__)
-
+#define DALI_LOG_WARNING(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugWarning, "%s " format, ASSERT_LOCATION, ##__VA_ARGS__)
 
 #else // DEBUG_ENABLED
 
@@ -165,12 +170,11 @@ DALI_CORE_API void UninstallLogFunction();
  */
 enum LogLevel
 {
-  NoLogging   = 0,
-  Concise     = 1,
-  General     = 2,
-  Verbose     = 3
+  NoLogging = 0,
+  Concise   = 1,
+  General   = 2,
+  Verbose   = 3
 };
-
 
 /**
  * The Filter object is used by the DALI_LOG_INFO macro and others to determine if the logging
@@ -183,39 +187,53 @@ enum LogLevel
 class DALI_CORE_API Filter
 {
 public:
-  using FilterList = std::list<Filter *>;
-  using FilterIter = std::list<Filter *>::iterator;
+  using FilterList = std::list<Filter*>;
+  using FilterIter = std::list<Filter*>::iterator;
 
 public:
-
   /**
    * Test if the filter is enabled for the given logging level
    * @param[in] level - the level to test.
    * @return true if this level of logging is enabled.
    */
-  bool IsEnabledFor(LogLevel level) { return level != Debug::NoLogging && level <= mLoggingLevel;}
+  bool IsEnabledFor(LogLevel level)
+  {
+    return level != Debug::NoLogging && level <= mLoggingLevel;
+  }
 
   /**
    * Test if trace is enabled for this filter.
    * @return true if trace is enabled;
    */
-  bool IsTraceEnabled() { return mTraceEnabled; }
+  bool IsTraceEnabled()
+  {
+    return mTraceEnabled;
+  }
 
   /**
    * Enable tracing on this filter.
    */
-  void EnableTrace() { mTraceEnabled = true; }
+  void EnableTrace()
+  {
+    mTraceEnabled = true;
+  }
 
   /**
    * Disable tracing on this filter.
    */
-  void DisableTrace() { mTraceEnabled = false; }
+  void DisableTrace()
+  {
+    mTraceEnabled = false;
+  }
 
   /**
    * Set the log level for this filter. Setting to a higher value than Debug::General also
    * enables General;
    */
-  void SetLogLevel(LogLevel level) { mLoggingLevel = level; }
+  void SetLogLevel(LogLevel level)
+  {
+    mLoggingLevel = level;
+  }
 
   /**
    * Perform the logging for this filter.
@@ -245,7 +263,7 @@ public:
    * FILTER_ENV=0,true dali-demo   // LogLevel NoLogging, Trace ON
    * @endcode
    */
-  static Filter* New(LogLevel level, bool trace, const char * environmentVariableName );
+  static Filter* New(LogLevel level, bool trace, const char* environmentVariableName);
 
   /**
    * Enable trace on all filters.
@@ -262,16 +280,20 @@ public:
    *
    * @param[in] level The log level
    */
-  static void SetGlobalLogLevel( LogLevel level );
+  static void SetGlobalLogLevel(LogLevel level);
 
 private:
-
   /**
    * Constructor.
    * @param[in] level - the highest log level.
    * @param[in] trace - whether this filter allows tracing.
    */
-  Filter(LogLevel level, bool trace) : mLoggingLevel(level), mTraceEnabled(trace), mNesting(0) {}
+  Filter(LogLevel level, bool trace)
+  : mLoggingLevel(level),
+    mTraceEnabled(trace),
+    mNesting(0)
+  {
+  }
 
   static FilterList* GetActiveFilters();
 
@@ -280,35 +302,34 @@ public:
   // you can add a filter to your own class or source file. If you do, use Filter::New()
   // to tell this class about it.
 
-  static Filter *gRender;
-  static Filter *gResource;
-  static Filter *gGLResource;
-  static Filter *gObject;
-  static Filter *gImage;
-  static Filter *gModel;
-  static Filter *gNode;
-  static Filter *gElement;
-  static Filter *gActor;
-  static Filter *gShader;
+  static Filter* gRender;
+  static Filter* gResource;
+  static Filter* gGLResource;
+  static Filter* gObject;
+  static Filter* gImage;
+  static Filter* gModel;
+  static Filter* gNode;
+  static Filter* gElement;
+  static Filter* gActor;
+  static Filter* gShader;
 
 private:
   LogLevel mLoggingLevel;
   bool     mTraceEnabled;
-public:
-  int      mNesting;
 
+public:
+  int mNesting;
 };
 
-
-#define  DALI_LOG_FILTER_SET_LEVEL(filter, level) filter->SetLogLevel(level)
-#define  DALI_LOG_FILTER_ENABLE_TRACE(filter)     filter->EnableTrace()
-#define  DALI_LOG_FILTER_DISABLE_TRACE(filter)    filter->DisableTrace()
+#define DALI_LOG_FILTER_SET_LEVEL(filter, level) filter->SetLogLevel(level)
+#define DALI_LOG_FILTER_ENABLE_TRACE(filter) filter->EnableTrace()
+#define DALI_LOG_FILTER_DISABLE_TRACE(filter) filter->DisableTrace()
 
 #else
 
-#define  DALI_LOG_FILTER_SET_LEVEL(filter, level)
-#define  DALI_LOG_FILTER_ENABLE_TRACE(filter)
-#define  DALI_LOG_FILTER_DISABLE_TRACE(filter)
+#define DALI_LOG_FILTER_SET_LEVEL(filter, level)
+#define DALI_LOG_FILTER_ENABLE_TRACE(filter)
+#define DALI_LOG_FILTER_DISABLE_TRACE(filter)
 
 #endif
 
@@ -318,24 +339,26 @@ public:
 
 #ifdef DEBUG_ENABLED
 
-#define DALI_LOG_INFO(filter, level, format, ...)                        \
-  if(filter && filter->IsEnabledFor(level)) { filter->Log(level, format,  ## __VA_ARGS__); }
-
-#define DALI_LOG_STREAM( filter, level, stream )  \
+#define DALI_LOG_INFO(filter, level, format, ...) \
   if(filter && filter->IsEnabledFor(level))       \
   {                                               \
-    std::ostringstream o;                         \
-    o << stream << std::endl;                     \
-    filter->Log(level, "%s", o.str().c_str());    \
+    filter->Log(level, format, ##__VA_ARGS__);    \
+  }
+
+#define DALI_LOG_STREAM(filter, level, stream) \
+  if(filter && filter->IsEnabledFor(level))    \
+  {                                            \
+    std::ostringstream o;                      \
+    o << stream << std::endl;                  \
+    filter->Log(level, "%s", o.str().c_str()); \
   }
 
 #else // DEBUG_ENABLED
 
 #define DALI_LOG_INFO(filter, level, format, ...)
-#define DALI_LOG_STREAM( filter, level, stream )
+#define DALI_LOG_STREAM(filter, level, stream)
 
 #endif // DEBUG_ENABLED
-
 
 /********************************************************************************
  *                                  Trace Macros                                *
@@ -356,22 +379,19 @@ public:
 
 public:
   std::string mMessage;
-  Filter* mFilter;
+  Filter*     mFilter;
 };
 
+#define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...) \
+  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, ASSERT_LOCATION, ##__VA_ARGS__)
 
-#define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...)                 \
-  Dali::Integration::Log::TraceObj debugTraceObj(filter, "%s: " format, ASSERT_LOCATION, ## __VA_ARGS__)
-
-#define DALI_LOG_TRACE_METHOD(filter)                                      \
+#define DALI_LOG_TRACE_METHOD(filter) \
   Dali::Integration::Log::TraceObj debugTraceObj(filter, ASSERT_LOCATION)
-
 
 #else // DEBUG_ENABLED
 
 #define DALI_LOG_TRACE_METHOD_FMT(filter, format, ...)
 #define DALI_LOG_TRACE_METHOD(filter)
-
 
 #endif
 
@@ -389,21 +409,23 @@ public:
  * Warning - this will increase the size of the object for a debug build.
  */
 #define DALI_LOG_OBJECT_STRING_DECLARATION \
-public: \
+public:                                    \
   std::string mDebugString;
 
 /**
  * Print all the actor tree names
  **/
-#define DALI_LOG_ACTOR_TREE( node ) { \
-  std::stringstream branch; \
-  Node* tempNode = node; \
-  while( tempNode ) { \
-    branch << "<" << tempNode->mDebugString << ">::"; \
-    tempNode = tempNode->GetParent(); \
-  } \
-  DALI_LOG_ERROR_NOFN("Actor tree: %s\n", branch.str().c_str()); \
-}
+#define DALI_LOG_ACTOR_TREE(node)                                  \
+  {                                                                \
+    std::stringstream branch;                                      \
+    Node*             tempNode = node;                             \
+    while(tempNode)                                                \
+    {                                                              \
+      branch << "<" << tempNode->mDebugString << ">::";            \
+      tempNode = tempNode->GetParent();                            \
+    }                                                              \
+    DALI_LOG_ERROR_NOFN("Actor tree: %s\n", branch.str().c_str()); \
+  }
 
 /**
  * Allows one object to set another object's debug string
@@ -413,7 +435,7 @@ public: \
 /**
  * Allows one object to set another object's std::string easily
  */
-#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, ...) (object->mDebugString = FormatToString(fmt, ## __VA_ARGS__))
+#define DALI_LOG_FMT_OBJECT_STRING(object, fmt, ...) (object->mDebugString = FormatToString(fmt, ##__VA_ARGS__))
 
 /**
  * Allows one object to get another object's debug string
@@ -428,8 +450,7 @@ public: \
 /**
  * Filtered logging of the object's debug string
  */
-#define DALI_LOG_OBJECT(filter, object)  DALI_LOG_INFO(filter, Debug::General, object->mDebugString)
-
+#define DALI_LOG_OBJECT(filter, object) DALI_LOG_INFO(filter, Debug::General, object->mDebugString)
 
 #else // DEBUG_ENABLED
 
@@ -449,27 +470,26 @@ public: \
 
 #if defined(DEBUG_ENABLED)
 
-void GetNanoseconds( uint64_t& timeInNanoseconds );
+void GetNanoseconds(uint64_t& timeInNanoseconds);
 
-#define DALI_LOG_TIMER_START( timeVariable )      \
-  uint64_t timeVariable##1; \
-  Debug::GetNanoseconds( timeVariable##1 );
+#define DALI_LOG_TIMER_START(timeVariable) \
+  uint64_t timeVariable##1;                \
+  Debug::GetNanoseconds(timeVariable##1);
 
-#define DALI_LOG_TIMER_END( timeVariable, filter, level, preString)  \
-  uint64_t timeVariable##2; \
-  Debug::GetNanoseconds( timeVariable##2 );                             \
-  DALI_LOG_INFO( filter, level, preString " %ld uSec\n", ((timeVariable##2-timeVariable##1)/1000));
+#define DALI_LOG_TIMER_END(timeVariable, filter, level, preString) \
+  uint64_t timeVariable##2;                                        \
+  Debug::GetNanoseconds(timeVariable##2);                          \
+  DALI_LOG_INFO(filter, level, preString " %ld uSec\n", ((timeVariable##2 - timeVariable##1) / 1000));
 
 #else // DEBUG_ENABLED
 
-#define DALI_LOG_TIMER_START( timeVariable )
-#define DALI_LOG_TIMER_END( timeVariable, filter, level, preString)
+#define DALI_LOG_TIMER_START(timeVariable)
+#define DALI_LOG_TIMER_END(timeVariable, filter, level, preString)
 
 #endif
 
-} // Debug
-} // Integration
-} // Dali
-
+} // namespace Log
+} // namespace Integration
+} // namespace Dali
 
 #endif // DALI_INTEGRATION_DEBUG_H

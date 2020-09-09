@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/resource-types.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
 using ResourceId      = uint32_t;
@@ -42,7 +41,6 @@ using ResourcePointer = IntrusivePtr<Dali::RefObject>;
 class PlatformAbstraction
 {
 public:
-
   // Resource Loading
 
   /**
@@ -61,11 +59,11 @@ public:
    * flip the image, e.g., from portrait to landscape.
    * @return dimensions that image will have if it is loaded with given parameters.
    */
-  virtual ImageDimensions GetClosestImageSize( const std::string& filename,
-                                               ImageDimensions size = ImageDimensions( 0, 0 ),
-                                               FittingMode::Type fittingMode = FittingMode::SHRINK_TO_FIT,
-                                               SamplingMode::Type samplingMode = SamplingMode::BOX,
-                                               bool orientationCorrection = true) = 0;
+  virtual ImageDimensions GetClosestImageSize(const std::string& filename,
+                                              ImageDimensions    size                  = ImageDimensions(0, 0),
+                                              FittingMode::Type  fittingMode           = FittingMode::SHRINK_TO_FIT,
+                                              SamplingMode::Type samplingMode          = SamplingMode::BOX,
+                                              bool               orientationCorrection = true) = 0;
 
   /**
    * @brief Determine the size of an image the resource loaders will provide when
@@ -83,11 +81,11 @@ public:
    * flip the image, e.g., from portrait to landscape.
    * @return dimensions that image will have if it is loaded with given parameters.
    */
-  virtual ImageDimensions GetClosestImageSize( ResourcePointer resourceBuffer,
-                                               ImageDimensions size = ImageDimensions( 0, 0 ),
-                                               FittingMode::Type fittingMode = FittingMode::SHRINK_TO_FIT,
-                                               SamplingMode::Type samplingMode = SamplingMode::BOX,
-                                               bool orientationCorrection = true) = 0;
+  virtual ImageDimensions GetClosestImageSize(ResourcePointer    resourceBuffer,
+                                              ImageDimensions    size                  = ImageDimensions(0, 0),
+                                              FittingMode::Type  fittingMode           = FittingMode::SHRINK_TO_FIT,
+                                              SamplingMode::Type samplingMode          = SamplingMode::BOX,
+                                              bool               orientationCorrection = true) = 0;
 
   /**
    * Request an image from the native filesystem. This is a synchronous request, i.e.
@@ -99,7 +97,7 @@ public:
    * @param[in] resourcePath The path to the resource
    * @return A pointer to a ref-counted resource
    */
-  virtual ResourcePointer LoadImageSynchronously( const BitmapResourceType& resourceType, const std::string& resourcePath ) = 0;
+  virtual ResourcePointer LoadImageSynchronously(const BitmapResourceType& resourceType, const std::string& resourcePath) = 0;
 
   /**
    * Decode a buffer of data synchronously.
@@ -109,7 +107,7 @@ public:
    *
    * @return A pointer to the decoded buffer.
    */
-  virtual BitmapPtr DecodeBuffer( const BitmapResourceType& resourceType, uint8_t * buffer, size_t bufferSize ) = 0;
+  virtual BitmapPtr DecodeBuffer(const BitmapResourceType& resourceType, uint8_t* buffer, size_t bufferSize) = 0;
 
   /**
    * Load a shader binary file into a buffer
@@ -117,7 +115,7 @@ public:
    * @param[out] buffer  A buffer to receive the file.
    * @result             true if the file is loaded.
    */
-  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< uint8_t >& buffer ) const = 0;
+  virtual bool LoadShaderBinaryFile(const std::string& filename, Dali::Vector<uint8_t>& buffer) const = 0;
 
   /**
    * Save a shader binary file to the resource file system.
@@ -126,7 +124,7 @@ public:
    * @param[in] numbytes Size of the buffer.
    * @result             true if the file is saved, else false.
    */
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const uint8_t * buffer, uint32_t numBytes ) const = 0;
+  virtual bool SaveShaderBinaryFile(const std::string& filename, const uint8_t* buffer, uint32_t numBytes) const = 0;
 
   /**
    * Sets a callback to occur in the future
@@ -134,20 +132,21 @@ public:
    * @param[in] callback function to call when the timer expires
    * @result    a timer reference ID, to be used for cancelling the timer
    */
-  virtual uint32_t StartTimer( uint32_t milliseconds, CallbackBase* callback ) = 0;
+  virtual uint32_t StartTimer(uint32_t milliseconds, CallbackBase* callback) = 0;
 
   /**
    * Cancels a running timer
    * @param[in] timerId the ID reference returned when the timer was started
    */
-  virtual void CancelTimer ( uint32_t timerId ) = 0;
+  virtual void CancelTimer(uint32_t timerId) = 0;
 
 protected:
-
   /**
    * Virtual destructor.
    */
-  virtual ~PlatformAbstraction() {}
+  virtual ~PlatformAbstraction()
+  {
+  }
 
 }; // class PlatformAbstraction
 

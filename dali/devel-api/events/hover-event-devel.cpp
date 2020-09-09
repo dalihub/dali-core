@@ -21,16 +21,13 @@
 
 namespace Dali
 {
-
 namespace DevelHoverEvent
 {
-
-HoverEvent New( uint32_t time )
+HoverEvent New(uint32_t time)
 {
-  return HoverEvent( new Internal::HoverEvent( time ) );
+  return HoverEvent(new Internal::HoverEvent(time));
 }
 
 } // namespace DevelHoverEvent
 
 } // namespace Dali
-

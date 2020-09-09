@@ -23,9 +23,9 @@
 #include <cstdint> // uint16_t
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/handle.h> // Dali::Handle
+#include <dali/public-api/object/handle.h>                // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/public-api/rendering/vertex-buffer.h> // Dali::VertexBuffer
+#include <dali/public-api/rendering/vertex-buffer.h>      // Dali::VertexBuffer
 
 namespace Dali
 {
@@ -47,7 +47,6 @@ class Geometry;
 class DALI_CORE_API Geometry : public BaseHandle
 {
 public:
-
   /**
    * @brief Enumeration for the description of the type of geometry, used to determine how the coordinates will be used.
    * @SINCE_1_1.45
@@ -62,7 +61,6 @@ public:
     TRIANGLE_FAN,  ///< A fan of triangles around a centre point (after the first triangle, following triangles need only 1 point) @SINCE_1_1.45
     TRIANGLE_STRIP ///< A strip of triangles (after the first triangle, following triangles need only 1 point)                     @SINCE_1_1.45
   };
-
 
   /**
    * @brief Creates a new Geometry object.
@@ -92,7 +90,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] handle Handle to an object
    */
-  Geometry( const Geometry& handle );
+  Geometry(const Geometry& handle);
 
   /**
    * @brief Downcasts to a geometry.
@@ -102,7 +100,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Geometry handle or an uninitialized handle
    */
-  static Geometry DownCast( BaseHandle handle );
+  static Geometry DownCast(BaseHandle handle);
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object.
@@ -111,7 +109,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Reference to the assigned object
    */
-  Geometry& operator=( const Geometry& handle );
+  Geometry& operator=(const Geometry& handle);
 
   /**
    * @brief Move constructor.
@@ -119,7 +117,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  Geometry( Geometry&& rhs );
+  Geometry(Geometry&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -128,7 +126,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Geometry& operator=( Geometry&& rhs );
+  Geometry& operator=(Geometry&& rhs);
 
   /**
    * @brief Adds a VertexBuffer to be used as source of geometry vertices.
@@ -138,7 +136,7 @@ public:
    * @return Index of the newly added buffer, can be used with RemoveVertexBuffer to remove
    *         this buffer if no longer required
    */
-  std::size_t AddVertexBuffer( VertexBuffer& vertexBuffer );
+  std::size_t AddVertexBuffer(VertexBuffer& vertexBuffer);
 
   /**
    * @brief Retrieves the number of vertex buffers that have been added to this geometry.
@@ -155,7 +153,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] index Index to the vertex buffer to remove
    */
-  void RemoveVertexBuffer( std::size_t index );
+  void RemoveVertexBuffer(std::size_t index);
 
   /**
    * @brief Sets a the index data to be used as a source of indices for the geometry
@@ -166,7 +164,7 @@ public:
    * @param[in] indices Array of indices
    * @param[in] count Number of indices in the array
    */
-  void SetIndexBuffer( const uint16_t* indices, size_t count );
+  void SetIndexBuffer(const uint16_t* indices, size_t count);
 
   /**
    * @brief Sets the type of primitives this geometry contains.
@@ -174,7 +172,7 @@ public:
    * @SINCE_1_1.43
    * @param[in] geometryType Type of primitives this geometry contains
    */
-  void SetType( Type geometryType );
+  void SetType(Type geometryType);
 
   /**
    * @brief Gets the type of primitives this geometry contains.
@@ -186,14 +184,13 @@ public:
   Type GetType() const;
 
 public:
-
   /**
    * @brief The constructor.
    * @note  Not intended for application developers.
    * @SINCE_1_1.43
    * @param[in] pointer A pointer to a newly allocated Geometry
    */
-  explicit DALI_INTERNAL Geometry( Internal::Geometry* pointer );
+  explicit DALI_INTERNAL Geometry(Internal::Geometry* pointer);
 };
 
 /**

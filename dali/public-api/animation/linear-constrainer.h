@@ -34,7 +34,7 @@ namespace Dali
 
 namespace Internal DALI_INTERNAL
 {
-  class LinearConstrainer;
+class LinearConstrainer;
 }
 
 /**
@@ -57,7 +57,6 @@ namespace Internal DALI_INTERNAL
 class DALI_CORE_API LinearConstrainer : public Handle
 {
 public:
-
   /**
    * @brief Enumeration for the instance of properties belonging to the LinearConstrainer class.
    * @SINCE_1_0.0
@@ -70,8 +69,8 @@ public:
      */
     enum
     {
-      VALUE     = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "value" type Array of float @SINCE_1_0.0
-      PROGRESS,                                         ///< name "progress" type Array of float @SINCE_1_0.0
+      VALUE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "value" type Array of float @SINCE_1_0.0
+      PROGRESS,                                    ///< name "progress" type Array of float @SINCE_1_0.0
     };
   };
 
@@ -92,7 +91,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a LinearConstrainer object or an uninitialized handle
    */
-  static LinearConstrainer DownCast( BaseHandle handle );
+  static LinearConstrainer DownCast(BaseHandle handle);
 
   /**
    * @brief Creates an uninitialized LinearConstrainer handle.
@@ -134,7 +133,7 @@ public:
    * @SINCE_1_9.22
    * @param[in] rhs A reference to the moved handle
    */
-  LinearConstrainer( LinearConstrainer&& rhs );
+  LinearConstrainer(LinearConstrainer&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -143,7 +142,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  LinearConstrainer& operator=( LinearConstrainer&& rhs );
+  LinearConstrainer& operator=(LinearConstrainer&& rhs);
 
   /**
    * @brief Applies the linear constraint to the target property.
@@ -154,7 +153,7 @@ public:
    * @param[in] range The range of values in the source property which will be mapped to [0,1]
    * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]. See cfloat.h for FLT_MAX
    */
-  void Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX) );
+  void Apply(Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX));
 
   /**
    * @brief Removes the linear constraint in the target object.
@@ -162,7 +161,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] target A handle to an object constrained by the LinearConstrainer
    */
-  void Remove( Dali::Handle& target );
+  void Remove(Dali::Handle& target);
 
 public: // Not intended for application developers
   /// @cond internal

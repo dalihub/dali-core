@@ -38,14 +38,15 @@ namespace Dali
 template<typename T>
 class IntrusivePtr
 {
-
 public:
-
   /**
    * @brief Standard constructor to unassigned object.
    * @SINCE_1_0.0
    */
-  IntrusivePtr() : mPtr( nullptr ) {}
+  IntrusivePtr()
+  : mPtr(nullptr)
+  {
+  }
 
   /**
    * @brief Constructor to attach existing object.
@@ -53,9 +54,10 @@ public:
    * @SINCE_1_0.0
    * @param[in] p Pointer to object
    */
-  IntrusivePtr( T* p ) : mPtr( p )
+  IntrusivePtr(T* p)
+  : mPtr(p)
   {
-    if( mPtr )
+    if(mPtr)
     {
       mPtr->Reference();
     }
@@ -69,9 +71,10 @@ public:
    * @tparam U Reference counter object type
    */
   template<typename U>
-  IntrusivePtr( IntrusivePtr<U> const& rhs ) : mPtr( rhs.Get() )
+  IntrusivePtr(IntrusivePtr<U> const& rhs)
+  : mPtr(rhs.Get())
   {
-    if( mPtr )
+    if(mPtr)
     {
       mPtr->Reference();
     }
@@ -82,9 +85,10 @@ public:
    * @SINCE_1_0.0
    * @param[in] rhs Const reference to an IntrusivePtr
    */
-  IntrusivePtr( IntrusivePtr const& rhs ) : mPtr( rhs.mPtr )
+  IntrusivePtr(IntrusivePtr const& rhs)
+  : mPtr(rhs.mPtr)
   {
-    if( mPtr )
+    if(mPtr)
     {
       mPtr->Reference();
     }
@@ -96,8 +100,8 @@ public:
    * @param[in] rhs Reference to an IntrusivePtr
    */
   template<typename U>
-  IntrusivePtr( IntrusivePtr<U>&& rhs )
-  : mPtr( rhs.Detach() )
+  IntrusivePtr(IntrusivePtr<U>&& rhs)
+  : mPtr(rhs.Detach())
   {
   }
 
@@ -106,8 +110,8 @@ public:
    * @SINCE_1_9.23
    * @param[in] rhs Reference to an IntrusivePtr
    */
-  IntrusivePtr( IntrusivePtr&& rhs )
-  : mPtr( rhs.Detach() )
+  IntrusivePtr(IntrusivePtr&& rhs)
+  : mPtr(rhs.Detach())
   {
   }
 
@@ -119,7 +123,7 @@ public:
    */
   ~IntrusivePtr()
   {
-    if( mPtr )
+    if(mPtr)
     {
       mPtr->Unreference();
     }
@@ -165,9 +169,9 @@ public:
    * @param rhs Const reference to intrusive pointer
    * @return Reference to reference counted object
    */
-  IntrusivePtr& operator=( IntrusivePtr const& rhs )
+  IntrusivePtr& operator=(IntrusivePtr const& rhs)
   {
-    IntrusivePtr( rhs ).Swap( *this );
+    IntrusivePtr(rhs).Swap(*this);
     return *this;
   }
 
@@ -178,9 +182,9 @@ public:
    * @param rhs Pointer to object to wrap
    * @return A Reference to this object
    */
-  IntrusivePtr& operator=( T* rhs )
+  IntrusivePtr& operator=(T* rhs)
   {
-    IntrusivePtr( rhs ).Swap( *this );
+    IntrusivePtr(rhs).Swap(*this);
     return *this;
   }
 
@@ -191,11 +195,11 @@ public:
    * @param rhs Reference to intrusive pointer
    * @return Reference to moved intrusive pointer
    */
-  IntrusivePtr& operator=( IntrusivePtr&& rhs )
+  IntrusivePtr& operator=(IntrusivePtr&& rhs)
   {
-    if ( this != &rhs )
+    if(this != &rhs)
     {
-      if (mPtr)
+      if(mPtr)
       {
         mPtr->Unreference();
       }
@@ -213,11 +217,11 @@ public:
    * @return Reference to moved intrusive pointer
    */
   template<typename U>
-  IntrusivePtr& operator=( IntrusivePtr<U>&& rhs )
+  IntrusivePtr& operator=(IntrusivePtr<U>&& rhs)
   {
-    if ( this != reinterpret_cast<IntrusivePtr<T>*>( &rhs ) )
+    if(this != reinterpret_cast<IntrusivePtr<T>*>(&rhs))
     {
-      if (mPtr)
+      if(mPtr)
       {
         mPtr->Unreference();
       }
@@ -233,7 +237,7 @@ public:
    */
   void Reset()
   {
-    IntrusivePtr().Swap( *this );
+    IntrusivePtr().Swap(*this);
   }
 
   /**
@@ -242,9 +246,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] rhs Pointer to object
    */
-  void Reset( T* rhs )
+  void Reset(T* rhs)
   {
-    IntrusivePtr( rhs ).Swap( *this );
+    IntrusivePtr(rhs).Swap(*this);
   }
 
   // IntrusivePtr comparisons - This is a variation of the safe bool idiom
@@ -254,7 +258,7 @@ public:
    *
    * Objects can be implicitly converted to this for validity checks.
    */
-  using BooleanType = void ( IntrusivePtr<T>::* )() const;
+  using BooleanType = void (IntrusivePtr<T>::*)() const;
 
   /**
    * @brief Converts an object handle to a BooleanType.
@@ -277,30 +281,31 @@ public:
   T* Detach()
   {
     T* ptr = mPtr;
-    mPtr = nullptr;
+    mPtr   = nullptr;
     return ptr;
   }
 
 private:
-
   /**
    * @brief Used by the safe bool idiom.
    * @SINCE_1_0.0
    */
-  void ThisIsSaferThanReturningVoidStar() const {}
+  void ThisIsSaferThanReturningVoidStar() const
+  {
+  }
 
   /**
    * @brief Internal swap function.
    * @SINCE_1_0.0
    */
-  void Swap( IntrusivePtr& rhs )
+  void Swap(IntrusivePtr& rhs)
   {
-    T* tmp = mPtr;
-    mPtr = rhs.mPtr;
+    T* tmp   = mPtr;
+    mPtr     = rhs.mPtr;
     rhs.mPtr = tmp;
   }
 
-  T* mPtr;  ///< pointer to RefObject
+  T* mPtr; ///< pointer to RefObject
 };
 
 /**
@@ -312,7 +317,7 @@ private:
  * @return True if the pointers point at the same object
  */
 template<typename T, typename U>
-inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
+inline bool operator==(IntrusivePtr<T> const& lhs, IntrusivePtr<U> const& rhs)
 {
   return lhs.Get() == rhs.Get();
 }
@@ -326,7 +331,7 @@ inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
  * @return True if the pointers point at different objects
  */
 template<typename T, typename U>
-inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
+inline bool operator!=(IntrusivePtr<T> const& lhs, IntrusivePtr<U> const& rhs)
 {
   return lhs.Get() != rhs.Get();
 }
@@ -340,7 +345,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
  * @return True if the intrusive pointer points at the specified object
  */
 template<typename T, typename U>
-inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
+inline bool operator==(IntrusivePtr<T> const& lhs, U* rhs)
 {
   return lhs.Get() == rhs;
 }
@@ -354,7 +359,7 @@ inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
  * @return True if the intrusive pointer doesn't point at the specified object
  */
 template<typename T, typename U>
-inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
+inline bool operator!=(IntrusivePtr<T> const& lhs, U* rhs)
 {
   return lhs.Get() != rhs;
 }
@@ -368,7 +373,7 @@ inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
  * @return True if the intrusive pointer points at the specified object
  */
 template<typename T, typename U>
-inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
+inline bool operator==(T* lhs, IntrusivePtr<U> const& rhs)
 {
   return lhs == rhs.Get();
 }
@@ -382,7 +387,7 @@ inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
  * @return True if the intrusive pointer doesn't point at the specified object
  */
 template<typename T, typename U>
-inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
+inline bool operator!=(T* lhs, IntrusivePtr<U> const& rhs)
 {
   return lhs != rhs.Get();
 }

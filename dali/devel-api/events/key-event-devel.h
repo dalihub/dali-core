@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace DevelKeyEvent
 {
-
 /**
  * @brief Creates an initialized KeyEvent.
  *
@@ -44,17 +42,17 @@ namespace DevelKeyEvent
  * @param[in]  deviceSubclass  The subclass of device the key event originated from
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API KeyEvent New( const std::string& keyName,
-                            const std::string& logicalKey,
-                            const std::string& keyString,
-                            int keyCode,
-                            int keyModifier,
-                            unsigned long timeStamp,
-                            const Dali::KeyEvent::State& keyState,
-                            const std::string& compose,
-                            const std::string& deviceName,
-                            const Device::Class::Type deviceClass,
-                            const Device::Subclass::Type deviceSubclass );
+DALI_CORE_API KeyEvent New(const std::string&           keyName,
+                           const std::string&           logicalKey,
+                           const std::string&           keyString,
+                           int                          keyCode,
+                           int                          keyModifier,
+                           unsigned long                timeStamp,
+                           const Dali::KeyEvent::State& keyState,
+                           const std::string&           compose,
+                           const std::string&           deviceName,
+                           const Device::Class::Type    deviceClass,
+                           const Device::Subclass::Type deviceSubclass);
 
 /**
  * @brief Set the name given to the key pressed
@@ -63,7 +61,7 @@ DALI_CORE_API KeyEvent New( const std::string& keyName,
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyName The name given to the key pressed.
  */
-DALI_CORE_API void SetKeyName( KeyEvent keyEvent, const std::string& keyName );
+DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const std::string& keyName);
 
 /**
  * @brief Set the actual string of input characters that should be used for input editors.
@@ -72,7 +70,7 @@ DALI_CORE_API void SetKeyName( KeyEvent keyEvent, const std::string& keyName );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyString The actual string of input characters
  */
-DALI_CORE_API void SetKeyString( KeyEvent keyEvent, const std::string& keyString );
+DALI_CORE_API void SetKeyString(KeyEvent keyEvent, const std::string& keyString);
 
 /**
  * @brief Set the unique key code for the key pressed.
@@ -81,7 +79,7 @@ DALI_CORE_API void SetKeyString( KeyEvent keyEvent, const std::string& keyString
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyCode The unique key code for the key pressed
  */
-DALI_CORE_API void SetKeyCode( KeyEvent keyEvent, int32_t keyCode );
+DALI_CORE_API void SetKeyCode(KeyEvent keyEvent, int32_t keyCode);
 
 /**
  * @brief Set the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
@@ -90,7 +88,7 @@ DALI_CORE_API void SetKeyCode( KeyEvent keyEvent, int32_t keyCode );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyModifier The key modifier
  */
-DALI_CORE_API void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier );
+DALI_CORE_API void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier);
 
 /**
  * @brief Set the time (in ms) that the key event occurred.
@@ -99,7 +97,7 @@ DALI_CORE_API void SetKeyModifier( KeyEvent keyEvent, int32_t keyModifier );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] time The time (in ms)
  */
-DALI_CORE_API void SetTime( KeyEvent keyEvent, unsigned long time );
+DALI_CORE_API void SetTime(KeyEvent keyEvent, unsigned long time);
 
 /**
  * @brief Set the state of the key event.
@@ -108,7 +106,7 @@ DALI_CORE_API void SetTime( KeyEvent keyEvent, unsigned long time );
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] state The state of the key event
  */
-DALI_CORE_API void SetState( KeyEvent keyEvent, const KeyEvent::State& state );
+DALI_CORE_API void SetState(KeyEvent keyEvent, const KeyEvent::State& state);
 
 } // namespace DevelKeyEvent
 

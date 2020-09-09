@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 Event::~Event()
 {
 }

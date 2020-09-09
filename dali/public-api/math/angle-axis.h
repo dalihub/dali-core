@@ -51,7 +51,8 @@ struct AngleAxis
   AngleAxis()
   : angle(0.0f),
     axis(0.0f, 0.0f, 0.0f)
-  { }
+  {
+  }
 
   /**
    * @brief Creates an angle-axis pair.
@@ -60,23 +61,21 @@ struct AngleAxis
    * @param[in] initialAngle The initial angle in radians
    * @param[in] initialAxis The initial axis
    */
-  AngleAxis( Radian initialAngle, const Vector3& initialAxis )
-  : angle( initialAngle ),
-    axis( initialAxis )
-  { }
+  AngleAxis(Radian initialAngle, const Vector3& initialAxis)
+  : angle(initialAngle),
+    axis(initialAxis)
+  {
+  }
 
 public:
-
-  AngleAxis( const AngleAxis& ) = default; ///< Default copy constructor
-  AngleAxis( AngleAxis&& ) = default; ///< Default move constructor
-  AngleAxis& operator=( const AngleAxis& ) = default; ///< Default copy assignment operator
-  AngleAxis& operator=( AngleAxis&& ) = default; ///< Default move assignment operator
+  AngleAxis(const AngleAxis&) = default;            ///< Default copy constructor
+  AngleAxis(AngleAxis&&)      = default;            ///< Default move constructor
+  AngleAxis& operator=(const AngleAxis&) = default; ///< Default copy assignment operator
+  AngleAxis& operator=(AngleAxis&&) = default;      ///< Default move assignment operator
 
 public:
-
-  Radian angle; ///< The angle in radians
-  Vector3 axis; ///< The axis
-
+  Radian  angle; ///< The angle in radians
+  Vector3 axis;  ///< The axis
 };
 
 // Compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
@@ -89,7 +88,7 @@ public:
  * @param rhs angle axis
  * @return True if they are equal
  */
-inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
+inline bool operator==(const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs)
 {
   return (lhs.angle == rhs.angle) && (lhs.axis == rhs.axis);
 }
@@ -102,9 +101,9 @@ inline bool operator==( const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs )
  * @param[in] angleAxis The angle axis to print
  * @return The output stream operator
  */
-inline std::ostream& operator<< (std::ostream& o, const Dali::AngleAxis& angleAxis)
+inline std::ostream& operator<<(std::ostream& o, const Dali::AngleAxis& angleAxis)
 {
-  return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree( angleAxis.angle ).degree << " degrees ]";
+  return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree(angleAxis.angle).degree << " degrees ]";
 }
 
 /**

@@ -18,15 +18,14 @@
  *
  */
 
-#include <dali/integration-api/addon-manager.h>
 #include <dali/devel-api/addons/addon-dispatch-table.h>
+#include <dali/integration-api/addon-manager.h>
 #include <vector>
 
 namespace Dali
 {
 namespace AddOns
 {
-
 /**
  * @class AddOnBase
  *
@@ -37,7 +36,6 @@ namespace AddOns
 class AddOnBase
 {
 protected:
-
   /**
    * @brief Constructor
    */
@@ -47,7 +45,6 @@ protected:
   }
 
 public:
-
   /**
    * @brief Destructor
    */
@@ -57,7 +54,7 @@ public:
    * @brief Retrieves AddOn info
    * @param[out] addonInfo AddOnInfo structure to fill by the function
    */
-  virtual void GetAddOnInfo( Dali::AddOnInfo& addonInfo ) = 0;
+  virtual void GetAddOnInfo(Dali::AddOnInfo& addonInfo) = 0;
 
   /**
    * @brief Returns a dispatch table for global functions.
@@ -75,25 +72,33 @@ public:
    * @brief OnStart event.
    * It's optional and should be implemented by the AddOn when it's required to handle the event.
    */
-  virtual void OnStart() {}
+  virtual void OnStart()
+  {
+  }
 
   /**
    * @brief OnResume event.
    * It's optional and should be implemented by the AddOn when it's required to handle the event.
    */
-  virtual void OnResume() {}
+  virtual void OnResume()
+  {
+  }
 
   /**
    * @brief OnPause event.
    * It's optional and should be implemented by the AddOn when it's required to handle the event.
    */
-  virtual void OnPause() {}
+  virtual void OnPause()
+  {
+  }
 
   /**
    * @brief OnStop event.
    * It's optional and should be implemented by the AddOn when it's required to handle the event.
    */
-  virtual void OnStop() {}
+  virtual void OnStop()
+  {
+  }
 
   /**
    * @brief Getter of static singleton
@@ -105,7 +110,6 @@ public:
   }
 
 private:
-
   static AddOnBase* mSingleton;
 };
 
@@ -121,10 +125,10 @@ extern Dali::AddOns::AddOnBase* CreateAddOn();
  * @param[out] info Reference to AddOnInfo structure
  */
 template<class T>
-void GetAddOnInfo( Dali::AddOnInfo& info )
+void GetAddOnInfo(Dali::AddOnInfo& info)
 {
   auto* addon = Dali::AddOns::AddOnBase::Get();
-  addon->GetAddOnInfo( info );
+  addon->GetAddOnInfo(info);
 }
 
 /**
@@ -133,25 +137,25 @@ void GetAddOnInfo( Dali::AddOnInfo& info )
  * @return Valid pointer or nullptr if function not found.
  */
 template<class T>
-void* GetGlobalProc( const char* funcname )
+void* GetGlobalProc(const char* funcname)
 {
-  if( !funcname )
+  if(!funcname)
   {
     return nullptr;
   }
   auto* addon = Dali::AddOns::AddOnBase::Get();
 
   // AddOn must be initialised up to this point!
-  if( !addon )
+  if(!addon)
   {
     return nullptr;
   }
 
   static Dali::AddOns::DispatchTable* globalDispatchTable = addon->GetGlobalDispatchTable();
 
-  if( globalDispatchTable )
+  if(globalDispatchTable)
   {
-    return globalDispatchTable->Find( funcname );
+    return globalDispatchTable->Find(funcname);
   }
   return nullptr;
 }
@@ -162,9 +166,9 @@ void* GetGlobalProc( const char* funcname )
  * @return Valid pointer or nullptr if function not found.
  */
 template<class T>
-void* GetInstanceProc( const char* funcname )
+void* GetInstanceProc(const char* funcname)
 {
-  if( !funcname )
+  if(!funcname)
   {
     return nullptr;
   }
@@ -172,16 +176,16 @@ void* GetInstanceProc( const char* funcname )
   auto* addon = Dali::AddOns::AddOnBase::Get();
 
   // AddOn must be initialised up to this point!
-  if( !addon )
+  if(!addon)
   {
     return nullptr;
   }
 
   static Dali::AddOns::DispatchTable* instanceDispatchTable = addon->GetInstanceDispatchTable();
 
-  if( instanceDispatchTable )
+  if(instanceDispatchTable)
   {
-    return instanceDispatchTable->Find( funcname );
+    return instanceDispatchTable->Find(funcname);
   }
   return nullptr;
 }
@@ -226,7 +230,7 @@ inline void AddOnConstructorInternal()
   auto* addon = Dali::AddOns::CreateAddOn();
 
   Dali::AddOnInfo info{};
-  addon->GetAddOnInfo( info );
+  addon->GetAddOnInfo(info);
 
   // Generate dispatch tables
   addon->GetGlobalDispatchTable();
@@ -234,17 +238,17 @@ inline void AddOnConstructorInternal()
 
   // Bind basic functions
   Dali::AddOnDispatchTable table;
-  table.name = info.name;
-  table.GetAddOnInfo = GetAddOnInfo<void>;
-  table.GetGlobalProc = GetGlobalProc<void>;
+  table.name            = info.name;
+  table.GetAddOnInfo    = GetAddOnInfo<void>;
+  table.GetGlobalProc   = GetGlobalProc<void>;
   table.GetInstanceProc = GetInstanceProc<void>;
-  table.OnStart = OnStart<void>;
-  table.OnStop = OnStop<void>;
-  table.OnResume = OnResume<void>;
-  table.OnPause = OnPause<void>;
+  table.OnStart         = OnStart<void>;
+  table.OnStop          = OnStop<void>;
+  table.OnResume        = OnResume<void>;
+  table.OnPause         = OnPause<void>;
 
   // Register dispatch table
-  Dali::Integration::AddOnManager::Get()->RegisterAddOnDispatchTable( &table );
+  Dali::Integration::AddOnManager::Get()->RegisterAddOnDispatchTable(&table);
 }
 
 } // namespace AddOns
@@ -255,16 +259,21 @@ inline void AddOnConstructorInternal()
  * Note: The macro requires GCC/Clang compiler and currently only Linux-based environment
  * is supported.
  */
-#define REGISTER_ADDON_CLASS( ADDON_CLASS_WITH_FULL_NAMESPACE ) \
-namespace Dali { namespace AddOns { \
-__attribute__((constructor)) void AddOnConstructor() { \
-  AddOnConstructorInternal();\
-}\
-AddOnBase* AddOnBase::mSingleton = nullptr; \
-AddOnBase* CreateAddOn() \
-{\
-  return new ADDON_CLASS_WITH_FULL_NAMESPACE();\
-}\
-}}
+#define REGISTER_ADDON_CLASS(ADDON_CLASS_WITH_FULL_NAMESPACE) \
+  namespace Dali                                              \
+  {                                                           \
+  namespace AddOns                                            \
+  {                                                           \
+  __attribute__((constructor)) void AddOnConstructor()        \
+  {                                                           \
+    AddOnConstructorInternal();                               \
+  }                                                           \
+  AddOnBase* AddOnBase::mSingleton = nullptr;                 \
+  AddOnBase* CreateAddOn()                                    \
+  {                                                           \
+    return new ADDON_CLASS_WITH_FULL_NAMESPACE();             \
+  }                                                           \
+  }                                                           \
+  }
 
 #endif // DALI_ADDON_BASE_H

@@ -23,12 +23,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/events/point-state.h>
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
-
 namespace Internal DALI_INTERNAL
 {
 class HoverEvent;
@@ -51,9 +50,7 @@ struct Vector2;
  */
 class DALI_CORE_API HoverEvent : public BaseHandle
 {
-
 public:
-
   // Construction & Destruction
 
   /**
@@ -70,7 +67,7 @@ public:
    * @SINCE_1_9.25
    * @param[in] rhs The HoverEvent to copy from
    */
-  HoverEvent( const HoverEvent& rhs );
+  HoverEvent(const HoverEvent& rhs);
 
   /**
    * @brief Move constructor.
@@ -78,7 +75,7 @@ public:
    * @SINCE_1_9.25
    * @param[in] rhs A reference to the moved HoverEvent
    */
-  HoverEvent( HoverEvent&& rhs );
+  HoverEvent(HoverEvent&& rhs);
 
   /**
    * @brief Destructor.
@@ -95,7 +92,7 @@ public:
    * @param[in] rhs The HoverEvent to copy from
    * @return A reference to this
    */
-  HoverEvent& operator=( const HoverEvent& rhs );
+  HoverEvent& operator=(const HoverEvent& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -104,7 +101,7 @@ public:
    * @param[in] rhs A reference to the moved HoverEvent
    * @return A reference to this
    */
-  HoverEvent& operator=( HoverEvent&& rhs );
+  HoverEvent& operator=(HoverEvent&& rhs);
 
   // Getters
 
@@ -135,7 +132,7 @@ public:
    * @return The Device ID of this point
    * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  int32_t GetDeviceId( std::size_t point ) const;
+  int32_t GetDeviceId(std::size_t point) const;
 
   /**
    * @brief Retrieves the State of the point specified.
@@ -146,7 +143,7 @@ public:
    * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
    * @see State
    */
-  PointState::Type GetState( std::size_t point ) const;
+  PointState::Type GetState(std::size_t point) const;
 
   /**
    * @brief Retrieves the actor that was underneath the point specified.
@@ -156,7 +153,7 @@ public:
    * @return The actor that was underneath the point specified
    * @note If point is greater than GetPointCount() then this method will return an empty handle.
    */
-  Actor GetHitActor( std::size_t point ) const;
+  Actor GetHitActor(std::size_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the hit-actor at the point specified.
@@ -170,7 +167,7 @@ public:
    * then you should use Actor::ScreenToLocal().
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetLocalPosition( std::size_t point ) const;
+  const Vector2& GetLocalPosition(std::size_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
@@ -180,10 +177,9 @@ public:
    * @return The co-ordinates relative to the top-left of the screen of the point specified
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetScreenPosition( std::size_t point ) const;
+  const Vector2& GetScreenPosition(std::size_t point) const;
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used internally to Create an initialized HoverEvent handle.
@@ -191,7 +187,7 @@ public: // Not intended for application developers
    * @SINCE_1_9.25
    * @param[in] hoverEvent A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL HoverEvent( Internal::HoverEvent* hoverEvent );
+  explicit DALI_INTERNAL HoverEvent(Internal::HoverEvent* hoverEvent);
   /// @endcond
 };
 

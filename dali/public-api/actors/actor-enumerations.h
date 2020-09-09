@@ -2,7 +2,7 @@
 #define DALI_ACTOR_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,17 +46,16 @@ enum ColorMode
  */
 namespace Dimension
 {
-
 /**
  * @brief Enumeration for Dimension types.
  * @SINCE_1_0.0
  */
 enum Type
 {
-  WIDTH  = 0x1,       ///< Width dimension @SINCE_1_0.0
-  HEIGHT = 0x2,       ///< Height dimension @SINCE_1_0.0
+  WIDTH  = 0x1, ///< Width dimension @SINCE_1_0.0
+  HEIGHT = 0x2, ///< Height dimension @SINCE_1_0.0
 
-  ALL_DIMENSIONS = 0x3  ///< Mask to cover all flags @SINCE_1_0.0
+  ALL_DIMENSIONS = 0x3 ///< Mask to cover all flags @SINCE_1_0.0
 };
 
 /**
@@ -65,7 +64,7 @@ enum Type
  */
 enum Meta
 {
-  DIMENSION_COUNT = 2  ///< Number of dimensions - update this if adding new dimension @SINCE_1_0.0
+  DIMENSION_COUNT = 2 ///< Number of dimensions - update this if adding new dimension @SINCE_1_0.0
 };
 
 } // namespace Dimension
@@ -76,21 +75,20 @@ enum Meta
  */
 namespace ResizePolicy
 {
-
 /**
  * @brief Enumeration for ResizePolicy types.
  * @SINCE_1_0.0
  */
 enum Type
 {
-  FIXED,                 ///< Size is fixed as set by SetSize @SINCE_1_0.0
-  USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size @SINCE_1_0.0 @see Actor::GetNaturalSize()
-  FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio is not maintained. @SINCE_1_0.0
-  SIZE_RELATIVE_TO_PARENT,        ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ). @SINCE_1_0.0
-  SIZE_FIXED_OFFSET_FROM_PARENT,  ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ). @SINCE_1_0.0
-  FIT_TO_CHILDREN,       ///< Size will adjust to wrap around all children @SINCE_1_0.0
-  DIMENSION_DEPENDENCY,  ///< One dimension is dependent on the other @SINCE_1_0.0
-  USE_ASSIGNED_SIZE      ///< The size will be assigned to the actor @SINCE_1_0.0
+  FIXED,                         ///< Size is fixed as set by SetSize @SINCE_1_0.0
+  USE_NATURAL_SIZE,              ///< Size is to use the actor's natural size @SINCE_1_0.0 @see Actor::GetNaturalSize()
+  FILL_TO_PARENT,                ///< Size is to fill up to the actor's parent's bounds. Aspect ratio is not maintained. @SINCE_1_0.0
+  SIZE_RELATIVE_TO_PARENT,       ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ). @SINCE_1_0.0
+  SIZE_FIXED_OFFSET_FROM_PARENT, ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ). @SINCE_1_0.0
+  FIT_TO_CHILDREN,               ///< Size will adjust to wrap around all children @SINCE_1_0.0
+  DIMENSION_DEPENDENCY,          ///< One dimension is dependent on the other @SINCE_1_0.0
+  USE_ASSIGNED_SIZE              ///< The size will be assigned to the actor @SINCE_1_0.0
 };
 const Type DEFAULT = USE_NATURAL_SIZE; ///< Default resize policy
 
@@ -102,16 +100,15 @@ const Type DEFAULT = USE_NATURAL_SIZE; ///< Default resize policy
  */
 namespace SizeScalePolicy
 {
-
 /**
  * @brief Enumeration for SizeScalePolicy types.
  * @SINCE_1_0.0
  */
 enum Type
 {
-  USE_SIZE_SET,                ///< Use the size that was set @SINCE_1_0.0
-  FIT_WITH_ASPECT_RATIO,       ///< Fit within the size set maintaining natural size aspect ratio @SINCE_1_0.0
-  FILL_WITH_ASPECT_RATIO       ///< Fill up the size set maintaining natural size aspect ratio. May exceed size bounds in one dimension. @SINCE_1_0.0
+  USE_SIZE_SET,          ///< Use the size that was set @SINCE_1_0.0
+  FIT_WITH_ASPECT_RATIO, ///< Fit within the size set maintaining natural size aspect ratio @SINCE_1_0.0
+  FILL_WITH_ASPECT_RATIO ///< Fill up the size set maintaining natural size aspect ratio. May exceed size bounds in one dimension. @SINCE_1_0.0
 };
 
 } // namespace SizeScalePolicy
@@ -122,16 +119,15 @@ enum Type
  */
 namespace HorizontalAlignment
 {
-
 /**
  * @brief Enumeration for HorizontalAlignment types.
  * @SINCE_1_0.0
  */
 enum Type
 {
-  LEFT,         ///< Align horizontally left @SINCE_1_0.0
-  CENTER,       ///< Align horizontally center @SINCE_1_0.0
-  RIGHT         ///< Align horizontally right @SINCE_1_0.0
+  LEFT,   ///< Align horizontally left @SINCE_1_0.0
+  CENTER, ///< Align horizontally center @SINCE_1_0.0
+  RIGHT   ///< Align horizontally right @SINCE_1_0.0
 };
 
 } // namespace HorizontalAlignment
@@ -142,16 +138,15 @@ enum Type
  */
 namespace VerticalAlignment
 {
-
 /**
  * @brief Enumeration for VerticalAlignment types.
  * @SINCE_1_0.0
  */
 enum Type
 {
-  TOP,          ///< Align vertically top @SINCE_1_0.0
-  CENTER,       ///< Align vertically center @SINCE_1_0.0
-  BOTTOM        ///< Align vertically bottom @SINCE_1_0.0
+  TOP,    ///< Align vertically top @SINCE_1_0.0
+  CENTER, ///< Align vertically center @SINCE_1_0.0
+  BOTTOM  ///< Align vertically bottom @SINCE_1_0.0
 };
 
 } // namespace VerticalAlignment
@@ -168,9 +163,9 @@ namespace ClippingMode
  */
 enum Type
 {
-  DISABLED,                     ///< This Actor will not clip its children. @SINCE_1_2_5
-  CLIP_CHILDREN,                ///< This Actor will clip itself and all children to within the pixel areas of this actors renderers. @SINCE_1_2_5
-  CLIP_TO_BOUNDING_BOX          ///< This Actor will clip itself and all children to within a screen-aligned rectangle encompassing its boundaries. @SINCE_1_2.61
+  DISABLED,            ///< This Actor will not clip its children. @SINCE_1_2_5
+  CLIP_CHILDREN,       ///< This Actor will clip itself and all children to within the pixel areas of this actors renderers. @SINCE_1_2_5
+  CLIP_TO_BOUNDING_BOX ///< This Actor will clip itself and all children to within a screen-aligned rectangle encompassing its boundaries. @SINCE_1_2.61
 };
 
 } // namespace ClippingMode
@@ -181,15 +176,14 @@ enum Type
  */
 namespace LayoutDirection
 {
-
 /**
  * @brief Enumeration for the LayoutDirection types.
  * @SINCE_1_2.60
  */
 enum Type
 {
-  LEFT_TO_RIGHT,   ///< Layout direction is from Left to Right direction. @SINCE_1_2.60
-  RIGHT_TO_LEFT    ///< Layout direction is from Right to Left direction. @SINCE_1_2.60
+  LEFT_TO_RIGHT, ///< Layout direction is from Left to Right direction. @SINCE_1_2.60
+  RIGHT_TO_LEFT  ///< Layout direction is from Right to Left direction. @SINCE_1_2.60
 };
 
 } // namespace LayoutDirection

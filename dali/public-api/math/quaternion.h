@@ -45,7 +45,6 @@ class Matrix;
 class DALI_CORE_API Quaternion
 {
 public:
-
   /**
    * @brief Default Constructor.
    * @SINCE_1_0.0
@@ -61,7 +60,7 @@ public:
    * @param[in] jBySineTheta
    * @param[in] kBySineTheta
    */
-  Quaternion( float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta );
+  Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta);
 
   /**
    * @brief Constructs from a quaternion represented by a vector.
@@ -69,7 +68,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] vector x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
    */
-  explicit Quaternion( const Vector4& vector );
+  explicit Quaternion(const Vector4& vector);
 
   /**
    * @brief Constructor from an axis and angle.
@@ -78,7 +77,7 @@ public:
    * @param[in] angle The angle around the axis
    * @param[in] axis  The vector of the axis
    */
-  Quaternion( Radian angle, const Vector3& axis );
+  Quaternion(Radian angle, const Vector3& axis);
 
   /**
    * @brief Constructs from Euler angles.
@@ -88,7 +87,7 @@ public:
    * @param[in] yaw
    * @param[in] roll
    */
-  Quaternion( Radian pitch, Radian yaw, Radian roll );
+  Quaternion(Radian pitch, Radian yaw, Radian roll);
 
   /**
    * @brief Constructs from a matrix.
@@ -106,7 +105,7 @@ public:
    * @param[in] yAxis The Y axis
    * @param[in] zAxis The Z axis
    */
-  explicit Quaternion( const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis );
+  explicit Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
 
   /**
    * @brief Constructs quaternion which describes minimum rotation to align v0 with v1.
@@ -116,7 +115,7 @@ public:
    * @pre v0 and v1 should be normalized
    *
    */
-  explicit Quaternion( const Vector3& v0, const Vector3& v1 );
+  explicit Quaternion(const Vector3& v0, const Vector3& v1);
 
   /**
    * @brief Destructor, nonvirtual as this is not a base class.
@@ -125,7 +124,7 @@ public:
    */
   ~Quaternion();
 
-// Constants
+  // Constants
 
   static const Quaternion IDENTITY; ///< (0.0f,0.0f,0.0f,1.0f)
 
@@ -145,7 +144,7 @@ public:
    * @param[out] angle Angle in radians
    * @return True if converted correctly
    */
-  bool ToAxisAngle( Vector3& axis, Radian& angle ) const;
+  bool ToAxisAngle(Vector3& axis, Radian& angle) const;
 
   /**
    * @brief Returns the quaternion as a vector.
@@ -163,7 +162,7 @@ public:
    * @param[in] yaw
    * @param[in] roll
    */
-  void SetEuler( Radian pitch, Radian yaw, Radian roll );
+  void SetEuler(Radian pitch, Radian yaw, Radian roll);
 
   /**
    * @brief Returns the Euler angles from a rotation Quaternion.
@@ -180,7 +179,7 @@ public:
    * @param[in] other The quaternion to add
    * @return A quaternion containing the result of the addition
    */
-  const Quaternion operator+( const Quaternion& other ) const;
+  const Quaternion operator+(const Quaternion& other) const;
 
   /**
    * @brief Subtraction operator.
@@ -189,7 +188,7 @@ public:
    * @param[in] other The quaternion to subtract
    * @return A quaternion containing the result of the subtract
    */
-  const Quaternion operator-( const Quaternion& other ) const;
+  const Quaternion operator-(const Quaternion& other) const;
 
   /**
    * @brief Multiplication operator.
@@ -198,7 +197,7 @@ public:
    * @param[in] other The quaternion to multiply
    * @return A quaternion containing the result
    */
-  const Quaternion operator*( const Quaternion& other ) const;
+  const Quaternion operator*(const Quaternion& other) const;
 
   /**
    * @brief Multiplication operator.
@@ -207,7 +206,7 @@ public:
    * @param[in] other The vector to multiply
    * @return A vector containing the result of the multiplication
    */
-  Vector3 operator*( const Vector3& other ) const;
+  Vector3 operator*(const Vector3& other) const;
 
   /**
    * @brief Division operator.
@@ -216,7 +215,7 @@ public:
    * @param[in] other A quaternion to divide by
    * @return A quaternion containing the result
    */
-  const Quaternion operator/( const Quaternion& other ) const;
+  const Quaternion operator/(const Quaternion& other) const;
 
   /**
    * @brief Scale operator.
@@ -225,7 +224,7 @@ public:
    * @param[in] scale A value to scale by
    * @return A quaternion containing the result
    */
-  const Quaternion operator*( float scale ) const;
+  const Quaternion operator*(float scale) const;
 
   /**
    * @brief Scale operator.
@@ -234,7 +233,7 @@ public:
    * @param[in] scale A value to scale by
    * @return A quaternion containing the result
    */
-  const Quaternion operator/( float scale ) const;
+  const Quaternion operator/(float scale) const;
 
   /**
    * @brief Unary Negation operator.
@@ -251,7 +250,7 @@ public:
    * @param[in] other The quaternion to add
    * @return A reference to this
    */
-  const Quaternion& operator+=( const Quaternion& other );
+  const Quaternion& operator+=(const Quaternion& other);
 
   /**
    * @brief Subtraction with Assignment operator.
@@ -260,7 +259,7 @@ public:
    * @param[in] other The quaternion to subtract
    * @return A reference to this
    */
-  const Quaternion& operator-=( const Quaternion& other );
+  const Quaternion& operator-=(const Quaternion& other);
 
   /**
    * @brief Multiplication with Assignment operator.
@@ -269,7 +268,7 @@ public:
    * @param[in] other The quaternion to multiply
    * @return A reference to this
    */
-  const Quaternion& operator*=( const Quaternion& other );
+  const Quaternion& operator*=(const Quaternion& other);
 
   /**
    * @brief Scale with Assignment operator.
@@ -278,7 +277,7 @@ public:
    * @param[in] scale the value to scale by
    * @return A reference to this
    */
-  const Quaternion& operator*=( float scale );
+  const Quaternion& operator*=(float scale);
 
   /**
    * @brief Scale with Assignment operator.
@@ -287,7 +286,7 @@ public:
    * @param[in] scale The value to scale by
    * @return A reference to this
    */
-  const Quaternion& operator/=( float scale );
+  const Quaternion& operator/=(float scale);
 
   /**
    * @brief Equality operator.
@@ -296,7 +295,7 @@ public:
    * @param[in] rhs The quaternion to compare with
    * @return True if the quaternions are equal
    */
-  bool operator==( const Quaternion& rhs ) const;
+  bool operator==(const Quaternion& rhs) const;
 
   /**
    * @brief Inequality operator.
@@ -305,7 +304,7 @@ public:
    * @param[in] rhs The quaternion to compare with
    * @return True if the quaternions are not equal
    */
-  bool operator!=( const Quaternion& rhs ) const;
+  bool operator!=(const Quaternion& rhs) const;
 
   /**
    * @brief Returns the length of the quaternion.
@@ -376,7 +375,7 @@ public:
    * @param[in] q2 The second quaternion
    * @return The dot product of the two quaternions
    */
-  static float Dot( const Quaternion &q1, const Quaternion &q2 );
+  static float Dot(const Quaternion& q1, const Quaternion& q2);
 
   /**
    * @brief Linear Interpolation (using a straight line between the two quaternions).
@@ -387,7 +386,7 @@ public:
    * @param[in] t A progress value between 0 and 1
    * @return The interpolated quaternion
    */
-  static Quaternion Lerp( const Quaternion &q1, const Quaternion &q2, float t );
+  static Quaternion Lerp(const Quaternion& q1, const Quaternion& q2, float t);
 
   /**
    * @brief Spherical Linear Interpolation (using the shortest arc of a great circle between
@@ -399,7 +398,7 @@ public:
    * @param[in] progress A progress value between 0 and 1
    * @return The interpolated quaternion
    */
-  static Quaternion Slerp( const Quaternion &q1, const Quaternion &q2, float progress );
+  static Quaternion Slerp(const Quaternion& q1, const Quaternion& q2, float progress);
 
   /**
    * @brief This version of Slerp, used by Squad, does not check for theta > 90.
@@ -410,7 +409,7 @@ public:
    * @param[in] t A progress value between 0 and 1
    * @return The interpolated quaternion
    */
-  static Quaternion SlerpNoInvert( const Quaternion &q1, const Quaternion &q2, float t );
+  static Quaternion SlerpNoInvert(const Quaternion& q1, const Quaternion& q2, float t);
 
   /**
    * @brief Spherical Cubic Interpolation.
@@ -423,7 +422,7 @@ public:
    * @param[in] t A progress value between 0 and 1
    * @return The interpolated quaternion
    */
-  static Quaternion Squad( const Quaternion& start, const Quaternion& end,  const Quaternion& ctrl1,  const Quaternion& ctrl2, float t );
+  static Quaternion Squad(const Quaternion& start, const Quaternion& end, const Quaternion& ctrl1, const Quaternion& ctrl2, float t);
 
   /**
    * @brief Returns the shortest angle between two quaternions in Radians.
@@ -433,7 +432,7 @@ public:
    * @param[in] q2 The second quaternion
    * @return The angle between the two quaternions
    */
-  static float AngleBetween( const Quaternion& q1, const Quaternion& q2 );
+  static float AngleBetween(const Quaternion& q1, const Quaternion& q2);
 
   /**
    * @brief Rotates v by this Quaternion (Quaternion must be unit).
@@ -442,7 +441,7 @@ public:
    * @param[in] vector A vector to rotate
    * @return The rotated vector
    */
-  Vector4 Rotate( const Vector4& vector ) const;
+  Vector4 Rotate(const Vector4& vector) const;
 
   /**
    * @brief Rotates v by this Quaternion (Quaternion must be unit).
@@ -451,10 +450,9 @@ public:
    * @param[in] vector A vector to rotate
    * @return The rotated vector
    */
-  Vector3 Rotate( const Vector3& vector ) const;
+  Vector3 Rotate(const Vector3& vector) const;
 
 private:
-
   /// @cond internal
   /**
    * @brief Sets the quaternion from 3 orthonormal axes.
@@ -464,19 +462,17 @@ private:
    * @param[in] yAxis The Y axis
    * @param[in] zAxis The Z axis
    */
-  DALI_INTERNAL void SetFromAxes( const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis );
+  DALI_INTERNAL void SetFromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
   /// @endcond
 
 public:
-
-  Quaternion( const Quaternion& ) = default; ///< Default copy constructor
-  Quaternion( Quaternion&& ) = default; ///< Default move constructor
-  Quaternion& operator=( const Quaternion& ) = default; ///< Default copy assignment operator
-  Quaternion& operator=( Quaternion&& ) = default; ///< Default move assignment operator
+  Quaternion(const Quaternion&) = default;            ///< Default copy constructor
+  Quaternion(Quaternion&&)      = default;            ///< Default move constructor
+  Quaternion& operator=(const Quaternion&) = default; ///< Default copy assignment operator
+  Quaternion& operator=(Quaternion&&) = default;      ///< Default move assignment operator
 
 public:
-
-  Vector4 mVector;   ///< w component is s ( = cos(theta/2.0) )
+  Vector4 mVector; ///< w component is s ( = cos(theta/2.0) )
 };
 
 /**
@@ -487,10 +483,17 @@ public:
  * @param[in] quaternion The quaternion to print
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<< (std::ostream& o, const Quaternion& quaternion);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion);
 
 // Allow Quaternion to be treated as a POD type
-template <> struct TypeTraits< Quaternion > : public BasicTypes< Quaternion > { enum { IS_TRIVIAL_TYPE = true }; };
+template<>
+struct TypeTraits<Quaternion> : public BasicTypes<Quaternion>
+{
+  enum
+  {
+    IS_TRIVIAL_TYPE = true
+  };
+};
 
 /**
  * @}

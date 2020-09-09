@@ -23,9 +23,8 @@
 
 namespace Dali
 {
-
-RotationGestureDetector::RotationGestureDetector( Internal::RotationGestureDetector* internal )
-: GestureDetector( internal )
+RotationGestureDetector::RotationGestureDetector(Internal::RotationGestureDetector* internal)
+: GestureDetector(internal)
 {
 }
 
@@ -37,32 +36,32 @@ RotationGestureDetector RotationGestureDetector::New()
 {
   Internal::RotationGestureDetectorPtr internal = Internal::RotationGestureDetector::New();
 
-  return RotationGestureDetector( internal.Get() );
+  return RotationGestureDetector(internal.Get());
 }
 
-RotationGestureDetector RotationGestureDetector::DownCast( BaseHandle handle )
+RotationGestureDetector RotationGestureDetector::DownCast(BaseHandle handle)
 {
-  return RotationGestureDetector( dynamic_cast<Dali::Internal::RotationGestureDetector*>( handle.GetObjectPtr() ) );
+  return RotationGestureDetector(dynamic_cast<Dali::Internal::RotationGestureDetector*>(handle.GetObjectPtr()));
 }
 
 RotationGestureDetector::~RotationGestureDetector()
 {
 }
 
-RotationGestureDetector::RotationGestureDetector( const RotationGestureDetector& handle )
-: GestureDetector( handle )
+RotationGestureDetector::RotationGestureDetector(const RotationGestureDetector& handle)
+: GestureDetector(handle)
 {
 }
 
-RotationGestureDetector& RotationGestureDetector::operator=( const RotationGestureDetector& rhs )
+RotationGestureDetector& RotationGestureDetector::operator=(const RotationGestureDetector& rhs)
 {
-  BaseHandle::operator=( rhs );
+  BaseHandle::operator=(rhs);
   return *this;
 }
 
 RotationGestureDetector::DetectedSignalType& RotationGestureDetector::DetectedSignal()
 {
-  return GetImplementation( *this ).DetectedSignal();
+  return GetImplementation(*this).DetectedSignal();
 }
 
 } // namespace Dali

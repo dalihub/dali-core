@@ -18,8 +18,8 @@
  */
 
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-value.h>
+#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 
 namespace Dali
@@ -30,7 +30,6 @@ namespace Dali
  */
 
 class Handle;
-
 
 /**
  * @brief Dali::IndirectValue is an intermediate object that enables a simpler
@@ -75,7 +74,7 @@ public:
    * @tparam Type The type of the associated property
    * @return The associated property cast to the desired type
    */
-  template <typename Type>
+  template<typename Type>
   inline operator Type()
   {
     Property::Value value = GetProperty();
@@ -92,7 +91,7 @@ private:
    * Making this private to prevent construction of auto type or IndirectValue type.
    * @param[in] rhs The object to move
    */
-  DALI_INTERNAL IndirectValue( IndirectValue&& rhs );
+  DALI_INTERNAL IndirectValue(IndirectValue&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -101,7 +100,7 @@ private:
    * Making this private to prevent assignment to auto type or IndirectValue type.
    * @param[in] rhs The object to move
    */
-  DALI_INTERNAL IndirectValue& operator=( IndirectValue&& rhs );
+  DALI_INTERNAL IndirectValue& operator=(IndirectValue&& rhs);
 
   /**
    * @brief Accessor for handle property.
@@ -121,12 +120,13 @@ private:
    * @param[in] handle A reference to the associated handle
    * @param[in] index The index to the associated property
    */
-  DALI_INTERNAL IndirectValue( Handle& handle, Property::Index index );
+  DALI_INTERNAL IndirectValue(Handle& handle, Property::Index index);
+
 private:
   IntrusivePtr<Dali::RefObject> mHandle; ///< A handle to the property owner
-  Property::Index mIndex; ///< Index of the property in the property owner.
+  Property::Index               mIndex;  ///< Index of the property in the property owner.
 
-  struct Extension; ///< Reserved for future use
+  struct Extension;      ///< Reserved for future use
   Extension* mExtension; ///< Reserved for future use
 
   /// @endcond

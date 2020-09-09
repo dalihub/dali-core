@@ -2,7 +2,7 @@
 #define DALI_BITWISE_ENUM_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 
 namespace Dali
 {
-
 /**
  * Type traits and methods to enable type safe bit field operators for an enum.
  * usage:
@@ -32,7 +31,7 @@ namespace Dali
  *   if( myFlag & FLAG2 )
  *    // do something
  */
-template< typename Enum >
+template<typename Enum>
 struct EnableBitMaskOperators
 {
   static const bool ENABLE = false; // can't be constexpr as it's a data member
@@ -44,11 +43,11 @@ struct EnableBitMaskOperators
  * @param rhs bitfield to or
  * @return EnumType with both flags set
  */
-template < typename EnumType >
-inline typename std::enable_if< EnableBitMaskOperators< EnumType >::ENABLE, EnumType >::type operator|( EnumType lhs, EnumType rhs )
+template<typename EnumType>
+inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator|(EnumType lhs, EnumType rhs)
 {
   using UnderlyingType = typename std::underlying_type<EnumType>::type;
-  return static_cast<EnumType>( static_cast<UnderlyingType>( lhs ) | static_cast<UnderlyingType>(rhs ) );
+  return static_cast<EnumType>(static_cast<UnderlyingType>(lhs) | static_cast<UnderlyingType>(rhs));
 }
 
 /**
@@ -57,11 +56,11 @@ inline typename std::enable_if< EnableBitMaskOperators< EnumType >::ENABLE, Enum
  * @param rhs bitfield to or
  * @return reference to lhs with both flags set
  */
-template < typename EnumType >
-inline typename std::enable_if< EnableBitMaskOperators< EnumType >::ENABLE, EnumType& >::type operator|=( EnumType& lhs, EnumType rhs )
+template<typename EnumType>
+inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator|=(EnumType& lhs, EnumType rhs)
 {
   using UnderlyingType = typename std::underlying_type<EnumType>::type;
-  lhs = static_cast<EnumType>(static_cast<UnderlyingType>( lhs ) | static_cast<UnderlyingType>( rhs ) );
+  lhs                  = static_cast<EnumType>(static_cast<UnderlyingType>(lhs) | static_cast<UnderlyingType>(rhs));
   return lhs;
 }
 
@@ -71,11 +70,11 @@ inline typename std::enable_if< EnableBitMaskOperators< EnumType >::ENABLE, Enum
  * @param rhs bitfield to AND
  * @return true if at least one flag is same in both
  */
-template < typename EnumType >
-inline typename std::enable_if< EnableBitMaskOperators< EnumType >::ENABLE, bool >::type operator&( EnumType lhs, EnumType rhs )
+template<typename EnumType>
+inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, bool>::type operator&(EnumType lhs, EnumType rhs)
 {
   using UnderlyingType = typename std::underlying_type<EnumType>::type;
-  return static_cast<bool>( static_cast<UnderlyingType>( lhs ) & static_cast<UnderlyingType>(rhs ) );
+  return static_cast<bool>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
 }
 
 } // namespace Dali

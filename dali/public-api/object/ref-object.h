@@ -2,7 +2,7 @@
 #define DALI_REF_OBJECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ class Value;
 class DALI_CORE_API RefObject
 {
 public:
-
   /**
    * @brief Increments the object's reference count.
    * @SINCE_1_0.0
@@ -68,7 +67,6 @@ public:
   uint32_t ReferenceCount();
 
 protected:
-
   /**
    * @brief Default constructor.
    * @SINCE_1_0.0
@@ -103,7 +101,6 @@ protected:
   RefObject& operator=(const RefObject& rhs);
 
 private:
-
   volatile uint32_t mCount; ///< Reference count
 };
 
