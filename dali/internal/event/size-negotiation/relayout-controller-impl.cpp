@@ -183,10 +183,8 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
   }
 
   // Remove any redundant sub-tree heads
-  for( std::vector< Dali::Actor >::iterator it = potentialRedundantSubRoots.begin(), itEnd = potentialRedundantSubRoots.end(); it != itEnd; ++it )
+  for( auto& subRoot : potentialRedundantSubRoots )
   {
-    Dali::Actor subRoot = *it;
-
     RemoveRequest( subRoot );
   }
 
@@ -366,17 +364,9 @@ void RelayoutController::AddRequest( Dali::Actor& actor )
   Internal::Actor* actorPtr = &GetImplementation( actor );
 
   // Only add the rootActor if it is not already recorded
-  bool found = false;
-  for( auto&& item : mDirtyLayoutSubTrees )
-  {
-    if( item == actorPtr )
-    {
-      found = true;
-      break;
-    }
-  }
+  auto itr = std::find( mDirtyLayoutSubTrees.begin(), mDirtyLayoutSubTrees.end(), actorPtr );
 
-  if( !found )
+  if( itr == mDirtyLayoutSubTrees.end() )
   {
     mDirtyLayoutSubTrees.PushBack( actorPtr );
   }
@@ -386,15 +376,10 @@ void RelayoutController::RemoveRequest( Dali::Actor& actor )
 {
   Internal::Actor* actorPtr = &GetImplementation( actor );
 
-  // Remove actor from dirty sub trees
-  for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
-  {
-    if( *it == actorPtr )
-    {
-      mDirtyLayoutSubTrees.Erase( it );
-      break;
-    }
-  }
+  mDirtyLayoutSubTrees.Erase( std::remove( mDirtyLayoutSubTrees.begin(),
+                                           mDirtyLayoutSubTrees.end(),
+                                           actorPtr ),
+                              mDirtyLayoutSubTrees.end() );
 }
 
 void RelayoutController::Request()
@@ -427,10 +412,8 @@ void RelayoutController::Relayout()
 
     // 1. Finds all top-level controls from the dirty list and allocate them the size of the scene
     //    These controls are paired with the parent/scene size and added to the stack.
-    for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
+    for( auto& dirtyActor : mDirtyLayoutSubTrees )
     {
-      Internal::Actor* dirtyActor = *it;
-
       // Need to test if actor is valid (could have been deleted and had the pointer cleared)
       if( dirtyActor )
       {
@@ -502,13 +485,11 @@ void RelayoutController::SetProcessingCoreEvents( bool processingEvents )
 void RelayoutController::FindAndZero( const RawActorList& list, const Dali::RefObject* object )
 {
   // Object has been destroyed so clear it from this list
-  for( RawActorList::Iterator it = list.Begin(), itEnd = list.End(); it != itEnd; ++it )
+  for( auto& actor : list )
   {
-    BaseObject* actor = *it;
-
     if( actor && ( actor == object ) )
     {
-      *it = NULL;    // Reset the pointer in the list. We don't want to remove it in case something is iterating over the list.
+      actor = nullptr; // Reset the pointer in the list. We don't want to remove it in case something is iterating over the list.
     }
   }
 }
