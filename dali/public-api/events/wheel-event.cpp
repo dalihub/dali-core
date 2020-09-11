@@ -32,9 +32,7 @@ WheelEvent::WheelEvent(const WheelEvent& rhs) = default;
 
 WheelEvent::WheelEvent(WheelEvent&& rhs) = default;
 
-WheelEvent::~WheelEvent()
-{
-}
+WheelEvent::~WheelEvent() = default;
 
 WheelEvent& WheelEvent::operator=(const WheelEvent& rhs) = default;
 

@@ -56,10 +56,7 @@ RenderItem::RenderItem()
 {
 }
 
-RenderItem::~RenderItem()
-{
-}
-
+RenderItem::~RenderItem() = default;
 
 ClippingBox RenderItem::CalculateViewportSpaceAABB( const Vector3& size, const int viewportWidth, const int viewportHeight ) const
 {

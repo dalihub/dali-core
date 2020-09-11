@@ -33,9 +33,7 @@ HoverEvent::HoverEvent(const HoverEvent& rhs) = default;
 
 HoverEvent::HoverEvent(HoverEvent&& rhs) = default;
 
-HoverEvent::~HoverEvent()
-{
-}
+HoverEvent::~HoverEvent() = default;
 
 HoverEvent& HoverEvent::operator=(const HoverEvent& rhs) = default;
 

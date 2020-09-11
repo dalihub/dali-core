@@ -35,8 +35,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~GlResourceOwner()
-  { }
+  virtual ~GlResourceOwner() = default;
 
   /**
    * Reset all GL resources.

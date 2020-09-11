@@ -35,7 +35,7 @@ public:
   /**
    * @brief Destructor
    */
-  virtual ~Connectable() {}
+  virtual ~Connectable() = default;
 
   /**
    * @brief Check if the object is on the scene

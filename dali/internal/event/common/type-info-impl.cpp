@@ -176,9 +176,7 @@ TypeInfo::TypeInfo(const std::string &name, const std::string &baseTypeName, Dal
   DALI_ASSERT_ALWAYS(!baseTypeName.empty() && "Type info construction must have a base type name");
 }
 
-TypeInfo::~TypeInfo()
-{
-}
+TypeInfo::~TypeInfo() = default;
 
 BaseHandle TypeInfo::CreateInstance() const
 {

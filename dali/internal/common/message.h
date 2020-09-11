@@ -41,16 +41,12 @@ public:
   /**
    * Construct the message base.
    */
-  MessageBase( )
-  {
-  }
+  MessageBase() = default;
 
   /**
    * Virtual destructor
    */
-  virtual ~MessageBase()
-  {
-  }
+  virtual ~MessageBase() = default;
 
   /**
    * Called to process the message.
@@ -90,9 +86,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~Message() override
-  {
-  }
+  ~Message() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -143,9 +137,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue1() override
-  {
-  }
+  ~MessageValue1() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -201,9 +193,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue2() override
-  {
-  }
+  ~MessageValue2() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -262,9 +252,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue3() override
-  {
-  }
+  ~MessageValue3() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -327,9 +315,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue4() override
-  {
-  }
+  ~MessageValue4() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -396,9 +382,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue5() override
-  {
-  }
+  ~MessageValue5() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -469,9 +453,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageValue6() override
-  {
-  }
+  ~MessageValue6() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -522,9 +504,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageDoubleBuffered0() override
-  {
-  }
+  ~MessageDoubleBuffered0() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -576,9 +556,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageDoubleBuffered1() override
-  {
-  }
+  ~MessageDoubleBuffered1() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -633,9 +611,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageDoubleBuffered2() override
-  {
-  }
+  ~MessageDoubleBuffered2() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -695,9 +671,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageDoubleBuffered3() override
-  {
-  }
+  ~MessageDoubleBuffered3() override = default;
 
   /**
    * @copydoc MessageBase::Process
@@ -760,9 +734,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~MessageDoubleBuffered4() override
-  {
-  }
+  ~MessageDoubleBuffered4() override = default;
 
   /**
    * @copydoc MessageBase::Process

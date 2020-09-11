@@ -234,17 +234,13 @@ protected: // API for deriving classes
    * @brief Empty constructor.
    * @SINCE_1_0.0
    */
-  VectorAlgorithms()
-  {
-  }
+  VectorAlgorithms() = default;
 
   /**
    * @brief Empty destructor.
    * @SINCE_1_0.0
    */
-  ~VectorAlgorithms()
-  {
-  }
+  ~VectorAlgorithms() = default;
 
   /**
    * @brief Copy vector contents.
@@ -392,12 +388,8 @@ template<>
 class VectorAlgorithms<false> : public VectorBase
 {
 private:
-  VectorAlgorithms()
-  {
-  }
-  ~VectorAlgorithms()
-  {
-  }
+  VectorAlgorithms()  = default;
+  ~VectorAlgorithms() = default;
 };
 /// @endcond
 
@@ -433,9 +425,7 @@ public: // API
    * @brief Default constructor. Does not allocate any space.
    * @SINCE_1_0.0
    */
-  Vector()
-  {
-  }
+  Vector() = default;
 
   /**
    * @brief Destructor. Releases the allocated space.

@@ -86,9 +86,7 @@ Path::Path()
 {
 }
 
-Path::~Path()
-{
-}
+Path::~Path() = default;
 
 Path* Path::Clone(const Path& path)
 {

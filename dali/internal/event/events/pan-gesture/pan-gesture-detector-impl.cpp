@@ -302,9 +302,7 @@ PanGestureDetector::PanGestureDetector( const SceneGraph::PanGesture& sceneObjec
 {
 }
 
-PanGestureDetector::~PanGestureDetector()
-{
-}
+PanGestureDetector::~PanGestureDetector() = default;
 
 const SceneGraph::PanGesture& PanGestureDetector::GetPanGestureSceneObject() const
 {

@@ -23,9 +23,7 @@
 
 namespace Dali
 {
-Gesture::Gesture()
-{
-}
+Gesture::Gesture() = default;
 
 Gesture::Gesture(Internal::Gesture* internal)
 : BaseHandle(internal)
@@ -40,9 +38,7 @@ Gesture& Gesture::operator=(const Gesture& rhs) = default;
 
 Gesture& Gesture::operator=(Gesture&& rhs) = default;
 
-Gesture::~Gesture()
-{
-}
+Gesture::~Gesture() = default;
 
 GestureType::Value Gesture::GetType() const
 {

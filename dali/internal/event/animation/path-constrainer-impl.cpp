@@ -64,9 +64,7 @@ PathConstrainer::PathConstrainer()
 {
 }
 
-PathConstrainer::~PathConstrainer()
-{
-}
+PathConstrainer::~PathConstrainer() = default;
 
 Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) const
 {

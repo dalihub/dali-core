@@ -32,8 +32,6 @@ TimePeriod::TimePeriod(float delay, float duration)
 {
 }
 
-TimePeriod::~TimePeriod()
-{
-}
+TimePeriod::~TimePeriod() = default;
 
 } // namespace Dali

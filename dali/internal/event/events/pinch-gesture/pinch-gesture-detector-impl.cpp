@@ -62,9 +62,7 @@ PinchGestureDetector::PinchGestureDetector()
 {
 }
 
-PinchGestureDetector::~PinchGestureDetector()
-{
-}
+PinchGestureDetector::~PinchGestureDetector() = default;
 
 void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Dali::PinchGesture& pinch)
 {

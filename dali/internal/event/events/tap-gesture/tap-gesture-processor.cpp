@@ -86,9 +86,7 @@ TapGestureProcessor::TapGestureProcessor()
 {
 }
 
-TapGestureProcessor::~TapGestureProcessor()
-{
-}
+TapGestureProcessor::~TapGestureProcessor() = default;
 
 void TapGestureProcessor::Process( Scene& scene, const TapGestureEvent& tapEvent )
 {

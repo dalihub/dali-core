@@ -40,7 +40,7 @@ public:
   /**
    * Constructor. Nothing to do as a pure interface.
    */
-  NodeDataProvider() { }
+  NodeDataProvider() = default;
 
   /**
    * @param bufferIndex to use
@@ -68,7 +68,7 @@ protected:
   /**
    * Virtual destructor, this is an interface, no deletion through this interface
    */
-  ~NodeDataProvider() override { }
+  ~NodeDataProvider() override = default;
 };
 
 } // SceneGraph

@@ -53,13 +53,9 @@ ObjectRegistryPtr ObjectRegistry::New()
   return ObjectRegistryPtr( new ObjectRegistry() );
 }
 
-ObjectRegistry::ObjectRegistry()
-{
-}
+ObjectRegistry::ObjectRegistry() = default;
 
-ObjectRegistry::~ObjectRegistry()
-{
-}
+ObjectRegistry::~ObjectRegistry() = default;
 
 void ObjectRegistry::RegisterObject( Dali::BaseObject* object )
 {

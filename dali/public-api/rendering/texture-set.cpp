@@ -31,13 +31,9 @@ TextureSet TextureSet::New()
   return TextureSet(textureSet.Get());
 }
 
-TextureSet::TextureSet()
-{
-}
+TextureSet::TextureSet() = default;
 
-TextureSet::~TextureSet()
-{
-}
+TextureSet::~TextureSet() = default;
 
 TextureSet::TextureSet(const TextureSet& handle) = default;
 

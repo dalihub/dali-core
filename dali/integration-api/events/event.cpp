@@ -22,9 +22,7 @@ namespace Dali
 {
 namespace Integration
 {
-Event::~Event()
-{
-}
+Event::~Event() = default;
 
 Event::Event(Type eventType)
 : type(eventType)

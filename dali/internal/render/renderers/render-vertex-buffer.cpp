@@ -125,9 +125,7 @@ VertexBuffer::VertexBuffer()
 {
 }
 
-VertexBuffer::~VertexBuffer()
-{
-}
+VertexBuffer::~VertexBuffer() = default;
 
 void VertexBuffer::SetFormat( VertexBuffer::Format* format )
 {

@@ -31,9 +31,7 @@ TapGestureEvent::TapGestureEvent( GestureState state )
 {
 }
 
-TapGestureEvent::~TapGestureEvent()
-{
-}
+TapGestureEvent::~TapGestureEvent() = default;
 
 } // namespace Internal
 

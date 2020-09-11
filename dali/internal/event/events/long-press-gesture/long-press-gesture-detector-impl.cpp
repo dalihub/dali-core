@@ -85,9 +85,7 @@ LongPressGestureDetector::LongPressGestureDetector(unsigned int minTouches, unsi
 {
 }
 
-LongPressGestureDetector::~LongPressGestureDetector()
-{
-}
+LongPressGestureDetector::~LongPressGestureDetector() = default;
 
 void LongPressGestureDetector::SetTouchesRequired(unsigned int touches)
 {

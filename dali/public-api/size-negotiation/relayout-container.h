@@ -44,17 +44,13 @@ public:
    *
    * @SINCE_1_0.0
    */
-  RelayoutContainer()
-  {
-  }
+  RelayoutContainer() = default;
 
   /**
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~RelayoutContainer()
-  {
-  }
+  virtual ~RelayoutContainer() = default;
 
   /**
    * @brief Adds relayout information to the container if it doesn't already exist.

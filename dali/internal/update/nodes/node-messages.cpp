@@ -35,9 +35,7 @@ NodePropertyMessageBase::NodePropertyMessageBase(UpdateManager& updateManager)
 {
 }
 
-NodePropertyMessageBase::~NodePropertyMessageBase()
-{
-}
+NodePropertyMessageBase::~NodePropertyMessageBase() = default;
 
 } // namespace SceneGraph
 

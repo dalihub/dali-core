@@ -98,9 +98,7 @@ struct NodeDepthPair
 
 struct NodeDepths
 {
-  NodeDepths()
-  {
-  }
+  NodeDepths() = default;
 
   void Add( SceneGraph::Node* node, uint32_t sortedDepth )
   {
@@ -1328,9 +1326,7 @@ public:
   /**
    * Virtual destructor
    */
-  ~IndexBufferMessage() override
-  {
-  }
+  ~IndexBufferMessage() override = default;
 
   /**
    * @copydoc MessageBase::Process

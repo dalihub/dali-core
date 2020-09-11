@@ -185,9 +185,7 @@ Camera* Camera::New()
   return new Camera();
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 void Camera::SetNode( const Node* node )
 {

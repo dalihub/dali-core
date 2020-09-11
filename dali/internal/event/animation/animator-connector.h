@@ -74,9 +74,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatorConnector() override
-  {
-  }
+  ~AnimatorConnector() override = default;
 
 private:
 
@@ -173,9 +171,7 @@ public:
   /**
    * Virtual destructor.
    */
-  ~AnimatorConnector() override
-  {
-  }
+  ~AnimatorConnector() override = default;
 
 private:
 

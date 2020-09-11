@@ -122,9 +122,7 @@ PropertyNotification::PropertyNotification(Object& object,
   }
 }
 
-PropertyNotification::~PropertyNotification()
-{
-}
+PropertyNotification::~PropertyNotification() = default;
 
 bool PropertyNotification::EvalFalse( const Dali::PropertyInput& value, RawArgumentContainer& arg )
 {

@@ -60,9 +60,7 @@ void shaderBinaryFilename( size_t shaderHash, std::string& filename )
 
 }
 
-ShaderFactory::ShaderFactory()
-{
-}
+ShaderFactory::ShaderFactory() = default;
 
 ShaderFactory::~ShaderFactory()
 {

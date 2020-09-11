@@ -40,14 +40,12 @@ public:
   /**
    * Constructor
    */
-  ProgramCache()
-  { }
+  ProgramCache() = default;
 
   /**
    * Destructor, virtual as this is an interface
    */
-  virtual ~ProgramCache()
-  { }
+  virtual ~ProgramCache() = default;
 
 public: // API
 

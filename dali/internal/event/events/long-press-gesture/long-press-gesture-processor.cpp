@@ -113,9 +113,7 @@ LongPressGestureProcessor::LongPressGestureProcessor()
 {
 }
 
-LongPressGestureProcessor::~LongPressGestureProcessor()
-{
-}
+LongPressGestureProcessor::~LongPressGestureProcessor() = default;
 
 void LongPressGestureProcessor::Process( Scene& scene, const LongPressGestureEvent& longPressEvent )
 {

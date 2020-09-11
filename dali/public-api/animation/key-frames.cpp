@@ -37,13 +37,9 @@ KeyFrames KeyFrames::DownCast(BaseHandle handle)
   return KeyFrames(dynamic_cast<Dali::Internal::KeyFrames*>(handle.GetObjectPtr()));
 }
 
-KeyFrames::KeyFrames()
-{
-}
+KeyFrames::KeyFrames() = default;
 
-KeyFrames::~KeyFrames()
-{
-}
+KeyFrames::~KeyFrames() = default;
 
 KeyFrames::KeyFrames(const KeyFrames& handle) = default;
 

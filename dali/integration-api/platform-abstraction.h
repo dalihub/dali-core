@@ -144,9 +144,7 @@ protected:
   /**
    * Virtual destructor.
    */
-  virtual ~PlatformAbstraction()
-  {
-  }
+  virtual ~PlatformAbstraction() = default;
 
 }; // class PlatformAbstraction
 

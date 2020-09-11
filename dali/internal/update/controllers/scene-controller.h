@@ -41,16 +41,12 @@ public:
   /**
    * Constructor
    */
-  SceneController()
-  {
-  }
+  SceneController() = default;
 
   /**
    * Destructor
    */
-  virtual ~SceneController()
-  {
-  }
+  virtual ~SceneController() = default;
 
   /**
    * Return the render message dispatcher

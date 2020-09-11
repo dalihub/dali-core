@@ -49,10 +49,7 @@ TypeRegistry *TypeRegistry::Get()
   return _reg;
 }
 
-TypeRegistry::TypeRegistry()
-{
-
-}
+TypeRegistry::TypeRegistry() = default;
 
 TypeRegistry::~TypeRegistry()
 {

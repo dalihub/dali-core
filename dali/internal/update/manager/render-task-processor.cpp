@@ -308,13 +308,9 @@ bool ProcessTasks( BufferIndex updateBufferIndex,
 
 } // Anonymous namespace.
 
-RenderTaskProcessor::RenderTaskProcessor()
-{
-}
+RenderTaskProcessor::RenderTaskProcessor() = default;
 
-RenderTaskProcessor::~RenderTaskProcessor()
-{
-}
+RenderTaskProcessor::~RenderTaskProcessor() = default;
 
 bool RenderTaskProcessor::Process( BufferIndex updateBufferIndex,
                                    RenderTaskList& renderTasks,

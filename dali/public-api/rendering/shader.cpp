@@ -31,13 +31,9 @@ Shader Shader::New(const std::string& vertexShader,
   return Shader(renderer.Get());
 }
 
-Shader::Shader()
-{
-}
+Shader::Shader() = default;
 
-Shader::~Shader()
-{
-}
+Shader::~Shader() = default;
 
 Shader::Shader(const Shader& handle) = default;
 

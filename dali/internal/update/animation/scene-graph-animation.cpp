@@ -82,9 +82,7 @@ Animation::Animation( float durationSeconds, float speedFactor, const Vector2& p
 {
 }
 
-Animation::~Animation()
-{
-}
+Animation::~Animation() = default;
 
 void Animation::operator delete( void* ptr )
 {

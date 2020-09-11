@@ -33,9 +33,7 @@ PropertyNotificationManager* PropertyNotificationManager::New()
   return new PropertyNotificationManager;
 }
 
-PropertyNotificationManager::~PropertyNotificationManager()
-{
-}
+PropertyNotificationManager::~PropertyNotificationManager() = default;
 
 void PropertyNotificationManager::PropertyNotificationCreated( PropertyNotification& propertyNotification )
 {
@@ -70,9 +68,7 @@ void PropertyNotificationManager::NotifyProperty( SceneGraph::PropertyNotificati
   }
 }
 
-PropertyNotificationManager::PropertyNotificationManager()
-{
-}
+PropertyNotificationManager::PropertyNotificationManager() = default;
 
 } // namespace Internal
 

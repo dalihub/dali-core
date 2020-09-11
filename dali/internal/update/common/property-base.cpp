@@ -26,14 +26,9 @@ namespace Internal
 
 namespace SceneGraph
 {
+PropertyBase::PropertyBase() = default;
 
-PropertyBase::PropertyBase()
-{
-}
-
-PropertyBase::~PropertyBase()
-{
-}
+PropertyBase::~PropertyBase() = default;
 
 } // namespace SceneGraph
 

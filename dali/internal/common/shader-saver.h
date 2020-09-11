@@ -50,7 +50,7 @@ protected:
    * Destructor. Protected as no derived class should ever be deleted
    * through a reference to this pure abstract interface.
    */
-  virtual ~ShaderSaver(){}
+  virtual ~ShaderSaver() = default;
 };
 
 } // namespace Internal

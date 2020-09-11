@@ -28,23 +28,16 @@ GestureDetector::GestureDetector(Internal::GestureDetector* internal)
 {
 }
 
-GestureDetector::GestureDetector()
-{
-}
+GestureDetector::GestureDetector() = default;
 
 GestureDetector GestureDetector::DownCast(BaseHandle handle)
 {
   return GestureDetector(dynamic_cast<Dali::Internal::GestureDetector*>(handle.GetObjectPtr()));
 }
 
-GestureDetector::~GestureDetector()
-{
-}
+GestureDetector::~GestureDetector() = default;
 
-GestureDetector::GestureDetector(const GestureDetector& handle)
-: Handle(handle)
-{
-}
+GestureDetector::GestureDetector(const GestureDetector& handle) = default;
 
 GestureDetector& GestureDetector::operator=(const GestureDetector& rhs)
 {

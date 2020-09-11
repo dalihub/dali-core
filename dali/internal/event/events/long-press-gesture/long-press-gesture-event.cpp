@@ -30,9 +30,7 @@ LongPressGestureEvent::LongPressGestureEvent( GestureState state )
 {
 }
 
-LongPressGestureEvent::~LongPressGestureEvent()
-{
-}
+LongPressGestureEvent::~LongPressGestureEvent() = default;
 
 } // namespace Internal
 

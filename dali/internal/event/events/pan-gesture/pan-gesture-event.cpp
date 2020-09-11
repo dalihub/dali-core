@@ -32,9 +32,7 @@ PanGestureEvent::PanGestureEvent(GestureState state)
 {
 }
 
-PanGestureEvent::~PanGestureEvent()
-{
-}
+PanGestureEvent::~PanGestureEvent() = default;
 
 } // namespace Internal
 

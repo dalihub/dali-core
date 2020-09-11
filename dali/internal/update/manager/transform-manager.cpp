@@ -82,8 +82,7 @@ TransformManager::TransformManager()
  mReorder(false)
 {}
 
-TransformManager::~TransformManager()
-{}
+TransformManager::~TransformManager() = default;
 
 TransformId TransformManager::CreateTransform()
 {

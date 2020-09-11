@@ -47,9 +47,7 @@ DiscardQueue::DiscardQueue( RenderQueue& renderQueue )
 {
 }
 
-DiscardQueue::~DiscardQueue()
-{
-}
+DiscardQueue::~DiscardQueue() = default;
 
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Node* node )
 {

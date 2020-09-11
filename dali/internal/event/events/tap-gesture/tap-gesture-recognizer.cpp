@@ -55,9 +55,7 @@ TapGestureRecognizer::TapGestureRecognizer( Observer& observer, Vector2 screenSi
 {
 }
 
-TapGestureRecognizer::~TapGestureRecognizer()
-{
-}
+TapGestureRecognizer::~TapGestureRecognizer() = default;
 
 void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
 {

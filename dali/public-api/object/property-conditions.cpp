@@ -29,9 +29,7 @@ PropertyCondition::PropertyCondition()
 {
 }
 
-PropertyCondition::~PropertyCondition()
-{
-}
+PropertyCondition::~PropertyCondition() = default;
 
 PropertyCondition::PropertyCondition(const PropertyCondition& handle) = default;
 

@@ -50,9 +50,7 @@ public:
   /**
    * Non-virtual destructor; PropertyAccessor is not suitable as a base class.
    */
-  ~PropertyAccessor()
-  {
-  }
+  ~PropertyAccessor() = default;
 
   /**
    * Query whether the accessor is set.
@@ -142,9 +140,7 @@ public:
   /**
    * Non-virtual destructor; PropertyAccessor is not suitable as a base class.
    */
-  ~TransformManagerPropertyAccessor()
-  {
-  }
+  ~TransformManagerPropertyAccessor() = default;
 
   /**
    * Query whether the accessor is set.
@@ -235,9 +231,7 @@ public:
   /**
    * Non-virtual destructor; PropertyAccessor is not suitable as a base class.
    */
-  ~TransformManagerPropertyComponentAccessor()
-  {
-  }
+  ~TransformManagerPropertyComponentAccessor() = default;
 
   /**
    * Query whether the accessor is set.

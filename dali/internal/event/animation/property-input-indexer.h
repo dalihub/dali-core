@@ -73,9 +73,7 @@ public:
   /**
    * Virtual Destructor
    */
-  ~PropertyInputIndexer() override
-  {
-  }
+  ~PropertyInputIndexer() override = default;
 
   /**
    * @copydoc Dali::Internal::PropertyInput::GetType()
