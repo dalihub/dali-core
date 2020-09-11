@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,38 @@
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/manager/update-manager.h>
+
+// EXTERNAL INCLUDES
+#include <cstring>
+
+namespace
+{
+const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
+} // namespace
 
 namespace Dali
 {
 namespace Internal
 {
-
-TexturePtr Texture::New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height )
+TexturePtr Texture::New(TextureType::Type type, Pixel::Format format, unsigned int width, unsigned int height)
 {
-  constexpr auto max_value = std::numeric_limits< uint16_t >::max();
-  DALI_ASSERT_ALWAYS( ( width < max_value )&&( height < max_value )&& "Size out of range" );
-  TexturePtr texture( new Texture( type, format, ImageDimensions( width, height) ) );
+  constexpr auto max_value = std::numeric_limits<uint16_t>::max();
+  DALI_ASSERT_ALWAYS((width < max_value) && (height < max_value) && "Size out of range");
+  TexturePtr texture(new Texture(type, format, ImageDimensions(width, height)));
   texture->Initialize();
   return texture;
 }
 
-TexturePtr Texture::New( NativeImageInterface& nativeImageInterface )
+TexturePtr Texture::New(NativeImageInterface& nativeImageInterface)
 {
-  TexturePtr texture( new Texture( &nativeImageInterface ) );
+  TexturePtr texture(new Texture(&nativeImageInterface));
   texture->Initialize();
 
   // Request event processing and update forcely.
-  texture->mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );
+  texture->mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle(true);
   texture->mEventThreadServices.ForceNextUpdate();
   return texture;
 }
@@ -53,112 +60,115 @@ Render::Texture* Texture::GetRenderObject() const
   return mRenderObject;
 }
 
-Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size )
-: mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( nullptr ),
+Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size)
+: mEventThreadServices(EventThreadServices::Get()),
+  mRenderObject(nullptr),
   mNativeImage(),
-  mSize( size ),
-  mType( type ),
-  mFormat( format )
+  mSize(size),
+  mType(type),
+  mFormat(format)
 {
 }
 
-Texture::Texture( NativeImageInterfacePtr nativeImageInterface )
-: mEventThreadServices( EventThreadServices::Get() ),
-  mRenderObject( nullptr ),
-  mNativeImage( nativeImageInterface ),
-  mSize( nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight() ),
-  mType( TextureType::TEXTURE_2D ),
-  mFormat( Pixel::RGB888 )
+Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
+: mEventThreadServices(EventThreadServices::Get()),
+  mRenderObject(nullptr),
+  mNativeImage(nativeImageInterface),
+  mSize(nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight()),
+  mType(TextureType::TEXTURE_2D),
+  mFormat(Pixel::RGB888)
 {
 }
 
 void Texture::Initialize()
 {
-  if( EventThreadServices::IsCoreRunning() )
+  if(EventThreadServices::IsCoreRunning())
   {
-    if( mNativeImage )
+    if(mNativeImage)
     {
-      mRenderObject = new Render::Texture( mNativeImage );
+      mRenderObject = new Render::Texture(mNativeImage);
     }
     else
     {
-      mRenderObject = new Render::Texture( mType, mFormat, mSize );
+      mRenderObject = new Render::Texture(mType, mFormat, mSize);
     }
 
-    OwnerPointer< Render::Texture > transferOwnership( mRenderObject );
-    AddTexture( mEventThreadServices.GetUpdateManager(), transferOwnership );
+    OwnerPointer<Render::Texture> transferOwnership(mRenderObject);
+    AddTexture(mEventThreadServices.GetUpdateManager(), transferOwnership);
   }
 }
 
 Texture::~Texture()
 {
-  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
   {
-    RemoveTexture( mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    RemoveTexture(mEventThreadServices.GetUpdateManager(), *mRenderObject);
   }
 }
 
-bool Texture::Upload( PixelDataPtr pixelData )
+bool Texture::Upload(PixelDataPtr pixelData)
 {
-  return Upload( pixelData, 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight() );
+  return Upload(pixelData, 0u, 0u, 0u, 0u, pixelData->GetWidth(), pixelData->GetHeight());
 }
 
-bool Texture::Upload( PixelDataPtr pixelData,
-                      unsigned int layer, unsigned int mipmap,
-                      unsigned int xOffset, unsigned int yOffset,
-                      unsigned int width, unsigned int height )
+bool Texture::Upload(PixelDataPtr pixelData,
+                     unsigned int layer,
+                     unsigned int mipmap,
+                     unsigned int xOffset,
+                     unsigned int yOffset,
+                     unsigned int width,
+                     unsigned int height)
 {
-  constexpr auto max_value = std::numeric_limits< uint16_t >::max();
-  DALI_ASSERT_ALWAYS( layer < max_value &&
-                      mipmap < max_value &&
-                      xOffset < max_value &&
-                      yOffset < max_value &&
-                      width < max_value &&
-                      height < max_value &&
-                      "Parameter value out of range" );
+  constexpr auto max_value = std::numeric_limits<uint16_t>::max();
+  DALI_ASSERT_ALWAYS(layer < max_value &&
+                     mipmap < max_value &&
+                     xOffset < max_value &&
+                     yOffset < max_value &&
+                     width < max_value &&
+                     height < max_value &&
+                     "Parameter value out of range");
 
   bool result(false);
-  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
   {
-    if( mNativeImage )
+    if(mNativeImage)
     {
-      DALI_LOG_ERROR( "OpenGL ES does not support uploading data to native texture\n");
+      DALI_LOG_ERROR("OpenGL ES does not support uploading data to native texture\n");
     }
     else
     {
-      unsigned int pixelDataSize = pixelData->GetWidth()*pixelData->GetHeight();
-      if( pixelData->GetBuffer() == nullptr || pixelDataSize == 0 )
+      unsigned int pixelDataSize = pixelData->GetWidth() * pixelData->GetHeight();
+      if(pixelData->GetBuffer() == nullptr || pixelDataSize == 0)
       {
-        DALI_LOG_ERROR( "PixelData is empty\n");
+        DALI_LOG_ERROR("PixelData is empty\n");
       }
       else
       {
         Pixel::Format pixelDataFormat = pixelData->GetPixelFormat();
-        if( ( pixelDataFormat == mFormat ) || ( (pixelDataFormat == Pixel::RGB888 ) && ( mFormat == Pixel::RGBA8888 ) ) )
+        if((pixelDataFormat == mFormat) || ((pixelDataFormat == Pixel::RGB888) && (mFormat == Pixel::RGBA8888)))
         {
-          if( pixelDataSize < width * height )
+          if(pixelDataSize < width * height)
           {
-            DALI_LOG_ERROR( "PixelData of an incorrect size when trying to update texture\n");
+            DALI_LOG_ERROR("PixelData of an incorrect size when trying to update texture\n");
           }
-          else if( ( xOffset + width  > ( mSize.GetWidth()  / (1u << mipmap) ) ) ||
-              ( yOffset + height > ( mSize.GetHeight() / (1u << mipmap) ) ) )
+          else if((xOffset + width > (mSize.GetWidth() / (1u << mipmap))) ||
+                  (yOffset + height > (mSize.GetHeight() / (1u << mipmap))))
           {
-            DALI_LOG_ERROR( "Texture update area out of bounds\n");
+            DALI_LOG_ERROR("Texture update area out of bounds\n");
           }
           else
           {
             //Parameters are correct. Send message to upload data to the texture
-            UploadParams params = { static_cast< uint16_t >( layer ),
-                                    static_cast< uint16_t >( mipmap ),
-                                    static_cast< uint16_t >( xOffset ),
-                                    static_cast< uint16_t >( yOffset ),
-                                    static_cast< uint16_t >( width ),
-                                    static_cast< uint16_t >( height ) };
-            UploadTextureMessage( mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params );
+            UploadParams params = {static_cast<uint16_t>(layer),
+                                   static_cast<uint16_t>(mipmap),
+                                   static_cast<uint16_t>(xOffset),
+                                   static_cast<uint16_t>(yOffset),
+                                   static_cast<uint16_t>(width),
+                                   static_cast<uint16_t>(height)};
+            UploadTextureMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, pixelData, params);
 
             // Request event processing and update forcely
-            mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle( true );
+            mEventThreadServices.GetRenderController().RequestProcessEventsOnIdle(true);
             mEventThreadServices.ForceNextUpdate();
 
             result = true;
@@ -166,7 +176,7 @@ bool Texture::Upload( PixelDataPtr pixelData,
         }
         else
         {
-          DALI_LOG_ERROR( "Bad format\n");
+          DALI_LOG_ERROR("Bad format\n");
         }
       }
     }
@@ -177,9 +187,9 @@ bool Texture::Upload( PixelDataPtr pixelData,
 
 void Texture::GenerateMipmaps()
 {
-  if( EventThreadServices::IsCoreRunning() && mRenderObject )
+  if(EventThreadServices::IsCoreRunning() && mRenderObject)
   {
-    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject );
+    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject);
   }
 }
 
@@ -191,6 +201,47 @@ unsigned int Texture::GetWidth() const
 unsigned int Texture::GetHeight() const
 {
   return mSize.GetHeight();
+}
+
+bool Texture::IsNative() const
+{
+  return mNativeImage != nullptr;
+}
+
+bool Texture::ApplyNativeFragmentShader(std::string& shader)
+{
+  std::string fragmentShader;
+  bool        modified = false;
+  if(mNativeImage != nullptr && !shader.empty())
+  {
+    const char* fragmentPrefix        = mNativeImage->GetCustomFragmentPrefix();
+    const char* customSamplerTypename = mNativeImage->GetCustomSamplerTypename();
+
+    if(fragmentPrefix != nullptr)
+    {
+      modified       = true;
+      fragmentShader = fragmentPrefix;
+      fragmentShader += "\n";
+    }
+    fragmentShader += shader;
+
+    if(customSamplerTypename != nullptr)
+    {
+      modified   = true;
+      size_t pos = fragmentShader.find(DEFAULT_SAMPLER_TYPENAME);
+      if(pos < fragmentShader.length())
+      {
+        fragmentShader.replace(pos, strlen(DEFAULT_SAMPLER_TYPENAME), customSamplerTypename);
+      }
+    }
+  }
+
+  if(modified)
+  {
+    shader = fragmentShader;
+  }
+
+  return modified;
 }
 
 } // namespace Internal

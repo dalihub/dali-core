@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/images/pixel-data-devel.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <test-native-image.h>
 
@@ -938,5 +939,124 @@ int UtcDaliTextureGetHeightNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliTextureCheckNativeP(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+
+  DALI_TEST_CHECK(nativeTexture);
+  DALI_TEST_CHECK(DevelTexture::IsNative(nativeTexture));
+  END_TEST;
+}
+
+int UtcDaliTextureCheckNativeN1(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+  Texture         texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  DALI_TEST_CHECK(texture);
+  DALI_TEST_CHECK(!DevelTexture::IsNative(texture));
+  END_TEST;
+}
+
+int UtcDaliTextureCheckNativeN2(void)
+{
+  TestApplication application;
+  Texture         texture;
+  try
+  {
+    bool native = DevelTexture::IsNative(texture);
+    DALI_TEST_CHECK(native != native);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+  END_TEST;
+}
+
+int UtcDaliTextureApplyFragShaderP1(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+  DALI_TEST_CHECK(nativeTexture);
+
+  const std::string baseFragShader =
+    "varying mediump vec4 uColor;\n"
+    "void main(){\n"
+    "  gl_FragColor=uColor;\n"
+    "}\n";
+  std::string fragShader = baseFragShader;
+  bool        applied    = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragShader);
+
+  DALI_TEST_CHECK(applied);
+  DALI_TEST_CHECK(baseFragShader.compare(fragShader));
+  DALI_TEST_CHECK(!fragShader.empty());
+  END_TEST;
+}
+
+int UtcDaliTextureApplyFragShaderP2(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+  DALI_TEST_CHECK(nativeTexture);
+
+  const std::string baseFragShader =
+    "varying mediump vec4 uColor;\n"
+    "varying vec2 vTexCoord;\n"
+    "uniform sampler2D uNative;\n"
+    "void main(){\n"
+    "  gl_FragColor=uColor*texture2D(uNative, vTexCoord);\n"
+    "}\n";
+  std::string fragShader = baseFragShader;
+  bool        applied    = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragShader);
+
+  DALI_TEST_CHECK(applied);
+  DALI_TEST_CHECK(baseFragShader.compare(fragShader));
+  DALI_TEST_CHECK(!fragShader.empty());
+  DALI_TEST_CHECK(fragShader.find("samplerExternalOES") < fragShader.length());
+  END_TEST;
+}
+
+int UtcDaliTextureApplyFragShaderN1(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+  DALI_TEST_CHECK(nativeTexture);
+
+  std::string fragShader;
+  bool        applied = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragShader);
+
+  DALI_TEST_CHECK(!applied);
+  DALI_TEST_CHECK(fragShader.empty());
+  END_TEST;
+}
+
+int UtcDaliTextureApplyFragShaderN2(void)
+{
+  TestApplication application;
+  unsigned int    width(64);
+  unsigned int    height(64);
+  Texture         texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  const std::string baseFragShader =
+    "varying mediump vec4 uColor;\n"
+    "void main(){\n"
+    "  gl_FragColor=uColor;\n"
+    "}\n";
+  std::string fragShader = baseFragShader;
+  bool        applied    = DevelTexture::ApplyNativeFragmentShader(texture, fragShader);
+
+  DALI_TEST_CHECK(!applied);
+  DALI_TEST_CHECK(!baseFragShader.compare(fragShader));
   END_TEST;
 }
